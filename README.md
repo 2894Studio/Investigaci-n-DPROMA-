@@ -4,8 +4,8 @@ Biblia de datos de investigación y sistema de agentes de Claude Code para el pr
 procesa entrevistas de research, produce hallazgos estructurados y trazables a evidencia, y los
 traduce en una web narrativa de resultados.
 
-**Estado actual:** 5 entrevistas procesadas y anonimizadas · 10 puntos de fricción documentados ·
-9 oportunidades priorizadas. Ver la web de hallazgos: se publica como Artifact al pedirlo en esta
+**Estado actual:** 6 entrevistas procesadas y anonimizadas · 18 puntos de fricción documentados ·
+17 oportunidades priorizadas. Ver la web de hallazgos: se publica como Artifact al pedirlo en esta
 sesión de Claude Code, o directamente abriendo `web/index.html` en el navegador (no requiere
 servidor ni build).
 
@@ -41,7 +41,7 @@ research de DPROMA, en vez de un conjunto de notas de reunión dispersas.
 ├── data/
 │   ├── brief-context.md               ← fuente única de las 6 categorías y 6 objetivos del brief
 │   ├── raw/                           ← transcripciones nuevas por procesar (vacío por defecto)
-│   ├── insights/                      ← un JSON por entrevista ya procesada (5 hoy)
+│   ├── insights/                      ← un JSON por entrevista ya procesada (6 hoy)
 │   └── aggregate.json                 ← dataset acumulado — la biblia de datos completa
 └── web/
     └── index.html                     ← web narrativa, standalone, dataset embebido
