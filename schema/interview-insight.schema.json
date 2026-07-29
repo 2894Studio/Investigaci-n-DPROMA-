@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://2894.studio/schema/interview-insight.schema.json",
+  "title": "InterviewInsight",
+  "description": "Registro estructurado del análisis de una entrevista de investigación DPROMA x 2894_",
+  "type": "object",
+  "required": ["meta", "workflows", "pain_points", "tools_inventory", "ai_adoption", "opportunities", "narrative"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["entrevista_id", "rol_area", "fecha", "anonimizado"],
+      "properties": {
+        "entrevista_id": { "type": "string", "description": "Identificador anonimizado, formato <fecha-ISO>_<rol-en-kebab-case>. Nunca contiene el nombre real." },
+        "rol_area": { "type": "string", "description": "Rol/área del entrevistado, ej. 'Seguimiento del proceso con proveedor tecnológico'" },
+        "fecha": { "type": "string", "format": "date" },
+        "duracion_minutos": { "type": "integer", "minimum": 0 },
+        "anonimizado": { "type": "boolean", "const": true }
+      }
+    },
+    "workflows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["proceso", "pasos"],
+        "properties": {
+          "proceso": { "type": "string" },
+          "disparador": { "type": "string" },
+          "frecuencia": { "type": "string" },
+          "dueño_de_facto": { "type": "string" },
+          "pasos": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["orden", "actor", "accion", "herramienta_o_canal"],
+              "properties": {
+                "orden": { "type": "integer", "minimum": 1 },
+                "actor": { "type": "string" },
+                "accion": { "type": "string" },
+                "herramienta_o_canal": { "type": "string" },
+                "evidencia_timestamp": { "type": "string" },
+                "unclear": { "type": "boolean", "default": false }
+              }
+            }
+          }
+        }
+      }
+    },
+    "pain_points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "categorias", "descripcion", "severidad"],
+        "properties": {
+          "id": { "type": "string" },
+          "categorias": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "falta_centralizacion",
+                "falta_formatos_comunes",
+                "gestion_por_whatsapp",
+                "trabajo_manual",
+                "falta_governance_ia",
+                "falta_visibilidad_kpis"
+              ]
+            },
+            "minItems": 1
+          },
+          "descripcion": { "type": "string" },
+          "severidad": { "type": "string", "enum": ["baja", "media", "alta"] },
+          "evidencia": { "type": "string", "maxLength": 400 },
+          "evidencia_timestamp": { "type": "string" },
+          "roles_afectados": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "tools_inventory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["herramienta", "tipo", "nivel_adopcion", "origen"],
+        "properties": {
+          "herramienta": { "type": "string" },
+          "tipo": { "type": "string", "enum": ["manual", "digital_no_ia", "ia"] },
+          "contexto_de_uso": { "type": "string" },
+          "nivel_adopcion": { "type": "string", "enum": ["ninguna", "basica", "intermedia", "avanzada"] },
+          "origen": { "type": "string", "enum": ["personal_informal", "organizacional"] },
+          "evidencia_timestamp": { "type": "string" }
+        }
+      }
+    },
+    "ai_adoption": {
+      "type": "object",
+      "required": ["nivel_uso_actual", "actitud"],
+      "properties": {
+        "nivel_uso_actual": { "type": "string", "enum": ["ninguno", "basico", "intermedio", "avanzado"] },
+        "casos_de_uso": { "type": "array", "items": { "type": "string" } },
+        "barreras": { "type": "array", "items": { "type": "string" } },
+        "actitud": { "type": "string", "enum": ["resistente", "cauteloso", "curioso", "impulsor"] },
+        "evidencia_timestamp": { "type": "string" }
+      }
+    },
+    "opportunities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "titulo", "descripcion", "pain_points_relacionados", "objetivo_dproma_relacionado", "impacto", "esfuerzo"],
+        "properties": {
+          "id": { "type": "string" },
+          "titulo": { "type": "string" },
+          "descripcion": { "type": "string" },
+          "pain_points_relacionados": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "objetivo_dproma_relacionado": {
+            "type": "array",
+            "items": { "type": "integer", "minimum": 1, "maximum": 6 },
+            "minItems": 1,
+            "description": "1=Centralizar en CRM, 2=Conocer a profundidad cada área, 3=Integrar IA responsablemente, 4=Estandarizar procesos/formatos, 5=Formar al equipo en Gemini, 6=App offline para instaladores"
+          },
+          "impacto": { "type": "string", "enum": ["bajo", "medio", "alto"] },
+          "esfuerzo": { "type": "string", "enum": ["bajo", "medio", "alto"] }
+        }
+      }
+    },
+    "narrative": {
+      "type": "object",
+      "required": ["persona_arquetipo", "vinetas"],
+      "properties": {
+        "persona_arquetipo": { "type": "string" },
+        "vinetas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["texto", "anonymization_check"],
+            "properties": {
+              "texto": { "type": "string", "maxLength": 700 },
+              "pain_points_relacionados": { "type": "array", "items": { "type": "string" } },
+              "anonymization_check": { "type": "string", "enum": ["passed", "needs_review"] }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Un día cualquiera en DPROMA — Hallazgos de investigación</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root{
+  --bg:#FAF8F5;
+  --surface:#FFFFFF;
+  --surface-tint:#F4F1FC;
+  --line:#ECE7E0;
+  --text:#1C1B22;
+  --text-dim:#716C79;
+  --blue:#3FA9F5;
+  --indigo:#6C6BF5;
+  --amber:#F0A93B;
+  --rose:#E8735F;
+  --green:#3FB88A;
+  --shadow: 0 20px 44px rgba(28,27,34,0.07), 0 2px 8px rgba(28,27,34,0.04);
+  --shadow-lift: 0 26px 60px rgba(28,27,34,0.12), 0 4px 12px rgba(28,27,34,0.06);
+}
+.p-admin   {--g1:#3FA9F5; --g2:#3FE0D0;}
+.p-ops     {--g1:#6C6BF5; --g2:#3FA9F5;}
+.p-almacen {--g1:#F0A93B; --g2:#E8735F;}
+.p-comercial{--g1:#E8735F; --g2:#F0C23B;}
+.p-proyectos{--g1:#9B6BF5; --g2:#6C6BF5;}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'Inter',sans-serif; line-height:1.62; font-size:16px;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.serif{font-family:'Fraunces',serif; font-weight:600; letter-spacing:-0.01em;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+a{color:inherit;}
+.wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+
+nav{position:sticky; top:0; z-index:50; background:rgba(250,248,245,0.82); backdrop-filter:blur(12px); border-bottom:1px solid var(--line);}
+nav .wrap{display:flex; align-items:center; justify-content:space-between; padding:16px 24px;}
+.brand{font-family:'Fraunces',serif; font-size:1.05rem; font-weight:600;}
+.brand span{background:linear-gradient(120deg,var(--blue),var(--indigo)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+.navlinks{display:flex; gap:6px; font-size:0.88rem; background:var(--surface); padding:5px; border-radius:100px; border:1px solid var(--line);}
+.navlinks a{color:var(--text-dim); text-decoration:none; padding:8px 16px; border-radius:100px; transition:all .15s;}
+.navlinks a:hover{color:var(--text); background:var(--surface-tint);}
+
+.hero{padding:96px 0 76px; position:relative; overflow:hidden;}
+.blob{position:absolute; border-radius:50%; filter:blur(60px); opacity:0.35; z-index:0;}
+.blob-1{width:460px; height:460px; background:radial-gradient(circle,var(--blue),transparent 70%); top:-180px; right:-120px;}
+.blob-2{width:340px; height:340px; background:radial-gradient(circle,var(--amber),transparent 70%); bottom:-140px; left:-80px; opacity:0.25;}
+.hero-inner{position:relative; z-index:1; display:grid; grid-template-columns:1.15fr 0.85fr; gap:56px; align-items:center;}
+.eyebrow{display:inline-flex; align-items:center; gap:8px; color:var(--indigo); font-size:0.78rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; background:var(--surface-tint); padding:7px 14px; border-radius:100px; margin-bottom:22px;}
+.eyebrow::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--indigo);}
+.hero h1{font-size:clamp(2rem,4.4vw,3.1rem); line-height:1.14; margin:0 0 22px;}
+.hero p.lede{font-size:1.08rem; color:var(--text-dim); max-width:520px; margin:0;}
+
+.chatcard{background:var(--surface); border:1px solid var(--line); border-radius:24px; box-shadow:var(--shadow-lift); padding:22px; position:relative;}
+.chatcard .chat-head{display:flex; align-items:center; gap:10px; padding-bottom:14px; border-bottom:1px solid var(--line); margin-bottom:16px;}
+.chat-head .avatar{width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#25D366,#128C7E);}
+.chat-head .who{font-size:0.86rem; font-weight:600;}
+.chat-head .sub{font-size:0.74rem; color:var(--text-dim);}
+.bubble-msg{max-width:82%; padding:10px 14px; border-radius:16px; font-size:0.86rem; margin-bottom:10px; line-height:1.45;}
+.bubble-in{background:var(--surface-tint); border-bottom-left-radius:4px;}
+.bubble-out{background:linear-gradient(135deg,#DCF8C6,#CFF3D2); margin-left:auto; border-bottom-right-radius:4px;}
+.bubble-time{font-size:0.66rem; color:var(--text-dim); display:block; margin-top:4px; text-align:right;}
+.chat-footer{margin-top:16px; padding-top:14px; border-top:1px dashed var(--line); font-size:0.76rem; color:var(--text-dim); display:flex; align-items:center; gap:8px;}
+.chat-footer .dot{width:7px; height:7px; border-radius:50%; background:var(--rose);}
+
+.stat-row{display:flex; gap:14px; margin-top:52px; flex-wrap:wrap; position:relative; z-index:1;}
+.stat{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:18px 22px; box-shadow:var(--shadow); flex:1; min-width:150px;}
+.stat .n{font-family:'Fraunces',serif; font-size:2rem; font-weight:600; background:linear-gradient(120deg,var(--blue),var(--indigo)); -webkit-background-clip:text; background-clip:text; color:transparent; line-height:1;}
+.stat .l{font-size:0.8rem; color:var(--text-dim); margin-top:6px;}
+
+section.block{padding:92px 0;}
+.block .kicker{display:inline-block; color:var(--indigo); font-weight:600; font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase; background:var(--surface-tint); padding:6px 14px; border-radius:100px; margin-bottom:16px;}
+.block h2{font-size:clamp(1.5rem,3.1vw,2.15rem); margin:0 0 14px;}
+.block .intro{color:var(--text-dim); max-width:600px; margin-bottom:46px; font-size:1.02rem;}
+
+.voice-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px;}
+.voice-card{background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:28px; box-shadow:var(--shadow); transition:transform .2s, box-shadow .2s;}
+.voice-card:hover{transform:translateY(-4px); box-shadow:var(--shadow-lift);}
+.voice-top{display:flex; align-items:center; gap:12px; margin-bottom:18px;}
+.avatar-orb{width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,var(--g1),var(--g2)); flex-shrink:0;}
+.voice-top .role{font-family:'Fraunces',serif; font-size:1rem; font-weight:600; line-height:1.25;}
+.voice-card blockquote{margin:0; font-size:0.97rem; font-style:italic; color:var(--text);}
+.voice-card blockquote::before{content:"\201C";}
+.voice-card blockquote::after{content:"\201D";}
+.tag-row{margin-top:18px; display:flex; gap:8px; flex-wrap:wrap;}
+.tag{font-size:0.72rem; padding:5px 12px; border-radius:100px; background:var(--surface-tint); color:var(--indigo); font-weight:600;}
+
+.flow{margin-bottom:46px;}
+.flow-head{display:flex; align-items:center; gap:12px; margin-bottom:20px;}
+.flow-head .avatar-orb{width:30px; height:30px;}
+.flow-title{font-size:1.08rem; font-weight:600;}
+.flow-meta{color:var(--text-dim); font-size:0.82rem;}
+.flow-track{display:flex; overflow-x:auto; gap:16px; padding:6px 6px 16px;}
+.flow-step{min-width:210px; flex-shrink:0; background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:16px 18px; position:relative; box-shadow:var(--shadow);}
+.flow-step:not(:last-child)::after{content:"›"; position:absolute; right:-16px; top:50%; transform:translateY(-50%); color:var(--text-dim); font-size:1.3rem;}
+.chan-pill{display:inline-flex; align-items:center; gap:6px; font-size:0.72rem; font-weight:600; padding:4px 10px; border-radius:100px; margin-bottom:10px;}
+.chan-pill .d{width:7px; height:7px; border-radius:50%;}
+.flow-step .actor{font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:5px;}
+.flow-step .action{font-size:0.9rem;}
+.legend{display:flex; gap:20px; margin-bottom:38px; flex-wrap:wrap; font-size:0.82rem; color:var(--text-dim);}
+.legend .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle;}
+
+.cat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:12px;}
+.cat-card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:22px; cursor:pointer; box-shadow:var(--shadow); transition:transform .15s;}
+.cat-card:hover{transform:translateY(-2px);}
+.cat-card .count{font-family:'Fraunces',serif; font-size:1.9rem; font-weight:600; color:var(--rose);}
+.cat-card .name{font-size:0.88rem; color:var(--text-dim); margin-top:4px;}
+.pain-list{display:none; flex-direction:column; gap:12px; margin:14px 0 34px;}
+.pain-list.open{display:flex;}
+.pain-item{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px 20px; box-shadow:var(--shadow);}
+.pain-item .sev{font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; padding:3px 10px; border-radius:100px;}
+.sev-alta{color:#B23A2C; background:#FBEAE7;} .sev-media{color:#8A5A0F; background:#FBF0DC;} .sev-baja{color:#1F7A54; background:#E4F5EC;}
+.pain-item p{margin:10px 0 0; font-size:0.94rem;}
+.pain-item .roles{margin-top:10px; font-size:0.78rem; color:var(--text-dim);}
+
+.matrix{position:relative; height:400px; background:var(--surface); border:1px solid var(--line); border-radius:20px; margin-bottom:28px; box-shadow:var(--shadow);}
+.axis-label{position:absolute; font-size:0.74rem; color:var(--text-dim); font-weight:600;}
+.axis-x{bottom:-30px; left:50%; transform:translateX(-50%);}
+.axis-y{left:-14px; top:50%; transform:rotate(-90deg) translateX(50%); transform-origin:left;}
+.bubble{position:absolute; width:16px; height:16px; border-radius:50%; border:3px solid var(--surface); cursor:pointer; transition:transform .15s; box-shadow:0 2px 6px rgba(0,0,0,0.15);}
+.bubble:hover{transform:scale(1.7); z-index:10;}
+.bubble-tip{display:none; position:absolute; width:260px; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px 18px; font-size:0.85rem; z-index:20; box-shadow:var(--shadow-lift); bottom:26px; left:50%; transform:translateX(-50%);}
+.bubble:hover .bubble-tip{display:block;}
+.grid-lines{position:absolute; inset:20px;}
+.grid-lines .h{position:absolute; left:0; right:0; top:50%; border-top:1px dashed var(--line);}
+.grid-lines .v{position:absolute; top:0; bottom:0; left:50%; border-left:1px dashed var(--line);}
+.quad-label{position:absolute; font-size:0.7rem; color:var(--text-dim); font-weight:600; padding:14px;}
+
+.closing{padding:88px 0 70px;}
+.closing h2{max-width:640px;}
+.open-q{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin-top:34px;}
+.open-q .q{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:20px 22px; font-size:0.94rem; box-shadow:var(--shadow);}
+.open-q .q::before{content:"?"; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--surface-tint); color:var(--indigo); font-weight:700; font-size:0.78rem; margin-right:10px;}
+footer{padding:44px 24px; text-align:center; color:var(--text-dim); font-size:0.82rem; border-top:1px solid var(--line);}
+
+@media (max-width:860px){ .hero-inner{grid-template-columns:1fr;} }
+@media (max-width:640px){
+  .navlinks{display:none;}
+  .hero{padding:64px 0 52px;}
+  section.block{padding:60px 0;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">DPROMA <span>× investigación</span></div>
+    <div class="navlinks">
+      <a href="#voces">Voces</a>
+      <a href="#flujos">Flujos</a>
+      <a href="#friccion">Fricciones</a>
+      <a href="#oportunidades">Oportunidades</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="wrap hero-inner">
+    <div>
+      <div class="eyebrow">Fase 1 · hallazgos de campo</div>
+      <h1>Un martes cualquiera, la operación de DPROMA vive dentro de un chat de WhatsApp.</h1>
+      <p class="lede">Cinco personas nos contaron cómo hacen su trabajo hoy: dando de alta clientes, programando instalaciones, controlando materiales, vendiendo administración vehicular, evaluando nuevos proyectos. Esto no es un dashboard — es lo que encontramos cuando escuchamos.</p>
+    </div>
+    <div class="chatcard">
+      <div class="chat-head">
+        <div class="avatar"></div>
+        <div>
+          <div class="who">Agencia Changán · Grupo</div>
+          <div class="sub">Alta de cliente nuevo</div>
+        </div>
+      </div>
+      <div class="bubble-msg bubble-in">Hola, ya tenemos comprador de un eléctrico, ¿qué necesitan para dar de alta?<span class="bubble-time">09:14</span></div>
+      <div class="bubble-msg bubble-out">Constancia de situación fiscal, comprobante de domicilio y carátula bancaria, por favor<span class="bubble-time">09:16</span></div>
+      <div class="bubble-msg bubble-in">Te los mando por correo en un momento<span class="bubble-time">09:20</span></div>
+      <div class="bubble-msg bubble-out">Perfecto, en cuanto llegue lo capturo y confirmo el alta<span class="bubble-time">09:47</span></div>
+      <div class="chat-footer"><span class="dot"></span> de aquí sale todo: Excel personal, aviso a facturación, aviso a instaladores</div>
+    </div>
+  </div>
+  <div class="wrap stat-row">
+    <div class="stat"><div class="n">5</div><div class="l">personas entrevistadas</div></div>
+    <div class="stat"><div class="n">10</div><div class="l">puntos de fricción documentados</div></div>
+    <div class="stat"><div class="n">9</div><div class="l">oportunidades identificadas</div></div>
+    <div class="stat"><div class="n">3/5</div><div class="l">ya usan IA en su rutina</div></div>
+  </div>
+</header>
+
+<section class="block" id="voces">
+  <div class="wrap">
+    <span class="kicker">Voces</span>
+    <h2>Cinco roles, cinco maneras de sostener la operación</h2>
+    <p class="intro">Cada persona entrevistada aparece aquí por su rol, no por su nombre. Son casos anónimos: lo que importa es el patrón, no quién lo dijo.</p>
+    <div class="voice-grid" id="voiceGrid"></div>
+  </div>
+</section>
+
+<section class="block" id="flujos">
+  <div class="wrap">
+    <span class="kicker">Flujos</span>
+    <h2>Así se hace hoy — no como debería ser</h2>
+    <p class="intro">Reconstrucción paso a paso de los procesos más mencionados, con el canal real de cada paso.</p>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--amber)"></span>WhatsApp / verbal</span>
+      <span><span class="dot" style="background:var(--blue)"></span>Digital (Excel, correo, CAD, Maps)</span>
+      <span><span class="dot" style="background:var(--green)"></span>Con apoyo de IA</span>
+    </div>
+    <div id="flowContainer"></div>
+  </div>
+</section>
+
+<section class="block" id="friccion">
+  <div class="wrap">
+    <span class="kicker">Fricciones</span>
+    <h2>Dónde duele hoy, agrupado como lo ve DPROMA</h2>
+    <p class="intro">Usamos las mismas 6 categorías del briefing del proyecto. Click en una categoría para ver la evidencia.</p>
+    <div class="cat-grid" id="catGrid"></div>
+    <div id="painDetail"></div>
+  </div>
+</section>
+
+<section class="block" id="oportunidades">
+  <div class="wrap">
+    <span class="kicker">Oportunidades</span>
+    <h2>Qué vale la pena resolver primero</h2>
+    <p class="intro">Cada oportunidad nace de un dolor real. Impacto vs. esfuerzo — pasa el mouse sobre cada punto.</p>
+    <div class="matrix" id="matrix">
+      <div class="grid-lines"><div class="h"></div><div class="v"></div></div>
+      <div class="quad-label" style="top:0; right:0;">alto impacto · bajo esfuerzo</div>
+      <div class="quad-label" style="bottom:0; left:0;">bajo impacto · alto esfuerzo</div>
+      <div class="axis-label axis-x">esfuerzo →</div>
+      <div class="axis-label axis-y">impacto →</div>
+    </div>
+  </div>
+</section>
+
+<section class="block closing">
+  <div class="wrap">
+    <span class="kicker">Lo que sigue</span>
+    <h2>Esto es investigación en curso, no un veredicto cerrado</h2>
+    <p class="intro">Cinco entrevistas dan dirección, no dan certeza estadística. Estas son las preguntas abiertas para la siguiente ronda.</p>
+    <div class="open-q">
+      <div class="q">¿Están representadas todas las personas necesarias para construir el flujo end-to-end del CRM?</div>
+      <div class="q">¿Cómo impacta hoy la operación interna en la experiencia del cliente final?</div>
+      <div class="q">Al terminar las tres fases del proyecto, ¿qué tendría que haber cambiado para considerar esto un éxito?</div>
+      <div class="q">¿Existe alguna restricción de presupuesto o integración obligatoria aún no puesta sobre la mesa?</div>
+    </div>
+  </div>
+</section>
+
+<footer>2894_ Studio × DPROMA — hallazgos anonimizados de investigación, julio 2026</footer>
+
+<script>
+const DATA = {
+"entrevistas": [
+  {"meta":{"entrevista_id":"2026-07-16_soporte-administrativo-transversal","rol_area":"Soporte administrativo transversal","fecha":"2026-07-16","persona_class":"p-admin"},
+   "workflows":[{"proceso":"Alta de cliente (agencia automotriz) en el padrón","pasos":[
+      {"actor":"Ventas","accion":"Abre grupo de WhatsApp con la agencia","herramienta_o_canal":"WhatsApp","canal_tipo":"whatsapp"},
+      {"actor":"Soporte admin.","accion":"Solicita documentos fiscales y bancarios","herramienta_o_canal":"WhatsApp","canal_tipo":"whatsapp"},
+      {"actor":"Agencia","accion":"Envía documentos","herramienta_o_canal":"Correo","canal_tipo":"digital"},
+      {"actor":"Soporte admin.","accion":"Captura manual en Excel propio","herramienta_o_canal":"Excel","canal_tipo":"digital"},
+      {"actor":"Soporte admin.","accion":"Confirma alta y notifica áreas","herramienta_o_canal":"WhatsApp/correo","canal_tipo":"whatsapp"}
+   ]}],
+   "pain_points":[
+     {"id":"pp-001","categorias":["gestion_por_whatsapp","trabajo_manual","falta_centralizacion"],"descripcion":"El alta de clientes depende de solicitudes por WhatsApp y captura manual en Excel personal, sin formularios digitales de captura directa.","severidad":"alta","roles_afectados":["soporte administrativo","facturación","instalaciones"]},
+     {"id":"pp-002","categorias":["falta_centralizacion","falta_formatos_comunes"],"descripcion":"No existe repositorio centralizado de contratos comerciales; cada área los guarda localmente, provocando cobros inconsistentes con lo pactado.","severidad":"alta","roles_afectados":["jurídico","facturación","cobranza","instalaciones"]},
+     {"id":"pp-003","categorias":["gestion_por_whatsapp","falta_visibilidad_kpis"],"descripcion":"Una campaña de marketing sin infraestructura humana suficiente generó pérdida masiva de prospectos por WhatsApp.","severidad":"alta","roles_afectados":["ventas","marketing"]}
+   ],
+   "ai_adoption":{"nivel_uso_actual":"ninguno"},
+   "opportunities":[
+     {"id":"op-001","titulo":"Formulario digital de alta de cliente","descripcion":"Sustituir la solicitud por WhatsApp y captura manual en Excel por un formulario digital conectado al padrón del CRM.","impacto":"alto","esfuerzo":"medio"},
+     {"id":"op-002","titulo":"Repositorio único de contratos con custodia jurídica","descripcion":"Jurídico como único custodio del repositorio, con permisos diferenciados por área.","impacto":"alto","esfuerzo":"medio"},
+     {"id":"op-003","titulo":"Checklist de capacidad operativa antes de campañas","descripcion":"Validar personal disponible antes de lanzar campañas de marketing.","impacto":"medio","esfuerzo":"bajo"}
+   ],
+   "narrative":{"persona_arquetipo":"Quien sostiene el alta de clientes y la relación administrativa con las agencias","vinetas":[
+     {"texto":"Cada agencia nueva llega por un grupo de WhatsApp. De ahí salen los documentos fiscales, el comprobante de domicilio, la carátula bancaria — y todo termina capturado a mano en un Excel personal antes de poder confirmar el alta. No hay un formulario, hay una persona sosteniendo el proceso con paciencia y una hoja de cálculo."},
+     {"texto":"Una campaña de redes sociales funcionó mejor de lo esperado: más de 200 mensajes de WhatsApp en pocos días. El problema no fue conseguir el interés, fue no tener a nadie disponible para responder — casi todos esos contactos se perdieron."}
+   ]}
+  },
+  {"meta":{"entrevista_id":"2026-07-22_coordinacion-tecnica-instalaciones","rol_area":"Coordinación técnica de instalaciones","fecha":"2026-07-22","persona_class":"p-ops"},
+   "workflows":[{"proceso":"Programación diaria de instalaciones","pasos":[
+      {"actor":"Agencia/cliente","accion":"Envía solicitud de instalación","herramienta_o_canal":"WhatsApp","canal_tipo":"whatsapp"},
+      {"actor":"Operaciones","accion":"Programa con un día de antelación","herramienta_o_canal":"WhatsApp/verbal","canal_tipo":"whatsapp"},
+      {"actor":"Operaciones","accion":"Revisa planos y cuadros de carga","herramienta_o_canal":"Documentos técnicos","canal_tipo":"digital"},
+      {"actor":"Almacén","accion":"Despacha materiales validados","herramienta_o_canal":"Verbal/WhatsApp","canal_tipo":"whatsapp"},
+      {"actor":"Operaciones","accion":"Optimiza ruta del día","herramienta_o_canal":"Google Maps + IA","canal_tipo":"ia"}
+   ]}],
+   "pain_points":[
+     {"id":"pp-004","categorias":["falta_centralizacion","trabajo_manual"],"descripcion":"Datos de clientes de distintas agencias se gestionan en archivos Excel compartidos, sin integración a una plataforma única.","severidad":"media","roles_afectados":["operaciones","instalaciones"]},
+     {"id":"pp-005","categorias":["falta_formatos_comunes","gestion_por_whatsapp"],"descripcion":"No existe proceso formal de devolución de materiales sobrantes; se gestiona informalmente por WhatsApp.","severidad":"media","roles_afectados":["operaciones","almacén"]}
+   ],
+   "ai_adoption":{"nivel_uso_actual":"avanzado"},
+   "opportunities":[
+     {"id":"op-004","titulo":"Integrar bases de clientes por agencia al CRM único","descripcion":"Migrar los Excel compartidos de clientes al módulo de clientes del CRM en desarrollo.","impacto":"medio","esfuerzo":"medio"},
+     {"id":"op-005","titulo":"Flujo formal de devolución de materiales","descripcion":"Reemplazar el aviso informal por WhatsApp por un registro estructurado en inventario.","impacto":"bajo","esfuerzo":"bajo"}
+   ],
+   "narrative":{"persona_arquetipo":"Quien coordina técnicamente las instalaciones diarias en campo","vinetas":[
+     {"texto":"Cada instalación arranca entre las 7 y las 8 de la mañana, y casi todas las solicitudes llegan por el mismo canal: un grupo de WhatsApp de una agencia. Ya usan IA para optimizar la ruta del día — la parte que falta no es tecnología, es tener esa misma solicitud en un solo lugar en vez de dispersa entre chats."}
+   ]}
+  },
+  {"meta":{"entrevista_id":"2026-07-20_gestion-almacen-inventario","rol_area":"Gestión de almacén e inventario","fecha":"2026-07-20","persona_class":"p-almacen"},
+   "workflows":[{"proceso":"Control de inventario y reabastecimiento","pasos":[
+      {"actor":"Almacén","accion":"Registra entradas y salidas en Excel propio","herramienta_o_canal":"Excel","canal_tipo":"digital"},
+      {"actor":"Almacén","accion":"Detecta mínimos de stock ('foco amarillo')","herramienta_o_canal":"Excel","canal_tipo":"digital"},
+      {"actor":"Almacén","accion":"Ante faltantes, compra de emergencia local","herramienta_o_canal":"Compra directa","canal_tipo":"whatsapp"}
+   ]}],
+   "pain_points":[
+     {"id":"pp-006","categorias":["trabajo_manual","falta_centralizacion"],"descripcion":"El control de inventario se sostiene en un Excel personal creado por una sola persona, sin integración al sistema de compras corporativo.","severidad":"media","roles_afectados":["almacén","compras"]},
+     {"id":"pp-007","categorias":["falta_visibilidad_kpis","trabajo_manual"],"descripcion":"Las compras de emergencia por desabasto elevan el costo de materiales entre 5% y 10%.","severidad":"media","roles_afectados":["almacén","finanzas"]}
+   ],
+   "ai_adoption":{"nivel_uso_actual":"basico"},
+   "opportunities":[
+     {"id":"op-006","titulo":"Integrar el control de inventario personal al módulo del CRM","descripcion":"Formalizar el Excel de mínimos/máximos ya definidos empíricamente como base del nuevo módulo de inventario.","impacto":"alto","esfuerzo":"medio"}
+   ],
+   "narrative":{"persona_arquetipo":"Quien reconstruyó desde cero el control de inventario del almacén","vinetas":[
+     {"texto":"No había ningún control cuando empezó: hubo que definir a mano cuántas piezas se usan por servicio, con variaciones que cambiaban semana a semana. El resultado es un Excel propio con mínimos y máximos que hoy evita quedarse sin material — pero solo una persona lo consulta y solo una persona lo mantiene."}
+   ]}
+  },
+  {"meta":{"entrevista_id":"2026-07-23_comercial-administracion-vehicular","rol_area":"Comercial — administración vehicular y cargadores","fecha":"2026-07-23","persona_class":"p-comercial"},
+   "workflows":[{"proceso":"Prospección y cierre comercial con concesionarias","pasos":[
+      {"actor":"Comercial","accion":"Presenta a DPROMA y garantías de servicio","herramienta_o_canal":"Visita presencial","canal_tipo":"digital"},
+      {"actor":"Comercial","accion":"Da seguimiento informal a cotizaciones","herramienta_o_canal":"WhatsApp/memoria","canal_tipo":"whatsapp"}
+   ]}],
+   "pain_points":[
+     {"id":"pp-008","categorias":["falta_centralizacion","falta_formatos_comunes"],"descripcion":"No existe una herramienta de gestión de relaciones con clientes para registrar seguimiento e historial de más de 20 clientes activos.","severidad":"alta","roles_afectados":["comercial","operaciones"]},
+     {"id":"pp-009","categorias":["gestion_por_whatsapp","falta_centralizacion"],"descripcion":"El mercado de gestoría vehicular es informal; DPROMA compite con procesos formales pero sin sistema que lo respalde aún.","severidad":"media","roles_afectados":["comercial"]}
+   ],
+   "ai_adoption":{"nivel_uso_actual":"basico"},
+   "opportunities":[
+     {"id":"op-007","titulo":"Módulo CRM comercial con historial de clientes","descripcion":"Priorizar el módulo de CRM comercial para registrar seguimiento e historial de concesionarias activas.","impacto":"alto","esfuerzo":"medio"},
+     {"id":"op-008","titulo":"Migrar seguimiento de Excel por correo a hoja colaborativa","descripcion":"Sustituir el envío de Excel por correo por una hoja colaborativa en tiempo real.","impacto":"medio","esfuerzo":"bajo"}
+   ],
+   "narrative":{"persona_arquetipo":"Quien sostiene la relación comercial con las agencias automotrices","vinetas":[
+     {"texto":"El argumento de venta es la formalidad: garantías de tiempo, procesos claros, frente a un mercado donde buena parte de los trámites se resuelven por fuera con comisiones informales. La ironía es que ese seguimiento tan formal en el discurso hoy vive en la memoria y en hilos de WhatsApp, sin un solo lugar donde consultar el historial de un cliente."}
+   ]}
+  },
+  {"meta":{"entrevista_id":"2026-07-23_direccion-proyectos-especiales","rol_area":"Dirección de proyectos especiales / expansión","fecha":"2026-07-23","persona_class":"p-proyectos"},
+   "workflows":[{"proceso":"Evaluación de viabilidad de un nuevo proyecto","pasos":[
+      {"actor":"Comercial","accion":"Transfiere planos/fotos del cliente interesado","herramienta_o_canal":"Correo/WhatsApp","canal_tipo":"whatsapp"},
+      {"actor":"Proyectos especiales","accion":"Evalúa factibilidad física y de permisos","herramienta_o_canal":"AutoCAD/Google Earth","canal_tipo":"digital"},
+      {"actor":"Proyectos especiales","accion":"Coordina validación técnica final","herramienta_o_canal":"Verbal/correo","canal_tipo":"digital"}
+   ]}],
+   "pain_points":[
+     {"id":"pp-010","categorias":["falta_formatos_comunes","falta_centralizacion"],"descripcion":"No existen formatos ni flujos documentados para proyectos nuevos; cada requerimiento se solicita de forma distinta e informal.","severidad":"media","roles_afectados":["proyectos especiales","comercial","operaciones"]}
+   ],
+   "ai_adoption":{"nivel_uso_actual":"intermedio"},
+   "opportunities":[
+     {"id":"op-009","titulo":"Formato mínimo estándar de requerimientos de proyecto","descripcion":"Definir un set mínimo de datos (planos, fotos, distancia a transformador) antes de transferir un proyecto.","impacto":"medio","esfuerzo":"bajo"}
+   ],
+   "narrative":{"persona_arquetipo":"Quien evalúa la viabilidad técnica de cada nuevo proyecto de expansión","vinetas":[
+     {"texto":"Cada proyecto nuevo llega distinto: un condominio, un estacionamiento, un centro comercial. Ya usa IA para pulir correos y convertir un croquis a mano en un render — pero la recolección de datos de partida sigue sin un formato único, así que cada vez se reinventa el punto de partida."}
+   ]}
+  }
+]};
+
+const CAT_LABELS = {
+  falta_centralizacion:"Falta de centralización",
+  falta_formatos_comunes:"Falta de formatos comunes",
+  gestion_por_whatsapp:"Gestión por WhatsApp",
+  trabajo_manual:"Trabajo 100% manual",
+  falta_governance_ia:"Sin governance de IA",
+  falta_visibilidad_kpis:"Sin visibilidad de KPIs"
+};
+const chanColor = {whatsapp:'var(--amber)', digital:'var(--blue)', ia:'var(--green)'};
+
+const voiceGrid = document.getElementById('voiceGrid');
+DATA.entrevistas.forEach(e=>{
+  const v = e.narrative.vinetas[0];
+  const div = document.createElement('div');
+  div.className = 'voice-card ' + e.meta.persona_class;
+  div.innerHTML = `<div class="voice-top">
+      <div class="avatar-orb"></div>
+      <div class="role">${e.narrative.persona_arquetipo}</div>
+    </div>
+    <blockquote>${v.texto}</blockquote>
+    <div class="tag-row"><span class="tag">IA: ${e.ai_adoption.nivel_uso_actual}</span><span class="tag">${e.pain_points.length} fricciones</span></div>`;
+  voiceGrid.appendChild(div);
+});
+
+const flowContainer = document.getElementById('flowContainer');
+DATA.entrevistas.forEach(e=>{
+  e.workflows.forEach(w=>{
+    const div = document.createElement('div');
+    div.className = 'flow';
+    let steps = w.pasos.map(p=>{
+      const isWa = p.canal_tipo === 'whatsapp';
+      const isIa = p.canal_tipo === 'ia';
+      const color = isWa ? 'var(--amber)' : isIa ? 'var(--green)' : 'var(--blue)';
+      const bg = isWa ? '#FBF0DC' : isIa ? '#E4F5EC' : '#E8F3FD';
+      return `<div class="flow-step">
+        <div class="chan-pill" style="color:${color}; background:${bg}"><span class="d" style="background:${color}"></span>${p.herramienta_o_canal}</div>
+        <div class="actor">${p.actor}</div>
+        <div class="action">${p.accion}</div>
+      </div>`;
+    }).join('');
+    div.innerHTML = `<div class="flow-head"><div class="avatar-orb ${e.meta.persona_class}"></div><div><div class="flow-title">${w.proceso}</div><div class="flow-meta">${e.meta.rol_area}</div></div></div>
+      <div class="flow-track">${steps}</div>`;
+    flowContainer.appendChild(div);
+  });
+});
+
+const allPains = DATA.entrevistas.flatMap(e=>e.pain_points.map(p=>({...p, rol:e.meta.rol_area})));
+const catGrid = document.getElementById('catGrid');
+const painDetail = document.getElementById('painDetail');
+Object.keys(CAT_LABELS).forEach(cat=>{
+  const items = allPains.filter(p=>p.categorias.includes(cat));
+  const card = document.createElement('div');
+  card.className = 'cat-card';
+  card.innerHTML = `<div class="count">${items.length}</div><div class="name">${CAT_LABELS[cat]}</div>`;
+  const list = document.createElement('div');
+  list.className = 'pain-list';
+  list.innerHTML = items.map(p=>`<div class="pain-item">
+      <span class="sev sev-${p.severidad}">Severidad ${p.severidad}</span>
+      <p>${p.descripcion}</p>
+      <div class="roles">Afecta a: ${p.roles_afectados.join(', ')} · fuente: ${p.rol}</div>
+    </div>`).join('') || '<div class="pain-item">Sin casos registrados en esta categoría todavía.</div>';
+  card.onclick = ()=>{ list.classList.toggle('open'); };
+  catGrid.appendChild(card);
+  painDetail.appendChild(list);
+});
+
+const allOps = DATA.entrevistas.flatMap(e=>e.opportunities.map(o=>({...o, rol:e.meta.rol_area, cls:e.meta.persona_class})));
+const levelToPos = {bajo:0.16, medio:0.5, alto:0.86};
+const matrix = document.getElementById('matrix');
+allOps.forEach(o=>{
+  const x = levelToPos[o.esfuerzo]*100;
+  const y = (1-levelToPos[o.impacto])*100;
+  const b = document.createElement('div');
+  b.className = 'bubble ' + o.cls;
+  b.style.background = 'linear-gradient(135deg,var(--g1),var(--g2))';
+  b.style.left = `calc(${x}% - 8px)`;
+  b.style.top = `calc(${y}% - 8px)`;
+  b.innerHTML = `<div class="bubble-tip"><strong>${o.titulo}</strong><br>${o.descripcion}<br><span style="color:var(--text-dim)">Impacto ${o.impacto} · Esfuerzo ${o.esfuerzo} · ${o.rol}</span></div>`;
+  matrix.appendChild(b);
+});
+</script>
+</body>
+</html>
