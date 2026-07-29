@@ -3,20 +3,116 @@
     "entrevista_id": "2026-07-20_gestion-almacen-inventario",
     "rol_area": "Gestión de almacén e inventario",
     "fecha": "2026-07-20",
-    "duracion_minutos": 62,
+    "duracion_minutos": 49,
     "anonimizado": true
   },
   "workflows": [
     {
-      "proceso": "Control de inventario y reabastecimiento",
-      "disparador": "Registro diario de entradas y salidas de material",
-      "frecuencia": "diaria",
-      "dueño_de_facto": "Gestión de almacén",
+      "proceso": "Levantamiento inicial de inventario y estandarización de formatos",
+      "disparador": "Incorporación reciente del responsable de almacén al puesto",
+      "frecuencia": "evento único (al inicio de la gestión)",
+      "dueño_de_facto": "Almacén",
       "pasos": [
         {
           "orden": 1,
           "actor": "Almacén",
-          "accion": "Registra entradas y salidas de material en Excel propio",
+          "accion": "Realiza conteo físico exhaustivo de todos los materiales existentes en bodega (aprox. dos días)",
+          "herramienta_o_canal": "conteo manual",
+          "evidencia_timestamp": "00:11:53",
+          "unclear": false
+        },
+        {
+          "orden": 2,
+          "actor": "Almacén",
+          "accion": "Crea un sistema propio en Excel para el control de entradas y salidas",
+          "herramienta_o_canal": "Excel",
+          "evidencia_timestamp": "00:11:53",
+          "unclear": false
+        },
+        {
+          "orden": 3,
+          "actor": "Almacén",
+          "accion": "Diseña y crea formatos de salida y entrada de material, dado que previamente no existían",
+          "herramienta_o_canal": "formato físico/digital creado por Almacén",
+          "evidencia_timestamp": "00:15:49",
+          "unclear": false
+        },
+        {
+          "orden": 4,
+          "actor": "Dirección",
+          "accion": "Define el stock máximo permitido en función del número de servicios (100 servicios)",
+          "herramienta_o_canal": "verbal/indicación directa",
+          "evidencia_timestamp": "00:10:22",
+          "unclear": true
+        }
+      ]
+    },
+    {
+      "proceso": "Control diario de entradas y salidas de material",
+      "disparador": "Operaciones notifica en WhatsApp la ruta y número de servicios del día",
+      "frecuencia": "diario",
+      "dueño_de_facto": "Almacén",
+      "pasos": [
+        {
+          "orden": 1,
+          "actor": "Operaciones",
+          "accion": "Sube al grupo de WhatsApp de almacén la ruta del día y número de servicios",
+          "herramienta_o_canal": "WhatsApp",
+          "evidencia_timestamp": "00:24:50",
+          "unclear": false
+        },
+        {
+          "orden": 2,
+          "actor": "Instalador",
+          "accion": "Solicita el material necesario para el/los servicios del día",
+          "herramienta_o_canal": "llamada/WhatsApp",
+          "evidencia_timestamp": "00:10:22",
+          "unclear": true
+        },
+        {
+          "orden": 3,
+          "actor": "Almacén",
+          "accion": "Entrega el material solicitado con una cantidad ligeramente mayor como buffer voluntario",
+          "herramienta_o_canal": "entrega física",
+          "evidencia_timestamp": "00:20:35",
+          "unclear": false
+        },
+        {
+          "orden": 4,
+          "actor": "Instalador",
+          "accion": "Regresa al final del día el material sobrante no utilizado",
+          "herramienta_o_canal": "entrega física",
+          "evidencia_timestamp": "00:20:35",
+          "unclear": false
+        },
+        {
+          "orden": 5,
+          "actor": "Almacén",
+          "accion": "Registra el material devuelto como entrada y llena diariamente el formato de salida, actualizando el Excel",
+          "herramienta_o_canal": "Excel / formato",
+          "evidencia_timestamp": "00:14:36",
+          "unclear": false
+        },
+        {
+          "orden": 6,
+          "actor": "Almacén",
+          "accion": "Revisa en el Excel si algún material llega a nivel mínimo ('foco amarillo')",
+          "herramienta_o_canal": "Excel",
+          "evidencia_timestamp": "00:14:36",
+          "unclear": false
+        }
+      ]
+    },
+    {
+      "proceso": "Reabastecimiento / compra regular de materiales",
+      "disparador": "El Excel muestra que un material llega al nivel mínimo (stock medio 50 servicios, crítico 30)",
+      "frecuencia": "por volumen de servicios, no por calendario",
+      "dueño_de_facto": "Almacén (cotización); encargada de pagos (autorización)",
+      "pasos": [
+        {
+          "orden": 1,
+          "actor": "Almacén",
+          "accion": "Identifica en el Excel qué material necesita resurtido",
           "herramienta_o_canal": "Excel",
           "evidencia_timestamp": "00:33:11",
           "unclear": false
@@ -24,17 +120,81 @@
         {
           "orden": 2,
           "actor": "Almacén",
-          "accion": "Detecta mínimos de stock ('foco amarillo') y solicita más material",
-          "herramienta_o_canal": "Excel",
-          "evidencia_timestamp": "00:33:11",
+          "accion": "Calcula la cantidad a comprar redondeando según unidad de venta del proveedor",
+          "herramienta_o_canal": "cálculo manual",
+          "evidencia_timestamp": "00:26:18",
           "unclear": false
         },
         {
           "orden": 3,
           "actor": "Almacén",
-          "accion": "Ante faltantes, compra de emergencia en ferreterías locales",
-          "herramienta_o_canal": "Compra directa",
+          "accion": "Realiza la cotización y contacto directo con proveedores, y envía la cotización para autorización",
+          "herramienta_o_canal": "no especificado",
+          "evidencia_timestamp": "00:21:47",
+          "unclear": true
+        },
+        {
+          "orden": 4,
+          "actor": "Encargada de pagos",
+          "accion": "Autoriza y realiza el pago al proveedor",
+          "herramienta_o_canal": "no especificado",
+          "evidencia_timestamp": "00:21:47",
+          "unclear": false
+        },
+        {
+          "orden": 5,
+          "actor": "Almacén",
+          "accion": "Recibe el material, lo cuenta físicamente y llena el formato de entrada",
+          "herramienta_o_canal": "conteo físico / formato",
+          "evidencia_timestamp": "00:21:47",
+          "unclear": false
+        }
+      ]
+    },
+    {
+      "proceso": "Compra de emergencia por desabasto",
+      "disparador": "Se necesita despachar material y no hay stock disponible",
+      "frecuencia": "ad hoc",
+      "dueño_de_facto": "Almacén",
+      "pasos": [
+        {
+          "orden": 1,
+          "actor": "Almacén",
+          "accion": "Detecta que no hay stock del material solicitado",
+          "herramienta_o_canal": "verbal",
           "evidencia_timestamp": "00:31:41",
+          "unclear": false
+        },
+        {
+          "orden": 2,
+          "actor": "Almacén",
+          "accion": "Acude a la ferretería local y compra el material faltante, con sobrecosto de 5%-10%",
+          "herramienta_o_canal": "compra física en ferretería local",
+          "evidencia_timestamp": "00:31:41",
+          "unclear": false
+        }
+      ]
+    },
+    {
+      "proceso": "Conteo físico periódico de inventario (auditoría)",
+      "disparador": "Ciclo de revisión periódica o discrepancias detectadas",
+      "frecuencia": "cada 15 días (propone pasar a mensual)",
+      "dueño_de_facto": "Almacén",
+      "pasos": [
+        {
+          "orden": 1,
+          "actor": "Almacén",
+          "accion": "Cuenta físicamente producto por producto en la bodega",
+          "herramienta_o_canal": "conteo físico manual",
+          "evidencia_timestamp": "00:37:53",
+          "unclear": false
+        },
+        {
+          "orden": 2,
+          "actor": "Almacén",
+          "accion": "Cuadra el conteo físico contra las cantidades registradas en el Excel",
+          "herramienta_o_canal": "Excel",
+          "evidencia_timestamp": "00:37:53",
           "unclear": false
         }
       ]
@@ -42,33 +202,135 @@
   ],
   "pain_points": [
     {
-      "id": "pp-006",
+      "id": "pp-031",
       "categorias": [
-        "trabajo_manual",
-        "falta_centralizacion"
+        "falta_formatos_comunes",
+        "trabajo_manual"
       ],
-      "descripcion": "El control de inventario se sostiene en un Excel personal creado por una sola persona, sin integración al sistema de compras corporativo.",
+      "descripcion": "Antes de la llegada del responsable de almacén no existían formatos de registro de entrada/salida de material; las decisiones de despacho se tomaban sin sustento documental.",
       "severidad": "media",
-      "evidencia": "No existe integración de esta información con el sistema de inventario general que maneja el área de compras",
-      "evidencia_timestamp": "00:41:27",
+      "evidencia": "No existían formatos de salida; se sacaba material sin ningún sustento documentado",
+      "evidencia_timestamp": "00:14:36",
       "roles_afectados": [
-        "almacén",
-        "compras"
+        "almacén"
       ]
     },
     {
-      "id": "pp-007",
+      "id": "pp-032",
       "categorias": [
-        "falta_visibilidad_kpis",
-        "trabajo_manual"
+        "trabajo_manual",
+        "falta_visibilidad_kpis"
       ],
-      "descripcion": "Las compras de emergencia por desabasto elevan el costo de materiales entre 5% y 10%.",
-      "severidad": "media",
-      "evidencia": "La compra de emergencia en ferreterías locales impacta los costos entre un 5% y 10%",
+      "descripcion": "La ausencia previa de niveles de stock mínimo/máximo definidos provocaba desabastecimientos, obligando a compras de emergencia con sobrecosto de 5%-10%.",
+      "severidad": "alta",
+      "evidencia": "Faltó material y hubo que comprarlo de emergencia, encareciendo el costo entre 5% y 10%",
       "evidencia_timestamp": "00:31:41",
       "roles_afectados": [
         "almacén",
-        "finanzas"
+        "finanzas/compras"
+      ]
+    },
+    {
+      "id": "pp-033",
+      "categorias": [
+        "falta_centralizacion",
+        "falta_visibilidad_kpis",
+        "trabajo_manual"
+      ],
+      "descripcion": "El control de inventario se lleva en un Excel individual operado por una sola persona; los reportes se generan solo bajo solicitud puntual, sin panel periódico automatizado.",
+      "severidad": "media",
+      "evidencia": "Solo una persona accede al Excel de inventario; reportes se envían solo si alguien los solicita",
+      "evidencia_timestamp": "00:36:55",
+      "roles_afectados": [
+        "almacén",
+        "dirección",
+        "finanzas/compras"
+      ]
+    },
+    {
+      "id": "pp-034",
+      "categorias": [
+        "trabajo_manual"
+      ],
+      "descripcion": "El conteo físico de inventario, identificado como la tarea que más tiempo consume, requiere revisar producto por producto de forma manual.",
+      "severidad": "media",
+      "evidencia": "La tarea que más tiempo toma es contar físicamente el inventario producto por producto",
+      "evidencia_timestamp": "00:37:53",
+      "roles_afectados": [
+        "almacén"
+      ]
+    },
+    {
+      "id": "pp-035",
+      "categorias": [
+        "gestion_por_whatsapp"
+      ],
+      "descripcion": "La coordinación operativa diaria entre almacén, operaciones e instaladores ocurre principalmente por WhatsApp, sin historial estructurado ni trazabilidad.",
+      "severidad": "media",
+      "evidencia": "La comunicación con operaciones e instaladores es principalmente por grupo de WhatsApp",
+      "evidencia_timestamp": "00:40:20",
+      "roles_afectados": [
+        "almacén",
+        "operaciones",
+        "instaladores"
+      ]
+    },
+    {
+      "id": "pp-036",
+      "categorias": [
+        "falta_formatos_comunes",
+        "falta_visibilidad_kpis"
+      ],
+      "descripcion": "No existe una definición validada de la cantidad exacta de piezas requerida por tipo de instalación; las cifras han cambiado informalmente sin estudio de campo formal.",
+      "severidad": "media",
+      "evidencia": "Las cantidades de material por instalación han variado sin criterio fijo",
+      "evidencia_timestamp": "00:19:26",
+      "roles_afectados": [
+        "almacén",
+        "instaladores"
+      ]
+    },
+    {
+      "id": "pp-037",
+      "categorias": [
+        "trabajo_manual",
+        "falta_visibilidad_kpis"
+      ],
+      "descripcion": "El control de la flota vehicular es completamente manual: no hay GPS instalado; las rutas se reconstruyen a posteriori en Google Maps y el kilometraje se valida con fotos del odómetro.",
+      "severidad": "media",
+      "evidencia": "No hay GPS en el vehículo; el kilometraje se valida con fotos del odómetro y mapas manuales",
+      "evidencia_timestamp": "00:44:54",
+      "roles_afectados": [
+        "almacén",
+        "logística/vehículos"
+      ]
+    },
+    {
+      "id": "pp-038",
+      "categorias": [
+        "falta_governance_ia"
+      ],
+      "descripcion": "El responsable de almacén utiliza IA generativa de forma personal y no reglamentada, sin lineamientos ni supervisión definidos por la empresa.",
+      "severidad": "media",
+      "evidencia": "Usa IA generativa para dudas y formatos, de manera personal y sin criterios definidos",
+      "evidencia_timestamp": "00:41:33",
+      "roles_afectados": [
+        "almacén"
+      ]
+    },
+    {
+      "id": "pp-039",
+      "categorias": [
+        "falta_visibilidad_kpis",
+        "falta_formatos_comunes"
+      ],
+      "descripcion": "No se ha definido el plan logístico ni las políticas de stock mínimo/máximo para los futuros almacenes foráneos (Tijuana y Monterrey).",
+      "severidad": "baja",
+      "evidencia": "Aún no se ha definido el plan logístico ni el stock para los almacenes foráneos",
+      "evidencia_timestamp": "00:27:53",
+      "roles_afectados": [
+        "almacén",
+        "dirección"
       ]
     }
   ],
@@ -76,61 +338,233 @@
     {
       "herramienta": "Excel",
       "tipo": "digital_no_ia",
-      "contexto_de_uso": "control de inventario con pestañas de EPP/uniformes y materiales de instalación",
-      "nivel_adopcion": "intermedia",
+      "contexto_de_uso": "Sistema propio creado por Almacén para registrar diariamente entradas y salidas de material y controlar mínimos/máximos",
+      "nivel_adopcion": "avanzada",
       "origen": "personal_informal",
+      "evidencia_timestamp": "00:11:53"
+    },
+    {
+      "herramienta": "Formatos de entrada/salida de material",
+      "tipo": "manual",
+      "contexto_de_uso": "Formatos creados por Almacén para respaldar cada movimiento con fecha, cantidad y destino",
+      "nivel_adopcion": "avanzada",
+      "origen": "personal_informal",
+      "evidencia_timestamp": "00:11:53"
+    },
+    {
+      "herramienta": "Conteo físico manual de inventario",
+      "tipo": "manual",
+      "contexto_de_uso": "Contar producto por producto para cuadrar existencias reales contra el Excel",
+      "nivel_adopcion": "avanzada",
+      "origen": "organizacional",
+      "evidencia_timestamp": "00:37:53"
+    },
+    {
+      "herramienta": "WhatsApp",
+      "tipo": "digital_no_ia",
+      "contexto_de_uso": "Grupos de 'almacén' y 'vehículos' para coordinar con operaciones e instaladores",
+      "nivel_adopcion": "avanzada",
+      "origen": "organizacional",
+      "evidencia_timestamp": "00:24:50"
+    },
+    {
+      "herramienta": "Nuevo sistema de inventario (en desarrollo por tecnología)",
+      "tipo": "digital_no_ia",
+      "contexto_de_uso": "Sistema que reemplazará gradualmente el Excel para automatizar el registro de entradas/salidas",
+      "nivel_adopcion": "basica",
+      "origen": "organizacional",
       "evidencia_timestamp": "00:33:11"
     },
     {
-      "herramienta": "ChatGPT",
-      "tipo": "ia",
-      "contexto_de_uso": "asistencia en la creación de formatos de registro",
+      "herramienta": "Correo electrónico",
+      "tipo": "digital_no_ia",
+      "contexto_de_uso": "Canal para enviar reportes de inventario bajo solicitud",
       "nivel_adopcion": "basica",
-      "origen": "personal_informal",
-      "evidencia_timestamp": "00:41:33"
+      "origen": "organizacional",
+      "evidencia_timestamp": "00:35:43"
     },
     {
       "herramienta": "Google Maps",
       "tipo": "digital_no_ia",
-      "contexto_de_uso": "trazado de rutas de flota y control de kilometraje/gasolina",
-      "nivel_adopcion": "basica",
+      "contexto_de_uso": "Planeado para trazar rutas de la camioneta y calcular kilometraje recorrido",
+      "nivel_adopcion": "ninguna",
       "origen": "organizacional",
       "evidencia_timestamp": "00:44:54"
+    },
+    {
+      "herramienta": "Fotografías (cámara de celular)",
+      "tipo": "digital_no_ia",
+      "contexto_de_uso": "Tomar fotos del odómetro al inicio y fin del día para validar kilometraje",
+      "nivel_adopcion": "basica",
+      "origen": "organizacional",
+      "evidencia_timestamp": "00:46:08"
+    },
+    {
+      "herramienta": "ChatGPT",
+      "tipo": "ia",
+      "contexto_de_uso": "Asistencia constante para resolver dudas sobre su Excel, crear formatos y apoyar tareas diarias",
+      "nivel_adopcion": "avanzada",
+      "origen": "personal_informal",
+      "evidencia_timestamp": "00:41:33"
+    },
+    {
+      "herramienta": "Computadora personal (segunda computadora)",
+      "tipo": "digital_no_ia",
+      "contexto_de_uso": "Equipo propio con programas instalados, usado porque la PC de oficina solo permite Google",
+      "nivel_adopcion": "avanzada",
+      "origen": "personal_informal",
+      "evidencia_timestamp": "00:43:38"
     }
   ],
   "ai_adoption": {
-    "nivel_uso_actual": "basico",
+    "nivel_uso_actual": "intermedio",
     "casos_de_uso": [
-      "creación de formatos con ChatGPT"
+      "consultas a ChatGPT para dudas cotidianas y creación de formatos sencillos"
     ],
-    "barreras": [],
+    "barreras": [
+      "la computadora de oficina solo permite herramientas de Google, por lo que usa una segunda computadora personal para acceder a otros programas",
+      "el control de inventario core sigue siendo un Excel manual, no una herramienta de IA"
+    ],
     "actitud": "curioso",
     "evidencia_timestamp": "00:41:33"
   },
   "opportunities": [
     {
-      "id": "op-006",
-      "titulo": "Integrar el control de inventario personal al módulo de inventario del CRM",
-      "descripcion": "Formalizar el Excel de control de stock (con sus mínimos/máximos ya definidos empíricamente) como el punto de partida del nuevo módulo de inventario, en vez de descartarlo.",
+      "id": "op-031",
+      "titulo": "Estandarizar formato único de registro de entrada/salida de material",
+      "descripcion": "Definir y adoptar un formato estándar y obligatorio para el registro de entradas y salidas de material en almacén.",
       "pain_points_relacionados": [
-        "pp-006",
-        "pp-007"
+        "pp-031"
+      ],
+      "objetivo_dproma_relacionado": [
+        4,
+        1
+      ],
+      "impacto": "medio",
+      "esfuerzo": "bajo"
+    },
+    {
+      "id": "op-032",
+      "titulo": "Sistema centralizado de inventario con niveles mín/máx y reportes automáticos",
+      "descripcion": "Migrar el control de inventario del Excel individual a un sistema centralizado con alertas de reabastecimiento y reportes accesibles sin depender de solicitudes puntuales.",
+      "pain_points_relacionados": [
+        "pp-032",
+        "pp-033"
       ],
       "objetivo_dproma_relacionado": [
         1,
-        4
+        2
       ],
       "impacto": "alto",
+      "esfuerzo": "alto"
+    },
+    {
+      "id": "op-033",
+      "titulo": "Agilizar el conteo físico de inventario con captura asistida por tecnología",
+      "descripcion": "Introducir un método de captura más rápido que el conteo manual, integrado al sistema central de inventario.",
+      "pain_points_relacionados": [
+        "pp-034"
+      ],
+      "objetivo_dproma_relacionado": [
+        3,
+        1
+      ],
+      "impacto": "medio",
+      "esfuerzo": "alto"
+    },
+    {
+      "id": "op-034",
+      "titulo": "Reemplazar coordinación por WhatsApp con módulo estructurado en app de campo",
+      "descripcion": "Sustituir la coordinación diaria entre almacén, operaciones e instaladores por un módulo de solicitudes y seguimiento en la futura app móvil.",
+      "pain_points_relacionados": [
+        "pp-035"
+      ],
+      "objetivo_dproma_relacionado": [
+        6,
+        1
+      ],
+      "impacto": "alto",
+      "esfuerzo": "alto"
+    },
+    {
+      "id": "op-035",
+      "titulo": "Catálogo estándar validado de materiales por tipo de instalación",
+      "descripcion": "Definir y validar formalmente la cantidad de piezas requerida por cada tipo de instalación, con gobernanza clara sobre quién puede modificarlo.",
+      "pain_points_relacionados": [
+        "pp-036"
+      ],
+      "objetivo_dproma_relacionado": [
+        4
+      ],
+      "impacto": "medio",
+      "esfuerzo": "bajo"
+    },
+    {
+      "id": "op-036",
+      "titulo": "Control de flota vehicular con geolocalización integrado al sistema central",
+      "descripcion": "Sustituir el control manual y sin GPS de la flota por geolocalización en tiempo real, centralizada junto al resto de datos operativos.",
+      "pain_points_relacionados": [
+        "pp-037"
+      ],
+      "objetivo_dproma_relacionado": [
+        1,
+        2
+      ],
+      "impacto": "medio",
+      "esfuerzo": "alto"
+    },
+    {
+      "id": "op-037",
+      "titulo": "Lineamientos formales de gobernanza de IA y capacitación en Gemini para almacén",
+      "descripcion": "Sustituir el uso personal y no reglamentado de IA generativa por lineamientos formales, acompañados de capacitación práctica en Gemini.",
+      "pain_points_relacionados": [
+        "pp-038"
+      ],
+      "objetivo_dproma_relacionado": [
+        3,
+        5
+      ],
+      "impacto": "medio",
+      "esfuerzo": "bajo"
+    },
+    {
+      "id": "op-038",
+      "titulo": "Plan logístico y políticas de stock estandarizadas para almacenes foráneos",
+      "descripcion": "Diseñar, a partir del modelo ya estandarizado del almacén central, un plan logístico replicable para las futuras ubicaciones foráneas.",
+      "pain_points_relacionados": [
+        "pp-039"
+      ],
+      "objetivo_dproma_relacionado": [
+        4,
+        2
+      ],
+      "impacto": "bajo",
       "esfuerzo": "medio"
     }
   ],
   "narrative": {
-    "persona_arquetipo": "quien reconstruyó desde cero el control de inventario del almacén",
+    "persona_arquetipo": "quien reconstruye desde cero el control de inventario",
     "vinetas": [
       {
-        "texto": "No había ningún control cuando empezó: hubo que definir a mano cuántas piezas se usan por servicio, con variaciones que cambiaban semana a semana. El resultado es un Excel propio con mínimos y máximos que hoy evita quedarse sin material — pero solo una persona lo consulta y solo una persona lo mantiene.",
+        "texto": "Cuando llegó al puesto, no había formatos de entrada ni salida de material, ni un método para saber qué había en el almacén. Hizo un conteo físico manual de dos días y armó su propio Excel para empezar a ordenar algo que antes no tenía ni un registro básico. Hoy ese archivo personal sigue siendo, en la práctica, el sistema de control del almacén.",
         "pain_points_relacionados": [
-          "pp-006"
+          "pp-031",
+          "pp-033"
+        ],
+        "anonymization_check": "passed"
+      },
+      {
+        "texto": "El reabastecimiento funciona con niveles mínimos y máximos definidos a mano, pero cuando algo se agota antes de tiempo, la solución es salir a comprarlo en una ferretería local con un sobrecosto de entre 5 y 10 por ciento. No es una falla puntual, es la válvula de escape que usa el área cada vez que el cálculo no alcanza.",
+        "pain_points_relacionados": [
+          "pp-032"
+        ],
+        "anonymization_check": "passed"
+      },
+      {
+        "texto": "La coordinación diaria de despacho a instaladores pasa por WhatsApp, sin ningún historial que se pueda consultar después. En paralelo, ChatGPT se volvió una herramienta de consulta casi constante para dudas y formatos, mientras el control real de inventario sigue corriendo en una hoja de Excel individual, no en un sistema compartido.",
+        "pain_points_relacionados": [
+          "pp-035",
+          "pp-038"
         ],
         "anonymization_check": "passed"
       }
