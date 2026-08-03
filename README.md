@@ -5,7 +5,7 @@ procesa entrevistas de research, produce hallazgos estructurados y trazables a e
 traduce en una web narrativa de resultados.
 
 **Estado actual:** 10 entrevistas procesadas y anonimizadas, verificadas contra sus transcripciones
-originales · 88 puntos de fricción documentados · 70 oportunidades priorizadas. Ver la web de
+originales · 95 puntos de fricción documentados · 76 oportunidades priorizadas. Ver la web de
 hallazgos: se publica como Artifact al pedirlo en esta
 sesión de Claude Code, o directamente abriendo `web/index.html` en el navegador (no requiere
 servidor ni build).
