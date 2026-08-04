@@ -504,6 +504,147 @@
   }
   .note strong{ color: var(--text); }
 
+  /* Matriz de impacto/viabilidad editable */
+  .matrix-wrap{
+    display:grid;
+    grid-template-columns: 1fr 320px;
+    gap: 2rem;
+    align-items: start;
+  }
+  @media (max-width: 900px){ .matrix-wrap{ grid-template-columns: 1fr; } }
+
+  .matrix-figure{
+    display:grid;
+    grid-template-columns: 28px 1fr;
+    grid-template-rows: 1fr 28px;
+    gap: 0.5rem 0.75rem;
+  }
+  .matrix-axis-y{
+    grid-column: 1; grid-row: 1;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .matrix-axis-x{
+    grid-column: 2; grid-row: 2;
+    text-align:center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .matrix-plot{
+    grid-column: 2; grid-row: 1;
+    position: relative;
+    aspect-ratio: 1;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+  @media (max-width: 700px){ .matrix-plot{ aspect-ratio: 4 / 5; } }
+  .matrix-plot::before,
+  .matrix-plot::after{
+    content:"";
+    position:absolute;
+    border-color: var(--border);
+  }
+  .matrix-plot::before{ left:0; right:0; top:50%; border-top: 1px dashed var(--border); }
+  .matrix-plot::after{ top:0; bottom:0; left:50%; border-left: 1px dashed var(--border); }
+
+  .matrix-quadrant{
+    position:absolute;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0.6;
+    pointer-events:none;
+  }
+  .matrix-quadrant.q-tl{ top: 0.85rem; left: 1rem; }
+  .matrix-quadrant.q-tr{ top: 0.85rem; right: 1rem; text-align:right; }
+  .matrix-quadrant.q-bl{ bottom: 0.85rem; left: 1rem; }
+  .matrix-quadrant.q-br{ bottom: 0.85rem; right: 1rem; text-align:right; }
+
+  .pill{
+    position:absolute;
+    transform: translate(-50%, -50%);
+    display:inline-flex;
+    align-items:center;
+    gap: 0.4em;
+    max-width: 150px;
+    padding: 0.4em 0.75em;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--accent);
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: var(--shadow);
+    cursor: grab;
+    touch-action: none;
+  }
+  @media (max-width: 700px){ .pill{ max-width: 118px; font-size: 0.6875rem; } }
+  .pill span:last-child{ overflow:hidden; text-overflow:ellipsis; }
+  .pill[aria-pressed="true"]{
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
+    z-index: 4;
+  }
+  .pill.is-dragging{
+    cursor: grabbing;
+    z-index: 5;
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+
+  .matrix-side{ display:flex; flex-direction:column; gap: 1rem; }
+  #matrizDetail{ min-height: 210px; }
+  .matrix-detail-empty{
+    font-size: 0.9375rem;
+    font-style: italic;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .matrix-controls{ display:flex; flex-wrap:wrap; gap: 1rem; align-items:center; }
+  .matrix-reset{
+    appearance:none;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.6em 1.1em;
+    cursor:pointer;
+  }
+  .matrix-reset:hover{ color: var(--accent); border-color: var(--accent); }
+
+  .sr-only{
+    position:absolute;
+    width:1px; height:1px;
+    padding:0; margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+  }
+
   footer{
     padding: clamp(3rem, 7vw, 4.5rem) 0 3rem;
   }
@@ -544,6 +685,7 @@
       <a href="#patrones">Patrones</a>
       <a href="#insights">Insights</a>
       <a href="#oportunidades">Oportunidades</a>
+      <a href="#matriz">Matriz</a>
     </nav>
   </div>
 </header>
@@ -803,6 +945,39 @@
   </div>
 </section>
 
+<section id="matriz">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">06 — Matriz de priorización</div>
+        <h2>Impacto y viabilidad, para decidir juntos por dónde empezar.</h2>
+      </div>
+      <p class="section-note">La posición de partida refleja lo que dice la investigación. Arrastra cualquier oportunidad si el equipo prioriza distinto.</p>
+    </div>
+    <div class="matrix-wrap">
+      <div class="matrix-figure">
+        <div class="matrix-axis-y" aria-hidden="true">Impacto</div>
+        <div class="matrix-plot" id="matrizPlot">
+          <span class="matrix-quadrant q-tl" aria-hidden="true">Grandes apuestas</span>
+          <span class="matrix-quadrant q-tr" aria-hidden="true">Quick wins</span>
+          <span class="matrix-quadrant q-bl" aria-hidden="true">Reconsiderar</span>
+          <span class="matrix-quadrant q-br" aria-hidden="true">Rellenos</span>
+        </div>
+        <div class="matrix-axis-x" aria-hidden="true">Viabilidad</div>
+      </div>
+      <div class="matrix-side">
+        <div class="card card-neutral" id="matrizDetail">
+          <p class="matrix-detail-empty">Selecciona una oportunidad del plano para ver su detalle completo.</p>
+        </div>
+        <div class="matrix-controls">
+          <button type="button" class="matrix-reset" id="matrizReset">Restablecer posiciones recomendadas</button>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" id="matrizAnnounce"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="metodologia">
   <div class="wrap">
     <div class="section-head">
@@ -829,6 +1004,157 @@
     </div>
   </div>
 </footer>
+
+<script>
+(function(){
+  var OPPS = [
+    { rank:'01', title:'CRM comercial y ficha única', desc:'CRM comercial y ficha única de cliente/agencia — pedida por 4 áreas; ya está en desarrollo activo.', objetivo:'Objetivo 1 — Centralizar la información en un CRM', areas:'Comercial, dirección comercial, dirección general, soporte administrativo', recX:85, recY:85 },
+    { rank:'02', title:'Validación de datos de facturación', desc:'Validación de datos de facturación (VIN, orden de confirmación) — impacto cuantificado: ~2M MXN en cartera vencida, retrasos de hasta 2 meses.', objetivo:'Objetivo 1 — Centralizar la información en un CRM (también: Objetivo 2)', areas:'Comercial, cobranza, finanzas', recX:65, recY:90 },
+    { rank:'03', title:'Estandarizar formatos y flujos', desc:'Estandarizar formatos y flujos de traspaso entre áreas — habilita todo lo demás; mencionado directa o indirectamente en las 10 entrevistas.', objetivo:'Objetivo 4 — Estandarizar procesos y formatos', areas:'Prácticamente las 10 entrevistas lo mencionan', recX:50, recY:75 },
+    { rank:'04', title:'Portal de trazabilidad de trámites', desc:'Portal de trazabilidad de trámites para el cliente — ya conceptualizado por el propio equipo; valor competitivo explícito.', objetivo:'Objetivo 1 — Centralizar la información en un CRM', areas:'Administración vehicular, comercial, dirección comercial', recX:85, recY:80 },
+    { rank:'05', title:'Dashboard directivo con IA y KPIs', desc:'Dashboard directivo con IA, KPIs y alertas automáticas — depende de que los módulos del objetivo 1 alimenten datos limpios primero.', objetivo:'Objetivo 3 — Integrar la IA de forma responsable (también: Objetivo 2)', areas:'Dirección general, dirección comercial, finanzas', recX:50, recY:78 },
+    { rank:'06', title:'Módulo jurídico + gestor documental', desc:'Módulo jurídico + gestor documental con firma digital — riesgo legal y financiero por contratos dispersos.', objetivo:'Objetivo 4 — Estandarizar procesos y formatos (también: Objetivo 1)', areas:'Soporte administrativo, jurídico/RH', recX:80, recY:65 },
+    { rank:'07', title:'Gobernanza y capacitación de IA', desc:'Gobernanza y capacitación de IA — bajo costo; condición habilitante para todo uso futuro de Gemini.', objetivo:'Objetivo 5 — Formar al equipo en IA de Gemini (también: Objetivo 3)', areas:'Al menos 6 de las 10 entrevistas mencionan uso ad hoc de IA sin gobierno', recX:85, recY:60 },
+    { rank:'08', title:'Almacén/inventario multi-sede', desc:'Gestión de almacén/inventario multi-sede — ya hay control manual funcional recién implementado.', objetivo:'Objetivo 1 — Centralizar la información en un CRM (también: Objetivo 6)', areas:'Almacén, coordinación técnica, dirección general', recX:80, recY:50 }
+  ];
+
+  var plot = document.getElementById('matrizPlot');
+  var detail = document.getElementById('matrizDetail');
+  var announce = document.getElementById('matrizAnnounce');
+  var resetBtn = document.getElementById('matrizReset');
+  if(!plot || !detail || !announce || !resetBtn) return;
+
+  var STORAGE_KEY = 'dproma-matriz-v1';
+
+  function loadSaved(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    }catch(e){ return {}; }
+  }
+  function savePos(rank, x, y){
+    try{
+      var saved = loadSaved();
+      saved[rank] = { x:x, y:y };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+    }catch(e){}
+  }
+  function clearSaved(){
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  }
+  function clamp(v){ return Math.max(4, Math.min(96, v)); }
+  function quadrantLabel(x, y){
+    if(x >= 50 && y >= 50) return 'Quick win: impacto alto, viabilidad alta';
+    if(x < 50 && y >= 50) return 'Gran apuesta: impacto alto, viabilidad más baja';
+    if(x >= 50 && y < 50) return 'Relleno: impacto más bajo, viabilidad alta';
+    return 'Reconsiderar: impacto y viabilidad bajos';
+  }
+  function setPos(el, x, y){
+    el.style.left = x + '%';
+    el.style.top = (100 - y) + '%';
+    el.dataset.x = x;
+    el.dataset.y = y;
+  }
+  function renderDetail(opp){
+    detail.innerHTML =
+      '<span class="badge">' + opp.rank + '</span>' +
+      '<h3>' + opp.title + '</h3>' +
+      '<p>' + opp.desc + '</p>' +
+      '<p style="margin-top:0.75rem;font-size:0.8125rem;color:var(--text-muted)"><strong style="color:var(--text)">Objetivo del brief:</strong> ' + opp.objetivo + '</p>' +
+      '<p style="font-size:0.8125rem;color:var(--text-muted)"><strong style="color:var(--text)">Áreas que la piden:</strong> ' + opp.areas + '</p>';
+  }
+  function resetDetail(){
+    detail.innerHTML = '<p class="matrix-detail-empty">Selecciona una oportunidad del plano para ver su detalle completo.</p>';
+  }
+
+  var saved = loadSaved();
+  var pills = [];
+
+  OPPS.forEach(function(opp){
+    var pos = saved[opp.rank] || { x: opp.recX, y: opp.recY };
+    var pill = document.createElement('button');
+    pill.type = 'button';
+    pill.className = 'pill';
+    pill.setAttribute('aria-pressed', 'false');
+    pill.innerHTML = '<span class="rank">' + opp.rank + '</span><span>' + opp.title + '</span>';
+    setPos(pill, pos.x, pos.y);
+    plot.appendChild(pill);
+    pills.push(pill);
+
+    var dragging = false;
+    var moved = false;
+
+    function select(){
+      pills.forEach(function(p){ p.setAttribute('aria-pressed', 'false'); });
+      pill.setAttribute('aria-pressed', 'true');
+      renderDetail(opp);
+    }
+
+    pill.addEventListener('pointerdown', function(e){
+      dragging = true;
+      moved = false;
+      try{ pill.setPointerCapture(e.pointerId); }catch(err){}
+      pill.classList.add('is-dragging');
+    });
+
+    pill.addEventListener('pointermove', function(e){
+      if(!dragging) return;
+      moved = true;
+      var rect = plot.getBoundingClientRect();
+      var x = clamp(((e.clientX - rect.left) / rect.width) * 100);
+      var y = clamp(100 - ((e.clientY - rect.top) / rect.height) * 100);
+      setPos(pill, x, y);
+    });
+
+    function endDrag(){
+      if(!dragging) return;
+      dragging = false;
+      pill.classList.remove('is-dragging');
+      var x = parseFloat(pill.dataset.x);
+      var y = parseFloat(pill.dataset.y);
+      if(moved){
+        savePos(opp.rank, x, y);
+        announce.textContent = opp.title + ' — ' + quadrantLabel(x, y);
+      }
+      select();
+    }
+
+    pill.addEventListener('pointerup', endDrag);
+    pill.addEventListener('pointercancel', endDrag);
+
+    pill.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 10 : 2;
+      var x = parseFloat(pill.dataset.x);
+      var y = parseFloat(pill.dataset.y);
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        select();
+        return;
+      }
+      var changed = true;
+      if(e.key === 'ArrowLeft') x = clamp(x - step);
+      else if(e.key === 'ArrowRight') x = clamp(x + step);
+      else if(e.key === 'ArrowUp') y = clamp(y + step);
+      else if(e.key === 'ArrowDown') y = clamp(y - step);
+      else changed = false;
+      if(changed){
+        e.preventDefault();
+        setPos(pill, x, y);
+        savePos(opp.rank, x, y);
+        announce.textContent = opp.title + ' — ' + quadrantLabel(x, y);
+      }
+    });
+  });
+
+  resetBtn.addEventListener('click', function(){
+    clearSaved();
+    OPPS.forEach(function(opp, i){ setPos(pills[i], opp.recX, opp.recY); });
+    pills.forEach(function(p){ p.setAttribute('aria-pressed', 'false'); });
+    resetDetail();
+    announce.textContent = 'Posiciones restablecidas a la recomendación de la investigación.';
+  });
+})();
+</script>
 
 </body>
 </html>
