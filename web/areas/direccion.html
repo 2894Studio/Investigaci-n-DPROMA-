@@ -224,10 +224,9 @@ tbody tr:hover{ background: var(--surface-alt); }
 }
 
 .flow-painpoints{ list-style:none; margin:2rem 0 0; padding:0; display:flex; flex-direction:column; gap:0.75rem; }
-.flow-painpoints li{ display:flex; gap:0.9rem; align-items:flex-start; cursor:pointer; }
+.flow-painpoints li{ display:flex; gap:0.9rem; align-items:flex-start; }
 .flow-painpoints .pp-n{ flex:0 0 auto; width:1.5rem; height:1.5rem; border-radius:50%; background:var(--surface-alt); border:1px solid var(--border); color:var(--accent); font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
 .flow-painpoints p{ margin:0; font-size:0.875rem; color:var(--text-muted); }
-.flow-painpoints li.is-highlighted .pp-n{ background:var(--accent); color:var(--on-accent); border-color:var(--accent); }
 
 .flow-skeleton{ position:relative; }
 .construction-overlay{
@@ -493,14 +492,6 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       var num = el('span','pp-n'); num.textContent = String(i+1);
       var p = el('p'); p.textContent = n.desc;
       li.appendChild(num); li.appendChild(p);
-      function toggle(on){
-        li.classList.toggle('is-highlighted', on);
-        var card = gridEl.querySelector('[data-id="'+n.id+'"]');
-        if(card) card.classList.toggle('is-expanded', on);
-        updateConnectors();
-      }
-      li.addEventListener('mouseenter', function(){ toggle(true); });
-      li.addEventListener('mouseleave', function(){ toggle(false); });
       ppListEl.appendChild(li);
     });
 
@@ -556,12 +547,21 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     }
 
     buildConnectors();
+    requestAnimationFrame(function(){ requestAnimationFrame(buildConnectors); });
+    if(document.fonts && document.fonts.ready){
+      document.fonts.ready.then(function(){ requestAnimationFrame(buildConnectors); });
+    }
 
+    var hoverTimer = null;
+    function scheduleUpdate(){
+      clearTimeout(hoverTimer);
+      hoverTimer = setTimeout(updateConnectors, 230);
+    }
     Array.prototype.slice.call(gridEl.querySelectorAll('.flow-node')).forEach(function(card){
-      card.addEventListener('mouseenter', function(){ setTimeout(updateConnectors, 230); });
-      card.addEventListener('mouseleave', function(){ setTimeout(updateConnectors, 230); });
-      card.addEventListener('focus', function(){ setTimeout(updateConnectors, 230); });
-      card.addEventListener('blur', function(){ setTimeout(updateConnectors, 230); });
+      card.addEventListener('mouseenter', scheduleUpdate);
+      card.addEventListener('mouseleave', scheduleUpdate);
+      card.addEventListener('focus', scheduleUpdate);
+      card.addEventListener('blur', scheduleUpdate);
     });
 
     var onResize = debounce(buildConnectors, 150);
