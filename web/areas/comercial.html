@@ -194,30 +194,42 @@ tbody tr:hover{ background: var(--surface-alt); }
   padding:0.9rem 1rem;
   cursor:default;
 }
-.flow-node:hover, .flow-node:focus-visible, .flow-node.is-expanded{ z-index:10; border-color:var(--accent); outline:none; }
+.flow-node:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }
 .flow-node-icon{ width:26px; height:26px; display:flex; align-items:center; justify-content:center; color:var(--accent); margin-bottom:0.5rem; }
 .flow-node-icon svg{ width:20px; height:20px; }
 .flow-node h4{ margin:0; font-size:0.875rem; font-weight:700; line-height:1.3; }
-.flow-node-desc{
-  margin:0; color:var(--text-muted); font-size:0.8125rem; line-height:1.45;
-  max-height:0; opacity:0; overflow:hidden;
-  transition: max-height .22s ease, opacity .22s ease, margin-top .22s ease;
-}
-.flow-node:hover .flow-node-desc, .flow-node:focus-visible .flow-node-desc, .flow-node.is-expanded .flow-node-desc{
-  max-height:12em; opacity:1; margin-top:0.5rem;
-}
+.flow-node-desc{ margin:0.4rem 0 0; color:var(--text-muted); font-size:0.8125rem; line-height:1.45; }
 .flow-node.is-exception{ background:var(--dark-surface); border-color:var(--dark-surface); color:var(--on-dark); }
 .flow-node.is-exception .flow-node-icon{ color:var(--accent-soft); }
 .flow-node.is-exception .flow-node-desc{ color:var(--dark-surface-text-muted, #b9bec9); }
-.flow-pp-badge{
-  position:absolute; top:-0.55rem; right:-0.55rem;
-  width:1.5rem; height:1.5rem; border-radius:50%;
-  background:var(--accent); color:var(--on-accent);
-  font-size:0.75rem; font-weight:700;
-  display:flex; align-items:center; justify-content:center;
-  box-shadow:var(--shadow);
-  cursor:help;
+.flow-node-pp{
+  margin-top:0.6rem;
+  padding:0.5rem 0.65rem;
+  border-radius:10px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border:1px solid var(--accent);
 }
+.flow-node.is-exception .flow-node-pp{
+  background: rgba(255,255,255,0.1);
+  border-color: var(--accent-soft);
+}
+.flow-pp-tag{
+  display:block;
+  font-size:0.6875rem;
+  font-weight:700;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:0.25rem;
+}
+.flow-node.is-exception .flow-pp-tag{ color:var(--accent-soft); }
+.flow-node-pp p{
+  margin:0;
+  font-size:0.8125rem;
+  color:var(--text);
+  line-height:1.4;
+}
+.flow-node.is-exception .flow-node-pp p{ color:var(--on-dark); }
 .flow-branch-label, .flow-periodic-label{
   grid-row: 1; align-self:end;
   font-size:0.6875rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted);
@@ -411,7 +423,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
   function svgNode(tag){ return document.createElementNS('http://www.w3.org/2000/svg', tag); }
   function debounce(fn, ms){ var t; return function(){ clearTimeout(t); t=setTimeout(fn, ms); }; }
 
-  function renderNode(node, extraClass){
+  function renderNode(node, extraClass, ppIndex){
     var card = el('div', 'flow-node' + (extraClass ? ' ' + extraClass : ''));
     card.dataset.id = node.id;
     card.tabIndex = 0;
@@ -420,6 +432,13 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     card.appendChild(icon);
     var h4 = el('h4'); h4.textContent = node.title; card.appendChild(h4);
     var p = el('p','flow-node-desc'); p.textContent = node.desc; card.appendChild(p);
+    if(node.pp){
+      var ppBlock = el('div','flow-node-pp');
+      var tag = el('span','flow-pp-tag'); tag.textContent = 'Pain point ' + ppIndex;
+      var ppText = el('p'); ppText.textContent = node.pp;
+      ppBlock.appendChild(tag); ppBlock.appendChild(ppText);
+      card.appendChild(ppBlock);
+    }
     return card;
   }
 
@@ -428,10 +447,17 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     var cols = flow.cycle.length;
     gridEl.style.setProperty('--cols', cols);
 
+    var pps = [];
+    function makeNode(node, extraClass){
+      var idx = null;
+      if(node.pp){ pps.push(node); idx = pps.length; }
+      return renderNode(node, extraClass, idx);
+    }
+
     var colOf = {};
     flow.cycle.forEach(function(n, i){
       colOf[n.id] = i + 1;
-      var card = renderNode(n);
+      var card = makeNode(n);
       card.style.gridColumn = String(i+1);
       card.style.gridRow = '1';
       gridEl.appendChild(card);
@@ -444,7 +470,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       var lbl = el('div','flow-branch-label'); lbl.textContent = flow.exception.label;
       lbl.style.gridColumn = String(exCol); lbl.style.gridRow = '2';
       gridEl.appendChild(lbl);
-      var exCard = renderNode(flow.exception.node, 'is-exception');
+      var exCard = makeNode(flow.exception.node, 'is-exception');
       exCard.style.gridColumn = String(exCol); exCard.style.gridRow = '3';
       gridEl.appendChild(exCard);
       maxRow = Math.max(maxRow, 3);
@@ -457,7 +483,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       gridEl.appendChild(blbl);
       flow.branch.nodes.forEach(function(n, i){
         var row = 3 + i;
-        var card = renderNode(n);
+        var card = makeNode(n);
         card.style.gridColumn = String(brCol); card.style.gridRow = String(row);
         gridEl.appendChild(card);
         maxRow = Math.max(maxRow, row);
@@ -470,27 +496,11 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       plbl.style.gridColumn = '1 / span ' + Math.min(3, cols); plbl.style.gridRow = String(pRow);
       gridEl.appendChild(plbl);
       flow.periodic.nodes.forEach(function(n, i){
-        var card = renderNode(n);
+        var card = makeNode(n);
         card.style.gridColumn = String(i+1); card.style.gridRow = String(pRow + 1);
         gridEl.appendChild(card);
       });
     }
-
-    var pps = [];
-    function collectPP(n){ if(n.pp) pps.push(n); }
-    flow.cycle.forEach(collectPP);
-    if(flow.exception) collectPP(flow.exception.node);
-    if(flow.branch) flow.branch.nodes.forEach(collectPP);
-
-    pps.forEach(function(n, i){
-      var badgeCard = gridEl.querySelector('[data-id="'+n.id+'"]');
-      if(badgeCard){
-        var badge = el('span','flow-pp-badge');
-        badge.textContent = String(i+1);
-        badge.title = 'Pain point: ' + n.pp;
-        badgeCard.appendChild(badge);
-      }
-    });
 
     ppListEl.innerHTML = '';
     pps.forEach(function(n, i){
@@ -526,7 +536,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     }
     function updateConnectors(){
       var canvasRect = gridEl.getBoundingClientRect();
-      Array.prototype.slice.call(svgElement.querySelectorAll('path')).forEach(function(p){ p.remove(); });
+      Array.prototype.slice.call(svgElement.querySelectorAll('path.flow-edge')).forEach(function(p){ p.remove(); });
       edges.forEach(function(edge){
         var fromEl = gridEl.querySelector('[data-id="'+edge.from+'"]');
         var toEl = gridEl.querySelector('[data-id="'+edge.to+'"]');
@@ -545,6 +555,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
           d = 'M '+x1+' '+y1+' C '+x1+' '+midY+', '+x2+' '+midY+', '+x2+' '+(y2-7);
         }
         var path = svgNode('path');
+        path.setAttribute('class','flow-edge');
         path.setAttribute('d', d);
         path.setAttribute('marker-end','url(#flowArrow)');
         if(edge.dashed) path.classList.add('is-dashed');
@@ -557,18 +568,6 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     if(document.fonts && document.fonts.ready){
       document.fonts.ready.then(function(){ requestAnimationFrame(buildConnectors); });
     }
-
-    var hoverTimer = null;
-    function scheduleUpdate(){
-      clearTimeout(hoverTimer);
-      hoverTimer = setTimeout(updateConnectors, 230);
-    }
-    Array.prototype.slice.call(gridEl.querySelectorAll('.flow-node')).forEach(function(card){
-      card.addEventListener('mouseenter', scheduleUpdate);
-      card.addEventListener('mouseleave', scheduleUpdate);
-      card.addEventListener('focus', scheduleUpdate);
-      card.addEventListener('blur', scheduleUpdate);
-    });
 
     var onResize = debounce(buildConnectors, 150);
     window.addEventListener('resize', onResize);
