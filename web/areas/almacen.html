@@ -158,6 +158,88 @@ tbody tr:hover{ background: var(--surface-alt); }
 .resp-list li{ padding: 0.85rem 0; border-bottom: 1px solid var(--border); color: var(--text-muted); font-size: 0.9375rem; }
 .resp-list li::before{ content: "—"; color: var(--accent); font-weight: 700; margin-right: 0.6em; }
 
+/* Flujos de trabajo — diagrama AS-IS/TO-BE */
+.flow-controls{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1.5rem; }
+.flow-tabs{ display:inline-flex; gap:0.4rem; background:var(--surface-alt); padding:0.3rem; border-radius:999px; border:1px solid var(--border); }
+.flow-tab{ appearance:none; font-family:inherit; font-size:0.8125rem; font-weight:700; padding:0.5em 1.1em; border-radius:999px; border:none; background:transparent; color:var(--text-muted); cursor:pointer; }
+.flow-tab.is-active{ background:var(--accent); color:var(--on-accent); }
+.flow-pills{ display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem; }
+.flow-pills:empty{ display:none; }
+.flow-pill{ appearance:none; font-family:inherit; font-size:0.8125rem; font-weight:700; padding:0.5em 1em; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer; }
+.flow-pill.is-active{ border-color:var(--accent); color:var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+
+.flow-panel[hidden]{ display:none; }
+.flow-canvas{ position:relative; padding-bottom:1rem; }
+.flow-grid{
+  position:relative;
+  display:grid;
+  grid-template-columns: repeat(var(--cols, 5), minmax(150px, 1fr));
+  grid-auto-rows: minmax(0,auto);
+  gap: 2.75rem 1.25rem;
+  align-items: start;
+  padding: 1.5rem 0.5rem 0.5rem;
+}
+.flow-svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; z-index:5; pointer-events:none; }
+.flow-svg path{ fill:none; stroke:var(--border); stroke-width:1.5; }
+.flow-svg path.is-dashed{ stroke-dasharray: 4 4; }
+.flow-svg polygon{ fill:var(--border); }
+
+.flow-node{
+  position:relative;
+  z-index:1;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  box-shadow:var(--shadow);
+  padding:0.9rem 1rem;
+  cursor:default;
+}
+.flow-node:hover, .flow-node:focus-visible, .flow-node.is-expanded{ z-index:10; border-color:var(--accent); outline:none; }
+.flow-node-icon{ width:26px; height:26px; display:flex; align-items:center; justify-content:center; color:var(--accent); margin-bottom:0.5rem; }
+.flow-node-icon svg{ width:20px; height:20px; }
+.flow-node h4{ margin:0; font-size:0.875rem; font-weight:700; line-height:1.3; }
+.flow-node-desc{
+  margin:0; color:var(--text-muted); font-size:0.8125rem; line-height:1.45;
+  max-height:0; opacity:0; overflow:hidden;
+  transition: max-height .22s ease, opacity .22s ease, margin-top .22s ease;
+}
+.flow-node:hover .flow-node-desc, .flow-node:focus-visible .flow-node-desc, .flow-node.is-expanded .flow-node-desc{
+  max-height:12em; opacity:1; margin-top:0.5rem;
+}
+.flow-node.is-exception{ background:var(--dark-surface); border-color:var(--dark-surface); color:var(--on-dark); }
+.flow-node.is-exception .flow-node-icon{ color:var(--accent-soft); }
+.flow-node.is-exception .flow-node-desc{ color:var(--dark-surface-text-muted, #b9bec9); }
+.flow-pp-badge{
+  position:absolute; top:-0.55rem; right:-0.55rem;
+  width:1.5rem; height:1.5rem; border-radius:50%;
+  background:var(--accent); color:var(--on-accent);
+  font-size:0.75rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:var(--shadow);
+}
+.flow-branch-label, .flow-periodic-label{
+  grid-row: 1; align-self:end;
+  font-size:0.6875rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted);
+  padding-bottom:0.35rem;
+}
+
+.flow-painpoints{ list-style:none; margin:2rem 0 0; padding:0; display:flex; flex-direction:column; gap:0.75rem; }
+.flow-painpoints li{ display:flex; gap:0.9rem; align-items:flex-start; cursor:pointer; }
+.flow-painpoints .pp-n{ flex:0 0 auto; width:1.5rem; height:1.5rem; border-radius:50%; background:var(--surface-alt); border:1px solid var(--border); color:var(--accent); font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.flow-painpoints p{ margin:0; font-size:0.875rem; color:var(--text-muted); }
+.flow-painpoints li.is-highlighted .pp-n{ background:var(--accent); color:var(--on-accent); border-color:var(--accent); }
+
+.flow-skeleton{ position:relative; }
+.construction-overlay{
+  position:sticky; top:1rem; z-index:6;
+  display:inline-block; margin-bottom:1.5rem;
+  background:var(--accent); color:var(--on-accent);
+  font-size:0.8125rem; font-weight:700;
+  padding:0.6em 1.1em; border-radius:999px; box-shadow:var(--shadow);
+}
+.flow-canvas--skeleton{ opacity:0.5; filter:grayscale(0.3); }
+.skel-card{ background:var(--surface-alt); border:1px dashed var(--border); border-radius:14px; height:5.5rem; }
+
 footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
 .footer-meta{ display:flex; justify-content: space-between; align-items:center; flex-wrap: wrap; gap: 1rem; font-size: 0.8125rem; color: var(--text-muted); }
 .footer-meta a{ color: var(--text-muted); }
@@ -174,6 +256,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     <nav>
       <a href="https://claude.ai/code/artifact/ecd7483c-b2ab-4ea1-9805-c68283b3af3c">Informe general</a>
       <a href="https://claude.ai/code/artifact/ecd7483c-b2ab-4ea1-9805-c68283b3af3c#areas">Todas las áreas</a>
+      <a href="#flujos">Flujos de trabajo</a>
     </nav>
   </div>
 </header>
@@ -256,6 +339,43 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
   </div>
 </section>
 
+<section id="flujos">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Flujos de trabajo</div>
+        <h2>Cómo opera el área hoy</h2>
+      </div>
+      <p class="section-note">Reconstruido a partir de la entrevista. Los números marcan los pain points confirmados.</p>
+    </div>
+
+    <div class="flow-controls">
+      <div class="flow-tabs" role="tablist">
+        <button type="button" class="flow-tab is-active" data-tab="asis">Cómo es hoy</button>
+        <button type="button" class="flow-tab" data-tab="tobe">Cómo puede ser</button>
+      </div>
+    </div>
+
+    <div class="flow-pills" id="flowPersonPills"></div>
+    <div class="flow-pills" id="flowNamePills"></div>
+
+    <div class="flow-panel" data-panel="asis">
+      <div class="flow-canvas" id="flowCanvas">
+        <svg class="flow-svg" id="flowSvg"></svg>
+        <div class="flow-grid" id="flowGrid"></div>
+      </div>
+      <ol class="flow-painpoints" id="flowPainpoints"></ol>
+    </div>
+
+    <div class="flow-panel" data-panel="tobe" hidden>
+      <div class="flow-skeleton">
+        <div class="construction-overlay">TO-BE en diseño — próxima fase del proyecto</div>
+        <div class="flow-canvas flow-canvas--skeleton" id="flowSkeleton"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
     <div class="footer-nav"><a href="https://claude.ai/code/artifact/ecd7483c-b2ab-4ea1-9805-c68283b3af3c#areas">← Volver a todas las áreas</a></div>
@@ -265,6 +385,301 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     </div>
   </div>
 </footer>
+
+<script>
+/* Motor de diagramas de flujo AS-IS/TO-BE — estética AZ, reusado idéntico en las 8 páginas de área */
+(function(){
+  var ICONS = {
+    whatsapp: '<path d="M12 2a10 10 0 00-8.5 15.2L2 22l4.9-1.5A10 10 0 1012 2z" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M8.5 8.5c.3 2 3 4.7 5 5l1-1.2c.2-.3.6-.4.9-.2l1.7 1c.3.2.4.6.2.9-.5 1-1.6 1.6-2.7 1.4-2.8-.5-5.7-3.4-6.2-6.2-.2-1.1.4-2.2 1.4-2.7.3-.2.7-.1.9.2l1 1.7c.2.3.1.7-.2.9z" fill="currentColor" stroke="none"/>',
+    search: '<circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.6" fill="none"/><line x1="15.5" y1="15.5" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    box: '<path d="M3 7l9-4 9 4-9 4-9-4z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M3 7v10l9 4 9-4V7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><line x1="12" y1="11" x2="12" y2="21" stroke="currentColor" stroke-width="1.6"/>',
+    doc: '<path d="M6 2h9l5 5v15H6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M15 2v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><line x1="9" y1="13" x2="15" y2="13" stroke="currentColor" stroke-width="1.6"/><line x1="9" y1="17" x2="15" y2="17" stroke="currentColor" stroke-width="1.6"/>',
+    check: '<circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M8 12l2.5 2.5L16 9" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    sheet: '<rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><line x1="3" y1="9" x2="21" y2="9" stroke="currentColor" stroke-width="1.6"/><line x1="9" y1="9" x2="9" y2="21" stroke="currentColor" stroke-width="1.6"/>',
+    quote: '<path d="M7 8c-2 0-3.5 1.5-3.5 3.5S5 15 7 15c0 2-1 3-3 3.5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M16 8c-2 0-3.5 1.5-3.5 3.5S14 15 16 15c0 2-1 3-3 3.5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>',
+    send: '<path d="M3 11l18-8-8 18-2.5-7.5L3 11z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>',
+    alert: '<path d="M12 3l10 18H2z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="17.2" r="0.9" fill="currentColor"/>'
+  };
+  var ANCHOR_Y = 28;
+
+  function el(tag, cls){ var e=document.createElement(tag); if(cls) e.className=cls; return e; }
+  function svgNode(tag){ return document.createElementNS('http://www.w3.org/2000/svg', tag); }
+  function debounce(fn, ms){ var t; return function(){ clearTimeout(t); t=setTimeout(fn, ms); }; }
+
+  function renderNode(node, extraClass){
+    var card = el('div', 'flow-node' + (extraClass ? ' ' + extraClass : ''));
+    card.dataset.id = node.id;
+    card.tabIndex = 0;
+    var icon = el('div','flow-node-icon');
+    icon.innerHTML = '<svg viewBox="0 0 24 24">' + (ICONS[node.icon] || ICONS.doc) + '</svg>';
+    card.appendChild(icon);
+    var h4 = el('h4'); h4.textContent = node.title; card.appendChild(h4);
+    var p = el('p','flow-node-desc'); p.textContent = node.desc; card.appendChild(p);
+    if(node.pp){
+      var badge = el('span','flow-pp-badge'); badge.textContent = node.pp; card.appendChild(badge);
+    }
+    return card;
+  }
+
+  function renderFlow(flow, gridEl, svgElement, ppListEl){
+    gridEl.innerHTML = '';
+    var cols = flow.cycle.length;
+    gridEl.style.setProperty('--cols', cols);
+
+    var colOf = {};
+    flow.cycle.forEach(function(n, i){
+      colOf[n.id] = i + 1;
+      var card = renderNode(n);
+      card.style.gridColumn = String(i+1);
+      card.style.gridRow = '1';
+      gridEl.appendChild(card);
+    });
+
+    var maxRow = 1;
+
+    if(flow.exception){
+      var exCol = colOf[flow.exception.triggerId] || 2;
+      var lbl = el('div','flow-branch-label'); lbl.textContent = flow.exception.label;
+      lbl.style.gridColumn = String(exCol); lbl.style.gridRow = '2';
+      gridEl.appendChild(lbl);
+      var exCard = renderNode(flow.exception.node, 'is-exception');
+      exCard.style.gridColumn = String(exCol); exCard.style.gridRow = '3';
+      gridEl.appendChild(exCard);
+      maxRow = Math.max(maxRow, 3);
+    }
+
+    if(flow.branch){
+      var brCol = colOf[flow.branch.triggerId] || cols;
+      var blbl = el('div','flow-branch-label'); blbl.textContent = flow.branch.label;
+      blbl.style.gridColumn = String(brCol); blbl.style.gridRow = '2';
+      gridEl.appendChild(blbl);
+      flow.branch.nodes.forEach(function(n, i){
+        var row = 3 + i;
+        var card = renderNode(n);
+        card.style.gridColumn = String(brCol); card.style.gridRow = String(row);
+        gridEl.appendChild(card);
+        maxRow = Math.max(maxRow, row);
+      });
+    }
+
+    if(flow.periodic){
+      var pRow = maxRow + 1;
+      var plbl = el('div','flow-periodic-label'); plbl.textContent = flow.periodic.label;
+      plbl.style.gridColumn = '1 / span ' + Math.min(3, cols); plbl.style.gridRow = String(pRow);
+      gridEl.appendChild(plbl);
+      flow.periodic.nodes.forEach(function(n, i){
+        var card = renderNode(n);
+        card.style.gridColumn = String(i+1); card.style.gridRow = String(pRow + 1);
+        gridEl.appendChild(card);
+      });
+    }
+
+    var pps = [];
+    function collectPP(n){ if(n.pp) pps.push(n); }
+    flow.cycle.forEach(collectPP);
+    if(flow.exception) collectPP(flow.exception.node);
+    if(flow.branch) flow.branch.nodes.forEach(collectPP);
+    pps.sort(function(a,b){ return a.pp - b.pp; });
+
+    ppListEl.innerHTML = '';
+    pps.forEach(function(n, i){
+      var li = el('li');
+      var num = el('span','pp-n'); num.textContent = String(i+1);
+      var p = el('p'); p.textContent = n.desc;
+      li.appendChild(num); li.appendChild(p);
+      function toggle(on){
+        li.classList.toggle('is-highlighted', on);
+        var card = gridEl.querySelector('[data-id="'+n.id+'"]');
+        if(card) card.classList.toggle('is-expanded', on);
+        updateConnectors();
+      }
+      li.addEventListener('mouseenter', function(){ toggle(true); });
+      li.addEventListener('mouseleave', function(){ toggle(false); });
+      ppListEl.appendChild(li);
+    });
+
+    var edges = [];
+    for(var i=0;i<flow.cycle.length-1;i++){
+      edges.push({ from: flow.cycle[i].id, to: flow.cycle[i+1].id, dir:'h' });
+    }
+    if(flow.exception){
+      edges.push({ from: flow.exception.triggerId, to: flow.exception.node.id, dir:'v', dashed:true });
+    }
+    if(flow.branch){
+      var chain = [flow.branch.triggerId].concat(flow.branch.nodes.map(function(n){return n.id;}));
+      for(var j=0;j<chain.length-1;j++){
+        edges.push({ from: chain[j], to: chain[j+1], dir:'v' });
+      }
+    }
+    if(flow.periodic){
+      for(var k=0;k<flow.periodic.nodes.length-1;k++){
+        edges.push({ from: flow.periodic.nodes[k].id, to: flow.periodic.nodes[k+1].id, dir:'h' });
+      }
+    }
+
+    function buildConnectors(){
+      svgElement.innerHTML = '<defs><marker id="flowArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" style="fill:var(--border)"/></marker></defs>';
+      updateConnectors();
+    }
+    function updateConnectors(){
+      var canvasRect = gridEl.getBoundingClientRect();
+      Array.prototype.slice.call(svgElement.querySelectorAll('path')).forEach(function(p){ p.remove(); });
+      edges.forEach(function(edge){
+        var fromEl = gridEl.querySelector('[data-id="'+edge.from+'"]');
+        var toEl = gridEl.querySelector('[data-id="'+edge.to+'"]');
+        if(!fromEl || !toEl) return;
+        var fr = fromEl.getBoundingClientRect(), tr = toEl.getBoundingClientRect();
+        var x1,y1,x2,y2,d,midX,midY;
+        if(edge.dir === 'h'){
+          x1 = fr.right - canvasRect.left; y1 = fr.top - canvasRect.top + ANCHOR_Y;
+          x2 = tr.left - canvasRect.left; y2 = tr.top - canvasRect.top + ANCHOR_Y;
+          midX = (x1+x2)/2;
+          d = 'M '+x1+' '+y1+' C '+midX+' '+y1+', '+midX+' '+y2+', '+(x2-7)+' '+y2;
+        } else {
+          x1 = fr.left - canvasRect.left + fr.width/2; y1 = fr.bottom - canvasRect.top;
+          x2 = tr.left - canvasRect.left + tr.width/2; y2 = tr.top - canvasRect.top;
+          midY = (y1+y2)/2;
+          d = 'M '+x1+' '+y1+' C '+x1+' '+midY+', '+x2+' '+midY+', '+x2+' '+(y2-7);
+        }
+        var path = svgNode('path');
+        path.setAttribute('d', d);
+        path.setAttribute('marker-end','url(#flowArrow)');
+        if(edge.dashed) path.classList.add('is-dashed');
+        svgElement.appendChild(path);
+      });
+    }
+
+    buildConnectors();
+
+    Array.prototype.slice.call(gridEl.querySelectorAll('.flow-node')).forEach(function(card){
+      card.addEventListener('mouseenter', function(){ setTimeout(updateConnectors, 230); });
+      card.addEventListener('mouseleave', function(){ setTimeout(updateConnectors, 230); });
+      card.addEventListener('focus', function(){ setTimeout(updateConnectors, 230); });
+      card.addEventListener('blur', function(){ setTimeout(updateConnectors, 230); });
+    });
+
+    var onResize = debounce(buildConnectors, 150);
+    window.addEventListener('resize', onResize);
+
+    return { buildConnectors: buildConnectors };
+  }
+
+  function renderSkeleton(flow, skelEl){
+    if(!skelEl) return;
+    skelEl.innerHTML = '';
+    skelEl.style.display = 'grid';
+    skelEl.style.gridTemplateColumns = 'repeat(' + flow.cycle.length + ', minmax(150px,1fr))';
+    skelEl.style.gap = '1.25rem';
+    flow.cycle.forEach(function(){
+      skelEl.appendChild(el('div','skel-card'));
+    });
+  }
+
+  window.DPROMA_initFlows = function(rootId, peopleData){
+    var root = document.getElementById(rootId);
+    if(!root) return;
+    var personPillsEl = root.querySelector('#flowPersonPills');
+    var namePillsEl = root.querySelector('#flowNamePills');
+    var gridEl = root.querySelector('#flowGrid');
+    var svgElement = root.querySelector('#flowSvg');
+    var ppListEl = root.querySelector('#flowPainpoints');
+    var skelEl = root.querySelector('#flowSkeleton');
+    var tabs = root.querySelectorAll('.flow-tab');
+    var panels = root.querySelectorAll('.flow-panel');
+
+    var state = { personIdx: 0, flowIdx: 0 };
+    var currentInstance = null;
+
+    function currentPerson(){ return peopleData[state.personIdx]; }
+    function currentFlow(){ return currentPerson().flows[state.flowIdx]; }
+
+    function renderPersonPills(){
+      personPillsEl.innerHTML = '';
+      if(peopleData.length < 2) return;
+      peopleData.forEach(function(p, i){
+        var btn = el('button','flow-pill' + (i===state.personIdx ? ' is-active':''));
+        btn.type='button'; btn.textContent = p.label;
+        btn.addEventListener('click', function(){ state.personIdx = i; state.flowIdx = 0; renderAll(); });
+        personPillsEl.appendChild(btn);
+      });
+    }
+    function renderNamePills(){
+      namePillsEl.innerHTML = '';
+      var flows = currentPerson().flows;
+      if(flows.length < 2) return;
+      flows.forEach(function(f, i){
+        var btn = el('button','flow-pill' + (i===state.flowIdx ? ' is-active':''));
+        btn.type='button'; btn.textContent = f.label;
+        btn.addEventListener('click', function(){ state.flowIdx = i; renderAll(); });
+        namePillsEl.appendChild(btn);
+      });
+    }
+    function renderAll(){
+      renderPersonPills();
+      renderNamePills();
+      var flow = currentFlow();
+      currentInstance = renderFlow(flow, gridEl, svgElement, ppListEl);
+      renderSkeleton(flow, skelEl);
+    }
+
+    Array.prototype.slice.call(tabs).forEach(function(tab){
+      tab.addEventListener('click', function(){
+        Array.prototype.slice.call(tabs).forEach(function(t){ t.classList.remove('is-active'); });
+        tab.classList.add('is-active');
+        var name = tab.dataset.tab;
+        Array.prototype.slice.call(panels).forEach(function(p){ p.hidden = p.dataset.panel !== name; });
+        if(name === 'asis' && currentInstance) currentInstance.buildConnectors();
+      });
+    });
+
+    renderAll();
+  };
+})();
+
+DPROMA_initFlows('flujos', [
+  {
+    id: 'jesus',
+    label: 'Jesus Ignacio Zamora — Almacén',
+    flows: [
+      {
+        id: 'ciclo',
+        label: 'Ciclo diario — despacho y registro',
+        cycle: [
+          { id:'n1', title:'Recibe ruta del día', desc:'Operaciones sube al grupo de WhatsApp de almacén la ruta del día y la cantidad de servicios programados.', icon:'whatsapp' },
+          { id:'n2', title:'Revisa material necesario', desc:'Revisa qué material se necesita para esos servicios — el criterio de consumo por servicio aún no está cerrado.', icon:'search', pp:1 },
+          { id:'n3', title:'Prepara y despacha', desc:'Prepara y entrega el material a los instaladores.', icon:'box' },
+          { id:'n4', title:'Registra salida', desc:'Llena el formato de salida de material del día: qué salió, cuándo, para cuántos servicios.', icon:'doc' },
+          { id:'n5', title:'Instalador ejecuta y reporta', desc:'El instalador ejecuta el servicio en sitio; si sobra material, lo regresa al final del día y se registra como entrada.', icon:'check' },
+          { id:'n6', title:'Actualiza stock en Excel', desc:'Actualiza su Excel personal con mínimos/máximos por volumen de servicios (máximo 100, medio 50, crítico 30) — vive solo en su equipo, pendiente de migrar a la herramienta.', icon:'sheet', pp:2 }
+        ],
+        branch: {
+          triggerId: 'n6',
+          label: '↓ Reposición de stock (nivel bajo)',
+          nodes: [
+            { id:'b1', title:'Cotiza con proveedores', desc:'Al detectar nivel bajo, cotiza con proveedores y ajusta la cantidad a pedir.', icon:'quote' },
+            { id:'b2', title:'Pasa cotización a Admin Principal', desc:'Traslada la cotización para que gestionen el depósito al proveedor.', icon:'send' },
+            { id:'b3', title:'Recibe y cuenta material', desc:'Coordina la fecha de entrega con el proveedor y cuenta físicamente lo recibido.', icon:'box' },
+            { id:'b4', title:'Registra entrada', desc:'Llena el formato de entrada de material y lo guarda en el almacén.', icon:'doc' }
+          ]
+        },
+        exception: {
+          triggerId: 'n2',
+          label: '↓ Excepción — falta de stock no prevista',
+          node: { id:'e1', title:'Compra de emergencia', desc:'Si falta un material puntual y no hay tiempo de esperar el ciclo normal, compra directo en ferretería local y se registra igual como entrada.', icon:'alert', pp:3 }
+        },
+        periodic: {
+          label: 'Proceso periódico — inventario mensual',
+          nodes: [
+            { id:'m1', title:'Cuenta físicamente', desc:'Cuenta producto por producto, físicamente.', icon:'check' },
+            { id:'m2', title:'Cuadra contra el Excel', desc:'Cuadra el conteo contra lo registrado en el Excel.', icon:'sheet' },
+            { id:'m3', title:'Investiga discrepancias', desc:'Si hay discrepancia, investiga antes de confirmar el ajuste.', icon:'search' }
+          ]
+        }
+      }
+    ]
+  }
+]);
+</script>
 
 </body>
 </html>
