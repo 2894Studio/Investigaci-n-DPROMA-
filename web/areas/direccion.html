@@ -216,6 +216,7 @@ tbody tr:hover{ background: var(--surface-alt); }
   font-size:0.75rem; font-weight:700;
   display:flex; align-items:center; justify-content:center;
   box-shadow:var(--shadow);
+  cursor:help;
 }
 .flow-branch-label, .flow-periodic-label{
   grid-row: 1; align-self:end;
@@ -420,9 +421,6 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     card.appendChild(icon);
     var h4 = el('h4'); h4.textContent = node.title; card.appendChild(h4);
     var p = el('p','flow-node-desc'); p.textContent = node.desc; card.appendChild(p);
-    if(node.pp){
-      var badge = el('span','flow-pp-badge'); badge.textContent = node.pp; card.appendChild(badge);
-    }
     return card;
   }
 
@@ -484,13 +482,22 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     flow.cycle.forEach(collectPP);
     if(flow.exception) collectPP(flow.exception.node);
     if(flow.branch) flow.branch.nodes.forEach(collectPP);
-    pps.sort(function(a,b){ return a.pp - b.pp; });
+
+    pps.forEach(function(n, i){
+      var badgeCard = gridEl.querySelector('[data-id="'+n.id+'"]');
+      if(badgeCard){
+        var badge = el('span','flow-pp-badge');
+        badge.textContent = String(i+1);
+        badge.title = 'Pain point: ' + n.pp;
+        badgeCard.appendChild(badge);
+      }
+    });
 
     ppListEl.innerHTML = '';
     pps.forEach(function(n, i){
       var li = el('li');
       var num = el('span','pp-n'); num.textContent = String(i+1);
-      var p = el('p'); p.textContent = n.desc;
+      var p = el('p'); p.textContent = n.pp;
       li.appendChild(num); li.appendChild(p);
       ppListEl.appendChild(li);
     });
@@ -652,23 +659,23 @@ DPROMA_initFlows('flujos', [
         label: 'Ciclo diario — supervisión de la operación',
         cycle: [
           { id:'n1', title:'Llama a Operaciones', desc:'A primera hora de la mañana llama a ICEV/Administración Vehicular para revisar el cierre del día anterior y proyectar el día.', icon:'whatsapp' },
-          { id:'n2', title:'Revisa facturación y cobranza', desc:'Revisa facturación y cuentas por cobrar — sin un tablero único, depende de revisar manualmente cada fuente.', icon:'sheet', pp:1 },
-          { id:'n3', title:'Recorre grupos de WhatsApp', desc:'Recorre los grupos de WhatsApp relevantes (más de 70) buscando avances o anomalías — sin alertas automáticas que le señalen dónde mirar.', icon:'search', pp:2 },
+          { id:'n2', title:'Revisa facturación y cobranza', desc:'Revisa facturación y cuentas por cobrar — sin un tablero único, depende de revisar manualmente cada fuente.', icon:'sheet', pp:'Revisa facturación y cuentas por cobrar sin un tablero único — depende de revisar manualmente cada fuente, sin alertas automáticas.' },
+          { id:'n3', title:'Recorre grupos de WhatsApp', desc:'Recorre los grupos de WhatsApp relevantes (más de 70) buscando avances o anomalías — sin alertas automáticas que le señalen dónde mirar.', icon:'search', pp:'Recorre más de 70 grupos de WhatsApp buscando avances o anomalías, sin ningún sistema que le señale dónde mirar.' },
           { id:'n4', title:'Comenta si algo le llama la atención', desc:'Si algo le llama la atención (ej. una instalación mal ejecutada), comenta directo en el chat para que el área lo atienda.', icon:'alert' },
           { id:'n5', title:'Aprueba fondos con "palomita"', desc:'Cuando un área solicita fondos, revisa la justificación y aprueba con una "palomita" en el chat, en paralelo a la validación de Admin/Finanzas.', icon:'check' },
-          { id:'n6', title:'Sigue al área comercial', desc:'Da seguimiento al área comercial preguntando directamente sobre visitas y relaciones con agencias, sin visibilidad sistemática de la frecuencia de contacto.', icon:'send', pp:3 }
+          { id:'n6', title:'Sigue al área comercial', desc:'Da seguimiento al área comercial preguntando directamente sobre visitas y relaciones con agencias, sin visibilidad sistemática de la frecuencia de contacto.', icon:'send', pp:'Da seguimiento al área comercial preguntando directamente, sin registro de frecuencia de contacto ni visibilidad sistemática de qué agencias necesitan atención.' }
         ],
         branch: {
           triggerId: 'n3',
           label: '↓ Revisión aleatoria de otras áreas',
           nodes: [
-            { id:'b1', title:'Pide evidencia directa', desc:'Ocasionalmente hace revisión aleatoria de reportes de otras áreas, pidiendo la evidencia directamente al responsable — no puede hacerlo de forma sistemática.', icon:'search' }
+            { id:'b1', title:'Pide evidencia directa', desc:'Ocasionalmente hace revisión aleatoria de reportes de otras áreas, pidiendo la evidencia directamente al responsable — no puede hacerlo de forma sistemática.', icon:'search', pp:'Sin acceso directo a reportes o evidencias — depende de pedirlos manualmente a cada responsable de área.' }
           ]
         },
         exception: {
           triggerId: 'n5',
           label: '↓ Excepción — detecta una anomalía',
-          node: { id:'e1', title:'Pide verificación física', desc:'Si detecta una posible anomalía (ej. exceso de compra de un material ya adquirido), pide verificación física antes de aprobar.', icon:'alert', pp:4 }
+          node: { id:'e1', title:'Pide verificación física', desc:'Si detecta una posible anomalía (ej. exceso de compra de un material ya adquirido), pide verificación física antes de aprobar.', icon:'alert', pp:'Sin alertas automáticas para detectar anomalías; depende de que él mismo las note y pida verificación física antes de aprobar.' }
         }
       }
     ]
@@ -682,9 +689,9 @@ DPROMA_initFlows('flujos', [
         label: 'Alta de agencia/cliente en el padrón',
         cycle: [
           { id:'a1', title:'Comercial abre grupo', desc:'Comercial abre un grupo de WhatsApp con la agencia.', icon:'whatsapp' },
-          { id:'a2', title:'Solicita documentos', desc:'Se solicita en el grupo: constancia de situación fiscal, comprobante de domicilio, carátula bancaria, y un formulario en Excel con los datos del gerente y del responsable de pagos.', icon:'doc', pp:1 },
+          { id:'a2', title:'Solicita documentos', desc:'Se solicita en el grupo: constancia de situación fiscal, comprobante de domicilio, carátula bancaria, y un formulario en Excel con los datos del gerente y del responsable de pagos.', icon:'doc', pp:'Alta de clientes 100% manual — no hay formulario digital que alimente el sistema automáticamente.' },
           { id:'a3', title:'Pide respaldo por correo', desc:'Pide que le envíen esos documentos también por correo, aparte del WhatsApp.', icon:'send' },
-          { id:'a4', title:'Organiza en Excel personal', desc:'Organiza manualmente la información recibida en su Excel personal — alta de clientes 100% manual, sin formulario digital que alimente el sistema.', icon:'sheet', pp:2 },
+          { id:'a4', title:'Organiza en Excel personal', desc:'Organiza manualmente la información recibida en su Excel personal — alta de clientes 100% manual, sin formulario digital que alimente el sistema.', icon:'sheet', pp:'La información se organiza a mano en su Excel personal, sin formulario digital que la capture directamente.' },
           { id:'a5', title:'Confirma y notifica', desc:'Confirma el alta al grupo y notifica a Admin/Finanzas e Instaladores — el cliente ya puede solicitar servicios.', icon:'check' }
         ]
       },
@@ -697,7 +704,7 @@ DPROMA_initFlows('flujos', [
           { id:'p3', title:'Envía a Dirección', desc:'Envía la cotización a Dirección por WhatsApp para autorización.', icon:'send' },
           { id:'p4', title:'Traslada a Admin/Finanzas', desc:'Si se autoriza, le generan el recurso y traslada la cotización autorizada a Admin/Finanzas para el pago.', icon:'check' },
           { id:'p5', title:'Comparte comprobante', desc:'Recibe el comprobante y lo comparte con el proveedor.', icon:'doc' },
-          { id:'p6', title:'Registra y arma kits', desc:'Coordina la entrega, registra el ingreso en su Excel y arma los kits — Excel de stock/materiales no integrado con el sistema general.', icon:'sheet', pp:2 }
+          { id:'p6', title:'Registra y arma kits', desc:'Coordina la entrega, registra el ingreso en su Excel y arma los kits — Excel de stock/materiales no integrado con el sistema general.', icon:'sheet', pp:'El Excel de stock y materiales no está integrado con el sistema general.' }
         ]
       }
     ]

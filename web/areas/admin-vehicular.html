@@ -216,6 +216,7 @@ tbody tr:hover{ background: var(--surface-alt); }
   font-size:0.75rem; font-weight:700;
   display:flex; align-items:center; justify-content:center;
   box-shadow:var(--shadow);
+  cursor:help;
 }
 .flow-branch-label, .flow-periodic-label{
   grid-row: 1; align-self:end;
@@ -416,9 +417,6 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     card.appendChild(icon);
     var h4 = el('h4'); h4.textContent = node.title; card.appendChild(h4);
     var p = el('p','flow-node-desc'); p.textContent = node.desc; card.appendChild(p);
-    if(node.pp){
-      var badge = el('span','flow-pp-badge'); badge.textContent = node.pp; card.appendChild(badge);
-    }
     return card;
   }
 
@@ -480,13 +478,22 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     flow.cycle.forEach(collectPP);
     if(flow.exception) collectPP(flow.exception.node);
     if(flow.branch) flow.branch.nodes.forEach(collectPP);
-    pps.sort(function(a,b){ return a.pp - b.pp; });
+
+    pps.forEach(function(n, i){
+      var badgeCard = gridEl.querySelector('[data-id="'+n.id+'"]');
+      if(badgeCard){
+        var badge = el('span','flow-pp-badge');
+        badge.textContent = String(i+1);
+        badge.title = 'Pain point: ' + n.pp;
+        badgeCard.appendChild(badge);
+      }
+    });
 
     ppListEl.innerHTML = '';
     pps.forEach(function(n, i){
       var li = el('li');
       var num = el('span','pp-n'); num.textContent = String(i+1);
-      var p = el('p'); p.textContent = n.desc;
+      var p = el('p'); p.textContent = n.pp;
       li.appendChild(num); li.appendChild(p);
       ppListEl.appendChild(li);
     });
@@ -647,25 +654,25 @@ DPROMA_initFlows('flujos', [
         id: 'ciclo',
         label: 'Ciclo — recepción y ejecución de trámite',
         cycle: [
-          { id:'n1', title:'Recibe solicitud', desc:'El cliente envía la solicitud de trámite por correo, WhatsApp o su propia plataforma — sin canal formal único, lo que diluye responsabilidad y genera pérdida real de tiempo.', icon:'whatsapp', pp:1 },
-          { id:'n2', title:'Calcula y solicita recurso', desc:'Organiza y calcula el presupuesto necesario, y solicita el recurso monetario a Admin Principal — bloqueante: sin esto no se puede proceder con ningún trámite.', icon:'quote', pp:2 },
+          { id:'n1', title:'Recibe solicitud', desc:'El cliente envía la solicitud de trámite por correo, WhatsApp o su propia plataforma — sin canal formal único, lo que diluye responsabilidad y genera pérdida real de tiempo.', icon:'whatsapp', pp:'El cliente envía la solicitud por correo, WhatsApp o su propia plataforma — sin canal formal único, diluye responsabilidad y genera pérdida real de tiempo.' },
+          { id:'n2', title:'Calcula y solicita recurso', desc:'Organiza y calcula el presupuesto necesario, y solicita el recurso monetario a Admin Principal — bloqueante: sin esto no se puede proceder con ningún trámite.', icon:'quote', pp:'Solicitar el recurso monetario a Admin Principal es el cuello de botella #1 del área: bloqueante para poder iniciar cualquier trámite.' },
           { id:'n3', title:'Asigna por localidad', desc:'Autorizado el fondo, se asignan los trámites por localidad al equipo correspondiente en las más de 7 ciudades donde operan.', icon:'send' },
-          { id:'n4', title:'Arma el expediente', desc:'Revisan la documentación entregada y solicitan lo que falte.', icon:'doc' },
+          { id:'n4', title:'Arma el expediente', desc:'Revisan la documentación entregada y solicitan lo que falte.', icon:'doc', pp:'Sin número de reporte único ni bitácora de fechas estructurada por trámite.' },
           { id:'n5', title:'Ejecuta ante la autoridad', desc:'Se ejecuta el trámite ante la autoridad correspondiente, mayormente de forma presencial.', icon:'check' },
-          { id:'n6', title:'Actualiza registro colaborativo', desc:'Se actualiza el Excel colaborativo compartido —a veces también con el equipo del cliente— con semáforo de estatus; múltiples usuarios editando sin control es la fuente de mayor margen de error del área.', icon:'sheet', pp:3 }
+          { id:'n6', title:'Actualiza registro colaborativo', desc:'Se actualiza el Excel colaborativo compartido —a veces también con el equipo del cliente— con semáforo de estatus; múltiples usuarios editando sin control es la fuente de mayor margen de error del área.', icon:'sheet', pp:'Excel colaborativo con múltiples usuarios —incluso del cliente— editando sin control, y sin separación entre comentarios internos y públicos.' }
         ],
         branch: {
-          triggerId: 'n2',
+          triggerId: 'n5',
           label: '↓ Gestión de viáticos de gestores en campo',
           nodes: [
             { id:'b1', title:'Revisión y autorización', desc:'Se revisa y autoriza el viático solicitado.', icon:'check' },
-            { id:'b2', title:'Espera aprobación de Dirección', desc:'Pasa a Admin Principal y espera aprobación de Dirección General antes de fondear — incluso para montos pequeños, con demasiados eslabones en la cadena.', icon:'send', pp:4 }
+            { id:'b2', title:'Espera aprobación de Dirección', desc:'Pasa a Admin Principal y espera aprobación de Dirección General antes de fondear — incluso para montos pequeños, con demasiados eslabones en la cadena.', icon:'send', pp:'La aprobación de viáticos pasa por demasiados eslabones, incluso para montos menores.' }
           ]
         },
         exception: {
           triggerId: 'n6',
           label: '↓ Excepción — cliente pregunta estatus',
-          node: { id:'e1', title:'Responde manualmente', desc:'Si el cliente pregunta el estatus, se responde manualmente por WhatsApp — no existe portal de autoservicio.', icon:'alert' }
+          node: { id:'e1', title:'Responde manualmente', desc:'Si el cliente pregunta el estatus, se responde manualmente por WhatsApp — no existe portal de autoservicio.', icon:'alert', pp:'Sin portal de trazabilidad para el cliente — depende de que alguien del equipo esté disponible para responder por WhatsApp.' }
         }
       }
     ]

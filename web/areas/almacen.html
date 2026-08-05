@@ -216,6 +216,7 @@ tbody tr:hover{ background: var(--surface-alt); }
   font-size:0.75rem; font-weight:700;
   display:flex; align-items:center; justify-content:center;
   box-shadow:var(--shadow);
+  cursor:help;
 }
 .flow-branch-label, .flow-periodic-label{
   grid-row: 1; align-self:end;
@@ -414,9 +415,6 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     card.appendChild(icon);
     var h4 = el('h4'); h4.textContent = node.title; card.appendChild(h4);
     var p = el('p','flow-node-desc'); p.textContent = node.desc; card.appendChild(p);
-    if(node.pp){
-      var badge = el('span','flow-pp-badge'); badge.textContent = node.pp; card.appendChild(badge);
-    }
     return card;
   }
 
@@ -478,13 +476,22 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     flow.cycle.forEach(collectPP);
     if(flow.exception) collectPP(flow.exception.node);
     if(flow.branch) flow.branch.nodes.forEach(collectPP);
-    pps.sort(function(a,b){ return a.pp - b.pp; });
+
+    pps.forEach(function(n, i){
+      var badgeCard = gridEl.querySelector('[data-id="'+n.id+'"]');
+      if(badgeCard){
+        var badge = el('span','flow-pp-badge');
+        badge.textContent = String(i+1);
+        badge.title = 'Pain point: ' + n.pp;
+        badgeCard.appendChild(badge);
+      }
+    });
 
     ppListEl.innerHTML = '';
     pps.forEach(function(n, i){
       var li = el('li');
       var num = el('span','pp-n'); num.textContent = String(i+1);
-      var p = el('p'); p.textContent = n.desc;
+      var p = el('p'); p.textContent = n.pp;
       li.appendChild(num); li.appendChild(p);
       ppListEl.appendChild(li);
     });
@@ -646,11 +653,11 @@ DPROMA_initFlows('flujos', [
         label: 'Ciclo diario — despacho y registro',
         cycle: [
           { id:'n1', title:'Recibe ruta del día', desc:'Operaciones sube al grupo de WhatsApp de almacén la ruta del día y la cantidad de servicios programados.', icon:'whatsapp' },
-          { id:'n2', title:'Revisa material necesario', desc:'Revisa qué material se necesita para esos servicios — el criterio de consumo por servicio aún no está cerrado.', icon:'search', pp:1 },
+          { id:'n2', title:'Revisa material necesario', desc:'Revisa qué material se necesita para esos servicios — el criterio de consumo por servicio aún no está cerrado.', icon:'search', pp:'El criterio de consumo real de material por servicio aún no está cerrado — ha cambiado varias veces (de 2 a 6 codos, según distancia).' },
           { id:'n3', title:'Prepara y despacha', desc:'Prepara y entrega el material a los instaladores.', icon:'box' },
           { id:'n4', title:'Registra salida', desc:'Llena el formato de salida de material del día: qué salió, cuándo, para cuántos servicios.', icon:'doc' },
           { id:'n5', title:'Instalador ejecuta y reporta', desc:'El instalador ejecuta el servicio en sitio; si sobra material, lo regresa al final del día y se registra como entrada.', icon:'check' },
-          { id:'n6', title:'Actualiza stock en Excel', desc:'Actualiza su Excel personal con mínimos/máximos por volumen de servicios (máximo 100, medio 50, crítico 30) — vive solo en su equipo, pendiente de migrar a la herramienta.', icon:'sheet', pp:2 }
+          { id:'n6', title:'Actualiza stock en Excel', desc:'Actualiza su Excel personal con mínimos/máximos por volumen de servicios (máximo 100, medio 50, crítico 30) — vive solo en su equipo, pendiente de migrar a la herramienta.', icon:'sheet', pp:'La base de datos de almacén vive en un Excel personal que debe actualizarse manualmente, pendiente de migrar a la herramienta en desarrollo.' }
         ],
         branch: {
           triggerId: 'n6',
@@ -665,7 +672,7 @@ DPROMA_initFlows('flujos', [
         exception: {
           triggerId: 'n2',
           label: '↓ Excepción — falta de stock no prevista',
-          node: { id:'e1', title:'Compra de emergencia', desc:'Si falta un material puntual y no hay tiempo de esperar el ciclo normal, compra directo en ferretería local y se registra igual como entrada.', icon:'alert', pp:3 }
+          node: { id:'e1', title:'Compra de emergencia', desc:'Si falta un material puntual y no hay tiempo de esperar el ciclo normal, compra directo en ferretería local y se registra igual como entrada.', icon:'alert', pp:'Sin reportes periódicos de inventario — todo es reactivo; cuando falta stock se resuelve con una compra de emergencia en ferretería.' }
         },
         periodic: {
           label: 'Proceso periódico — inventario mensual',

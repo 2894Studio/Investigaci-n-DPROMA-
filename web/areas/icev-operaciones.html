@@ -216,6 +216,7 @@ tbody tr:hover{ background: var(--surface-alt); }
   font-size:0.75rem; font-weight:700;
   display:flex; align-items:center; justify-content:center;
   box-shadow:var(--shadow);
+  cursor:help;
 }
 .flow-branch-label, .flow-periodic-label{
   grid-row: 1; align-self:end;
@@ -413,9 +414,6 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     card.appendChild(icon);
     var h4 = el('h4'); h4.textContent = node.title; card.appendChild(h4);
     var p = el('p','flow-node-desc'); p.textContent = node.desc; card.appendChild(p);
-    if(node.pp){
-      var badge = el('span','flow-pp-badge'); badge.textContent = node.pp; card.appendChild(badge);
-    }
     return card;
   }
 
@@ -477,13 +475,22 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     flow.cycle.forEach(collectPP);
     if(flow.exception) collectPP(flow.exception.node);
     if(flow.branch) flow.branch.nodes.forEach(collectPP);
-    pps.sort(function(a,b){ return a.pp - b.pp; });
+
+    pps.forEach(function(n, i){
+      var badgeCard = gridEl.querySelector('[data-id="'+n.id+'"]');
+      if(badgeCard){
+        var badge = el('span','flow-pp-badge');
+        badge.textContent = String(i+1);
+        badge.title = 'Pain point: ' + n.pp;
+        badgeCard.appendChild(badge);
+      }
+    });
 
     ppListEl.innerHTML = '';
     pps.forEach(function(n, i){
       var li = el('li');
       var num = el('span','pp-n'); num.textContent = String(i+1);
-      var p = el('p'); p.textContent = n.desc;
+      var p = el('p'); p.textContent = n.pp;
       li.appendChild(num); li.appendChild(p);
       ppListEl.appendChild(li);
     });
@@ -645,24 +652,24 @@ DPROMA_initFlows('flujos', [
         label: 'Ciclo diario — recepción y ejecución de instalación',
         cycle: [
           { id:'n1', title:'Recibe solicitud', desc:'Llega la solicitud de instalación por WhatsApp, de una agencia o directo del cliente.', icon:'whatsapp' },
-          { id:'n2', title:'Registra cliente en Excel', desc:'Se registra al cliente en el Excel correspondiente — los datos de clientes viven dispersos en documentos Excel.', icon:'sheet', pp:1 },
+          { id:'n2', title:'Registra cliente en Excel', desc:'Se registra al cliente en el Excel correspondiente — los datos de clientes viven dispersos en documentos Excel.', icon:'sheet', pp:'Los datos de clientes viven dispersos en documentos Excel, sin repositorio compartido.' },
           { id:'n3', title:'Agenda instalación', desc:'Se agenda la instalación con un día de anticipación.', icon:'check' },
-          { id:'n4', title:'Diseña ruta con IA', desc:'Diseña la ruta óptima apoyándose en un prompt de IA — sin proceso estandarizado para el resto del equipo.', icon:'search', pp:2 },
-          { id:'n5', title:'Solicita y valida material', desc:'Solicita material a Almacén mediante hoja compartida y se revisa la cantidad. Si alguno de los dos no está disponible, la salida ocurre sin ese control formal.', icon:'box', pp:3 },
+          { id:'n4', title:'Diseña ruta con IA', desc:'Diseña la ruta óptima apoyándose en un prompt de IA — sin proceso estandarizado para el resto del equipo.', icon:'search', pp:'La creación de rutas depende de un prompt de IA, sin proceso estandarizado para el resto del equipo.' },
+          { id:'n5', title:'Solicita y valida material', desc:'Solicita material a Almacén mediante hoja compartida y se revisa la cantidad. Si alguno de los dos no está disponible, la salida ocurre sin ese control formal.', icon:'box', pp:'Cuello de botella en validación de materiales: depende de que Almacén e ICEV estén disponibles para revisar y autorizar; si uno falta, la salida ocurre sin ese control formal.' },
           { id:'n6', title:'Despacho y ejecución', desc:'Almacén despacha el material y el instalador sale a ruta a ejecutar el servicio.', icon:'doc' }
         ],
         branch: {
-          triggerId: 'n3',
+          triggerId: 'n4',
           label: '↓ Gestión de viáticos',
           nodes: [
             { id:'b1', title:'Estima el desplazamiento', desc:'Según si el instalador debe quedarse en el sitio, se hace una estimación de ruta y kilometraje.', icon:'search' },
-            { id:'b2', title:'Envía solicitud a Admin Principal', desc:'Se envía la solicitud de viáticos a administración para su gestión — mayor pérdida de tiempo cuando depende de decisiones externas al área.', icon:'send', pp:4 }
+            { id:'b2', title:'Envía solicitud a Admin Principal', desc:'Se envía la solicitud de viáticos a administración para su gestión — mayor pérdida de tiempo cuando depende de decisiones externas al área.', icon:'send', pp:'Mayor pérdida de tiempo cuando la liberación de recursos de viáticos depende de decisiones externas al área.' }
           ]
         },
         exception: {
           triggerId: 'n6',
           label: '↓ Excepción — sobrante o cancelación',
-          node: { id:'e1', title:'Aviso informal por WhatsApp', desc:'Si sobra material o hay cancelación, se avisa por WhatsApp — sin proceso formal de devolución ni control sistemático.', icon:'alert' }
+          node: { id:'e1', title:'Aviso informal por WhatsApp', desc:'Si sobra material o hay cancelación, se avisa por WhatsApp — sin proceso formal de devolución ni control sistemático.', icon:'alert', pp:'Sin proceso formal de devolución de material sobrante — se gestiona por WhatsApp, sin control sistemático.' }
         }
       }
     ]

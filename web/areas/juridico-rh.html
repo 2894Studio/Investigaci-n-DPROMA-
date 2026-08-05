@@ -216,6 +216,7 @@ tbody tr:hover{ background: var(--surface-alt); }
   font-size:0.75rem; font-weight:700;
   display:flex; align-items:center; justify-content:center;
   box-shadow:var(--shadow);
+  cursor:help;
 }
 .flow-branch-label, .flow-periodic-label{
   grid-row: 1; align-self:end;
@@ -417,9 +418,6 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     card.appendChild(icon);
     var h4 = el('h4'); h4.textContent = node.title; card.appendChild(h4);
     var p = el('p','flow-node-desc'); p.textContent = node.desc; card.appendChild(p);
-    if(node.pp){
-      var badge = el('span','flow-pp-badge'); badge.textContent = node.pp; card.appendChild(badge);
-    }
     return card;
   }
 
@@ -481,13 +479,22 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     flow.cycle.forEach(collectPP);
     if(flow.exception) collectPP(flow.exception.node);
     if(flow.branch) flow.branch.nodes.forEach(collectPP);
-    pps.sort(function(a,b){ return a.pp - b.pp; });
+
+    pps.forEach(function(n, i){
+      var badgeCard = gridEl.querySelector('[data-id="'+n.id+'"]');
+      if(badgeCard){
+        var badge = el('span','flow-pp-badge');
+        badge.textContent = String(i+1);
+        badge.title = 'Pain point: ' + n.pp;
+        badgeCard.appendChild(badge);
+      }
+    });
 
     ppListEl.innerHTML = '';
     pps.forEach(function(n, i){
       var li = el('li');
       var num = el('span','pp-n'); num.textContent = String(i+1);
-      var p = el('p'); p.textContent = n.desc;
+      var p = el('p'); p.textContent = n.pp;
       li.appendChild(num); li.appendChild(p);
       ppListEl.appendChild(li);
     });
@@ -649,11 +656,11 @@ DPROMA_initFlows('flujos', [
         label: 'Elaboración de contrato',
         cycle: [
           { id:'n1', title:'Recibe solicitud', desc:'Recibe la solicitud de contrato —de Comercial, de un socio, o de Dirección— por WhatsApp o verbalmente.', icon:'whatsapp' },
-          { id:'n2', title:'Identifica plantilla o investiga', desc:'Identifica si aplica una plantilla ya estandarizada (gestoría vehicular, instalación, NDA) — hoy solo existen 3 plantillas parciales; si no hay precedente, investiga qué tipo de contrato aplica.', icon:'search', pp:1 },
-          { id:'n3', title:'Genera primer borrador', desc:'Si es un proyecto sin precedente, genera un primer borrador con IA — la elaboración de contratos consume cerca del 70% de su tiempo, pese a que podría estandarizarse.', icon:'doc', pp:2 },
+          { id:'n2', title:'Identifica plantilla o investiga', desc:'Identifica si aplica una plantilla ya estandarizada (gestoría vehicular, instalación, NDA) — hoy solo existen 3 plantillas parciales; si no hay precedente, investiga qué tipo de contrato aplica.', icon:'search', pp:'Solo existen 3 plantillas parciales (gestoría vehicular, instalación, NDA); si no encajan, tiene que investigar desde cero qué tipo de contrato aplica cada vez.' },
+          { id:'n3', title:'Genera primer borrador', desc:'Si es un proyecto sin precedente, genera un primer borrador con IA — la elaboración de contratos consume cerca del 70% de su tiempo, pese a que podría estandarizarse.', icon:'doc', pp:'La elaboración de contratos consume cerca del 70% de su tiempo de forma manual, pese a que podría estandarizarse.' },
           { id:'n4', title:'Añade cláusulas de protección', desc:'Añade manualmente las declaraciones y cláusulas que protegen a DPROMA — esto no lo hace la IA; los datos del cliente se cargan siempre a mano, nunca se suben a la IA.', icon:'check' },
           { id:'n5', title:'Comparte y negocia', desc:'Comparte el contrato vía Google Docs para negociación, revisa cambios propuestos y negocia cláusulas específicas.', icon:'send' },
-          { id:'n6', title:'Firma y guarda', desc:'Genera y firma el NDA correspondiente a la par. El contrato firmado queda en su computadora y en la nube si está compartido con el cliente, sin repositorio central ni firma digital integrada.', icon:'sheet', pp:3 }
+          { id:'n6', title:'Firma y guarda', desc:'Genera y firma el NDA correspondiente a la par. El contrato firmado queda en su computadora y en la nube si está compartido con el cliente, sin repositorio central ni firma digital integrada.', icon:'sheet', pp:'El contrato firmado queda en su computadora y en la nube si está compartido con el cliente — sin repositorio documental corporativo ni firma digital integrada.' }
         ],
         exception: {
           triggerId: 'n5',
@@ -666,7 +673,7 @@ DPROMA_initFlows('flujos', [
         label: 'Onboarding e incidencias de RH',
         cycle: [
           { id:'r1', title:'Comparte onboarding', desc:'Comparte la presentación de onboarding (Word) al nuevo colaborador.', icon:'doc' },
-          { id:'r2', title:'Gestiona incidencias', desc:'Gestiona las incidencias del día a día de forma presencial en oficina — explícitamente no es un proceso a distancia; hay resistencia de los colaboradores a adoptar procesos nuevos formalizados.', icon:'check', pp:1 },
+          { id:'r2', title:'Gestiona incidencias', desc:'Gestiona las incidencias del día a día de forma presencial en oficina — explícitamente no es un proceso a distancia; hay resistencia de los colaboradores a adoptar procesos nuevos formalizados.', icon:'check' },
           { id:'r3', title:'Orienta accidente/incapacidad', desc:'Ante un accidente o incapacidad, orienta el proceso con el Seguro Social y registra la incidencia.', icon:'alert' },
           { id:'r4', title:'Gestiona salidas', desc:'Para salidas, negocia y explica el motivo con el colaborador.', icon:'send' }
         ]

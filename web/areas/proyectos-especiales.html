@@ -216,6 +216,7 @@ tbody tr:hover{ background: var(--surface-alt); }
   font-size:0.75rem; font-weight:700;
   display:flex; align-items:center; justify-content:center;
   box-shadow:var(--shadow);
+  cursor:help;
 }
 .flow-branch-label, .flow-periodic-label{
   grid-row: 1; align-self:end;
@@ -417,9 +418,6 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     card.appendChild(icon);
     var h4 = el('h4'); h4.textContent = node.title; card.appendChild(h4);
     var p = el('p','flow-node-desc'); p.textContent = node.desc; card.appendChild(p);
-    if(node.pp){
-      var badge = el('span','flow-pp-badge'); badge.textContent = node.pp; card.appendChild(badge);
-    }
     return card;
   }
 
@@ -481,13 +479,22 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     flow.cycle.forEach(collectPP);
     if(flow.exception) collectPP(flow.exception.node);
     if(flow.branch) flow.branch.nodes.forEach(collectPP);
-    pps.sort(function(a,b){ return a.pp - b.pp; });
+
+    pps.forEach(function(n, i){
+      var badgeCard = gridEl.querySelector('[data-id="'+n.id+'"]');
+      if(badgeCard){
+        var badge = el('span','flow-pp-badge');
+        badge.textContent = String(i+1);
+        badge.title = 'Pain point: ' + n.pp;
+        badgeCard.appendChild(badge);
+      }
+    });
 
     ppListEl.innerHTML = '';
     pps.forEach(function(n, i){
       var li = el('li');
       var num = el('span','pp-n'); num.textContent = String(i+1);
-      var p = el('p'); p.textContent = n.desc;
+      var p = el('p'); p.textContent = n.pp;
       li.appendChild(num); li.appendChild(p);
       ppListEl.appendChild(li);
     });
@@ -649,24 +656,24 @@ DPROMA_initFlows('flujos', [
         label: 'Ciclo — evaluación de un nuevo proyecto',
         cycle: [
           { id:'n1', title:'Recibe nuevo proyecto', desc:'El área comercial o Dirección contacta con un nuevo proyecto.', icon:'whatsapp' },
-          { id:'n2', title:'Solicita información inicial', desc:'Solicita planos, fotografías y contexto de la necesidad — la información mínima para evaluar factibilidad no está documentada ni compartida con el equipo.', icon:'doc', pp:1 },
-          { id:'n3', title:'Primera entrevista con cliente', desc:'Realiza la primera entrevista con el cliente para validar si la idea es técnicamente viable; en proyectos grandes, Comercial lo acompaña. La información técnica suele llegar incompleta desde el lead.', icon:'check', pp:2 },
+          { id:'n2', title:'Solicita información inicial', desc:'Solicita planos, fotografías y contexto de la necesidad — la información mínima para evaluar factibilidad no está documentada ni compartida con el equipo.', icon:'doc', pp:'La información técnica suele llegar incompleta desde el lead, y no existe un formato documentado de qué mínimo se necesita para evaluar factibilidad.' },
+          { id:'n3', title:'Primera entrevista con cliente', desc:'Realiza la primera entrevista con el cliente para validar si la idea es técnicamente viable; en proyectos grandes, Comercial lo acompaña. La información técnica suele llegar incompleta desde el lead.', icon:'check', pp:'Sin formato de evaluación de factibilidad: él sabe mentalmente qué necesita, pero no está documentado ni compartido con el equipo ni con el cliente.' },
           { id:'n4', title:'Visita de campo', desc:'Programa visita de campo: revisa factibilidad eléctrica y física del espacio, y da un criterio (viable / viable con ajustes / no viable).', icon:'search' },
           { id:'n5', title:'Revisión conjunta con ICEV', desc:'Pasa la información al área ICEV para revisión técnica conjunta, y se reúnen de nuevo con el cliente con la propuesta ya integrada.', icon:'send' },
-          { id:'n6', title:'Documenta todo ad hoc', desc:'Todo el proceso se documenta caso por caso —correo, Excel, AutoCAD, PowerPoint— sin plantilla ni etapas estandarizadas, ni base de datos compartida con el equipo.', icon:'sheet', pp:3 }
+          { id:'n6', title:'Documenta todo ad hoc', desc:'Todo el proceso se documenta caso por caso —correo, Excel, AutoCAD, PowerPoint— sin plantilla ni etapas estandarizadas, ni base de datos compartida con el equipo.', icon:'sheet', pp:'Todo el proceso se documenta caso por caso, sin plantilla ni etapas estandarizadas, y sin base de datos compartida — el equipo depende de preguntarle directamente el estatus.' }
         ],
         branch: {
           triggerId: 'n5',
           label: '↓ Si requiere remodelación o servicio especializado',
           nodes: [
-            { id:'b1', title:'Busca proveedores', desc:'Busca proveedores por conocidos, redes sociales o recomendación de Comercial — de forma informal y manual, sin repositorio de proveedores validados.', icon:'search', pp:4 },
+            { id:'b1', title:'Busca proveedores', desc:'Busca proveedores por conocidos, redes sociales o recomendación de Comercial — de forma informal y manual, sin repositorio de proveedores validados.', icon:'search', pp:'Busca proveedores por conocidos, redes sociales o recomendación de Comercial, de forma informal y manual, sin repositorio de proveedores validados.' },
             { id:'b2', title:'Compara y presenta a Finanzas', desc:'Compara al menos 2 proveedores y presenta la mejor opción a Finanzas para aprobación y pago.', icon:'quote' }
           ]
         },
         exception: {
-          triggerId: 'n4',
+          triggerId: 'n6',
           label: '↓ Si requiere permisos (uso de suelo, obra)',
-          node: { id:'e1', title:'Gestiona permisos con ICEV', desc:'Gestiona los permisos junto con ICEV/Operaciones — sin apoyo legal especializado dedicado, a diferencia de la gestoría vehicular que sí tiene su propio proceso.', icon:'alert' }
+          node: { id:'e1', title:'Gestiona permisos con ICEV', desc:'Gestiona los permisos junto con ICEV/Operaciones — sin apoyo legal especializado dedicado, a diferencia de la gestoría vehicular que sí tiene su propio proceso.', icon:'alert', pp:'Sin apoyo legal especializado para permisos de uso de suelo y obra — recae en él y en ICEV/Operaciones.' }
         }
       }
     ]

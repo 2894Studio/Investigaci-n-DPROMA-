@@ -216,6 +216,7 @@ tbody tr:hover{ background: var(--surface-alt); }
   font-size:0.75rem; font-weight:700;
   display:flex; align-items:center; justify-content:center;
   box-shadow:var(--shadow);
+  cursor:help;
 }
 .flow-branch-label, .flow-periodic-label{
   grid-row: 1; align-self:end;
@@ -419,9 +420,6 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     card.appendChild(icon);
     var h4 = el('h4'); h4.textContent = node.title; card.appendChild(h4);
     var p = el('p','flow-node-desc'); p.textContent = node.desc; card.appendChild(p);
-    if(node.pp){
-      var badge = el('span','flow-pp-badge'); badge.textContent = node.pp; card.appendChild(badge);
-    }
     return card;
   }
 
@@ -483,13 +481,22 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     flow.cycle.forEach(collectPP);
     if(flow.exception) collectPP(flow.exception.node);
     if(flow.branch) flow.branch.nodes.forEach(collectPP);
-    pps.sort(function(a,b){ return a.pp - b.pp; });
+
+    pps.forEach(function(n, i){
+      var badgeCard = gridEl.querySelector('[data-id="'+n.id+'"]');
+      if(badgeCard){
+        var badge = el('span','flow-pp-badge');
+        badge.textContent = String(i+1);
+        badge.title = 'Pain point: ' + n.pp;
+        badgeCard.appendChild(badge);
+      }
+    });
 
     ppListEl.innerHTML = '';
     pps.forEach(function(n, i){
       var li = el('li');
       var num = el('span','pp-n'); num.textContent = String(i+1);
-      var p = el('p'); p.textContent = n.desc;
+      var p = el('p'); p.textContent = n.pp;
       li.appendChild(num); li.appendChild(p);
       ppListEl.appendChild(li);
     });
@@ -653,21 +660,21 @@ DPROMA_initFlows('flujos', [
           { id:'n1', title:'Identifica agencia objetivo', desc:'Identifica agencia o concesionaria objetivo según línea de negocio (administración vehicular o cargadores).', icon:'search' },
           { id:'n2', title:'Visita y presenta', desc:'Hace visita, solicita hablar con el gerente comercial y presenta la propuesta física impresa de DPROMA — sin material digital.', icon:'doc' },
           { id:'n3', title:'Negocia condiciones', desc:'Negocia condiciones: garantías de tiempo, reportes, esquema de utilidad para la agencia.', icon:'quote' },
-          { id:'n4', title:'Solicita contrato a Jurídico', desc:'Si aceptan, solicita el contrato a Jurídico — el proceso de firma con el cliente aún no está definido.', icon:'send', pp:1 },
-          { id:'n5', title:'Transfiere a ICEV', desc:'Transfiere el cliente cerrado a ICEV/Administración Vehicular de forma verbal o por WhatsApp, sin documento de traspaso.', icon:'whatsapp', pp:2 },
-          { id:'n6', title:'Registra de forma dispersa', desc:'Registra todo en notas, WhatsApp y Excel/Sheets propios — sin CRM ni historial centralizado por cliente.', icon:'sheet', pp:3 }
+          { id:'n4', title:'Solicita contrato a Jurídico', desc:'Si aceptan, solicita el contrato a Jurídico — el proceso de firma con el cliente aún no está definido.', icon:'send', pp:'El proceso de firma de contrato con el cliente aún no está formalizado.' },
+          { id:'n5', title:'Transfiere a ICEV', desc:'Transfiere el cliente cerrado a ICEV/Administración Vehicular de forma verbal o por WhatsApp, sin documento de traspaso.', icon:'whatsapp', pp:'El traspaso del cliente cerrado a ICEV/Administración Vehicular es verbal o por WhatsApp, sin documento formal.' },
+          { id:'n6', title:'Registra de forma dispersa', desc:'Registra todo en notas, WhatsApp y Excel/Sheets propios — sin CRM ni historial centralizado por cliente.', icon:'sheet', pp:'Registra todo en notas, WhatsApp y Excel propios — sin trabajo colaborativo real ni historial centralizado por cliente.' }
         ],
         branch: {
           triggerId: 'n3',
           label: '↓ Si el lead no cierra de inmediato',
           nodes: [
-            { id:'b1', title:'Sin seguimiento sistemático', desc:'No existe proceso de seguimiento ni función de marketing — el lead queda sin gestión sistemática.', icon:'alert', pp:4 }
+            { id:'b1', title:'Sin seguimiento sistemático', desc:'No existe proceso de seguimiento ni función de marketing — el lead queda sin gestión sistemática.', icon:'alert', pp:'No existe función de marketing: si el lead no cierra de inmediato, queda sin ningún proceso de seguimiento.' }
           ]
         },
         exception: {
           triggerId: 'n5',
           label: '↓ Excepción — cliente activo con problemas',
-          node: { id:'e1', title:'Media directamente', desc:'Si surge un retraso de trámite o de factura, el cliente lo contacta a él directo en vez del área responsable, y media con Facturación y Operaciones.', icon:'alert' }
+          node: { id:'e1', title:'Media directamente', desc:'Si surge un retraso de trámite o de factura, el cliente lo contacta a él directo en vez del área responsable, y media con Facturación y Operaciones.', icon:'alert', pp:'El cliente lo contacta directo a él en vez del área responsable cuando hay un retraso de trámite o de factura, y él termina mediando con Facturación y Operaciones.' }
         }
       }
     ]
@@ -682,7 +689,7 @@ DPROMA_initFlows('flujos', [
         cycle: [
           { id:'g1', title:'Recibe datos del cliente', desc:'La agencia envía datos de clientes finales por WhatsApp o correo.', icon:'whatsapp' },
           { id:'g2', title:'Valida promoción vigente', desc:'Se valida si el vehículo entra en la promoción vigente.', icon:'check' },
-          { id:'g3', title:'Solicita TO y VIN', desc:'Si el grupo automotriz exige TO y VIN, se solicitan — sin estos datos no se puede facturar después.', icon:'doc', pp:1 },
+          { id:'g3', title:'Solicita TO y VIN', desc:'Si el grupo automotriz exige TO y VIN, se solicitan — sin estos datos no se puede facturar después.', icon:'doc', pp:'Sin estos datos (TO, VIN) al alta del cliente, no se puede facturar después.' },
           { id:'g4', title:'Pasa a Operaciones', desc:'Se pasa el cliente a Operaciones para agendar la visita técnica.', icon:'send' },
           { id:'g5', title:'Cotiza excedente', desc:'En la visita se mide la instalación; si excede lo cubierto por la promoción, se cotiza el excedente al cliente final, quien debe aceptar y pagar antes de instalar.', icon:'quote' },
           { id:'g6', title:'Ejecuta con evidencia', desc:'Se ejecuta la instalación, con fotos antes y después como evidencia.', icon:'box' }
@@ -690,16 +697,16 @@ DPROMA_initFlows('flujos', [
         exception: {
           triggerId: 'g6',
           label: '↓ Excepción — facturación sin sincronizar',
-          node: { id:'ge1', title:'Pasa a Finanzas sin sincronía', desc:'La evidencia y los datos (incluido TO/VIN) se pasan a Finanzas para facturar, hoy sin sincronización automática — genera discrepancias confirmadas entre lo instalado y lo facturado.', icon:'alert', pp:2 }
+          node: { id:'ge1', title:'Pasa a Finanzas sin sincronía', desc:'La evidencia y los datos (incluido TO/VIN) se pasan a Finanzas para facturar, hoy sin sincronización automática — genera discrepancias confirmadas entre lo instalado y lo facturado.', icon:'alert', pp:'La evidencia y los datos se pasan a Finanzas sin sincronización automática — genera discrepancias confirmadas entre lo instalado y lo facturado.' }
         }
       },
       {
         id: 'reporte',
         label: 'Reporte semanal a clientes B2B',
         cycle: [
-          { id:'h1', title:'Compila instalaciones', desc:'Operaciones compila manualmente las instalaciones y trámites de la semana.', icon:'sheet', pp:1 },
+          { id:'h1', title:'Compila instalaciones', desc:'Operaciones compila manualmente las instalaciones y trámites de la semana.', icon:'sheet', pp:'El reporte se compila completamente a mano, incluyendo insertar fotos una por una.' },
           { id:'h2', title:'Arma el reporte', desc:'Se arma el reporte con fotos (B2B) o estatus general (placas: completado / en proceso / sin empezar).', icon:'doc' },
-          { id:'h3', title:'Envía sin horario fijo', desc:'Se envía sin horario fijo — a veces se retrasa hasta el sábado por la noche.', icon:'send', pp:2 },
+          { id:'h3', title:'Envía sin horario fijo', desc:'Se envía sin horario fijo — a veces se retrasa hasta el sábado por la noche.', icon:'send', pp:'Se envía sin horario fijo — prometido el viernes por la mañana, a veces llega hasta el sábado por la noche.' },
           { id:'h4', title:'Cliente firma de recibido', desc:'El cliente final no recibe reporte post-servicio, solo firma de recibido.', icon:'check' }
         ]
       }

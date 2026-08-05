@@ -216,6 +216,7 @@ tbody tr:hover{ background: var(--surface-alt); }
   font-size:0.75rem; font-weight:700;
   display:flex; align-items:center; justify-content:center;
   box-shadow:var(--shadow);
+  cursor:help;
 }
 .flow-branch-label, .flow-periodic-label{
   grid-row: 1; align-self:end;
@@ -417,9 +418,6 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     card.appendChild(icon);
     var h4 = el('h4'); h4.textContent = node.title; card.appendChild(h4);
     var p = el('p','flow-node-desc'); p.textContent = node.desc; card.appendChild(p);
-    if(node.pp){
-      var badge = el('span','flow-pp-badge'); badge.textContent = node.pp; card.appendChild(badge);
-    }
     return card;
   }
 
@@ -481,13 +479,22 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     flow.cycle.forEach(collectPP);
     if(flow.exception) collectPP(flow.exception.node);
     if(flow.branch) flow.branch.nodes.forEach(collectPP);
-    pps.sort(function(a,b){ return a.pp - b.pp; });
+
+    pps.forEach(function(n, i){
+      var badgeCard = gridEl.querySelector('[data-id="'+n.id+'"]');
+      if(badgeCard){
+        var badge = el('span','flow-pp-badge');
+        badge.textContent = String(i+1);
+        badge.title = 'Pain point: ' + n.pp;
+        badgeCard.appendChild(badge);
+      }
+    });
 
     ppListEl.innerHTML = '';
     pps.forEach(function(n, i){
       var li = el('li');
       var num = el('span','pp-n'); num.textContent = String(i+1);
-      var p = el('p'); p.textContent = n.desc;
+      var p = el('p'); p.textContent = n.pp;
       li.appendChild(num); li.appendChild(p);
       ppListEl.appendChild(li);
     });
@@ -652,7 +659,7 @@ DPROMA_initFlows('flujos', [
           { id:'c2', title:'Evalúa costo y calidad', desc:'Evalúa costo, tiempo de entrega y calidad.', icon:'search' },
           { id:'c3', title:'Presenta a Dirección', desc:'Presenta la mejor propuesta a Dirección General.', icon:'send' },
           { id:'c4', title:'Dirección aprueba', desc:'Dirección aprueba y transfiere fondos.', icon:'check' },
-          { id:'c5', title:'Paga y entrega comprobante', desc:'Paga al proveedor y entrega el comprobante al área — nunca tiene fondos predispuestos, cada pago repite este ciclo completo.', icon:'sheet', pp:1 }
+          { id:'c5', title:'Paga y entrega comprobante', desc:'Paga al proveedor y entrega el comprobante al área — nunca tiene fondos predispuestos, cada pago repite este ciclo completo.', icon:'sheet', pp:'Nunca tiene fondos predispuestos — cada pago, aunque ya evaluado y recomendado por ella, requiere el ciclo completo de aprobación de Dirección General.' }
         ]
       },
       {
@@ -660,10 +667,10 @@ DPROMA_initFlows('flujos', [
         label: 'Facturación semanal',
         cycle: [
           { id:'f1', title:'Recibe relación semanal', desc:'Instalaciones y Administración Vehicular envían su relación de servicios a facturar con VIN u otros datos según cliente.', icon:'whatsapp' },
-          { id:'f2', title:'Valida el servicio', desc:'Revisa evidencia o entra directo a la plataforma del cliente a verificar el VIN — validación manual, propensa a error humano.', icon:'search', pp:1 },
+          { id:'f2', title:'Valida el servicio', desc:'Revisa evidencia o entra directo a la plataforma del cliente a verificar el VIN — validación manual, propensa a error humano.', icon:'search', pp:'Validación manual de VIN contra la plataforma de cada cliente — consume mucho tiempo, propensa a error humano, sin acceso automatizado.' },
           { id:'f3', title:'Envía reporte a Contable', desc:'Genera reporte y lo envía al área contable (proveedor externo).', icon:'send' },
           { id:'f4', title:'Recibe prefacturas', desc:'Contable genera prefacturas y se las reenvía.', icon:'doc' },
-          { id:'f5', title:'Revisa una por una', desc:'Revisa cada prefactura para detectar errores de dígito, concepto o cliente — un solo error rebota la factura completa.', icon:'check', pp:2 },
+          { id:'f5', title:'Revisa una por una', desc:'Revisa cada prefactura para detectar errores de dígito, concepto o cliente — un solo error rebota la factura completa.', icon:'check', pp:'Un solo error de dígito, concepto o cliente en una prefactura rebota la factura completa.' },
           { id:'f6', title:'Corrige y cierra', desc:'Corrige y confirma para emitir las facturas finales, y cierra cotejando con el cliente si recibió la documentación física. Todo el ciclo toma de sábado a martes.', icon:'sheet' }
         ]
       },
