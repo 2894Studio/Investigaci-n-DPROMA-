@@ -579,13 +579,14 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       ppListEl.appendChild(li);
     });
 
+    var ARROW_LEN = 8, ARROW_HALF = 4.5;
     function buildConnectors(){
-      svgElement.innerHTML = '<defs><marker id="flowArrow" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" style="fill:color-mix(in srgb, var(--accent) 45%, var(--border))"/></marker></defs>';
+      svgElement.innerHTML = '';
       updateConnectors();
     }
     function updateConnectors(){
       var canvasRect = gridEl.getBoundingClientRect();
-      Array.prototype.slice.call(svgElement.querySelectorAll('path.flow-edge')).forEach(function(p){ p.remove(); });
+      Array.prototype.slice.call(svgElement.querySelectorAll('.flow-edge, .flow-arrowhead')).forEach(function(p){ p.remove(); });
 
       /* auto-fit decide cuántas tarjetas caben por fila según el ancho real,
          así que la fila visual se detecta comparando posiciones ya renderizadas,
@@ -610,12 +611,14 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
         if(!fromEl || !toEl) return;
         var fr = fromEl.getBoundingClientRect(), tr = toEl.getBoundingClientRect();
         var sameRow = Math.abs(fr.top - tr.top) < 4;
-        var x1,y1,x2,y2,d,midX,midY;
+        var x1,y1,x2,y2,d,midX,midY,tipX,tipY,points;
         if(sameRow){
           x1 = fr.right - canvasRect.left; y1 = fr.top - canvasRect.top + ANCHOR_Y;
           x2 = tr.left - canvasRect.left; y2 = tr.top - canvasRect.top + ANCHOR_Y;
           midX = (x1+x2)/2;
-          d = 'M '+x1+' '+y1+' C '+midX+' '+y1+', '+midX+' '+y2+', '+(x2-8)+' '+y2;
+          d = 'M '+x1+' '+y1+' C '+midX+' '+y1+', '+midX+' '+y2+', '+(x2-ARROW_LEN)+' '+y2;
+          tipX = x2; tipY = y2;
+          points = tipX+','+tipY+' '+(tipX-ARROW_LEN)+','+(tipY-ARROW_HALF)+' '+(tipX-ARROW_LEN)+','+(tipY+ARROW_HALF);
         } else {
           /* Cierre de fila en ángulo recto, pasando por debajo de TODAS las
              tarjetas de la fila (no solo la última) — nunca cruza sobre otra tarjeta. */
@@ -625,17 +628,18 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
              al tramo final (donde va la punta) suficiente espacio y que la
              flecha nunca quede montada sobre la esquina. */
           midY = y1 + Math.min(16, (y2 - y1) / 2);
-          d = 'M '+x1+' '+y1+' L '+x1+' '+midY+' L '+x2+' '+midY+' L '+x2+' '+(y2-8);
+          d = 'M '+x1+' '+y1+' L '+x1+' '+midY+' L '+x2+' '+midY+' L '+x2+' '+(y2-ARROW_LEN);
+          tipX = x2; tipY = y2;
+          points = tipX+','+tipY+' '+(tipX-ARROW_HALF)+','+(tipY-ARROW_LEN)+' '+(tipX+ARROW_HALF)+','+(tipY-ARROW_LEN);
         }
         var path = svgNode('path');
         path.setAttribute('class','flow-edge' + (sameRow ? '' : ' is-wrap'));
         path.setAttribute('d', d);
-        path.setAttribute('marker-end','url(#flowArrow)');
         svgElement.appendChild(path);
         if(!sameRow){
           /* stroke-dasharray no sabe dónde termina el trazo: según el largo total
              del camino, el patrón puede terminar justo en un "hueco", dejando la
-             punta de flecha visualmente separada de la línea. Se calcula el
+             línea visualmente separada de la punta de flecha. Se calcula el
              desfase para que el punteado siempre termine a mitad de un trazo. */
           var DASH = 5, GAP = 5, CYCLE = DASH + GAP;
           var total = path.getTotalLength();
@@ -643,6 +647,14 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
           path.style.strokeDasharray = DASH + ' ' + GAP;
           path.style.strokeDashoffset = String(offset);
         }
+        /* Triángulo dibujado a mano, no <marker>: un marker SVG con orient="auto"
+           puede deformarse o duplicarse visualmente en ciertos navegadores/zooms
+           cuando el tramo final es muy corto o el trazo es punteado. Un polígono
+           independiente, siempre con la misma forma y tamaño fijos, es inmune a eso. */
+        var tri = svgNode('polygon');
+        tri.setAttribute('class','flow-arrowhead');
+        tri.setAttribute('points', points);
+        svgElement.appendChild(tri);
       });
     }
 
