@@ -444,6 +444,41 @@
   }
   .matrix-add-btn:hover{ opacity: 0.9; }
 
+  .matrix-detail-actions{ display:flex; flex-wrap:wrap; gap: 0.6rem; margin-top: 1rem; }
+  .matrix-detail-edit, .matrix-detail-delete, .matrix-detail-cancel{
+    appearance:none;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.5em 1em;
+    cursor:pointer;
+    color: var(--text);
+  }
+  .matrix-detail-edit:hover{ color: var(--accent); border-color: var(--accent); }
+  .matrix-detail-delete{ color: #c23b3b; border-color: color-mix(in srgb, #c23b3b 40%, var(--border)); }
+  .matrix-detail-delete:hover{ color: #fff; background: #c23b3b; border-color: #c23b3b; }
+  .matrix-detail-cancel:hover{ color: var(--accent); border-color: var(--accent); }
+
+  .matrix-detail-form{ display:flex; flex-direction:column; gap: 0.6rem; }
+  .matrix-edit-textarea{
+    font-family: inherit;
+    font-size: 0.875rem;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.6em 0.8em;
+    resize: vertical;
+    min-height: 4.5em;
+  }
+  .matrix-edit-textarea:focus-visible, .matrix-detail-edit:focus-visible, .matrix-detail-delete:focus-visible, .matrix-detail-cancel:focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
   #matrizPriority{ border-radius: 18px; padding: 1.5rem; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
   #matrizPriority h3{ font-size: 1.0625rem; margin-bottom: 0.75rem; }
   #matrizPriority ol{
@@ -674,10 +709,70 @@
     div.textContent = str == null ? '' : str;
     return div.innerHTML;
   }
-  function renderDetail(idea){
+  function renderDetail(idea, pill){
+    var actions = '';
+    if(idea.isCustom){
+      actions = '<div class="matrix-detail-actions">' +
+        '<button type="button" class="matrix-detail-edit">Editar</button>' +
+        '<button type="button" class="matrix-detail-delete">Eliminar</button>' +
+        '</div>';
+    }
     detail.innerHTML =
       '<h3>' + escapeHtml(idea.title) + '</h3>' +
-      '<p>' + escapeHtml(idea.desc) + '</p>';
+      '<p>' + escapeHtml(idea.desc) + '</p>' + actions;
+    if(idea.isCustom){
+      detail.querySelector('.matrix-detail-edit').addEventListener('click', function(){ renderEditForm(idea, pill); });
+      detail.querySelector('.matrix-detail-delete').addEventListener('click', function(){ deleteIdea(idea, pill); });
+    }
+  }
+  function renderEditForm(idea, pill){
+    detail.innerHTML =
+      '<form class="matrix-detail-form">' +
+      '<label class="sr-only" for="matrizEditTitle">Título de la iniciativa</label>' +
+      '<input type="text" id="matrizEditTitle" class="matrix-add-input" maxlength="80" required />' +
+      '<label class="sr-only" for="matrizEditDesc">Descripción de la iniciativa</label>' +
+      '<textarea id="matrizEditDesc" class="matrix-edit-textarea" maxlength="240"></textarea>' +
+      '<div class="matrix-detail-actions">' +
+      '<button type="submit" class="matrix-add-btn">Guardar</button>' +
+      '<button type="button" class="matrix-detail-cancel">Cancelar</button>' +
+      '</div>' +
+      '</form>';
+    var titleInput = detail.querySelector('#matrizEditTitle');
+    var descInput = detail.querySelector('#matrizEditDesc');
+    titleInput.value = idea.title;
+    descInput.value = idea.desc;
+    detail.querySelector('form').addEventListener('submit', function(e){
+      e.preventDefault();
+      var newTitle = titleInput.value.trim();
+      if(!newTitle) return;
+      idea.title = newTitle;
+      idea.desc = descInput.value.trim();
+      pill.dataset.title = idea.title;
+      pill.innerHTML = '<span class="rank">' + escapeHtml(idea.rank) + '</span><span>' + escapeHtml(idea.title) + '</span>';
+      saveCustom(customIdeas);
+      renderPriorityList();
+      renderDetail(idea, pill);
+      announce.textContent = idea.title + ' actualizada.';
+    });
+    detail.querySelector('.matrix-detail-cancel').addEventListener('click', function(){
+      renderDetail(idea, pill);
+    });
+    titleInput.focus();
+  }
+  function deleteIdea(idea, pill){
+    if(!window.confirm('¿Eliminar la iniciativa "' + idea.title + '"?')) return;
+    plot.removeChild(pill);
+    pills = pills.filter(function(p){ return p !== pill; });
+    customIdeas = customIdeas.filter(function(i){ return i !== idea; });
+    saveCustom(customIdeas);
+    try{
+      var s = loadSaved();
+      delete s[idea.rank];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    }catch(e){}
+    resetDetail();
+    renderPriorityList();
+    announce.textContent = idea.title + ' eliminada.';
   }
   function resetDetail(){
     detail.innerHTML = '<p class="matrix-detail-empty">Selecciona una iniciativa del plano para ver su detalle completo.</p>';
@@ -715,7 +810,7 @@
     function select(){
       pills.forEach(function(p){ p.setAttribute('aria-pressed', 'false'); });
       pill.setAttribute('aria-pressed', 'true');
-      renderDetail(idea);
+      renderDetail(idea, pill);
     }
 
     pill.addEventListener('pointerdown', function(e){
@@ -783,6 +878,7 @@
 
   var customIdeas = loadCustom();
   customIdeas.forEach(function(idea){
+    idea.isCustom = true;
     IDEAS.push(idea);
     addPill(idea);
     var num = parseInt(idea.rank, 10);
@@ -811,7 +907,8 @@
       title: title,
       desc: 'Iniciativa añadida por el equipo.',
       recX: 50,
-      recY: 50
+      recY: 50,
+      isCustom: true
     };
     IDEAS.push(idea);
     var pill = addPill(idea);
