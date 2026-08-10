@@ -184,7 +184,9 @@ tbody tr:hover{ background: var(--surface-alt); }
   stroke: color-mix(in srgb, var(--accent) 45%, var(--border));
   stroke-width: 2;
   stroke-linecap: round;
+  stroke-linejoin: round;
 }
+.flow-svg path.flow-edge.is-wrap{ stroke-dasharray: 5 5; }
 .flow-svg polygon{ fill: color-mix(in srgb, var(--accent) 45%, var(--border)); }
 
 .flow-node{
@@ -501,20 +503,23 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     var pps = [];
     var cardById = {};
     var edges = [];
+    var rowCards = [];
 
     flow.cycle.forEach(function(node, i){
       var idx = null;
       if(node.pp){ pps.push(node); idx = pps.length; }
       var card = renderNode(node, null, idx, i + 1);
       var col = (i % perRow) + 1;
-      var row = Math.floor(i / perRow) + 1;
+      var rowIdx = Math.floor(i / perRow);
       card.style.gridColumn = String(col);
-      card.style.gridRow = String(row);
+      card.style.gridRow = String(rowIdx + 1);
       gridEl.appendChild(card);
       cardById[node.id] = card;
+      if(!rowCards[rowIdx]) rowCards[rowIdx] = [];
+      rowCards[rowIdx].push(card);
       var startsNewRow = i > 0 && col === 1;
-      if(i > 0 && !startsNewRow){
-        edges.push({ from: flow.cycle[i - 1].id, to: node.id, dir: 'h' });
+      if(i > 0){
+        edges.push({ from: flow.cycle[i - 1].id, to: node.id, dir: startsNewRow ? 'wrap' : 'h', fromRow: rowIdx - 1 });
       }
     });
 
@@ -577,13 +582,18 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
           midX = (x1+x2)/2;
           d = 'M '+x1+' '+y1+' C '+midX+' '+y1+', '+midX+' '+y2+', '+(x2-8)+' '+y2;
         } else {
-          x1 = fr.left - canvasRect.left + fr.width/2; y1 = fr.bottom - canvasRect.top;
+          /* 'wrap': cierre de fila en ángulo recto, pasando por debajo de TODAS
+             las tarjetas de la fila (no solo la última) — nunca cruza sobre otra tarjeta. */
+          var rowBottom = Math.max.apply(null, (rowCards[edge.fromRow] || [fromEl]).map(function(c){
+            return c.getBoundingClientRect().bottom - canvasRect.top;
+          }));
+          x1 = fr.left - canvasRect.left + fr.width/2; y1 = rowBottom;
           x2 = tr.left - canvasRect.left + tr.width/2; y2 = tr.top - canvasRect.top;
-          midY = (y1+y2)/2;
-          d = 'M '+x1+' '+y1+' C '+x1+' '+midY+', '+x2+' '+midY+', '+x2+' '+(y2-8);
+          midY = y1 + Math.max(16, (y2 - y1) / 2);
+          d = 'M '+x1+' '+y1+' L '+x1+' '+midY+' L '+x2+' '+midY+' L '+x2+' '+(y2-8);
         }
         var path = svgNode('path');
-        path.setAttribute('class','flow-edge');
+        path.setAttribute('class','flow-edge' + (edge.dir === 'wrap' ? ' is-wrap' : ''));
         path.setAttribute('d', d);
         path.setAttribute('marker-end','url(#flowArrow)');
         svgElement.appendChild(path);
