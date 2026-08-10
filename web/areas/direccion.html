@@ -169,11 +169,11 @@ tbody tr:hover{ background: var(--surface-alt); }
 .flow-pill.is-active{ border-color:var(--accent); color:var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
 
 .flow-panel[hidden]{ display:none; }
-.flow-canvas{ position:relative; padding-bottom:1rem; overflow-x:auto; }
+.flow-canvas{ position:relative; padding-bottom:1rem; }
 .flow-grid{
   position:relative;
   display:grid;
-  grid-template-columns: repeat(var(--cols, 4), minmax(200px, 1fr));
+  grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
   grid-auto-rows: minmax(0,auto);
   gap: 2.75rem 1.5rem;
   align-items: start;
@@ -490,38 +490,49 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
 
   function stripArrow(s){ return String(s || '').replace(/^\s*↓\s*/, ''); }
 
-  /* El flujo principal se numera y se envuelve a una segunda fila cuando tiene
-     más de 4 pasos, así las tarjetas quedan anchas en vez de angostas y altas.
+  var MIN_CARD_WIDTH = 180;
+  var COL_GAP = 24;
+
+  /* El flujo principal se numera y se envuelve a 2 filas cuando tiene más de 4
+     pasos, así las tarjetas quedan anchas en vez de angostas y altas. Cuántas
+     tarjetas caben por fila se recalcula contra el ancho real del contenedor
+     (y de nuevo en cada resize) — nunca se corta ni necesita scroll horizontal.
      Las variantes/excepciones se anidan dentro de la tarjeta que las dispara —
      la relación se ve por contención, sin flecha ni carril aparte. */
   function renderFlow(flow, gridEl, svgElement, ppListEl){
     gridEl.innerHTML = '';
-    var n = flow.cycle.length;
-    var perRow = n <= 4 ? n : Math.ceil(n / 2);
-    gridEl.style.setProperty('--cols', perRow);
 
     var pps = [];
     var cardById = {};
+    var mainCards = [];
     var edges = [];
-    var rowCards = [];
 
     flow.cycle.forEach(function(node, i){
       var idx = null;
       if(node.pp){ pps.push(node); idx = pps.length; }
       var card = renderNode(node, null, idx, i + 1);
-      var col = (i % perRow) + 1;
-      var rowIdx = Math.floor(i / perRow);
-      card.style.gridColumn = String(col);
-      card.style.gridRow = String(rowIdx + 1);
       gridEl.appendChild(card);
       cardById[node.id] = card;
-      if(!rowCards[rowIdx]) rowCards[rowIdx] = [];
-      rowCards[rowIdx].push(card);
-      var startsNewRow = i > 0 && col === 1;
+      mainCards.push(card);
       if(i > 0){
-        edges.push({ from: flow.cycle[i - 1].id, to: node.id, dir: startsNewRow ? 'wrap' : 'h', fromRow: rowIdx - 1 });
+        edges.push({ from: flow.cycle[i - 1].id, to: node.id });
       }
     });
+
+    var idealPerRow = mainCards.length <= 4 ? mainCards.length : Math.ceil(mainCards.length / 2);
+    function layoutMainCards(){
+      var containerWidth = gridEl.getBoundingClientRect().width;
+      var maxFit = containerWidth > 0
+        ? Math.max(1, Math.floor((containerWidth + COL_GAP) / (MIN_CARD_WIDTH + COL_GAP)))
+        : idealPerRow;
+      var perRow = Math.max(1, Math.min(idealPerRow, maxFit));
+      gridEl.style.setProperty('--cols', perRow);
+      mainCards.forEach(function(card, i){
+        card.style.gridColumn = String((i % perRow) + 1);
+        card.style.gridRow = String(Math.floor(i / perRow) + 1);
+      });
+    }
+    layoutMainCards();
 
     function attachNested(kind, tagText, labelText, nodes, triggerId){
       var triggerCard = cardById[triggerId];
@@ -570,30 +581,46 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     function updateConnectors(){
       var canvasRect = gridEl.getBoundingClientRect();
       Array.prototype.slice.call(svgElement.querySelectorAll('path.flow-edge')).forEach(function(p){ p.remove(); });
+
+      /* auto-fit decide cuántas tarjetas caben por fila según el ancho real,
+         así que la fila visual se detecta comparando posiciones ya renderizadas,
+         no un cálculo previo — funciona igual a cualquier ancho de pantalla. */
+      var rows = [];
+      mainCards.forEach(function(card){
+        var top = Math.round(card.getBoundingClientRect().top);
+        var row = rows.filter(function(r){ return Math.abs(r.top - top) < 4; })[0];
+        if(!row){ row = { top: top, cards: [] }; rows.push(row); }
+        row.cards.push(card);
+      });
+      function rowBottomOf(card){
+        var top = Math.round(card.getBoundingClientRect().top);
+        var row = rows.filter(function(r){ return Math.abs(r.top - top) < 4; })[0];
+        var cards = row ? row.cards : [card];
+        return Math.max.apply(null, cards.map(function(c){ return c.getBoundingClientRect().bottom - canvasRect.top; }));
+      }
+
       edges.forEach(function(edge){
         var fromEl = cardById[edge.from];
         var toEl = cardById[edge.to];
         if(!fromEl || !toEl) return;
         var fr = fromEl.getBoundingClientRect(), tr = toEl.getBoundingClientRect();
+        var sameRow = Math.abs(fr.top - tr.top) < 4;
         var x1,y1,x2,y2,d,midX,midY;
-        if(edge.dir === 'h'){
+        if(sameRow){
           x1 = fr.right - canvasRect.left; y1 = fr.top - canvasRect.top + ANCHOR_Y;
           x2 = tr.left - canvasRect.left; y2 = tr.top - canvasRect.top + ANCHOR_Y;
           midX = (x1+x2)/2;
           d = 'M '+x1+' '+y1+' C '+midX+' '+y1+', '+midX+' '+y2+', '+(x2-8)+' '+y2;
         } else {
-          /* 'wrap': cierre de fila en ángulo recto, pasando por debajo de TODAS
-             las tarjetas de la fila (no solo la última) — nunca cruza sobre otra tarjeta. */
-          var rowBottom = Math.max.apply(null, (rowCards[edge.fromRow] || [fromEl]).map(function(c){
-            return c.getBoundingClientRect().bottom - canvasRect.top;
-          }));
-          x1 = fr.left - canvasRect.left + fr.width/2; y1 = rowBottom;
+          /* Cierre de fila en ángulo recto, pasando por debajo de TODAS las
+             tarjetas de la fila (no solo la última) — nunca cruza sobre otra tarjeta. */
+          x1 = fr.left - canvasRect.left + fr.width/2; y1 = rowBottomOf(fromEl);
           x2 = tr.left - canvasRect.left + tr.width/2; y2 = tr.top - canvasRect.top;
           midY = y1 + Math.max(16, (y2 - y1) / 2);
           d = 'M '+x1+' '+y1+' L '+x1+' '+midY+' L '+x2+' '+midY+' L '+x2+' '+(y2-8);
         }
         var path = svgNode('path');
-        path.setAttribute('class','flow-edge' + (edge.dir === 'wrap' ? ' is-wrap' : ''));
+        path.setAttribute('class','flow-edge' + (sameRow ? '' : ' is-wrap'));
         path.setAttribute('d', d);
         path.setAttribute('marker-end','url(#flowArrow)');
         svgElement.appendChild(path);
@@ -606,10 +633,10 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       document.fonts.ready.then(function(){ requestAnimationFrame(buildConnectors); });
     }
 
-    var onResize = debounce(buildConnectors, 150);
+    var onResize = debounce(function(){ layoutMainCards(); buildConnectors(); }, 150);
     window.addEventListener('resize', onResize);
 
-    return { buildConnectors: buildConnectors };
+    return { buildConnectors: function(){ layoutMainCards(); buildConnectors(); } };
   }
 
   function renderSkeleton(flow, skelEl){
