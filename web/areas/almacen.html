@@ -173,16 +173,21 @@ tbody tr:hover{ background: var(--surface-alt); }
 .flow-grid{
   position:relative;
   display:grid;
-  grid-template-columns: repeat(var(--cols, 5), minmax(150px, 1fr));
+  grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
   grid-auto-rows: minmax(0,auto);
-  gap: 2.75rem 1.25rem;
+  gap: 3.5rem 1.5rem;
   align-items: start;
-  padding: 1.5rem 0.5rem 0.5rem;
 }
 .flow-svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; z-index:5; pointer-events:none; }
-.flow-svg path{ fill:none; stroke:var(--border); stroke-width:1.5; }
-.flow-svg path.is-dashed{ stroke-dasharray: 4 4; }
-.flow-svg polygon{ fill:var(--border); }
+.flow-svg path.flow-edge{
+  fill:none;
+  stroke: color-mix(in srgb, var(--accent) 45%, var(--border));
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.flow-svg path.flow-edge.is-wrap{ stroke-dasharray: 5 5; }
+.flow-svg polygon{ fill: color-mix(in srgb, var(--accent) 45%, var(--border)); }
 
 .flow-node{
   position:relative;
@@ -191,14 +196,25 @@ tbody tr:hover{ background: var(--surface-alt); }
   border:1px solid var(--border);
   border-radius:14px;
   box-shadow:var(--shadow);
-  padding:0.9rem 1rem;
+  padding:1rem 1.1rem;
   cursor:default;
 }
 .flow-node:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }
+.flow-node-step{
+  position:absolute;
+  top: -0.6rem; left: -0.6rem;
+  width:1.5rem; height:1.5rem;
+  border-radius:50%;
+  background:var(--accent); color:var(--on-accent);
+  font-size:0.75rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: var(--shadow);
+  z-index:2;
+}
 .flow-node-icon{ width:26px; height:26px; display:flex; align-items:center; justify-content:center; color:var(--accent); margin-bottom:0.5rem; }
 .flow-node-icon svg{ width:20px; height:20px; }
-.flow-node h4{ margin:0; font-size:0.875rem; font-weight:700; line-height:1.3; }
-.flow-node-desc{ margin:0.4rem 0 0; color:var(--text-muted); font-size:0.8125rem; line-height:1.45; }
+.flow-node h4{ margin:0; font-size:0.9375rem; font-weight:700; line-height:1.3; }
+.flow-node-desc{ margin:0.4rem 0 0; color:var(--text-muted); font-size:0.8125rem; line-height:1.5; }
 .flow-node.is-exception{ background:var(--dark-surface); border-color:var(--dark-surface); color:var(--on-dark); }
 .flow-node.is-exception .flow-node-icon{ color:var(--accent-soft); }
 .flow-node.is-exception .flow-node-desc{ color:var(--dark-surface-text-muted, #b9bec9); }
@@ -230,11 +246,42 @@ tbody tr:hover{ background: var(--surface-alt); }
   line-height:1.4;
 }
 .flow-node.is-exception .flow-node-pp p{ color:var(--on-dark); }
-.flow-branch-label, .flow-periodic-label{
-  grid-row: 1; align-self:end;
-  font-size:0.6875rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted);
-  padding-bottom:0.35rem;
+
+/* Variantes/excepciones anidadas dentro de la tarjeta que las dispara —
+   la relación se ve por contención, no hace falta una flecha ni un carril aparte. */
+.flow-nested-wrap{
+  margin-top: 0.9rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed var(--border);
 }
+.flow-node.is-exception .flow-nested-wrap{ border-top-color: rgba(255,255,255,0.25); }
+.flow-nested-label{
+  display:flex; align-items:baseline; flex-wrap:wrap; gap:0.5em;
+  font-size:0.75rem; color: var(--text-muted);
+  margin-bottom:0.75rem;
+}
+.flow-node.is-exception .flow-nested-label{ color: var(--dark-surface-text-muted, #b9bec9); }
+.flow-nested-tag{
+  flex:none;
+  display:inline-block;
+  font-size:0.6875rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;
+  padding:0.2em 0.6em; border-radius:999px;
+  background: var(--surface-alt); color: var(--accent); border:1px solid var(--border);
+}
+.flow-node.is-exception .flow-nested-tag{ background: rgba(255,255,255,0.12); color: var(--accent-soft); border-color: rgba(255,255,255,0.25); }
+.flow-nested-chain{ display:flex; flex-wrap:wrap; gap:0.6rem; }
+.flow-node.is-nested{
+  flex:1 1 170px;
+  background: var(--surface-alt);
+  border-style:dashed;
+  box-shadow:none;
+  padding:0.7rem 0.85rem;
+}
+.flow-node.is-nested .flow-node-icon{ width:20px; height:20px; margin-bottom:0.35rem; }
+.flow-node.is-nested .flow-node-icon svg{ width:16px; height:16px; }
+.flow-node.is-nested h4{ font-size:0.8125rem; }
+.flow-node.is-nested .flow-node-desc{ font-size:0.75rem; }
+.flow-node.is-nested.is-exception{ background: var(--dark-surface); border-color: var(--dark-surface); border-style: solid; }
 
 .flow-painpoints{ list-style:none; margin:2rem 0 0; padding:0; display:flex; flex-direction:column; gap:0.75rem; }
 .flow-painpoints li{ display:flex; gap:0.9rem; align-items:flex-start; }
@@ -418,10 +465,14 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
   function svgNode(tag){ return document.createElementNS('http://www.w3.org/2000/svg', tag); }
   function debounce(fn, ms){ var t; return function(){ clearTimeout(t); t=setTimeout(fn, ms); }; }
 
-  function renderNode(node, extraClass, ppIndex){
+  function renderNode(node, extraClass, ppIndex, stepNumber){
     var card = el('div', 'flow-node' + (extraClass ? ' ' + extraClass : ''));
     card.dataset.id = node.id;
     card.tabIndex = 0;
+    if(stepNumber){
+      var step = el('div','flow-node-step'); step.textContent = String(stepNumber);
+      card.appendChild(step);
+    }
     var icon = el('div','flow-node-icon');
     icon.innerHTML = '<svg viewBox="0 0 24 24">' + (ICONS[node.icon] || ICONS.doc) + '</svg>';
     card.appendChild(icon);
@@ -437,64 +488,83 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     return card;
   }
 
+  function stripArrow(s){ return String(s || '').replace(/^\s*↓\s*/, ''); }
+
+  var MIN_CARD_WIDTH = 180;
+  var COL_GAP = 24;
+
+  /* El flujo principal se numera y se envuelve a 2 filas cuando tiene más de 4
+     pasos, así las tarjetas quedan anchas en vez de angostas y altas. Cuántas
+     tarjetas caben por fila se recalcula contra el ancho real del contenedor
+     (y de nuevo en cada resize) — nunca se corta ni necesita scroll horizontal.
+     Las variantes/excepciones se anidan dentro de la tarjeta que las dispara —
+     la relación se ve por contención, sin flecha ni carril aparte. */
   function renderFlow(flow, gridEl, svgElement, ppListEl){
     gridEl.innerHTML = '';
-    var cols = flow.cycle.length;
-    gridEl.style.setProperty('--cols', cols);
 
     var pps = [];
-    function makeNode(node, extraClass){
+    var cardById = {};
+    var mainCards = [];
+    var edges = [];
+
+    flow.cycle.forEach(function(node, i){
       var idx = null;
       if(node.pp){ pps.push(node); idx = pps.length; }
-      return renderNode(node, extraClass, idx);
-    }
-
-    var colOf = {};
-    flow.cycle.forEach(function(n, i){
-      colOf[n.id] = i + 1;
-      var card = makeNode(n);
-      card.style.gridColumn = String(i+1);
-      card.style.gridRow = '1';
+      var card = renderNode(node, null, idx, i + 1);
       gridEl.appendChild(card);
+      cardById[node.id] = card;
+      mainCards.push(card);
+      if(i > 0){
+        edges.push({ from: flow.cycle[i - 1].id, to: node.id });
+      }
     });
 
-    var maxRow = 1;
+    var idealPerRow = mainCards.length <= 4 ? mainCards.length : Math.ceil(mainCards.length / 2);
+    function layoutMainCards(){
+      var containerWidth = gridEl.getBoundingClientRect().width;
+      var maxFit = containerWidth > 0
+        ? Math.max(1, Math.floor((containerWidth + COL_GAP) / (MIN_CARD_WIDTH + COL_GAP)))
+        : idealPerRow;
+      var perRow = Math.max(1, Math.min(idealPerRow, maxFit));
+      gridEl.style.setProperty('--cols', perRow);
+      mainCards.forEach(function(card, i){
+        card.style.gridColumn = String((i % perRow) + 1);
+        card.style.gridRow = String(Math.floor(i / perRow) + 1);
+      });
+    }
+    layoutMainCards();
 
-    if(flow.exception){
-      var exCol = colOf[flow.exception.triggerId] || 2;
-      var lbl = el('div','flow-branch-label'); lbl.textContent = flow.exception.label;
-      lbl.style.gridColumn = String(exCol); lbl.style.gridRow = '2';
-      gridEl.appendChild(lbl);
-      var exCard = makeNode(flow.exception.node, 'is-exception');
-      exCard.style.gridColumn = String(exCol); exCard.style.gridRow = '3';
-      gridEl.appendChild(exCard);
-      maxRow = Math.max(maxRow, 3);
+    function attachNested(kind, tagText, labelText, nodes, triggerId){
+      var triggerCard = cardById[triggerId];
+      if(!triggerCard) return;
+      var wrap = el('div','flow-nested-wrap');
+      var label = el('div','flow-nested-label');
+      var tag = el('span','flow-nested-tag'); tag.textContent = tagText;
+      label.appendChild(tag);
+      if(labelText){ label.appendChild(document.createTextNode(labelText)); }
+      wrap.appendChild(label);
+      var chain = el('div','flow-nested-chain');
+      nodes.forEach(function(node){
+        var idx = null;
+        if(node.pp){ pps.push(node); idx = pps.length; }
+        var nestedCard = renderNode(node, 'is-nested' + (kind === 'exception' ? ' is-exception' : ''), idx);
+        chain.appendChild(nestedCard);
+      });
+      wrap.appendChild(chain);
+      triggerCard.appendChild(wrap);
     }
 
     if(flow.branch){
-      var brCol = colOf[flow.branch.triggerId] || cols;
-      var blbl = el('div','flow-branch-label'); blbl.textContent = flow.branch.label;
-      blbl.style.gridColumn = String(brCol); blbl.style.gridRow = '2';
-      gridEl.appendChild(blbl);
-      flow.branch.nodes.forEach(function(n, i){
-        var row = 3 + i;
-        var card = makeNode(n);
-        card.style.gridColumn = String(brCol); card.style.gridRow = String(row);
-        gridEl.appendChild(card);
-        maxRow = Math.max(maxRow, row);
-      });
+      attachNested('branch', 'Variante', stripArrow(flow.branch.label), flow.branch.nodes, flow.branch.triggerId);
     }
-
+    if(flow.exception){
+      var exLabel = stripArrow(flow.exception.label).replace(/^Excepción\s*[—-]\s*/i, '');
+      attachNested('exception', 'Excepción', exLabel, [flow.exception.node], flow.exception.triggerId);
+    }
     if(flow.periodic){
-      var pRow = maxRow + 1;
-      var plbl = el('div','flow-periodic-label'); plbl.textContent = flow.periodic.label;
-      plbl.style.gridColumn = '1 / span ' + Math.min(3, cols); plbl.style.gridRow = String(pRow);
-      gridEl.appendChild(plbl);
-      flow.periodic.nodes.forEach(function(n, i){
-        var card = makeNode(n);
-        card.style.gridColumn = String(i+1); card.style.gridRow = String(pRow + 1);
-        gridEl.appendChild(card);
-      });
+      var pLabel = stripArrow(flow.periodic.label).replace(/^Proceso peri[oó]dico\s*[—-]\s*/i, '');
+      var lastId = flow.cycle[flow.cycle.length - 1].id;
+      attachNested('periodic', 'Proceso periódico', pLabel, flow.periodic.nodes, lastId);
     }
 
     ppListEl.innerHTML = '';
@@ -506,55 +576,70 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       ppListEl.appendChild(li);
     });
 
-    var edges = [];
-    for(var i=0;i<flow.cycle.length-1;i++){
-      edges.push({ from: flow.cycle[i].id, to: flow.cycle[i+1].id, dir:'h' });
-    }
-    if(flow.exception){
-      edges.push({ from: flow.exception.triggerId, to: flow.exception.node.id, dir:'v', dashed:true });
-    }
-    if(flow.branch){
-      var chain = [flow.branch.triggerId].concat(flow.branch.nodes.map(function(n){return n.id;}));
-      for(var j=0;j<chain.length-1;j++){
-        edges.push({ from: chain[j], to: chain[j+1], dir:'v' });
-      }
-    }
-    if(flow.periodic){
-      for(var k=0;k<flow.periodic.nodes.length-1;k++){
-        edges.push({ from: flow.periodic.nodes[k].id, to: flow.periodic.nodes[k+1].id, dir:'h' });
-      }
-    }
-
     function buildConnectors(){
-      svgElement.innerHTML = '<defs><marker id="flowArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" style="fill:var(--border)"/></marker></defs>';
+      svgElement.innerHTML = '<defs><marker id="flowArrow" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" style="fill:color-mix(in srgb, var(--accent) 45%, var(--border))"/></marker></defs>';
       updateConnectors();
     }
     function updateConnectors(){
       var canvasRect = gridEl.getBoundingClientRect();
       Array.prototype.slice.call(svgElement.querySelectorAll('path.flow-edge')).forEach(function(p){ p.remove(); });
+
+      /* auto-fit decide cuántas tarjetas caben por fila según el ancho real,
+         así que la fila visual se detecta comparando posiciones ya renderizadas,
+         no un cálculo previo — funciona igual a cualquier ancho de pantalla. */
+      var rows = [];
+      mainCards.forEach(function(card){
+        var top = Math.round(card.getBoundingClientRect().top);
+        var row = rows.filter(function(r){ return Math.abs(r.top - top) < 4; })[0];
+        if(!row){ row = { top: top, cards: [] }; rows.push(row); }
+        row.cards.push(card);
+      });
+      function rowBottomOf(card){
+        var top = Math.round(card.getBoundingClientRect().top);
+        var row = rows.filter(function(r){ return Math.abs(r.top - top) < 4; })[0];
+        var cards = row ? row.cards : [card];
+        return Math.max.apply(null, cards.map(function(c){ return c.getBoundingClientRect().bottom - canvasRect.top; }));
+      }
+
       edges.forEach(function(edge){
-        var fromEl = gridEl.querySelector('[data-id="'+edge.from+'"]');
-        var toEl = gridEl.querySelector('[data-id="'+edge.to+'"]');
+        var fromEl = cardById[edge.from];
+        var toEl = cardById[edge.to];
         if(!fromEl || !toEl) return;
         var fr = fromEl.getBoundingClientRect(), tr = toEl.getBoundingClientRect();
+        var sameRow = Math.abs(fr.top - tr.top) < 4;
         var x1,y1,x2,y2,d,midX,midY;
-        if(edge.dir === 'h'){
+        if(sameRow){
           x1 = fr.right - canvasRect.left; y1 = fr.top - canvasRect.top + ANCHOR_Y;
           x2 = tr.left - canvasRect.left; y2 = tr.top - canvasRect.top + ANCHOR_Y;
           midX = (x1+x2)/2;
-          d = 'M '+x1+' '+y1+' C '+midX+' '+y1+', '+midX+' '+y2+', '+(x2-7)+' '+y2;
+          d = 'M '+x1+' '+y1+' C '+midX+' '+y1+', '+midX+' '+y2+', '+(x2-8)+' '+y2;
         } else {
-          x1 = fr.left - canvasRect.left + fr.width/2; y1 = fr.bottom - canvasRect.top;
+          /* Cierre de fila en ángulo recto, pasando por debajo de TODAS las
+             tarjetas de la fila (no solo la última) — nunca cruza sobre otra tarjeta. */
+          x1 = fr.left - canvasRect.left + fr.width/2; y1 = rowBottomOf(fromEl);
           x2 = tr.left - canvasRect.left + tr.width/2; y2 = tr.top - canvasRect.top;
-          midY = (y1+y2)/2;
-          d = 'M '+x1+' '+y1+' C '+x1+' '+midY+', '+x2+' '+midY+', '+x2+' '+(y2-7);
+          /* El primer tramo (bajada) se mantiene corto a propósito, para dejarle
+             al tramo final (donde va la punta) suficiente espacio y que la
+             flecha nunca quede montada sobre la esquina. */
+          midY = y1 + Math.min(16, (y2 - y1) / 2);
+          d = 'M '+x1+' '+y1+' L '+x1+' '+midY+' L '+x2+' '+midY+' L '+x2+' '+(y2-8);
         }
         var path = svgNode('path');
-        path.setAttribute('class','flow-edge');
+        path.setAttribute('class','flow-edge' + (sameRow ? '' : ' is-wrap'));
         path.setAttribute('d', d);
         path.setAttribute('marker-end','url(#flowArrow)');
-        if(edge.dashed) path.classList.add('is-dashed');
         svgElement.appendChild(path);
+        if(!sameRow){
+          /* stroke-dasharray no sabe dónde termina el trazo: según el largo total
+             del camino, el patrón puede terminar justo en un "hueco", dejando la
+             punta de flecha visualmente separada de la línea. Se calcula el
+             desfase para que el punteado siempre termine a mitad de un trazo. */
+          var DASH = 5, GAP = 5, CYCLE = DASH + GAP;
+          var total = path.getTotalLength();
+          var offset = (((DASH / 2 - total) % CYCLE) + CYCLE) % CYCLE;
+          path.style.strokeDasharray = DASH + ' ' + GAP;
+          path.style.strokeDashoffset = String(offset);
+        }
       });
     }
 
@@ -564,10 +649,10 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       document.fonts.ready.then(function(){ requestAnimationFrame(buildConnectors); });
     }
 
-    var onResize = debounce(buildConnectors, 150);
+    var onResize = debounce(function(){ layoutMainCards(); buildConnectors(); }, 150);
     window.addEventListener('resize', onResize);
 
-    return { buildConnectors: buildConnectors };
+    return { buildConnectors: function(){ layoutMainCards(); buildConnectors(); } };
   }
 
   function renderSkeleton(flow, skelEl){
