@@ -635,6 +635,17 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
         path.setAttribute('d', d);
         path.setAttribute('marker-end','url(#flowArrow)');
         svgElement.appendChild(path);
+        if(!sameRow){
+          /* stroke-dasharray no sabe dónde termina el trazo: según el largo total
+             del camino, el patrón puede terminar justo en un "hueco", dejando la
+             punta de flecha visualmente separada de la línea. Se calcula el
+             desfase para que el punteado siempre termine a mitad de un trazo. */
+          var DASH = 5, GAP = 5, CYCLE = DASH + GAP;
+          var total = path.getTotalLength();
+          var offset = (((DASH / 2 - total) % CYCLE) + CYCLE) % CYCLE;
+          path.style.strokeDasharray = DASH + ' ' + GAP;
+          path.style.strokeDashoffset = String(offset);
+        }
       });
     }
 
