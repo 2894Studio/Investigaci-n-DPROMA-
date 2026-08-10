@@ -169,19 +169,27 @@ tbody tr:hover{ background: var(--surface-alt); }
 .flow-pill.is-active{ border-color:var(--accent); color:var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
 
 .flow-panel[hidden]{ display:none; }
-.flow-canvas{ position:relative; padding-bottom:1rem; }
+.flow-canvas{ display:flex; flex-direction:column; gap:2.25rem; }
+.flow-lane + .flow-lane{ padding-top:2rem; border-top:1px dashed var(--border); }
+.flow-lane-label{ display:flex; align-items:center; gap:0.6em; flex-wrap:wrap; font-size:0.8125rem; color:var(--text-muted); margin-bottom:1rem; }
+.flow-lane-tag{
+  flex:none;
+  font-size:0.6875rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;
+  padding:0.25em 0.7em; border-radius:999px;
+  background:var(--surface-alt); color:var(--accent); border:1px solid var(--border);
+}
+.flow-lane[data-lane="exception"] .flow-lane-tag{ background:var(--dark-surface); color:var(--on-dark); border-color:var(--dark-surface); }
+.flow-lane[data-lane="periodic"] .flow-lane-tag{ background:var(--accent); color:var(--on-accent); border-color:var(--accent); }
+.flow-lane-track{ position:relative; padding:0.25rem 0.5rem 0.5rem; }
 .flow-grid{
   position:relative;
   display:grid;
   grid-template-columns: repeat(var(--cols, 5), minmax(150px, 1fr));
-  grid-auto-rows: minmax(0,auto);
-  gap: 2.75rem 1.25rem;
+  gap: 1.25rem;
   align-items: start;
-  padding: 1.5rem 0.5rem 0.5rem;
 }
 .flow-svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; z-index:5; pointer-events:none; }
 .flow-svg path{ fill:none; stroke:var(--border); stroke-width:1.5; }
-.flow-svg path.is-dashed{ stroke-dasharray: 4 4; }
 .flow-svg polygon{ fill:var(--border); }
 
 .flow-node{
@@ -230,11 +238,6 @@ tbody tr:hover{ background: var(--surface-alt); }
   line-height:1.4;
 }
 .flow-node.is-exception .flow-node-pp p{ color:var(--on-dark); }
-.flow-branch-label, .flow-periodic-label{
-  grid-row: 1; align-self:end;
-  font-size:0.6875rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted);
-  padding-bottom:0.35rem;
-}
 
 .flow-painpoints{ list-style:none; margin:2rem 0 0; padding:0; display:flex; flex-direction:column; gap:0.75rem; }
 .flow-painpoints li{ display:flex; gap:0.9rem; align-items:flex-start; }
@@ -378,10 +381,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     <div class="flow-pills" id="flowNamePills"></div>
 
     <div class="flow-panel" data-panel="asis">
-      <div class="flow-canvas" id="flowCanvas">
-        <svg class="flow-svg" id="flowSvg"></svg>
-        <div class="flow-grid" id="flowGrid"></div>
-      </div>
+      <div class="flow-canvas" id="flowCanvas"></div>
       <ol class="flow-painpoints" id="flowPainpoints"></ol>
     </div>
 
@@ -443,11 +443,16 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     return card;
   }
 
-  function renderFlow(flow, gridEl, svgElement, ppListEl){
-    gridEl.innerHTML = '';
-    var cols = flow.cycle.length;
-    gridEl.style.setProperty('--cols', cols);
+  var laneMarkerSeq = 0;
 
+  function stripArrow(s){ return String(s || '').replace(/^\s*↓\s*/, ''); }
+
+  /* Cada variante/excepción/proceso periódico vive en su propio carril horizontal,
+     con su propia mini-secuencia de nodos — nunca cuelga en vertical bajo una
+     columna del flujo principal. La relación con el paso que la dispara se explica
+     en el texto del carril ("— después de «...»"), no con una flecha vertical. */
+  function renderFlow(flow, canvasEl, ppListEl){
+    canvasEl.innerHTML = '';
     var pps = [];
     function makeNode(node, extraClass){
       var idx = null;
@@ -455,52 +460,67 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       return renderNode(node, extraClass, idx);
     }
 
+    var laneRefs = [];
+
+    function addLane(kind, tagText, labelText, nodes){
+      var lane = el('div','flow-lane');
+      lane.dataset.lane = kind;
+      if(tagText){
+        var labelEl = el('div','flow-lane-label');
+        var tag = el('span','flow-lane-tag'); tag.textContent = tagText;
+        labelEl.appendChild(tag);
+        labelEl.appendChild(document.createTextNode(' ' + labelText));
+        lane.appendChild(labelEl);
+      }
+      var track = el('div','flow-lane-track');
+      var svg = svgNode('svg'); svg.setAttribute('class','flow-svg');
+      var markerId = 'flowArrow' + (laneMarkerSeq++);
+      var grid = el('div','flow-grid');
+      grid.style.setProperty('--cols', nodes.length);
+      track.appendChild(svg);
+      track.appendChild(grid);
+      lane.appendChild(track);
+      canvasEl.appendChild(lane);
+
+      nodes.forEach(function(n, i){
+        var card = makeNode(n, kind === 'exception' ? 'is-exception' : null);
+        card.style.gridColumn = String(i+1);
+        card.style.gridRow = '1';
+        grid.appendChild(card);
+      });
+
+      var edges = [];
+      for(var i=0;i<nodes.length-1;i++){
+        edges.push({ from: nodes[i].id, to: nodes[i+1].id });
+      }
+      laneRefs.push({ svg: svg, grid: grid, edges: edges, markerId: markerId });
+    }
+
+    addLane('main', null, null, flow.cycle);
+
     var colOf = {};
-    flow.cycle.forEach(function(n, i){
-      colOf[n.id] = i + 1;
-      var card = makeNode(n);
-      card.style.gridColumn = String(i+1);
-      card.style.gridRow = '1';
-      gridEl.appendChild(card);
+    flow.cycle.forEach(function(n, i){ colOf[n.id] = i; });
+    function triggerTitle(id){
+      var match = flow.cycle.filter(function(n){ return n.id === id; })[0];
+      return match ? match.title : '';
+    }
+
+    var extraLanes = [];
+    if(flow.branch){
+      extraLanes.push({ type:'branch', tag:'Variante', trigger: flow.branch.triggerId, nodes: flow.branch.nodes, text: stripArrow(flow.branch.label) });
+    }
+    if(flow.exception){
+      extraLanes.push({ type:'exception', tag:'Excepción', trigger: flow.exception.triggerId, nodes: [flow.exception.node], text: stripArrow(flow.exception.label).replace(/^Excepción\s*[—-]\s*/i, '') });
+    }
+    extraLanes.sort(function(a, b){ return (colOf[a.trigger] || 0) - (colOf[b.trigger] || 0); });
+    extraLanes.forEach(function(lane){
+      var label = lane.text + ' — después de «' + triggerTitle(lane.trigger) + '»';
+      addLane(lane.type, lane.tag, label, lane.nodes);
     });
 
-    var maxRow = 1;
-
-    if(flow.exception){
-      var exCol = colOf[flow.exception.triggerId] || 2;
-      var lbl = el('div','flow-branch-label'); lbl.textContent = flow.exception.label;
-      lbl.style.gridColumn = String(exCol); lbl.style.gridRow = '2';
-      gridEl.appendChild(lbl);
-      var exCard = makeNode(flow.exception.node, 'is-exception');
-      exCard.style.gridColumn = String(exCol); exCard.style.gridRow = '3';
-      gridEl.appendChild(exCard);
-      maxRow = Math.max(maxRow, 3);
-    }
-
-    if(flow.branch){
-      var brCol = colOf[flow.branch.triggerId] || cols;
-      var blbl = el('div','flow-branch-label'); blbl.textContent = flow.branch.label;
-      blbl.style.gridColumn = String(brCol); blbl.style.gridRow = '2';
-      gridEl.appendChild(blbl);
-      flow.branch.nodes.forEach(function(n, i){
-        var row = 3 + i;
-        var card = makeNode(n);
-        card.style.gridColumn = String(brCol); card.style.gridRow = String(row);
-        gridEl.appendChild(card);
-        maxRow = Math.max(maxRow, row);
-      });
-    }
-
     if(flow.periodic){
-      var pRow = maxRow + 1;
-      var plbl = el('div','flow-periodic-label'); plbl.textContent = flow.periodic.label;
-      plbl.style.gridColumn = '1 / span ' + Math.min(3, cols); plbl.style.gridRow = String(pRow);
-      gridEl.appendChild(plbl);
-      flow.periodic.nodes.forEach(function(n, i){
-        var card = makeNode(n);
-        card.style.gridColumn = String(i+1); card.style.gridRow = String(pRow + 1);
-        gridEl.appendChild(card);
-      });
+      var ptext = stripArrow(flow.periodic.label).replace(/^Proceso peri[oó]dico\s*[—-]\s*/i, '');
+      addLane('periodic', 'Periódico', ptext, flow.periodic.nodes);
     }
 
     ppListEl.innerHTML = '';
@@ -512,55 +532,31 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       ppListEl.appendChild(li);
     });
 
-    var edges = [];
-    for(var i=0;i<flow.cycle.length-1;i++){
-      edges.push({ from: flow.cycle[i].id, to: flow.cycle[i+1].id, dir:'h' });
-    }
-    if(flow.exception){
-      edges.push({ from: flow.exception.triggerId, to: flow.exception.node.id, dir:'v', dashed:true });
-    }
-    if(flow.branch){
-      var chain = [flow.branch.triggerId].concat(flow.branch.nodes.map(function(n){return n.id;}));
-      for(var j=0;j<chain.length-1;j++){
-        edges.push({ from: chain[j], to: chain[j+1], dir:'v' });
-      }
-    }
-    if(flow.periodic){
-      for(var k=0;k<flow.periodic.nodes.length-1;k++){
-        edges.push({ from: flow.periodic.nodes[k].id, to: flow.periodic.nodes[k+1].id, dir:'h' });
-      }
-    }
-
     function buildConnectors(){
-      svgElement.innerHTML = '<defs><marker id="flowArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" style="fill:var(--border)"/></marker></defs>';
+      laneRefs.forEach(function(lane){
+        lane.svg.innerHTML = '<defs><marker id="'+lane.markerId+'" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" style="fill:var(--border)"/></marker></defs>';
+      });
       updateConnectors();
     }
     function updateConnectors(){
-      var canvasRect = gridEl.getBoundingClientRect();
-      Array.prototype.slice.call(svgElement.querySelectorAll('path.flow-edge')).forEach(function(p){ p.remove(); });
-      edges.forEach(function(edge){
-        var fromEl = gridEl.querySelector('[data-id="'+edge.from+'"]');
-        var toEl = gridEl.querySelector('[data-id="'+edge.to+'"]');
-        if(!fromEl || !toEl) return;
-        var fr = fromEl.getBoundingClientRect(), tr = toEl.getBoundingClientRect();
-        var x1,y1,x2,y2,d,midX,midY;
-        if(edge.dir === 'h'){
-          x1 = fr.right - canvasRect.left; y1 = fr.top - canvasRect.top + ANCHOR_Y;
-          x2 = tr.left - canvasRect.left; y2 = tr.top - canvasRect.top + ANCHOR_Y;
-          midX = (x1+x2)/2;
-          d = 'M '+x1+' '+y1+' C '+midX+' '+y1+', '+midX+' '+y2+', '+(x2-7)+' '+y2;
-        } else {
-          x1 = fr.left - canvasRect.left + fr.width/2; y1 = fr.bottom - canvasRect.top;
-          x2 = tr.left - canvasRect.left + tr.width/2; y2 = tr.top - canvasRect.top;
-          midY = (y1+y2)/2;
-          d = 'M '+x1+' '+y1+' C '+x1+' '+midY+', '+x2+' '+midY+', '+x2+' '+(y2-7);
-        }
-        var path = svgNode('path');
-        path.setAttribute('class','flow-edge');
-        path.setAttribute('d', d);
-        path.setAttribute('marker-end','url(#flowArrow)');
-        if(edge.dashed) path.classList.add('is-dashed');
-        svgElement.appendChild(path);
+      laneRefs.forEach(function(lane){
+        var canvasRect = lane.grid.getBoundingClientRect();
+        Array.prototype.slice.call(lane.svg.querySelectorAll('path.flow-edge')).forEach(function(p){ p.remove(); });
+        lane.edges.forEach(function(edge){
+          var fromEl = lane.grid.querySelector('[data-id="'+edge.from+'"]');
+          var toEl = lane.grid.querySelector('[data-id="'+edge.to+'"]');
+          if(!fromEl || !toEl) return;
+          var fr = fromEl.getBoundingClientRect(), tr = toEl.getBoundingClientRect();
+          var x1 = fr.right - canvasRect.left, y1 = fr.top - canvasRect.top + ANCHOR_Y;
+          var x2 = tr.left - canvasRect.left, y2 = tr.top - canvasRect.top + ANCHOR_Y;
+          var midX = (x1+x2)/2;
+          var d = 'M '+x1+' '+y1+' C '+midX+' '+y1+', '+midX+' '+y2+', '+(x2-7)+' '+y2;
+          var path = svgNode('path');
+          path.setAttribute('class','flow-edge');
+          path.setAttribute('d', d);
+          path.setAttribute('marker-end','url(#'+lane.markerId+')');
+          lane.svg.appendChild(path);
+        });
       });
     }
 
@@ -592,8 +588,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     if(!root) return;
     var personPillsEl = root.querySelector('#flowPersonPills');
     var namePillsEl = root.querySelector('#flowNamePills');
-    var gridEl = root.querySelector('#flowGrid');
-    var svgElement = root.querySelector('#flowSvg');
+    var canvasEl = root.querySelector('#flowCanvas');
     var ppListEl = root.querySelector('#flowPainpoints');
     var skelEl = root.querySelector('#flowSkeleton');
     var tabs = root.querySelectorAll('.flow-tab');
@@ -630,7 +625,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       renderPersonPills();
       renderNamePills();
       var flow = currentFlow();
-      currentInstance = renderFlow(flow, gridEl, svgElement, ppListEl);
+      currentInstance = renderFlow(flow, canvasEl, ppListEl);
       renderSkeleton(flow, skelEl);
     }
 
