@@ -175,7 +175,7 @@ tbody tr:hover{ background: var(--surface-alt); }
   display:grid;
   grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
   grid-auto-rows: minmax(0,auto);
-  gap: 2.75rem 1.5rem;
+  gap: 3.5rem 1.5rem;
   align-items: start;
 }
 .flow-svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; z-index:5; pointer-events:none; }
@@ -186,7 +186,7 @@ tbody tr:hover{ background: var(--surface-alt); }
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.flow-svg path.flow-edge.is-wrap{ stroke: color-mix(in srgb, var(--accent) 28%, var(--border)); }
+.flow-svg path.flow-edge.is-wrap{ stroke-dasharray: 5 5; }
 .flow-svg polygon{ fill: color-mix(in srgb, var(--accent) 45%, var(--border)); }
 
 .flow-node{
@@ -624,7 +624,10 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
              tarjetas de la fila (no solo la última) — nunca cruza sobre otra tarjeta. */
           x1 = fr.left - canvasRect.left + fr.width/2; y1 = rowBottomOf(fromEl);
           x2 = tr.left - canvasRect.left + tr.width/2; y2 = tr.top - canvasRect.top;
-          midY = y1 + Math.max(16, (y2 - y1) / 2);
+          /* El primer tramo (bajada) se mantiene corto a propósito, para dejarle
+             al tramo final (donde va la punta) suficiente espacio y que la
+             flecha nunca quede montada sobre la esquina. */
+          midY = y1 + Math.min(16, (y2 - y1) / 2);
           d = 'M '+x1+' '+y1+' L '+x1+' '+midY+' L '+x2+' '+midY+' L '+x2+' '+(y2-8);
         }
         var path = svgNode('path');
