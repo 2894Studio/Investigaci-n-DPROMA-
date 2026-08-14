@@ -1,0 +1,109 @@
+# Síntesis UX — 10 entrevistas DPROMA × 2894 Studio (versión corregida, fuente: transcripciones en bruto)
+
+> Fuente: 10 transcripciones en bruto ("Notas de Gemini") levantadas entre el 16 y el 31 de julio de 2026.
+> Marco de análisis: `data/brief-context.md` (Brief oficial DPROMA x 2894_).
+> Todos los nombres propios de entrevistados y terceros mencionados han sido reemplazados por rol + área.
+
+## 1. Resumen ejecutivo
+
+Las 10 entrevistas describen una operación que hoy corre casi enteramente sobre Excel personal, WhatsApp y buena voluntad individual — exactamente el punto de partida que el brief describe en sus 6 categorías de dolor, y las 10 fuentes lo confirman de forma consistente, no como percepción aislada. No existe un solo repositorio de información operativa, comercial, financiera o jurídica (objetivo 1 del brief): cada área mantiene su propio Excel o carpeta personal, y el traspaso de información entre áreas ocurre por WhatsApp o correo, sin trazabilidad. El dolor más agudo y mejor cuantificado es financiero: validaciones manuales de facturación generan retrasos de hasta dos meses y una cartera vencida cercana a los 2 millones de pesos por falta de datos obligatorios capturados a tiempo. La empresa ya está operando con crecimiento activo (nuevas sedes en Tijuana y Monterrey, nuevos roles de dirección incorporándose, certificación ISO 9001 en curso) sin que la infraestructura de datos haya acompañado ese crecimiento — lo que valida la urgencia del objetivo general del brief, pero también expone que los objetivos específicos 3 (IA responsable) y 5 (adopción/formación) parten de una base casi nula: el uso de IA hoy es individual, no gobernado, y en al menos un caso ya generó desconfianza por resultados fabricados. El objetivo 6 (app móvil de instaladores offline) es el que menos evidencia directa tiene, porque ningún instalador de campo fue entrevistado directamente — solo sus supervisores.
+
+## 2. Perfiles / roles cubiertos
+
+| # | Fecha | Área / rol anonimizado | Mapeo a perfiles del brief |
+|---|---|---|---|
+| 1 | 2026-07-16 | Soporte administrativo transversal a Dirección General (marketing, compras de EPP/uniformes, alta de clientes, apoyo a certificación ISO 9001) | Administración |
+| 2 | 2026-07-20 | Responsable de almacén e inventario (recién incorporado) | Operaciones (soporte a Instaladores, sin acceso a app móvil) |
+| 3 | 2026-07-22 | Coordinación técnica de instalaciones (liderazgo de operaciones de instalación + colaborador de campo) | Operaciones |
+| 4 | 2026-07-23 | Área comercial — administración vehicular y cargadores eléctricos | Operaciones (comercial) |
+| 5 | 2026-07-23 | Dirección de proyectos especiales y expansión (diseño, factibilidad, nuevos negocios) | Operaciones / Gestores (proyectos técnicos) |
+| 6 | 2026-07-28 | Jurídico y Recursos Humanos | Gestores (legal) |
+| 7 | 2026-07-30 | Dirección comercial y cobranza | Operaciones |
+| 8 | 2026-07-31 | Administración vehicular (dirección de área + colaborador de trámites) | Gestores (vehículos) |
+| 9 | 2026-07-31 | Dirección general / supervisión operativa transversal | Administración (dirección) |
+| 10 | 2026-07-31 | Finanzas, cobranza y almacén | Administración |
+
+Cobertura: las 10 entrevistas exceden la lista mínima de 6 roles prioritarios del brief y profundizan en comercial/cobranza y dirección general, tal como el propio brief anticipa. No hay evidencia directa de **instaladores de campo** (perfil "Instaladores" del brief) — aparecen siempre referenciados por terceros (almacén, coordinación técnica), nunca como voz propia.
+
+## 3. Patrones transversales de dolor (categorías oficiales del brief)
+
+### falta_centralizacion — presente en 10/10 entrevistas
+Cada área sostiene su propia versión de la verdad. Ejemplos triangulados: el padrón de clientes se arma en un Excel personal armado por quien da soporte administrativo transversal (entrevista 1); las bases de clientes de marcas ancla se gestionan en un Excel que "vive" y se comparte por archivo, no por plataforma (entrevista 3); el área comercial reconoce no tener carpetas compartidas de Drive y depender de que cada colaborador arme sus propias carpetas locales (entrevista 4); administración vehicular trabaja con Excel con macros y semáforos compartidos manualmente (entrevista 8); dirección general no tiene forma de ver reportes de todas las áreas sin pedirlos uno por uno (entrevista 9). La dirección general lo resume como ausencia de un "centro de control" — el propio proyecto pasó de concebirse como CRM a describirse internamente como eso (entrevista 8, nota de apertura).
+
+### falta_formatos_comunes — presente en 9/10 entrevistas
+No hay estándar de captura entre áreas. El área comercial admite no usar ningún formato de detección de necesidades ni de traspaso de cliente cerrado a operaciones (entrevista 4). Jurídico está apenas definiendo qué cláusulas mínimas debe llevar cada tipo de contrato — antes cada documento se redactaba desde cero según el cliente (entrevista 6). Almacén tuvo que crear sus propios formatos de entrada/salida porque "no existían... no estaban a la mano" antes de su llegada (entrevista 2). Comercial/cobranza detectó que la falta de campos obligatorios (orden de confirmación, número de identificación vehicular) en el registro inicial es la causa directa de una cartera pendiente de cobro cercana a los 2 millones de pesos (entrevista 7).
+
+### gestion_por_whatsapp — presente en 9/10 entrevistas
+Es el canal operativo por defecto, no de respaldo. Dirección general participa en más de 70 grupos de WhatsApp para dar seguimiento a áreas distintas (entrevista 9). Las solicitudes de servicio de instalación llegan por WhatsApp de agencias o clientes directos (entrevista 3). La aprobación de fondos y viáticos se resuelve con un visto bueno informal ("palomita") en un chat grupal (entrevistas 3 y 9). Administración vehicular identifica textualmente la comunicación como su "talón de Aquiles" por la dependencia de grupos de WhatsApp que restan formalidad y dificultan asignar responsables (entrevista 8). Una campaña de marketing perdió más de 200 leads recibidos por WhatsApp porque no había personal ni infraestructura para responder a tiempo (entrevista 1).
+
+### trabajo_manual — presente en 10/10 entrevistas
+Es la constante más transversal de todas. Conteo físico de inventario producto por producto contra un Excel (entrevista 2); validación manual de números de identificación vehicular contra plataformas de clientes antes de facturar, señalada como la tarea que más tiempo consume en finanzas (entrevista 10); redacción manual de contratos "desde cero" según cliente (entrevista 6); estimación manual de viáticos por ruta y kilometraje sin GPS de flotilla (entrevista 2); reconciliación manual entre hojas de servicio en papel y salidas de almacén (entrevista 3).
+
+### falta_governance_ia — presente en 8/10 entrevistas (de forma explícita)
+El uso de IA existe, pero es individual, no gobernado y sin capacitación formal — contrario al objetivo 5 del brief. El líder de coordinación técnica admite que su equipo "casi no" usa IA de forma institucional, y que las herramientas que sí funcionan (optimización de rutas, cuantificación de hojas de servicio) las diseñó él mismo de forma personal, sin que estén documentadas ni transferidas al equipo de forma estructurada (entrevista 3). El área comercial expresa desconfianza explícita: un colaborador externo que sí usa IA de forma intensiva ha recibido respuestas con información inexistente (agencias que no existen), lo que generó cautela deliberada para no usarla en tareas críticas (entrevista 4). Jurídico usa IA para redactar borradores de contrato pero ajusta todo manualmente después (entrevista 6). Dirección general, tras un taller de IA, es quien articula la visión más madura — un asistente conversacional que consulte datos operativos en tiempo real — pero reconoce que hoy no existe ese nivel de integración (entrevista 9). En ningún caso se menciona una política, criterio de uso o lineamiento compartido: cada quien decide qué herramienta usar y para qué.
+
+### falta_visibilidad_kpis — presente en 6/10 entrevistas, con mayor fuerza en el nivel directivo
+Dirección general pide explícitamente un tablero de control que consolide estados financieros, facturación, cuentas por cobrar y estatus vehicular en una sola vista, con alertas automáticas ante incumplimientos (ej. cliente sin contacto en 24 horas) — hoy depende de pedir evidencias manualmente (entrevista 9). Dirección comercial/cobranza reconoce que los reportes semanales a clientes "a veces se envían tarde o no se envían" por carga de trabajo (entrevista 7). Almacén genera reportes de inventario solo bajo solicitud puntual, sin cadencia automática (entrevista 2). Administración vehicular propone dar al propio cliente un usuario de consulta de trazabilidad para reducir la carga de responder manualmente (entrevista 8).
+
+## 4. Contraste con las funcionalidades previstas del brief
+
+| Módulo previsto (brief) | Validación en entrevistas | Fuerza |
+|---|---|---|
+| **CRM Comercial** | Solicitud explícita y detallada (documento propio de requerimientos, referencia a HubSpot) en entrevista 4; el propio proyecto interno "evolucionó" de CRM a "centro de control" según entrevista 8; dirección general pide tablero comercial (entrevista 9); soporte administrativo describe alta de clientes 100% manual (entrevista 1) | **Muy fuerte** — 4 entrevistas independientes |
+| **Facturación y cobranzas (SAT)** | Cartera pendiente cuantificada (~2M MXN) por falta de datos obligatorios (entrevista 7); retrasos de hasta 2 meses en una refactura (entrevista 4); validación manual de VIN identificada como la tarea más lenta de finanzas (entrevista 10) | **Muy fuerte** — 3 entrevistas, con impacto financiero cuantificado |
+| **Módulo jurídico + gestor documental** | Propuesta espontánea de que jurídico sea custodio único de contratos con permisos diferenciados (entrevista 1); entrevista completa dedicada a estandarización de cláusulas, firma digital y referencia a una plataforma usada en un empleo anterior (entrevista 6) | **Fuerte** — 2 entrevistas, una de ellas monográfica |
+| **Trámites vehiculares (Gestores)** | Entrevista monográfica: catálogo completo de servicios, tiempos por localidad (2 a 15 días), volumen de 300-400 trámites/mes por cliente, propuesta propia de portal con trazabilidad en tiempo real para el cliente (entrevista 8) | **Fuerte** — validación directa y detallada |
+| **Inventario y almacén** | Entrevista monográfica sobre control de stock mínimo/máximo, compras de emergencia (sobrecosto 5-10%), expansión a almacenes foráneos (entrevista 2); validación cruzada de materiales entre operaciones y almacén (entrevista 3); refuerzo de control tras faltantes reportado por dirección general (entrevista 9) | **Fuerte** — 3 entrevistas |
+| **Compras** | Flujo descrito de cotización → aprobación → pago en al menos 4 entrevistas (1, 2, 5, 10), consistente entre ellas | **Fuerte** |
+| **Caja chica y viáticos** | Reglas específicas ya existentes pero informales (límites por tipo de gasto, plazo de comprobación de 3 días) descritas en detalle en entrevista 10; cuello de botella de aprobación multinivel señalado en entrevista 8, que pide una política de montos sin necesidad de aprobación de Dirección General | **Fuerte** |
+| **Dashboard y reportes con IA** | Pedido explícito y detallado por dirección general (entrevista 9); mencionado como necesidad de automatización de reportes por dirección comercial (entrevista 7) | **Moderada-fuerte** — impulsado sobre todo desde el nivel directivo, no desde las áreas operativas |
+| **Solicitud de recursos** | Descrito como flujo de aprobación vía chat grupal con validación informal (entrevistas 3, 9); sin formato ni bitácora hoy | **Moderada** |
+| **Customer Support (llamadas y atención a cliente)** | Dolor real pero sin módulo dedicado propuesto: el área comercial recibe quejas de facturación y trámites directamente aunque no le correspondan (entrevista 4); pérdida de 200+ leads por falta de capacidad de respuesta (entrevista 1) | **Moderada** — valida el dolor, no valida un módulo específico de soporte |
+| **Gestión bancaria** | Mencionada solo tangencialmente: espera de comprobantes de transferencia (entrevista 1), ejecución de pagos por finanzas (entrevista 10) | **Débil** — no hay ninguna entrevista que la señale como dolor prioritario |
+| **App móvil de instaladores — offline, escaneo de códigos de barras, evidencias foto/video, registro de llegada/estado/mantenimiento** | Evidencia parcial: uso ya activo de fotografía como evidencia de instalación y de material usado (entrevistas 3, 7, 9); optimización de rutas con Google Maps + IA ya en uso informal (entrevista 3). **Sin ninguna evidencia** sobre necesidad de operación offline ni de escaneo de materiales por código de barras — porque ningún instalador fue entrevistado directamente | **Parcial / con vacío de evidencia** — los componentes de foto/evidencia y ruta están validados; offline y escaneo de código de barras son supuestos del brief no contrastados aún con el usuario final |
+
+## 5. Oportunidades priorizadas (RICE-lite)
+
+Ordenadas de mayor a menor prioridad combinada (impacto × viabilidad × número de áreas que la piden), cruzadas con los objetivos específicos del brief.
+
+1. **Centralizar CRM comercial y ficha única de cliente/agencia** (objetivo 1) — Impacto: alto. Viabilidad: alta (ya está en desarrollo activo). Áreas que lo piden: comercial, dirección comercial, dirección general, soporte administrativo (4).
+2. **Automatizar validación de datos de facturación (VIN, orden de confirmación) antes de instalar/facturar** (objetivos 1, 2) — Impacto: alto y cuantificado (~2M MXN en cartera vencida, retrasos de hasta 2 meses). Viabilidad: media-alta (requiere integración con datos de cliente ya capturados). Áreas: comercial, cobranza, finanzas (3).
+3. **Estandarizar formatos y flujos de traspaso entre áreas** (objetivo 4) — Impacto: alto pero difuso (habilita todo lo demás). Viabilidad: media (requiere gestión del cambio, no solo desarrollo). Áreas: prácticamente las 10 entrevistas lo mencionan de forma directa o indirecta.
+4. **Portal de trazabilidad de trámites para el cliente (placas, instalación)** (objetivo 1, visión de posicionamiento tecnológico) — Impacto: alto, con valor competitivo explícito ("hito diferencial en el mercado"). Viabilidad: alta (ya conceptualizado por el propio equipo). Áreas: administración vehicular, comercial, dirección comercial (3).
+5. **Dashboard directivo con KPIs y alertas automáticas** (objetivos 2, 3) — Impacto: alto para toma de decisiones. Viabilidad: media (depende de que los módulos anteriores alimenten datos limpios primero). Áreas: dirección general, dirección comercial, finanzas (3).
+6. **Módulo jurídico + gestor documental con firma digital** (objetivos 1, 4) — Impacto: medio-alto (riesgo legal y financiero por contratos dispersos y cobros inconsistentes con lo pactado). Viabilidad: alta. Áreas: soporte administrativo, jurídico/RH (2, con fuerte respaldo cualitativo).
+7. **Gobernanza y capacitación de IA (lineamientos de uso, prompts compartidos, verificación de resultados)** (objetivos 3, 5) — Impacto: medio-alto, condición habilitante para todo uso futuro de Gemini. Viabilidad: alta (bajo costo, requiere decisión organizacional, no desarrollo). Áreas: al menos 6 de las 10 mencionan uso ad hoc de IA sin gobierno.
+8. **Gestión de almacén/inventario multi-sede (CDMX, Tijuana, Monterrey) con lógica de stock mínimo/máximo** (objetivos 1, 6) — Impacto: medio (ya hay control manual funcional recién implementado). Viabilidad: alta. Áreas: almacén, coordinación técnica, dirección general (3).
+
+## 6. Respuestas parciales a las preguntas abiertas del brief
+
+**¿La lista de stakeholders cubre todos los perfiles necesarios para el flujo end-to-end del CRM?**
+Parcialmente respondida. Las 10 entrevistas cubren bien administración/dirección, operaciones (comercial, instalación, proyectos especiales) y gestores (vehicular, jurídico), y de hecho exceden el listado mínimo del brief. Pero dejan vacíos identificables: (1) ningún **instalador de campo** fue entrevistado directamente — solo referenciado por sus supervisores en almacén y coordinación técnica; (2) no hay entrevista de **contabilidad**, mencionada en dos entrevistas como función externa/tercerizada que genera cuellos de botella de facturación; (3) no existe un rol de **marketing** dedicado — se menciona explícitamente su ausencia en dos entrevistas distintas; (4) el ciclo de entrevistas se cierra reconociendo que falta una persona clave de dirección de desarrollo de nuevos negocios, mencionada mas no entrevistada en esta tanda.
+
+**¿En qué horizonte de tiempo se proyecta la expansión a otros mercados, y a qué países?**
+Sigue completamente abierta. Ninguna de las 10 entrevistas menciona expansión a otros países de LatAm. Sí hay evidencia sólida de expansión geográfica **nacional** (almacenes y equipos en Tijuana y Monterrey, presencia en Mérida, Querétaro, Puebla y Guadalajara), lo que confirma que DPROMA ya opera multi-sede dentro de México, pero no aporta nada sobre el horizonte internacional.
+
+**¿Cuáles son las áreas y actividades prioritarias en el CRM — el mayor dolor operativo hoy?**
+Respondida con bastante fuerza: facturación/cobranza y centralización de clientes emergen como el dolor más agudo y el único cuantificado en dinero (cartera pendiente cercana a 2 millones de pesos, retrasos de hasta 2 meses en una factura). El área comercial pide un CRM desde el día en que ingresó a la empresa. Esto da una respuesta operativa concreta, aunque no sustituye una decisión formal del cliente sobre prioridades de fase.
+
+**¿Existe alguna restricción no comentada aún (presupuesto, integraciones obligatorias, etc.)?**
+Sigue abierta. Ninguna entrevista menciona restricciones de presupuesto ni integraciones obligatorias adicionales a las ya listadas en el brief (SAT, bancarias, Maps, CRM). No hay evidencia para responder esta pregunta.
+
+**¿Cómo impacta hoy la operación interna en la experiencia del cliente? ¿Hay algún proceso de cara al cliente prioritario de mejorar?**
+Respondida con evidencia sólida y triangulada. El proceso de cara al cliente más crítico es el estatus de trámites e instalaciones: el área comercial describe cómo los retrasos y la informalidad de gestores independientes dañan la experiencia de compra; dirección comercial/cobranza señala que reportes semanales tardíos erosionan la confianza; administración vehicular propone dar acceso directo de consulta al cliente como diferenciador; y soporte administrativo documenta la pérdida de más de 200 leads por falta de capacidad de respuesta en una campaña. La visibilidad de estatus hacia el cliente es, de forma consistente, el punto de mayor impacto en experiencia.
+
+**Al finalizar las tres fases del proyecto, ¿qué tiene que haber cambiado en la operación para que se considere exitoso?**
+Sigue mayormente abierta — no hay una definición formal de éxito en ninguna entrevista. La señal más cercana viene de dirección general, quien describe el éxito de forma cualitativa: reportes visuales que permitan identificar y reaccionar a problemas antes de que se conviertan en crisis ("bolas de nieve"), y una diferenciación competitiva vía tecnología. Esto es una intuición directiva, no un criterio de éxito acordado con el cliente.
+
+## 7. Recomendaciones accionables para la siguiente fase
+
+1. **Entrevistar directamente a instaladores de campo** antes de cerrar el alcance de la app móvil offline — hoy el módulo con más supuestos no contrastados del brief (offline, escaneo de código de barras) depende de una voz que aún no ha sido escuchada directamente.
+2. **Priorizar la automatización de validación de datos de facturación (VIN/orden de confirmación) como quick win de Fase 1** — es el único dolor con impacto financiero cuantificado por los propios entrevistados y afecta a tres áreas distintas de forma directa.
+3. **Definir con el equipo de dirección un criterio de éxito medible por fase** — ninguna entrevista lo aporta; sin esto, la priorización de RICE-lite de esta síntesis queda sin ancla de negocio verificable al cierre del proyecto.
+4. **Levantar un mapeo de formatos actuales por área antes de estandarizar** — como insumo directo del objetivo 4 del brief, aprovechando que varias personas entrevistadas (almacén, jurídico, administración vehicular) ya se comprometieron a compartir sus diagramas de flujo y formatos.
+5. **Diseñar lineamientos mínimos de uso de IA (governance) en paralelo al desarrollo técnico**, no después — hay uso real pero disperso y en un caso ya se reportó desconfianza por resultados fabricados; esto es barato de resolver y condiciona la adopción real del objetivo 5.
+6. **Cerrar explícitamente con el cliente las preguntas abiertas de expansión LatAm, restricciones no comentadas y criterio de éxito** en una sesión dedicada — las entrevistas de investigación de usuario no son la fuente adecuada para resolverlas y seguir asumiendo respuestas por omisión introduce riesgo de alcance.
+
+---
+
+**Nota de anonimización**: todos los nombres propios reales de entrevistados y terceros fueron reemplazados por rol + área. Antes de compartir este documento fuera del equipo del proyecto, se recomienda una segunda revisión para confirmar que ninguna combinación de rol + dato específico (ej. cargos unipersonales, montos de cartera vencida) permita reidentificar a una persona, dado el tamaño de la organización.
