@@ -328,6 +328,63 @@ section + section{ border-top: 1px solid var(--border); }
 .mejora-pie{ margin:0.6rem 0 0; font-size:0.875rem; color:var(--text-muted); max-width:66ch; }
 .mejora-zoom{ margin:0.45rem 0 0; font-size:0.8125rem; font-weight:500; color:var(--accent); }
 
+/* Animaciones de flujo: SVG + keyframes, sin librerías.
+   Ciclo compartido de 8s; cada nodo enciende en su fase y cada paquete
+   viaja en el hueco entre dos nodos. */
+.anim{
+  margin-top:1.25rem; border:1px solid var(--border); border-radius:14px;
+  background:var(--surface); padding:1.25rem 1.35rem 1.1rem;
+}
+.anim svg{ width:100%; height:auto; display:block; overflow:visible; }
+.anim figcaption{ margin:0.85rem 0 0; font-size:0.8125rem; color:var(--text-muted); }
+.anim text{ font-family:'DM Sans',system-ui,sans-serif; text-anchor:middle; }
+.anim .t1{ font-size:13px; font-weight:700; fill:var(--text); }
+.anim .t2{ font-size:11px; fill:var(--text-muted); }
+.anim .caja{ fill:var(--surface-alt); stroke:var(--border); stroke-width:1.2; }
+.anim .destino .caja{ fill:color-mix(in srgb, var(--accent) 12%, var(--surface)); stroke:var(--accent-soft); }
+.anim .puerta .caja{ fill:color-mix(in srgb, var(--accent) 16%, var(--surface)); stroke:var(--accent); stroke-width:1.8; }
+.anim .futuro .caja{ stroke-dasharray:5 4; }
+.anim .via{ stroke:var(--border); stroke-width:1.5; fill:none; }
+.anim .pk{ fill:var(--accent); }
+
+.anim .nodo{ opacity:.32; animation:8s linear infinite; }
+.anim .n1{ animation-name:anim-on1; }
+.anim .n2{ animation-name:anim-on2; }
+.anim .n3{ animation-name:anim-on3; }
+.anim .n4{ animation-name:anim-on4; }
+@keyframes anim-on1{ 0%,5%{opacity:.32} 11%,100%{opacity:1} }
+@keyframes anim-on2{ 0%,30%{opacity:.32} 36%,100%{opacity:1} }
+@keyframes anim-on3{ 0%,55%{opacity:.32} 61%,100%{opacity:1} }
+@keyframes anim-on4{ 0%,80%{opacity:.32} 86%,100%{opacity:1} }
+
+.anim .pk{ opacity:0; animation:8s linear infinite; }
+.anim .p1{ animation-name:anim-viaja1; }
+.anim .p2{ animation-name:anim-viaja2; }
+.anim .p3{ animation-name:anim-viaja3; }
+@keyframes anim-viaja1{
+  0%,11%   { transform:translate(0,0); opacity:0 }
+  14%      { transform:translate(calc(var(--dx)*.12), calc(var(--dy,0px)*.12)); opacity:1 }
+  27%      { transform:translate(calc(var(--dx)*.88), calc(var(--dy,0px)*.88)); opacity:1 }
+  30%,100% { transform:translate(var(--dx), var(--dy,0px)); opacity:0 }
+}
+@keyframes anim-viaja2{
+  0%,36%   { transform:translate(0,0); opacity:0 }
+  39%      { transform:translate(calc(var(--dx)*.12), calc(var(--dy,0px)*.12)); opacity:1 }
+  52%      { transform:translate(calc(var(--dx)*.88), calc(var(--dy,0px)*.88)); opacity:1 }
+  55%,100% { transform:translate(var(--dx), var(--dy,0px)); opacity:0 }
+}
+@keyframes anim-viaja3{
+  0%,61%   { transform:translate(0,0); opacity:0 }
+  64%      { transform:translate(calc(var(--dx)*.12), calc(var(--dy,0px)*.12)); opacity:1 }
+  77%      { transform:translate(calc(var(--dx)*.88), calc(var(--dy,0px)*.88)); opacity:1 }
+  80%,100% { transform:translate(var(--dx), var(--dy,0px)); opacity:0 }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .anim .nodo{ animation:none; opacity:1; }
+  .anim .pk{ display:none; }
+}
+
 /* Entidades */
 .entidad-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; margin-top: 1.25rem; }
 @media (max-width: 860px){ .entidad-grid{ grid-template-columns: repeat(2,1fr); } }
@@ -725,6 +782,39 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
                 </ol>
               </div>
             </div>
+            <figure class="anim">
+              <svg viewBox="0 0 680 92" role="img" aria-label="Flujo del alta: Comercial genera el enlace, la agencia llena el formulario y sube sus documentos, el sistema valida lo que falta y el registro queda creado en el padrón.">
+                <line class="via" x1="74" y1="14" x2="605" y2="14"/>
+                <line class="via" x1="74" y1="14" x2="74" y2="30"/>
+                <line class="via" x1="251" y1="14" x2="251" y2="30"/>
+                <line class="via" x1="428" y1="14" x2="428" y2="30"/>
+                <line class="via" x1="605" y1="14" x2="605" y2="30"/>
+                  <g class="nodo n1 ">
+                    <rect class="caja" x="0" y="30" width="148" height="56" rx="12"/>
+                    <text class="t1" x="74" y="55">Comercial</text>
+                    <text class="t2" x="74" y="73">genera el enlace</text>
+                  </g>
+                  <g class="nodo n2 ">
+                    <rect class="caja" x="177" y="30" width="148" height="56" rx="12"/>
+                    <text class="t1" x="251" y="55">Agencia</text>
+                    <text class="t2" x="251" y="73">llena y sube sus docs</text>
+                  </g>
+                  <g class="nodo n3 ">
+                    <rect class="caja" x="354" y="30" width="148" height="56" rx="12"/>
+                    <text class="t1" x="428" y="55">Validación</text>
+                    <text class="t2" x="428" y="73">revisa lo que falta</text>
+                  </g>
+                  <g class="nodo n4 destino">
+                    <rect class="caja" x="531" y="30" width="148" height="56" rx="12"/>
+                    <text class="t1" x="605" y="55">Padrón</text>
+                    <text class="t2" x="605" y="73">registro creado</text>
+                  </g>
+                <circle class="pk p1" cx="74" cy="14" r="5" style="--dx:177px"/>
+                <circle class="pk p2" cx="251" cy="14" r="5" style="--dx:177px"/>
+                <circle class="pk p3" cx="428" cy="14" r="5" style="--dx:177px"/>
+              </svg>
+              <figcaption>El alta viaja del cliente al registro sin pasar por una transcripción manual.</figcaption>
+            </figure>
             <p class="finding-cierre">Desaparece la transcripción manual y <b>el alta deja de depender de que alguien esté disponible</b> para capturarla.</p>
             <details class="tecnico">
               <summary><span class="finding-toggle" aria-hidden="true"></span>Detalle para implementación</summary>
@@ -880,10 +970,10 @@ POST /api/ordenes-instalacion
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
-            <p>Cuando se da de alta un cliente o cambian sus datos fiscales, las áreas involucradas se enteran solas, en el canal donde ya trabajan, sin que nadie reenvíe nada.</p>
+            <p>Cuando se da de alta un cliente o cambian sus datos fiscales, las áreas involucradas se enteran solas, sin que nadie reenvíe nada. El aviso llega por correo, que es el canal que la empresa ya usa y que no obliga a nadie a adoptar una herramienta nueva.</p>
             <div class="glosa">
-              <p><b>Qué es un espacio de Google Chat y su dirección secreta.</b> Google Chat permite crear un espacio por área, parecido a un canal. A cada espacio se le puede dar una dirección secreta. Cuando SIO-DPROMA envía información a esa dirección, aparece automáticamente un mensaje en el espacio con los datos y un botón para abrir el expediente.</p>
-              <p>Es el reemplazo directo del grupo de WhatsApp, con dos diferencias: lo escribe el sistema y no una persona, y queda registrado en el entorno de trabajo de la empresa en lugar de en un teléfono particular.</p>
+              <p><b>Al grupo del área, no a las personas.</b> En Google Workspace se crea una dirección por área, del tipo facturacion@dproma.mx o instalaciones@dproma.mx, y se define quién pertenece a cada una. El sistema envía siempre a la dirección del área, nunca a un correo personal.</p>
+              <p>Esto importa por una razón práctica: cuando alguien entra, sale o cambia de puesto, se ajusta la pertenencia al grupo y los avisos siguen llegando a quien corresponde. Si el sistema enviara a personas, cada cambio de plantilla obligaría a editar la configuración del CRM.</p>
             </div>
             <div class="escenario">
               <div class="escenario-col">
@@ -900,44 +990,61 @@ POST /api/ordenes-instalacion
                 <h4>Con la automatización</h4>
                 <ol>
                   <li>Se completa el alta en el sistema</li>
-                  <li>Aparece la tarjeta en el espacio de Facturación</li>
-                  <li>Aparece en el espacio de Instalaciones</li>
-                  <li>Cada tarjeta lleva el botón para abrir la ficha</li>
-                  <li>El aviso queda registrado con fecha</li>
+                  <li>Llega el correo a facturación con los datos fiscales y el enlace al expediente</li>
+                  <li>Llega a instalaciones, con las sucursales y si están habilitadas para visita</li>
+                  <li>Cada área recibe solo lo que le toca, no el registro completo</li>
+                  <li>El envío queda registrado con fecha en el historial del cliente</li>
                 </ol>
               </div>
             </div>
+            <figure class="anim">
+              <svg viewBox="0 0 680 112" role="img" aria-label="Un alta confirmada dispara dos correos: uno a facturación con los datos fiscales y otro a instalaciones con las sucursales y su estado.">
+                <path class="via" d="M190 56 H310 Q330 56 350 30 H430"/>
+                <path class="via" d="M190 56 H310 Q330 56 350 82 H430"/>
+                <g class="nodo n1">
+                  <rect class="caja" x="0" y="28" width="190" height="56" rx="12"/>
+                  <text class="t1" x="95" y="53">Alta confirmada</text>
+                  <text class="t2" x="95" y="71">evento del sistema</text>
+                </g>
+                <g class="nodo n2 destino">
+                  <rect class="caja" x="430" y="6" width="250" height="48" rx="12"/>
+                  <text class="t1" x="555" y="27">Facturación</text>
+                  <text class="t2" x="555" y="44">recibe los datos fiscales</text>
+                </g>
+                <g class="nodo n2 destino">
+                  <rect class="caja" x="430" y="58" width="250" height="48" rx="12"/>
+                  <text class="t1" x="555" y="79">Instalaciones</text>
+                  <text class="t2" x="555" y="96">recibe sucursal y estado</text>
+                </g>
+                <circle class="pk p1" cx="196" cy="56" r="5" style="--dx:228px;--dy:-26px"/>
+                <circle class="pk p1" cx="196" cy="56" r="5" style="--dx:228px;--dy:26px"/>
+              </svg>
+              <figcaption>Un evento, dos correos, y cada área recibe solo la parte que le toca.</figcaption>
+            </figure>
             <p class="finding-cierre">Nadie se entera tarde porque <b>avisar deja de ser tarea de una persona</b>.</p>
             <details class="tecnico">
               <summary><span class="finding-toggle" aria-hidden="true"></span>Detalle para implementación</summary>
               <div class="tecnico-body">
                 <p><b>Eventos:</b> <code>cliente.creado</code>, <code>cliente.datos_fiscales.modificados</code>, <code>cliente.expediente.completado</code>, <code>sucursal.creada</code>.</p>
-                <p><b>Suscriptores:</b> tabla de configuración que asocia cada evento con uno o más espacios, editable por Dirección sin tocar el código.</p>
+                <p><b>Suscriptores:</b> tabla de configuración que asocia cada evento con un área y una plantilla, editable por Dirección sin tocar el código. La columna <code>canal</code> existe desde el primer día aunque hoy solo tenga un valor, para que añadir otro medio más adelante no obligue a rehacer el módulo.</p>
                 <div class="code">tabla suscripcion_aviso
-  evento         | espacio       | url_secreta
-  cliente.creado | facturacion   | https://chat.googleapis.com/v1/spaces/...
-  cliente.creado | instalaciones | https://chat.googleapis.com/v1/spaces/...
+  evento          | area          | canal  | destino                  | plantilla
+  cliente.creado  | facturacion   | correo | facturacion@dproma.mx    | alta_fiscal
+  cliente.creado  | instalaciones | correo | instalaciones@dproma.mx  | alta_operativa
 
 al emitir evento e con datos d:
   para cada s en suscripcion_aviso donde s.evento = e:
-      POST s.url_secreta  cuerpo = tarjeta(e, d)
-      registrar aviso_enviado { evento, espacio, enviado_en }
-
-tarjeta(e, d) =
-{
-  "cardsV2": [{ "cardId": d.cliente_id, "card": {
-    "header": { "title": d.razon_social, "subtitle": d.rfc },
-    "sections": [{ "widgets": [
-      { "decoratedText": { "topLabel": "Sucursales", "text": d.sucursales } },
-      { "decoratedText": { "topLabel": "Expediente", "text": d.estado_expediente } },
-      { "buttonList": { "buttons": [
-        { "text": "Abrir ficha",
-          "onClick": { "openLink": { "url": d.url_ficha } } }
-      ]}}
-    ]}]
-  }}]
-}</div>
-                <p style="margin-top:0.75rem">Las direcciones secretas se guardan como configuración cifrada, nunca en el código fuente. Si un envío falla, se reintenta y se registra, para que un aviso perdido sea visible en lugar de silencioso.</p>
+      cuerpo = render(s.plantilla, filtrar(d, s.area))
+      enviar_correo(de: avisos@dproma.mx, a: s.destino,
+                    asunto: asunto(s.plantilla, d),
+                    html: cuerpo,
+                    encabezados: { "References": "cliente-" + d.cliente_id })
+      registrar aviso_enviado { evento, area, canal, destino, enviado_en }</div>
+                <p style="margin-top:0.75rem"><b>Tres detalles que hacen la diferencia en el uso diario.</b></p>
+                <p>El asunto se construye con un formato fijo, por ejemplo <code>[Alta] Grupo Automotriz ELEKTRA · GAE-940312-K71</code>, para que buscar por RFC en el buzón encuentre todo el historial de ese cliente.</p>
+                <p>El encabezado <code>References</code> con el identificador del cliente hace que Gmail agrupe en una sola conversación todos los avisos de ese cliente, en lugar de dejar correos sueltos.</p>
+                <p>Cada área recibe una plantilla distinta sobre el mismo evento: facturación necesita los datos fiscales, instalaciones necesita las sucursales y su estado. Enviar el registro completo a todos es lo que hace que la gente deje de leer los avisos.</p>
+                <p style="margin-top:0.75rem">El envío se hace desde una cuenta del dominio, no desde el correo personal de quien capturó el alta. Si un envío falla, se reintenta y se registra, para que un aviso perdido sea visible en lugar de silencioso.</p>
               </div>
             </details>
           </div>
@@ -1030,8 +1137,8 @@ al subir documento:
   para cada d en documento donde d.vigencia_hasta no es null:
       dias = d.vigencia_hasta - hoy
       si dias en [60, 30, 7] y no existe aviso_enviado(d.id, dias):
-          notificar_espacio("juridico", plantilla_vencimiento(d, dias))
-          si dias == 7: notificar_espacio("direccion", ...)
+          notificar_area("juridico", plantilla_vencimiento(d, dias))
+          si dias == 7: notificar_area("direccion", ...)
           registrar aviso_enviado(d.id, dias)
       si dias < 0 y cliente.estado_expediente != "vencido":
           cliente.estado_expediente = "vencido"
@@ -1083,7 +1190,7 @@ al subir documento:
       si dias == 3 o dias == 7:
           enviar_correo(contacto_principal(c), plantilla_faltantes(faltantes, enlace_vigente(c)))
       si dias == 10:
-          notificar_espacio("comercial", "Alta detenida: " + c.razon_social)</div>
+          notificar_area("comercial", "Alta detenida: " + c.razon_social)</div>
                 <p style="margin-top:0.75rem">El correo sale desde una cuenta de Google Workspace de la empresa, no desde la cuenta personal de quien hizo el alta, para que la respuesta del cliente llegue a un buzón compartido.</p>
               </div>
             </details>
@@ -1125,6 +1232,37 @@ al subir documento:
                 </ol>
               </div>
             </div>
+            <figure class="anim">
+              <svg viewBox="0 0 680 112" role="img" aria-label="Los datos del sistema alimentan un solo generador de informe, que sirve a Dirección hoy y al portal del cliente en la fase cinco, cambiando solo el filtro de audiencia.">
+                <line class="via" x1="180" y1="56" x2="230" y2="56"/>
+                <path class="via" d="M420 56 H455 Q470 56 485 30 H520"/>
+                <path class="via" d="M420 56 H455 Q470 56 485 82 H520"/>
+                <g class="nodo n1">
+                  <rect class="caja" x="0" y="28" width="180" height="56" rx="12"/>
+                  <text class="t1" x="90" y="53">Datos del sistema</text>
+                  <text class="t2" x="90" y="71">trámites y órdenes</text>
+                </g>
+                <g class="nodo n2">
+                  <rect class="caja" x="230" y="28" width="190" height="56" rx="12"/>
+                  <text class="t1" x="325" y="53">Un solo generador</text>
+                  <text class="t2" x="325" y="71">filtra según audiencia</text>
+                </g>
+                <g class="nodo n3 destino">
+                  <rect class="caja" x="520" y="6" width="160" height="48" rx="12"/>
+                  <text class="t1" x="600" y="27">Dirección</text>
+                  <text class="t2" x="600" y="44">informe interno</text>
+                </g>
+                <g class="nodo n4 destino futuro">
+                  <rect class="caja" x="520" y="58" width="160" height="48" rx="12"/>
+                  <text class="t1" x="600" y="79">Cliente</text>
+                  <text class="t2" x="600" y="96">portal, fase 5</text>
+                </g>
+                <circle class="pk p1" cx="186" cy="56" r="5" style="--dx:38px"/>
+                <circle class="pk p2" cx="426" cy="56" r="5" style="--dx:174px;--dy:-26px"/>
+                <circle class="pk p3" cx="426" cy="56" r="5" style="--dx:174px;--dy:26px"/>
+              </svg>
+              <figcaption>El mismo generador sirve a Dirección hoy y al portal del cliente después.</figcaption>
+            </figure>
             <p class="finding-cierre">Este mismo informe, expuesto al cliente en lugar de a Dirección, <b>es literalmente el portal de consulta de trámites</b>. El trabajo ya está hecho, solo cambia quién lo ve.</p>
             <details class="tecnico">
               <summary><span class="finding-toggle" aria-hidden="true"></span>Detalle para implementación</summary>
@@ -1208,6 +1346,39 @@ tarea semanal (viernes 08:00):
                 </ol>
               </div>
             </div>
+            <figure class="anim">
+              <svg viewBox="0 0 680 92" role="img" aria-label="Flujo con inteligencia artificial: el cliente sube la constancia, el modelo extrae los campos, una persona confirma o corrige, y solo entonces el dato queda guardado en el padrón.">
+                <line class="via" x1="74" y1="14" x2="605" y2="14"/>
+                <line class="via" x1="74" y1="14" x2="74" y2="30"/>
+                <line class="via" x1="251" y1="14" x2="251" y2="30"/>
+                <line class="via" x1="428" y1="14" x2="428" y2="30"/>
+                <line class="via" x1="605" y1="14" x2="605" y2="30"/>
+                  <g class="nodo n1 ">
+                    <rect class="caja" x="0" y="30" width="148" height="56" rx="12"/>
+                    <text class="t1" x="74" y="55">Constancia PDF</text>
+                    <text class="t2" x="74" y="73">la sube el cliente</text>
+                  </g>
+                  <g class="nodo n2 ">
+                    <rect class="caja" x="177" y="30" width="148" height="56" rx="12"/>
+                    <text class="t1" x="251" y="55">Modelo</text>
+                    <text class="t2" x="251" y="73">extrae los campos</text>
+                  </g>
+                  <g class="nodo n3 puerta">
+                    <rect class="caja" x="354" y="30" width="148" height="56" rx="12"/>
+                    <text class="t1" x="428" y="55">Persona</text>
+                    <text class="t2" x="428" y="73">confirma o corrige</text>
+                  </g>
+                  <g class="nodo n4 destino">
+                    <rect class="caja" x="531" y="30" width="148" height="56" rx="12"/>
+                    <text class="t1" x="605" y="55">Padrón</text>
+                    <text class="t2" x="605" y="73">el dato queda guardado</text>
+                  </g>
+                <circle class="pk p1" cx="74" cy="14" r="5" style="--dx:177px"/>
+                <circle class="pk p2" cx="251" cy="14" r="5" style="--dx:177px"/>
+                <circle class="pk p3" cx="428" cy="14" r="5" style="--dx:177px"/>
+              </svg>
+              <figcaption>La IA precarga, pero el dato solo entra al padrón después de la confirmación humana.</figcaption>
+            </figure>
             <p class="finding-cierre">Quien confirma es <b>el propio cliente, sobre su propio documento</b>, que es quien mejor puede detectar un error.</p>
             <details class="tecnico">
               <summary><span class="finding-toggle" aria-hidden="true"></span>Detalle para implementación</summary>
@@ -1262,7 +1433,7 @@ si confianza >= 0.85:
 sino:
     documento.tipo = null
     documento.requiere_revision = true
-    notificar_espacio("juridico", "Documento sin clasificar: " + cliente.razon_social)</div>
+    notificar_area("juridico", "Documento sin clasificar: " + cliente.razon_social)</div>
               </div>
             </details>
           </div>
@@ -1478,7 +1649,7 @@ fase 5  solo lo aprobado se escribe en cliente, sucursal, contacto</div>
     <div class="tech-proposal card card-neutral reveal">
       <span class="eyebrow">Qué se puede sostener desde el primer día</span>
       <h3>El valor no espera a que el sistema esté terminado</h3>
-      <p>La empresa ya está entrando al entorno de Google Workspace, y eso permite adelantar tres piezas antes de que el desarrollo propio esté listo: el expediente documental puede vivir en una unidad compartida con permisos por área desde hoy, los avisos entre áreas pueden pasar de los grupos de WhatsApp a espacios de Google Chat desde hoy, y los informes semanales pueden salir como documentos generados desde hoy.</p>
+      <p>La empresa ya está entrando al entorno de Google Workspace, y eso permite adelantar tres piezas antes de que el desarrollo propio esté listo: el expediente documental puede vivir en una unidad compartida con permisos por área desde hoy, los avisos entre áreas pueden pasar de los grupos de WhatsApp a correos a un grupo por área desde hoy, y los informes semanales pueden salir como documentos generados desde hoy.</p>
       <p>Cuando SIO-DPROMA asuma esas funciones, no reemplaza un proceso improvisado: hereda uno que ya está ordenado y que el equipo ya sabe usar.</p>
     </div>
   </div>
