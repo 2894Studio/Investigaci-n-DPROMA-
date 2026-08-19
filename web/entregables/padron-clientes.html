@@ -332,7 +332,7 @@ section + section{ border-top: 1px solid var(--border); }
    Ciclo compartido de 8s; cada nodo enciende en su fase y cada paquete
    viaja en el hueco entre dos nodos. */
 .anim{
-  margin-top:1.25rem; border:1px solid var(--border); border-radius:14px;
+  margin:1.25rem 0 0; border:1px solid var(--border); border-radius:14px;
   background:var(--surface); padding:1.25rem 1.35rem 1.1rem;
 }
 .anim svg{ width:100%; height:auto; display:block; overflow:visible; }
@@ -380,10 +380,81 @@ section + section{ border-top: 1px solid var(--border); }
   80%,100% { transform:translate(var(--dx), var(--dy,0px)); opacity:0 }
 }
 
+/* Cuando el trazo se bifurca o curva, el paquete recorre la ruta real
+   con offset-path en lugar de cruzar en línea recta. */
+.anim .r1{ animation-name:anim-ruta1; }
+.anim .r2{ animation-name:anim-ruta2; }
+.anim .r3{ animation-name:anim-ruta3; }
+@keyframes anim-ruta1{
+  0%,11%   { offset-distance:0%;   opacity:0 }
+  14%      { offset-distance:12%;  opacity:1 }
+  27%      { offset-distance:88%;  opacity:1 }
+  30%,100% { offset-distance:100%; opacity:0 }
+}
+@keyframes anim-ruta2{
+  0%,36%   { offset-distance:0%;   opacity:0 }
+  39%      { offset-distance:12%;  opacity:1 }
+  52%      { offset-distance:88%;  opacity:1 }
+  55%,100% { offset-distance:100%; opacity:0 }
+}
+@keyframes anim-ruta3{
+  0%,61%   { offset-distance:0%;   opacity:0 }
+  64%      { offset-distance:12%;  opacity:1 }
+  77%      { offset-distance:88%;  opacity:1 }
+  80%,100% { offset-distance:100%; opacity:0 }
+}
+
 @media (prefers-reduced-motion: reduce){
   .anim .nodo{ animation:none; opacity:1; }
   .anim .pk{ display:none; }
 }
+
+/* Esquema de datos y recorridos por rol */
+.esquema{
+  margin:1.25rem 0 0; border:1px solid var(--border); border-radius:14px;
+  background:var(--surface); padding:1.35rem;
+}
+.esquema svg{ width:100%; height:auto; display:block; }
+.esquema text{ font-family:'DM Sans',system-ui,sans-serif; }
+.esquema .caja{ fill:var(--surface-alt); stroke:var(--border); stroke-width:1.2; }
+.esquema .raiz .caja{ fill:color-mix(in srgb, var(--accent) 12%, var(--surface)); stroke:var(--accent); stroke-width:1.6; }
+.esquema .et{ font-size:13.5px; font-weight:700; fill:var(--text); }
+.esquema .ec{ font-size:10.5px; fill:var(--text-muted); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+.esquema .rel{ stroke:var(--border); stroke-width:1.4; fill:none; }
+.esquema .card{ font-size:10px; font-weight:700; fill:var(--accent); text-anchor:middle; }
+.esquema figcaption{ margin:0.9rem 0 0; font-size:0.8125rem; color:var(--text-muted); }
+
+.rol-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; margin-top:1.25rem; }
+@media (max-width: 760px){ .rol-grid{ grid-template-columns:1fr; } }
+.rol{
+  border:1px solid var(--border); border-radius:14px; padding:1.15rem 1.3rem;
+  background:var(--surface); min-width:0;
+}
+.rol.externo{ background:color-mix(in srgb, var(--accent) 7%, var(--surface)); border-color:var(--accent-soft); }
+.rol h4{ margin:0; font-size:1rem; font-weight:700; }
+.rol-entra{
+  margin:0.4rem 0 0; font-size:0.75rem; font-weight:700; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--accent);
+}
+.rol ol{ margin:0.85rem 0 0; padding-left:1.1rem; font-size:0.875rem; color:var(--text-muted); }
+.rol ol li + li{ margin-top:0.35rem; }
+.rol-limite{
+  margin:0.85rem 0 0; padding-top:0.7rem; border-top:1px solid var(--border);
+  font-size:0.8125rem; color:var(--text);
+}
+.rol-limite b{ color:var(--accent); font-weight:700; }
+
+/* Recomendación de tecnología */
+.tec-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; margin-top:1.25rem; }
+@media (max-width: 760px){ .tec-grid{ grid-template-columns:1fr; } }
+.tec{ border:1px solid var(--border); border-radius:14px; padding:1.15rem 1.3rem; background:var(--surface); min-width:0; }
+.tec.contra{ background:var(--surface-alt); border-style:dashed; }
+.tec h4{ margin:0 0 0.15rem; font-size:0.9375rem; font-weight:700; }
+.tec-para{ margin:0 0 0.6rem; font-size:0.75rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--accent); }
+.tec.contra .tec-para{ color:var(--text-muted); }
+.tec p{ margin:0; font-size:0.875rem; color:var(--text-muted); }
+.tec p + p{ margin-top:0.5rem; }
+.tec b{ color:var(--text); font-weight:600; }
 
 /* Entidades */
 .entidad-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; margin-top: 1.25rem; }
@@ -405,7 +476,15 @@ section + section{ border-top: 1px solid var(--border); }
 }
 .fase h3{ font-size: 1rem; margin:0 0 0.3rem; }
 .fase p{ margin:0; font-size:0.9375rem; color: var(--text-muted); }
-.fase--portal{ background: color-mix(in srgb, var(--accent) 8%, var(--surface)); border-color: var(--accent-soft); }
+/* La fase futura no se resalta: se marca como fuera del alcance actual */
+.fase--futura{ background: var(--surface); border-style: dashed; border-color: var(--accent-soft); }
+.fase--futura .fase-n{ background: transparent; color: var(--accent); border: 1.5px dashed var(--accent-soft); }
+.fase--futura h3{ color: var(--text-muted); }
+.fase-etiqueta{
+  display:inline-block; margin-left:0.6rem; font-size:0.6875rem; font-weight:700;
+  letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted);
+  border:1px dashed var(--border); border-radius:999px; padding:0.15em 0.6em; vertical-align:middle;
+}
 
 .responsibility-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap: 1.25rem; margin-top: 1.75rem; max-width: 66ch; }
 @media (max-width: 560px){ .responsibility-grid{ grid-template-columns: 1fr; } }
@@ -516,6 +595,8 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
           <li data-i="1">Dos estados</li>
           <li data-i="2">La pantalla</li>
           <li data-i="3">Quién puede qué</li>
+          <li data-i="4">El esquema</li>
+          <li data-i="5">Recorrido por rol</li>
         </ol>
       </aside>
 
@@ -731,6 +812,163 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
           </div>
         </section>
 
+
+        <section class="capas-step" data-i="4">
+          <h3>El esquema</h3>
+          <p>Las cuatro entidades no viven sueltas: se relacionan en una jerarquía que decide qué es posible consultar y qué no. Este es el mapa que el ingeniero necesita antes de escribir la primera tabla.</p>
+          <figure class="esquema">
+            <svg viewBox="0 0 680 340" role="img" aria-label="Esquema del padrón. La entidad cliente se relaciona uno a muchos con contacto, sucursal y documento. La entidad sucursal se relaciona uno a muchos con orden de instalación, de modo que toda orden apunta a una sucursal concreta y nunca a la razón social completa.">
+              <path class="rel" d="M340 92 V132 H100 V172"/>
+              <path class="rel" d="M340 92 V172"/>
+              <path class="rel" d="M340 92 V132 H580 V172"/>
+              <path class="rel" d="M340 256 V286"/>
+              <text class="card" x="205" y="126">1 a N</text>
+              <text class="card" x="367" y="126">1 a N</text>
+              <text class="card" x="475" y="126">1 a N</text>
+              <text class="card" x="371" y="275">1 a N</text>
+                <g class="ent raiz">
+                  <rect class="caja" x="250" y="8" width="180" height="84" rx="11"/>
+                  <text class="et" x="263" y="31">cliente</text>
+                  <text class="ec" x="263" y="51">rfc  ·  razon_social</text>
+                  <text class="ec" x="263" y="66">estado_comercial</text>
+                  <text class="ec" x="263" y="81">estado_expediente</text>
+                </g>
+                <g class="ent">
+                  <rect class="caja" x="10" y="172" width="180" height="84" rx="11"/>
+                  <text class="et" x="23" y="195">contacto</text>
+                  <text class="ec" x="23" y="215">cliente_id</text>
+                  <text class="ec" x="23" y="230">sucursal_id  (nullable)</text>
+                  <text class="ec" x="23" y="245">rol  ·  principal</text>
+                </g>
+                <g class="ent">
+                  <rect class="caja" x="250" y="172" width="180" height="84" rx="11"/>
+                  <text class="et" x="263" y="195">sucursal</text>
+                  <text class="ec" x="263" y="215">cliente_id</text>
+                  <text class="ec" x="263" y="230">direccion</text>
+                  <text class="ec" x="263" y="245">campos_requeridos</text>
+                </g>
+                <g class="ent">
+                  <rect class="caja" x="490" y="172" width="180" height="84" rx="11"/>
+                  <text class="et" x="503" y="195">documento</text>
+                  <text class="ec" x="503" y="215">cliente_id</text>
+                  <text class="ec" x="503" y="230">tipo  ·  drive_file_id</text>
+                  <text class="ec" x="503" y="245">vigencia_hasta</text>
+                </g>
+                <g class="ent">
+                  <rect class="caja" x="250" y="286" width="180" height="46" rx="11"/>
+                  <text class="et" x="263" y="309">orden_instalacion</text>
+                  <text class="ec" x="263" y="329">sucursal_id  (obligatorio)</text>
+                </g>
+            </svg>
+            <figcaption>La relación de abajo es la que cambia la operación: la orden de instalación apunta a la sucursal, no a la razón social. Todo lo demás cuelga del cliente.</figcaption>
+          </figure>
+          <div class="glosa">
+            <p><b>Cómo se lee.</b> Una razón social tiene varias sucursales, varios contactos y varios documentos. Cada uno de esos registros sabe a qué cliente pertenece, así que desde la ficha del cliente se puede llegar a todo lo suyo, y desde cualquier documento se puede volver a su cliente.</p>
+            <p>La relación de abajo es la que corrige el problema de hoy: como la orden de instalación guarda la sucursal y no la razón social, la pregunta de qué sucursal generó el servicio queda contestada en el momento de crear la orden, no semanas después al facturar.</p>
+          </div>
+        </section>
+
+        <section class="capas-step" data-i="5">
+          <h3>El recorrido según quién entra</h3>
+          <p>El padrón lo usan seis áreas con necesidades distintas, y una séptima audiencia externa: el propio cliente, que ya entra en la fase 2 para registrarse. Ninguna debería entrar por la misma puerta ni ver lo mismo. Estas son las pantallas y quién llega a cada una.</p>
+          <div class="spec-scroll">
+          <table class="spec-table">
+            <thead><tr><th>Pantalla</th><th>Qué contiene</th><th>Quién llega aquí</th></tr></thead>
+            <tbody>
+              <tr><td>Lista maestra</td><td>Tabla de clientes con filtros por tipo, estado y vigencia</td><td>Comercial, Administración, Finanzas</td></tr>
+              <tr><td>Vista 360 del cliente</td><td>Expediente, sucursales, órdenes, contratos e historial de cambios</td><td>Dirección, Comercial</td></tr>
+              <tr><td>Ficha de sucursal</td><td>Dirección, campos que exige para facturar y si está habilitada</td><td>Instalaciones</td></tr>
+              <tr><td>Alta interna</td><td>Formulario mínimo para crear el cliente y generar su enlace</td><td>Comercial</td></tr>
+              <tr><td>Bandeja de revisión</td><td>Cola de documentos pendientes de aprobar, con su vigencia</td><td>Jurídico y RH</td></tr>
+              <tr><td>Formulario de auto registro</td><td>Vista pública sin sesión, alcanzable solo con el enlace</td><td>El cliente</td></tr>
+              <tr><td>Informe de avance</td><td>Documento generado con el filtro de audiencia aplicado</td><td>Dirección, Comercial, Administración y Finanzas</td></tr>
+            </tbody>
+          </table>
+          </div>
+          <p style="margin-top:1.25rem">Y este es el recorrido de cada rol, del punto de entrada hasta donde termina su alcance.</p>
+          <div class="rol-grid">
+            <article class="rol">
+              <h4>Comercial</h4>
+              <p class="rol-entra">Entra por la lista, filtrada por sus cuentas</p>
+              <ol>
+                <li>Busca si el cliente ya existe, por RFC o por razón social</li>
+                <li>Si no existe, lo crea con los datos mínimos que conoce</li>
+                <li>Genera el enlace de auto registro y se lo envía a la agencia</li>
+                <li>Sigue el estado del expediente hasta que queda completo</li>
+              </ol>
+              <p class="rol-limite">No ve datos bancarios <b>y no puede aprobar documentos</b>.</p>
+            </article>
+            <article class="rol">
+              <h4>Jurídico y RH</h4>
+              <p class="rol-entra">Entra por la bandeja de revisión, no por la lista</p>
+              <ol>
+                <li>Ve la cola de documentos pendientes, ordenada por antigüedad</li>
+                <li>Abre el documento junto a los datos capturados y los compara</li>
+                <li>Aprueba o rechaza, y fija la fecha de vigencia</li>
+                <li>Al aprobar el último pendiente, el expediente pasa a completo solo</li>
+              </ol>
+              <p class="rol-limite">Es la <b>única área que aprueba</b> y que fija vigencias.</p>
+            </article>
+            <article class="rol">
+              <h4>Administración</h4>
+              <p class="rol-entra">Entra por la lista, filtrada por expediente incompleto</p>
+              <ol>
+                <li>Ve de una vez qué clientes están frenando operación y qué les falta</li>
+                <li>Corrige datos fiscales y bancarios en la ficha del cliente</li>
+                <li>Configura por sucursal qué campos exige ese grupo para facturar</li>
+                <li>Lanza la solicitud masiva de documentos a los seleccionados</li>
+              </ol>
+              <p class="rol-limite">Edita el dato, pero <b>no lo aprueba</b>.</p>
+            </article>
+            <article class="rol">
+              <h4>Instalaciones</h4>
+              <p class="rol-entra">Entra por la sucursal, nunca por el cliente</p>
+              <ol>
+                <li>Llega desde la orden de instalación a la ficha de esa sucursal</li>
+                <li>Ve si está habilitada y, si no lo está, qué falta y quién lo tiene</li>
+                <li>Marca la sucursal como lista para la visita técnica</li>
+                <li>Si intenta programar sin expediente, el servidor rechaza la orden</li>
+              </ol>
+              <p class="rol-limite">Consulta, más <b>un solo interruptor</b>.</p>
+            </article>
+            <article class="rol">
+              <h4>Finanzas</h4>
+              <p class="rol-entra">Entra buscando por RFC desde cualquier pantalla</p>
+              <ol>
+                <li>Localiza el cliente por su RFC, sin navegar la lista</li>
+                <li>Ve datos fiscales, uso de CFDI y las órdenes de cada sucursal</li>
+                <li>Comprueba que la sucursal de la orden es la que va a facturar</li>
+                <li>Si algo no cuadra, lo reporta al área dueña de ese dato</li>
+              </ol>
+              <p class="rol-limite"><b>Solo consulta</b>, sin excepciones.</p>
+            </article>
+            <article class="rol">
+              <h4>Dirección</h4>
+              <p class="rol-entra">Entra por la vista 360 del cliente</p>
+              <ol>
+                <li>Abre la ficha y ve la cuenta completa en una sola pantalla</li>
+                <li>Genera el informe de avance del momento y lo comparte</li>
+                <li>Marca la cuenta como seguimiento para recibirlo cada semana</li>
+                <li>Configura qué área recibe qué aviso, sin tocar el código</li>
+              </ol>
+              <p class="rol-limite">Consulta total <b>más los informes</b>.</p>
+            </article>
+            <article class="rol externo">
+              <h4>El cliente</h4>
+              <p class="rol-entra">Entra por un enlace, sin cuenta ni contraseña</p>
+              <ol>
+                <li>Recibe el enlace y accede solo a su propio registro</li>
+                <li>Completa sus datos y sube sus documentos, sin transcripción de por medio</li>
+                <li>Si más adelante se abre el portal, consulta ahí el estado de sus trámites</li>
+                <li>Nunca ve el padrón, solo la fila que le corresponde</li>
+              </ol>
+              <p class="rol-limite">Se registra desde la fase 2; consultar sus trámites <b>queda como línea futura</b>.</p>
+            </article>
+          </div>
+          <div class="glosa">
+            <p><b>La regla que sostiene todo esto.</b> Cada rol entra por la pantalla donde está su trabajo, no por la lista general. Comercial busca clientes, Jurídico revisa una cola, Instalaciones llega desde una orden y Finanzas busca por RFC. Si todos entran por la misma tabla y filtran a mano, el módulo vuelve a ser un archivo compartido con mejor apariencia.</p>
+          </div>
+        </section>
       </div>
     </div>
   </div>
@@ -1016,8 +1254,8 @@ POST /api/ordenes-instalacion
                   <text class="t1" x="555" y="79">Instalaciones</text>
                   <text class="t2" x="555" y="96">recibe sucursal y estado</text>
                 </g>
-                <circle class="pk p1" cx="196" cy="56" r="5" style="--dx:228px;--dy:-26px"/>
-                <circle class="pk p1" cx="196" cy="56" r="5" style="--dx:228px;--dy:26px"/>
+                <circle class="pk r1" r="5" style="offset-path:path('M190 56 H310 Q330 56 350 30 H430')"/>
+                <circle class="pk r1" r="5" style="offset-path:path('M190 56 H310 Q330 56 350 82 H430')"/>
               </svg>
               <figcaption>Un evento, dos correos, y cada área recibe solo la parte que le toca.</figcaption>
             </figure>
@@ -1257,11 +1495,11 @@ al subir documento:
                   <text class="t1" x="600" y="79">Cliente</text>
                   <text class="t2" x="600" y="96">portal, fase 5</text>
                 </g>
-                <circle class="pk p1" cx="186" cy="56" r="5" style="--dx:38px"/>
-                <circle class="pk p2" cx="426" cy="56" r="5" style="--dx:174px;--dy:-26px"/>
-                <circle class="pk p3" cx="426" cy="56" r="5" style="--dx:174px;--dy:26px"/>
+                <circle class="pk r1" r="5" style="offset-path:path('M180 56 H230')"/>
+                <circle class="pk r2" r="5" style="offset-path:path('M420 56 H455 Q470 56 485 30 H520')"/>
+                <circle class="pk r3" r="5" style="offset-path:path('M420 56 H455 Q470 56 485 82 H520')"/>
               </svg>
-              <figcaption>El mismo generador sirve a Dirección hoy y al portal del cliente después.</figcaption>
+              <figcaption>Un solo generador: cada área pide su informe y el filtro decide qué sale.</figcaption>
             </figure>
             <p class="finding-cierre">Este mismo informe, expuesto al cliente en lugar de a Dirección, <b>es literalmente el portal de consulta de trámites</b>. El trabajo ya está hecho, solo cambia quién lo ve.</p>
             <details class="tecnico">
@@ -1580,6 +1818,61 @@ fase 5  solo lo aprobado se escribe en cliente, sucursal, contacto</div>
       </table>
       </div>
     </div>
+
+    <div class="reveal" style="margin-top:3rem">
+      <span class="eyebrow">Con qué construirlo</span>
+      <h3 style="font-size:1.125rem;margin-top:0.6rem">Tecnología concreta, y dónde conviene cada pieza</h3>
+      <p class="prose" style="margin-top:0.75rem;color:var(--text-muted);max-width:68ch">DPROMA no necesita construir capacidad de inteligencia artificial desde cero. Casi todo lo propuesto se resuelve con servicios que ya se contratan por uso, y una parte con lo que Workspace incluye. Lo que sigue es dónde conviene cada uno, y también dónde no conviene usar IA aunque se pueda.</p>
+
+      <div class="tec-grid">
+        <article class="tec">
+          <p class="tec-para">Leer y clasificar documentos</p>
+          <h4>Un modelo multimodal con salida estructurada</h4>
+          <p>Es la pieza central de los casos 01 y 02. Un modelo que acepta el PDF directamente y devuelve JSON validado contra un esquema, sin entrenar nada ni etiquetar ejemplos. Gemini y Claude admiten forzar el esquema de respuesta, que es lo que impide que el modelo improvise campos.</p>
+          <p><b>Criterio:</b> empezar aquí, no con un parser especializado. Si más adelante el volumen justifica precisión mayor sobre un solo tipo de documento, entonces sí vale un servicio dedicado de extracción de formularios.</p>
+        </article>
+
+        <article class="tec">
+          <p class="tec-para">Dentro de Workspace</p>
+          <h4>Gemini en Drive, Gmail y Docs</h4>
+          <p>Según la edición de Workspace contratada, Gemini permite preguntar sobre el contenido de la unidad compartida sin abrir carpeta por carpeta, y redactar sobre documentos existentes. Sirve para que el equipo consulte expedientes y contratos en lenguaje natural.</p>
+          <p><b>Criterio:</b> es una ayuda para las personas, no una pieza del sistema. El padrón nunca debe depender de que alguien le pregunte algo a Gemini; lo que el sistema necesita saber, lo tiene en su base de datos.</p>
+        </article>
+
+        <article class="tec">
+          <p class="tec-para">Procesos internos</p>
+          <h4>NotebookLM para documentar la operación</h4>
+          <p>La investigación registró que no hay documentación compartida de procesos entre áreas, y que ni siquiera había una definición común de qué es el padrón. Cargar manuales, contratos tipo y criterios de cada área en un cuaderno consultable resuelve esa parte sin construir nada.</p>
+          <p><b>Criterio:</b> aplica desde hoy, en paralelo al desarrollo, y es de las piezas más baratas de arrancar.</p>
+        </article>
+
+        <article class="tec">
+          <p class="tec-para">Automatización sin desarrollo</p>
+          <h4>Apps Script y AppSheet para los bordes</h4>
+          <p>Incluidos en Workspace. Sirven para las piezas que no justifican entrar al desarrollo propio: mover un archivo, generar el documento del informe, o una captura móvil puntual en campo mientras la funcionalidad llega al sistema.</p>
+          <p><b>Criterio:</b> útil en los bordes, nunca para el núcleo. Si una regla del padrón vive en un script, deja de ser una regla del sistema y vuelve el problema que estamos resolviendo.</p>
+        </article>
+
+        <article class="tec contra">
+          <p class="tec-para">Donde la IA no es la respuesta</p>
+          <h4>Duplicados: primero el índice, después el modelo</h4>
+          <p>Buscar razones sociales parecidas se resuelve mejor con un índice de similitud de texto en la propia base de datos, del tipo trigrama, que con un modelo. Es determinista, instantáneo, cuesta cero por consulta y siempre da el mismo resultado ante la misma entrada, que es justo lo que un auditor pide.</p>
+          <p><b>Criterio:</b> el índice ordena los candidatos y el modelo solo entra a explicar por qué dos registros se parecen, en los casos que la persona no resuelve de un vistazo.</p>
+        </article>
+
+        <article class="tec contra">
+          <p class="tec-para">Donde la IA no es la respuesta</p>
+          <h4>Domicilios: primero un servicio de direcciones</h4>
+          <p>Normalizar una dirección es un problema con solución conocida. Un servicio de geocodificación devuelve la dirección estructurada y validada contra un catálogo real, cosa que un modelo de lenguaje no puede garantizar porque no consulta ningún catálogo.</p>
+          <p><b>Criterio:</b> el servicio resuelve la mayoría, y el modelo entra solo en lo que devuelve sin resolver, siempre con la aprobación humana que ya está definida.</p>
+        </article>
+      </div>
+
+      <div class="glosa">
+        <p><b>El criterio que ordena toda esta lista.</b> La IA aporta donde el problema es interpretar algo no estructurado: un PDF, un texto escrito de cualquier manera, un documento sin etiquetar. Donde el problema ya tiene una solución determinista, meter un modelo añade costo, latencia y una fuente de error que antes no existía.</p>
+        <p>Esa distinción es también la respuesta al antecedente registrado en la investigación. Una herramienta devolvió agencias que no existían porque se le pidió recordar datos, no interpretar un documento que tenía delante. Ninguno de los casos propuestos aquí le pide al modelo que recuerde nada.</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1619,38 +1912,39 @@ fase 5  solo lo aprobado se escribe en cliente, sucursal, contacto</div>
           <span class="fase-n" aria-hidden="true">2</span>
           <div>
             <h3>Alta por enlace y reglas de servidor</h3>
-            <p>El alta deja de vivir en WhatsApp y la regla de instalación deja de ser un aviso que se puede ignorar. Es donde se corta el origen de la mayoría de los errores.</p>
+            <p>El alta por enlace es esto: en lugar de pedir los documentos por WhatsApp y capturarlos a mano, el sistema genera una dirección web única para esa agencia, con un código que solo funciona para ella y que caduca. La agencia entra ahí sin cuenta ni contraseña, llena el formulario y sube su documentación, y el registro se crea solo. En la misma fase, la regla que impide instalar sin datos fiscales pasa al servidor y deja de ser un aviso que se puede ignorar. Es donde se corta el origen de la mayoría de los errores.</p>
           </div>
         </div>
         <div class="fase">
           <span class="fase-n" aria-hidden="true">3</span>
           <div>
-            <h3>Avisos y expediente en Drive</h3>
-            <p>Las áreas se enteran solas de cada alta y cada cambio, y los documentos tienen un solo lugar con permisos por área.</p>
+            <h3>Avisos por correo y expediente en Drive</h3>
+            <p>Sí, son los avisos por correo de la automatización 04: cada alta y cada cambio de datos fiscales llega solo a la dirección del área que le corresponde, con la plantilla que esa área necesita. En paralelo, cada cliente estrena su carpeta en Drive y todo documento subido cae ahí con permisos por área.</p>
           </div>
         </div>
         <div class="fase">
           <span class="fase-n" aria-hidden="true">4</span>
           <div>
-            <h3>Informes para Dirección</h3>
-            <p>Bajo demanda desde la ficha del cliente, y programados cada semana para las cuentas en seguimiento.</p>
+            <h3>Informes por área, no solo para Dirección</h3>
+            <p>El generador es uno solo y el filtro de audiencia decide qué sale, así que sirve a cada área con su propia pregunta: Dirección quiere el avance de una cuenta, Comercial quiere el estado de su cartera para autogestionarse sin pedirle datos a nadie, Administración quiere qué expedientes están frenando operación, y Finanzas quiere qué órdenes no se pueden facturar todavía. Bajo demanda desde la ficha, y programados para quien marque su seguimiento.</p>
           </div>
         </div>
-        <div class="fase fase--portal">
+        <div class="fase fase--futura">
           <span class="fase-n" aria-hidden="true">5</span>
           <div>
-            <h3>Portal del cliente</h3>
-            <p>El mismo informe de la fase 4, expuesto al cliente con el filtro de audiencia ya previsto, para que consulte el estado de sus trámites sin preguntarle a nadie. Es el destino que justifica ordenar el padrón primero.</p>
+            <h3>Portal del cliente <span class="fase-etiqueta">Fuera del alcance actual</span></h3>
+            <p>Línea futura, no parte del plan que se ejecuta ahora. Se enuncia porque condiciona una decisión de esta fase: si el generador de informes nace con el filtro de audiencia previsto, abrirlo al cliente más adelante es añadir una ruta pública. Si nace sin él, hay que rehacerlo entero.</p>
           </div>
         </div>
       </div>
     </div>
 
     <div class="tech-proposal card card-neutral reveal">
-      <span class="eyebrow">Qué se puede sostener desde el primer día</span>
-      <h3>El valor no espera a que el sistema esté terminado</h3>
-      <p>La empresa ya está entrando al entorno de Google Workspace, y eso permite adelantar tres piezas antes de que el desarrollo propio esté listo: el expediente documental puede vivir en una unidad compartida con permisos por área desde hoy, los avisos entre áreas pueden pasar de los grupos de WhatsApp a correos a un grupo por área desde hoy, y los informes semanales pueden salir como documentos generados desde hoy.</p>
-      <p>Cuando SIO-DPROMA asuma esas funciones, no reemplaza un proceso improvisado: hereda uno que ya está ordenado y que el equipo ya sabe usar.</p>
+      <span class="eyebrow">Qué papel juega Google Workspace</span>
+      <h3>Infraestructura permanente, no un paso intermedio</h3>
+      <p>Workspace no es un sustituto temporal mientras SIO-DPROMA se construye. Es la capa sobre la que el sistema se apoya de forma definitiva, y por eso conviene decidirlo ahora y no después.</p>
+      <p>Los documentos del cliente viven en Drive, en una unidad compartida con permisos por área, y el sistema guarda la referencia de cada archivo en el expediente. Los avisos entre áreas salen por correo a un grupo por área, y la tabla de suscripción deja la puerta abierta a añadir espacios de Google Chat cuando el equipo los use. Los informes se entregan como documentos de Google, para que se puedan compartir y comentar sin exportar nada.</p>
+      <p>Construirlo así evita el error más caro de estos proyectos: levantar un almacenamiento de archivos, un sistema de correo y un generador de documentos propios, que después hay que mantener. SIO-DPROMA se concentra en lo que nadie más puede hacer por DPROMA, que es el modelo de datos, las reglas y los recorridos, y delega en Workspace lo que ya está resuelto.</p>
     </div>
   </div>
 </section>
