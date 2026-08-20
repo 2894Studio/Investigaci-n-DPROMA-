@@ -234,12 +234,13 @@ section + section{ border-top: 1px solid var(--border); }
 .finding-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap: 0; border-top: 1px solid var(--border); }
 .finding{ list-style:none; border-bottom: 1px solid var(--border); }
 .finding-details > summary{
-  cursor:pointer; list-style:none; display:grid; grid-template-columns: 2.5rem 1fr auto;
+  cursor:pointer; list-style:none; display:grid; grid-template-columns: 2.5rem 1fr auto auto;
   align-items:center; gap: 1rem; padding: 1.5rem 0;
 }
 .finding-details > summary::-webkit-details-marker{ display:none; }
 .finding-details .n{ font-weight: 700; color: var(--accent); font-size: 0.9375rem; }
 .finding-details summary h3{ font-size: 1.0625rem; font-weight: 700; }
+@media (max-width: 640px){ .finding-details > summary{ grid-template-columns: 2.5rem 1fr auto; } .finding-details summary .marca{ grid-column: 2; } }
 .finding-toggle{ position:relative; display:inline-block; width:0.8rem; height:0.8rem; color: var(--accent); transition: transform .2s ease; flex:none; }
 .finding-toggle::before, .finding-toggle::after{ content:""; position:absolute; top:50%; left:50%; background:currentColor; transform:translate(-50%,-50%); }
 .finding-toggle::before{ width:100%; height:2px; }
@@ -276,7 +277,7 @@ section + section{ border-top: 1px solid var(--border); }
    ancho estira la pista en vez de scrollear dentro de sí mismo. */
 .capas-layout > *, .capas-steps, .capas-step, .escenario > *,
 .evidence-stack > *, .finding-body, .tecnico, .tecnico-body,
-.entidad-grid > *, .fase > *{ min-width: 0; }
+.fase > *{ min-width: 0; }
 .capas-sticky{ position:sticky; top: 1.5rem; }
 .capas-index{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap: 0.75rem; }
 .capas-index li{
@@ -343,7 +344,6 @@ section + section{ border-top: 1px solid var(--border); }
 .anim .caja{ fill:var(--surface-alt); stroke:var(--border); stroke-width:1.2; }
 .anim .destino .caja{ fill:color-mix(in srgb, var(--accent) 12%, var(--surface)); stroke:var(--accent-soft); }
 .anim .puerta .caja{ fill:color-mix(in srgb, var(--accent) 16%, var(--surface)); stroke:var(--accent); stroke-width:1.8; }
-.anim .futuro .caja{ stroke-dasharray:5 4; }
 .anim .via{ stroke:var(--border); stroke-width:1.5; fill:none; }
 .anim .pk{ fill:var(--accent); }
 
@@ -422,6 +422,8 @@ section + section{ border-top: 1px solid var(--border); }
 .esquema .ec{ font-size:10.5px; fill:var(--text-muted); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
 .esquema .rel{ stroke:var(--border); stroke-width:1.4; fill:none; }
 .esquema .card{ font-size:10px; font-weight:700; fill:var(--accent); text-anchor:middle; }
+.esquema .eje{ font-size:10px; font-weight:700; fill:var(--text-muted); letter-spacing:0.1em; text-anchor:middle; }
+.esquema .cardg rect{ fill:var(--surface); stroke:none; }
 .esquema figcaption{ margin:0.9rem 0 0; font-size:0.8125rem; color:var(--text-muted); }
 
 .rol-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; margin-top:1.25rem; }
@@ -456,13 +458,39 @@ section + section{ border-top: 1px solid var(--border); }
 .tec p + p{ margin-top:0.5rem; }
 .tec b{ color:var(--text); font-weight:600; }
 
+/* Etiquetas de estado: resuelto, brecha, propuesta */
+.marca{
+  display:inline-flex; align-items:center; gap:0.4em; font-size:0.6875rem;
+  font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+  padding:0.28em 0.75em; border-radius:999px; white-space:nowrap; flex:none;
+}
+.marca-ok{ background:var(--surface-alt); color:var(--text-muted); border:1px solid var(--border); }
+.marca-brecha{ background:var(--accent); color:var(--on-accent); }
+.marca-nueva{ background:transparent; color:var(--accent); border:1px solid var(--accent); }
+.marca-fila{ display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; }
+
+/* Tabla de contraste */
+.contraste-table td:last-child{ white-space:nowrap; }
+.contraste-grupo td{
+  background:var(--surface-alt); color:var(--text); font-weight:700;
+  font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;
+}
+
+/* Brechas desarrolladas */
+.brecha{
+  border:1px solid var(--border); border-radius:16px; padding:1.5rem 1.75rem;
+  background:var(--surface); box-shadow:var(--shadow); min-width:0;
+}
+.brecha + .brecha{ margin-top:1.25rem; }
+.brecha h3{ font-size:1.0625rem; margin:0.6rem 0 0; }
+.brecha > p{ margin:0.7rem 0 0; font-size:0.9375rem; color:var(--text-muted); max-width:68ch; }
+.brecha-efecto{
+  margin:1rem 0 0; padding-left:1rem; border-left:3px solid var(--accent-soft);
+  font-size:0.9375rem; color:var(--text);
+}
+.brecha-efecto b{ color:var(--accent); }
+
 /* Entidades */
-.entidad-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; margin-top: 1.25rem; }
-@media (max-width: 860px){ .entidad-grid{ grid-template-columns: repeat(2,1fr); } }
-@media (max-width: 480px){ .entidad-grid{ grid-template-columns: 1fr; } }
-.entidad{ border:1px solid var(--border); border-radius:14px; padding:1rem 1.15rem; background: var(--surface-alt); }
-.entidad h4{ margin:0 0 0.35rem; font-size:0.9375rem; color: var(--accent); }
-.entidad p{ margin:0; font-size:0.875rem; color: var(--text-muted); }
 
 /* Fases de implementación */
 .fase-list{ display:flex; flex-direction:column; gap: 1rem; margin-top: 1.75rem; }
@@ -476,15 +504,6 @@ section + section{ border-top: 1px solid var(--border); }
 }
 .fase h3{ font-size: 1rem; margin:0 0 0.3rem; }
 .fase p{ margin:0; font-size:0.9375rem; color: var(--text-muted); }
-/* La fase futura no se resalta: se marca como fuera del alcance actual */
-.fase--futura{ background: var(--surface); border-style: dashed; border-color: var(--accent-soft); }
-.fase--futura .fase-n{ background: transparent; color: var(--accent); border: 1.5px dashed var(--accent-soft); }
-.fase--futura h3{ color: var(--text-muted); }
-.fase-etiqueta{
-  display:inline-block; margin-left:0.6rem; font-size:0.6875rem; font-weight:700;
-  letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted);
-  border:1px dashed var(--border); border-radius:999px; padding:0.15em 0.6em; vertical-align:middle;
-}
 
 .responsibility-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap: 1.25rem; margin-top: 1.75rem; max-width: 66ch; }
 @media (max-width: 560px){ .responsibility-grid{ grid-template-columns: 1fr; } }
@@ -506,6 +525,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     <nav>
       <a href="/">Informe general</a>
       <a href="#diagnostico">Diagnóstico</a>
+      <a href="#contraste">Contraste</a>
       <a href="#arquitectura">Arquitectura</a>
       <a href="#automatizaciones">Automatizaciones</a>
       <a href="#ia">Inteligencia artificial</a>
@@ -527,7 +547,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
           <span class="claim-word">gobernanza</span> <span class="claim-word">de</span>
           <span class="claim-word">datos.</span>
         </h1>
-        <p class="claim-sub">Es la pieza que decide si se puede facturar, si se puede instalar y si el contrato sigue vigente. Y es el primer paso hacia darle al cliente la posibilidad de consultar por su cuenta el estado de sus trámites.</p>
+        <p class="claim-sub">Es la pieza que decide si se puede facturar, si se puede instalar y si el contrato sigue vigente. Y es la base sobre la que descansa el portal donde la agencia consulta por su cuenta.</p>
         <p class="claim-scroll-hint" id="claimScrollHint">Sigue bajando</p>
       </div>
     </div>
@@ -573,8 +593,103 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     <div class="prose reveal" style="margin-top:2.25rem">
       <p>El padrón no es un catálogo de nombres, es la precondición de tres procesos: facturar, instalar y sostener la relación contractual. Cuando el registro falla, no falla una lista, se frena la operación de varias áreas al mismo tiempo.</p>
       <p>Hoy Dirección no puede obtener un informe de avance de un cliente sin pedírselo a varias personas, porque no existe un registro único que consultar. La respuesta llega tarde, incompleta, y depende de que quien la tiene esté disponible.</p>
-      <p>Ordenar el padrón también es la condición para el portal donde el cliente consulte por su cuenta cómo van sus trámites. Sin un registro confiable de quién es cada cliente, qué sucursal le corresponde y en qué estado está cada solicitud, ese portal no se puede construir.</p>
+      <p>El portal donde la agencia consulta por su cuenta ya está previsto en el módulo, y descansa entero sobre este registro: sin saber con certeza quién es cada cliente, qué sucursal le corresponde y en qué estado está su expediente, no hay nada que mostrarle.</p>
     </div>
+  </div>
+</section>
+
+<section id="contraste">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Contraste con el módulo construido</div>
+        <h2>Lo que ya está resuelto y lo que falta.</h2>
+        <p class="section-note">Este análisis se revisó contra la documentación del módulo y la pantalla que compartió el equipo de desarrollo.</p>
+      </div>
+    </div>
+
+    <div class="prose reveal">
+      <p>Buena parte del análisis ya está resuelta en el modelo del módulo, y en dos casos resuelta mejor de lo que se había propuesto: los requisitos por agencia y el manejo de los datos de contacto. Queda un grupo más corto de puntos abiertos, y ahí es donde conviene concentrar la conversación.</p>
+    </div>
+
+    <div class="spec-scroll reveal">
+    <table class="spec-table contraste-table">
+      <thead><tr><th>Punto</th><th>Cómo quedó en el módulo</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr class="contraste-grupo"><td colspan="3">Confirmado</td></tr>
+        <tr><td>Orden contra sucursal</td><td>Toda orden se genera contra una sucursal, no contra la razón social</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
+        <tr><td>Regla de instalación</td><td>El sistema bloquea la creación de la orden si los datos fiscales están incompletos</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
+        <tr><td>Alta por liga</td><td>Existe el auto registro y el cliente entra como pendiente hasta completar los fiscales</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
+        <tr><td>Requisitos por agencia</td><td>Resuelto como tabla propia de requisitos de intake, mejor que el campo estructurado que se proponía</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
+        <tr><td>Documentos fiscales</td><td>Constancia, comprobante de domicilio y carátula bancaria, por razón social</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
+        <tr><td>Separación en entidades</td><td>Razón social, sucursal, contacto y dato de contacto como entidades independientes</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
+        <tr><td>Contactos con varios datos</td><td>Hasta cuatro datos por tipo y uno principal, más granular de lo que se proponía</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
+        <tr><td>Portal del cliente</td><td>Portal de agencias con cuenta de Google, acotado a la razón social del contacto</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
+        <tr><td>Aviso al contacto principal</td><td>Los avisos de acceso al portal salen al dato de contacto principal de tipo correo</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
+
+        <tr class="contraste-grupo"><td colspan="3">Sigue abierto</td></tr>
+        <tr><td>Un solo campo de estado</td><td>Activo, Inactivo y Registro incompleto conviven en la misma columna</td><td><span class="marca marca-brecha">Brecha</span></td></tr>
+        <tr><td>Datos fiscales sin detalle</td><td>La pantalla dice Completos o Incompletos, sin decir qué documento falta</td><td><span class="marca marca-brecha">Brecha</span></td></tr>
+        <tr><td>Vigencia documental</td><td>Ningún documento tiene fecha de vencimiento</td><td><span class="marca marca-brecha">Brecha</span></td></tr>
+        <tr><td>Verificación al subir</td><td>No se contrasta el RFC del documento contra el capturado</td><td><span class="marca marca-nueva">Propuesta</span></td></tr>
+        <tr><td>Expediente documental</td><td>No está definido dónde viven los archivos ni con qué permisos</td><td><span class="marca marca-nueva">Propuesta</span></td></tr>
+        <tr><td>Avisos a áreas internas</td><td>Solo están los avisos de acceso al portal, no los de alta y cambio de datos</td><td><span class="marca marca-nueva">Propuesta</span></td></tr>
+        <tr><td>Informes y vista 360</td><td>El icono existe, el contenido de la vista y los informes no están definidos</td><td><span class="marca marca-nueva">Propuesta</span></td></tr>
+        <tr><td>Deduplicación y bitácora</td><td>El historial existe para el acceso al portal, no para el registro en general</td><td><span class="marca marca-nueva">Propuesta</span></td></tr>
+        <tr><td>Permisos por área interna</td><td>El control de acceso cubre a las agencias, no a las áreas de DPROMA</td><td><span class="marca marca-nueva">Propuesta</span></td></tr>
+        <tr><td>Inteligencia artificial</td><td>No aparece ningún caso de uso</td><td><span class="marca marca-nueva">Propuesta</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="section-head reveal" style="margin-top:3rem">
+      <div>
+        <div class="eyebrow">Las tres brechas</div>
+        <h2>Qué cuesta hoy que no estén resueltas.</h2>
+      </div>
+    </div>
+
+    <article class="brecha reveal">
+      <span class="marca marca-brecha">Brecha</span>
+      <h3>Estado comercial y estado de expediente comparten un solo campo</h3>
+      <p>La columna de estado mezcla dos preguntas distintas: si el cliente sigue siendo cliente, y si su documentación permite operar. En la pantalla actual las quince razones sociales aparecen como Activo, incluidas las cuatro que tienen los datos fiscales incompletos.</p>
+            <p class="mejora-donde">Dónde: Columna Estado</p>
+            <a class="mejora-shot-link" href="/entregables/img/padron-estado.png" target="_blank" rel="noopener">
+              <img class="mejora-shot" src="/entregables/img/padron-estado.png" loading="lazy"
+                   alt="Pantalla actual del padrón de clientes. La columna Estado resaltada, donde todas las filas muestran Activo pese a que cuatro de ellas tienen los datos fiscales incompletos.">
+              <span class="mejora-zoom">Abrir la captura a tamaño completo →</span>
+            </a>
+            <p class="mejora-pie">Un cliente comercialmente activo con el expediente incompleto es exactamente el caso que frena una facturación, y con un solo campo no hay forma de filtrarlo.</p>
+      <p class="brecha-efecto">Sin separar los dos ejes, <b>nadie puede pedir la lista de clientes activos que hoy no se pueden facturar</b>, que es la pregunta que más veces se hace antes de cerrar un mes.</p>
+    </article>
+
+    <article class="brecha reveal">
+      <span class="marca marca-brecha">Brecha</span>
+      <h3>La columna de datos fiscales dice que algo falta, pero no qué</h3>
+      <p>La documentación del módulo describe esta columna como el estado de completitud con el documento o dato faltante. En la pantalla solo aparece Completos o Incompletos.</p>
+            <p class="mejora-donde">Dónde: Columna Datos fiscales</p>
+            <a class="mejora-shot-link" href="/entregables/img/padron-datos-fiscales.png" target="_blank" rel="noopener">
+              <img class="mejora-shot" src="/entregables/img/padron-datos-fiscales.png" loading="lazy"
+                   alt="Pantalla actual del padrón de clientes. La columna Datos fiscales resaltada, mostrando solo las etiquetas Completos e Incompletos sin indicar qué documento falta.">
+              <span class="mejora-zoom">Abrir la captura a tamaño completo →</span>
+            </a>
+            <p class="mejora-pie">Ver que un expediente está incompleto no permite hacer nada al respecto: hay que abrir el registro para averiguar si falta la constancia, el comprobante de domicilio o la carátula bancaria.</p>
+      <p class="brecha-efecto">Cada consulta obliga a abrir la ficha, así que <b>la lista deja de servir para trabajar y solo sirve para enterarse</b>.</p>
+    </article>
+
+    <article class="brecha reveal">
+      <span class="marca marca-brecha">Brecha</span>
+      <h3>Ningún documento tiene fecha de vigencia</h3>
+      <p>La razón social guarda sus tres documentos fiscales y una bandera de completitud, pero ninguno de ellos tiene fecha de vencimiento. El control de vigencias contractuales fue una petición explícita del área de Jurídico durante la investigación.</p>
+            <p class="mejora-donde">Dónde: Entre Datos fiscales y Última orden</p>
+            <a class="mejora-shot-link" href="/entregables/img/padron-vigencia.png" target="_blank" rel="noopener">
+              <img class="mejora-shot" src="/entregables/img/padron-vigencia.png" loading="lazy"
+                   alt="Pantalla actual del padrón de clientes. Marcador de inserción punteado entre las columnas Datos fiscales y Última orden, señalando dónde entraría la columna de vigencia.">
+              <span class="mejora-zoom">Abrir la captura a tamaño completo →</span>
+            </a>
+            <p class="mejora-pie">Es la única de las tres que no corrige algo existente, sino que añade un dato al modelo. La línea punteada marca dónde entra en la pantalla.</p>
+      <p class="brecha-efecto">Un contrato vencido no se distingue de uno vigente, así que <b>el vencimiento se descubre cuando alguien necesita el documento</b>, con la operación ya detenida.</p>
+    </article>
   </div>
 </section>
 
@@ -591,11 +706,12 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     <div class="capas-layout reveal">
       <aside class="capas-sticky">
         <ol class="capas-index" id="capasIndex" aria-label="Progreso de la sección">
-          <li data-i="0" class="is-active">Cuatro entidades</li>
-          <li data-i="1">Dos estados</li>
-          <li data-i="2">La pantalla</li>
-          <li data-i="3">Quién puede qué</li>
-          <li data-i="4">El esquema</li>
+          <li data-i="0" class="is-active">El esquema</li>
+          <li data-i="1">Eje comercial</li>
+          <li data-i="2">Dos estados</li>
+          <li data-i="3">La pantalla</li>
+          <li data-i="4">Quién puede qué</li>
+          
           <li data-i="5">Recorrido por rol</li>
         </ol>
       </aside>
@@ -603,72 +719,170 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       <div class="capas-steps" id="capasSteps">
 
         <section class="capas-step" data-i="0">
-          <h3>Cuatro entidades en lugar de una sola fila</h3>
-          <p>Hoy la pantalla mezcla en una misma fila la empresa, sus sucursales y su contacto, y resuelve las sucursales con un contador. Eso obliga a salir de la pantalla para saber cuál es cuál, y deja fuera al expediente, que no aparece por ningún lado. La propuesta es separar la información en cuatro piezas que se relacionan entre sí.</p>
+          <h3>El esquema</h3>
+          <p>El módulo modela al cliente en dos ejes que se cruzan. El comercial encadena marca, grupo automotriz y agencia, y sirve para agrupar y medir. El fiscal parte de la razón social, que concentra el RFC y los documentos, y decide si se puede facturar. La sucursal es donde ambos se encuentran: pertenece a una razón social y puede colgar de una agencia.</p>
+          <figure class="esquema">
+            <svg viewBox="0 0 690 432" role="img" aria-label="Esquema del padrón de clientes. El eje comercial encadena marca, grupo automotriz y agencia, y la agencia factura contra una razón social. El eje fiscal parte de la razón social, de la que cuelgan sus documentos fiscales, sus requisitos de intake y sus sucursales. De la sucursal cuelgan los contactos, y de cada contacto sus datos de contacto. Toda orden de instalación apunta a una sucursal.">
+            <text class="eje" x="100" y="18">EJE COMERCIAL</text>
+            <text class="eje" x="358" y="18">EJE FISCAL</text>
 
-          <div class="entidad-grid">
-            <div class="entidad">
-              <h4>Cliente</h4>
-              <p>La empresa o persona ante el SAT. Su identidad fiscal.</p>
-            </div>
-            <div class="entidad">
-              <h4>Sucursal</h4>
-              <p>El punto concreto donde se presta el servicio.</p>
-            </div>
-            <div class="entidad">
-              <h4>Contacto</h4>
-              <p>Las personas, cada una con su rol: quién firma, quién paga, quién opera.</p>
-            </div>
-            <div class="entidad">
-              <h4>Documento</h4>
-              <p>El expediente, con su fecha de vigencia y quién lo aprobó.</p>
-            </div>
-          </div>
-
+            <path class="rel" d="M100 84 V124"/>
+            <path class="rel" d="M100 168 V208"/>
+            <path class="rel" d="M176 230 H222 V154 H268"/>
+            <path class="rel" d="M448 140 H480 V62 H512"/>
+            <path class="rel" d="M448 168 H512"/>
+            <path class="rel" d="M358 184 V244"/>
+            <path class="rel" d="M448 266 H512"/>
+            <path class="rel" d="M589 288 V328"/>
+            <path class="rel" d="M358 304 V364"/>
+            <g class="ent">
+              <rect class="caja" x="24" y="40" width="152" height="44" rx="11"/>
+              <text class="et" x="37" y="63">Marca</text>
+              <text class="ec" x="37" y="81">universo declarado</text>
+            </g>
+            <g class="ent">
+              <rect class="caja" x="24" y="124" width="152" height="44" rx="11"/>
+              <text class="et" x="37" y="147">Grupo automotriz</text>
+              <text class="ec" x="37" y="165">marca</text>
+            </g>
+            <g class="ent">
+              <rect class="caja" x="24" y="208" width="152" height="44" rx="11"/>
+              <text class="et" x="37" y="231">Agencia</text>
+              <text class="ec" x="37" y="249">grupo automotriz</text>
+            </g>
+            <g class="ent raiz">
+              <rect class="caja" x="268" y="124" width="180" height="60" rx="11"/>
+              <text class="et" x="281" y="147">Razón social</text>
+              <text class="ec" x="281" y="165">rfc · nombre legal</text>
+              <text class="ec" x="281" y="179">completitud fiscal</text>
+            </g>
+            <g class="ent">
+              <rect class="caja" x="268" y="244" width="180" height="60" rx="11"/>
+              <text class="et" x="281" y="267">Sucursal</text>
+              <text class="ec" x="281" y="285">razon social · agencia</text>
+              <text class="ec" x="281" y="299">direccion · municipio</text>
+            </g>
+            <g class="ent">
+              <rect class="caja" x="268" y="364" width="180" height="44" rx="11"/>
+              <text class="et" x="281" y="387">Orden instalación</text>
+              <text class="ec" x="281" y="405">sucursal (obligatorio)</text>
+            </g>
+            <g class="ent">
+              <rect class="caja" x="512" y="40" width="154" height="44" rx="11"/>
+              <text class="et" x="525" y="63">Documento fiscal</text>
+              <text class="ec" x="525" y="81">tipo · archivo</text>
+            </g>
+            <g class="ent">
+              <rect class="caja" x="512" y="146" width="154" height="44" rx="11"/>
+              <text class="et" x="525" y="169">Requisito intake</text>
+              <text class="ec" x="525" y="187">clave · obligatorio</text>
+            </g>
+            <g class="ent">
+              <rect class="caja" x="512" y="244" width="154" height="44" rx="11"/>
+              <text class="et" x="525" y="267">Contacto</text>
+              <text class="ec" x="525" y="285">nombre · rol</text>
+            </g>
+            <g class="ent">
+              <rect class="caja" x="512" y="328" width="154" height="44" rx="11"/>
+              <text class="et" x="525" y="351">Dato de contacto</text>
+              <text class="ec" x="525" y="369">tipo · principal</text>
+            </g>
+            <g class="cardg">
+              <rect x="81" y="96" width="38" height="16" rx="4"/>
+              <text class="card" x="100" y="108">1 a N</text>
+            </g>
+            <g class="cardg">
+              <rect x="81" y="180" width="38" height="16" rx="4"/>
+              <text class="card" x="100" y="192">1 a N</text>
+            </g>
+            <g class="cardg">
+              <rect x="203" y="184" width="38" height="16" rx="4"/>
+              <text class="card" x="222" y="196">N a 1</text>
+            </g>
+            <g class="cardg">
+              <rect x="461" y="93" width="38" height="16" rx="4"/>
+              <text class="card" x="480" y="105">1 a N</text>
+            </g>
+            <g class="cardg">
+              <rect x="461" y="160" width="38" height="16" rx="4"/>
+              <text class="card" x="480" y="172">1 a N</text>
+            </g>
+            <g class="cardg">
+              <rect x="339" y="206" width="38" height="16" rx="4"/>
+              <text class="card" x="358" y="218">1 a N</text>
+            </g>
+            <g class="cardg">
+              <rect x="461" y="258" width="38" height="16" rx="4"/>
+              <text class="card" x="480" y="270">1 a N</text>
+            </g>
+            <g class="cardg">
+              <rect x="570" y="300" width="38" height="16" rx="4"/>
+              <text class="card" x="589" y="312">1 a N</text>
+            </g>
+            <g class="cardg">
+              <rect x="339" y="326" width="38" height="16" rx="4"/>
+              <text class="card" x="358" y="338">N a 1</text>
+            </g>
+            </svg>
+            <figcaption>Nueve entidades y dos ejes que se cruzan en la razón social. El comercial sirve para agrupar y medir cobertura; el fiscal decide si se puede facturar.</figcaption>
+          </figure>
           <div class="glosa">
-            <p><b>Por qué importa separar la sucursal.</b> En la pantalla actual, Grupo Automotriz ELEKTRA aparece como una fila con cuatro sucursales. Cuando se hace una instalación en Polanco, la orden se guarda a nombre de la empresa completa, así que después alguien tiene que averiguar cuál de las cuatro fue para poder facturar.</p>
-            <p>Si la orden se guarda desde el inicio a nombre de la sucursal de Polanco, esa pregunta nunca aparece. El dato nace correcto en el momento en que se captura, en vez de reconstruirse semanas más tarde.</p>
+            <p><b>Cómo se lee.</b> Una razón social tiene varias sucursales, varios contactos y varios documentos. Cada uno de esos registros sabe a qué cliente pertenece, así que desde la ficha del cliente se puede llegar a todo lo suyo, y desde cualquier documento se puede volver a su cliente.</p>
+            <p>La relación de abajo es la que corrige el problema de hoy: como la orden de instalación guarda la sucursal y no la razón social, la pregunta de qué sucursal generó el servicio queda contestada en el momento de crear la orden, no semanas después al facturar.</p>
           </div>
-
           <details class="tecnico">
             <summary><span class="finding-toggle" aria-hidden="true"></span>Detalle para implementación</summary>
             <div class="tecnico-body">
-              <p><b>Regla estructural:</b> <code>orden_instalacion.sucursal_id</code> es obligatorio y apunta siempre a <code>sucursal</code>, nunca a <code>cliente</code>. La razón social se obtiene navegando <code>sucursal.cliente_id</code>.</p>
+              <p><b>Las dos relaciones que sostienen la operación.</b> <code>orden_instalacion.sucursal_id</code> es obligatorio y apunta a la sucursal, nunca a la razón social; la razón social se obtiene navegando <code>sucursal.razon_social_id</code>. Y <code>requisito_intake.razon_social_id</code> permite que cada agencia exija sus propios documentos sin tocar el código.</p>
               <div class="spec-scroll">
               <table class="spec-table">
-                <thead><tr><th>Entidad</th><th>Campos</th></tr></thead>
+                <thead><tr><th>Entidad</th><th>Campos que decide este análisis</th></tr></thead>
                 <tbody>
-                  <tr>
-                    <td><code>cliente</code></td>
-                    <td><code>id</code>, <code>razon_social</code>, <code>rfc</code> (único), <code>tipo</code> (empresa | agencia | persona_fisica), <code>regimen_fiscal</code>, <code>uso_cfdi</code>, <code>domicilio_fiscal</code>, <code>estado_comercial</code>, <code>estado_expediente</code>, <code>origen</code> (comercial | autoregistro | migracion), <code>creado_por</code>, <code>creado_en</code></td>
-                  </tr>
-                  <tr>
-                    <td><code>sucursal</code></td>
-                    <td><code>id</code>, <code>cliente_id</code> (FK), <code>nombre</code>, <code>direccion</code>, <code>contacto_operativo_id</code>, <code>campos_requeridos_facturacion</code> (JSON), <code>activa</code></td>
-                  </tr>
-                  <tr>
-                    <td><code>contacto</code></td>
-                    <td><code>id</code>, <code>cliente_id</code> (FK), <code>sucursal_id</code> (FK, nullable), <code>nombre</code>, <code>email</code>, <code>telefono</code>, <code>rol</code> (gerente | pagos | operativo | firma), <code>principal</code> (bool)</td>
-                  </tr>
-                  <tr>
-                    <td><code>documento</code></td>
-                    <td><code>id</code>, <code>cliente_id</code> (FK), <code>tipo</code> (constancia_fiscal | comprobante_domicilio | caratula_bancaria | acta_constitutiva | poder_notarial | ine | contrato), <code>drive_file_id</code>, <code>vigencia_hasta</code> (nullable), <code>subido_por</code>, <code>subido_en</code>, <code>verificado_por</code> (nullable)</td>
-                  </tr>
+                  <tr><td><code>razon_social</code></td><td>Se propone partir <code>estado</code> en <code>estado_comercial</code> (prospecto, activo, suspendido, baja) y <code>estado_expediente</code> (incompleto, en_revision, completo, vencido)</td></tr>
+                  <tr><td><code>documento</code></td><td>Se propone añadir <code>vigencia_hasta</code> (nullable) y <code>verificado_por</code>, que hoy no existen</td></tr>
+                  <tr><td><code>marca</code></td><td><code>universo_declarado</code> ya existe y es la base del cálculo de cobertura</td></tr>
+                  <tr><td><code>dato_contacto</code></td><td>Máximo cuatro activos por contacto y tipo, uno principal por tipo. Ya resuelto</td></tr>
                 </tbody>
               </table>
               </div>
-              <p style="margin-top:1rem"><b>Sobre <code>campos_requeridos_facturacion</code>:</b> cada grupo automotriz exige datos distintos para poder facturarle. Guardarlos por sucursal en lugar de fijarlos en el código permite que Administración los configure sin tocar el sistema.</p>
-              <div class="code">// ejemplo del contenido del campo, para una sucursal de grupo automotriz
-{
-  "requiere": ["vin", "orden_confirmacion"],
-  "formato_vin": "^[A-HJ-NPR-Z0-9]{17}$",
-  "nota_operativa": "sin orden de confirmación no se puede emitir factura"
-}</div>
             </div>
           </details>
         </section>
 
         <section class="capas-step" data-i="1">
+          <h3>Qué habilita el eje comercial</h3>
+          <p>La marca guarda su universo de agencias declarado, es decir cuántas agencias existen en el país para ese fabricante. Contra ese número se puede medir cuántas ya son clientes activos de DPROMA. Es un dato que hasta ahora había que reconstruir cruzando información a mano, y que convierte una intuición comercial en una cifra que se consulta.</p>
+          <div class="glosa">
+            <p><b>Cómo se calcula.</b> Se cuentan las agencias de esa marca que tienen al menos una razón social activa con expediente completo, y se divide entre el universo declarado. El resultado es el porcentaje de cobertura de esa marca.</p>
+            <p>La condición de expediente completo importa: una agencia registrada pero sin papeles no genera negocio, así que contarla como cobertura da una cifra optimista que no se sostiene al momento de facturar.</p>
+          </div>
+          <p style="margin-top:1.25rem">Con esa medición disponible se pueden construir tres cosas que hoy no existen:</p>
+          <ul class="resp-list">
+            <li><b>Mapa de cobertura por marca.</b> Qué fabricantes están bien cubiertos y cuáles apenas empiezan, para decidir dónde poner esfuerzo comercial en lugar de repartirlo por igual.</li>
+            <li><b>Detección de agencias frías.</b> Agencias registradas como clientes que llevan meses sin una orden. La investigación señaló que el seguimiento a cuentas de alto valor es reactivo, y esta es la lista que lo vuelve proactivo.</li>
+            <li><b>Alta en cadena.</b> Cuando se gana una agencia de un grupo automotriz, el sistema sabe qué otras agencias del mismo grupo aún no son clientes, y Comercial arranca con la información en la mano.</li>
+          </ul>
+          <details class="tecnico">
+            <summary><span class="finding-toggle" aria-hidden="true"></span>Detalle para implementación</summary>
+            <div class="tecnico-body">
+              <div class="code">funcion cobertura(marca_id):
+  universo = marca(marca_id).universo_declarado
+  activas  = contar(distinct agencia.id
+                    donde agencia.marca_id = marca_id
+                      y existe razon_social activa ligada
+                      y razon_social.completitud_fiscal = true)
+  devolver { universo, activas, porcentaje: activas / universo }
+
+funcion agencias_frias(dias = 90):
+  devolver agencias con al menos una razon social activa
+           y sin ninguna orden de instalación en los ultimos `dias`
+           ordenadas por fecha de la ultima orden</div>
+              <p style="margin-top:0.75rem">Ambas consultas alimentan el informe por área del apartado de automatizaciones, con Comercial como audiencia.</p>
+            </div>
+          </details>
+        </section>
+
+        <section class="capas-step" data-i="2">
           <h3>Dos estados en lugar de tres etiquetas mezcladas</h3>
           <p>La columna de estado de la pantalla actual usa Activo, Registro incompleto e Inactivo en el mismo lugar. Eso mezcla dos preguntas que son distintas: si el cliente sigue siendo cliente, y si su expediente está en orden. Son independientes, y necesitan verse por separado.</p>
 
@@ -682,24 +896,24 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
           </div>
         </section>
 
-        <section class="capas-step" data-i="2">
+        <section class="capas-step" data-i="3">
           <h3>Qué cambia en la pantalla</h3>
-          <p>Seis mejoras concretas sobre la maqueta actual. Cada una abre la captura de la pantalla de hoy con el punto exacto al que se refiere.</p>
+          <p>Las tres brechas de la sección anterior se resuelven en esta misma pantalla. A eso se suman cuatro mejoras que no corrigen un problema, sino que hacen la lista utilizable para trabajar sobre ella.</p>
           <ul class="mejora-list">
             <li class="mejora">
               <details>
                 <summary>
                   <span class="finding-toggle" aria-hidden="true"></span>
-                  <span><b>Sucursales desplegables en la misma fila.</b> El contador se sustituye por una fila que se abre y muestra las sucursales con su dirección y su estado, sin cambiar de pantalla.</span>
+                  <span><span class="marca marca-nueva">Propuesta</span> <b>Sucursales desplegables en la misma fila.</b> El contador se sustituye por una fila que se abre y muestra las sucursales con su dirección y su estado, sin cambiar de pantalla.</span>
                 </summary>
                 <div class="mejora-body">
-                  <p class="mejora-donde">Dónde: Columna SUCURSALES</p>
+                  <p class="mejora-donde">Dónde: Columna Sucursales</p>
                   <a class="mejora-shot-link" href="/entregables/img/padron-sucursales.png" target="_blank" rel="noopener">
                     <img class="mejora-shot" src="/entregables/img/padron-sucursales.png" loading="lazy"
-                       alt="Pantalla actual del padrón de clientes. Columna SUCURSALES de la tabla, resaltada sobre el resto de la pantalla.">
+                         alt="Pantalla actual del padrón de clientes. La columna Sucursales resaltada, mostrando solo el número de sucursales de cada razón social.">
                     <span class="mejora-zoom">Abrir la captura a tamaño completo →</span>
                   </a>
-                  <p class="mejora-pie">Hoy la celda solo dice cuántas sucursales hay. En Grupo Automotriz ELEKTRA aparecen los cuatro nombres apretados en una línea, y en el resto ni siquiera eso.</p>
+                  <p class="mejora-pie">La celda dice cuántas sucursales hay, pero no cuáles. Para saber si la de Polanco está habilitada hay que salir de la lista, y esa consulta es la que Instalaciones hace antes de cada visita.</p>
                 </div>
               </details>
             </li>
@@ -707,50 +921,16 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
               <details>
                 <summary>
                   <span class="finding-toggle" aria-hidden="true"></span>
-                  <span><b>Datos fiscales accionables.</b> El indicador deja de ser sí o no y muestra qué documento falta, con la acción de pedirlo al cliente desde la misma celda.</span>
+                  <span><span class="marca marca-nueva">Propuesta</span> <b>Último movimiento en lugar de última orden.</b> Cuenta también un cambio de datos fiscales o una renovación de contrato, no solo un servicio, para que la columna refleje actividad real.</span>
                 </summary>
                 <div class="mejora-body">
-                  <p class="mejora-donde">Dónde: Columna DATOS FISCALES</p>
-                  <a class="mejora-shot-link" href="/entregables/img/padron-datos-fiscales.png" target="_blank" rel="noopener">
-                    <img class="mejora-shot" src="/entregables/img/padron-datos-fiscales.png" loading="lazy"
-                       alt="Pantalla actual del padrón de clientes. Columna DATOS FISCALES, con la advertencia de Autos del Valle SAPI visible.">
-                    <span class="mejora-zoom">Abrir la captura a tamaño completo →</span>
-                  </a>
-                  <p class="mejora-pie">La fila de Autos del Valle SAPI ya señala que falta la carátula bancaria, pero desde ahí no se puede hacer nada al respecto.</p>
-                </div>
-              </details>
-            </li>
-            <li class="mejora">
-              <details>
-                <summary>
-                  <span class="finding-toggle" aria-hidden="true"></span>
-                  <span><b>Columna de vigencia del expediente.</b> Hoy no existe en ninguna parte. Muestra cuándo vence el contrato o la documentación, con aviso visual cuando se acerca.</span>
-                </summary>
-                <div class="mejora-body">
-                  <p class="mejora-donde">Dónde: Entre DATOS FISCALES y ÚLTIMA ORDEN</p>
-                  <a class="mejora-shot-link" href="/entregables/img/padron-vigencia.png" target="_blank" rel="noopener">
-                    <img class="mejora-shot" src="/entregables/img/padron-vigencia.png" loading="lazy"
-                       alt="Pantalla actual del padrón de clientes. Marcador de inserción entre las columnas DATOS FISCALES y ÚLTIMA ORDEN.">
-                    <span class="mejora-zoom">Abrir la captura a tamaño completo →</span>
-                  </a>
-                  <p class="mejora-pie">Es la única mejora que no corrige algo existente, sino que añade una columna nueva. La línea punteada marca dónde entra.</p>
-                </div>
-              </details>
-            </li>
-            <li class="mejora">
-              <details>
-                <summary>
-                  <span class="finding-toggle" aria-hidden="true"></span>
-                  <span><b>Último movimiento en lugar de última orden.</b> Cuenta también un cambio de datos fiscales o una renovación de contrato, no solo un servicio, para que el registro refleje actividad real.</span>
-                </summary>
-                <div class="mejora-body">
-                  <p class="mejora-donde">Dónde: Columna ÚLTIMA ORDEN</p>
+                  <p class="mejora-donde">Dónde: Columna Última orden</p>
                   <a class="mejora-shot-link" href="/entregables/img/padron-ultimo-movimiento.png" target="_blank" rel="noopener">
                     <img class="mejora-shot" src="/entregables/img/padron-ultimo-movimiento.png" loading="lazy"
-                       alt="Pantalla actual del padrón de clientes. Columna ÚLTIMA ORDEN de la tabla, resaltada sobre el resto de la pantalla.">
+                         alt="Pantalla actual del padrón de clientes. La columna Última orden resaltada, que solo registra servicios y no otros movimientos del registro.">
                     <span class="mejora-zoom">Abrir la captura a tamaño completo →</span>
                   </a>
-                  <p class="mejora-pie">Servicios Onix SC aparece inactivo con fecha de febrero. Con el criterio actual, una renovación de contrato firmada la semana pasada no cambiaría esa fecha.</p>
+                  <p class="mejora-pie">Con el criterio actual, una razón social que renovó su contrato la semana pasada sigue apareciendo con la fecha de su último servicio, que puede ser de hace meses.</p>
                 </div>
               </details>
             </li>
@@ -758,40 +938,34 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
               <details>
                 <summary>
                   <span class="finding-toggle" aria-hidden="true"></span>
-                  <span><b>Acción masiva útil.</b> La selección múltiple, que hoy solo exporta o desactiva, gana la acción de solicitar documentos faltantes a todos los seleccionados de una vez.</span>
+                  <span><span class="marca marca-nueva">Propuesta</span> <b>Vista 360 con contenido definido.</b> El icono ya existe. Falta decidir qué reúne: expediente, sucursales, órdenes, trámites, contratos e historial de cambios en una sola pantalla.</span>
                 </summary>
                 <div class="mejora-body">
-                  <p class="mejora-donde">Dónde: Barra de selección múltiple</p>
-                  <a class="mejora-shot-link" href="/entregables/img/padron-accion-masiva.png" target="_blank" rel="noopener">
-                    <img class="mejora-shot" src="/entregables/img/padron-accion-masiva.png" loading="lazy"
-                       alt="Pantalla actual del padrón de clientes. Barra azul de selección múltiple, sobre el encabezado de la tabla.">
-                    <span class="mejora-zoom">Abrir la captura a tamaño completo →</span>
-                  </a>
-                  <p class="mejora-pie">La barra ya aparece al seleccionar filas, con Exportar selección, Asignar a campaña y Desactivar. Falta la acción que resuelve el problema más frecuente.</p>
-                </div>
-              </details>
-            </li>
-            <li class="mejora">
-              <details>
-                <summary>
-                  <span class="finding-toggle" aria-hidden="true"></span>
-                  <span><b>Vista 360 del cliente.</b> Reúne expediente, sucursales, órdenes, contratos e historial de cambios en una sola pantalla. Es la que Dirección abre cuando necesita saber cómo va una cuenta.</span>
-                </summary>
-                <div class="mejora-body">
-                  <p class="mejora-donde">Dónde: Columna ACCIONES</p>
+                  <p class="mejora-donde">Dónde: Primer icono de la columna Acciones</p>
                   <a class="mejora-shot-link" href="/entregables/img/padron-vista-360.png" target="_blank" rel="noopener">
                     <img class="mejora-shot" src="/entregables/img/padron-vista-360.png" loading="lazy"
-                       alt="Pantalla actual del padrón de clientes. Columna ACCIONES, con el icono de Vista 360 en primer lugar.">
+                         alt="Pantalla actual del padrón de clientes. El primer icono de la columna Acciones resaltado, que abre la vista 360 del cliente.">
                     <span class="mejora-zoom">Abrir la captura a tamaño completo →</span>
                   </a>
-                  <p class="mejora-pie">El primer icono de la columna ya está etiquetado como Vista 360 en la maqueta. Lo que falta es definir qué reúne esa pantalla.</p>
+                  <p class="mejora-pie">Es la pantalla que Dirección abre cuando necesita saber cómo va una cuenta, y de la que sale el informe de avance.</p>
+                </div>
+              </details>
+            </li>
+            <li class="mejora">
+              <details>
+                <summary>
+                  <span class="finding-toggle" aria-hidden="true"></span>
+                  <span><span class="marca marca-nueva">Propuesta</span> <b>Acción masiva de documentos faltantes.</b> La selección múltiple gana la acción de pedir a todos los seleccionados lo que les falta, en un solo movimiento.</span>
+                </summary>
+                <div class="mejora-body">
+                  <p class="mejora-pie">Hoy la lista permite ver que cuatro razones sociales tienen el expediente incompleto, pero resolverlo obliga a entrar una por una.</p>
                 </div>
               </details>
             </li>
           </ul>
         </section>
 
-        <section class="capas-step" data-i="3">
+        <section class="capas-step" data-i="4">
           <h3>Quién puede qué</h3>
           <p>Gobernanza de datos significa decidir de antemano quién crea, quién edita, quién aprueba y quién solo consulta. Sin esa decisión, cualquier sistema termina degradándose en un archivo compartido que todos editan.</p>
           <div class="spec-scroll">
@@ -813,64 +987,10 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
         </section>
 
 
-        <section class="capas-step" data-i="4">
-          <h3>El esquema</h3>
-          <p>Las cuatro entidades no viven sueltas. Cuelgan de una jerarquía donde el cliente es la raíz y todo lo demás sabe a qué cliente pertenece, y esa jerarquía decide qué se puede consultar desde dónde.</p>
-          <figure class="esquema">
-            <svg viewBox="0 0 680 340" role="img" aria-label="Esquema del padrón. La entidad cliente se relaciona uno a muchos con contacto, sucursal y documento. La entidad sucursal se relaciona uno a muchos con orden de instalación, de modo que toda orden apunta a una sucursal concreta y nunca a la razón social completa.">
-              <path class="rel" d="M340 92 V132 H100 V172"/>
-              <path class="rel" d="M340 92 V172"/>
-              <path class="rel" d="M340 92 V132 H580 V172"/>
-              <path class="rel" d="M340 256 V286"/>
-              <text class="card" x="205" y="126">1 a N</text>
-              <text class="card" x="367" y="126">1 a N</text>
-              <text class="card" x="475" y="126">1 a N</text>
-              <text class="card" x="371" y="275">1 a N</text>
-                <g class="ent raiz">
-                  <rect class="caja" x="250" y="8" width="180" height="84" rx="11"/>
-                  <text class="et" x="263" y="31">cliente</text>
-                  <text class="ec" x="263" y="51">rfc  ·  razon_social</text>
-                  <text class="ec" x="263" y="66">estado_comercial</text>
-                  <text class="ec" x="263" y="81">estado_expediente</text>
-                </g>
-                <g class="ent">
-                  <rect class="caja" x="10" y="172" width="180" height="84" rx="11"/>
-                  <text class="et" x="23" y="195">contacto</text>
-                  <text class="ec" x="23" y="215">cliente_id</text>
-                  <text class="ec" x="23" y="230">sucursal_id  (nullable)</text>
-                  <text class="ec" x="23" y="245">rol  ·  principal</text>
-                </g>
-                <g class="ent">
-                  <rect class="caja" x="250" y="172" width="180" height="84" rx="11"/>
-                  <text class="et" x="263" y="195">sucursal</text>
-                  <text class="ec" x="263" y="215">cliente_id</text>
-                  <text class="ec" x="263" y="230">direccion</text>
-                  <text class="ec" x="263" y="245">campos_requeridos</text>
-                </g>
-                <g class="ent">
-                  <rect class="caja" x="490" y="172" width="180" height="84" rx="11"/>
-                  <text class="et" x="503" y="195">documento</text>
-                  <text class="ec" x="503" y="215">cliente_id</text>
-                  <text class="ec" x="503" y="230">tipo  ·  drive_file_id</text>
-                  <text class="ec" x="503" y="245">vigencia_hasta</text>
-                </g>
-                <g class="ent">
-                  <rect class="caja" x="250" y="286" width="180" height="46" rx="11"/>
-                  <text class="et" x="263" y="309">orden_instalacion</text>
-                  <text class="ec" x="263" y="329">sucursal_id  (obligatorio)</text>
-                </g>
-            </svg>
-            <figcaption>La relación de abajo es la que cambia la operación: la orden de instalación apunta a la sucursal, no a la razón social. Todo lo demás cuelga del cliente.</figcaption>
-          </figure>
-          <div class="glosa">
-            <p><b>Cómo se lee.</b> Una razón social tiene varias sucursales, varios contactos y varios documentos. Cada uno de esos registros sabe a qué cliente pertenece, así que desde la ficha del cliente se puede llegar a todo lo suyo, y desde cualquier documento se puede volver a su cliente.</p>
-            <p>La relación de abajo es la que corrige el problema de hoy: como la orden de instalación guarda la sucursal y no la razón social, la pregunta de qué sucursal generó el servicio queda contestada en el momento de crear la orden, no semanas después al facturar.</p>
-          </div>
-        </section>
 
         <section class="capas-step" data-i="5">
           <h3>El recorrido según quién entra</h3>
-          <p>El padrón lo usan seis áreas con necesidades distintas, y una séptima audiencia externa: el propio cliente, que ya entra en la fase 2 para registrarse. Ninguna debería entrar por la misma puerta ni ver lo mismo. Estas son las pantallas y quién llega a cada una.</p>
+          <p>El padrón lo usan seis áreas internas con necesidades distintas, más una audiencia externa que el módulo ya contempla: el contacto de la agencia, con su propio acceso al portal. Ninguna debería entrar por la misma puerta ni ver lo mismo. Estas son las pantallas y quién llega a cada una.</p>
           <div class="spec-scroll">
           <table class="spec-table">
             <thead><tr><th>Pantalla</th><th>Qué contiene</th><th>Quién llega aquí</th></tr></thead>
@@ -880,7 +1000,8 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
               <tr><td>Ficha de sucursal</td><td>Dirección, campos que exige para facturar y si está habilitada</td><td>Instalaciones</td></tr>
               <tr><td>Alta interna</td><td>Formulario mínimo para crear el cliente y generar su enlace</td><td>Comercial</td></tr>
               <tr><td>Bandeja de revisión</td><td>Cola de documentos pendientes de aprobar, con su vigencia</td><td>Jurídico y RH</td></tr>
-              <tr><td>Formulario de auto registro</td><td>Vista pública sin sesión, alcanzable solo con el enlace</td><td>El cliente</td></tr>
+              <tr><td>Formulario de auto registro</td><td>Vista pública sin sesión, alcanzable solo con la liga</td><td>El contacto de la agencia</td></tr>
+              <tr><td>Portal de agencias</td><td>Acceso con cuenta de Google, acotado a la razón social del contacto</td><td>El contacto de la agencia</td></tr>
               <tr><td>Informe de avance</td><td>Documento generado con el filtro de audiencia aplicado</td><td>Dirección, Comercial, Administración y Finanzas</td></tr>
             </tbody>
           </table>
@@ -954,15 +1075,15 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
               <p class="rol-limite">Consulta total <b>más los informes</b>.</p>
             </article>
             <article class="rol externo">
-              <h4>El cliente</h4>
-              <p class="rol-entra">Entra por un enlace, sin cuenta ni contraseña</p>
+              <h4>Contacto de agencia</h4>
+              <p class="rol-entra">Entra al portal con su cuenta de Google</p>
               <ol>
-                <li>Recibe el enlace y accede solo a su propio registro</li>
-                <li>Completa sus datos y sube sus documentos, sin transcripción de por medio</li>
-                <li>Si más adelante se abre el portal, consulta ahí el estado de sus trámites</li>
-                <li>Nunca ve el padrón, solo la fila que le corresponde</li>
+                <li>Recibe la liga de registro y llena el formulario, sin cuenta ni contraseña</li>
+                <li>Si necesita acceso permanente, se solicita para su correo de Google y queda pendiente de aprobación</li>
+                <li>Aprobado el acceso, entra al portal y ve solo lo de su razón social</li>
+                <li>El acceso se puede rechazar o revocar en cualquier momento, con el motivo registrado</li>
               </ol>
-              <p class="rol-limite">Se registra desde la fase 2; consultar sus trámites <b>queda como línea futura</b>.</p>
+              <p class="rol-limite">Nunca ve datos de otra agencia. <b>Ya resuelto en el módulo</b>.</p>
             </article>
           </div>
           <div class="glosa">
@@ -991,10 +1112,11 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
           <summary>
             <span class="n">01</span>
             <h3>Alta por enlace de auto registro</h3>
+            <span class="marca marca-ok">Resuelto</span>
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
-            <p>El cliente carga sus propios datos y documentos en un formulario, en lugar de mandarlos por WhatsApp para que alguien los transcriba. El botón ya existe en la maqueta actual; lo que falta es el flujo detrás.</p>
+            <p>El cliente carga sus propios datos y documentos en un formulario, en lugar de mandarlos por WhatsApp para que alguien los transcriba. El módulo ya lo resuelve: el registro entra por liga y queda en estado pendiente hasta que se completan los datos fiscales.</p>
             <div class="glosa">
               <p><b>Qué es el enlace.</b> Un enlace es una dirección web. El sistema genera una única para esa agencia, con un código que solo funciona para ella y que caduca a los pocos días. Comercial se la envía y la agencia entra directo a su formulario, sin cuenta ni contraseña.</p>
             </div>
@@ -1010,7 +1132,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
                 </ol>
               </div>
               <div class="escenario-col despues">
-                <h4>Con la automatización</h4>
+                <h4>En el módulo</h4>
                 <ol>
                   <li>Comercial genera el enlace desde la ficha del cliente</li>
                   <li>La agencia llena el formulario y sube sus documentos</li>
@@ -1053,7 +1175,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
               </svg>
               <figcaption>El alta viaja del cliente al registro sin pasar por una transcripción manual.</figcaption>
             </figure>
-            <p class="finding-cierre">Desaparece la transcripción manual y <b>el alta deja de depender de que alguien esté disponible</b> para capturarla.</p>
+            <p class="finding-cierre">Desaparece la transcripción manual y <b>el alta deja de depender de que alguien esté disponible</b> para capturarla. Queda una decisión abierta: qué pasa con el registro pendiente si la agencia no completa sus datos, que es lo que resuelve el recordatorio escalado.</p>
             <details class="tecnico">
               <summary><span class="finding-toggle" aria-hidden="true"></span>Detalle para implementación</summary>
               <div class="tecnico-body">
@@ -1087,6 +1209,7 @@ POST /registro/:token
           <summary>
             <span class="n">02</span>
             <h3>Verificación de la constancia fiscal en el momento de subirla</h3>
+            <span class="marca marca-nueva">Propuesta</span>
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
@@ -1139,14 +1262,15 @@ POST /registro/:token
         <details class="finding-details">
           <summary>
             <span class="n">03</span>
-            <h3>La regla de instalación deja de ser un aviso</h3>
+            <h3>La regla de instalación vive en el sistema</h3>
+            <span class="marca marca-ok">Resuelto</span>
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
-            <p>La maqueta actual ya enuncia la regla: no se programa una instalación para una sucursal con datos fiscales incompletos. La propuesta es cambiar dónde vive esa regla.</p>
+            <p>La regla vive donde debe. El módulo bloquea la creación de la orden cuando los datos fiscales de la razón social están incompletos, así que no depende de que alguien respete un aviso en pantalla.</p>
             <div class="glosa">
-              <p><b>Aviso contra regla.</b> Un aviso en pantalla se puede ignorar, y una orden que entre por otra vía se lo salta por completo. Si la regla vive en el servidor, la orden simplemente no se puede crear, sin importar por dónde llegue: desde la pantalla, desde una carga masiva o desde una integración futura.</p>
-              <p>Además, como cada grupo automotriz pide campos distintos para poder facturar, la regla revisa lo que exige esa sucursal en particular, no una lista genérica igual para todos.</p>
+              <p><b>Por qué importa dónde vive la regla.</b> Un aviso en pantalla se puede ignorar, y una orden que entre por otra vía se lo salta por completo. Al vivir en el sistema, la orden no se puede crear sin importar por dónde llegue: desde la pantalla, desde una carga masiva o desde una integración futura.</p>
+              <p>El módulo además resuelve bien la parte variable: como cada agencia puede exigir documentos o datos propios, los requisitos se configuran por razón social en su propia tabla, y la validación lee de ahí en lugar de una lista fija en el código.</p>
             </div>
             <div class="escenario">
               <div class="escenario-col">
@@ -1160,7 +1284,7 @@ POST /registro/:token
                 </ol>
               </div>
               <div class="escenario-col despues">
-                <h4>Con la automatización</h4>
+                <h4>En el módulo</h4>
                 <ol>
                   <li>Se intenta crear la orden para esa sucursal</li>
                   <li>El servidor revisa qué exige esa sucursal</li>
@@ -1170,7 +1294,7 @@ POST /registro/:token
                 </ol>
               </div>
             </div>
-            <p class="finding-cierre">Ninguna instalación se ejecuta sobre un cliente <b>que después no se va a poder facturar</b>.</p>
+            <p class="finding-cierre">Ninguna instalación se ejecuta sobre un cliente <b>que después no se va a poder facturar</b>. Lo que falta es que el bloqueo diga qué documento falta, para que quien lo encuentra pueda resolverlo.</p>
             <details class="tecnico">
               <summary><span class="finding-toggle" aria-hidden="true"></span>Detalle para implementación</summary>
               <div class="tecnico-body">
@@ -1205,10 +1329,11 @@ POST /api/ordenes-instalacion
           <summary>
             <span class="n">04</span>
             <h3>Aviso automático a las áreas al alta y al cambio</h3>
+            <span class="marca marca-nueva">Propuesta</span>
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
-            <p>Cuando se da de alta un cliente o cambian sus datos fiscales, las áreas involucradas se enteran solas, sin que nadie reenvíe nada. El aviso llega por correo, que es el canal que la empresa ya usa y que no obliga a nadie a adoptar una herramienta nueva.</p>
+            <p>El módulo ya envía avisos automáticos por correo, pero solo los del acceso al portal, y siempre al contacto de la agencia. Falta el otro lado: cuando se da de alta un cliente o cambian sus datos fiscales, las áreas internas de DPROMA no se enteran salvo que alguien se lo cuente. La propuesta es reutilizar el mismo mecanismo hacia dentro.</p>
             <div class="glosa">
               <p><b>Al grupo del área, no a las personas.</b> En Google Workspace se crea una dirección por área, del tipo facturacion@dproma.mx o instalaciones@dproma.mx, y se define quién pertenece a cada una. El sistema envía siempre a la dirección del área, nunca a un correo personal.</p>
               <p>Esto importa por una razón práctica: cuando alguien entra, sale o cambia de puesto, se ajusta la pertenencia al grupo y los avisos siguen llegando a quien corresponde. Si el sistema enviara a personas, cada cambio de plantilla obligaría a editar la configuración del CRM.</p>
@@ -1294,6 +1419,7 @@ al emitir evento e con datos d:
           <summary>
             <span class="n">05</span>
             <h3>El expediente se crea solo en Drive</h3>
+            <span class="marca marca-nueva">Propuesta</span>
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
@@ -1344,10 +1470,11 @@ al subir documento:
           <summary>
             <span class="n">06</span>
             <h3>Alertas de vencimiento contractual y documental</h3>
+            <span class="marca marca-brecha">Brecha</span>
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
-            <p>Una revisión diaria busca contratos y documentos próximos a vencer y avisa a Jurídico con anticipación. Es la necesidad que hoy no tiene ningún soporte: los vencimientos se descubren cuando ya pasaron.</p>
+            <p>Una revisión diaria busca contratos y documentos próximos a vencer y avisa a Jurídico con anticipación. Requiere primero añadir la fecha de vigencia al documento, que hoy no existe en el modelo, y por eso es la brecha con más dependencia técnica de las tres.</p>
             <div class="escenario">
               <div class="escenario-col">
                 <h4>Hoy</h4>
@@ -1393,6 +1520,7 @@ al subir documento:
           <summary>
             <span class="n">07</span>
             <h3>Recordatorio automático de expediente incompleto</h3>
+            <span class="marca marca-nueva">Propuesta</span>
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
@@ -1440,7 +1568,8 @@ al subir documento:
         <details class="finding-details">
           <summary>
             <span class="n">08</span>
-            <h3>Informe de avance por cliente para Dirección</h3>
+            <h3>Informe de avance por cliente, para cada área</h3>
+            <span class="marca marca-nueva">Propuesta</span>
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
@@ -1490,16 +1619,16 @@ al subir documento:
                   <text class="t1" x="600" y="27">Dirección</text>
                   <text class="t2" x="600" y="44">informe interno</text>
                 </g>
-                <g class="nodo n4 destino futuro">
+                <g class="nodo n4 destino">
                   <rect class="caja" x="520" y="58" width="160" height="48" rx="12"/>
-                  <text class="t1" x="600" y="79">Cliente</text>
-                  <text class="t2" x="600" y="96">portal, fase 5</text>
+                  <text class="t1" x="600" y="79">Portal</text>
+                  <text class="t2" x="600" y="96">contacto de agencia</text>
                 </g>
                 <circle class="pk r1" r="5" style="offset-path:path('M180 56 H230')"/>
                 <circle class="pk r2" r="5" style="offset-path:path('M420 56 H455 Q470 56 485 30 H520')"/>
                 <circle class="pk r3" r="5" style="offset-path:path('M420 56 H455 Q470 56 485 82 H520')"/>
               </svg>
-              <figcaption>Un solo generador: cada área pide su informe y el filtro decide qué sale.</figcaption>
+              <figcaption>Un solo generador: cada área pide su informe, y el filtro de audiencia decide qué sale hacia dentro y qué hacia el portal.</figcaption>
             </figure>
             <p class="finding-cierre">Este mismo informe, expuesto al cliente en lugar de a Dirección, <b>es literalmente el portal de consulta de trámites</b>. El trabajo ya está hecho, solo cambia quién lo ve.</p>
             <details class="tecnico">
@@ -1527,7 +1656,7 @@ tarea semanal (viernes 08:00):
   para cada c en cliente donde c.seguimiento_direccion = true:
       doc = armar_informe(c.id, "interno")
       enviar_correo(DIRECCION, doc)</div>
-                <p style="margin-top:0.75rem">Separar la audiencia desde el inicio evita rehacer el generador cuando llegue el portal: la fase 5 solo agrega la ruta pública y reutiliza la misma función con <code>audiencia = "cliente"</code>.</p>
+                <p style="margin-top:0.75rem">Separar la audiencia desde el inicio permite reutilizar el mismo generador para el portal de agencias, que ya existe: cambia el valor de <code>audiencia</code> y el filtro hace el resto.</p>
               </div>
             </details>
           </div>
@@ -1560,6 +1689,7 @@ tarea semanal (viernes 08:00):
           <summary>
             <span class="n">01</span>
             <h3>Leer la constancia fiscal y llenar el formulario</h3>
+            <span class="marca marca-nueva">Propuesta</span>
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
@@ -1655,6 +1785,7 @@ al recibir respuesta:
           <summary>
             <span class="n">02</span>
             <h3>Clasificar el documento que se sube</h3>
+            <span class="marca marca-nueva">Propuesta</span>
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
@@ -1683,6 +1814,7 @@ sino:
           <summary>
             <span class="n">03</span>
             <h3>Detectar clientes duplicados</h3>
+            <span class="marca marca-nueva">Propuesta</span>
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
@@ -1713,12 +1845,13 @@ sino:
           <summary>
             <span class="n">04</span>
             <h3>Ordenar los domicilios a un formato único</h3>
+            <span class="marca marca-nueva">Propuesta</span>
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
             <div class="glosa">
-              <p><b>Cuál es el problema.</b> La misma dirección se captura de formas distintas según quién la escriba. Una persona pone Av. Insurgentes Sur 1234, Col. Del Valle. Otra pone AVENIDA INSURGENTES SUR NO 1234 COLONIA DEL VALLE. Son el mismo lugar, pero para el sistema son dos textos que no tienen nada que ver.</p>
-              <p>Eso rompe la búsqueda, impide agrupar clientes por zona y complica la planeación de rutas de instalación, porque no hay manera de saber que dos servicios están en la misma colonia.</p>
+              <p><b>Qué está resuelto y qué no.</b> El módulo ya guarda el municipio contra un catálogo y permite adjuntar el enlace de Maps de una dirección, así que agrupar por municipio y localizar un punto ya funciona. Lo que sigue libre es la calle: una persona escribe Av. Insurgentes Sur 1234, Col. Del Valle y otra escribe AVENIDA INSURGENTES SUR NO 1234 COLONIA DEL VALLE.</p>
+              <p>Eso rompe la búsqueda por dirección y complica la planeación de rutas dentro de un mismo municipio, porque no hay manera de saber que dos servicios están en la misma colonia.</p>
             </div>
             <p>La IA reescribe la dirección a una estructura fija de calle, número, colonia, código postal, municipio y estado, y muestra el texto original al lado del propuesto para que una persona apruebe el cambio. Nunca se sobrescribe el original en silencio.</p>
             <p class="finding-cierre">Quien confirma es <b>Administración, con ambos textos a la vista</b>.</p>
@@ -1746,7 +1879,8 @@ los campos estructurados quedan vacíos</div>
         <details class="finding-details">
           <summary>
             <span class="n">05</span>
-            <h3>Resumen de cuenta dentro del informe de Dirección</h3>
+            <h3>Resumen de cuenta dentro del informe</h3>
+            <span class="marca marca-nueva">Propuesta</span>
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
@@ -1775,6 +1909,7 @@ entrada = armar_informe(cliente_id, "interno")   // el mismo JSON del informe</d
           <summary>
             <span class="n">06</span>
             <h3>Migrar los archivos actuales al padrón nuevo</h3>
+            <span class="marca marca-nueva">Propuesta</span>
             <span class="finding-toggle" aria-hidden="true"></span>
           </summary>
           <div class="finding-body">
@@ -1900,36 +2035,36 @@ fase 5  solo lo aprobado se escribe en cliente, sucursal, contacto</div>
         <div class="fase">
           <span class="fase-n" aria-hidden="true">1</span>
           <div>
-            <h3>Modelo de datos y migración</h3>
-            <p>Las cuatro entidades, los dos estados y la consolidación de los archivos actuales con revisión por área. Sin esta base, ninguna automatización posterior tiene dónde apoyarse.</p>
+            <h3>Separar los dos estados y decir qué falta</h3>
+            <p>Partir el campo de estado en estado comercial y estado de expediente, y que la columna de datos fiscales nombre el documento que falta en lugar de decir solo Incompletos. Son las dos brechas que se resuelven sin añadir nada al modelo, solo separando lo que hoy está junto y mostrando lo que ya se sabe.</p>
           </div>
         </div>
         <div class="fase">
           <span class="fase-n" aria-hidden="true">2</span>
           <div>
-            <h3>Alta por enlace y reglas de servidor</h3>
-            <p>El alta por enlace es esto: en lugar de pedir los documentos por WhatsApp y capturarlos a mano, el sistema genera una dirección web única para esa agencia, con un código que solo funciona para ella y que caduca. La agencia entra ahí sin cuenta ni contraseña, llena el formulario y sube su documentación, y el registro se crea solo. En la misma fase, la regla que impide instalar sin datos fiscales pasa al servidor y deja de ser un aviso que se puede ignorar. Es donde se corta el origen de la mayoría de los errores.</p>
+            <h3>Vigencia documental y alertas de vencimiento</h3>
+            <p>Añadir la fecha de vigencia al documento, que hoy no existe, la columna que la muestra en la lista, y la revisión diaria que avisa a Jurídico a 60, 30 y 7 días. Es la brecha con dependencia técnica real, porque toca el modelo de datos.</p>
           </div>
         </div>
         <div class="fase">
           <span class="fase-n" aria-hidden="true">3</span>
           <div>
-            <h3>Avisos por correo y expediente en Drive</h3>
-            <p>Cada alta y cada cambio de datos fiscales sale por correo a la dirección del área que le corresponde, con la plantilla que esa área necesita y nada más. En paralelo, cada cliente estrena su carpeta en Drive, y todo documento que se sube cae ahí con los permisos del área que puede verlo.</p>
+            <h3>Expediente en Drive y avisos hacia dentro</h3>
+            <p>Los documentos tienen un solo lugar con permisos por área, y el mecanismo de avisos que ya existe hacia las agencias se extiende a las áreas internas de DPROMA, con una plantilla distinta por área.</p>
           </div>
         </div>
         <div class="fase">
           <span class="fase-n" aria-hidden="true">4</span>
           <div>
-            <h3>Informes por área, no solo para Dirección</h3>
-            <p>El generador es uno solo y el filtro de audiencia decide qué sale, así que sirve a cada área con su propia pregunta: Dirección quiere el avance de una cuenta, Comercial quiere el estado de su cartera para autogestionarse sin pedirle datos a nadie, Administración quiere qué expedientes están frenando operación, y Finanzas quiere qué órdenes no se pueden facturar todavía. Bajo demanda desde la ficha, y programados para quien marque su seguimiento.</p>
+            <h3>Vista 360, informes y cobertura de marca</h3>
+            <p>Definir qué reúne la vista 360, y construir el generador de informes con filtro de audiencia que sirve a cada área con su propia pregunta. Aquí entra el mapa de cobertura por marca y la lista de agencias frías, que el eje comercial ya permite calcular.</p>
           </div>
         </div>
-        <div class="fase fase--futura">
+        <div class="fase">
           <span class="fase-n" aria-hidden="true">5</span>
           <div>
-            <h3>Portal del cliente <span class="fase-etiqueta">Fuera del alcance actual</span></h3>
-            <p>Línea futura, no parte del plan que se ejecuta ahora. Aun así condiciona una decisión de la fase 4: si el generador de informes nace con el filtro de audiencia previsto, abrirlo al cliente más adelante es añadir una ruta pública. Si nace sin él, hay que rehacerlo entero.</p>
+            <h3>Lectura y clasificación de documentos</h3>
+            <p>Los casos de inteligencia artificial, empezando por leer la constancia fiscal para llenar el formulario y clasificar lo que sube el cliente. Va al final porque se apoya en todo lo anterior y porque conviene entrar cuando el resto ya es estable.</p>
           </div>
         </div>
       </div>
@@ -1971,7 +2106,9 @@ fase 5  solo lo aprobado se escribe en cliente, sucursal, contacto</div>
         io.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+  }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
+  /* threshold 0: con 0.15 un bloque más alto que la ventana nunca llegaba a
+     mostrar el 15% exigido y se quedaba invisible para siempre. */
   els.forEach(function(el){ io.observe(el); });
 })();
 
