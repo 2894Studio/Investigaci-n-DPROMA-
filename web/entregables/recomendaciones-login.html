@@ -189,6 +189,285 @@ section + section{ border-top: 1px solid var(--border); }
   .rec-list li{ grid-template-columns: 1.75rem 1fr; gap: 0 0.75rem; }
 }
 
+/* ───────────── Simulaciones wireframe ─────────────
+   Maquetas de baja fidelidad animadas con CSS, sin librerías: enseñan el
+   comportamiento recomendado frente al habitual sin comprometer decisiones
+   visuales que todavía no están tomadas.
+   Cada figura declara su ciclo en --cyc y el fotograma en el que se congela
+   (--freeze) cuando el sistema pide movimiento reducido. */
+.wire{
+  --cyc: 9s;
+  --freeze: -6.2s;
+  --err: #b32d2d; /* 5.1:1 sobre el gris de la maqueta — el mínimo que pide este mismo entregable */
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 1.5rem 1.75rem 1.35rem;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .wire{ --err:#ff7b7b; } }
+:root[data-theme="dark"] .wire{ --err:#ff7b7b; }
+@media (max-width: 560px){ .wire{ padding: 1.25rem 1.1rem 1.1rem; } }
+
+.wire-head{ display:flex; align-items:center; gap:0.5rem 1rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+.wire-head .wire-title{ font-size:1.0625rem; font-weight:700; flex:1 1 16ch; }
+.wire-tag{
+  flex:none; font-size:0.6875rem; font-weight:700; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  padding:0.3em 0.7em; border-radius:999px;
+}
+.wire-toggle{
+  flex:none; appearance:none; font-family:inherit; font-size:0.75rem; font-weight:700;
+  color:var(--text-muted); background:var(--surface); border:1px solid var(--border);
+  border-radius:999px; padding:0 0.95em; min-height:2.25rem; cursor:pointer;
+}
+.wire-toggle:hover{ color:var(--accent); border-color:var(--accent); }
+
+.wire-stage{ display:grid; gap:1.5rem; }
+.wire-stage--split{ grid-template-columns:repeat(2,1fr); }
+@media (max-width: 720px){ .wire-stage--split{ grid-template-columns:1fr; } }
+.wire-panel{ display:flex; flex-direction:column; gap:0.65rem; min-width:0; }
+.wire-panel-label{
+  display:flex; align-items:center; gap:0.45em; font-size:0.75rem; font-weight:700;
+  letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted);
+}
+.wire-panel-label::before{ content:""; width:0.5em; height:0.5em; border-radius:999px; background:currentColor; flex:none; }
+.wire-panel.is-good .wire-panel-label{ color:var(--accent); }
+.wire-panel.is-bad .wire-panel-label{ color:var(--err); }
+.wire figcaption{ margin:1.1rem 0 0; font-size:0.8125rem; line-height:1.5; color:var(--text-muted); max-width:74ch; }
+.wire-refs{ display:block; margin-top:0.35rem; font-weight:700; color:var(--accent); }
+
+/* Maqueta de la pantalla */
+.wf{
+  position:relative; overflow:hidden;
+  border:1.5px solid var(--border); border-radius:12px;
+  background:var(--surface-alt); padding:1.05rem 1.1rem 1.2rem;
+}
+.wf-logo{ width:2.1rem; height:2.1rem; border-radius:7px; border:1.5px dashed var(--border); margin-bottom:0.85rem; }
+.wf-label{ display:block; font-size:0.6875rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.3rem; }
+.wf-field{
+  position:relative; display:flex; align-items:center; gap:0.5rem;
+  height:2.5rem; padding:0 0.7rem; margin-bottom:0.8rem;
+  border:1.5px solid var(--border); border-radius:8px; background:var(--surface);
+}
+.wf-field.is-err{ border-color:var(--err); }
+.wf-field:last-of-type{ margin-bottom:0; }
+.wf-slot{ display:grid; min-width:0; }
+.wf-slot > *{ grid-area:1 / 1; }
+.wf-value{ font-size:0.8125rem; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.wf-value.is-ph{ color:var(--text-muted); }
+.wf-dots{ letter-spacing:0.16em; }
+.wf-eye{ position:relative; margin-left:auto; flex:none; width:1.3rem; height:1.3rem; color:var(--text-muted); }
+.wf-eye svg{ position:absolute; inset:0; width:100%; height:100%; }
+.wf-ico-err{ flex:none; width:1rem; height:1rem; color:var(--err); margin-left:auto; }
+
+.wf-check{ display:flex; align-items:center; gap:0.85rem; margin:0.85rem 0 0.9rem; font-size:0.75rem; color:var(--text-muted); }
+.wf-box{ position:relative; flex:none; width:1.05rem; height:1.05rem; border:1.5px solid var(--border); border-radius:4px; background:var(--surface); }
+
+.wf-btn{
+  position:relative; display:grid; place-items:center;
+  height:2.5rem; margin-top:0.9rem; border-radius:8px;
+  background:var(--accent); color:var(--on-accent);
+  font-size:0.8125rem; font-weight:700;
+}
+.wf-btn > span{ grid-area:1 / 1; display:flex; align-items:center; gap:0.5rem; }
+.wf-spin{ flex:none; width:0.9rem; height:0.9rem; border-radius:50%; border:2px solid currentColor; border-top-color:transparent; }
+
+.wf-msgbox{ min-height:3.6rem; padding-top:0.7rem; }
+.wf-msgbox--sm{ min-height:2.4rem; }
+.wf-msg{ margin:0; display:flex; align-items:flex-start; gap:0.4rem; font-size:0.75rem; line-height:1.35; color:var(--err); }
+.wf-msg .wf-ico{ flex:none; width:0.9rem; height:0.9rem; margin-top:0.08rem; }
+.wf-sub{ margin:0.35rem 0 0; font-size:0.75rem; line-height:1.35; color:var(--text-muted); }
+.wf-link{ display:inline-block; position:relative; margin-top:0.5rem; font-size:0.75rem; font-weight:700; color:var(--accent); }
+.wf-pad{ height:2.4rem; }
+
+/* Cursor y pulsación */
+.wf-cursor{ position:absolute; left:50%; top:50%; z-index:4; width:1.05rem; height:1.05rem; color:var(--text); pointer-events:none; }
+.wf-cursor svg{ width:100%; height:100%; display:block; filter:drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+.wf-ripple{
+  position:absolute; left:50%; top:50%; z-index:3; width:2.4rem; height:2.4rem;
+  margin:-1.2rem 0 0 -1.2rem; border-radius:50%; border:2px solid var(--on-accent); opacity:0; pointer-events:none;
+}
+.wf-ripple--dead{ border-color:var(--text-muted); }
+
+/* Anillo de foco para el recorrido de tabulación */
+.wf-focus{ position:absolute; inset:-5px; border:2px solid var(--accent); border-radius:10px; opacity:0; pointer-events:none; }
+.wf-focus--tight{ inset:-6px; border-radius:8px; }
+/* En objetivos pequeños pegados a su etiqueta, la insignia se pone a la
+   izquierda para no tapar el texto que está justo al lado. */
+.wf-focus--flip .wf-focus-n{ right:auto; left:-11px; }
+.wf-focus-n{
+  position:absolute; top:-10px; right:-10px; width:18px; height:18px; border-radius:50%;
+  background:var(--accent); color:var(--on-accent); font-size:10px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; line-height:1;
+}
+
+/* Tira de peticiones al servidor */
+.wf-net{ display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; margin-top:0.15rem; }
+.wf-net-l{ font-size:0.6875rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-muted); margin-right:0.15rem; }
+.wf-net-c{
+  font-size:0.6875rem; font-weight:700; color:var(--err);
+  border:1px solid color-mix(in srgb, var(--err) 40%, transparent);
+  background: color-mix(in srgb, var(--err) 10%, transparent);
+  border-radius:999px; padding:0.2em 0.6em; opacity:0;
+}
+.wf-net-c.is-ok{
+  color:var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* Etiqueta de estado de la simulación (figura del color) */
+.wire-note{ display:grid; margin-bottom:1rem; font-size:0.75rem; font-weight:700; color:var(--text-muted); min-height:1.2rem; }
+.wire-note > span{ grid-area:1 / 1; }
+
+/* Indicador de tecla */
+.wf-key{
+  display:inline-flex; align-items:center; justify-content:center; min-width:2.6rem; height:1.6rem;
+  border:1.5px solid var(--border); border-bottom-width:3px; border-radius:6px; background:var(--surface);
+  font-size:0.6875rem; font-weight:700; color:var(--text-muted);
+}
+.wf-step{ display:grid; min-height:1.3rem; font-size:0.75rem; font-weight:700; color:var(--accent); }
+.wf-step > span{ grid-area:1 / 1; }
+.wf-keyrow{ display:flex; align-items:center; gap:0.6rem; margin-top:0.9rem; }
+
+/* Motor de animación compartido */
+.wire .wa{
+  animation-duration: var(--d, var(--cyc));
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+.wire .wa--2s{ --d:2s; }
+.wire .wa--spin{ --d:0.75s; animation-name:wf-spin; }
+@keyframes wf-spin{ to{ transform:rotate(360deg) } }
+
+.wire.is-paused .wa{ animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce){
+  /* La regla global de la página fuerza animation-duration a 0.001ms, que
+     dejaría cada simulación en su último fotograma: todo oculto. Aquí se
+     restituye la duración solo para poder congelar la animación, en pausa
+     desde el primer momento, en el fotograma que explica el punto. No hay
+     movimiento en ningún caso; se usa el motor de animación como si fuera
+     una imagen fija. */
+  .wire .wa{
+    animation-duration: var(--d, var(--cyc)) !important;
+    animation-delay: var(--freeze) !important;
+    animation-play-state: paused !important;
+  }
+  .wire .wa--spin{ animation: none !important; }
+  .wire-toggle{ display:none; }
+}
+
+/* Figura 1 — el error conserva lo escrito */
+.wa-c1{ animation-name:w1-cursor; }
+.wa-r1{ animation-name:w1-ripple; }
+.wa-press1{ animation-name:w1-press; }
+.wa-clear{ animation-name:w1-clear; }
+.wa-keep{ animation-name:w1-keep; }
+.wa-err{ animation-name:w1-err; }
+.wa-show{ animation-name:w1-show; }
+@keyframes w1-cursor{
+  0%,8%    { transform:translate(64px,52px); opacity:0 }
+  13%      { transform:translate(64px,52px); opacity:1 }
+  23%      { transform:translate(-4px,2px);  opacity:1 }
+  88%      { transform:translate(-4px,2px);  opacity:1 }
+  95%,100% { transform:translate(-4px,2px);  opacity:0 }
+}
+@keyframes w1-ripple{
+  0%,24%   { opacity:0; transform:scale(.3) }
+  26%      { opacity:.85; transform:scale(.55) }
+  33%,100% { opacity:0; transform:scale(1.5) }
+}
+@keyframes w1-press{ 0%,24%{ transform:none } 26%{ transform:scale(.97) } 29%,100%{ transform:none } }
+@keyframes w1-clear{ 0%,29%{ opacity:1 } 33%,92%{ opacity:0 } 97%,100%{ opacity:1 } }
+@keyframes w1-keep{ 0%,100%{ opacity:1 } }
+@keyframes w1-err{
+  0%,29%   { border-color:var(--border) }
+  33%,92%  { border-color:var(--err) }
+  97%,100% { border-color:var(--border) }
+}
+@keyframes w1-show{ 0%,30%{ opacity:0 } 34%,92%{ opacity:1 } 97%,100%{ opacity:0 } }
+
+/* Figura 2 — el botón dice que está trabajando */
+.wa-c2{ animation-name:w2-cursor; }
+.wa-r2a{ animation-name:w2-r1; }
+.wa-r2b{ animation-name:w2-r2; }
+.wa-r2c{ animation-name:w2-r3; }
+.wa-chip1{ animation-name:w2-chip1; }
+.wa-chip2{ animation-name:w2-chip2; }
+.wa-chip3{ animation-name:w2-chip3; }
+.wa-idle{ animation-name:w2-idle; }
+.wa-busy{ animation-name:w2-busy; }
+.wa-dim{ animation-name:w2-dim; }
+@keyframes w2-cursor{
+  0%,7%    { transform:translate(64px,52px); opacity:0 }
+  12%      { transform:translate(64px,52px); opacity:1 }
+  19%      { transform:translate(-4px,2px);  opacity:1 }
+  23%      { transform:translate(3px,-4px) }
+  27%      { transform:translate(-4px,2px) }
+  31%      { transform:translate(-9px,-3px) }
+  35%      { transform:translate(-4px,2px) }
+  88%      { transform:translate(-4px,2px);  opacity:1 }
+  95%,100% { transform:translate(-4px,2px);  opacity:0 }
+}
+@keyframes w2-r1{ 0%,19%{opacity:0;transform:scale(.3)} 21%{opacity:.85;transform:scale(.55)} 26%,100%{opacity:0;transform:scale(1.5)} }
+@keyframes w2-r2{ 0%,27%{opacity:0;transform:scale(.3)} 29%{opacity:.85;transform:scale(.55)} 34%,100%{opacity:0;transform:scale(1.5)} }
+@keyframes w2-r3{ 0%,35%{opacity:0;transform:scale(.3)} 37%{opacity:.85;transform:scale(.55)} 42%,100%{opacity:0;transform:scale(1.5)} }
+@keyframes w2-chip1{ 0%,20%{opacity:0} 23%,90%{opacity:1} 96%,100%{opacity:0} }
+@keyframes w2-chip2{ 0%,28%{opacity:0} 31%,90%{opacity:1} 96%,100%{opacity:0} }
+@keyframes w2-chip3{ 0%,36%{opacity:0} 39%,90%{opacity:1} 96%,100%{opacity:0} }
+@keyframes w2-idle{ 0%,19%{opacity:1} 22%,92%{opacity:0} 97%,100%{opacity:1} }
+@keyframes w2-busy{ 0%,19%{opacity:0} 22%,92%{opacity:1} 97%,100%{opacity:0} }
+@keyframes w2-dim{ 0%,19%{opacity:1} 22%,92%{opacity:.5} 97%,100%{opacity:1} }
+
+/* Figura 3 — mostrar contraseña */
+.wa-c3{ animation-name:w3-cursor; }
+.wa-r3a{ animation-name:w3-r1; }
+.wa-r3b{ animation-name:w3-r2; }
+.wa-hide{ animation-name:w3-hide; }
+.wa-plain{ animation-name:w3-plain; }
+@keyframes w3-cursor{
+  0%,9%    { transform:translate(40px,40px); opacity:0 }
+  14%      { transform:translate(40px,40px); opacity:1 }
+  22%      { transform:translate(-2px,3px);  opacity:1 }
+  90%      { transform:translate(-2px,3px);  opacity:1 }
+  96%,100% { transform:translate(-2px,3px);  opacity:0 }
+}
+@keyframes w3-r1{ 0%,23%{opacity:0;transform:scale(.3)} 25%{opacity:.85;transform:scale(.5)} 31%,100%{opacity:0;transform:scale(1.4)} }
+@keyframes w3-r2{ 0%,62%{opacity:0;transform:scale(.3)} 64%{opacity:.85;transform:scale(.5)} 70%,100%{opacity:0;transform:scale(1.4)} }
+@keyframes w3-hide{ 0%,24%{opacity:1} 27%,62%{opacity:0} 66%,100%{opacity:1} }
+@keyframes w3-plain{ 0%,24%{opacity:0} 27%,62%{opacity:1} 66%,100%{opacity:0} }
+
+/* Figura 4 — el color no puede ser la única señal */
+.wa-gray{ animation-name:w4-gray; }
+.wa-lab1{ animation-name:w4-lab1; }
+.wa-lab2{ animation-name:w4-lab2; }
+@keyframes w4-gray{ 0%,30%{ filter:none } 38%,86%{ filter:grayscale(1) } 94%,100%{ filter:none } }
+@keyframes w4-lab1{ 0%,30%{opacity:1} 36%,88%{opacity:0} 94%,100%{opacity:1} }
+@keyframes w4-lab2{ 0%,32%{opacity:0} 38%,86%{opacity:1} 92%,100%{opacity:0} }
+
+/* Figura 5 — orden de tabulación */
+.wa-f1{ animation-name:w5-f1; }
+.wa-f2{ animation-name:w5-f2; }
+.wa-f3{ animation-name:w5-f3; }
+.wa-f4{ animation-name:w5-f4; }
+.wa-f5{ animation-name:w5-f5; }
+.wa-f6{ animation-name:w5-f6; }
+.wa-tab{ animation-name:w5-tab; }
+@keyframes w5-f1{ 0%,15.2%{opacity:1} 16.8%,100%{opacity:0} }
+@keyframes w5-f2{ 0%,15.2%{opacity:0} 16.8%,31.9%{opacity:1} 33.5%,100%{opacity:0} }
+@keyframes w5-f3{ 0%,31.9%{opacity:0} 33.5%,48.6%{opacity:1} 50.2%,100%{opacity:0} }
+@keyframes w5-f4{ 0%,48.6%{opacity:0} 50.2%,65.3%{opacity:1} 66.9%,100%{opacity:0} }
+@keyframes w5-f5{ 0%,65.3%{opacity:0} 66.9%,82%{opacity:1} 83.6%,100%{opacity:0} }
+@keyframes w5-f6{ 0%,82%{opacity:0} 83.6%,98%{opacity:1} 99.5%,100%{opacity:0} }
+@keyframes w5-tab{ 0%{transform:scale(1)} 9%{transform:scale(1.15)} 30%,100%{transform:scale(1)} }
+
+.wire-panel .wf{ flex:1 1 auto; }
+.wire-stage--solo{ max-width:23rem; }
+.wf-msgbox--lg{ min-height:5.4rem; }
+
 footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
 .footer-meta{ display:flex; justify-content: space-between; align-items:center; flex-wrap: wrap; gap: 1rem; font-size: 0.8125rem; color: var(--text-muted); }
 .footer-meta a{ color: var(--text-muted); }
@@ -254,6 +533,117 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
           <li><span>Enlace de "¿Olvidaste tu contraseña?" siempre visible, no solo tras un error.</span></li>
         </ul>
       </article>
+
+      <figure class="wire reveal" style="--cyc:9s; --freeze:-6.2s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">Un error no debería borrar lo que ya escribiste</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Lo habitual</span>
+            <div class="wf">
+              <div class="wf-logo"></div>
+              <span class="wf-label">Usuario</span>
+              <div class="wf-field wa wa-err"><span class="wf-value wa wa-clear">operaciones@dproma.mx</span></div>
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field wa wa-err"><span class="wf-value wf-dots wa wa-clear">••••••••••</span></div>
+              <div class="wf-btn wa wa-press1">
+                <span>Iniciar sesión</span>
+                <span class="wf-ripple wa wa-r1"></span>
+                <span class="wf-cursor wa wa-c1"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span>
+              </div>
+              <div class="wf-msgbox wf-msgbox--lg">
+                <p class="wf-msg wa wa-show">Dato inválido</p>
+                <span class="wf-link wa wa-show">¿Olvidaste tu contraseña?</span>
+              </div>
+            </div>
+          </div>
+          <div class="wire-panel is-good">
+            <span class="wire-panel-label">Recomendado</span>
+            <div class="wf">
+              <div class="wf-logo"></div>
+              <span class="wf-label">Usuario</span>
+              <div class="wf-field wa wa-err"><span class="wf-value wa wa-keep">operaciones@dproma.mx</span></div>
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field wa wa-err"><span class="wf-value wf-dots wa wa-clear">••••••••••</span></div>
+              <div class="wf-btn wa wa-press1">
+                <span>Iniciar sesión</span>
+                <span class="wf-ripple wa wa-r1"></span>
+                <span class="wf-cursor wa wa-c1"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span>
+              </div>
+              <div class="wf-msgbox wf-msgbox--lg">
+                <p class="wf-msg wa wa-show"><svg class="wf-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.8 2 20.2h20z"/><path d="M12 9.8v4.4"/><path d="M12 17.3h.01"/></svg>Usuario o contraseña incorrectos</p>
+                <p class="wf-sub wa wa-show">Te quedan 2 de 5 intentos antes del bloqueo.</p>
+                <span class="wf-link">¿Olvidaste tu contraseña?</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption>Las dos pantallas reciben el mismo error. La habitual vacía los dos campos y responde «Dato inválido», que no dice qué corregir, y el enlace de recuperación solo aparece cuando ya se ha fallado. La recomendada conserva el correo, no revela cuál de los dos campos falló, avisa de cuántos intentos quedan y mantiene el enlace visible desde el principio. Reintentar cuesta una contraseña, no un formulario entero.
+          <span class="wire-refs">Puntos 1, 5, 6, 7 y 10</span>
+        </figcaption>
+      </figure>
+      <figure class="wire reveal" style="--cyc:10s; --freeze:-6s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">El botón tiene que decir que está trabajando</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Sin feedback</span>
+            <div class="wf">
+              <div class="wf-logo"></div>
+              <span class="wf-label">Usuario</span>
+              <div class="wf-field"><span class="wf-value">operaciones@dproma.mx</span></div>
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field"><span class="wf-value wf-dots">••••••••••</span></div>
+              <div class="wf-btn">
+                <span>Iniciar sesión</span>
+                <span class="wf-ripple wa wa-r2a"></span>
+                <span class="wf-ripple wa wa-r2b"></span>
+                <span class="wf-ripple wa wa-r2c"></span>
+                <span class="wf-cursor wa wa-c2"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span>
+              </div>
+              <div class="wf-pad"></div>
+            </div>
+            <div class="wf-net">
+              <span class="wf-net-l">Al servidor</span>
+              <span class="wf-net-c wa wa-chip1">POST /login</span>
+              <span class="wf-net-c wa wa-chip2">POST /login</span>
+              <span class="wf-net-c wa wa-chip3">POST /login</span>
+            </div>
+          </div>
+          <div class="wire-panel is-good">
+            <span class="wire-panel-label">Con feedback</span>
+            <div class="wf">
+              <div class="wf-logo"></div>
+              <span class="wf-label">Usuario</span>
+              <div class="wf-field"><span class="wf-value">operaciones@dproma.mx</span></div>
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field"><span class="wf-value wf-dots">••••••••••</span></div>
+              <div class="wf-btn wa wa-dim">
+                <span class="wa wa-idle">Iniciar sesión</span>
+                <span class="wa wa-busy"><span class="wf-spin wa wa--spin"></span>Verificando…</span>
+                <span class="wf-ripple wa wa-r2a"></span>
+                <span class="wf-ripple wf-ripple--dead wa wa-r2b"></span>
+                <span class="wf-ripple wf-ripple--dead wa wa-r2c"></span>
+                <span class="wf-cursor wa wa-c2"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span>
+              </div>
+              <div class="wf-pad"></div>
+            </div>
+            <div class="wf-net">
+              <span class="wf-net-l">Al servidor</span>
+              <span class="wf-net-c is-ok wa wa-chip1">POST /login</span>
+            </div>
+          </div>
+        </div>
+        <figcaption>Las dos reciben tres pulsaciones. Sin feedback el botón no cambia de aspecto en ningún momento, así que volver a pulsar es la reacción natural: salen tres peticiones de acceso por un solo intento real. Con feedback el botón se apaga y pasa a «Verificando…» en la primera pulsación; las dos siguientes rebotan y solo sale una petición.
+          <span class="wire-refs">Punto 8</span>
+        </figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -277,6 +667,78 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
           <li><span>No uses solo color para indicar error, un error común es usar solo borde rojo sin icono ni texto.</span></li>
         </ul>
       </article>
+
+      <figure class="wire reveal" style="--cyc:8s; --freeze:-3.5s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">El ojo de mostrar contraseña</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <div class="wire-stage wire-stage--solo" aria-hidden="true">
+          <div class="wire-panel">
+            <div class="wf">
+              <div class="wf-logo"></div>
+              <span class="wf-label">Usuario</span>
+              <div class="wf-field"><span class="wf-value">operaciones@dproma.mx</span></div>
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field">
+                <span class="wf-slot">
+                  <span class="wf-value wf-dots wa wa-hide">••••••••••</span>
+                  <span class="wf-value wa wa-plain">Dpr0ma·2026</span>
+                </span>
+                <span class="wf-eye">
+                  <svg class="wa wa-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3.4 21 21"/><path d="M10.4 6.2A9.9 9.9 0 0 1 12 6.1c6 0 9.6 5.9 9.6 5.9a17.3 17.3 0 0 1-3.4 3.9"/><path d="M6.7 8A16.8 16.8 0 0 0 2.4 12s3.6 5.9 9.6 5.9a9.6 9.6 0 0 0 3.6-.7"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                  <svg class="wa wa-plain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.4 12S6 6.1 12 6.1 21.6 12 21.6 12 18 17.9 12 17.9 2.4 12 2.4 12Z"/><circle cx="12" cy="12" r="2.9"/></svg>
+                  <span class="wf-ripple wa wa-r3a"></span>
+                  <span class="wf-ripple wa wa-r3b"></span>
+                  <span class="wf-cursor wa wa-c3"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span>
+                </span>
+              </div>
+              <div class="wf-btn"><span>Iniciar sesión</span></div>
+            </div>
+          </div>
+        </div>
+        <figcaption>El icono alterna entre ocultar y mostrar sin recargar nada ni perder lo escrito. En escritorio no hay autocorrección del móvil que avise de un error de tecleo: comprobar la contraseña antes de enviarla es la única forma de no gastar un intento en una errata. El objetivo mide 24×24 px como mínimo y entra en el orden de tabulación.
+          <span class="wire-refs">Punto 3 de UI · Punto 2 de accesibilidad</span>
+        </figcaption>
+      </figure>
+      <figure class="wire reveal" style="--cyc:9s; --freeze:-1.5s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">El color no puede ser la única señal</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <p class="wire-note" aria-hidden="true">
+          <span class="wa wa-lab1">Con color</span>
+          <span class="wa wa-lab2">Simulación: el color no llega</span>
+        </p>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Solo borde rojo</span>
+            <div class="wf wa wa-gray">
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field is-err"><span class="wf-value wf-dots">••••••</span></div>
+              <div class="wf-msgbox wf-msgbox--sm"></div>
+            </div>
+          </div>
+          <div class="wire-panel is-good">
+            <span class="wire-panel-label">Borde, icono y texto</span>
+            <div class="wf wa wa-gray">
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field is-err">
+                <span class="wf-value wf-dots">••••••</span>
+                <svg class="wf-ico-err" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.8 2 20.2h20z"/><path d="M12 9.8v4.4"/><path d="M12 17.3h.01"/></svg>
+              </div>
+              <div class="wf-msgbox wf-msgbox--sm">
+                <p class="wf-msg">La contraseña debe tener al menos 8 caracteres</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption>Los dos campos están en el mismo error. La simulación retira el color a mitad del ciclo, que es lo que ocurre con una deficiencia en la percepción del rojo, con brillo alto en pantalla o al imprimir. Sin color, el campo que solo tenía borde rojo deja de comunicar que algo falla y parece un campo normal; el que suma icono y texto lo sigue diciendo, y además explica qué corregir.
+          <span class="wire-refs">Punto 5 de UI · Punto 5 de UX</span>
+        </figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -297,6 +759,60 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
           <li><span>Tamaño mínimo de objetivo interactivo: 24×24px CSS, recomendado 44×44px para checkboxes y toggles (2.5.8), aunque sea desktop conviene por trackpads/precisión.</span></li>
         </ul>
       </article>
+
+      <figure class="wire reveal" style="--cyc:12s; --freeze:-2.5s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">El recorrido de tabulación, parada por parada</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <div class="wire-stage wire-stage--solo" aria-hidden="true">
+          <div class="wire-panel">
+            <div class="wf">
+              <div class="wf-logo"></div>
+              <span class="wf-label">Usuario</span>
+              <div class="wf-field">
+                <span class="wf-value">operaciones@dproma.mx</span>
+                <span class="wf-focus wa wa-f1"><span class="wf-focus-n">1</span></span>
+              </div>
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field">
+                <span class="wf-value wf-dots">••••••••••</span>
+                <span class="wf-eye">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3.4 21 21"/><path d="M10.4 6.2A9.9 9.9 0 0 1 12 6.1c6 0 9.6 5.9 9.6 5.9a17.3 17.3 0 0 1-3.4 3.9"/><path d="M6.7 8A16.8 16.8 0 0 0 2.4 12s3.6 5.9 9.6 5.9a9.6 9.6 0 0 0 3.6-.7"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                  <span class="wf-focus wf-focus--tight wa wa-f3"><span class="wf-focus-n">3</span></span>
+                </span>
+                <span class="wf-focus wa wa-f2"><span class="wf-focus-n">2</span></span>
+              </div>
+              <div class="wf-check">
+                <span class="wf-box"><span class="wf-focus wf-focus--tight wf-focus--flip wa wa-f4"><span class="wf-focus-n">4</span></span></span>
+                <span>Recordarme en este equipo</span>
+              </div>
+              <div class="wf-btn">
+                <span>Iniciar sesión</span>
+                <span class="wf-focus wa wa-f5"><span class="wf-focus-n">5</span></span>
+              </div>
+              <div class="wf-msgbox wf-msgbox--sm">
+                <span class="wf-link">¿Olvidaste tu contraseña?<span class="wf-focus wf-focus--tight wa wa-f6"><span class="wf-focus-n">6</span></span></span>
+              </div>
+            </div>
+            <div class="wf-keyrow">
+              <span class="wf-key wa wa--2s wa-tab">Tab</span>
+              <span class="wf-step">
+                <span class="wa wa-f1">1 · Usuario</span>
+                <span class="wa wa-f2">2 · Contraseña</span>
+                <span class="wa wa-f3">3 · Mostrar u ocultar</span>
+                <span class="wa wa-f4">4 · Recordarme</span>
+                <span class="wa wa-f5">5 · Iniciar sesión</span>
+                <span class="wa wa-f6">6 · ¿Olvidaste tu contraseña?</span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <figcaption>Seis paradas en el mismo orden en que se lee la pantalla, sin saltos hacia atrás ni elementos que se queden fuera del recorrido. El foco se ve siempre: quien navega con teclado sabe en todo momento dónde está y qué va a activar al pulsar Intro.
+          <span class="wire-refs">Punto 1 de accesibilidad</span>
+        </figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -359,6 +875,20 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     raf = requestAnimationFrame(function(){ update(); raf = null; });
   }, { passive: true });
   update();
+})();
+
+/* Pausa de las simulaciones — WCAG 2.2.2: todo movimiento que arranca solo,
+   dura más de 5s y convive con texto necesita una forma de detenerlo. */
+(function(){
+  document.querySelectorAll('[data-wire-toggle]').forEach(function(btn){
+    var fig = btn.closest('.wire');
+    if(!fig) return;
+    btn.addEventListener('click', function(){
+      var paused = fig.classList.toggle('is-paused');
+      btn.setAttribute('aria-pressed', paused ? 'true' : 'false');
+      btn.textContent = paused ? 'Reproducir' : 'Pausar';
+    });
+  });
 })();
 </script>
 
