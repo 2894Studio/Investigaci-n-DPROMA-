@@ -25,18 +25,35 @@ comentarios. Son unos cinco minutos y no hace falta saber SQL.
 La siembra deja las 22 iniciativas del plan con las de corto plazo ya fechadas. Ejecutarla
 dos veces no duplica nada.
 
-## 3. Comprobar que la base no queda abierta
+## 3. Comprobar que quedó bien
 
 Esto no te lo saltes. Nueva consulta, pega esto y ejecútalo:
 
 ```sql
-select tablename, rowsecurity from pg_tables
-where schemaname = 'public'
-  and tablename in ('initiatives','deliverables','comments','changes','settings');
+select
+  (select count(*) from initiatives)                             as iniciativas,
+  (select count(*) from initiatives where start_date is not null) as con_fecha,
+  (select count(*) from deliverables)                            as entregables,
+  (select count(*) from pg_tables
+     where schemaname = 'public' and rowsecurity
+       and tablename in ('initiatives','deliverables','comments','changes','settings'))
+                                                                 as tablas_protegidas,
+  (select count(*) from information_schema.role_table_grants
+     where grantee = 'anon' and privilege_type = 'DELETE'
+       and table_name in ('initiatives','deliverables','comments','changes','settings'))
+                                                                 as permisos_de_borrado;
 ```
 
-Las cinco filas tienen que salir con `rowsecurity` en **true**. Si alguna sale en `false`,
-algo falló al ejecutar `schema.sql`: vuelve a lanzarlo entero antes de seguir.
+Tiene que salir exactamente esto:
+
+| iniciativas | con_fecha | entregables | tablas_protegidas | permisos_de_borrado |
+|---|---|---|---|---|
+| 22 | 9 | 3 | **5** | **0** |
+
+Los dos últimos son los que importan de verdad. `tablas_protegidas` por debajo de 5 significa
+que alguna tabla quedó abierta de par en par. `permisos_de_borrado` por encima de 0 significa
+que se puede vaciar el roadmap llamando a la API. En cualquiera de los dos casos, vuelve a
+ejecutar `schema.sql` entero antes de seguir.
 
 ## 4. Copiar las dos claves
 
@@ -57,6 +74,19 @@ window.ROADMAP_CONFIG = {
 
 Sube el cambio. En cuanto Vercel despliegue, el aviso amarillo de «Modo local» desaparece y
 lo que escriba cualquiera lo ven todos.
+
+## 6. Probar que se comparte de verdad
+
+Treinta segundos y sales de dudas:
+
+1. Abre `/roadmap`. El aviso amarillo ya no debería estar.
+2. Escribe tu nombre arriba, pincha una iniciativa y deja un comentario.
+3. Abre la misma página en una ventana de incógnito, o en el móvil.
+4. Pincha la misma iniciativa. El comentario tiene que estar ahí, con tu nombre.
+
+Si en el paso 2 sale un aviso rojo, el texto del error dice qué pasa. Los dos habituales:
+`401` o `permission denied` significa que la clave está mal copiada o que falta ejecutar
+`schema.sql`; `relation … does not exist`, que faltó ejecutarlo entero.
 
 ## Sobre las claves
 
