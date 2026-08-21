@@ -389,29 +389,38 @@
   .diag-grid{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,.8fr);
               gap:clamp(1.5rem,4vw,3rem); align-items:center; }
   @media (max-width:860px){ .diag-grid{ grid-template-columns:minmax(0,1fr); } }
-  .ecg{ display:flex; flex-direction:column; gap:.75rem; align-items:flex-start; }
-  .ecg-svg{ width:100%; max-width:24rem; height:auto; overflow:visible; }
+  /* El propio trazo es el control de pausa, así que es un <button>: se pulsa
+     con el ratón y también con el teclado, y lleva su nombre en aria-label. */
+  .ecg{
+    position:relative; display:block; width:100%; max-width:26rem;
+    padding:.6rem .5rem 1.6rem; margin:0; border:0; background:transparent; cursor:pointer;
+  }
+  .ecg-svg{ width:100%; height:auto; overflow:visible; display:block; }
   .ecg-base, .ecg-live{ fill:none; stroke-linecap:round; stroke-linejoin:round; }
   .ecg-base{ stroke:var(--border); stroke-width:1.6; }
   .ecg-live{
     stroke:var(--accent); stroke-width:2.2;
     stroke-dasharray:70 930;
-    animation: ecg-run 4.4s linear infinite;
+    animation: ecg-run 3.4s linear infinite;
     filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent) 45%, transparent));
   }
   @keyframes ecg-run{ from{ stroke-dashoffset:1000; } to{ stroke-dashoffset:0; } }
   .ecg.is-paused .ecg-live{ animation-play-state:paused; }
-  .ecg-toggle{
-    appearance:none; font-family:inherit; font-size:.6875rem; font-weight:700;
-    letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted);
-    background:transparent; border:1px solid var(--border); border-radius:999px;
-    padding:0 .8em; min-height:1.75rem; cursor:pointer; white-space:nowrap;
+  /* La pista solo asoma al apuntar o al llegar con el teclado: el control
+     existe siempre, pero no ensucia la página cuando no hace falta. */
+  .ecg-hint{
+    position:absolute; left:50%; bottom:-1.1rem; transform:translateX(-50%);
+    font-size:.6875rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--text-muted); opacity:0; transition:opacity .18s ease; pointer-events:none;
   }
-  .ecg-toggle:hover{ color:var(--accent); border-color:var(--accent); }
+  .ecg:hover .ecg-hint, .ecg:focus-visible .ecg-hint{ opacity:1; }
+  .ecg[aria-pressed="true"] .ecg-hint{ opacity:1; color:var(--accent); }
+  .ecg:hover .ecg-base{ stroke:color-mix(in srgb, var(--accent) 30%, var(--border)); }
   @media (prefers-reduced-motion: reduce){
-    /* Sin movimiento: se ve el trazo entero, quieto, y sobra el control. */
+    /* Sin movimiento: el trazo entero, quieto, y nada que pausar. */
     .ecg-live{ animation:none; stroke-dasharray:none; opacity:.5; }
-    .ecg-toggle{ display:none; }
+    .ecg{ cursor:default; }
+    .ecg-hint{ display:none; }
   }
 
   /* Roadmap en pequeño: solo lectura, lee el estado real de la herramienta.
@@ -508,14 +517,14 @@
         <p>Actualmente DPROMA gestiona la mayoría de sus operaciones de forma manual y dispersa. No existe una herramienta centralizada: la información se registra en hojas de cálculo (Excel), sin formatos comunes entre áreas. Las coordinaciones internas, con instaladores y clientes se realizan en gran medida por WhatsApp, lo que dificulta el seguimiento, la trazabilidad y la generación de reportes.</p>
         <p>DPROMA opera hoy dos negocios de alto crecimiento, instalación de cargadores eléctricos y gestoría vehicular, sostenidos por la memoria y disponibilidad de las personas, sin una capa digital que centralice información, sin gobernanza sobre cómo se usan los datos o la IA, y sin un solo panel donde la dirección pueda ver el estado real de la operación.</p>
       </div>
-      <div class="ecg reveal">
-        <svg class="ecg-svg" viewBox="0 0 240 80" role="img" aria-label="Trazo de electrocardiograma en movimiento, decorativo">
-          <path class="ecg-base" pathLength="1000" d="M0,40 h18 q5,-7 10,0 h8 l4,3 l5,-26 l5,38 l4,-15 h10 q8,-9 16,0 h40 h18 q5,-7 10,0 h8 l4,3 l5,-26 l5,38 l4,-15 h10 q8,-9 16,0 h40"/>
-          <path class="ecg-live" pathLength="1000" d="M0,40 h18 q5,-7 10,0 h8 l4,3 l5,-26 l5,38 l4,-15 h10 q8,-9 16,0 h40 h18 q5,-7 10,0 h8 l4,3 l5,-26 l5,38 l4,-15 h10 q8,-9 16,0 h40"/>
+      <button type="button" class="ecg reveal" id="ecgToggle" aria-pressed="false"
+              aria-label="Electrocardiograma decorativo en movimiento. Púlsalo para pausarlo.">
+        <svg class="ecg-svg" viewBox="0 8 120 56" aria-hidden="true">
+          <path class="ecg-base" pathLength="1000" d="M0,40 h18 q5,-7 10,0 h8 l4,3 l5,-26 l5,38 l4,-15 h10 q8,-9 16,0 h40"/>
+          <path class="ecg-live" pathLength="1000" d="M0,40 h18 q5,-7 10,0 h8 l4,3 l5,-26 l5,38 l4,-15 h10 q8,-9 16,0 h40"/>
         </svg>
-        <button type="button" class="ecg-toggle" id="ecgToggle" aria-pressed="false"
-                aria-label="Pausar la animación del electrocardiograma">Pausar</button>
-      </div>
+        <span class="ecg-hint" aria-hidden="true">Pausar</span>
+      </button>
     </div>
   </div>
 </section>
@@ -911,13 +920,16 @@
 /* Pausa del electro: arranca solo, se repite y convive con el texto, así que
    necesita una forma de pararlo (WCAG 2.2.2). */
 (function(){
-  var btn = document.getElementById('ecgToggle');
-  if(!btn) return;
-  var fig = btn.closest('.ecg');
-  btn.addEventListener('click', function(){
-    var quieto = fig.classList.toggle('is-paused');
-    btn.setAttribute('aria-pressed', quieto ? 'true' : 'false');
-    btn.textContent = quieto ? 'Reanudar' : 'Pausar';
+  var ecg = document.getElementById('ecgToggle');
+  if(!ecg) return;
+  var pista = ecg.querySelector('.ecg-hint');
+  ecg.addEventListener('click', function(){
+    var quieto = ecg.classList.toggle('is-paused');
+    ecg.setAttribute('aria-pressed', quieto ? 'true' : 'false');
+    ecg.setAttribute('aria-label', quieto
+      ? 'Electrocardiograma decorativo, en pausa. Púlsalo para reanudarlo.'
+      : 'Electrocardiograma decorativo en movimiento. Púlsalo para pausarlo.');
+    if(pista) pista.textContent = quieto ? 'Reanudar' : 'Pausar';
   });
 })();
 </script>
