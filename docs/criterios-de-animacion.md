@@ -17,8 +17,10 @@ Cómo se implementa, para que no sea un control escondido:
   estado. Los dos se actualizan al pausar.
 - `cursor: pointer` para que se note que responde.
 - Una pista de texto —«Pausar» / «Reanudar»— que aparece al apuntar con el ratón o al
-  recibir el foco, y que se queda visible mientras está en pausa. Escondida el resto del
-  tiempo: el control existe siempre, pero solo se muestra cuando hace falta.
+  recibir el foco, y **desaparece al salir, también si está en pausa**. El control existe
+  siempre, pero no se queda encendido llamando la atención sobre sí mismo: el estado de
+  pausa ya lo cuenta `aria-pressed` a quien lo necesita, y quien pausó sabe que pausó.
+  Nunca en color de acento: la pista es una ayuda, no un aviso.
 - El anillo de foco tiene que verse. No quitar el `:focus-visible`.
 
 ## 2. Con `prefers-reduced-motion`, quieta y completa
