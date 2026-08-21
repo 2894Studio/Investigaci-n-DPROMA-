@@ -295,6 +295,9 @@ textarea.field{ width:100%; resize:vertical; min-height:4.5rem; line-height:1.45
 .hint{ font-size:.75rem; color:var(--text-muted); margin:.4rem 0 0; }
 
 /* Historial */
+.btn-mini{ min-height:1.9rem; font-size:.6875rem; padding:0 .7em; }
+.btn-danger{ color:var(--st-bloq); border-color:color-mix(in srgb, var(--st-bloq) 45%, var(--border)); }
+.btn-danger:hover{ color:var(--on-accent); background:var(--st-bloq); border-color:var(--st-bloq); }
 .hist{ list-style:none; margin:0; padding:0; max-height:15rem; overflow-y:auto; }
 .hist li{ padding:.45rem 0; border-top:1px solid var(--border); font-size:.75rem; color:var(--text-muted); }
 .hist li:first-child{ border-top:0; }
@@ -412,8 +415,9 @@ footer{ padding:2rem 0 3rem; border-top:1px solid var(--border); }
         </div>
         <div class="card-body" id="histBody" hidden>
           <ul class="hist" id="histList"></ul>
-          <p class="hint">Nada se borra: al quitar una iniciativa, un enlace o un comentario se
-            archivan y se pueden recuperar desde aquí.</p>
+          <p class="hint">Quitar algo lo archiva, y desde aquí se recupera. Solo una iniciativa
+            ya archivada puede eliminarse del todo, y entonces se lleva sus comentarios y su
+            historial. Los comentarios sueltos no se borran nunca.</p>
         </div>
       </section>
     </div>
@@ -601,6 +605,11 @@ var remoteDb = {
     return rest('initiatives?id=eq.' + id + '&rev=eq.' + rev, { method:'PATCH', body:JSON.stringify(patch) })
       .then(function(a){ return a.length ? a[0] : null; });
   },
+  /* Devuelve false si la base no borró nada: o no está archivada, o falta
+     aplicar la migración que habilita el borrado. */
+  deleteInitiative: function(id){
+    return rest('initiatives?id=eq.' + id, { method:'DELETE' }).then(function(a){ return a.length > 0; });
+  },
   addComment: function(row){ return rest('comments', { method:'POST', body:JSON.stringify(row) }).then(function(a){ return a[0]; }); },
   archiveComment: function(id){ return rest('comments?id=eq.' + id, { method:'PATCH', body:JSON.stringify({ archived:true }) }); },
   addDeliverable: function(row){ return rest('deliverables', { method:'POST', body:JSON.stringify(row) }).then(function(a){ return a[0]; }); },
@@ -650,6 +659,17 @@ var localDb = {
       }
     }
     return P(null);
+  },
+  deleteInitiative: function(id){
+    var s = lread();
+    var it = null;
+    s.initiatives.forEach(function(i){ if(i.id === id) it = i; });
+    if(!it || !it.archived) return P(false);      // la misma regla que la base
+    s.initiatives = s.initiatives.filter(function(i){ return i.id !== id; });
+    s.comments     = s.comments.filter(function(c){ return c.initiative_id !== id; });
+    s.deliverables = s.deliverables.filter(function(d){ return d.initiative_id !== id; });
+    s.changes      = s.changes.filter(function(c){ return c.initiative_id !== id; });
+    lwrite(s); return P(true);
   },
   addComment: function(row){
     var s = lread();
@@ -940,8 +960,9 @@ function renderDetail(){
        '<input type="text" id="cArea" class="field" maxlength="60" placeholder="Tu área (opcional)">' +
        '<button type="button" class="btn btn-primary" id="cAdd">Publicar comentario</button></div></div>';
 
-  h += '<div class="detail-sec detail-sec--full"><button type="button" class="btn" id="dArchive">Archivar iniciativa</button>' +
-       '<p class="hint">No se borra: pasa al historial y se puede recuperar.</p></div>';
+  h += '<div class="detail-sec detail-sec--full"><button type="button" class="btn" id="dArchive">Quitar del roadmap</button>' +
+       '<p class="hint">Pasa a «Archivadas», en el historial. Desde ahí se puede recuperar, o eliminar '
+       + 'del todo si de verdad sobra.</p></div>';
 
   h += '</div>';
   box.innerHTML = h;
@@ -955,7 +976,8 @@ function renderHist(){
   if(arch.length){
     h += '<li><b>Archivadas</b></li>' + arch.map(function(it){
       return '<li class="linkrow"><span style="flex:1">' + esc(it.title) + '</span>' +
-             '<button type="button" class="btn" data-restore="' + it.id + '" style="min-height:1.9rem;font-size:.6875rem">Restaurar</button></li>';
+             '<button type="button" class="btn btn-mini" data-restore="' + it.id + '">Restaurar</button>' +
+             '<button type="button" class="btn btn-mini btn-danger" data-purge="' + it.id + '">Eliminar</button></li>';
     }).join('');
   }
   h += state.changes.length
@@ -1368,9 +1390,47 @@ $('btnHist').addEventListener('click', function(){
   this.textContent = open ? 'Ocultar' : 'Ver';
 });
 $('histList').addEventListener('click', function(e){
-  var b = e.target.closest('[data-restore]'); if(!b) return;
-  var it = byId(b.getAttribute('data-restore')); if(!it) return;
-  commitPatch(it, { archived:false }, 'restauró la iniciativa');
+  var b = e.target.closest('[data-restore]');
+  if(b){
+    var it = byId(b.getAttribute('data-restore'));
+    if(it) commitPatch(it, { archived:false }, 'restauró la iniciativa');
+    return;
+  }
+  var d = e.target.closest('[data-purge]'); if(!d) return;
+  var it2 = byId(d.getAttribute('data-purge')); if(!it2) return;
+  if(!requireName()) return;
+  /* Esto sí borra. Se pregunta nombrando la iniciativa para que nadie la
+     elimine creyendo que la archiva, y se avisa de lo que se lleva por delante. */
+  var cs = state.comments.filter(function(c){ return c.initiative_id === it2.id; }).length;
+  if(!window.confirm('Eliminar «' + it2.title + '» definitivamente.\n\n' +
+      'Se borra también su historial' + (cs ? ' y sus ' + cs + ' comentario' + (cs>1?'s':'') : '') +
+      '. Esto no se puede deshacer.\n\n¿Seguir?')) return;
+  clearErr(); setSave('Eliminando…', '');
+  db.deleteInitiative(it2.id).then(function(hecho){
+    if(!hecho){
+      setSave('No se eliminó', 'is-err');
+      showErr('La base no permitió eliminar «' + it2.title + '». Si acabas de habilitar el borrado, ' +
+              'comprueba que ejecutaste supabase/migracion-borrado.sql en el SQL Editor.');
+      return;
+    }
+    /* El apunte va sin initiative_id: la fila ya no existe y la clave ajena
+       lo rechazaría. El título se guarda en el texto. */
+    db.log({ actor_name:state.me, action:'eliminó «' + it2.title + '»' });
+    state.initiatives  = state.initiatives.filter(function(i){ return i.id !== it2.id; });
+    state.comments     = state.comments.filter(function(c){ return c.initiative_id !== it2.id; });
+    state.deliverables = state.deliverables.filter(function(x){ return x.initiative_id !== it2.id; });
+    state.changes      = state.changes.filter(function(c){ return c.initiative_id !== it2.id; });
+    logLocal(null, 'eliminó «' + it2.title + '»');
+    if(state.selectedId === it2.id) state.selectedId = null;
+    setSave('Eliminada', 'is-ok');
+    renderAll();
+  }).catch(function(err){
+    setSave('No se eliminó', 'is-err');
+    var m = String(err && err.message || err);
+    showErr(/42501|permission denied/i.test(m)
+      ? 'La base no deja borrar. Ejecuta supabase/migracion-borrado.sql en el SQL Editor de Supabase: es lo que habilita eliminar iniciativas archivadas. (' + m.slice(0,120) + ')'
+      : 'No se pudo eliminar. ' + explicaError(err));
+  });
 });
 
 /* Nueva iniciativa */
