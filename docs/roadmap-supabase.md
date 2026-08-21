@@ -132,6 +132,24 @@ rehacer los datos.
 Supabase hace copias automáticas en el plan gratuito, pero conviene exportar de vez en
 cuando: **`Table Editor`** → cada tabla → **`Export`** → **`Export table as CSV`**.
 
+## Dejar el roadmap a cero antes de abrirlo al equipo
+
+Después de montarlo y de probarlo quedan comentarios de prueba, estados cambiados y fechas
+movidas. Para empezar limpio, ejecuta una vez `supabase/reset.sql`: **`+ New query`**, pegar
+todo, **`Run`**.
+
+Borra comentarios, historial, iniciativas y entregables añadidos, y vuelve a dejar el estado
+de partida del plan: 22 iniciativas, las 9 de corto plazo con sus fechas propuestas, los 3
+entregables enlazados y la ventana Ago–Dic 2026.
+
+Es para usarlo **una sola vez, antes de abrir la herramienta al equipo**. Después ya no: se
+lleva por delante el trabajo de todo el mundo y no hay vuelta atrás. Esto no archiva, borra.
+Funciona desde el editor SQL porque ahí entras como propietario de la base; desde la página
+web nadie puede borrar nada, que es justo lo que se busca.
+
+Si quieres guardar antes lo que haya: **`Table Editor`** → cada tabla → **`Export`** →
+**`Export table as CSV`**.
+
 ## Glosario, porque la interfaz está en inglés
 
 | En este documento | En pantalla |

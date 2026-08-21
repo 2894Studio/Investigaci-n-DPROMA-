@@ -383,6 +383,46 @@
     padding-left: 1.25rem; border-left: 3px solid var(--accent);
   }
 
+  /* Roadmap en pequeño: solo lectura, lee el estado real de la herramienta.
+     Si no hay conexión o falla, se esconde y queda el enlace, que es lo que
+     de verdad tiene que funcionar siempre. */
+  .mini{ margin-top: 2rem; padding: 1.5rem 1.75rem; --st-no:#8b8f9a; --st-curso:#0A46FF; --st-bloq:#b32d2d; --st-hecha:#1c7a4a; }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .mini{ --st-no:#9aa0ac; --st-curso:#5b83ff; --st-bloq:#ff7b7b; --st-hecha:#4bbd83; }
+  }
+  :root[data-theme="dark"] .mini{ --st-no:#9aa0ac; --st-curso:#5b83ff; --st-bloq:#ff7b7b; --st-hecha:#4bbd83; }
+  .mini-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+  .mini-head h3{ font-size:1.125rem; margin-top:.35rem; }
+  .mini-cta{ font-weight:700; font-size:.9375rem; text-decoration:none; white-space:nowrap;
+             display:inline-flex; align-items:center; min-height:1.6rem; }
+  .mini-note{ margin:.7rem 0 0; color:var(--text-muted); font-size:.9375rem; max-width:66ch; }
+  .mini-body{ margin-top:1.1rem; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:var(--surface); }
+  .mini-axis{ position:relative; height:1.5rem; border-bottom:1px solid var(--border); }
+  .mini-cell{ position:absolute; top:0; bottom:0; padding-left:.4rem; display:flex; align-items:center;
+              font-size:.625rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+              color:var(--text-muted); border-left:1px solid var(--border); white-space:nowrap; overflow:hidden; }
+  .mini-cell:first-child{ border-left:0; }
+  .mini-lane{ position:relative; padding:.4rem 0; border-bottom:1px solid var(--border); }
+  .mini-lane:last-child{ border-bottom:0; }
+  .mini-lane-t{ position:absolute; left:.5rem; top:.3rem; z-index:2; font-size:.5625rem; font-weight:700;
+                letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); }
+  .mini-rows{ position:relative; margin-top:1rem; }
+  .mini-bar{ position:absolute; height:1.15rem; border-radius:4px; display:flex; align-items:center;
+             padding:0 .35rem; font-size:.625rem; white-space:nowrap; overflow:hidden;
+             background:color-mix(in srgb, var(--accent) 15%, var(--surface));
+             border:1px solid var(--accent); color:var(--text); }
+  .mini-bar[data-s="bloqueada"]{ border-color:var(--st-bloq); background:color-mix(in srgb, var(--st-bloq) 14%, var(--surface)); }
+  .mini-bar[data-s="hecha"]{ opacity:.7; }
+  .mini-dot{ flex:none; width:.35rem; height:.35rem; border-radius:50%; margin-right:.25rem; background:var(--st-no); }
+  .mini-bar[data-s="en-curso"] .mini-dot{ background:var(--st-curso); }
+  .mini-bar[data-s="bloqueada"] .mini-dot{ background:var(--st-bloq); }
+  .mini-bar[data-s="hecha"] .mini-dot{ background:var(--st-hecha); }
+  .mini-foot{ display:flex; align-items:center; gap:1rem; flex-wrap:wrap; margin-top:.7rem;
+              font-size:.75rem; color:var(--text-muted); }
+  .mini-key{ display:inline-flex; align-items:center; gap:.3rem; }
+  .mini-key i{ width:.5rem; height:.5rem; border-radius:50%; display:inline-block; font-style:normal; }
+  @media (max-width:640px){ .mini{ padding:1.25rem 1.1rem; } .mini-bar{ font-size:0; padding:0; } }
+
   footer{
     padding: clamp(3rem, 7vw, 4.5rem) 0 3rem;
   }
@@ -672,11 +712,28 @@
       </article>
     </div>
 
-    <div class="callout card card-neutral reveal">
-      <span class="eyebrow">Segunda fase · Ya disponible</span>
-      <p>Este roadmap también existe como herramienta: las mismas iniciativas sobre un calendario,
-        con sus entregables, su estado y un hilo de comentarios por iniciativa.</p>
-      <p style="margin-top:.6rem"><a href="/roadmap" style="font-weight:700">Abrir el roadmap interactivo →</a></p>
+    <div class="mini card card-neutral reveal" id="mini">
+      <div class="mini-head">
+        <div>
+          <span class="eyebrow">Segunda fase · Ya disponible</span>
+          <h3>El roadmap, como herramienta</h3>
+        </div>
+        <a class="mini-cta" href="/roadmap">Abrir para editarlo →</a>
+      </div>
+      <p class="mini-note">Las mismas iniciativas sobre un calendario, con sus entregables, su estado
+        y un hilo de comentarios por iniciativa. Ahí se arrastran las fechas y se deja constancia de
+        en qué va cada cosa; aquí abajo, cómo está ahora mismo.</p>
+      <div class="mini-body" id="miniBody" hidden>
+        <div class="mini-axis" id="miniAxis"></div>
+        <div id="miniLanes"></div>
+      </div>
+      <div class="mini-foot" id="miniFoot" hidden>
+        <span class="mini-key"><i style="background:var(--st-no)"></i>No iniciada</span>
+        <span class="mini-key"><i style="background:var(--st-curso)"></i>En curso</span>
+        <span class="mini-key"><i style="background:var(--st-bloq)"></i>Bloqueada</span>
+        <span class="mini-key"><i style="background:var(--st-hecha)"></i>Hecha</span>
+        <span id="miniPend"></span>
+      </div>
     </div>
   </div>
 </section>
@@ -811,6 +868,86 @@
     });
   }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
   els.forEach(function(el){ io.observe(el); });
+})();
+</script>
+
+<script src="/roadmap-config.js"></script>
+<script>
+/* Roadmap en pequeño, solo lectura.
+   Lee el estado real de la herramienta para que esta página no se quede
+   contando un plan que el equipo ya movió. Si no hay conexión, si falla o si
+   no hay nada programado, el bloque se queda escondido y sobrevive el enlace,
+   que es lo único que aquí tiene que funcionar siempre. */
+(function(){
+  var CFG = window.ROADMAP_CONFIG || {};
+  if(!CFG.url || !CFG.anonKey) return;
+
+  var DAY = 86400000;
+  function dnum(x){ var p = String(x).split('-').map(Number); return Date.UTC(p[0], p[1]-1, p[2]) / DAY; }
+  function addMonths(iso, k){ var p = iso.split('-').map(Number);
+    return new Date(Date.UTC(p[0], p[1]-1+k, p[2])).toISOString().slice(0,10); }
+  var MES3 = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  function esc(t){ var d = document.createElement('div'); d.textContent = t == null ? '' : t; return d.innerHTML; }
+
+  var h = { apikey: CFG.anonKey, 'Content-Type':'application/json' };
+  if(/^ey[A-Za-z0-9_-]+\./.test(CFG.anonKey)) h.Authorization = 'Bearer ' + CFG.anonKey;
+  function get(q){
+    return fetch(CFG.url.replace(/\/+$/,'') + '/rest/v1/' + q, { headers:h })
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); });
+  }
+
+  Promise.all([
+    get('initiatives?select=title,track,start_date,end_date,status,archived&order=start_date.asc'),
+    get('settings?select=value&key=eq.calendar_range')
+  ]).then(function(res){
+    var vivas = (res[0] || []).filter(function(i){ return !i.archived; });
+    var prog  = vivas.filter(function(i){ return i.start_date && i.end_date; });
+    if(!prog.length) return;
+
+    var rango = (res[1] && res[1][0] && res[1][0].value) || { start:'2026-08-01', end:'2026-12-31' };
+    var t0 = dnum(rango.start), t1 = dnum(rango.end);
+    prog.forEach(function(i){                       // que nada quede fuera del dibujo
+      t0 = Math.min(t0, dnum(i.start_date));
+      t1 = Math.max(t1, dnum(i.end_date));
+    });
+    var dias = Math.max(1, t1 - t0 + 1);
+    function pct(n){ return ((n - t0) / dias * 100) + '%'; }
+
+    var ejeHtml = '', m = rango.start.slice(0,8) + '01';
+    if(dnum(m) > t0) m = new Date(t0 * DAY).toISOString().slice(0,8) + '01';
+    while(dnum(m) <= t1){
+      var sig = addMonths(m, 1);
+      var izq = Math.max(t0, dnum(m)), der = Math.min(t1 + 1, dnum(sig));
+      if(der > izq){
+        ejeHtml += '<span class="mini-cell" style="left:' + pct(izq) + ';width:' +
+                   ((der - izq) / dias * 100) + '%">' + MES3[+m.split('-')[1]-1] + '</span>';
+      }
+      m = sig;
+    }
+    document.getElementById('miniAxis').innerHTML = ejeHtml;
+
+    var lanes = '';
+    [['negocio','Negocio'], ['discovery','Discovery']].forEach(function(tr){
+      var items = prog.filter(function(i){ return i.track === tr[0]; });
+      if(!items.length) return;
+      var filas = items.map(function(it, k){
+        return '<span class="mini-bar" data-s="' + esc(it.status) + '"' +
+               ' style="left:' + pct(dnum(it.start_date)) + ';width:' +
+               Math.max(1.2, (dnum(it.end_date) - dnum(it.start_date) + 1) / dias * 100) + '%;top:' + (k*22) + 'px"' +
+               ' title="' + esc(it.title) + '">' +
+               '<span class="mini-dot"></span>' + esc(it.title) + '</span>';
+      }).join('');
+      lanes += '<div class="mini-lane"><span class="mini-lane-t">' + tr[1] + '</span>' +
+               '<div class="mini-rows" style="height:' + (items.length*22) + 'px">' + filas + '</div></div>';
+    });
+    document.getElementById('miniLanes').innerHTML = lanes;
+    document.getElementById('miniBody').hidden = false;
+
+    var sinFecha = vivas.length - prog.length;
+    document.getElementById('miniPend').textContent =
+      sinFecha ? '· ' + sinFecha + (sinFecha === 1 ? ' iniciativa sin programar' : ' iniciativas sin programar') : '';
+    document.getElementById('miniFoot').hidden = false;
+  }).catch(function(){ /* sin conexión: se queda el enlace y ya */ });
 })();
 </script>
 
