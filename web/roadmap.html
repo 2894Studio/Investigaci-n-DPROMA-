@@ -679,7 +679,26 @@ function showErr(msg){
   $('errText').textContent = msg;
   $('errNotice').hidden = false;
 }
-function clearErr(){ $('errNotice').hidden = true; }
+function clearErr(){ $('errNotice').hidden = true; errDeMontaje = false; }
+var errDeMontaje = false;
+/* Los errores de Supabase llegan en inglés y en jerga de Postgres. Los tres
+   que salen mientras se monta la base tienen una causa concreta y una acción
+   concreta, así que se traducen a eso en vez de soltar el código crudo. */
+function explicaError(e){
+  var m = String((e && e.message) || e);
+  var pista =
+    /42P01|does not exist|schema cache/i.test(m)
+      ? 'La base todavía no tiene las tablas: falta ejecutar supabase/schema.sql en el SQL Editor de Supabase.' :
+    /Invalid API key|No API key|JWT|401/i.test(m)
+      ? 'Supabase no acepta la clave. Comprueba que en web/roadmap-config.js esté la clave publishable completa y sin espacios.' :
+    /42501|permission denied/i.test(m)
+      ? 'La base rechaza la operación por permisos. Ejecuta supabase/schema.sql entero: la parte final es la que concede los permisos al rol anónimo.' :
+    /Failed to fetch|NetworkError|TypeError/i.test(m)
+      ? 'No se pudo contactar con Supabase. Revisa la URL del proyecto en web/roadmap-config.js y que el proyecto no esté pausado.' :
+    '';
+  if(pista){ errDeMontaje = true; return pista + ' (' + m.slice(0, 160) + ')'; }
+  return m;
+}
 function requireName(){
   if(state.me.trim()) return true;
   showErr('Escribe tu nombre en la barra de arriba antes de cambiar nada: cada cambio queda firmado en el historial.');
@@ -952,7 +971,7 @@ function commitPatch(it, patch, action){
     return true;
   }).catch(function(e){
     setSave('No se guardó', 'is-err');
-    showErr('No se pudo guardar. ' + e.message);
+    showErr('No se pudo guardar. ' + explicaError(e));
     return refresh().then(function(){ return false; });
   });
 }
@@ -1025,7 +1044,7 @@ function wireDetail(it){
       db.log({ initiative_id:it.id, actor_name:state.me, action:'añadió el entregable ' + label });
       logLocal(it.id, 'añadió el entregable ' + label);
       setSave('Guardado', 'is-ok'); renderDetail(); renderHist();
-    }).catch(function(e){ setSave('No se guardó', 'is-err'); showErr(e.message); });
+    }).catch(function(e){ setSave('No se guardó', 'is-err'); showErr(explicaError(e)); });
   });
   box.querySelectorAll('[data-del-rm]').forEach(function(b){
     b.addEventListener('click', function(){
@@ -1036,7 +1055,7 @@ function wireDetail(it){
         db.log({ initiative_id:it.id, actor_name:state.me, action:'archivó un entregable' });
         logLocal(it.id, 'archivó un entregable');
         setSave('Guardado', 'is-ok'); renderDetail(); renderHist();
-      }).catch(function(e){ showErr(e.message); });
+      }).catch(function(e){ showErr(explicaError(e)); });
     });
   });
 
@@ -1053,7 +1072,7 @@ function wireDetail(it){
         db.log({ initiative_id:it.id, actor_name:state.me, action:'comentó' });
         logLocal(it.id, 'comentó');
         setSave('Publicado', 'is-ok'); renderDetail(); renderHist();
-      }).catch(function(e){ setSave('No se publicó', 'is-err'); showErr(e.message); });
+      }).catch(function(e){ setSave('No se publicó', 'is-err'); showErr(explicaError(e)); });
   });
   box.querySelectorAll('[data-com-rm]').forEach(function(b){
     b.addEventListener('click', function(){
@@ -1064,7 +1083,7 @@ function wireDetail(it){
         db.log({ initiative_id:it.id, actor_name:state.me, action:'archivó un comentario' });
         logLocal(it.id, 'archivó un comentario');
         renderDetail(); renderHist();
-      }).catch(function(e){ showErr(e.message); });
+      }).catch(function(e){ showErr(explicaError(e)); });
     });
   });
 
@@ -1291,7 +1310,7 @@ function moveRange(side){
     db.log({ actor_name:state.me, action:'amplió el calendario' });
     logLocal(null, 'amplió el calendario');
     setSave('Guardado', 'is-ok'); renderAll();
-  }).catch(function(e){ setSave('No se guardó', 'is-err'); showErr(e.message); renderAll(); });
+  }).catch(function(e){ setSave('No se guardó', 'is-err'); showErr(explicaError(e)); renderAll(); });
 }
 $('btnExpL').addEventListener('click', function(){ moveRange(-1); });
 $('btnExpR').addEventListener('click', function(){ moveRange(1); });
@@ -1347,7 +1366,7 @@ $('frmNueva').addEventListener('submit', function(){
     logLocal(row.id, 'creó la iniciativa');
     state.selectedId = row.id;
     setSave('Creada', 'is-ok'); renderAll();
-  }).catch(function(err){ setSave('No se creó', 'is-err'); showErr(err.message); });
+  }).catch(function(err){ setSave('No se creó', 'is-err'); showErr(explicaError(err)); });
 });
 
 /* ── Carga y refresco ──────────────────────────────────────────────────────*/
@@ -1359,9 +1378,15 @@ function refresh(){
     state.changes = d.changes || [];
     state.range = d.range || state.range;
     if(state.selectedId && !byId(state.selectedId)) state.selectedId = null;
+    if(REMOTE && !state.initiatives.length){
+      showErr('Conexión con Supabase correcta, pero la base está vacía: falta ejecutar supabase/seed.sql en el SQL Editor.');
+      errDeMontaje = true;
+    } else if(errDeMontaje){
+      clearErr();          // ya está resuelto, se retira el aviso de montaje
+    }
     renderAll();
   }).catch(function(e){
-    showErr('No se pudieron cargar los datos. ' + e.message);
+    showErr('No se pudieron cargar los datos. ' + explicaError(e));
   });
 }
 
