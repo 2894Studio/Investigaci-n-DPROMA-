@@ -18,16 +18,27 @@ comentarios. Son unos cinco minutos y no hace falta saber SQL.
 
 ## 2. Crear las tablas
 
-1. En el menú lateral, **SQL Editor** → **New query**.
-2. Copia el contenido entero de `supabase/schema.sql` y pégalo. **Run**.
-3. Nueva consulta. Copia el contenido entero de `supabase/seed.sql`. **Run**.
+La interfaz de Supabase está en inglés. El **SQL Editor** es una caja de texto donde pegas
+instrucciones para la base de datos y le das a un botón para ejecutarlas; cada bloque de
+texto es una *query*. Se llega así:
 
-La siembra deja las 22 iniciativas del plan con las de corto plazo ya fechadas. Ejecutarla
-dos veces no duplica nada.
+1. Barra lateral izquierda → **SQL Editor** (icono de hoja con `>_`).
+2. Botón **`+ New query`**, arriba a la izquierda del panel. Se abre una hoja en blanco.
+3. Copia el contenido entero de `supabase/schema.sql`, pégalo en la hoja y pulsa **`Run`**
+   (abajo a la derecha, o `Ctrl+Enter` / `Cmd+Enter` en Mac). El resultado sale debajo.
+4. Pulsa otra vez **`+ New query`** para tener una hoja limpia, pega el contenido entero de
+   `supabase/seed.sql` y **`Run`**.
+
+Cada script va en su propia hoja para que no se mezclen: si pegas el segundo debajo del
+primero sin borrar, ejecutarías los dos otra vez.
+
+Da igual si te equivocas y ejecutas algo dos veces. Los scripts están escritos para poder
+repetirse sin romper nada ni duplicar datos. La siembra deja las 22 iniciativas del plan,
+con las de corto plazo ya fechadas.
 
 ## 3. Comprobar que quedó bien
 
-Esto no te lo saltes. Nueva consulta, pega esto y ejecútalo:
+Esto no te lo saltes. Otra vez **`+ New query`**, pega esto y **`Run`**:
 
 ```sql
 select
@@ -57,7 +68,7 @@ ejecutar `schema.sql` entero antes de seguir.
 
 ## 4. Copiar las dos claves
 
-1. **Project Settings** (el engranaje) → **API**.
+1. **`Project Settings`** (el engranaje, abajo en la barra lateral) → **`API`**.
 2. Copia **Project URL** — algo como `https://abcdefgh.supabase.co`.
 3. Copia la clave **anon public**. Es una cadena larga que empieza por `eyJ…`.
 
@@ -119,4 +130,15 @@ rehacer los datos.
 ## Copia de seguridad
 
 Supabase hace copias automáticas en el plan gratuito, pero conviene exportar de vez en
-cuando: **Table Editor** → cada tabla → **Export to CSV**.
+cuando: **`Table Editor`** → cada tabla → **`Export`** → **`Export table as CSV`**.
+
+## Glosario, porque la interfaz está en inglés
+
+| En este documento | En pantalla |
+|---|---|
+| Editor SQL | `SQL Editor` |
+| Nueva consulta, hoja en blanco | `+ New query` |
+| Ejecutar | `Run` |
+| Ajustes del proyecto | `Project Settings` |
+| Editor de tablas | `Table Editor` |
+| Clave anónima pública | `anon public` |
