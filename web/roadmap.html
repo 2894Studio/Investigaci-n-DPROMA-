@@ -540,14 +540,20 @@ function seedState(){
 }
 
 /* Supabase (PostgREST) */
+/* La clave pública de Supabase viene en dos formatos: el JWT clásico («anon»,
+   empieza por ey…) y el nuevo sb_publishable_…. El primero va también en
+   Authorization, como hace supabase-js; el segundo NO, porque PostgREST intenta
+   parsear esa cabecera como un JWT y rechaza la petición entera. Para el nuevo
+   basta apikey, que es con lo que el gateway resuelve el rol anónimo. */
+var CLAVE_ES_JWT = /^ey[A-Za-z0-9_-]+\./.test(String(CFG.anonKey || ''));
 function rest(path, opts){
   opts = opts || {};
   opts.headers = {
     apikey: CFG.anonKey,
-    Authorization: 'Bearer ' + CFG.anonKey,
     'Content-Type': 'application/json',
     Prefer: opts.prefer || 'return=representation'
   };
+  if(CLAVE_ES_JWT) opts.headers.Authorization = 'Bearer ' + CFG.anonKey;
   return fetch(CFG.url.replace(/\/+$/,'') + '/rest/v1/' + path, opts).then(function(r){
     return r.text().then(function(txt){
       if(!r.ok) throw new Error('Supabase ' + r.status + ' · ' + txt.slice(0,300));
