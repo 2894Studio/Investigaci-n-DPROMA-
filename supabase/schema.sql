@@ -7,9 +7,12 @@
 -- cualquiera puede llamar a esta API directamente. Por eso las reglas de verdad
 -- viven aquí y no en la interfaz:
 --
---   · No existe permiso de DELETE en ninguna tabla. Nada se puede borrar, venga
---     de donde venga la petición. Quitar algo es marcar archived = true, y eso
---     se puede deshacer.
+--   · Solo se puede borrar una iniciativa, y solo si ya está archivada. Quitar
+--     algo es, primero, archivarlo (reversible); el borrado definitivo es un
+--     segundo paso deliberado. Un «delete from initiatives» contra la API no
+--     puede vaciar el roadmap: solo alcanza lo que alguien ya apartó.
+--     Los comentarios, los entregables y el historial no se pueden borrar por
+--     su cuenta; solo caen en cascada con su iniciativa.
 --   · El texto de un comentario es inmutable: sobre comments solo se concede
 --     UPDATE de la columna archived, así que nadie puede reescribir lo que
 --     escribió otra persona.
@@ -44,7 +47,7 @@ create table if not exists initiatives (
 
 create table if not exists deliverables (
   id            uuid primary key default gen_random_uuid(),
-  initiative_id uuid not null references initiatives(id),
+  initiative_id uuid not null references initiatives(id) on delete cascade,
   label         text not null check (char_length(label) between 1 and 120),
   url           text not null check (char_length(url) between 1 and 600
                                      and url ~ '^(https?://|/)'),
@@ -54,7 +57,7 @@ create table if not exists deliverables (
 
 create table if not exists comments (
   id            uuid primary key default gen_random_uuid(),
-  initiative_id uuid not null references initiatives(id),
+  initiative_id uuid not null references initiatives(id) on delete cascade,
   author_name   text not null check (char_length(author_name) between 1 and 60),
   author_area   text check (char_length(author_area) <= 60),
   body          text not null check (char_length(body) between 1 and 2000),
@@ -65,7 +68,7 @@ create table if not exists comments (
 -- Historial. Solo se añade; no se edita ni se borra.
 create table if not exists changes (
   id            bigint generated always as identity primary key,
-  initiative_id uuid references initiatives(id),
+  initiative_id uuid references initiatives(id) on delete cascade,
   actor_name    text check (char_length(actor_name) <= 60),
   action        text not null check (char_length(action) between 1 and 40),
   detail        jsonb,
@@ -113,9 +116,13 @@ alter table settings     enable row level security;
 drop policy if exists p_read   on initiatives;
 drop policy if exists p_write  on initiatives;
 drop policy if exists p_update on initiatives;
+drop policy if exists p_delete on initiatives;
 create policy p_read   on initiatives for select using (true);
 create policy p_write  on initiatives for insert with check (true);
 create policy p_update on initiatives for update using (true) with check (true);
+-- Borrar solo lo ya archivado: un «delete from initiatives» contra la API no
+-- puede llevarse el roadmap por delante, solo lo que alguien apartó a propósito.
+create policy p_delete on initiatives for delete using (archived = true);
 
 drop policy if exists p_read   on deliverables;
 drop policy if exists p_write  on deliverables;
@@ -154,7 +161,7 @@ revoke all on table initiatives, deliverables, comments, changes, settings
 
 grant usage on schema public to anon, authenticated;
 
-grant select, insert on table initiatives to anon, authenticated;
+grant select, insert, delete on table initiatives to anon, authenticated;
 grant update (title, note, track, horizon, start_date, end_date,
               status, archived, sort_order) on table initiatives to anon, authenticated;
 

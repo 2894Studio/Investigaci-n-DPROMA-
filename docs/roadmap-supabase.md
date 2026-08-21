@@ -105,9 +105,9 @@ Si en el paso 2 sale un aviso rojo, el texto del error dice qué pasa. Los dos h
 el navegador de cualquiera que abra el roadmap. Lo que protege los datos no es esconderla,
 son las reglas de seguridad de `schema.sql`:
 
-- No existe permiso de borrado en ninguna tabla, así que nadie puede vaciar el roadmap ni
-  llamando a la API por su cuenta. Quitar algo es archivarlo, y se recupera desde el
-  historial.
+- Solo se puede borrar una iniciativa, y solo si ya está archivada. Nadie puede vaciar el
+  roadmap de una llamada, ni saltándose la página. Los comentarios, los entregables y el
+  historial no se borran por su cuenta: solo caen en cascada con su iniciativa.
 - El texto de un comentario no se puede reescribir: solo se puede archivar.
 - El historial es de solo añadir.
 - Las longitudes máximas las impone la base, no el formulario.
@@ -131,6 +131,27 @@ rehacer los datos.
 
 Supabase hace copias automáticas en el plan gratuito, pero conviene exportar de vez en
 cuando: **`Table Editor`** → cada tabla → **`Export`** → **`Export table as CSV`**.
+
+## Habilitar el borrado de iniciativas
+
+Al montarlo, la base no dejaba borrar nada: quitar una iniciativa era archivarla. Para poder
+además **eliminarla del todo**, ejecuta una vez `supabase/migracion-borrado.sql`:
+**`+ New query`**, pegar, **`Run`**. (En una base creada de cero no hace falta: `schema.sql`
+ya lo trae.)
+
+La regla que instala es deliberada: **solo se puede borrar lo que ya está archivado.** Así
+que quitar sigue siendo reversible, y eliminar es un segundo paso a conciencia. Un
+`delete from initiatives` lanzado contra la API no puede vaciar el roadmap: solo alcanzaría
+lo que alguien apartó antes.
+
+Al eliminar una iniciativa se van con ella sus comentarios, sus entregables y sus líneas de
+historial. Un comentario suelto sigue sin poder borrarse, y el historial sigue sin poder
+reescribirse.
+
+Conviene saber el límite: quien quiera hacer daño a propósito puede archivar y borrar en dos
+llamadas seguidas. La regla frena el accidente y el `delete` de una línea, no a alguien
+decidido. Si eso llega a preocupar, la salida es cerrar la escritura con login, no quitar el
+borrado.
 
 ## Dejar el roadmap a cero antes de abrirlo al equipo
 
