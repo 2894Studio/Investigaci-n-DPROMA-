@@ -134,7 +134,11 @@ label.lbl{ display:block; font-size:.6875rem; font-weight:700; letter-spacing:.0
 .savestate.is-err{ color:var(--st-bloq); }
 
 /* Rejilla principal */
-.app{ display:grid; grid-template-columns:minmax(0,1fr) 350px; gap:1.25rem; align-items:start; padding-bottom:3rem; }
+.app{ display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.25rem; align-items:start; padding-bottom:3rem; }
+/* La ficha va debajo del calendario, no en la columna lateral: es lo que se
+   abre al pinchar una barra y tiene que caer a la vista, no al final de una
+   columna de tres tarjetas. */
+.main{ display:flex; flex-direction:column; gap:1.25rem; min-width:0; }
 /* minmax(0,1fr) y no 1fr: un item de grid tiene min-width:auto, así que el
    calendario estiraría la columna hasta el ancho de su contenido en vez de
    desplazarse por dentro, y la página entera se iría hacia la derecha. */
@@ -248,9 +252,17 @@ label.lbl{ display:block; font-size:.6875rem; font-weight:700; letter-spacing:.0
 
 /* Ficha */
 .detail-empty{ padding:1.25rem 1rem; font-size:.875rem; color:var(--text-muted); font-style:italic; }
-.detail-title{ font-size:1rem; line-height:1.3; }
-.detail-sec{ padding:.9rem 1rem; border-top:1px solid var(--border); }
-.detail-sec:first-child{ border-top:0; }
+.detail-title{ font-size:1.0625rem; line-height:1.3; }
+/* Al ancho del calendario caben tres bloques por fila; comentarios y cierre
+   ocupan la fila entera porque son los que más crecen. */
+.detail-body{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); }
+.detail-sec{ padding:.9rem 1.1rem; border-top:1px solid var(--border); min-width:0; }
+.detail-sec--full{ grid-column:1 / -1; }
+.detail-sec--mid{ border-left:1px solid var(--border); }
+@media (max-width:900px){
+  .detail-body{ grid-template-columns:minmax(0,1fr); }
+  .detail-sec--mid{ border-left:0; }
+}
 .detail-sec h4{ font-size:.6875rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); margin-bottom:.55rem; }
 .statuses{ display:flex; flex-wrap:wrap; gap:.35rem; }
 .statuses .btn{ font-size:.75rem; min-height:2rem; }
@@ -258,7 +270,9 @@ label.lbl{ display:block; font-size:.6875rem; font-weight:700; letter-spacing:.0
 .statuses .btn[data-v="no-iniciada"][aria-pressed="true"]{ background:var(--st-no); border-color:var(--st-no); color:var(--st-no-on); }
 .statuses .btn[data-v="bloqueada"][aria-pressed="true"]{ background:var(--st-bloq); border-color:var(--st-bloq); color:var(--st-bloq-on); }
 .statuses .btn[data-v="hecha"][aria-pressed="true"]{ background:var(--st-hecha); border-color:var(--st-hecha); color:var(--st-hecha-on); }
-.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+/* minmax(0,1fr): un input de fecha trae un ancho intrínseco grande y con 1fr
+   a secas se desborda a la columna de al lado. */
+.grid2{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:.6rem; }
 .grid2 .field{ width:100%; }
 .rowset{ display:flex; gap:.4rem; flex-wrap:wrap; }
 .linklist{ list-style:none; margin:0 0 .6rem; padding:0; display:flex; flex-direction:column; gap:.4rem; }
@@ -274,6 +288,9 @@ label.lbl{ display:block; font-size:.6875rem; font-weight:700; letter-spacing:.0
 .comment-b{ margin:.3rem 0 0; font-size:.8125rem; white-space:pre-wrap; overflow-wrap:anywhere; }
 .comment-arch{ margin-left:auto; }
 .stack{ display:flex; flex-direction:column; gap:.5rem; }
+.stack--wide{ max-width:60rem; }
+.comment-b{ max-width:80ch; }
+.detail-sec--full .comment{ max-width:90ch; }
 textarea.field{ width:100%; resize:vertical; min-height:4.5rem; line-height:1.45; }
 .hint{ font-size:.75rem; color:var(--text-muted); margin:.4rem 0 0; }
 
@@ -350,6 +367,7 @@ footer{ padding:2rem 0 3rem; border-top:1px solid var(--border); }
   </div>
 
   <div class="app">
+    <div class="main">
     <!-- Calendario -->
     <section class="gantt" aria-labelledby="ganttH">
       <h2 class="sr-only" id="ganttH">Calendario de iniciativas</h2>
@@ -369,7 +387,13 @@ footer{ padding:2rem 0 3rem; border-top:1px solid var(--border); }
       </div>
     </section>
 
-    <!-- Bandeja + ficha -->
+      <section class="card" id="detailCard" aria-labelledby="detH">
+        <div class="card-head"><h2 id="detH">Ficha de la iniciativa</h2></div>
+        <div id="detail"><p class="detail-empty">Selecciona una iniciativa del calendario o de la bandeja para ver aquí sus entregables, su estado y sus comentarios.</p></div>
+      </section>
+    </div>
+
+    <!-- Bandeja y registro -->
     <div class="side">
       <section class="card" aria-labelledby="trayH">
         <div class="card-head">
@@ -379,11 +403,6 @@ footer{ padding:2rem 0 3rem; border-top:1px solid var(--border); }
         <p class="hint" style="padding:.6rem 1rem 0; margin:0">Arrástralas al calendario para
           programarlas, o usa el botón <strong>Programar</strong> de cada una.</p>
         <div id="tray"></div>
-      </section>
-
-      <section class="card" aria-labelledby="detH">
-        <div class="card-head"><h2 id="detH">Ficha de la iniciativa</h2></div>
-        <div id="detail"><p class="detail-empty">Selecciona una iniciativa del calendario o de la bandeja.</p></div>
       </section>
 
       <section class="card" aria-labelledby="histH">
@@ -866,13 +885,13 @@ function renderDetail(){
   var box = $('detail');
   var it = state.selectedId ? byId(state.selectedId) : null;
   if(!it || it.archived){
-    box.innerHTML = '<p class="detail-empty">Selecciona una iniciativa del calendario o de la bandeja.</p>';
+    box.innerHTML = '<p class="detail-empty">Selecciona una iniciativa del calendario o de la bandeja para ver aquí sus entregables, su estado y sus comentarios.</p>';
     return;
   }
   var ds = delsDe(it.id), cs = comsDe(it.id);
-  var h = '';
+  var h = '<div class="detail-body">';
 
-  h += '<div class="detail-sec">' +
+  h += '<div class="detail-sec detail-sec--full">' +
        '<h4>' + esc(({corto:'Corto plazo', medio:'Medio plazo', largo:'Largo plazo'})[it.horizon]) +
        ' · ' + esc(it.track === 'negocio' ? 'Negocio' : 'Discovery') + '</h4>' +
        '<p class="detail-title">' + esc(it.title) + '</p>' +
@@ -884,7 +903,7 @@ function renderDetail(){
                 ' aria-pressed="' + (it.status === s.v) + '">' + s.t + '</button>';
        }).join('') + '</div></div>';
 
-  h += '<div class="detail-sec"><h4>Fechas</h4>' +
+  h += '<div class="detail-sec detail-sec--mid"><h4>Fechas</h4>' +
        '<div class="grid2">' +
        '<div><label class="lbl" for="dStart">Inicio</label><input type="date" id="dStart" class="field" value="' + (it.start_date || '') + '"></div>' +
        '<div><label class="lbl" for="dEnd">Fin</label><input type="date" id="dEnd" class="field" value="' + (it.end_date || '') + '"></div>' +
@@ -894,7 +913,7 @@ function renderDetail(){
        '</div>' +
        '<p class="hint">También puedes arrastrar la barra, o moverla con las flechas del teclado cuando tenga el foco.</p></div>';
 
-  h += '<div class="detail-sec"><h4>Entregables</h4>';
+  h += '<div class="detail-sec detail-sec--mid"><h4>Entregables</h4>';
   h += ds.length
     ? '<ul class="linklist">' + ds.map(function(d){
         return '<li class="linkrow"><a href="' + esc(safeUrl(d.url)) + '">' + esc(d.label) + '</a>' +
@@ -906,7 +925,7 @@ function renderDetail(){
        '<input type="url" id="dUrl" class="field" maxlength="600" placeholder="https://…">' +
        '<button type="button" class="btn" id="dAddLink">Añadir entregable</button></div></div>';
 
-  h += '<div class="detail-sec"><h4>Comentarios · ' + cs.length + '</h4>';
+  h += '<div class="detail-sec detail-sec--full"><h4>Comentarios · ' + cs.length + '</h4>';
   h += cs.length ? cs.map(function(c){
         return '<div class="comment"><div class="comment-h">' +
           '<span class="comment-who">' + esc(c.author_name) + '</span>' +
@@ -915,15 +934,16 @@ function renderDetail(){
           '<button type="button" class="mini comment-arch" data-com-rm="' + c.id + '" aria-label="Archivar este comentario">Archivar</button>' +
           '</div><p class="comment-b">' + esc(c.body) + '</p></div>';
       }).join('') : '<p class="hint" style="margin:0 0 .6rem">Todavía no hay comentarios.</p>';
-  h += '<div class="stack" style="margin-top:.7rem">' +
+  h += '<div class="stack stack--wide" style="margin-top:.7rem">' +
        '<label class="sr-only" for="cBody">Tu comentario</label>' +
        '<textarea id="cBody" class="field" maxlength="2000" placeholder="Escribe un comentario para el equipo…"></textarea>' +
        '<input type="text" id="cArea" class="field" maxlength="60" placeholder="Tu área (opcional)">' +
        '<button type="button" class="btn btn-primary" id="cAdd">Publicar comentario</button></div></div>';
 
-  h += '<div class="detail-sec"><button type="button" class="btn" id="dArchive">Archivar iniciativa</button>' +
+  h += '<div class="detail-sec detail-sec--full"><button type="button" class="btn" id="dArchive">Archivar iniciativa</button>' +
        '<p class="hint">No se borra: pasa al historial y se puede recuperar.</p></div>';
 
+  h += '</div>';
   box.innerHTML = h;
   wireDetail(it);
 }
@@ -1105,13 +1125,17 @@ function wireDetail(it){
 function select(id){
   state.selectedId = id;
   renderGantt(); renderTray(); renderDetail();
-  /* En móvil la ficha queda debajo de todo, y en escritorio puede caer fuera
-     de la pantalla: si no se ve, se trae. */
-  var card = $('detail').closest('.card');
+  /* La ficha es más alta que la pantalla, así que traerla del todo dejaría el
+     calendario fuera y se perdería de vista la barra que se acaba de pinchar.
+     Se sube solo hasta dejar su cabecera a un tercio de la altura: encima
+     queda el final del calendario y debajo la parte útil de la ficha. */
+  var card = $('detailCard');
   if(card){
     var r = card.getBoundingClientRect();
-    if(r.top > window.innerHeight - 120 || r.bottom < 80){
-      card.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    var objetivo = Math.round(window.innerHeight * 0.34);
+    if(r.top > objetivo + 40 || r.top < 0){
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollBy({ top: r.top - objetivo, behavior: reduce ? 'auto' : 'smooth' });
     }
   }
 }
