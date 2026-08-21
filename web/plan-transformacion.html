@@ -308,8 +308,8 @@
   }
 
   /* Bloque destacado dentro de prosa */
-  .callout{ margin-top: 2rem; max-width: 66ch; }
-  .callout p{ font-size: 1rem; }
+  .callout{ margin-top: 2rem; }
+  .callout p{ font-size: 1rem; max-width: 66ch; }
 
   /* Subtítulo dentro de sección */
   .subhead{
@@ -381,6 +381,37 @@
     font-size: clamp(1.125rem, 2.4vw, 1.5rem);
     font-weight: 700; line-height: 1.35; max-width: 44ch;
     padding-left: 1.25rem; border-left: 3px solid var(--accent);
+  }
+
+  /* Diagnóstico a dos columnas: el texto a la izquierda y un electro a la
+     derecha, que estaba desaprovechada. Es decorativo, así que se congela con
+     movimiento reducido y lleva su propio control de pausa (WCAG 2.2.2). */
+  .diag-grid{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,.8fr);
+              gap:clamp(1.5rem,4vw,3rem); align-items:center; }
+  @media (max-width:860px){ .diag-grid{ grid-template-columns:minmax(0,1fr); } }
+  .ecg{ display:flex; flex-direction:column; gap:.75rem; align-items:flex-start; }
+  .ecg-svg{ width:100%; max-width:24rem; height:auto; overflow:visible; }
+  .ecg-base, .ecg-live{ fill:none; stroke-linecap:round; stroke-linejoin:round; }
+  .ecg-base{ stroke:var(--border); stroke-width:1.6; }
+  .ecg-live{
+    stroke:var(--accent); stroke-width:2.2;
+    stroke-dasharray:70 930;
+    animation: ecg-run 4.4s linear infinite;
+    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent) 45%, transparent));
+  }
+  @keyframes ecg-run{ from{ stroke-dashoffset:1000; } to{ stroke-dashoffset:0; } }
+  .ecg.is-paused .ecg-live{ animation-play-state:paused; }
+  .ecg-toggle{
+    appearance:none; font-family:inherit; font-size:.6875rem; font-weight:700;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted);
+    background:transparent; border:1px solid var(--border); border-radius:999px;
+    padding:0 .8em; min-height:1.75rem; cursor:pointer; white-space:nowrap;
+  }
+  .ecg-toggle:hover{ color:var(--accent); border-color:var(--accent); }
+  @media (prefers-reduced-motion: reduce){
+    /* Sin movimiento: se ve el trazo entero, quieto, y sobra el control. */
+    .ecg-live{ animation:none; stroke-dasharray:none; opacity:.5; }
+    .ecg-toggle{ display:none; }
   }
 
   /* Roadmap en pequeño: solo lectura, lee el estado real de la herramienta.
@@ -472,9 +503,19 @@
       <div class="eyebrow">Briefing</div>
       <h2>Diagnóstico</h2>
     </div>
-    <div class="prose reveal">
-      <p>Actualmente, DPROMA gestiona la mayoría de sus operaciones de forma manual y dispersa. No existe una herramienta centralizada: la información se registra en hojas de cálculo (Excel), sin formatos comunes entre áreas. Las coordinaciones internas, con instaladores y clientes se realizan en gran medida por WhatsApp, lo que dificulta el seguimiento, la trazabilidad y la generación de reportes.</p>
-      <p>DPROMA opera hoy dos negocios de alto crecimiento, instalación de cargadores eléctricos y gestoría vehicular, sostenidos por la memoria y disponibilidad de las personas, sin una capa digital que centralice información, sin gobernanza sobre cómo se usan los datos o la IA, y sin un solo panel donde la dirección pueda ver el estado real de la operación.</p>
+    <div class="diag-grid">
+      <div class="prose reveal">
+        <p>Actualmente DPROMA gestiona la mayoría de sus operaciones de forma manual y dispersa. No existe una herramienta centralizada: la información se registra en hojas de cálculo (Excel), sin formatos comunes entre áreas. Las coordinaciones internas, con instaladores y clientes se realizan en gran medida por WhatsApp, lo que dificulta el seguimiento, la trazabilidad y la generación de reportes.</p>
+        <p>DPROMA opera hoy dos negocios de alto crecimiento, instalación de cargadores eléctricos y gestoría vehicular, sostenidos por la memoria y disponibilidad de las personas, sin una capa digital que centralice información, sin gobernanza sobre cómo se usan los datos o la IA, y sin un solo panel donde la dirección pueda ver el estado real de la operación.</p>
+      </div>
+      <div class="ecg reveal">
+        <svg class="ecg-svg" viewBox="0 0 240 80" role="img" aria-label="Trazo de electrocardiograma en movimiento, decorativo">
+          <path class="ecg-base" pathLength="1000" d="M0,40 h18 q5,-7 10,0 h8 l4,3 l5,-26 l5,38 l4,-15 h10 q8,-9 16,0 h40 h18 q5,-7 10,0 h8 l4,3 l5,-26 l5,38 l4,-15 h10 q8,-9 16,0 h40"/>
+          <path class="ecg-live" pathLength="1000" d="M0,40 h18 q5,-7 10,0 h8 l4,3 l5,-26 l5,38 l4,-15 h10 q8,-9 16,0 h40 h18 q5,-7 10,0 h8 l4,3 l5,-26 l5,38 l4,-15 h10 q8,-9 16,0 h40"/>
+        </svg>
+        <button type="button" class="ecg-toggle" id="ecgToggle" aria-pressed="false"
+                aria-label="Pausar la animación del electrocardiograma">Pausar</button>
+      </div>
     </div>
   </div>
 </section>
@@ -865,6 +906,19 @@
     });
   }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
   els.forEach(function(el){ io.observe(el); });
+})();
+
+/* Pausa del electro: arranca solo, se repite y convive con el texto, así que
+   necesita una forma de pararlo (WCAG 2.2.2). */
+(function(){
+  var btn = document.getElementById('ecgToggle');
+  if(!btn) return;
+  var fig = btn.closest('.ecg');
+  btn.addEventListener('click', function(){
+    var quieto = fig.classList.toggle('is-paused');
+    btn.setAttribute('aria-pressed', quieto ? 'true' : 'false');
+    btn.textContent = quieto ? 'Reanudar' : 'Pausar';
+  });
 })();
 </script>
 
