@@ -99,10 +99,26 @@ extender el sistema a pantallas con títulos de sección o cifras grandes, retom
 
 ## 3. Espaciado y radios
 
+Escala base 4px (`--sp-2` = 2×4, `--sp-6` = 6×4...), aunque el nombre del token no es el
+multiplicador — es un identificador arbitrario, no una fórmula a extrapolar sin mirar la tabla:
+
 ```css
 --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-6:24px; --sp-8:32px;
 --r-ctrl:6px; --r-card:10px; --r-modal:16px;
 ```
+
+| Token | Valor | Uso |
+|---|---|---|
+| `--sp-2` | 8px | Separación mínima (icono-texto, gap entre chips) |
+| `--sp-3` | 12px | Gap interno de fila (paso numerado, botón) |
+| `--sp-4` | 16px | Padding de control, gap entre bloques cortos |
+| `--sp-6` | 24px | Padding de sección, margen entre grupos |
+| `--sp-8` | 32px | Padding de la tarjeta principal, columnas del layout |
+
+La maqueta original define además `--sp-1` (4px) y `--sp-12` (48px) para los extremos —
+espaciado mínimo entre elementos muy pegados, y separación grande entre secciones—, que la
+propuesta de acceso no llegó a necesitar. Añadirlos si hace falta ese rango, en vez de usar un
+valor suelto fuera de la escala.
 
 | Token | Valor | Uso |
 |---|---|---|
@@ -227,12 +243,24 @@ lector de pantalla.
 
 ### 6.4 Iconos (`.msi`)
 
-Material Symbols Rounded, variante rellena (`FILL@1`). Se cargan por subconjunto —solo los
-nombres que se usan— para no pedir la fuente completa:
+Material Symbols Rounded, variante rellena (`FILL@1`). Buscar y elegir el icono en
+[fonts.google.com/icons](https://fonts.google.com/icons) — filtrar por estilo **Rounded** (no
+Outlined ni Sharp, para que combine con el resto) y copiar el nombre exacto que aparece debajo
+del icono (p. ej. `account_circle`), que es el mismo nombre que va en el HTML y en `icon_names`
+del `<link>`.
+
+Se cargan por subconjunto —solo los nombres que se usan— para no pedir la fuente completa. Al
+añadir un icono nuevo, se añade su nombre a la lista de `icon_names` del `<link>` existente, no
+se crea un `<link>` aparte:
 
 ```html
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=account_circle,badge,cloud_off,login,lock,logout,refresh,support_agent&display=block" rel="stylesheet">
 ```
+
+Los cuatro ejes del nombre de familia (`opsz,wght,FILL,GRAD@24,500,1,0`) fijan el aspecto para
+todos los iconos que pidas con ese `<link>` — tamaño óptico 24, peso 500, relleno activado,
+grado neutro. No hace falta tocarlos por icono; se heredan igual en `font-variation-settings`
+de `.msi`.
 
 ```css
 .msi{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;
