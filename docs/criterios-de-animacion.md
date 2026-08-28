@@ -65,3 +65,4 @@ detenerse. Cualquier bucle decorativo entra ahí.
 |---|---|
 | `web/plan-transformacion.html` | Electrocardiograma del Diagnóstico. Sigue este criterio. |
 | `web/entregables/recomendaciones-login.html` | Cinco simulaciones de la pantalla de acceso. **Todavía usan botón «Pausar» aparte**, de antes de esta norma. Pendiente de convertir. |
+| `web/entregables/propuestas/acceso-sio-dproma.html` | Ilustración de la estación de carga. Sigue este criterio: se pausa pulsándola. |
