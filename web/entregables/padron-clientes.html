@@ -516,8 +516,32 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
 .footer-nav{ margin-bottom: 1.5rem; }
 .footer-nav a{ color: var(--accent); text-decoration:none; font-weight: 500; font-size: 0.9375rem; }
 
+/* ═══ Pestañas ═══════════════════════════════════════════════════════════════
+   Mismo patrón que el entregable del acceso, con una diferencia de color: allí
+   la pestaña elegida se rellena de acento con --chip-cliente-bg, token que aquí
+   no existe. Y rellenarla con --accent tampoco vale: en oscuro, --on-accent
+   sobre --accent da 4,16:1 y este texto va a 14px en negrita, que pide 4,5:1.
+   Así que la elegida se levanta sobre --surface con el texto en --text —19,7:1
+   en claro y 16,8:1 en oscuro— y se marca con un borde de acento, que como
+   elemento gráfico solo necesita 3:1 y da 5,14 y 3,76. */
+.tabs-wrap{padding:clamp(2rem,5vw,3rem) 0 0}
+.tabs{display:inline-flex;gap:.3rem;background:var(--surface-alt);padding:.3rem;
+  border-radius:999px;border:1px solid var(--border);max-width:100%;flex-wrap:wrap}
+.tab{appearance:none;font-family:inherit;font-size:.875rem;font-weight:700;
+  padding:.62em 1.25em;border-radius:999px;border:1px solid transparent;
+  background:transparent;color:var(--text-muted);cursor:pointer;min-height:2.75rem;
+  transition:background-color 160ms ease,color 160ms ease,border-color 160ms ease}
+.tab:hover{color:var(--text)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--text);
+  border-color:var(--accent);box-shadow:var(--shadow)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.tabs-note{margin-top:.85rem;font-size:.8125rem;color:var(--text-muted);max-width:62ch}
+.panel:focus{outline:none}
+.panel[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.tab{transition:none}}
+
 /* Índice de las tres maquetas del módulo */
-.maquetas-mod{padding:clamp(3rem,7vw,5rem) 0;border-top:1px solid var(--border,#e5e7eb)}
+.maquetas-mod{padding:clamp(2rem,5vw,3rem) 0 clamp(3rem,7vw,5rem)}
 .maquetas-lede{max-width:62ch;margin:.75rem 0 1.75rem}
 .maquetas-lista{list-style:none;padding:0;margin:0;display:grid;gap:1rem;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
@@ -527,6 +551,10 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
 .maquetas-lista a:hover{border-color:currentColor;transform:translateY(-2px)}
 .maquetas-lista b{font-size:1.0625rem}
 .maquetas-lista span{font-size:.9375rem;opacity:.78;line-height:1.5}
+.maquetas-cambio{font-size:.875rem;opacity:1;color:var(--text-muted);
+  margin-top:.5rem;padding-top:.7rem;border-top:1px solid var(--border)}
+.maquetas-cambio code{font-size:.875em;padding:.1em .3em;border-radius:4px;
+  background:rgba(127,127,127,.14)}
 .maquetas-pie{margin-top:1.5rem;font-size:.9375rem;opacity:.75;max-width:70ch}
 .maquetas-pie code{font-size:.875em;padding:.1em .35em;border-radius:4px;
   background:rgba(127,127,127,.14)}
@@ -546,6 +574,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       <a href="#automatizaciones">Automatizaciones</a>
       <a href="#ia">Inteligencia artificial</a>
       <a href="#conclusiones">Conclusiones</a>
+      <a href="#pantallas">Las pantallas</a>
       <a class="nav-cta" href="/entregables">Entregables</a>
     </nav>
   </div>
@@ -569,6 +598,21 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     </div>
   </div>
 </section>
+
+<div class="tabs-wrap">
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Contenido del entregable">
+      <button type="button" class="tab" id="t-diag" role="tab"
+              aria-selected="true" aria-controls="p-diag">Diagnóstico</button>
+      <button type="button" class="tab" id="t-pant" role="tab"
+              aria-selected="false" aria-controls="p-pant" tabindex="-1">Las pantallas</button>
+    </div>
+    <p class="tabs-note">El diagnóstico es el análisis del módulo tal como está hoy. Las pantallas
+      son la propuesta ya construida: se abren, se prueban y se recorren con el teclado.</p>
+  </div>
+</div>
+
+<div class="panel" id="p-diag" role="tabpanel" aria-labelledby="t-diag" tabindex="-1">
 
 <section id="diagnostico">
   <div class="wrap">
@@ -2097,40 +2141,70 @@ fase 5  solo lo aprobado se escribe en cliente, sucursal, contacto</div>
   </div>
 </section>
 
-<!-- Las tres pantallas del módulo, con las recomendaciones de UX, interfaz y
+</div><!-- /#p-diag -->
+
+<!-- Las cinco pantallas del módulo, con las recomendaciones de UX, interfaz y
      accesibilidad ya aplicadas. Mismo patrón que la propuesta del acceso. -->
-<section class="maquetas-mod">
+<div class="panel" id="p-pant" role="tabpanel" aria-labelledby="t-pant" tabindex="-1" hidden>
+
+<section class="maquetas-mod" id="pantallas">
   <div class="wrap">
     <h2>Las pantallas, para abrirlas</h2>
-    <p class="maquetas-lede">No son dibujos: son las tres pantallas del módulo de clientes,
-      construidas con los tokens del sistema y con los hallazgos de la revisión aplicados. Se
-      pueden abrir, cambiar entre los cuatro estados, probar el tema claro y oscuro y recorrerlas
-      con el teclado. Lo que se ve es lo que hay que construir.</p>
+    <p class="maquetas-lede">No son dibujos: son las cinco pantallas del módulo de clientes,
+      construidas con los tokens del sistema de diseño y con los hallazgos de la revisión ya
+      aplicados. Se pueden abrir, cambiar entre sus estados —con datos, cargando, vacío y error—,
+      probar el tema claro y el oscuro, estrecharlas hasta el móvil y recorrerlas solo con el
+      teclado. Lo que se ve es lo que hay que construir.</p>
     <ul class="maquetas-lista">
       <li><a href="/entregables/propuestas/padron-clientes">
         <b>Padrón de clientes</b>
         <span>La lista completa: resumen de estatus, filtros, expediente documental,
-          sucursales desplegables y detección de duplicados.</span></a></li>
+          sucursales desplegables y detección de duplicados.</span>
+        <span class="maquetas-cambio">Se separan el resumen y los filtros, que llegaban en la
+          misma fila y con la misma forma. Y se escribe la capa interactiva, que no existía:
+          los chips no filtraban, las columnas no se ordenaban y cuatro de los cinco botones de
+          sucursales apuntaban a filas inexistentes.</span></a></li>
       <li><a href="/entregables/propuestas/ficha-cliente">
         <b>Ficha de cliente</b>
         <span>Identidad fiscal, contactos con sus cuatro listas, actividad en otros módulos
-          e historial de cambios.</span></a></li>
+          e historial de cambios.</span>
+        <span class="maquetas-cambio">Se corrigen cuatro <code>id</code> duplicados: por uno de
+          ellos, la explicación de por qué un botón estaba bloqueado nunca llegaba a un lector de
+          pantalla. Y el tope de contactos pedía «retira uno» sin que existiera forma de
+          retirar.</span></a></li>
       <li><a href="/entregables/propuestas/alta-cliente">
         <b>Alta de nuevo cliente</b>
         <span>El formulario de alta de una razón social, con sus dos niveles de
-          obligatoriedad y la subida de documentos.</span></a></li>
+          obligatoriedad y la subida de documentos.</span>
+        <span class="maquetas-cambio">«Tipo de cliente» era un campo editable con «Se calcula
+          solo» escrito dentro. Los documentos se pedían en cajas de texto, sin un
+          <code>type="file"</code> en todo el archivo. Y en error desaparecía el formulario
+          entero mientras el aviso decía que lo capturado seguía ahí.</span></a></li>
       <li><a href="/entregables/propuestas/editar-cliente">
         <b>Cambiar razón social</b>
         <span>El diálogo que se abre desde el padrón, con sus tres momentos:
-          editando, guardando y error al guardar.</span></a></li>
+          editando, guardando y error al guardar.</span>
+        <span class="maquetas-cambio">Se separa la maqueta de su especificación, que venían
+          mezcladas. Al medirlo apareció la causa de «los elementos están muy juntos»: un token
+          de espaciado que no existía en ninguna parte y se usaba cuatro veces.</span></a></li>
+      <li><a href="/entregables/propuestas/acceso-sio-dproma">
+        <b>Acceso al sistema</b>
+        <span>La pantalla de entrada, de la que salió el sistema de diseño que comparten
+          todas las demás.</span>
+        <span class="maquetas-cambio">Es la referencia: no se ha tocado en esta revisión. Se
+          incluye aquí para poder compararla con las cuatro anteriores y comprobar que son la
+          misma familia.</span></a></li>
     </ul>
-    <p class="maquetas-pie">El sistema de diseño que comparten está en
-      <code>docs/sistema-diseno-sio-dproma.md</code>; las decisiones de producto que hubo que
-      tomar para resolver los hallazgos, en <code>docs/decisiones-producto-padron.md</code>; y la
-      especificación del patrón de diálogo —foco, medidas y qué formularios caben en uno— en
-      <code>docs/patron-dialogo-sio-dproma.md</code>.</p>
+    <p class="maquetas-pie">El sistema de diseño que comparten se puede leer en el entregable
+      <a href="/entregables/reglas-de-diseno">Sistema de diseño</a>. Las decisiones de producto que
+      hubo que tomar para resolver los hallazgos están en
+      <code>docs/decisiones-producto-padron.md</code>, cada una con lo que habría que validar con
+      DPROMA; y la especificación del patrón de diálogo —foco, medidas y qué formularios caben en
+      uno— en <code>docs/patron-dialogo-sio-dproma.md</code>.</p>
   </div>
 </section>
+
+</div><!-- /#p-pant -->
 
 
 <footer>
@@ -2144,6 +2218,69 @@ fase 5  solo lo aprobado se escribe en cliente, sucursal, contacto</div>
 </footer>
 
 <script>
+/* Pestañas. El panel oculto no dispara el IntersectionObserver de .reveal, así
+   que al abrirlo hay que revelar lo suyo o el contenido se queda invisible. */
+(function(){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  if(!tabs.length) return;
+  var paneles = tabs.map(function(t){ return document.getElementById(t.getAttribute('aria-controls')); });
+
+  function revela(panel){
+    panel.querySelectorAll('.reveal:not(.is-visible)').forEach(function(el){
+      el.classList.add('is-visible');
+    });
+  }
+  function activa(tab, mueveFoco){
+    tabs.forEach(function(t, i){
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      paneles[i].hidden = !on;
+      if(on) revela(paneles[i]);
+    });
+    if(mueveFoco) tab.focus();
+  }
+  tabs.forEach(function(tab, i){
+    tab.addEventListener('click', function(){ activa(tab, false); });
+    tab.addEventListener('keydown', function(e){
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if(d){ e.preventDefault(); activa(tabs[(i + d + tabs.length) % tabs.length], true); }
+      else if(e.key === 'Home'){ e.preventDefault(); activa(tabs[0], true); }
+      else if(e.key === 'End'){ e.preventDefault(); activa(tabs[tabs.length - 1], true); }
+    });
+  });
+
+  /* Un enlace a una sección abre antes la pestaña que la contiene: si no, el
+     navegador no encuentra a dónde desplazarse. */
+  function abrePara(hash){
+    if(!hash || hash === '#') return false;
+    var destino;
+    try { destino = document.querySelector(hash); } catch(err){ return false; }
+    if(!destino) return false;
+    var panel = destino.closest('.panel');
+    if(!panel) return false;
+    var i = paneles.indexOf(panel);
+    if(i < 0 || !panel.hidden) return false;
+    activa(tabs[i], false);
+    return true;
+  }
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(){
+      if(abrePara(a.getAttribute('href'))){
+        var destino = document.querySelector(a.getAttribute('href'));
+        requestAnimationFrame(function(){ destino.scrollIntoView({ block:'start' }); });
+      }
+    });
+  });
+
+  /* #pantallas abre la pestaña de las maquetas: sirve para enviar el enlace directo. */
+  function porHash(){
+    if(location.hash === '#pantallas'){ activa(tabs[1], false); return; }
+    abrePara(location.hash);
+  }
+  window.addEventListener('hashchange', porHash);
+  porHash();
+})();
 /* Reveal-on-scroll */
 (function(){
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
