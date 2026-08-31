@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,arrow_downward,bolt,check_circle,confirmation_number,credit_card,dark_mode,dashboard,description,download,edit,error,expand_more,folder,group,inbox,inventory_2,light_mode,link,location_on,menu,receipt_long,refresh,schedule,trending_up&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,arrow_downward,bolt,check_circle,close,confirmation_number,credit_card,dark_mode,dashboard,description,download,edit,error,expand_more,folder,group,inbox,inventory_2,light_mode,link,location_on,menu,receipt_long,refresh,schedule,trending_up,warning&display=block" rel="stylesheet">
 <style>
 :root{
 --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -541,6 +541,38 @@ tbody th:first-child::after,thead th:first-child::after{content:"";position:abso
 
 
 
+/* ARQ-FICHA-EXTRA */
+/* Sigue en el orden de tabulación y sigue anunciando por qué no se puede
+   añadir: con [disabled] el teclado pasaba de largo (doc §6.16). */
+.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+.btn[aria-disabled="true"]:hover{background:var(--surface);border-color:var(--border-2)}
+.marcas{display:flex;flex-direction:column;gap:var(--sp-2);align-items:flex-start}
+.grupo-marcas{display:flex;flex-direction:column;gap:5px}
+.grupo-marcas .et-marca{font-size:10.5px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--text-3)}
+.grupo-marcas{flex-direction:row;align-items:center;flex-wrap:wrap}
+.grupo-marcas .et-marca{width:100%}
+
+/* El aviso de alcance parcial usa la banda del sistema, con su propio icono. */
+.banda-warn{background:var(--warn-bg);color:var(--warn-ink);border-color:transparent}
+.banda-warn .msi{color:var(--warn-ink)}
+
+/* La ayuda larga se abre a petición: eran cinco líneas antes del primer dato. */
+.mas-ayuda{background:transparent;border:0;color:var(--link);cursor:pointer;
+  font:600 var(--fs-dense) var(--font-ui);text-decoration:underline;min-height:24px;
+  padding:0 2px;border-radius:4px}
+.ayuda-larga{margin:0 0 var(--sp-3);padding:var(--sp-3) var(--sp-4);background:var(--surface-2);
+  border-radius:var(--r-ctrl)}
+.ayuda-larga p{font-size:var(--fs-dense);color:var(--text-2);line-height:1.55;margin:0;max-width:88ch}
+
+/* Un valor de contacto es accionable: se llama, se escribe, se copia. */
+a.valor{color:var(--link);text-decoration:none}
+a.valor:hover{text-decoration:underline}
+/* Enlaces que son el elemento primario de su fila, no texto en prosa: llegan a
+   24px de alto (doc §7.3). */
+.maps,.folio,.migas a{min-height:24px;display:inline-flex;align-items:center;padding:2px 0}
+/* @fin ARQ-FICHA-EXTRA */
+
 /* ARQ-ESTADOS */
 .skel{display:block;height:12px;border-radius:4px;
   background:linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%);
@@ -695,10 +727,12 @@ main[data-state="loading"] .state-loading{display:flex}
 <h2 id="id-t">Comercializadora Vértice del Bajío, S.&nbsp;A. de C.&nbsp;V.</h2>
 <span class="rfc" translate="no">RFC CVB240118QT7</span>
 <div class="marcas">
+<span class="grupo-marcas"><span class="et-marca">Clasificación</span>
 <span class="p-type p-s1">Empresa</span>
+<span class="p-type p-s2">Grupo Automotriz Vértice</span></span>
+<span class="grupo-marcas"><span class="et-marca">Estado</span>
 <span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Comercialmente activo</span>
-<span class="pill p-warn"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span>Falta 1 de 2 documentos</span>
-<span class="p-type p-s2">Grupo Automotriz Vértice</span>
+<span class="pill p-warn"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span>Falta 1 de 2 documentos</span></span>
 </div>
 </div>
 <div class="princ">
@@ -714,94 +748,95 @@ main[data-state="loading"] .state-loading{display:flex}
 
 <section class="grupo-t" aria-labelledby="cont-t">
 <h3 id="cont-t">Contactos</h3>
-<p class="ayuda"><b>El cliente tiene un contacto principal, uno solo.</b> Es la persona con la que se trata, y sus datos son los que el sistema usa por omisión para avisos y acuses. Designar a otro libera al anterior. Cada contacto guarda sus propios datos en cuatro listas —correos, teléfonos, direcciones y domicilios de agencia— con hasta cuatro registros cada una y una etiqueta libre por renglón.</p>
-<article class="contacto es-principal">
+<p class="ayuda"><b>Cada cliente tiene un contacto principal, uno solo:</b> designar a otro libera al anterior. <button class="mas-ayuda" type="button" aria-expanded="false" aria-controls="ayuda-contactos">Cómo funcionan las listas</button></p>
+<div class="ayuda-larga" id="ayuda-contactos" hidden><p>Los datos del contacto principal son los que el sistema usa por omisión para avisos y acuses. Cada contacto guarda los suyos en cuatro listas —correos, teléfonos, direcciones y domicilios de agencia— con hasta cuatro registros cada una y una etiqueta libre por renglón.</p></div>
+<article class="contacto es-principal" aria-labelledby="c1-nombre">
 <header>
 <span class="av" aria-hidden="true">RM</span>
-<span class="qq"><b>Rosalía Mendieta Quiroz</b><small>Gerente de flotilla · sucursal Querétaro Centro</small></span>
+<span class="qq"><h4 id="c1-nombre">Rosalía Mendieta Quiroz</h4><small>Gerente de flotilla · sucursal Querétaro Centro</small></span>
 <span class="acc"><span class="marca-pr"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Contacto principal</span><button class="btn mini" type="button">Editar</button></span>
 </header>
 <div class="listas">
-<section class="lista" aria-labelledby="l-CORREO-20">
-<header><span class="msi msi-sm" aria-hidden="true" translate="no">link</span><h4 id="l-CORREO-20">Correos</h4><span class="cupo tnum">2 de 4</span></header>
+<section class="lista" aria-labelledby="c1-correo">
+<header><span class="msi msi-sm" aria-hidden="true" translate="no">link</span><h5 id="c1-correo">Correos</h5><span class="cupo tnum">2 de 4</span></header>
 <div class="dato">
-<span class="cu"><span class="valor">r.mendieta@verticebajio.example</span>
+<span class="cu"><a class="valor" href="mailto:r.mendieta@verticebajio.example" title="r.mendieta@verticebajio.example">r.mendieta@verticebajio.example</a>
 <span class="bajo"><span class="etq">trabajo</span></span></span>
-<span class="acciones"><button class="iconbtn" type="button" aria-label="Editar r.mendieta@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button></span>
+<span class="acciones"><button class="iconbtn" type="button" title="Editar" aria-label="Editar r.mendieta@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button><button class="iconbtn" type="button" title="Retirar" aria-label="Retirar r.mendieta@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">close</span></button></span>
 </div><div class="dato">
-<span class="cu"><span class="valor">rosalia.mq@verticebajio.example</span>
+<span class="cu"><a class="valor" href="mailto:rosalia.mq@verticebajio.example" title="rosalia.mq@verticebajio.example">rosalia.mq@verticebajio.example</a>
 <span class="bajo"><span class="etq">alterno</span></span></span>
-<span class="acciones"><button class="iconbtn" type="button" aria-label="Editar rosalia.mq@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button></span>
-</div><footer><button class="btn mini" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir</button><span class="motivo" id="tope-CORREO">Hasta 4.</span></footer>
-</section><section class="lista" aria-labelledby="l-TELEFONO-22">
-<header><span class="msi msi-sm" aria-hidden="true" translate="no">credit_card</span><h4 id="l-TELEFONO-22">Teléfonos</h4><span class="cupo tnum">2 de 4</span></header>
+<span class="acciones"><button class="iconbtn" type="button" title="Editar" aria-label="Editar rosalia.mq@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button><button class="iconbtn" type="button" title="Retirar" aria-label="Retirar rosalia.mq@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">close</span></button></span>
+</div><footer><button class="btn mini" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir</button></footer>
+</section><section class="lista" aria-labelledby="c1-telefono">
+<header><span class="msi msi-sm" aria-hidden="true" translate="no">credit_card</span><h5 id="c1-telefono">Teléfonos</h5><span class="cupo tnum">2 de 4</span></header>
 <div class="dato">
-<span class="cu"><span class="valor">+52 442 000 0001</span>
+<span class="cu"><a class="valor" href="tel:+524420000001" title="+52 442 000 0001">+52 442 000 0001</a>
 <span class="bajo"><span class="etq">móvil</span></span></span>
-<span class="acciones"><button class="iconbtn" type="button" aria-label="Editar +52 442 000 0001"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button></span>
+<span class="acciones"><button class="iconbtn" type="button" title="Editar" aria-label="Editar +52 442 000 0001"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button><button class="iconbtn" type="button" title="Retirar" aria-label="Retirar +52 442 000 0001"><span class="msi msi-sm" aria-hidden="true" translate="no">close</span></button></span>
 </div><div class="dato">
 <span class="cu"><span class="valor">+52 442 000 0002 ext. 118</span>
 <span class="bajo"><span class="etq">conmutador</span></span></span>
-<span class="acciones"><button class="iconbtn" type="button" aria-label="Editar +52 442 000 0002 ext. 118"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button></span>
-</div><footer><button class="btn mini" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir</button><span class="motivo" id="tope-TELEFONO">Hasta 4.</span></footer>
-</section><section class="lista" aria-labelledby="l-DIRECCION-16">
-<header><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span><h4 id="l-DIRECCION-16">Direcciones</h4><span class="cupo tnum">1 de 4</span></header>
+<span class="acciones"><button class="iconbtn" type="button" title="Editar" aria-label="Editar +52 442 000 0002 ext. 118"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button><button class="iconbtn" type="button" title="Retirar" aria-label="Retirar +52 442 000 0002 ext. 118"><span class="msi msi-sm" aria-hidden="true" translate="no">close</span></button></span>
+</div><footer><button class="btn mini" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir</button></footer>
+</section><section class="lista" aria-labelledby="c1-direccion">
+<header><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span><h5 id="c1-direccion">Direcciones</h5><span class="cupo tnum">1 de 4</span></header>
 <div class="dato">
 <span class="cu"><span class="valor dir">Av. Constituyentes Pte. 1204, Col. El Jacal, 76180 Santiago de Querétaro, Qro.</span>
 <span class="bajo"><span class="etq">oficinas centrales</span><a class="maps" href="#"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>Ver en Maps</a></span></span>
-<span class="acciones"><button class="iconbtn" type="button" aria-label="Editar Av. Constituyentes Pte. 1204, Col. El Jacal, 76180 Santiago de Querétaro, Qro."><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button></span>
-</div><footer><button class="btn mini" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir</button><span class="motivo" id="tope-DIRECCION">Hasta 4.</span></footer>
-</section><section class="lista" aria-labelledby="l-DOMICILIO_AGENCIA-24">
-<header><span class="msi msi-sm" aria-hidden="true" translate="no">folder</span><h4 id="l-DOMICILIO_AGENCIA-24">Domicilios de agencia</h4><span class="cupo tnum">1 de 4</span></header>
+<span class="acciones"><button class="iconbtn" type="button" title="Editar" aria-label="Editar Av. Constituyentes Pte. 1204, Col. El Jacal, 76180 Santiago de Querétaro, Qro."><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button><button class="iconbtn" type="button" title="Retirar" aria-label="Retirar Av. Constituyentes Pte. 1204, Col. El Jacal, 76180 Santiago de Querétaro, Qro."><span class="msi msi-sm" aria-hidden="true" translate="no">close</span></button></span>
+</div><footer><button class="btn mini" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir</button></footer>
+</section><section class="lista" aria-labelledby="c1-domicilio_agencia">
+<header><span class="msi msi-sm" aria-hidden="true" translate="no">folder</span><h5 id="c1-domicilio_agencia">Domicilios de agencia</h5><span class="cupo tnum">1 de 4</span></header>
 <div class="dato">
 <span class="cu"><span class="valor dir">Blvd. Bernardo Quintana 501-B, Col. Centro Sur, 76090 Querétaro, Qro.</span>
 <span class="bajo"><span class="etq">punto de carga</span><a class="maps" href="#"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>Ver en Maps</a></span></span>
-<span class="acciones"><button class="iconbtn" type="button" aria-label="Editar Blvd. Bernardo Quintana 501-B, Col. Centro Sur, 76090 Querétaro, Qro."><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button></span>
-</div><footer><button class="btn mini" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir</button><span class="motivo" id="tope-DOMICILIO_AGENCIA">Hasta 4.</span></footer>
+<span class="acciones"><button class="iconbtn" type="button" title="Editar" aria-label="Editar Blvd. Bernardo Quintana 501-B, Col. Centro Sur, 76090 Querétaro, Qro."><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button><button class="iconbtn" type="button" title="Retirar" aria-label="Retirar Blvd. Bernardo Quintana 501-B, Col. Centro Sur, 76090 Querétaro, Qro."><span class="msi msi-sm" aria-hidden="true" translate="no">close</span></button></span>
+</div><footer><button class="btn mini" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir</button></footer>
 </section>
 </div>
-</article><article class="contacto">
+</article><article class="contacto" aria-labelledby="c2-nombre">
 <header>
 <span class="av" aria-hidden="true">LC</span>
-<span class="qq"><b>Luis Cárdenas Villaseñor</b><small>Responsable de pagos · sucursal Querétaro Centro</small></span>
+<span class="qq"><h4 id="c2-nombre">Luis Cárdenas Villaseñor</h4><small>Responsable de pagos · sucursal Querétaro Centro</small></span>
 <span class="acc"><button class="btn mini" type="button">Hacer principal</button><button class="btn mini" type="button">Editar</button></span>
 </header>
 <div class="listas">
-<section class="lista" aria-labelledby="l-CORREO-34">
-<header><span class="msi msi-sm" aria-hidden="true" translate="no">link</span><h4 id="l-CORREO-34">Correos</h4><span class="cupo tnum lleno">4 de 4</span></header>
+<section class="lista" aria-labelledby="c2-correo">
+<header><span class="msi msi-sm" aria-hidden="true" translate="no">link</span><h5 id="c2-correo">Correos</h5><span class="cupo tnum lleno">4 de 4</span></header>
 <div class="dato">
-<span class="cu"><span class="valor">pagos@verticebajio.example</span>
+<span class="cu"><a class="valor" href="mailto:pagos@verticebajio.example" title="pagos@verticebajio.example">pagos@verticebajio.example</a>
 <span class="bajo"><span class="etq">pagos</span></span></span>
-<span class="acciones"><button class="iconbtn" type="button" aria-label="Editar pagos@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button></span>
+<span class="acciones"><button class="iconbtn" type="button" title="Editar" aria-label="Editar pagos@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button><button class="iconbtn" type="button" title="Retirar" aria-label="Retirar pagos@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">close</span></button></span>
 </div><div class="dato">
-<span class="cu"><span class="valor">facturacion@verticebajio.example</span>
+<span class="cu"><a class="valor" href="mailto:facturacion@verticebajio.example" title="facturacion@verticebajio.example">facturacion@verticebajio.example</a>
 <span class="bajo"><span class="etq">facturación</span></span></span>
-<span class="acciones"><button class="iconbtn" type="button" aria-label="Editar facturacion@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button></span>
+<span class="acciones"><button class="iconbtn" type="button" title="Editar" aria-label="Editar facturacion@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button><button class="iconbtn" type="button" title="Retirar" aria-label="Retirar facturacion@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">close</span></button></span>
 </div><div class="dato">
-<span class="cu"><span class="valor">l.cardenas@verticebajio.example</span>
+<span class="cu"><a class="valor" href="mailto:l.cardenas@verticebajio.example" title="l.cardenas@verticebajio.example">l.cardenas@verticebajio.example</a>
 <span class="bajo"><span class="etq">trabajo</span></span></span>
-<span class="acciones"><button class="iconbtn" type="button" aria-label="Editar l.cardenas@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button></span>
+<span class="acciones"><button class="iconbtn" type="button" title="Editar" aria-label="Editar l.cardenas@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button><button class="iconbtn" type="button" title="Retirar" aria-label="Retirar l.cardenas@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">close</span></button></span>
 </div><div class="dato">
-<span class="cu"><span class="valor">tesoreria@verticebajio.example</span>
+<span class="cu"><a class="valor" href="mailto:tesoreria@verticebajio.example" title="tesoreria@verticebajio.example">tesoreria@verticebajio.example</a>
 <span class="bajo"><span class="etq">tesorería</span></span></span>
-<span class="acciones"><button class="iconbtn" type="button" aria-label="Editar tesoreria@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button></span>
-</div><footer><button class="btn mini" type="button" disabled aria-describedby="tope-CORREO"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir</button><span class="motivo tope" id="tope-CORREO">Tope: 4 de 4. Retira uno para añadir otro correo.</span></footer>
-</section><section class="lista" aria-labelledby="l-TELEFONO-15">
-<header><span class="msi msi-sm" aria-hidden="true" translate="no">credit_card</span><h4 id="l-TELEFONO-15">Teléfonos</h4><span class="cupo tnum">1 de 4</span></header>
+<span class="acciones"><button class="iconbtn" type="button" title="Editar" aria-label="Editar tesoreria@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button><button class="iconbtn" type="button" title="Retirar" aria-label="Retirar tesoreria@verticebajio.example"><span class="msi msi-sm" aria-hidden="true" translate="no">close</span></button></span>
+</div><footer><button class="btn mini" type="button" aria-disabled="true" aria-describedby="c2-tope-correo"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir</button><span class="motivo tope" id="c2-tope-correo">Tope: 4 de 4. Retira uno para añadir otro correo.</span></footer>
+</section><section class="lista" aria-labelledby="c2-telefono">
+<header><span class="msi msi-sm" aria-hidden="true" translate="no">credit_card</span><h5 id="c2-telefono">Teléfonos</h5><span class="cupo tnum">1 de 4</span></header>
 <div class="dato">
-<span class="cu"><span class="valor">+52 442 000 0004</span>
+<span class="cu"><a class="valor" href="tel:+524420000004" title="+52 442 000 0004">+52 442 000 0004</a>
 <span class="bajo"><span class="etq">móvil</span></span></span>
-<span class="acciones"><button class="iconbtn" type="button" aria-label="Editar +52 442 000 0004"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button></span>
-</div><footer><button class="btn mini" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir</button><span class="motivo" id="tope-TELEFONO">Hasta 4.</span></footer>
-</section><section class="lista" aria-labelledby="l-DIRECCION-16">
-<header><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span><h4 id="l-DIRECCION-16">Direcciones</h4><span class="cupo tnum">1 de 4</span></header>
+<span class="acciones"><button class="iconbtn" type="button" title="Editar" aria-label="Editar +52 442 000 0004"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button><button class="iconbtn" type="button" title="Retirar" aria-label="Retirar +52 442 000 0004"><span class="msi msi-sm" aria-hidden="true" translate="no">close</span></button></span>
+</div><footer><button class="btn mini" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir</button></footer>
+</section><section class="lista" aria-labelledby="c2-direccion">
+<header><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span><h5 id="c2-direccion">Direcciones</h5><span class="cupo tnum">1 de 4</span></header>
 <div class="dato">
 <span class="cu"><span class="valor dir">Blvd. Bernardo Quintana 501-B, Col. Centro Sur, 76090 Querétaro, Qro.</span>
 <span class="bajo"><span class="etq">administración</span><a class="maps" href="#"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>Ver en Maps</a></span></span>
-<span class="acciones"><button class="iconbtn" type="button" aria-label="Editar Blvd. Bernardo Quintana 501-B, Col. Centro Sur, 76090 Querétaro, Qro."><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button></span>
-</div><footer><button class="btn mini" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir</button><span class="motivo" id="tope-DIRECCION">Hasta 4.</span></footer>
-</section><section class="lista" aria-labelledby="l-DOMICILIO_AGENCIA-17">
-<header><span class="msi msi-sm" aria-hidden="true" translate="no">folder</span><h4 id="l-DOMICILIO_AGENCIA-17">Domicilios de agencia</h4><span class="cupo tnum">0 de 4</span></header>
+<span class="acciones"><button class="iconbtn" type="button" title="Editar" aria-label="Editar Blvd. Bernardo Quintana 501-B, Col. Centro Sur, 76090 Querétaro, Qro."><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button><button class="iconbtn" type="button" title="Retirar" aria-label="Retirar Blvd. Bernardo Quintana 501-B, Col. Centro Sur, 76090 Querétaro, Qro."><span class="msi msi-sm" aria-hidden="true" translate="no">close</span></button></span>
+</div><footer><button class="btn mini" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir</button></footer>
+</section><section class="lista" aria-labelledby="c2-domicilio_agencia">
+<header><span class="msi msi-sm" aria-hidden="true" translate="no">folder</span><h5 id="c2-domicilio_agencia">Domicilios de agencia</h5><span class="cupo tnum">0 de 4</span></header>
 <div class="vacia"><span class="msi" aria-hidden="true" translate="no">inbox</span><b>Sin domicilios de agencia</b><p>Es el tipo que usa el instalador para llegar: si falta, la orden se programa sin destino verificable.</p><button class="btn mini" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir domicilio</button></div>
 </section>
 </div>
@@ -809,9 +844,10 @@ main[data-state="loading"] .state-loading{display:flex}
 <p style="font-size:var(--fs-dense);color:var(--text-2)"><button class="btn" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir contacto</button></p>
 </section>
 
+<div class="banda banda-warn" role="status"><span class="msi" aria-hidden="true" translate="no">warning</span><p><b>Estás viendo una parte.</b> Este cliente tiene sucursales fuera de tu alcance, así que las listas de abajo están recortadas: dicen «ninguno <em>en tu alcance</em>», no «ninguno».</p></div>
 <section class="grupo-t" aria-labelledby="cruz-t">
 <h3 id="cruz-t">Actividad en otros módulos</h3>
-<div class="banda b-warn"><span class="msi" aria-hidden="true" translate="no">error</span><p><b>Estás viendo una parte.</b> Este cliente tiene sucursales fuera de tu alcance, así que las listas de abajo están recortadas: dicen «ninguno <em>en tu alcance</em>», no «ninguno».</p></div>
+
 <div class="cruz" style="margin-top:var(--sp-3)">
 <article class="tarjeta"><header><span class="msi" aria-hidden="true" translate="no">folder</span><h4>Trámites vehiculares</h4><span class="n tnum">3 en tu alcance</span></header>
 <ul>
@@ -898,6 +934,25 @@ document.querySelectorAll('.demo [data-set]').forEach(function(b){
 bt.addEventListener('click',function(){raiz.setAttribute('data-theme',oscuro()?'light':'dark');pinta();});
 mq.addEventListener('change',pinta);
 pinta();
+/* Un botón al tope explica el motivo al pulsarlo, en vez de no responder. */
+document.querySelectorAll('.btn[aria-disabled="true"]').forEach(function(bt){
+  bt.addEventListener('click',function(e){
+    e.preventDefault();
+    var m=document.getElementById(bt.getAttribute('aria-describedby'));
+    live.textContent=m?m.textContent:'No se pueden añadir más registros a esta lista.';
+  });
+});
+
+var masAyuda=document.querySelector('.mas-ayuda');
+if(masAyuda){
+  var cajaAyuda=document.getElementById(masAyuda.getAttribute('aria-controls'));
+  masAyuda.addEventListener('click',function(){
+    var abierta=masAyuda.getAttribute('aria-expanded')==='true';
+    masAyuda.setAttribute('aria-expanded',String(!abierta));
+    cajaAyuda.hidden=abierta;
+  });
+}
+
 var mb=document.getElementById('menu-btn');
 var velo=document.querySelector('.velo-menu');
 function menu(abierto){
