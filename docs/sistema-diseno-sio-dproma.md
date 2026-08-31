@@ -218,10 +218,22 @@ Escala base de 4px. El nombre del token **no es el multiplicador** — es un ide
 fórmula a extrapolar sin mirar la tabla.
 
 ```css
---sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-6:24px; --sp-8:32px; --sp-12:48px;
+--sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px;
+--sp-8:32px; --sp-12:48px;
 --r-ctrl:6px; --r-card:10px; --r-modal:16px; --r-pill:999px;
 --row-comfy:40px; --row-compact:32px;
 ```
+
+**`--sp-5` (20px) se añadió porque faltaba y ya se estaba usando.** La maqueta del diálogo lo
+referenciaba cuatro veces —el padding de la cabecera, el del cuerpo y el del pie— sin que
+existiera en ningún `:root`. Un `var()` que no resuelve no cae a un valor por omisión: invalida
+**la declaración entera**, así que los tres paddings computaban a **0** y el contenido quedaba
+pegado al borde. El documento de recomendaciones lo describió como «los elementos del diálogo
+están muy juntos y sin jerarquía»; la causa era un hueco en la escala.
+
+Lo que enseña, más allá del valor: **un token que no existe falla en silencio**. No hay error en
+consola, no hay aviso, y el síntoma se parece a una decisión de diseño desafortunada. Cuando un
+espaciado se vea raro, lo primero es comprobar que su token está definido.
 
 | Token | Valor | Uso |
 |---|---|---|
@@ -229,6 +241,7 @@ fórmula a extrapolar sin mirar la tabla.
 | `--sp-2` | 8px | Icono-texto, gap entre chips |
 | `--sp-3` | 12px | Gap interno de fila, celda de tabla |
 | `--sp-4` | 16px | Padding de control, gap entre bloques cortos |
+| `--sp-5` | 20px | Padding interior de un diálogo |
 | `--sp-6` | 24px | Padding de sección, margen entre grupos |
 | `--sp-8` | 32px | Padding de tarjeta principal, columnas del layout |
 | `--sp-12` | 48px | Separación grande entre secciones |
@@ -993,26 +1006,59 @@ reemplazarlo o quitarlo.
 
 ### 6.18 Diálogo modal
 
-El patrón de foco que traía la especificación del diálogo de edición estaba bien resuelto y se
-generaliza a **todos** los diálogos del sistema:
+**Se usa `<dialog>` nativo con `showModal()`.** El navegador da el velo, la capa superior y la
+trampa de foco; lo que sigue siendo trabajo nuestro es a dónde entra el foco al abrir y a dónde
+vuelve al cerrar. La alternativa —un `<div role="dialog" aria-modal="true">` en el flujo del
+documento— obliga a reimplementar las tres cosas, y en la práctica no se reimplementan.
 
-- El foco entra al **primer campo rellenable**, no al título ni al botón de cerrar.
-- No se puede salir del diálogo con el tabulador mientras está abierto.
-- Al cerrar, el foco vuelve al control desde el que se abrió.
-- Escape cierra.
+```css
+dialog.modal{border:0;padding:0;margin:auto;   /* margin:auto es el centrado nativo:
+    un margin propio lo anula y el diálogo se pega a la esquina */
+  max-width:520px;width:calc(100% - 32px);max-height:calc(100dvh - 64px);
+  background:var(--surface);color:var(--text);
+  border-radius:var(--r-modal);box-shadow:var(--sh-modal)}
+dialog.modal[open]{display:flex;flex-direction:column}
+dialog.modal::backdrop{background:var(--velo-modal)}
+dialog.modal > header{display:flex;align-items:center;gap:var(--sp-3);
+  padding:var(--sp-4) var(--sp-5);border-bottom:1px solid var(--border)}
+dialog.modal .cuerpo{padding:var(--sp-6) var(--sp-5);display:flex;
+  flex-direction:column;gap:var(--sp-5)}
+dialog.modal > footer{display:flex;align-items:center;gap:var(--sp-3);
+  padding:var(--sp-4) var(--sp-5);border-top:1px solid var(--border)}
+```
 
-Más tres reglas de contenido:
+**Cuatro reglas de foco**, que son las que nadie escribe y todo el mundo incumple:
 
-- **El nombre del botón y el contenido del diálogo coinciden.** «Editar cliente» que solo deja
-  cambiar la razón social se llama «Cambiar razón social», o se amplía a lo que promete.
-- **Un campo de solo lectura se muestra como dato, no como campo.** Si el RFC no se puede
-  cambiar, no lleva caja de campo: etiqueta y valor, en tamaño menor, como contexto. Si hace
-  falta explicar por qué no se edita, un icono con ayuda emergente basta.
-- **Detrás del diálogo va la pantalla real atenuada** con `--velo-modal`, no un esqueleto de
-  carga. Ver barras grises detrás sugiere que lo de atrás se está recargando; ver el contexto
-  propio tranquiliza.
+1. Al abrir, el foco va al **primer control que se puede rellenar** — no al diálogo, no al aspa.
+2. Mientras está abierto, `Tab` cicla dentro. Lo da `showModal()`.
+3. Al cerrar sin guardar, el foco vuelve **al control desde el que se abrió**.
+4. Al cerrar guardando, va **a la fila o el elemento que se acaba de cambiar**; si ya no existe,
+   al contenedor más cercano. Nunca al `body`. Ojo: una `<tr>` no recibe foco sin `tabindex="-1"`.
 
----
+**Mientras una operación está en vuelo, nada cierra el diálogo:** ni Escape, ni el aspa, ni el
+clic en el velo. Cerrar a medio guardar deja a alguien sin saber si se guardó.
+
+```js
+dlg.addEventListener('cancel', function(e){          // Escape
+  if (dlg.dataset.momento === 'guardando') e.preventDefault();
+});
+```
+
+Tres reglas de contenido, con su detalle y la aritmética de qué formularios caben en un diálogo,
+en `docs/patron-dialogo-sio-dproma.md`:
+
+- **El nombre del botón y el contenido coinciden.** «Editar cliente» que solo deja cambiar la
+  razón social se llama «Cambiar razón social».
+- **Un campo de solo lectura se muestra como dato**, no como campo — pero conservando el motivo.
+  Un campo en gris sin explicación se lee como una carencia del formulario; con el motivo al
+  lado, como la decisión que es.
+- **Detrás va la pantalla real atenuada**, no un esqueleto de carga. Las barras grises se
+  confunden con «cargando» y hacen pensar que se ha perdido el sitio en la lista.
+
+**El andamiaje de maqueta no puede vivir fuera del diálogo.** Un modal bloquea todo lo que hay
+fuera de la capa superior, así que el panel de estados deja de ser pulsable en cuanto el diálogo
+abre. Mientras está abierto, el panel se traslada dentro del `<dialog>`. Es código de maqueta —
+en el producto no existe— pero sin él la maqueta no se puede recorrer.
 
 ## 7. Layout
 
