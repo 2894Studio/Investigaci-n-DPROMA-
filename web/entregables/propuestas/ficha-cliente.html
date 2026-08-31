@@ -536,12 +536,19 @@ tbody th:first-child::after,thead th:first-child::after{content:"";position:abso
    añadir: con [disabled] el teclado pasaba de largo (doc §6.16). */
 .btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
 .btn[aria-disabled="true"]:hover{background:var(--surface);border-color:var(--border-2)}
-.marcas{display:flex;flex-direction:column;gap:var(--sp-2);align-items:flex-start}
-.grupo-marcas{display:flex;flex-direction:column;gap:5px}
-.grupo-marcas .et-marca{font-size:10.5px;font-weight:700;letter-spacing:.09em;
-  text-transform:uppercase;color:var(--text-3)}
-.grupo-marcas{flex-direction:row;align-items:center;flex-wrap:wrap}
-.grupo-marcas .et-marca{width:100%}
+/* Rótulo y valores en dos columnas: los rótulos se alinean entre sí y todos
+   los valores arrancan en la misma vertical. Antes era una columna con
+   align-items:center heredado de .identidad .marcas, así que cada grupo se
+   centraba según su propio ancho —368px y 415px— y empezaban en x distintas. */
+.marcas{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-2) var(--sp-4);
+  align-items:center;margin:0}
+.marcas dt{font-size:10.5px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--text-3);white-space:nowrap}
+.marcas dd{margin:0;display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center}
+@media (max-width:560px){
+  .marcas{grid-template-columns:1fr;gap:4px}
+  .marcas dd:not(:last-child){margin-bottom:var(--sp-2)}
+}
 
 /* El aviso de alcance parcial usa la banda del sistema, con su propio icono. */
 .banda-warn{background:var(--warn-bg);color:var(--warn-ink);border-color:transparent}
@@ -631,7 +638,6 @@ main[data-state="loading"] .state-loading{display:flex}
 .identidad .datos{display:flex;flex-direction:column;gap:var(--sp-2);min-width:0}
 .identidad h2{font-size:var(--fs-title);line-height:1.25}
 .identidad .rfc{font-size:var(--fs-dense);color:var(--text-2);font-variant-numeric:tabular-nums}
-.identidad .marcas{display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center}
 
 .princ{background:var(--accent-soft);border:1px solid var(--border);border-radius:var(--r-card);
   padding:var(--sp-3) var(--sp-4);min-width:260px;max-width:360px}
@@ -734,14 +740,12 @@ main[data-state="loading"] .state-loading{display:flex}
 <div class="datos">
 <h2 id="id-t">Comercializadora Vértice del Bajío, S.&nbsp;A. de C.&nbsp;V.</h2>
 <span class="rfc" translate="no">RFC CVB240118QT7</span>
-<div class="marcas">
-<span class="grupo-marcas"><span class="et-marca">Clasificación</span>
-<span class="p-type p-s1">Empresa</span>
-<span class="p-type p-s2">Grupo Automotriz Vértice</span></span>
-<span class="grupo-marcas"><span class="et-marca">Estado</span>
-<span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Comercialmente activo</span>
-<span class="pill p-warn"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span>Falta 1 de 2 documentos</span></span>
-</div>
+<dl class="marcas">
+<dt>Clasificación</dt>
+<dd><span class="p-type p-s1">Empresa</span><span class="p-type p-s2">Grupo Automotriz Vértice</span></dd>
+<dt>Estado</dt>
+<dd><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Comercialmente activo</span><span class="pill p-warn"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span>Falta 1 de 2 documentos</span></dd>
+</dl>
 </div>
 <div class="princ">
 <span class="et">Contacto principal</span>
