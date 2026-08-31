@@ -440,17 +440,54 @@ el `<main>`:
 </main>
 ```
 
+**El estado va dentro de una tarjeta, no suelto sobre el fondo.** En el acceso la tarjeta ya es
+el contenedor de las cuatro vistas. En el dashboard la zona de contenido es enorme, así que un
+mensaje centrado sin superficie no se lee como una respuesta del sistema, sino como una pantalla
+que no terminó de cargar: el estado vacío del padrón dejaba ~500px de fondo liso alrededor de un
+glifo gris. El contenedor centra; la tarjeta de dentro es la que tiene forma.
+
 ```css
-.estado{display:flex;flex-direction:column;align-items:center;text-align:center;
-  gap:var(--sp-3);padding:var(--sp-12) var(--sp-4);flex:1;justify-content:center}
-.estado-ico{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;background:var(--accent-soft);color:var(--accent)}
+.state{display:none;align-items:center;justify-content:center;flex:1;
+  padding:var(--sp-8) var(--sp-4)}
+
+.tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-modal);box-shadow:var(--sh-modal);
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-3)}
+.estado-ico{width:52px;height:52px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--accent-soft);color:var(--accent)}
 .estado-ico .msi{font-size:28px}
-.estado--err .estado-ico{background:var(--err-fill);color:var(--err-ink)}
-.estado h2{font-size:18px}
-.estado p{color:var(--text-2);font-size:var(--fs-dense);line-height:1.6;max-width:58ch}
-.estado .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
+.tarjeta-estado.es-err .estado-ico{background:var(--err-fill);color:var(--err-ink)}
+.tarjeta-estado p{color:var(--text-2);font-size:var(--fs-dense);line-height:1.6;max-width:36ch}
+.tarjeta-estado .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
+.tarjeta-estado .acc{display:flex;gap:var(--sp-2);flex-wrap:wrap;justify-content:center;width:100%}
+.tarjeta-estado .acc .btn{flex:1 1 auto}
 ```
+
+```html
+<div class="state state-error">
+  <div class="tarjeta-estado es-err">
+    <span class="estado-ico"><span class="msi" aria-hidden="true" translate="no">error</span></span>
+    <h2>No se pudo cargar el padrón</h2>
+    <p>…qué pasó · qué no se perdió · qué hacer…</p>
+    <p class="ref" translate="no">Referencia del error: PAD-20260821-1655</p>
+    <div class="acc">…</div>
+  </div>
+</div>
+```
+
+**Es `--r-modal` y `--sh-modal`, no los de `.tarjeta`.** La tarjeta del acceso tiene 16px de radio
+y sombra elevada; `.tarjeta` tiene 10px y `--sh-rest`. Con la receta de `.tarjeta` el estado sale
+plano y de esquinas duras: no es la misma tarjeta. Y va **opaca**: el `.glass` del acceso se
+compone sobre fondo plano en algo que difiere de `--surface` en 2/255, así que el aspecto es
+idéntico y además se respeta el §4 —el translúcido es de la pantalla de entrada—.
+El medallón se tiñe con `--err-fill`, no con el `--err-soft` del acceso, que fuera de esa pantalla
+no existe.
+
+**El medallón no es decoración: es lo que da peso al icono.** Sin él, el icono de estado acaba
+siendo texto en `--text-3`, el gris más apagado del sistema, a 30px. Las cuatro maquetas del
+padrón llegaron así pese a que este apartado ya lo prescribía.
 
 **Cuatro reglas que no son opcionales:**
 
@@ -595,8 +632,14 @@ párrafo de instrucciones corrido cuando hay una secuencia de 2-4 acciones que s
   background:linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%);
   background-size:200% 100%;animation:shimmer 1.4s linear infinite}
 @keyframes shimmer{to{background-position:-200% 0}}
-@media (prefers-reduced-motion:reduce){.skel{animation:none}}
+@media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}
 ```
+
+**Hay que aplanar el fondo, no solo parar la animación.** `animation:none` a secas no retira el
+degradado: lo **congela** en la posición 0, y cada barra se queda con una rampa visible de
+`--surface-2` a `--border`. Quien pide menos movimiento no recibe una barra en reposo, recibe una
+barra a medio pintar. Esta línea del documento se escribió incompleta y las tres maquetas del
+padrón la copiaron tal cual; el acceso era el único sitio donde estaba bien.
 
 **Sin texto real dentro de las barras.** Un `role="status"` con `aria-label` en el contenedor
 basta, y evita que un lector de pantalla lea contenido oculto por `color:transparent`, que sigue
@@ -1204,10 +1247,10 @@ Todo lo que lleve `data-andamio` se retira en la versión real. Un solo selector
 
 ---
 
-## 10. Cinco trampas comprobadas
+## 10. Seis trampas comprobadas
 
-No son teoría: las cinco aparecieron aplicando este documento al módulo de clientes, y las
-cinco se ven solo si se comprueba en el navegador, no leyendo la hoja de estilos.
+No son teoría: las seis aparecieron aplicando este documento al módulo de clientes, y las
+seis se ven solo si se comprueba en el navegador, no leyendo la hoja de estilos.
 
 **El tamaño se mide en el navegador, no en el CSS.** La regla de los 12px se puede burlar sin
 querer con la forma abreviada `font:`, donde el tamaño no aparece como `font-size`. Los avatares
@@ -1247,6 +1290,19 @@ unidades **empezando en x=0**, mientras que la marca vive a partir de x=740. Res
 sobrante parece lo correcto. Se comprueba midiendo la caja del `<use>` contra la del `<svg>`:
 si el desplazamiento no es ~0, está mal.
 
+**Una regla copiada del acceso puede traerse un token que allí existe y aquí no.** El medallón de
+error del acceso usa `--err-soft`; su tarjeta usa `--glass-line`. Ninguno de los dos está declarado
+en las maquetas del padrón, que tienen `--err-fill` en su lugar. Copiada tal cual, la declaración
+entera se invalida en silencio: mismo desenlace que `--sp-5`, pero más traicionero, porque el
+archivo de origen se ve perfectamente y la regla parece probada. Cada archivo declara sus propios
+tokens en su `:root`, así que el copiar-pegar entre pantallas hay que comprobarlo:
+
+```
+usados    = {var(--x) en el <style> y en los style=""}
+declarados = {--x: en el <style>}
+usados - declarados  →  tiene que ser vacío
+```
+
 ---
 
 ## 11. Checklist al añadir un componente nuevo
@@ -1274,6 +1330,7 @@ si el desplazamiento no es ~0, está mal.
 
 **Estructura**
 - ¿Cada pantalla o vista tiene un encabezado real, no solo texto en negrita?
+- ¿Los estados de vacío y error van en tarjeta, con su medallón, y no sueltos sobre el fondo?
 - ¿Todos los `id` son únicos, y cada `aria-describedby` / `aria-controls` apunta a algo que
   existe?
 - ¿Toda columna ordenable declara `aria-sort`, incluidas las que aún no ordenan?
@@ -1296,3 +1353,5 @@ si el desplazamiento no es ~0, está mal.
 - ¿Ningún icono se dimensiona con `width`/`height` en vez de con `font-size`?
 - ¿El isotipo lleva sus medidas en el `<use>` y ningún `viewBox` repetido en el `<svg>`?
   Se comprueba midiendo: la caja del `<use>` debe empezar donde empieza la del `<svg>`.
+- ¿Todo token `var(--x)` que usa el archivo está declarado **en ese mismo archivo**? Copiar una
+  regla de otra pantalla es la vía habitual de colar uno que no existe aquí.

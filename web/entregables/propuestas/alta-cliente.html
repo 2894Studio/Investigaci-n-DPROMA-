@@ -597,24 +597,43 @@ tbody th:first-child::after,thead th:first-child::after{content:"";position:abso
 /* @fin ARQ-ALTA-EXTRA */
 
 /* ARQ-ESTADOS */
-.skel{display:block;height:12px;border-radius:4px;
+.skel{display:block;height:12px;border-radius:var(--r-ctrl);
   background:linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%);
-  background-size:200% 100%;animation:shimmer 1.4s linear infinite;color:transparent}
+  background-size:200% 100%;animation:shimmer 1.4s linear infinite}
 @keyframes shimmer{to{background-position:-200% 0}}
-@media (prefers-reduced-motion:reduce){.skel{animation:none}}
-.state{display:none;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-2);
-  padding:56px 16px;flex:1;justify-content:center}
+/* animation:none no retira el degradado: lo congela en la posición 0 y deja
+   cada barra a medio pintar. Hay que aplanar también el fondo, como el acceso. */
+@media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}
+.state{display:none;align-items:center;justify-content:center;flex:1;
+  padding:var(--sp-8) var(--sp-4)}
+
+/* La tarjeta del acceso, reproducida con superficie opaca: mismo radio,
+   misma sombra y mismo relleno. Su .glass se compone sobre fondo plano en
+   algo que difiere de --surface en 2/255, así que el aspecto es el mismo, y
+   el translúcido es de la pantalla de entrada, no del dashboard (§4). */
+.tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-modal);box-shadow:var(--sh-modal);
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-3)}
+.estado-ico{width:52px;height:52px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--accent-soft);color:var(--accent)}
+.estado-ico .msi{font-size:28px}
+/* --err-soft es del acceso y aquí no existe: un var() sin resolver invalidaría
+   la declaración entera en silencio. El token de estas maquetas es --err-fill. */
+.tarjeta-estado.es-err .estado-ico{background:var(--err-fill);color:var(--err-ink)}
 main > .state-ok,main > .state-loading,main > .state-empty,main > .state-error{display:none}
 .state-ok{flex-direction:column;flex:1;min-height:0}
-.state .msi{font-size:30px;color:var(--text-3)}
 /* El icono de un botón hereda el color del botón. Sin esta línea, el gris
    del bloque de estado pintaba también el icono de «Reintentar» sobre el
    verde de acento: 1,03:1 de contraste, con 3:1 de mínimo. */
 .state .btn .msi{color:inherit;font-size:17px}
 .state h2{font-size:18px;font-weight:700;text-wrap:balance}
-.state p{color:var(--text-2);font-size:var(--fs-dense);max-width:58ch;line-height:1.55}
+.state p{color:var(--text-2);font-size:var(--fs-dense);max-width:36ch;line-height:1.55}
 .state .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
-.state .acc{display:flex;gap:var(--sp-2);flex-wrap:wrap;justify-content:center;margin-top:var(--sp-1)}
+.state .acc{display:flex;gap:var(--sp-2);flex-wrap:wrap;justify-content:center;
+  margin-top:var(--sp-1);width:100%}
+.state .acc .btn{flex:1 1 auto}
 main[data-state="ok"] .state-ok{display:flex}
 main[data-state="empty"] .state-empty{display:flex}
 main[data-state="error"] .state-ok{display:flex}
@@ -766,10 +785,12 @@ tiene fecha, conviene subirlos ahora.</p>
 </div></div>
 <div class="state-loading sk" role="status" aria-label="Cargando"><div class="sk-caja"><span class="skel" style="width:26%"></span><span class="skel" style="width:92%;height:38px"></span><span class="skel" style="width:46%;height:38px"></span><span class="skel" style="width:46%;height:38px"></span></div><div class="sk-caja"><span class="skel" style="width:24%"></span><span class="skel" style="width:46%;height:38px"></span><span class="skel" style="width:46%;height:38px"></span><span class="skel" style="width:92%;height:38px"></span></div></div>
 <div class="state state-empty">
-<span class="msi" aria-hidden="true" translate="no">add</span>
-<h2>El formulario está en blanco</h2>
-<p>No has capturado nada todavía. <b>Con la razón social, el RFC y el tipo basta para dar de alta</b>; lo demás se puede completar más adelante desde la ficha del cliente.</p>
-<div class="acc"><button class="btn p" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span>Empezar por la razón social</button><button class="btn" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">search</span>Buscar si ya está dado de alta</button></div>
+<div class="tarjeta-estado">
+  <span class="estado-ico"><span class="msi" aria-hidden="true" translate="no">add</span></span>
+  <h2>El formulario está en blanco</h2>
+  <p>No has capturado nada todavía. <b>Con la razón social, el RFC y el tipo basta para dar de alta</b>; lo demás se puede completar más adelante desde la ficha del cliente.</p>
+  <div class="acc"><button class="btn p" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span>Empezar por la razón social</button><button class="btn" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">search</span>Buscar si ya está dado de alta</button></div>
+</div>
 </div>
 </main>
 <p class="sr" id="live" aria-live="polite"></p>
