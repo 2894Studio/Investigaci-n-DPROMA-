@@ -1204,10 +1204,10 @@ Todo lo que lleve `data-andamio` se retira en la versión real. Un solo selector
 
 ---
 
-## 10. Cuatro trampas comprobadas
+## 10. Cinco trampas comprobadas
 
-No son teoría: las cuatro aparecieron aplicando este documento al módulo de clientes, y las
-cuatro se ven solo si se comprueba en el navegador, no leyendo la hoja de estilos.
+No son teoría: las cinco aparecieron aplicando este documento al módulo de clientes, y las
+cinco se ven solo si se comprueba en el navegador, no leyendo la hoja de estilos.
 
 **El tamaño se mide en el navegador, no en el CSS.** La regla de los 12px se puede burlar sin
 querer con la forma abreviada `font:`, donde el tamaño no aparece como `font-size`. Los avatares
@@ -1230,6 +1230,22 @@ vez, el estado no puede mostrarla nunca y el fallo es silencioso.
 dentro de una `<label>` de 24×24 cumple, porque la etiqueta es el destino. Y al revés: un campo
 de búsqueda dentro de un `<div>` con forma de pastilla **no** cumple, porque pulsar la pastilla
 no hace nada. El contenedor tiene que ser una `<label for="…">`.
+
+**Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.**
+El isotipo se escribe así, con las medidas en el `<use>` y **sin** `viewBox` en el envoltorio:
+
+```html
+<svg width="44" height="42" aria-hidden="true">
+  <use href="#dproma-mark" width="44" height="42"/>
+</svg>
+```
+
+Escrito al revés —`viewBox="740 0 970 932"` en el `<svg>` y un `<use>` sin medidas— el `<use>`
+toma su tamaño por omisión, el 100% del lienzo, que en ese sistema de coordenadas son 970×932
+unidades **empezando en x=0**, mientras que la marca vive a partir de x=740. Resultado: se pinta
+32,5px a la izquierda de su caja y se recorta casi entera. No da error, no avisa, y el atributo
+sobrante parece lo correcto. Se comprueba midiendo la caja del `<use>` contra la del `<svg>`:
+si el desplazamiento no es ~0, está mal.
 
 ---
 
@@ -1278,3 +1294,5 @@ no hace nada. El contenedor tiene que ser una `<label for="…">`.
   de 1em se ven igual.
 - ¿Se regeneró `icon_names` después del último cambio de markup, y todo icono usado está dentro?
 - ¿Ningún icono se dimensiona con `width`/`height` en vez de con `font-size`?
+- ¿El isotipo lleva sus medidas en el `<use>` y ningún `viewBox` repetido en el `<svg>`?
+  Se comprueba midiendo: la caja del `<use>` debe empezar donde empieza la del `<svg>`.
