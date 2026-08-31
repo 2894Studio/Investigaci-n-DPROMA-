@@ -515,6 +515,31 @@ falta tocarlos por icono; se heredan en `font-variation-settings` de `.msi`.
 .msi-sm{font-size:17px} .msi-lg{font-size:24px}
 ```
 
+**El subconjunto se regenera cada vez que cambia el markup.** Es el fallo más fácil de cometer y
+el más difícil de ver: se añade un icono al HTML, se olvida añadirlo a `icon_names`, y el
+navegador pinta el nombre en letras. Pasó con `close`, `edit`, `pause_circle` y
+`progress_activity` en el diálogo, porque la lista se generó antes de escribir el markup.
+
+La comprobación es exacta y cuesta una línea — todo icono usado tiene que estar en la lista:
+
+```js
+const enLista = decodeURIComponent(
+  document.querySelector('link[href*="icon_names="]').href.split('icon_names=')[1].split('&')[0]
+).split(',');
+[...document.querySelectorAll('.msi')].map(e => e.textContent.trim())
+  .filter(n => !enLista.includes(n));      // tiene que salir vacío
+```
+
+Y al generar la lista, **solo los nombres del markup**, más los que el conmutador de tema
+intercambia. Un barrido suelto del JS cuela cualquier cadena en minúsculas —`seleccionado`,
+`comfy`, `tr`— y un nombre inválido no degrada: devuelve **400** y se quedan sin cargar todos
+los iconos de la página.
+
+**Un glifo se dimensiona con `font-size`, nunca con `width`/`height`.** La caja de `.msi` ya es
+`1em × 1em` con `overflow:hidden`, así que fijarle 12px de ancho no encoge el dibujo: lo recorta.
+Es el resto típico de cuando el icono era un `<svg>`, y le pasó a la flecha de orden de las
+cabeceras de tabla.
+
 **`text-transform:none` y `letter-spacing:normal` no son adorno: son lo que hace que el icono
 sea un icono.** El glifo se pide por ligadura —el navegador lee las letras `location_on` y las
 sustituye por el dibujo—, así que cualquier ancestro que transforme ese texto rompe la
@@ -1246,3 +1271,5 @@ no hace nada. El contenedor tiene que ser una `<label for="…">`.
 - ¿El destino de 24px es el contenedor que acepta la pulsación, y ese contenedor es pulsable?
 - ¿Los iconos se vieron con la fuente cargada? Sin red, un glifo roto y el respaldo de la caja
   de 1em se ven igual.
+- ¿Se regeneró `icon_names` después del último cambio de markup, y todo icono usado está dentro?
+- ¿Ningún icono se dimensiona con `width`/`height` en vez de con `font-size`?
