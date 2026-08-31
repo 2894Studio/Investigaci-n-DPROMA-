@@ -331,13 +331,14 @@ main[id="contenido"]::after{content:"";display:block;flex-shrink:0;height:var(--
 .p4-b{display:flex;gap:var(--sp-3);padding:var(--sp-3) var(--sp-6) 0;align-items:center;flex-wrap:wrap}
 .p4-f{display:flex;gap:var(--sp-2);padding:var(--sp-3) var(--sp-6);align-items:center;flex-wrap:wrap}
 .p4-f .tools{margin-left:auto;display:flex;gap:var(--sp-2);align-items:center}
-.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;
+  border:1px solid var(--border);background:var(--surface);
   color:var(--text);border-radius:var(--r-ctrl);padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);
   cursor:pointer;white-space:nowrap}
 .btn:hover{background:var(--surface-2);border-color:var(--border-2)}
 .btn.p{background:var(--accent);border-color:transparent;color:var(--accent-ink)}
 .btn.p:hover{filter:brightness(1.08)}
-.btn.mini{padding:5px 10px;font-size:var(--fs-meta)}
+.btn.mini{min-height:28px;padding:5px 10px;font-size:var(--fs-meta)}
 .btn[disabled]{opacity:.72;cursor:not-allowed}
 .btn.p[disabled]{background:var(--surface-2);color:var(--text-2);border-color:var(--border)}
 .btn[disabled]:hover{background:var(--surface);border-color:var(--border)}
@@ -658,8 +659,7 @@ main > .state-ok,main > .state-loading,main > .state-empty,main > .state-error{d
 .state p{color:var(--text-2);font-size:var(--fs-dense);max-width:36ch;line-height:1.55}
 .state .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
 .state .acc{display:flex;gap:var(--sp-2);flex-wrap:wrap;justify-content:center;
-  margin-top:var(--sp-1);width:100%}
-.state .acc .btn{flex:1 1 auto}
+  margin-top:var(--sp-1)}
 main[data-state="ok"] .state-ok{display:flex}
 main[data-state="empty"] .state-empty{display:flex}
 main[data-state="error"] .state-error{display:flex}
@@ -667,7 +667,24 @@ main[data-state="loading"] .state-loading{display:flex}
 .sk{flex-direction:column;gap:var(--sp-3);padding:var(--sp-4) var(--sp-6)}
 @media (max-width:1280px){.sk{padding-left:var(--sp-4);padding-right:var(--sp-4)}}
 .sk-fila{display:grid;gap:var(--sp-4);align-items:center}
-@media (max-width:900px){.sk-fila{grid-template-columns:1fr !important}}
+/* El esqueleto imita la forma de la tabla —cabecera, alto de fila y anchos de
+   columna reales— para que el contenido no salte al aparecer (§6.7). Medido:
+   la tabla ocupa 455px y el esqueleto plano se quedaba en 164px. */
+.sk-tabla{gap:0;padding:0}
+.sk-tabla .sk-fila{padding:0 var(--sp-6);min-height:67px;
+  border-bottom:1px solid var(--border)}
+.sk-tabla .sk-cab{min-height:35px;background:var(--surface-2)}
+.sk-tabla .sk-cab .skel{height:8px}
+.sk-tabla .celda{display:flex;flex-direction:column;gap:7px;min-width:0}
+/* La tabla pasa a modo tarjeta en 860px, no en 900: si el esqueleto apila
+   antes, entre esos dos anchos anuncia una forma que la tabla no va a tener. */
+@media (max-width:860px){
+  .sk-fila{grid-template-columns:1fr !important}
+  .sk-tabla{gap:var(--sp-3);padding:var(--sp-4)}
+  .sk-tabla .sk-cab{display:none}          /* la tabla oculta el thead aquí */
+  .sk-tabla .sk-fila{background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--r-card);padding:var(--sp-4);row-gap:32px;min-height:0}
+}
 .sk-caja{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
   padding:var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-3)}
 /* @fin ARQ-ESTADOS */
@@ -956,7 +973,7 @@ main[data-state="loading"] .state-loading{display:flex}
 <p class="nota"><span class="msi" aria-hidden="true" translate="no">view_column</span><span>Las columnas se encienden y apagan desde <b>«Columnas»</b>. Ocultar no es quitar: el dato sigue en la ficha del cliente.</span></p>
 
 </div></div>
-<div class="state-loading sk" role="status" aria-label="Cargando el padrón de clientes"><div class="sk-fila" style="grid-template-columns:26% 11% 10% 23% 15% 10% 120px"><span class="skel" style="width:88%"></span><span class="skel" style="width:62%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:70%"></span><span class="skel" style="width:82%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:100%"></span></div><div class="sk-fila" style="grid-template-columns:26% 11% 10% 23% 15% 10% 120px"><span class="skel" style="width:72%"></span><span class="skel" style="width:55%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:52%"></span><span class="skel" style="width:68%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:100%"></span></div><div class="sk-fila" style="grid-template-columns:26% 11% 10% 23% 15% 10% 120px"><span class="skel" style="width:92%"></span><span class="skel" style="width:62%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:64%"></span><span class="skel" style="width:76%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:100%"></span></div><div class="sk-fila" style="grid-template-columns:26% 11% 10% 23% 15% 10% 120px"><span class="skel" style="width:66%"></span><span class="skel" style="width:48%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:62%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:100%"></span></div><div class="sk-fila" style="grid-template-columns:26% 11% 10% 23% 15% 10% 120px"><span class="skel" style="width:84%"></span><span class="skel" style="width:55%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:74%"></span><span class="skel" style="width:88%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:100%"></span></div><div class="sk-fila" style="grid-template-columns:26% 11% 10% 23% 15% 10% 120px"><span class="skel" style="width:78%"></span><span class="skel" style="width:62%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:50%"></span><span class="skel" style="width:70%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:100%"></span></div></div>
+<div class="state-loading sk sk-tabla" role="status" aria-label="Cargando el padrón de clientes"><div class="sk-fila sk-cab" style="grid-template-columns:23.4fr 11fr 11.3fr 20.8fr 15.6fr 9.9fr 94px"><span class="skel" style="width:62%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:60%"></span><span class="skel" style="width:66%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:52%"></span><span class="skel" style="width:40%"></span></div><div class="sk-fila" style="grid-template-columns:23.4fr 11fr 11.3fr 20.8fr 15.6fr 9.9fr 94px"><span class="celda"><span class="skel" style="width:88%"></span><span class="skel" style="width:52%;height:9px"></span></span><span class="skel" style="width:62%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:70%"></span><span class="skel" style="width:82%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:70%"></span></div><div class="sk-fila" style="grid-template-columns:23.4fr 11fr 11.3fr 20.8fr 15.6fr 9.9fr 94px"><span class="celda"><span class="skel" style="width:72%"></span><span class="skel" style="width:48%;height:9px"></span></span><span class="skel" style="width:55%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:52%"></span><span class="skel" style="width:68%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:70%"></span></div><div class="sk-fila" style="grid-template-columns:23.4fr 11fr 11.3fr 20.8fr 15.6fr 9.9fr 94px"><span class="celda"><span class="skel" style="width:92%"></span><span class="skel" style="width:56%;height:9px"></span></span><span class="skel" style="width:62%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:64%"></span><span class="skel" style="width:76%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:70%"></span></div><div class="sk-fila" style="grid-template-columns:23.4fr 11fr 11.3fr 20.8fr 15.6fr 9.9fr 94px"><span class="celda"><span class="skel" style="width:66%"></span><span class="skel" style="width:44%;height:9px"></span></span><span class="skel" style="width:48%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:62%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:70%"></span></div><div class="sk-fila" style="grid-template-columns:23.4fr 11fr 11.3fr 20.8fr 15.6fr 9.9fr 94px"><span class="celda"><span class="skel" style="width:84%"></span><span class="skel" style="width:52%;height:9px"></span></span><span class="skel" style="width:55%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:74%"></span><span class="skel" style="width:88%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:70%"></span></div><div class="sk-fila" style="grid-template-columns:23.4fr 11fr 11.3fr 20.8fr 15.6fr 9.9fr 94px"><span class="celda"><span class="skel" style="width:78%"></span><span class="skel" style="width:50%;height:9px"></span></span><span class="skel" style="width:62%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:50%"></span><span class="skel" style="width:70%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:70%"></span></div></div>
 <div class="state state-empty">
 <div class="tarjeta-estado">
   <span class="estado-ico"><span class="msi" aria-hidden="true" translate="no">group</span></span>

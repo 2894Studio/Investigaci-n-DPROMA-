@@ -364,6 +364,11 @@ En la pantalla de acceso los botones van a 44px de alto, por encima del mínimo,
 dos o tres acciones de toda la pantalla. En el dashboard el suelo es 36px (28px en `.mini`, que
 solo se usa dentro de una fila o una tarjeta, junto a otros destinos).
 
+**Y el suelo hay que declararlo, no confiarlo al relleno.** Las cuatro maquetas del padrón
+definían `.btn` sin `min-height`: con `padding:8px 13px` sobre `--fs-dense` salían a **35px**, un
+píxel por debajo del suelo, y `.mini` a 27px. Nadie lo ve leyendo el CSS porque el número no está
+escrito en ninguna parte; se ve midiendo la caja de cada botón renderizado.
+
 **Un icono dentro de un botón hereda el color del botón.** Suena obvio y fue un fallo real: una
 regla de bloque pintaba de gris todos los iconos dentro de un estado, incluido el del botón
 «Reintentar» sobre fondo de acento. El contraste entre el icono gris y el verde era de
@@ -461,9 +466,14 @@ glifo gris. El contenedor centra; la tarjeta de dentro es la que tiene forma.
 .tarjeta-estado.es-err .estado-ico{background:var(--err-fill);color:var(--err-ink)}
 .tarjeta-estado p{color:var(--text-2);font-size:var(--fs-dense);line-height:1.6;max-width:36ch}
 .tarjeta-estado .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
-.tarjeta-estado .acc{display:flex;gap:var(--sp-2);flex-wrap:wrap;justify-content:center;width:100%}
-.tarjeta-estado .acc .btn{flex:1 1 auto}
+.tarjeta-estado .acc{display:flex;gap:var(--sp-2);flex-wrap:wrap;justify-content:center}
 ```
+
+**El botón no se estira para llenar la tarjeta.** En el acceso, `.btn` lleva `flex:1 1 auto` y
+los botones ocupan el ancho de la tarjeta: son las dos acciones de toda la pantalla. En el
+dashboard `.btn` es `inline-flex` (§6.2) y se dimensiona con su contenido, dentro de la tarjeta
+igual que fuera. Estirarlo convierte un «Reintentar» en una barra verde de 480px que no se
+parece a ningún otro botón del sistema.
 
 ```html
 <div class="state state-error">
@@ -656,6 +666,37 @@ pero anunciado.
 
 El esqueleto **imita la forma de lo que va a llegar**, no una forma genérica: mismas columnas y
 mismos anchos que la tabla real, para que el contenido no salte al aparecer.
+
+**Y el mismo alto, que es la mitad que se olvida.** «Mismas columnas» se cumple fácil y aun así
+el esqueleto queda muy corto: el del padrón tenía barras de 12px en filas de 12px, así que medía
+**164px** frente a los **455px** de la tabla. Al llegar los datos, la pantalla daba un salto de
+291px. Un esqueleto de tabla necesita, medido contra la tabla real:
+
+| | tabla | esqueleto correcto |
+|---|---|---|
+| cabecera | 35px, sobre `--surface-2` | una banda igual, con barras de 8px |
+| alto de fila | 59–76px | `min-height` en ese entorno, no el alto de la barra |
+| primera columna | razón social **y** RFC | dos barras apiladas, no una |
+| anchos | 282 / 133 / 136 / 250 / 188 / 119 / 94 | en `fr`, para que nunca desborde |
+
+```css
+.sk-tabla{gap:0;padding:0}
+.sk-tabla .sk-fila{display:grid;gap:var(--sp-4);align-items:center;
+  padding:0 var(--sp-6);min-height:67px;border-bottom:1px solid var(--border)}
+.sk-tabla .sk-cab{min-height:35px;background:var(--surface-2)}
+.sk-tabla .sk-cab .skel{height:8px}
+.sk-tabla .celda{display:flex;flex-direction:column;gap:7px;min-width:0}
+```
+
+**Y cambia de forma en el mismo punto que la tabla.** El esqueleto del padrón apilaba sus celdas
+en 900px mientras la tabla pasaba a modo tarjeta en 860px: en esos 40px de diferencia el
+esqueleto anunciaba una forma que la tabla no iba a tener. El punto de ruptura del esqueleto es
+el de la tabla, y en modo tarjeta el esqueleto también se vuelve tarjetas —y oculta su cabecera,
+porque la tabla oculta el `thead`—. Medido a los dos anchos, la diferencia de alto queda en el 4%.
+
+Y los anchos de barra son **irregulares**. Todas las celdas al 100% de su columna se leen como
+papel cuadriculado, no como datos: ninguna tabla real tiene todos los valores del mismo largo.
+Es lo que ya hacía el esqueleto del acceso y lo que al del padrón le faltaba.
 
 ### 6.8 Chip / control secundario (`.chip`)
 
@@ -1351,6 +1392,10 @@ usados - declarados  →  tiene que ser vacío
   de 1em se ven igual.
 - ¿Se regeneró `icon_names` después del último cambio de markup, y todo icono usado está dentro?
 - ¿Ningún icono se dimensiona con `width`/`height` en vez de con `font-size`?
+- ¿El esqueleto mide **lo mismo de alto** que el contenido que sustituye, y no solo lo mismo
+  de ancho? Se comprueba midiendo las dos cajas.
+- ¿Los botones llegan a su suelo (36px, 28px en `.mini`) con `min-height` declarado, y no por
+  casualidad del relleno?
 - ¿El isotipo lleva sus medidas en el `<use>` y ningún `viewBox` repetido en el `<svg>`?
   Se comprueba midiendo: la caja del `<use>` debe empezar donde empieza la del `<svg>`.
 - ¿Todo token `var(--x)` que usa el archivo está declarado **en ese mismo archivo**? Copiar una
