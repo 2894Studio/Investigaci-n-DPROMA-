@@ -1,9 +1,3 @@
----
-title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 1.1.0
-last_updated: 2026-08-31
-description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
-
 # Sistema de diseño — SIO-DPROMA
 
 Referencia técnica para construir SIO-DPROMA. Empezó siendo el sistema de la pantalla de
@@ -1302,12 +1296,3 @@ si el desplazamiento no es ~0, está mal.
 - ¿Ningún icono se dimensiona con `width`/`height` en vez de con `font-size`?
 - ¿El isotipo lleva sus medidas en el `<use>` y ningún `viewBox` repetido en el `<svg>`?
   Se comprueba midiendo: la caja del `<use>` debe empezar donde empieza la del `<svg>`.
-
----
-
-## Historial de cambios
-
-| Versión | Fecha | Cambios |
-|---|---|---|
-| 1.0.0 | 2026-08-XX | Documenta el sistema de diseño del acceso a SIO-DPROMA (color, tipografía, componentes del login). |
-| 1.1.0 | 2026-08-XX | Se abre el sistema al dashboard: tabla densa, filtros, formularios, semáforo de 5 estados, ficha de cliente. Corrige `--text-3` (fallaba sobre `--surface-2`). Migra a Material Symbols. Documenta 5 trampas comprobadas al aplicar el sistema al módulo de clientes y retira el control de densidad de la tabla. |
