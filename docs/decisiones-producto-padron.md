@@ -1,6 +1,6 @@
 # Decisiones de producto — módulo de clientes
 
-Ocho hallazgos del documento de recomendaciones del padrón no se arreglaban con CSS: para
+Nueve hallazgos del documento de recomendaciones del padrón no se arreglaban con CSS: para
 resolverlos había que **decidir cómo se comporta el producto**, y esa decisión no estaba tomada
 en ninguna parte.
 
@@ -156,6 +156,25 @@ a diario. Plegar conserva el aviso y devuelve la pantalla.
 **A validar.** Si resolver duplicados resulta ser una tarea frecuente y no puntual, el sitio
 correcto es una sección propia dentro del padrón, no un aviso plegado. Es una pregunta de
 frecuencia real, que sabremos cuando el padrón esté cargado.
+
+---
+
+## 9. El control de densidad se retira
+
+**Hallazgo 1.3.** «Cómoda» y «Compacta» reducían el espaciado sin reducir contenido, así que la
+vista compacta se leía peor sin mostrar más.
+
+**Decisión.** Se retira el control. La tabla se queda en densidad cómoda.
+
+**Por qué.** El hallazgo admitía dos salidas: hacer que compacta redujera también contenido, o
+quitarla. Se implementó la primera y después se optó por la segunda. Dos botones permanentes en
+la barra de filtros, para una preferencia que casi nadie cambia, compiten por atención con los
+controles que sí se usan a diario — y la barra ya tiene cuatro filtros, el aviso de columnas
+ocultas y, cuando hay selección, su propia barra de acciones.
+
+**A validar.** Si al cargar el padrón real las filas resultan más altas de lo previsto y hay
+quien pide ver más de un vistazo, la salida no es devolver los dos botones: es que la densidad
+sea una preferencia de la persona, guardada junto a la de columnas, y no un control en pantalla.
 
 ---
 

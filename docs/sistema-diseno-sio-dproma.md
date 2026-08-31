@@ -764,15 +764,20 @@ thead th:first-child{z-index:7}
 5. **Ninguna columna desaparece en silencio.** Ocultar por `@media` sin avisar deja a quien
    trabaja en un portátil pequeño con menos datos sin saber que faltan. O hay desplazamiento
    horizontal, o hay un aviso de cuántas columnas están ocultas con forma de recuperarlas.
-6. **La densidad compacta reduce contenido, no solo espacio.** Bajar la fila de 40 a 32px y
-   dejar la misma información produce una pantalla más apretada que se lee peor, sin ganar nada.
-   Compacta significa: fila de `--row-compact`, la segunda línea de la celda principal pasa a
-   etiqueta emergente, y las listas largas dentro de celda se acortan.
+6. **Si se ofrece densidad, la compacta reduce contenido, no solo espacio.** Bajar la fila de 40
+   a 32px y dejar la misma información produce una pantalla más apretada que se lee peor, sin
+   ganar nada. Compacta significa: fila de `--row-compact`, la segunda línea de la celda
+   principal pasa a etiqueta emergente, y las listas largas dentro de celda se acortan.
 
    ```css
-   [data-densidad="compacta"] tbody th,[data-densidad="compacta"] td{height:var(--row-compact)}
-   [data-densidad="compacta"] .rz small{display:none}
+   [data-density="compact"] tbody th,[data-density="compact"] td{height:var(--row-compact)}
+   [data-density="compact"] .rz small{display:none}
    ```
+
+   **Y la primera pregunta es si hace falta ofrecerla.** El padrón la retiró: dos botones
+   permanentes en la barra de filtros, para una preferencia que casi nadie cambia, compiten por
+   atención con los controles que sí se usan a diario. Los tokens `--row-comfy`/`--row-compact`
+   siguen en el sistema para cuando una pantalla la necesite de verdad.
 
 7. **Una celda no lleva un párrafo.** Una tabla se escanea en vertical; con dos o tres líneas de
    prosa distintas por fila deja de poder escanearse y obliga a leerlo todo. En la celda va la
