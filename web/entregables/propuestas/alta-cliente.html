@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="es-MX" data-density="comfy">
+<html lang="es-MX" data-density="comfy" data-tacto="raton">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F2F5F7">
 <title>SIO-DPROMA — Nuevo cliente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,arrow_downward,bolt,check_circle,confirmation_number,credit_card,dark_mode,dashboard,description,edit,error,expand_more,folder,group,inventory_2,light_mode,menu,receipt_long,refresh,search,trending_up,warning&display=block" rel="stylesheet">
 <style>
 :root{
 --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -65,7 +69,7 @@
 
   --text:   #1B2430;
   --text-2: #4C5A6B;
-  --text-3: #66717F;
+  --text-3: #5C6675;
 
   --accent:     #3E7A4C;   
   --accent-ink: #F7FAF9;
@@ -205,9 +209,12 @@ body{display:grid;grid-template-rows:1fr auto;overflow:hidden;
 .wordmark{font-family:var(--font-brand);font-weight:400;letter-spacing:.08em}
 h1,h2,h3,h4{text-wrap:balance}
 svg{display:block}
-.ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-.ico-sm{width:13px;height:13px}
-.ico-xs{width:11px;height:11px}
+.msi{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;
+  font-size:20px;line-height:1;display:inline-block;white-space:nowrap;direction:ltr;
+  width:1em;height:1em;overflow:hidden;flex-shrink:0;
+  font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24}
+.msi-sm{font-size:17px}
+.msi-xs{font-size:15px}
 .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 :focus{outline:none}
 :focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset);border-radius:var(--r-ctrl)}
@@ -218,7 +225,13 @@ svg{display:block}
 button,.pressable{transition:transform var(--dur-micro) var(--ease-out),background-color var(--dur-micro) var(--ease-out),
   border-color var(--dur-micro) var(--ease-out),color var(--dur-micro) var(--ease-out)}
 button:active,.pressable:active{transform:scale(.97)}
-input[type="checkbox"],input[type="radio"]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer}
+input[type="checkbox"],input[type="radio"]{accent-color:var(--accent);width:16px;height:16px;cursor:pointer}
+/* El destino pulsable son 24×24 (WCAG 2.2, 2.5.8); el dibujo sigue en 16.
+   La etiqueta no aporta nombre accesible —lo pone el aria-label del input— 
+   solo área. */
+.casilla{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
+  flex-shrink:0;cursor:pointer;border-radius:4px;margin:-4px}
+.casilla:hover{background:var(--surface-2)}
 .lnk{color:var(--link);font-weight:600;text-decoration:none;border-radius:4px}
 .lnk:hover{text-decoration:underline}
 /* @fin ARQ-BASE */
@@ -235,7 +248,7 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--accent);width:15px
 .grp{margin:9px 8px 2px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}
 .side ul{list-style:none}
 .it{display:flex;align-items:center;gap:9px;padding:6px 9px;border-radius:7px;color:var(--chrome-dim);
-  font-size:13.5px;text-decoration:none;border-left:3px solid transparent;
+  font-size:var(--fs-dense);text-decoration:none;border-left:3px solid transparent;
   transition:background-color var(--dur-micro) var(--ease-out),color var(--dur-micro) var(--ease-out)}
 .it .et{white-space:normal;overflow-wrap:anywhere;line-height:1.25;min-width:0}
 .it:hover{background:var(--chrome-hover);color:var(--chrome-ink)}
@@ -255,7 +268,7 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--accent);width:15px
   display:grid;place-items:center;font:700 11px var(--font-ui);flex-shrink:0}
 .cromo-quien{display:flex;flex-direction:column;align-items:flex-start;min-width:0;line-height:1.25}
 .cromo-quien b{font-size:var(--fs-dense);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
-.cromo-quien small{font-size:11px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+.cromo-quien small{font-size:var(--fs-meta);color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
 @media (max-width:860px){.cromo-quien{display:none}.cromo-prof{padding:4px}}
 
 .main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;position:relative}
@@ -330,7 +343,7 @@ main[id="contenido"]::after{content:"";display:block;flex-shrink:0;height:var(--
 .search{width:100%;max-width:380px;min-width:0;flex-shrink:0;display:flex;align-items:center;gap:8px;background:var(--bg);
   border:1px solid var(--border);border-radius:var(--r-pill);padding:8px 14px;color:var(--text-3)}
 .search:focus-within{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.search svg{color:var(--text-3);flex-shrink:0}
+.search .msi{color:var(--text-3);flex-shrink:0}
 .search input{border:0;background:transparent;color:var(--text);font:500 var(--fs-dense) var(--font-ui);width:100%;outline:0}
 .search input:focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}
 .search input::placeholder{color:var(--text-3)}
@@ -362,14 +375,14 @@ main[id="contenido"]::after{content:"";display:block;flex-shrink:0;height:var(--
 .tabla-caja{min-width:0;overflow-x:auto;flex:none}
 table{width:100%;border-collapse:collapse;font-size:var(--fs-dense)}
 caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-thead th{text-align:left;color:var(--text-2);font-size:11px;font-weight:700;letter-spacing:.04em;
+thead th{text-align:left;color:var(--text-2);font-size:var(--fs-meta);font-weight:700;letter-spacing:.04em;
   text-transform:uppercase;padding:var(--sp-2) var(--sp-4);border-bottom:1px solid var(--border);
   background:var(--surface);white-space:nowrap;position:sticky;top:0;z-index:5}
 tbody th,td{padding:var(--sp-2) var(--sp-4);height:var(--row-comfy);border-bottom:1px solid var(--border);
   vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 tbody th{text-align:left;font-weight:400}
 td:has(> input[type="checkbox"]:only-child),td.control{overflow:visible;text-overflow:clip}
-thead th button{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;color:inherit;
+thead th button{display:inline-flex;align-items:center;gap:5px;min-height:24px;border:0;background:transparent;color:inherit;
   font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;padding:3px 5px;margin:-3px -5px;
   border-radius:var(--r-ctrl);white-space:nowrap}
 thead th button:hover{color:var(--text)}
@@ -384,7 +397,7 @@ tbody tr:hover td,tbody tr:hover th{background:var(--surface-2)}
 .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .dos{display:flex;flex-direction:column;gap:2px;line-height:1.35;white-space:normal;min-width:0}
 .dos b{font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dos small{color:var(--text-3);font-size:11px}
+.dos small{color:var(--text-3);font-size:var(--fs-meta)}
 .acciones{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
 .acciones .iconbtn{width:28px;height:28px}
 .tfoot{display:flex;align-items:center;color:var(--text-3);font-size:var(--fs-meta);
@@ -397,9 +410,9 @@ tbody tr:hover td,tbody tr:hover th{background:var(--surface-2)}
 .pag button[aria-current="page"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .nota{display:flex;gap:var(--sp-3);align-items:flex-start;
   padding:var(--sp-4) calc(var(--sp-6) + 68px) var(--sp-4) var(--sp-6);
-  font-size:11.5px;color:var(--text-2);line-height:1.55;border-top:1px solid var(--border);
+  font-size:var(--fs-meta);color:var(--text-2);line-height:1.55;border-top:1px solid var(--border);
   background:var(--surface);flex-shrink:0}
-.nota svg{flex-shrink:0;margin-top:2px;color:var(--text-3)}
+.nota .msi{margin-top:1px;color:var(--text-3)}
 .nota b{color:var(--text)}
 @media (max-width:1280px){.p4-t,.p4-b,.p4-f,.tfoot{padding-left:var(--sp-4);padding-right:var(--sp-4)}
   .nota{padding-left:var(--sp-4);padding-right:calc(var(--sp-4) + 68px)}}
@@ -446,39 +459,6 @@ tbody th:first-child::after,thead th:first-child::after{content:"";position:abso
 }
 /* @fin ARQ-P4 */
 
-/* ARQ-SEMAFORO */
-.pill{display:inline-flex;align-items:center;gap:5px;border-radius:var(--r-ctrl);padding:3px 9px;
-  font-size:11px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
-.p-ok{background:var(--ok-bg);color:var(--ok-ink)}
-.p-warn{background:var(--warn-bg);color:var(--warn-ink)}
-.p-err{background:var(--err-bg);color:var(--err-ink)}
-.p-block{background:var(--block-bg);color:var(--block-ink)}
-.p-pause{background:var(--pause-bg);color:var(--pause-ink)}
-.p-neutro{background:var(--surface-2);color:var(--text-2)}
-.sin-reloj{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;
-  color:var(--text-3);border:1px dashed var(--border-2);border-radius:var(--r-ctrl);
-  padding:3px 9px;background:transparent;white-space:nowrap}
-.p-type{display:inline-flex;align-items:center;gap:6px;border-radius:var(--r-ctrl);padding:3px 9px;
-  font-size:11px;font-weight:700;color:var(--text-2);white-space:nowrap}
-.p-type::before{content:"";width:7px;height:7px;border-radius:999px;flex-shrink:0}
-.p-s1{background:color-mix(in srgb,var(--serie-1) 16%,var(--surface))}
-.p-s1::before{background:var(--serie-1)}
-.p-s2{background:color-mix(in srgb,var(--serie-2) 16%,var(--surface))}
-.p-s2::before{background:var(--serie-2)}
-.p-s0{background:var(--surface-2)}
-.p-s0::before{display:none}
-.prio{display:inline-flex;align-items:center;gap:5px;border-radius:4px;padding:1px 7px;
-  font-size:10.5px;font-weight:700;white-space:nowrap}
-.prio::before{content:"";flex-shrink:0}
-.pr-crit{background:var(--err-bg);color:var(--err-ink)}
-.pr-crit::before{border-left:5px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent}
-.pr-alta{background:var(--warn-bg);color:var(--warn-ink)}
-.pr-alta::before{width:7px;height:7px;border-radius:50%;background:currentColor}
-.pr-media{background:var(--surface-2);color:var(--text-2)}
-.pr-media::before{width:7px;height:2px;background:currentColor}
-.pr-baja{background:var(--surface-2);color:var(--text-3)}
-.pr-baja::before{width:7px;height:7px;border:1.5px solid currentColor;border-radius:50%}
-/* @fin ARQ-SEMAFORO */
 
 /* ARQ-P6 */
 .cuerpo{padding:var(--sp-4) var(--sp-6) var(--sp-8);display:flex;flex-direction:column;gap:var(--sp-4);flex:1;min-width:0}
@@ -507,13 +487,13 @@ tbody th:first-child::after,thead th:first-child::after{content:"";position:abso
 .bitacora .ev{display:flex;flex-direction:column;gap:3px;min-width:0}
 .bitacora .ev .qq{font-size:var(--fs-dense);color:var(--text)}
 .bitacora .ev .qq b{font-weight:600}
-.bitacora .ev .cuando{font-size:11px;color:var(--text-3);font-variant-numeric:tabular-nums}
+.bitacora .ev .cuando{font-size:var(--fs-meta);color:var(--text-3);font-variant-numeric:tabular-nums}
 .bitacora .ev .texto{font-size:var(--fs-dense);color:var(--text-2);line-height:1.55;
   background:var(--surface);border:1px solid var(--border);border-radius:var(--r-ctrl);
   padding:var(--sp-2) var(--sp-3);margin-top:3px}
 .banda{display:flex;gap:var(--sp-3);align-items:flex-start;padding:var(--sp-3) var(--sp-4);
   border-radius:var(--r-card);font-size:var(--fs-dense);line-height:1.55}
-.banda svg{flex-shrink:0;margin-top:2px}
+.banda .msi{margin-top:1px}
 .banda .der{margin-left:auto;flex-shrink:0}
 .b-warn{background:var(--warn-bg);color:var(--warn-ink)}
 .b-err{background:var(--err-bg);color:var(--err-ink)}
@@ -521,45 +501,6 @@ tbody th:first-child::after,thead th:first-child::after{content:"";position:abso
 .b-info{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}
 /* @fin ARQ-P6 */
 
-/* ARQ-P7 */
-.split{display:grid;grid-template-columns:minmax(320px,380px) 1fr;flex:1;min-height:0}
-@media (max-width:1024px){.split{grid-template-columns:1fr;grid-template-rows:auto 1fr}}
-.bandeja{border-right:1px solid var(--border);display:flex;flex-direction:column;min-width:0;background:var(--surface)}
-@media (max-width:1024px){.bandeja{border-right:0;border-bottom:1px solid var(--border);max-height:38vh}}
-.bandeja .bh{padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--border);
-  display:flex;flex-direction:column;gap:var(--sp-2);flex-shrink:0}
-.bandeja .bh .cuenta{font-size:var(--fs-meta);color:var(--text-3);font-variant-numeric:tabular-nums}
-.bandeja .bh .cuenta b{color:var(--text)}
-.bandeja ol{list-style:none;overflow-y:auto;flex:1;min-height:0}
-.tk{display:grid;grid-template-columns:3px 1fr;border-bottom:1px solid var(--border);
-  cursor:pointer;text-decoration:none;color:inherit;
-  transition:background-color var(--dur-micro) var(--ease-out)}
-.tk:hover{background:var(--surface-2)}
-.tk .franja{display:block;background:transparent}
-.tk[aria-current="true"]{background:var(--accent-soft)}
-.tk[aria-current="true"] .franja{background:var(--accent)}
-.tk .cont{padding:var(--sp-3) var(--sp-4);display:flex;flex-direction:column;gap:5px;min-width:0}
-.tk .l1{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
-.tk .ref{font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text-3);letter-spacing:.03em}
-.tk .der{margin-left:auto}
-.tk .asunto{font-size:var(--fs-dense);font-weight:600;color:var(--text);line-height:1.35;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.tk .l3{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
-.tk .quien{font-size:11px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tk .cuando{margin-left:auto;font-size:11px;color:var(--text-3);white-space:nowrap;font-variant-numeric:tabular-nums}
-.detalle{border-left:1px solid var(--border);display:flex;flex-direction:column;min-width:0;overflow-y:auto}
-@media (max-width:1024px){.detalle{border-left:0}}
-.detalle .dh{padding:var(--sp-4) var(--sp-6) var(--sp-3);border-bottom:1px solid var(--border);
-  display:flex;flex-direction:column;gap:var(--sp-2);background:var(--surface);flex-shrink:0}
-@media (max-width:1280px){.detalle .dh{padding-left:var(--sp-4);padding-right:var(--sp-4)}}
-.detalle .dh h2{font-size:var(--fs-sub);line-height:1.3}
-.detalle .dh .meta-l{display:flex;gap:var(--sp-3);flex-wrap:wrap;align-items:center;
-  font-size:var(--fs-meta);color:var(--text-2)}
-.detalle .dh .meta-l b{color:var(--text);font-variant-numeric:tabular-nums}
-.detalle .dh .acciones{justify-content:flex-start;margin-top:var(--sp-1)}
-.detalle .banda{margin:var(--sp-4) var(--sp-6) 0}
-@media (max-width:1280px){.detalle .banda{margin-left:var(--sp-4);margin-right:var(--sp-4)}}
-/* @fin ARQ-P7 */
 
 /* ARQ-P5 */
 .form{padding:var(--sp-4) var(--sp-6) var(--sp-8);display:flex;flex-direction:column;gap:var(--sp-4);
@@ -570,7 +511,7 @@ tbody th:first-child::after,thead th:first-child::after{content:"";position:abso
 .seccion > header{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);
   border-bottom:1px solid var(--border);background:var(--surface-2)}
 .seccion > header .idx{width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-ink);
-  display:grid;place-items:center;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0}
+  display:grid;place-items:center;font-size:var(--fs-meta);font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0}
 .seccion > header h2{font-size:var(--fs-base);font-weight:600}
 .seccion > header .est{margin-left:auto;font-size:var(--fs-meta);color:var(--text-2)}
 .seccion .rejilla{padding:var(--sp-4);display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:var(--sp-4)}
@@ -585,8 +526,8 @@ tbody th:first-child::after,thead th:first-child::after{content:"";position:abso
 .ctrl input:focus,.ctrl select:focus,.ctrl textarea:focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 @media (pointer:coarse){input,select,textarea{font-size:max(16px,var(--fs-dense))}}
 .ctrl input[type="text"]:focus-visible,.ctrl input[type="date"]:focus-visible,.ctrl input[type="number"]:focus-visible,.ctrl input:focus-visible,.ctrl select:focus-visible,.ctrl textarea:focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}
-.ctrl .ayuda{font-size:11px;color:var(--text-3);line-height:1.45}
-.ctrl .mal{font-size:11px;color:var(--err-ink);line-height:1.45;font-weight:600;display:flex;gap:5px;align-items:flex-start}
+.ctrl .ayuda{font-size:var(--fs-meta);color:var(--text-3);line-height:1.45}
+.ctrl .mal{font-size:var(--fs-meta);color:var(--err-ink);line-height:1.45;font-weight:600;display:flex;gap:5px;align-items:flex-start}
 .ctrl.error input,.ctrl.error select,.ctrl.error textarea{border-color:var(--err);box-shadow:0 0 0 1px var(--err)}
 .ctrl.ancho{grid-column:1/-1}
 .barra-form{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-6);
@@ -606,10 +547,14 @@ tbody th:first-child::after,thead th:first-child::after{content:"";position:abso
   padding:56px 16px;flex:1;justify-content:center}
 main > .state-ok,main > .state-loading,main > .state-empty,main > .state-error{display:none}
 .state-ok{flex-direction:column;flex:1;min-height:0}
-.state .ico{width:30px;height:30px;color:var(--text-3)}
-.state b{font-size:var(--fs-base)}
+.state .msi{font-size:30px;color:var(--text-3)}
+/* El icono de un botón hereda el color del botón. Sin esta línea, el gris
+   del bloque de estado pintaba también el icono de «Reintentar» sobre el
+   verde de acento: 1,03:1 de contraste, con 3:1 de mínimo. */
+.state .btn .msi{color:inherit;font-size:17px}
+.state h2{font-size:18px;font-weight:700;text-wrap:balance}
 .state p{color:var(--text-2);font-size:var(--fs-dense);max-width:58ch;line-height:1.55}
-.state .ref{color:var(--text-3);font-size:11px;font-variant-numeric:tabular-nums}
+.state .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
 .state .acc{display:flex;gap:var(--sp-2);flex-wrap:wrap;justify-content:center;margin-top:var(--sp-1)}
 main[data-state="ok"] .state-ok{display:flex}
 main[data-state="empty"] .state-empty{display:flex}
@@ -637,39 +582,39 @@ main[data-state="loading"] .state-loading{display:flex}
 
 .form-h{display:flex;flex-direction:column;gap:var(--sp-3)}
 .aviso-canal{display:flex;gap:var(--sp-3);align-items:flex-start;border-radius:var(--r-ctrl);
-  padding:var(--sp-2) var(--sp-3);font-size:11.5px;line-height:1.5;margin-top:var(--sp-2)}
+  padding:var(--sp-2) var(--sp-3);font-size:var(--fs-meta);line-height:1.5;margin-top:var(--sp-2)}
 .aviso-canal.si{background:var(--ok-bg);color:var(--ok-ink)}
 .aviso-canal.no{background:var(--warn-bg);color:var(--warn-ink)}
-.aviso-canal svg{flex-shrink:0;margin-top:1px}
+.aviso-canal .msi{margin-top:1px}
 .mats{padding:0}
 .mats table{min-width:0}
 .mats td,.mats th{white-space:normal}
 .mats tfoot td,.mats tfoot th{font-weight:700;background:var(--surface-2);border-bottom:0}
 .quitar{color:var(--err-ink)}
-.tope{font-size:11px;color:var(--text-3);line-height:1.45}
+.tope{font-size:var(--fs-meta);color:var(--text-3);line-height:1.45}
 </style>
 </head>
 <body>
 <a class="skip" href="#contenido">Saltar al contenido</a>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="lgrad" x1="1233.32" y1="931.42" x2="1233.32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c361e"/><stop offset="0.14" stop-color="#12572b"/><stop offset="0.32" stop-color="#2e823d"/><stop offset="0.48" stop-color="#60a84b"/><stop offset="0.64" stop-color="#76b552"/><stop offset="0.78" stop-color="#a5c86a"/><stop offset="1" stop-color="#c7d97b"/></linearGradient><symbol id="dproma-mark" viewBox="740 0 970 932"><path fill="url(#lgrad)" d="M869.35,924.63H811.84c-39.82,0-66.56-40.83-50.66-77.33L1048.86,108C1083.11,29.8,1146.12,0,1243.39,0c95.89,0,158.91,29.8,191.79,108L1705.76,854.8c15.27,36.41-11.47,76.62-51,76.62h-59.54a55.27,55.27,0,0,1-51-34L1285.73,191c-8.22-19.86-23.29-28.56-45.21-28.56s-37,8.7-46.58,28.56L920,891.4A55.26,55.26,0,0,1,869.35,924.63Z"/></symbol><symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol><symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol><symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></symbol><symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></symbol><symbol id="i-box" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7L12 12l8.7-5M12 22V12"/></symbol><symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></symbol><symbol id="i-folder" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.9 3.9A2 2 0 0 0 8.2 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol><symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M3 8l4-4 4 4M3 8l2 5h4l2-5M13 8l4-4 4 4M13 8l2 5h4l2-5"/></symbol><symbol id="i-trend" viewBox="0 0 24 24"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></symbol><symbol id="i-ticket" viewBox="0 0 24 24"><path d="M3 9a3 3 0 0 0 0 6v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3a3 3 0 0 1 0-6V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z"/><path d="M13 5v2M13 11v2M13 17v2"/></symbol><symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2L3 14h8l-1 8 10-12h-8z"/></symbol><symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol><symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol><symbol id="i-report" viewBox="0 0 24 24"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12.5" y="7" width="3" height="10" rx="1"/><rect x="18" y="13" width="3" height="4" rx="1"/></symbol><symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol><symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol><symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></symbol><symbol id="i-alertc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></symbol><symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol><symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol><symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13l3.5 7v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></symbol><symbol id="i-chevd" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol><symbol id="i-badge" viewBox="0 0 24 24"><path d="M12 2l2.6 5.3 5.9.9-4.2 4.1 1 5.8L12 15.4 6.7 18.1l1-5.8L3.5 8.2l5.9-.9z"/></symbol><symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></symbol><symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol><symbol id="i-export" viewBox="0 0 24 24"><path d="M12 3v13M7 12l5 5 5-5M4 21h16"/></symbol><symbol id="i-link" viewBox="0 0 24 24"><path d="M9 17H7a5 5 0 0 1 0-10h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-pause" viewBox="0 0 24 24"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></symbol><symbol id="i-columns" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></symbol><symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.6 7-12a7 7 0 1 0-14 0c0 5.4 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></symbol><symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol><symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol><symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol></defs></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="lgrad" x1="1233.32" y1="931.42" x2="1233.32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c361e"/><stop offset="0.14" stop-color="#12572b"/><stop offset="0.32" stop-color="#2e823d"/><stop offset="0.48" stop-color="#60a84b"/><stop offset="0.64" stop-color="#76b552"/><stop offset="0.78" stop-color="#a5c86a"/><stop offset="1" stop-color="#c7d97b"/></linearGradient><symbol id="dproma-mark" viewBox="740 0 970 932"><path fill="url(#lgrad)" d="M869.35,924.63H811.84c-39.82,0-66.56-40.83-50.66-77.33L1048.86,108C1083.11,29.8,1146.12,0,1243.39,0c95.89,0,158.91,29.8,191.79,108L1705.76,854.8c15.27,36.41-11.47,76.62-51,76.62h-59.54a55.27,55.27,0,0,1-51-34L1285.73,191c-8.22-19.86-23.29-28.56-45.21-28.56s-37,8.7-46.58,28.56L920,891.4A55.26,55.26,0,0,1,869.35,924.63Z"/></symbol></defs></svg>
 <div class="hoja">
-<div class="app"><button class="velo-menu" data-cromo type="button" aria-label="Cerrar el menú" tabindex="-1"></button><nav class="side" data-cromo id="menu-lateral" aria-label="Navegación principal"><div class="logo"><svg width="44" height="42" viewBox="740 0 970 932" aria-hidden="true"><use href="#dproma-mark"/></svg><span class="wordmark" translate="no">SIO-DPROMA</span></div><div class="side-scroll"><div class="bloque"><p class="grp" id="g-principal" aria-hidden="true">Principal</p><ul aria-labelledby="g-principal"><li><a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-grid"/></svg><span class="et">Tablero</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-operacion" aria-hidden="true">Operación</p><ul aria-labelledby="g-operacion"><li><a class="it" href="#" aria-current="page"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg><span class="et">Padrón de clientes</span></a></li><li><a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-card"/></svg><span class="et">Viáticos</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-icev" aria-hidden="true">ICEV</p><ul aria-labelledby="g-icev"><li><a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg><span class="et">Órdenes de instalación</span></a></li><li><a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-card"/></svg><span class="et">Instaladores y agenda</span></a></li><li><a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-zap"/></svg><span class="et">Trámites CFE</span></a></li><li><a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-box"/></svg><span class="et">Recetas de despacho</span></a></li><li><a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-receipt"/></svg><span class="et">Compras de almacén</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-tramites-vehiculares" aria-hidden="true">Trámites vehiculares</p><ul aria-labelledby="g-tramites-vehiculares"><li><a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg><span class="et">Trámites vehiculares</span></a></li><li><a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span class="et">Trámites concluidos</span></a></li><li><a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg><span class="et">Gestoría</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-direccion-y-administracion" aria-hidden="true">Dirección y Administración</p><ul aria-labelledby="g-direccion-y-administracion"><li><a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-trend"/></svg><span class="et">Cuentas por cobrar</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-soporte" aria-hidden="true">Soporte</p><ul aria-labelledby="g-soporte"><li><a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg><span class="et">Usuarios</span></a></li><li><a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-alertc"/></svg><span class="et">Incidencias de servicio</span></a></li><li><a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-ticket"/></svg><span class="et">Tickets TI</span></a></li></ul></div></div></nav><div class="area"><header class="cromo-top" data-cromo>
-<button class="iconbtn hamburguesa" type="button" id="menu-btn" aria-label="Abrir el menú" aria-expanded="false" aria-controls="menu-lateral"><svg class="ico" aria-hidden="true"><use href="#i-menu"/></svg></button>
+<div class="app"><button class="velo-menu" data-cromo type="button" aria-label="Cerrar el menú" tabindex="-1"></button><nav class="side" data-cromo id="menu-lateral" aria-label="Navegación principal"><div class="logo"><svg width="44" height="42" viewBox="740 0 970 932" aria-hidden="true"><use href="#dproma-mark"/></svg><span class="wordmark" translate="no">SIO-DPROMA</span></div><div class="side-scroll"><div class="bloque"><p class="grp" id="g-principal" aria-hidden="true">Principal</p><ul aria-labelledby="g-principal"><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">dashboard</span><span class="et">Tablero</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-operacion" aria-hidden="true">Operación</p><ul aria-labelledby="g-operacion"><li><a class="it" href="#" aria-current="page"><span class="msi" aria-hidden="true" translate="no">group</span><span class="et">Padrón de clientes</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">credit_card</span><span class="et">Viáticos</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-icev" aria-hidden="true">ICEV</p><ul aria-labelledby="g-icev"><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">description</span><span class="et">Órdenes de instalación</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">credit_card</span><span class="et">Instaladores y agenda</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">bolt</span><span class="et">Trámites CFE</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">inventory_2</span><span class="et">Recetas de despacho</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">receipt_long</span><span class="et">Compras de almacén</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-tramites-vehiculares" aria-hidden="true">Trámites vehiculares</p><ul aria-labelledby="g-tramites-vehiculares"><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">folder</span><span class="et">Trámites vehiculares</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">check_circle</span><span class="et">Trámites concluidos</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">folder</span><span class="et">Gestoría</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-direccion-y-administracion" aria-hidden="true">Dirección y Administración</p><ul aria-labelledby="g-direccion-y-administracion"><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">trending_up</span><span class="et">Cuentas por cobrar</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-soporte" aria-hidden="true">Soporte</p><ul aria-labelledby="g-soporte"><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">group</span><span class="et">Usuarios</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">error</span><span class="et">Incidencias de servicio</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">confirmation_number</span><span class="et">Tickets TI</span></a></li></ul></div></div></nav><div class="area"><header class="cromo-top" data-cromo>
+<button class="iconbtn hamburguesa" type="button" id="menu-btn" aria-label="Abrir el menú" aria-expanded="false" aria-controls="menu-lateral"><span class="msi" aria-hidden="true" translate="no">menu</span></button>
 <div class="hueco" aria-hidden="true"></div>
 <div class="derecha">
-<button class="iconbtn" type="button" id="tema" aria-label="Cambiar a tema claro" aria-pressed="false"><svg class="ico" aria-hidden="true"><use href="#i-moon" id="tema-ico"/></svg></button>
+<button class="iconbtn" type="button" id="tema" aria-label="Cambiar a tema claro" aria-pressed="false"><span class="msi" id="tema-ico" aria-hidden="true" translate="no">dark_mode</span></button>
 <button class="cromo-prof" type="button" aria-label="Cuenta de Alex Rai, Administración de sistemas" aria-expanded="false">
 <span class="cromo-av" aria-hidden="true">AR</span>
 <span class="cromo-quien"><b>Alex Rai</b><small>Administración de sistemas</small></span>
-<svg class="ico ico-sm" aria-hidden="true"><use href="#i-chevd"/></svg>
+<span class="msi msi-sm" aria-hidden="true" translate="no">expand_more</span>
 </button>
 </div>
 </header><div class="main">
 <header class="p4"><div class="p4-t"><h1>Nuevo cliente</h1><span class="resumen">Alta de una razón social en el padrón</span></div></header>
 <main id="contenido" data-state="ok" tabindex="-1">
 <div class="state-ok "><div class="form">
-<nav class="migas" aria-label="Ruta"><a href="#">Padrón de clientes</a><svg class="ico ico-sm" aria-hidden="true"><use href="#i-down"/></svg><span>Nuevo cliente</span></nav>
-<div class="banda b-info"><svg class="ico" aria-hidden="true"><use href="#i-alert"/></svg><p>El alta necesita <b>razón social y RFC</b>. Todo lo demás se puede completar después, <b>y los dos documentos son opcionales</b>: un cliente sin ellos se registra, se edita y se consulta sin estorbo.<br><br>Lo que no podrá hacer hasta tenerlos es <b>que se le programe una instalación o se le facture</b>. Si el cliente ya tiene fecha, conviene subirlos ahora; si no, no hay ninguna prisa.<br><br>Los datos que captures aquí se tratan según el <a class="lnk" href="https://www.dproma.com/aviso-de-privacidad" target="_blank" rel="noopener noreferrer">aviso de privacidad de DPROMA</a>. <b>No hace falta que el cliente firme nada</b>: basta con informarle, y el aviso ya existía antes que este sistema.</p></div>
+<nav class="migas" aria-label="Ruta"><a href="#">Padrón de clientes</a><span class="msi msi-sm" aria-hidden="true" translate="no">arrow_downward</span><span>Nuevo cliente</span></nav>
+<div class="banda b-info"><span class="msi" aria-hidden="true" translate="no">warning</span><p>El alta necesita <b>razón social y RFC</b>. Todo lo demás se puede completar después, <b>y los dos documentos son opcionales</b>: un cliente sin ellos se registra, se edita y se consulta sin estorbo.<br><br>Lo que no podrá hacer hasta tenerlos es <b>que se le programe una instalación o se le facture</b>. Si el cliente ya tiene fecha, conviene subirlos ahora; si no, no hay ninguna prisa.<br><br>Los datos que captures aquí se tratan según el <a class="lnk" href="https://www.dproma.com/aviso-de-privacidad" target="_blank" rel="noopener noreferrer">aviso de privacidad de DPROMA</a>. <b>No hace falta que el cliente firme nada</b>: basta con informarle, y el aviso ya existía antes que este sistema.</p></div>
 <section class="seccion">
 <header><span class="idx tnum">1</span><h2>Identificación</h2><span class="est">2 de 2 capturados</span></header>
 <div class="rejilla"><div class="ctrl ancho">
@@ -698,7 +643,7 @@ main[data-state="loading"] .state-loading{display:flex}
 </div><div class="ctrl ancho error">
 <label for="dom">Domicilio fiscal <span class="req">*</span></label>
 <input type="text" id="dom" value="" placeholder="Calle, número, colonia, ciudad y estado">
-<span class="mal"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-alertc"/></svg>Falta el domicilio fiscal. Sin él no se puede timbrar una factura a este cliente.</span>
+<span class="mal"><span class="msi msi-xs" aria-hidden="true" translate="no">error</span>Falta el domicilio fiscal. Sin él no se puede timbrar una factura a este cliente.</span>
 </div><div class="ctrl">
 <label for="car">Constancia de situación fiscal</label>
 <input type="text" id="car" value="" placeholder="">
@@ -740,26 +685,27 @@ main[data-state="loading"] .state-loading{display:flex}
 </div></div>
 </section>
 </div></div>
-<div class="state-loading sk" role="status" aria-label="Cargando"><div class="sk-caja"><span class="skel" style="width:26%">Identificación</span><span class="skel" style="width:92%;height:38px">razón social</span><span class="skel" style="width:46%;height:38px">RFC</span><span class="skel" style="width:46%;height:38px">tipo</span></div><div class="sk-caja"><span class="skel" style="width:24%">Datos fiscales</span><span class="skel" style="width:46%;height:38px">código postal</span><span class="skel" style="width:46%;height:38px">régimen</span><span class="skel" style="width:92%;height:38px">domicilio fiscal</span></div></div>
+<div class="state-loading sk" role="status" aria-label="Cargando"><div class="sk-caja"><span class="skel" style="width:26%"></span><span class="skel" style="width:92%;height:38px"></span><span class="skel" style="width:46%;height:38px"></span><span class="skel" style="width:46%;height:38px"></span></div><div class="sk-caja"><span class="skel" style="width:24%"></span><span class="skel" style="width:46%;height:38px"></span><span class="skel" style="width:46%;height:38px"></span><span class="skel" style="width:92%;height:38px"></span></div></div>
 <div class="state state-empty">
-<svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>
-<b>El formulario está en blanco</b>
+<span class="msi" aria-hidden="true" translate="no">add</span>
+<h2>El formulario está en blanco</h2>
 <p>No has capturado nada todavía. <b>Con la razón social, el RFC y el tipo basta para dar de alta</b>; lo demás se puede completar más adelante desde la ficha del cliente.</p>
-<div class="acc"><button class="btn p" type="button"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-edit"/></svg>Empezar por la razón social</button><button class="btn" type="button"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-search"/></svg>Buscar si ya está dado de alta</button></div>
+<div class="acc"><button class="btn p" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span>Empezar por la razón social</button><button class="btn" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">search</span>Buscar si ya está dado de alta</button></div>
 </div>
 <div class="state state-error">
-<svg class="ico" style="color:var(--err-ink)" aria-hidden="true"><use href="#i-alertc"/></svg>
-<b>No se pudo dar de alta el cliente</b>
+<span class="msi" style="color:var(--err-ink)" aria-hidden="true" translate="no">error</span>
+<h2>No se pudo dar de alta el cliente</h2>
 <p>El servicio del padrón no respondió. <b>El cliente no se creó, pero lo que capturaste no se perdió</b>: sigue en el borrador de esta pantalla. Vuelve a intentar sin recapturar nada.</p>
 <p class="ref" translate="no">Referencia del error: PAD-20260821-1401</p>
-<div class="acc"><button class="btn p" type="button"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg>Reintentar</button></div>
+<div class="acc"><button class="btn p" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">refresh</span>Reintentar</button></div>
 </div>
 </main>
-<div class="barra-form"><span class="izq">Borrador guardado hace <b>1 min</b>. Puedes salir y volver.</span><div class="der"><button class="btn" type="button">Cancelar</button><button class="btn" type="button"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>Guardar borrador</button><button class="btn p" type="button"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>Dar de alta</button></div></div>
+<p class="sr" id="live" aria-live="polite"></p>
+<div class="barra-form"><span class="izq">Borrador guardado hace <b>1 min</b>. Puedes salir y volver.</span><div class="der"><button class="btn" type="button">Cancelar</button><button class="btn" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">check_circle</span>Guardar borrador</button><button class="btn p" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Dar de alta</button></div></div>
 <button class="fab" data-cromo type="button" aria-label="Abrir el asistente del sistema" title="Asistente del sistema"><span class="ring"></span><svg width="22" height="21" viewBox="740 0 970 932" aria-hidden="true"><use href="#dproma-mark"/></svg></button><span class="desvanece" aria-hidden="true"></span></div></div></div>
 </div>
-<div class="demo" data-andamio role="group" aria-label="Ver la pantalla en sus distintos estados">
-<span class="et-g">ESTADO</span>
+<div class="demo" data-andamio role="group" aria-label="Controles de la maqueta: ver la pantalla en sus distintos estados">
+<span class="et-g">Vista de maqueta</span>
 <button type="button" data-set="ok" aria-pressed="true">Con datos</button>
 <button type="button" data-set="loading" aria-pressed="false">Cargando</button>
 <button type="button" data-set="empty" aria-pressed="false">Vacío</button>
@@ -777,15 +723,28 @@ function pinta(){
   var o=oscuro();
   bt.setAttribute('aria-pressed',String(o));
   bt.setAttribute('aria-label',o?'Cambiar a tema claro':'Cambiar a tema oscuro');
-  ico.setAttribute('href',o?'#i-sun':'#i-moon');
+  ico.textContent=o?'light_mode':'dark_mode';
   var m=document.querySelector('meta[name="theme-color"]');
   if(m)m.setAttribute('content',getComputedStyle(document.body).backgroundColor);
 }
+/* El cambio de vista se anuncia y el foco viaja al contenido. Sin las dos
+   cosas, quien usa lector de pantalla no se entera de que la pantalla cambió:
+   el <main tabindex="-1"> ya estaba preparado y nadie le mandaba el foco. */
+var DICE={
+  ok:'Formulario de alta de cliente.',
+  loading:'Cargando el formulario de alta.',
+  empty:'Formulario de alta en blanco.',
+  error:'No se pudo dar de alta el cliente. El formulario sigue relleno.'};
+var live=document.getElementById('live');
+function muestra(clave,mueveFoco){
+  cont.setAttribute('data-state',clave);
+  document.querySelectorAll('.demo [data-set]').forEach(function(o){
+    o.setAttribute('aria-pressed',String(o.dataset.set===clave));});
+  live.textContent=DICE[clave]||'';
+  if(mueveFoco)cont.focus();
+}
 document.querySelectorAll('.demo [data-set]').forEach(function(b){
-  b.addEventListener('click',function(){
-    document.querySelectorAll('.demo [data-set]').forEach(function(o){o.setAttribute('aria-pressed',String(o===b));});
-    cont.setAttribute('data-state',b.dataset.set);
-  });
+  b.addEventListener('click',function(){muestra(b.dataset.set,true);});
 });
 bt.addEventListener('click',function(){raiz.setAttribute('data-theme',oscuro()?'light':'dark');pinta();});
 mq.addEventListener('change',pinta);
