@@ -1309,5 +1309,5 @@ si el desplazamiento no es ~0, está mal.
 
 | Versión | Fecha | Cambios |
 |---|---|---|
-| 1.0.0 | 2026-08-XX | Documenta el sistema de diseño del acceso a SIO-DPROMA (color, tipografía, componentes del login). |
-| 1.1.0 | 2026-08-XX | Se abre el sistema al dashboard: tabla densa, filtros, formularios, semáforo de 5 estados, ficha de cliente. Corrige `--text-3` (fallaba sobre `--surface-2`). Migra a Material Symbols. Documenta 5 trampas comprobadas al aplicar el sistema al módulo de clientes y retira el control de densidad de la tabla. |
+| 1.0.0 | 2026-08-28 | Documenta el sistema de diseño del acceso a SIO-DPROMA (color, tipografía, componentes del login). |
+| 1.1.0 | 2026-08-31 | Se abre el sistema al dashboard: tabla densa, filtros, formularios, semáforo de 5 estados, ficha de cliente. Corrige `--text-3` (fallaba sobre `--surface-2`). Migra a Material Symbols. Documenta 5 trampas comprobadas al aplicar el sistema al módulo de clientes y retira el control de densidad de la tabla. |
