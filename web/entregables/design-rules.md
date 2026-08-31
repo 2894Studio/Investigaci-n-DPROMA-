@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 1.2.0
+version: 1.3.0
 last_updated: 2026-08-31
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 
@@ -415,29 +415,26 @@ navegador.
 
 #### Cuándo usar una tarjeta, y cuál
 
-Cuatro usos reales, extraídos de cómo ya se usan en acceso, padrón y ficha de cliente — no son
-cuatro clases distintas, son la misma receta aplicada a cuatro trabajos distintos:
+Dos razones, no cuatro clases. Coincide con el consenso general de patrones de UI (Nielsen
+Norman Group, Material Design): una tarjeta representa **un objeto o un flujo autocontenido**,
+no es el contenedor por defecto de todo lo que hay en pantalla.
 
-1. **Agrupar contenido secundario con cabecera propia.** En la ficha de cliente, «Trámites
-   vehiculares» y «Órdenes de instalación» son bloques con icono + título + contador (`.n`) que
-   viven aparte del resto — no el objeto principal de la pantalla. Una tarjeta agrupa, no es el
-   contenedor por defecto de todo lo que hay en la pantalla.
-2. **Contenido valioso pero no siempre necesario, como `<details class="tarjeta">`.** Los
-   «posibles duplicados» del padrón llegan plegados a propósito: son útiles, pero antes se
-   mostraban siempre abiertos y empujaban la tabla —lo que se viene a consultar cada día— fuera
-   de la pantalla (hallazgo 2.1). Si un bloque no hace falta en la primera pantalla, se pliega;
-   no se quita, y no se abre por defecto.
-3. **Un paso de formulario, con el modificador `.seccion`.** Alta y edición de cliente usan la
-   misma receta visual con la cabecera cambiada: un índice numerado (`.idx`) en vez de un icono,
-   porque ahí la cabecera ordena pasos, no clasifica contenido. Es la misma tarjeta, no una clase
-   nueva — mismo fondo, borde, radio y sombra.
-4. **Nunca la tabla o lista principal de la pantalla.** El padrón no envuelve su tabla en una
-   tarjeta: vive en su propio `.tabla-caja`. Meter el objeto principal dentro de una tarjeta le
-   resta jerarquía — la tarjeta comunica «esto es un grupo aparte», y la tabla no lo es.
+1. **Contener un flujo pequeño y autocontenido.** `.glass` en el acceso agrupa los cuatro
+   estados (acceso, cargando, vacío, error) como un único flujo — una tarjeta, un contenedor,
+   el estado cambia dentro. Las vistas de estado del dashboard (§6.4) siguen el mismo principio:
+   un solo contenedor que cambia de contenido, nunca una tarjeta nueva por estado.
+2. **Agrupar información para que no quede suelta en la interfaz.** `.tarjeta` agrupa bloques
+   con identidad propia («Trámites vehiculares», «Órdenes de instalación» en la ficha de
+   cliente); `<details class="tarjeta">` agrupa y pliega lo valioso-pero-no-esencial (los
+   «posibles duplicados» del padrón, que antes empujaban la tabla fuera de pantalla — hallazgo
+   2.1); `.seccion` agrupa los campos de un paso de formulario, con índice numerado en vez de
+   icono en la cabecera. Misma receta visual, cabecera distinta según qué agrupa.
 
-`.glass` (§4) no entra en esta lista: es la única tarjeta translúcida del sistema, exclusiva de
-la pantalla de acceso, y existe una sola por pantalla como contenedor de los cuatro estados —
-no se usa para agrupar contenido dentro del dashboard.
+**Nunca la tabla o lista principal de la pantalla.** El padrón no envuelve su tabla en una
+tarjeta: vive en su propio `.tabla-caja`. Envolver el objeto principal en una tarjeta le resta
+jerarquía — la tarjeta dice «esto es un grupo aparte», y la tabla no lo es. Y no se anidan
+tarjetas dentro de tarjetas: si un grupo necesita subgrupos, es una señal de que la pantalla
+tiene más de un objeto y conviene dividirla, no apilar tarjetas.
 
 ### 6.4 Vistas de estado de una pantalla
 
@@ -1337,4 +1334,5 @@ si el desplazamiento no es ~0, está mal.
 |---|---|---|
 | 1.0.0 | 2026-08-28 | Documenta el sistema de diseño del acceso a SIO-DPROMA (color, tipografía, componentes del login). |
 | 1.1.0 | 2026-08-31 | Se abre el sistema al dashboard: tabla densa, filtros, formularios, semáforo de 5 estados, ficha de cliente. Corrige `--text-3` (fallaba sobre `--surface-2`). Migra a Material Symbols. Documenta 5 trampas comprobadas al aplicar el sistema al módulo de clientes y retira el control de densidad de la tabla. |
-| 1.2.0 | 2026-08-31 | Documenta cuándo usar cada tarjeta (`.tarjeta`, `.seccion`, `.glass`), a partir del uso real en acceso, padrón y ficha de cliente: agrupar contenido secundario, plegar lo valioso-pero-no-esencial, pasos de formulario, y nunca envolver la tabla o lista principal. |
+| 1.2.0 | 2026-08-31 | Documenta cuándo usar cada tarjeta (`.tarjeta`, `.seccion`, `.glass`), a partir del uso real en acceso, padrón y ficha de cliente. |
+| 1.3.0 | 2026-08-31 | Reescribe el racional de tarjetas a dos principios generales, alineados con buenas prácticas de UI (NN/g, Material Design): contener un flujo pequeño autocontenido, o agrupar información para que no quede suelta en la interfaz. Añade la regla de no anidar tarjetas. |

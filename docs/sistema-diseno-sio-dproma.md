@@ -409,29 +409,26 @@ navegador.
 
 #### Cuándo usar una tarjeta, y cuál
 
-Cuatro usos reales, extraídos de cómo ya se usan en acceso, padrón y ficha de cliente — no son
-cuatro clases distintas, son la misma receta aplicada a cuatro trabajos distintos:
+Dos razones, no cuatro clases. Coincide con el consenso general de patrones de UI (Nielsen
+Norman Group, Material Design): una tarjeta representa **un objeto o un flujo autocontenido**,
+no es el contenedor por defecto de todo lo que hay en pantalla.
 
-1. **Agrupar contenido secundario con cabecera propia.** En la ficha de cliente, «Trámites
-   vehiculares» y «Órdenes de instalación» son bloques con icono + título + contador (`.n`) que
-   viven aparte del resto — no el objeto principal de la pantalla. Una tarjeta agrupa, no es el
-   contenedor por defecto de todo lo que hay en la pantalla.
-2. **Contenido valioso pero no siempre necesario, como `<details class="tarjeta">`.** Los
-   «posibles duplicados» del padrón llegan plegados a propósito: son útiles, pero antes se
-   mostraban siempre abiertos y empujaban la tabla —lo que se viene a consultar cada día— fuera
-   de la pantalla (hallazgo 2.1). Si un bloque no hace falta en la primera pantalla, se pliega;
-   no se quita, y no se abre por defecto.
-3. **Un paso de formulario, con el modificador `.seccion`.** Alta y edición de cliente usan la
-   misma receta visual con la cabecera cambiada: un índice numerado (`.idx`) en vez de un icono,
-   porque ahí la cabecera ordena pasos, no clasifica contenido. Es la misma tarjeta, no una clase
-   nueva — mismo fondo, borde, radio y sombra.
-4. **Nunca la tabla o lista principal de la pantalla.** El padrón no envuelve su tabla en una
-   tarjeta: vive en su propio `.tabla-caja`. Meter el objeto principal dentro de una tarjeta le
-   resta jerarquía — la tarjeta comunica «esto es un grupo aparte», y la tabla no lo es.
+1. **Contener un flujo pequeño y autocontenido.** `.glass` en el acceso agrupa los cuatro
+   estados (acceso, cargando, vacío, error) como un único flujo — una tarjeta, un contenedor,
+   el estado cambia dentro. Las vistas de estado del dashboard (§6.4) siguen el mismo principio:
+   un solo contenedor que cambia de contenido, nunca una tarjeta nueva por estado.
+2. **Agrupar información para que no quede suelta en la interfaz.** `.tarjeta` agrupa bloques
+   con identidad propia («Trámites vehiculares», «Órdenes de instalación» en la ficha de
+   cliente); `<details class="tarjeta">` agrupa y pliega lo valioso-pero-no-esencial (los
+   «posibles duplicados» del padrón, que antes empujaban la tabla fuera de pantalla — hallazgo
+   2.1); `.seccion` agrupa los campos de un paso de formulario, con índice numerado en vez de
+   icono en la cabecera. Misma receta visual, cabecera distinta según qué agrupa.
 
-`.glass` (§4) no entra en esta lista: es la única tarjeta translúcida del sistema, exclusiva de
-la pantalla de acceso, y existe una sola por pantalla como contenedor de los cuatro estados —
-no se usa para agrupar contenido dentro del dashboard.
+**Nunca la tabla o lista principal de la pantalla.** El padrón no envuelve su tabla en una
+tarjeta: vive en su propio `.tabla-caja`. Envolver el objeto principal en una tarjeta le resta
+jerarquía — la tarjeta dice «esto es un grupo aparte», y la tabla no lo es. Y no se anidan
+tarjetas dentro de tarjetas: si un grupo necesita subgrupos, es una señal de que la pantalla
+tiene más de un objeto y conviene dividirla, no apilar tarjetas.
 
 ### 6.4 Vistas de estado de una pantalla
 
