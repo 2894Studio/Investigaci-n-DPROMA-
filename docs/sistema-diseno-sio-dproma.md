@@ -364,6 +364,11 @@ En la pantalla de acceso los botones van a 44px de alto, por encima del mínimo,
 dos o tres acciones de toda la pantalla. En el dashboard el suelo es 36px (28px en `.mini`, que
 solo se usa dentro de una fila o una tarjeta, junto a otros destinos).
 
+**Y el suelo hay que declararlo, no confiarlo al relleno.** Las cuatro maquetas del padrón
+definían `.btn` sin `min-height`: con `padding:8px 13px` sobre `--fs-dense` salían a **35px**, un
+píxel por debajo del suelo, y `.mini` a 27px. Nadie lo ve leyendo el CSS porque el número no está
+escrito en ninguna parte; se ve midiendo la caja de cada botón renderizado.
+
 **Un icono dentro de un botón hereda el color del botón.** Suena obvio y fue un fallo real: una
 regla de bloque pintaba de gris todos los iconos dentro de un estado, incluido el del botón
 «Reintentar» sobre fondo de acento. El contraste entre el icono gris y el verde era de
@@ -463,17 +468,59 @@ el `<main>`:
 </main>
 ```
 
+**El estado va dentro de una tarjeta, no suelto sobre el fondo.** En el acceso la tarjeta ya es
+el contenedor de las cuatro vistas. En el dashboard la zona de contenido es enorme, así que un
+mensaje centrado sin superficie no se lee como una respuesta del sistema, sino como una pantalla
+que no terminó de cargar: el estado vacío del padrón dejaba ~500px de fondo liso alrededor de un
+glifo gris. El contenedor centra; la tarjeta de dentro es la que tiene forma.
+
 ```css
-.estado{display:flex;flex-direction:column;align-items:center;text-align:center;
-  gap:var(--sp-3);padding:var(--sp-12) var(--sp-4);flex:1;justify-content:center}
-.estado-ico{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;background:var(--accent-soft);color:var(--accent)}
+.state{display:none;align-items:center;justify-content:center;flex:1;
+  padding:var(--sp-8) var(--sp-4)}
+
+.tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-modal);box-shadow:var(--sh-modal);
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-3)}
+.estado-ico{width:52px;height:52px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--accent-soft);color:var(--accent)}
 .estado-ico .msi{font-size:28px}
-.estado--err .estado-ico{background:var(--err-fill);color:var(--err-ink)}
-.estado h2{font-size:18px}
-.estado p{color:var(--text-2);font-size:var(--fs-dense);line-height:1.6;max-width:58ch}
-.estado .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
+.tarjeta-estado.es-err .estado-ico{background:var(--err-fill);color:var(--err-ink)}
+.tarjeta-estado p{color:var(--text-2);font-size:var(--fs-dense);line-height:1.6;max-width:36ch}
+.tarjeta-estado .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
+.tarjeta-estado .acc{display:flex;gap:var(--sp-2);flex-wrap:wrap;justify-content:center}
 ```
+
+**El botón no se estira para llenar la tarjeta.** En el acceso, `.btn` lleva `flex:1 1 auto` y
+los botones ocupan el ancho de la tarjeta: son las dos acciones de toda la pantalla. En el
+dashboard `.btn` es `inline-flex` (§6.2) y se dimensiona con su contenido, dentro de la tarjeta
+igual que fuera. Estirarlo convierte un «Reintentar» en una barra verde de 480px que no se
+parece a ningún otro botón del sistema.
+
+```html
+<div class="state state-error">
+  <div class="tarjeta-estado es-err">
+    <span class="estado-ico"><span class="msi" aria-hidden="true" translate="no">error</span></span>
+    <h2>No se pudo cargar el padrón</h2>
+    <p>…qué pasó · qué no se perdió · qué hacer…</p>
+    <p class="ref" translate="no">Referencia del error: PAD-20260821-1655</p>
+    <div class="acc">…</div>
+  </div>
+</div>
+```
+
+**Es `--r-modal` y `--sh-modal`, no los de `.tarjeta`.** La tarjeta del acceso tiene 16px de radio
+y sombra elevada; `.tarjeta` tiene 10px y `--sh-rest`. Con la receta de `.tarjeta` el estado sale
+plano y de esquinas duras: no es la misma tarjeta. Y va **opaca**: el `.glass` del acceso se
+compone sobre fondo plano en algo que difiere de `--surface` en 2/255, así que el aspecto es
+idéntico y además se respeta el §4 —el translúcido es de la pantalla de entrada—.
+El medallón se tiñe con `--err-fill`, no con el `--err-soft` del acceso, que fuera de esa pantalla
+no existe.
+
+**El medallón no es decoración: es lo que da peso al icono.** Sin él, el icono de estado acaba
+siendo texto en `--text-3`, el gris más apagado del sistema, a 30px. Las cuatro maquetas del
+padrón llegaron así pese a que este apartado ya lo prescribía.
 
 **Cuatro reglas que no son opcionales:**
 
@@ -618,8 +665,14 @@ párrafo de instrucciones corrido cuando hay una secuencia de 2-4 acciones que s
   background:linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%);
   background-size:200% 100%;animation:shimmer 1.4s linear infinite}
 @keyframes shimmer{to{background-position:-200% 0}}
-@media (prefers-reduced-motion:reduce){.skel{animation:none}}
+@media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}
 ```
+
+**Hay que aplanar el fondo, no solo parar la animación.** `animation:none` a secas no retira el
+degradado: lo **congela** en la posición 0, y cada barra se queda con una rampa visible de
+`--surface-2` a `--border`. Quien pide menos movimiento no recibe una barra en reposo, recibe una
+barra a medio pintar. Esta línea del documento se escribió incompleta y las tres maquetas del
+padrón la copiaron tal cual; el acceso era el único sitio donde estaba bien.
 
 **Sin texto real dentro de las barras.** Un `role="status"` con `aria-label` en el contenedor
 basta, y evita que un lector de pantalla lea contenido oculto por `color:transparent`, que sigue
@@ -636,6 +689,37 @@ pero anunciado.
 
 El esqueleto **imita la forma de lo que va a llegar**, no una forma genérica: mismas columnas y
 mismos anchos que la tabla real, para que el contenido no salte al aparecer.
+
+**Y el mismo alto, que es la mitad que se olvida.** «Mismas columnas» se cumple fácil y aun así
+el esqueleto queda muy corto: el del padrón tenía barras de 12px en filas de 12px, así que medía
+**164px** frente a los **455px** de la tabla. Al llegar los datos, la pantalla daba un salto de
+291px. Un esqueleto de tabla necesita, medido contra la tabla real:
+
+| | tabla | esqueleto correcto |
+|---|---|---|
+| cabecera | 35px, sobre `--surface-2` | una banda igual, con barras de 8px |
+| alto de fila | 59–76px | `min-height` en ese entorno, no el alto de la barra |
+| primera columna | razón social **y** RFC | dos barras apiladas, no una |
+| anchos | 282 / 133 / 136 / 250 / 188 / 119 / 94 | en `fr`, para que nunca desborde |
+
+```css
+.sk-tabla{gap:0;padding:0}
+.sk-tabla .sk-fila{display:grid;gap:var(--sp-4);align-items:center;
+  padding:0 var(--sp-6);min-height:67px;border-bottom:1px solid var(--border)}
+.sk-tabla .sk-cab{min-height:35px;background:var(--surface-2)}
+.sk-tabla .sk-cab .skel{height:8px}
+.sk-tabla .celda{display:flex;flex-direction:column;gap:7px;min-width:0}
+```
+
+**Y cambia de forma en el mismo punto que la tabla.** El esqueleto del padrón apilaba sus celdas
+en 900px mientras la tabla pasaba a modo tarjeta en 860px: en esos 40px de diferencia el
+esqueleto anunciaba una forma que la tabla no iba a tener. El punto de ruptura del esqueleto es
+el de la tabla, y en modo tarjeta el esqueleto también se vuelve tarjetas —y oculta su cabecera,
+porque la tabla oculta el `thead`—. Medido a los dos anchos, la diferencia de alto queda en el 4%.
+
+Y los anchos de barra son **irregulares**. Todas las celdas al 100% de su columna se leen como
+papel cuadriculado, no como datos: ninguna tabla real tiene todos los valores del mismo largo.
+Es lo que ya hacía el esqueleto del acceso y lo que al del padrón le faltaba.
 
 ### 6.8 Chip / control secundario (`.chip`)
 
@@ -1227,10 +1311,10 @@ Todo lo que lleve `data-andamio` se retira en la versión real. Un solo selector
 
 ---
 
-## 10. Cinco trampas comprobadas
+## 10. Seis trampas comprobadas
 
-No son teoría: las cinco aparecieron aplicando este documento al módulo de clientes, y las
-cinco se ven solo si se comprueba en el navegador, no leyendo la hoja de estilos.
+No son teoría: las seis aparecieron aplicando este documento al módulo de clientes, y las
+seis se ven solo si se comprueba en el navegador, no leyendo la hoja de estilos.
 
 **El tamaño se mide en el navegador, no en el CSS.** La regla de los 12px se puede burlar sin
 querer con la forma abreviada `font:`, donde el tamaño no aparece como `font-size`. Los avatares
@@ -1270,6 +1354,19 @@ unidades **empezando en x=0**, mientras que la marca vive a partir de x=740. Res
 sobrante parece lo correcto. Se comprueba midiendo la caja del `<use>` contra la del `<svg>`:
 si el desplazamiento no es ~0, está mal.
 
+**Una regla copiada del acceso puede traerse un token que allí existe y aquí no.** El medallón de
+error del acceso usa `--err-soft`; su tarjeta usa `--glass-line`. Ninguno de los dos está declarado
+en las maquetas del padrón, que tienen `--err-fill` en su lugar. Copiada tal cual, la declaración
+entera se invalida en silencio: mismo desenlace que `--sp-5`, pero más traicionero, porque el
+archivo de origen se ve perfectamente y la regla parece probada. Cada archivo declara sus propios
+tokens en su `:root`, así que el copiar-pegar entre pantallas hay que comprobarlo:
+
+```
+usados    = {var(--x) en el <style> y en los style=""}
+declarados = {--x: en el <style>}
+usados - declarados  →  tiene que ser vacío
+```
+
 ---
 
 ## 11. Checklist al añadir un componente nuevo
@@ -1297,6 +1394,7 @@ si el desplazamiento no es ~0, está mal.
 
 **Estructura**
 - ¿Cada pantalla o vista tiene un encabezado real, no solo texto en negrita?
+- ¿Los estados de vacío y error van en tarjeta, con su medallón, y no sueltos sobre el fondo?
 - ¿Todos los `id` son únicos, y cada `aria-describedby` / `aria-controls` apunta a algo que
   existe?
 - ¿Toda columna ordenable declara `aria-sort`, incluidas las que aún no ordenan?
@@ -1317,5 +1415,11 @@ si el desplazamiento no es ~0, está mal.
   de 1em se ven igual.
 - ¿Se regeneró `icon_names` después del último cambio de markup, y todo icono usado está dentro?
 - ¿Ningún icono se dimensiona con `width`/`height` en vez de con `font-size`?
+- ¿El esqueleto mide **lo mismo de alto** que el contenido que sustituye, y no solo lo mismo
+  de ancho? Se comprueba midiendo las dos cajas.
+- ¿Los botones llegan a su suelo (36px, 28px en `.mini`) con `min-height` declarado, y no por
+  casualidad del relleno?
 - ¿El isotipo lleva sus medidas en el `<use>` y ningún `viewBox` repetido en el `<svg>`?
   Se comprueba midiendo: la caja del `<use>` debe empezar donde empieza la del `<svg>`.
+- ¿Todo token `var(--x)` que usa el archivo está declarado **en ese mismo archivo**? Copiar una
+  regla de otra pantalla es la vía habitual de colar uno que no existe aquí.

@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="es-MX" data-density="comfy" data-tacto="raton">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F5F7">
+<title>SIO-DPROMA — Nuevo cliente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,arrow_downward,bolt,check_circle,confirmation_number,credit_card,dark_mode,dashboard,description,edit,error,expand_more,folder,group,inventory_2,light_mode,menu,receipt_long,refresh,search,trending_up,upload&display=block" rel="stylesheet">
+<style>
+:root{
+--font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-brand: 'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif; 
+
+  --fs-meta: 12px;   
+  --fs-dense: 13px;  
+  --fs-base: 14px;   
+  --fs-sub: 16px;    
+  --fs-title: 20px;  
+  --fs-kpi: 30px;    
+
+  
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-6: 24px; --sp-8: 32px; --sp-12: 48px;
+
+  --row-comfy: 40px;    
+  --row-compact: 32px;  
+
+  
+  --r-ctrl: 6px; --r-card: 10px; --r-modal: 16px; --r-pill: 999px;
+
+  
+  --dur-micro: 120ms;  
+  --dur-base: 200ms;   
+  --dur-enter: 300ms;  
+  --ease-out: cubic-bezier(.23, 1, .32, 1);        
+  --ease-in-out: cubic-bezier(.77, 0, .175, 1);    
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);  
+  --stagger: 40ms;
+
+  
+  --focus-w: 2px;
+  --focus-offset: 2px;
+
+  color-scheme: light;
+
+  --marca-azul:#1E4E79;
+  --marca-3:#2e823d;
+  --marca-halo:rgba(199,217,123,.35);
+  --marca-halo-suave:rgba(199,217,123,.5);
+  --chrome-focus:#9FE0AE;
+  --chrome-hover:rgba(255,255,255,.08);
+  --chrome-activo:rgba(255,255,255,.12);
+}
+:root{
+--chrome:      #1E4E79;   
+  --chrome-ink:  #F2F5F7;
+  --chrome-dim:  rgba(242,245,247,.72);
+  --chrome-line: rgba(242,245,247,.14);
+
+  --bg:        #F2F5F7;
+  --surface:   #FAFCFD;   
+  --surface-2: #E7EDF3;
+  --border:    rgba(27,36,48,.14);
+  --border-2:  rgba(27,36,48,.26);
+  --border-fuerte: rgba(27,36,48,.52);   
+
+  --text:   #1B2430;
+  --text-2: #4C5A6B;
+  --text-3: #5C6675;
+
+  --accent:     #3E7A4C;   
+  --accent-ink: #F7FAF9;
+  --accent-soft: rgba(62,122,76,.10);
+
+  
+  --ok:    #2F8F6F;  --ok-fill:    rgba(47,143,111,.12);
+  --warn:  #B98A1E;  --warn-fill:  rgba(185,138,30,.14);
+  --err:   #C24238;  --err-fill:   rgba(194,66,56,.11);
+  --block: #9678CC;  --block-fill: rgba(150,120,204,.13);
+  --pause: #4A5560;  --pause-fill: rgba(74,85,96,.11);
+
+  
+  --ok-ink: #22705A; --warn-ink: #7E5B0E; --err-ink: #B03A31;
+  --block-ink: #6D4FA3; --pause-ink: #4A5560;
+
+  
+  --ok-bg:#E2EFEC;--warn-bg:#F1ECDE;--err-bg:#F4E8E7;--block-bg:#EDEBF7;--pause-bg:#E7EAEC;--link:#2F6B3C;
+
+  
+  --serie-1: #2C6CA8;
+  --serie-2: #7A5FA8;
+
+  --sh-rest:  0 1px 2px rgba(19,29,43,.07);
+  --sh-float: 0 6px 18px rgba(19,29,43,.10);
+  --sh-modal: 0 24px 60px rgba(19,29,43,.22);
+  --glass:    rgba(250,252,253,.66);
+  --velo-suave:rgba(19,29,43,.08);
+  --velo-trama:rgba(19,29,43,.24);
+  --velo-modal:rgba(19,29,43,.45);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+color-scheme: dark;
+
+  --chrome:      #122740;
+  --chrome-ink:  #E7ECF2;
+  --chrome-dim:  rgba(231,236,242,.72);
+  --chrome-line: rgba(231,236,242,.10);
+
+  --bg:        #10161F;
+  --surface:   #171F2C;
+  --surface-2: #1D2735;
+  --border:    rgba(231,236,242,.12);
+  --border-2:  rgba(231,236,242,.24);
+  --border-fuerte: rgba(231,236,242,.40);
+
+  --text:   #E7ECF2;
+  --text-2: #A8B3C2;
+  --text-3: #8B96A6;
+
+  --accent:     #4A8F5A;
+  --accent-ink: #08120D;
+  --accent-soft: rgba(74,143,90,.16);
+
+  --ok:    #4FBF98;  --ok-fill:    rgba(79,191,152,.14);
+  --warn:  #E8C24C;  --warn-fill:  rgba(232,194,76,.14);
+  --err:   #EE6E5F;  --err-fill:   rgba(238,110,95,.14);
+  --block: #C0A9F0;  --block-fill: rgba(192,169,240,.14);
+  --pause: #6B7684;  --pause-fill: rgba(107,118,132,.20);
+
+  
+  --ok-ink: #4FBF98; --warn-ink: #E8C24C; --err-ink: #EE6E5F;
+  --block-ink: #C0A9F0; --pause-ink: #98A4B4;
+  --ok-bg:#1F353B;--warn-bg:#343630;--err-bg:#352A33;--block-bg:#2F3247;--pause-bg:#28303E;--link:#7FC08F;
+
+  --serie-1: #6FA8DC;
+  --serie-2: #B69BE0;
+
+  --sh-rest:  0 1px 2px rgba(0,0,0,.35);
+  --sh-float: 0 6px 18px rgba(0,0,0,.40);
+  --sh-modal: 0 24px 60px rgba(0,0,0,.55);
+  --glass:    rgba(29,39,53,.55);
+  --velo-suave:rgba(0,0,0,.32);
+  --velo-trama:rgba(4,8,14,.42);
+  --velo-modal:rgba(4,8,14,.62);
+  }
+}
+:root[data-theme="dark"]{
+color-scheme: dark;
+
+  --chrome:      #122740;
+  --chrome-ink:  #E7ECF2;
+  --chrome-dim:  rgba(231,236,242,.72);
+  --chrome-line: rgba(231,236,242,.10);
+
+  --bg:        #10161F;
+  --surface:   #171F2C;
+  --surface-2: #1D2735;
+  --border:    rgba(231,236,242,.12);
+  --border-2:  rgba(231,236,242,.24);
+  --border-fuerte: rgba(231,236,242,.40);
+
+  --text:   #E7ECF2;
+  --text-2: #A8B3C2;
+  --text-3: #8B96A6;
+
+  --accent:     #4A8F5A;
+  --accent-ink: #08120D;
+  --accent-soft: rgba(74,143,90,.16);
+
+  --ok:    #4FBF98;  --ok-fill:    rgba(79,191,152,.14);
+  --warn:  #E8C24C;  --warn-fill:  rgba(232,194,76,.14);
+  --err:   #EE6E5F;  --err-fill:   rgba(238,110,95,.14);
+  --block: #C0A9F0;  --block-fill: rgba(192,169,240,.14);
+  --pause: #6B7684;  --pause-fill: rgba(107,118,132,.20);
+
+  
+  --ok-ink: #4FBF98; --warn-ink: #E8C24C; --err-ink: #EE6E5F;
+  --block-ink: #C0A9F0; --pause-ink: #98A4B4;
+  --ok-bg:#1F353B;--warn-bg:#343630;--err-bg:#352A33;--block-bg:#2F3247;--pause-bg:#28303E;--link:#7FC08F;
+
+  --serie-1: #6FA8DC;
+  --serie-2: #B69BE0;
+
+  --sh-rest:  0 1px 2px rgba(0,0,0,.35);
+  --sh-float: 0 6px 18px rgba(0,0,0,.40);
+  --sh-modal: 0 24px 60px rgba(0,0,0,.55);
+  --glass:    rgba(29,39,53,.55);
+  --velo-suave:rgba(0,0,0,.32);
+  --velo-trama:rgba(4,8,14,.42);
+  --velo-modal:rgba(4,8,14,.62);
+}
+@media (prefers-reduced-motion:reduce){
+  :root{--dur-micro:1ms;--dur-base:120ms;--dur-enter:120ms;--ease-spring:linear;--stagger:0ms}
+}
+
+/* ARQ-BASE */
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none !important}
+html,body{height:100%}
+body{display:grid;grid-template-rows:1fr auto;overflow:hidden;
+  font-family:var(--font-ui);font-size:var(--fs-base);background:var(--bg);color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  transition:background-color var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out)}
+.tnum{font-variant-numeric:tabular-nums}
+.wordmark{font-family:var(--font-brand);font-weight:400;letter-spacing:.08em}
+h1,h2,h3,h4{text-wrap:balance}
+svg{display:block}
+.msi{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;
+  font-size:20px;line-height:1;display:inline-block;white-space:nowrap;direction:ltr;
+  width:1em;height:1em;overflow:hidden;flex-shrink:0;
+  /* El glifo se pide por ligadura, así que cualquier ancestro con text-transform
+     o letter-spacing la rompe y el navegador pinta el nombre en letras. Pasa en
+     las cabeceras de tabla y en los rótulos en mayúsculas, que llevan las dos. */
+  text-transform:none;letter-spacing:normal;font-feature-settings:'liga';
+  font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24}
+.msi-sm{font-size:17px}
+.msi-xs{font-size:15px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus{outline:none}
+:focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset);border-radius:var(--r-ctrl)}
+.side :focus-visible{outline-color:var(--chrome-focus)}
+.skip{position:absolute;left:8px;top:-60px;z-index:200;background:var(--accent);color:var(--accent-ink);
+  padding:8px 16px;border-radius:var(--r-ctrl);font-weight:600;transition:transform var(--dur-base) var(--ease-out)}
+.skip:focus-visible{transform:translateY(70px)}
+button,.pressable{transition:transform var(--dur-micro) var(--ease-out),background-color var(--dur-micro) var(--ease-out),
+  border-color var(--dur-micro) var(--ease-out),color var(--dur-micro) var(--ease-out)}
+button:active,.pressable:active{transform:scale(.97)}
+input[type="checkbox"],input[type="radio"]{accent-color:var(--accent);width:16px;height:16px;cursor:pointer}
+/* El destino pulsable son 24×24 (WCAG 2.2, 2.5.8); el dibujo sigue en 16.
+   La etiqueta no aporta nombre accesible —lo pone el aria-label del input— 
+   solo área. */
+.casilla{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
+  flex-shrink:0;cursor:pointer;border-radius:4px;margin:-4px}
+.casilla:hover{background:var(--surface-2)}
+.lnk{color:var(--link);font-weight:600;text-decoration:none;border-radius:4px}
+.lnk:hover{text-decoration:underline}
+/* @fin ARQ-BASE */
+
+/* ARQ-CROMO */
+.hoja{min-height:0;overflow:hidden;display:flex;position:relative}
+.app{flex:1;display:flex;min-width:0;min-height:0}
+.side{width:236px;background:var(--chrome);color:var(--chrome-ink);padding:12px 12px 16px;flex-shrink:0;
+  display:flex;flex-direction:column;min-height:0;overflow:hidden;z-index:120}
+.side-scroll{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--chrome-line) transparent}
+.side .logo{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:4px 8px 12px;
+  border-bottom:1px solid var(--chrome-line);margin-bottom:8px}
+.side .bloque{margin-bottom:2px}
+.grp{text-transform:uppercase;margin:9px 8px 2px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}
+.side ul{list-style:none}
+.it{display:flex;align-items:center;gap:9px;padding:6px 9px;border-radius:7px;color:var(--chrome-dim);
+  font-size:var(--fs-dense);text-decoration:none;border-left:3px solid transparent;
+  transition:background-color var(--dur-micro) var(--ease-out),color var(--dur-micro) var(--ease-out)}
+.it .et{white-space:normal;overflow-wrap:anywhere;line-height:1.25;min-width:0}
+.it:hover{background:var(--chrome-hover);color:var(--chrome-ink)}
+.it[aria-current="page"]{background:var(--chrome-activo);color:var(--chrome-ink);font-weight:600;border-left-color:var(--ok)}
+.area{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;position:relative}
+
+.cromo-top{display:flex;align-items:center;gap:var(--sp-4);padding:8px var(--sp-6);
+  border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;z-index:20}
+@media (max-width:1280px){.cromo-top{padding-left:var(--sp-4);padding-right:var(--sp-4)}}
+.cromo-top .hueco{flex:1;min-width:0}
+.cromo-top .derecha{display:flex;align-items:center;gap:var(--sp-2)}
+.hamburguesa{display:none}
+.cromo-prof{display:flex;align-items:center;gap:var(--sp-2);border:1px solid transparent;background:transparent;
+  border-radius:var(--r-pill);padding:4px 10px 4px 4px;cursor:pointer;color:var(--text);max-width:260px}
+.cromo-prof:hover{background:var(--surface-2);border-color:var(--border)}
+.cromo-av{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--text);
+  display:grid;place-items:center;font:700 var(--fs-meta) var(--font-ui);flex-shrink:0}
+.cromo-quien{display:flex;flex-direction:column;align-items:flex-start;min-width:0;line-height:1.25}
+.cromo-quien b{font-size:var(--fs-dense);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+.cromo-quien small{font-size:var(--fs-meta);color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+@media (max-width:860px){.cromo-quien{display:none}.cromo-prof{padding:4px}}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;position:relative}
+main[id="contenido"]{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;
+  scroll-padding-bottom:var(--sp-8)}
+main[id="contenido"]::after{content:"";display:block;flex-shrink:0;height:var(--sp-8)}
+.desvanece{position:absolute;left:0;right:0;bottom:0;height:28px;pointer-events:none;z-index:15;
+  background:linear-gradient(to bottom,transparent,var(--bg))}
+
+.fab{position:absolute;right:max(26px,env(safe-area-inset-right));bottom:max(26px,env(safe-area-inset-bottom));width:52px;height:52px;border-radius:50%;border:0;
+  background:linear-gradient(135deg,var(--marca-azul),var(--marca-3));display:grid;place-items:center;cursor:pointer;
+  box-shadow:var(--sh-float),0 0 0 1px var(--marca-halo);z-index:20}
+.fab .ring{position:absolute;inset:-4px;border-radius:50%;border:1.5px dashed var(--marca-halo-suave);
+  opacity:0;transition:opacity var(--dur-base) var(--ease-out)}
+.fab:hover .ring,.fab:focus-visible .ring{opacity:1;animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.fab:hover .ring,.fab:focus-visible .ring{animation:none}}
+
+.velo-menu{display:none}
+
+[data-tacto="dedo"] .it{min-height:46px}
+[data-tacto="dedo"] .iconbtn{width:46px;height:46px}
+[data-tacto="dedo"] .cromo-prof{min-height:46px}
+[data-tacto="dedo"] .cromo-av{width:34px;height:34px}
+[data-tacto="dedo"] .seg button{min-height:46px}
+[data-tacto="dedo"] .btn{min-height:46px}
+
+@media (min-width:860.02px) and (max-width:1100px){
+  .side{width:64px;padding:16px 8px}
+  .side .et,.grp,.side .wordmark{display:none}
+  .it{justify-content:center;padding:10px 6px}
+  .side .logo{padding:2px 0 10px}
+}
+
+@media (max-width:860px){
+  .side{position:absolute;left:0;top:0;bottom:0;width:272px;padding:12px;
+    transform:translateX(-101%);transition:transform var(--dur-base) var(--ease-out);
+    box-shadow:var(--sh-modal)}
+  :root[data-menu="abierto"] .side{transform:none}
+  .velo-menu{display:block;position:absolute;inset:0;background:var(--velo-modal);z-index:110;
+    opacity:0;pointer-events:none;transition:opacity var(--dur-base) var(--ease-out);border:0}
+  :root[data-menu="abierto"] .velo-menu{opacity:1;pointer-events:auto}
+  .hamburguesa{display:grid}
+  .fab{right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:46px;height:46px}
+}
+@media (prefers-reduced-motion:reduce){.side{transition:none}.velo-menu{transition:none}}
+/* @fin ARQ-CROMO */
+
+/* ARQ-P4 */
+.p4{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.p4-t{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-6) 0;flex-wrap:wrap}
+.p4-t h1{font-size:var(--fs-title);font-weight:700;line-height:1.25}
+.p4-t .resumen{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums;line-height:1.5}
+.p4-t .resumen b{color:var(--text)}
+.p4-t .acc{margin-left:auto;display:flex;gap:var(--sp-2);align-items:center;flex-wrap:wrap}
+.p4-b{display:flex;gap:var(--sp-3);padding:var(--sp-3) var(--sp-6) 0;align-items:center;flex-wrap:wrap}
+.p4-f{display:flex;gap:var(--sp-2);padding:var(--sp-3) var(--sp-6);align-items:center;flex-wrap:wrap}
+.p4-f .tools{margin-left:auto;display:flex;gap:var(--sp-2);align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--text);border-radius:var(--r-ctrl);padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);
+  cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--surface-2);border-color:var(--border-2)}
+.btn.p{background:var(--accent);border-color:transparent;color:var(--accent-ink)}
+.btn.p:hover{filter:brightness(1.08)}
+.btn.mini{min-height:28px;padding:5px 10px;font-size:var(--fs-meta)}
+.btn[disabled]{opacity:.72;cursor:not-allowed}
+.btn.p[disabled]{background:var(--surface-2);color:var(--text-2);border-color:var(--border)}
+.btn[disabled]:hover{background:var(--surface);border-color:var(--border)}
+.iconbtn{width:36px;height:36px;border:1px solid var(--border);border-radius:var(--r-ctrl);display:grid;
+  place-items:center;cursor:pointer;background:transparent;color:var(--text-2);flex-shrink:0}
+.iconbtn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
+.search{width:100%;max-width:380px;min-width:0;flex-shrink:0;display:flex;align-items:center;gap:8px;background:var(--bg);
+  border:1px solid var(--border);border-radius:var(--r-pill);padding:8px 14px;color:var(--text-3)}
+.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.search .msi{color:var(--text-3);flex-shrink:0}
+.search input{border:0;background:transparent;color:var(--text);font:500 var(--fs-dense) var(--font-ui);width:100%;outline:0}
+.search input:focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}
+.search input::placeholder{color:var(--text-3)}
+.schip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);background:var(--surface);
+  border-radius:var(--r-pill);padding:6px 13px 6px 10px;cursor:pointer;font:600 var(--fs-meta) var(--font-ui);
+  box-shadow:var(--sh-rest)}
+.schip:hover{border-color:currentColor}
+.schip b{font-size:var(--fs-dense);font-weight:800;font-variant-numeric:tabular-nums}
+.schip[aria-pressed="true"]{box-shadow:inset 0 0 0 1.5px currentColor,var(--sh-rest)}
+.schip.c-ok{color:var(--ok-ink)}       .schip.c-ok[aria-pressed="true"]{background:var(--ok-bg)}
+.schip.c-warn{color:var(--warn-ink)}   .schip.c-warn[aria-pressed="true"]{background:var(--warn-bg)}
+.schip.c-err{color:var(--err-ink)}     .schip.c-err[aria-pressed="true"]{background:var(--err-bg)}
+.schip.c-block{color:var(--block-ink)} .schip.c-block[aria-pressed="true"]{background:var(--block-bg)}
+.schip.c-pause{color:var(--pause-ink)} .schip.c-pause[aria-pressed="true"]{background:var(--pause-bg)}
+.schip.c-neutro{color:var(--text-2);border-style:dashed;border-color:var(--border-2)}
+.schip.c-neutro[aria-pressed="true"]{background:var(--surface-2);box-shadow:inset 0 0 0 1.5px var(--border-2),var(--sh-rest)}
+.f{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-pill);padding:6px 12px;font-size:var(--fs-meta);color:var(--text-2);cursor:pointer}
+.f:hover{border-color:var(--border-2);color:var(--text)}
+.f b{color:var(--text)}
+.f[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
+.seg{display:flex;background:var(--surface-2);border-radius:var(--r-pill);padding:3px;gap:2px}
+.seg button{border:0;background:transparent;color:var(--text-2);border-radius:var(--r-pill);
+  padding:6px 13px;font:600 var(--fs-meta) var(--font-ui);cursor:pointer;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:6px}
+.seg button:hover{color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:var(--sh-rest)}
+.seg button:active{transform:none}
+.tabla-caja{min-width:0;overflow-x:auto;flex:none}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-dense)}
+caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+thead th{text-align:left;color:var(--text-2);font-size:var(--fs-meta);font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;padding:var(--sp-2) var(--sp-4);border-bottom:1px solid var(--border);
+  background:var(--surface);white-space:nowrap;position:sticky;top:0;z-index:5}
+tbody th,td{padding:var(--sp-2) var(--sp-4);height:var(--row-comfy);border-bottom:1px solid var(--border);
+  vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tbody th{text-align:left;font-weight:400}
+td:has(> input[type="checkbox"]:only-child),td.control{overflow:visible;text-overflow:clip}
+thead th button{display:inline-flex;align-items:center;gap:5px;min-height:24px;border:0;background:transparent;color:inherit;
+  font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;padding:3px 5px;margin:-3px -5px;
+  border-radius:var(--r-ctrl);white-space:nowrap}
+thead th button:hover{color:var(--text)}
+thead th .sort{opacity:.25;font-size:14px;flex-shrink:0;transition:transform var(--dur-base) var(--ease-out)}
+thead th[aria-sort="ascending"] .sort,thead th[aria-sort="descending"] .sort{opacity:1;color:var(--accent)}
+thead th[aria-sort="ascending"] .sort{transform:rotate(180deg)}
+tbody tr{transition:background-color var(--dur-micro) var(--ease-out)}
+tbody tr:hover td,tbody tr:hover th{background:var(--surface-2)}
+.denso tbody th,.denso td{height:var(--row-compact);padding:var(--sp-1) var(--sp-4);font-size:var(--fs-dense)}
+.folio{font-variant-numeric:tabular-nums;font-weight:600;color:var(--link);text-decoration:none;white-space:nowrap}
+.folio:hover{text-decoration:underline}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dos{display:flex;flex-direction:column;gap:2px;line-height:1.35;white-space:normal;min-width:0}
+.dos b{font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dos small{color:var(--text-3);font-size:var(--fs-meta)}
+.acciones{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.acciones .iconbtn{width:28px;height:28px}
+.tfoot{display:flex;align-items:center;color:var(--text-3);font-size:var(--fs-meta);
+  padding:var(--sp-3) var(--sp-6);gap:var(--sp-2);border-top:1px solid var(--border);
+  background:var(--surface);flex-wrap:wrap;flex-shrink:0}
+.pag{margin-left:auto;display:flex;gap:5px}
+.pag button{background:var(--surface);border:1px solid var(--border);color:var(--text-2);
+  border-radius:var(--r-ctrl);min-width:32px;height:32px;padding:0 8px;cursor:pointer;font:600 var(--fs-meta) var(--font-ui)}
+.pag button:hover{background:var(--surface-2);color:var(--text)}
+.pag button[aria-current="page"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.nota{display:flex;gap:var(--sp-3);align-items:flex-start;
+  padding:var(--sp-4) calc(var(--sp-6) + 68px) var(--sp-4) var(--sp-6);
+  font-size:var(--fs-meta);color:var(--text-2);line-height:1.55;border-top:1px solid var(--border);
+  background:var(--surface);flex-shrink:0}
+.nota .msi{margin-top:1px;color:var(--text-3)}
+.nota b{color:var(--text)}
+@media (max-width:1280px){.p4-t,.p4-b,.p4-f,.tfoot{padding-left:var(--sp-4);padding-right:var(--sp-4)}
+  .nota{padding-left:var(--sp-4);padding-right:calc(var(--sp-4) + 68px)}}
+
+.tabla-caja{position:relative}
+tbody th:first-child,thead th:first-child{position:sticky;left:0;z-index:6;background:var(--surface)}
+thead th:first-child{z-index:7}
+tbody tr:hover th:first-child{background:var(--surface-2)}
+tbody th:first-child::after,thead th:first-child::after{content:"";position:absolute;top:0;bottom:0;right:0;
+  width:1px;background:var(--border)}
+
+@media (max-width:860px){
+  .tabla-caja{overflow-x:visible}
+  .tabla-caja table{min-width:0 !important;display:block;table-layout:auto !important}
+  .tabla-caja thead{display:none}
+  .tabla-caja tbody{display:flex;flex-direction:column;gap:var(--sp-3);padding:var(--sp-4)}
+  .tabla-caja tbody tr{display:block;background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--r-card);box-shadow:var(--sh-rest);overflow:hidden}
+  .tabla-caja tbody tr:hover td,.tabla-caja tbody tr:hover th{background:transparent}
+  .tabla-caja tbody th,.tabla-caja tbody td{display:grid;grid-template-columns:minmax(88px,34%) 1fr;
+    gap:var(--sp-3);height:auto;min-height:0;padding:var(--sp-2) var(--sp-3);white-space:normal;
+    text-overflow:clip;overflow:visible;align-items:start;border-bottom:1px solid var(--border);
+    position:static;text-align:left}
+  .tabla-caja tbody th::after{display:none}
+  .tabla-caja tbody th::before,.tabla-caja tbody td::before{content:attr(data-et);
+    font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--text-3);padding-top:3px;line-height:1.3}
+  .tabla-caja tbody tr > *:last-child{border-bottom:0}
+  .tabla-caja tbody tr > *:first-child{background:var(--surface-2);grid-template-columns:1fr;
+    padding:var(--sp-3);font-size:var(--fs-base)}
+  .tabla-caja tbody tr > *:first-child::before{display:none}
+  .tabla-caja tbody [colspan]{grid-template-columns:1fr}
+  .tabla-caja tbody td > .pill,.tabla-caja tbody td > .p-type,
+  .tabla-caja tbody td > .schip,.tabla-caja tbody td > button{justify-self:start}
+  .tabla-caja tbody [colspan]::before{display:none}
+  .tabla-caja tbody .acciones{justify-content:flex-start}
+  .tabla-caja tbody .num{text-align:left}
+  .tfoot{flex-direction:column;align-items:flex-start;gap:var(--sp-3)}
+  .tfoot .pag{margin-left:0;flex-wrap:wrap}
+  .nota{padding-right:var(--sp-4)}
+  .p4-t h1{font-size:var(--fs-sub)}
+  .p4-t .acc{margin-left:0;width:100%}
+  .search{max-width:none}
+}
+/* @fin ARQ-P4 */
+
+
+/* ARQ-P6 */
+.cuerpo{padding:var(--sp-4) var(--sp-6) var(--sp-8);display:flex;flex-direction:column;gap:var(--sp-4);flex:1;min-width:0}
+@media (max-width:1280px){.cuerpo{padding-left:var(--sp-4);padding-right:var(--sp-4)}}
+@media (min-width:1700px){.cuerpo{max-width:1560px}}
+.migas{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-meta);color:var(--text-3);flex-wrap:wrap}
+.migas a{color:var(--link);text-decoration:none;font-weight:600;border-radius:4px}
+.migas a:hover{text-decoration:underline}
+.tarjeta{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
+  box-shadow:var(--sh-rest);min-width:0}
+.tarjeta > header{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-3) var(--sp-4);
+  border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tarjeta > header h2,.tarjeta > header h3{font-size:var(--fs-base);font-weight:600}
+.tarjeta > header .n{margin-left:auto;font-size:var(--fs-meta);color:var(--text-3);font-variant-numeric:tabular-nums}
+.tarjeta .interior{padding:var(--sp-4)}
+.campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:var(--sp-3)}
+.campo{display:flex;flex-direction:column;gap:2px;min-width:0}
+.campo .et{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3)}
+.campo .vl{font-size:var(--fs-dense);color:var(--text);word-break:break-word}
+.bitacora{list-style:none;display:flex;flex-direction:column}
+.bitacora li{display:grid;grid-template-columns:22px 1fr;gap:var(--sp-3);padding-bottom:var(--sp-4);position:relative}
+.bitacora li:not(:last-child)::before{content:"";position:absolute;left:10px;top:22px;bottom:0;width:1px;background:var(--border)}
+.bitacora .punto{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+  background:var(--surface-2);color:var(--text-2);z-index:1}
+.bitacora .punto.acc{background:var(--accent-soft);color:var(--accent)}
+.bitacora .ev{display:flex;flex-direction:column;gap:3px;min-width:0}
+.bitacora .ev .qq{font-size:var(--fs-dense);color:var(--text)}
+.bitacora .ev .qq b{font-weight:600}
+.bitacora .ev .cuando{font-size:var(--fs-meta);color:var(--text-3);font-variant-numeric:tabular-nums}
+.bitacora .ev .texto{font-size:var(--fs-dense);color:var(--text-2);line-height:1.55;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-ctrl);
+  padding:var(--sp-2) var(--sp-3);margin-top:3px}
+.banda{display:flex;gap:var(--sp-3);align-items:flex-start;padding:var(--sp-3) var(--sp-4);
+  border-radius:var(--r-card);font-size:var(--fs-dense);line-height:1.55}
+.banda .msi{margin-top:1px}
+.banda .der{margin-left:auto;flex-shrink:0}
+.b-warn{background:var(--warn-bg);color:var(--warn-ink)}
+.b-err{background:var(--err-bg);color:var(--err-ink)}
+.b-ok{background:var(--ok-bg);color:var(--ok-ink)}
+.b-info{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}
+/* @fin ARQ-P6 */
+
+
+/* ARQ-P5 */
+.form{padding:var(--sp-4) var(--sp-6) var(--sp-8);display:flex;flex-direction:column;gap:var(--sp-4);
+  flex:1;min-width:0;max-width:1080px}
+@media (max-width:1280px){.form{padding-left:var(--sp-4);padding-right:var(--sp-4)}}
+.seccion{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
+  box-shadow:var(--sh-rest);overflow:hidden}
+.seccion > header{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);
+  border-bottom:1px solid var(--border);background:var(--surface-2)}
+.seccion > header .idx{width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-ink);
+  display:grid;place-items:center;font-size:var(--fs-meta);font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0}
+.seccion > header h2{font-size:var(--fs-base);font-weight:600}
+.seccion > header .est{margin-left:auto;font-size:var(--fs-meta);color:var(--text-2)}
+.seccion .rejilla{padding:var(--sp-4);display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:var(--sp-4)}
+.ctrl{display:flex;flex-direction:column;gap:5px;min-width:0}
+.ctrl > label{font-size:var(--fs-meta);font-weight:600;color:var(--text-2)}
+.ctrl > label .req{color:var(--err-ink)}
+/* Por exclusión, no por enumeración: enumerar tipos deja fuera cualquiera que
+   se añada después (pasó con email y tel, que se quedaron en 19px de alto). */
+.ctrl input:not([type="file"]):not([type="checkbox"]):not([type="radio"]),.ctrl select,.ctrl textarea{
+  border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:var(--r-ctrl);
+  padding:9px 12px;font:400 var(--fs-dense) var(--font-ui);width:100%;outline:0;
+  transition:border-color var(--dur-micro) var(--ease-out),box-shadow var(--dur-micro) var(--ease-out)}
+.ctrl textarea{resize:vertical;min-height:76px;line-height:1.5}
+.ctrl input:focus,.ctrl select:focus,.ctrl textarea:focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+@media (pointer:coarse){input,select,textarea{font-size:max(16px,var(--fs-dense))}}
+.ctrl input:focus-visible,.ctrl select:focus-visible,.ctrl textarea:focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}
+.ctrl .ayuda{font-size:var(--fs-meta);color:var(--text-3);line-height:1.45}
+.ctrl .mal{font-size:var(--fs-meta);color:var(--err-ink);line-height:1.45;font-weight:600;display:flex;gap:5px;align-items:flex-start}
+.ctrl.error input,.ctrl.error select,.ctrl.error textarea{border-color:var(--err);box-shadow:0 0 0 1px var(--err)}
+.ctrl.ancho{grid-column:1/-1}
+.barra-form{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-6);
+  border-top:1px solid var(--border);background:var(--surface);flex-wrap:wrap;flex-shrink:0}
+@media (max-width:1280px){.barra-form{padding-left:var(--sp-4);padding-right:var(--sp-4)}}
+.barra-form .izq{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-meta);color:var(--text-3);line-height:1.5}
+.barra-form .der{margin-left:auto;display:flex;gap:var(--sp-2);flex-wrap:wrap;
+  margin-right:68px}  /* hueco del botón flotante, que caía encima de «Dar de alta» */
+/* @fin ARQ-P5 */
+
+/* ARQ-ALTA-EXTRA */
+.migas a{min-height:24px;display:inline-flex;align-items:center;padding:2px 0}
+/* Dos niveles de obligatoriedad, con palabras distintas: el asterisco decía
+   «obligatorio» para dos cosas que no lo son igual (doc §6.16, regla 2). */
+.nivel{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;padding:2px 7px;border-radius:var(--r-pill);margin-left:6px;
+  vertical-align:middle;letter-spacing:.05em}
+.nivel-alta{background:var(--accent-soft);color:var(--accent)}
+.nivel-fact,.nivel-op{background:var(--surface-2);color:var(--text-2)}
+
+/* Un dato calculado se muestra como dato, no como campo: era un input editable
+   con el valor «Se calcula solo» dentro (doc §6.16, regla 1). */
+.et-dato{font-size:var(--fs-meta);font-weight:600;color:var(--text-2)}
+.dato-calc{display:flex;align-items:center;gap:var(--sp-2);min-height:38px;padding:8px 0}
+.dato-calc .valor{font-size:var(--fs-base);font-weight:600;color:var(--text)}
+.pista-calc{display:inline-flex;align-items:center;gap:5px;min-height:24px;padding:2px 8px;
+  border:1px dashed var(--border-2);border-radius:var(--r-pill);background:transparent;
+  color:var(--text-2);font:600 var(--fs-meta) var(--font-ui);cursor:help}
+
+/* Subida de archivo (doc §6.17). */
+.subida{position:relative}
+.subida input[type="file"]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.subida input[type="file"]:focus-visible + .subida-caja{outline:2px solid var(--accent);outline-offset:2px}
+.subida-caja{display:flex;align-items:center;gap:var(--sp-3);min-height:64px;padding:var(--sp-3) var(--sp-4);
+  border:1px dashed var(--border-2);border-radius:var(--r-ctrl);background:var(--bg);
+  color:var(--text-2);font-size:var(--fs-meta);line-height:1.5;cursor:pointer}
+.subida-caja b{color:var(--text);font-size:var(--fs-dense)}
+.subida-caja .msi{font-size:24px;color:var(--text-3)}
+.subida:hover .subida-caja{border-color:var(--accent);background:var(--accent-soft)}
+.subida[data-cargado="true"] .subida-caja{border-style:solid;border-color:var(--ok);background:var(--ok-bg)}
+.subida[data-cargado="true"] .subida-caja .msi{color:var(--ok-ink)}
+.quitar-archivo{position:relative;z-index:2;margin-left:auto;min-height:28px;padding:4px 10px;
+  border:1px solid var(--border-2);border-radius:var(--r-ctrl);background:var(--surface);
+  color:var(--text);font:600 var(--fs-meta) var(--font-ui);cursor:pointer}
+
+/* El error va encima del formulario, no en lugar del formulario. */
+.banda-info{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}
+.banda-err{background:var(--err-bg);color:var(--err-ink)}
+.banda-err .msi{color:var(--err-ink)}
+.aviso-error{display:none;gap:var(--sp-3);align-items:flex-start;margin-bottom:var(--sp-4)}
+.aviso-error p{margin:0 0 var(--sp-2)}
+.aviso-error .ref{font-size:var(--fs-meta);opacity:.85;font-variant-numeric:tabular-nums}
+.mas-ayuda{background:transparent;border:0;color:var(--link);cursor:pointer;
+  font:600 var(--fs-dense) var(--font-ui);text-decoration:underline;min-height:24px;
+  padding:0 2px;border-radius:4px}
+.ayuda-larga{margin:0 0 var(--sp-4);padding:var(--sp-3) var(--sp-4);background:var(--surface-2);
+  border-radius:var(--r-ctrl)}
+.ayuda-larga p{font-size:var(--fs-dense);color:var(--text-2);line-height:1.55;margin:0 0 var(--sp-2)}
+.ayuda-larga p:last-child{margin-bottom:0}
+.seccion > header .est{display:inline-flex;align-items:center;gap:5px}
+/* @fin ARQ-ALTA-EXTRA */
+
+/* ARQ-ESTADOS */
+.skel{display:block;height:12px;border-radius:var(--r-ctrl);
+  background:linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%);
+  background-size:200% 100%;animation:shimmer 1.4s linear infinite}
+@keyframes shimmer{to{background-position:-200% 0}}
+/* animation:none no retira el degradado: lo congela en la posición 0 y deja
+   cada barra a medio pintar. Hay que aplanar también el fondo, como el acceso. */
+@media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}
+.state{display:none;align-items:center;justify-content:center;flex:1;
+  padding:var(--sp-8) var(--sp-4)}
+
+/* La tarjeta del acceso, reproducida con superficie opaca: mismo radio,
+   misma sombra y mismo relleno. Su .glass se compone sobre fondo plano en
+   algo que difiere de --surface en 2/255, así que el aspecto es el mismo, y
+   el translúcido es de la pantalla de entrada, no del dashboard (§4). */
+.tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-modal);box-shadow:var(--sh-modal);
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-3)}
+.estado-ico{width:52px;height:52px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--accent-soft);color:var(--accent)}
+.estado-ico .msi{font-size:28px}
+/* --err-soft es del acceso y aquí no existe: un var() sin resolver invalidaría
+   la declaración entera en silencio. El token de estas maquetas es --err-fill. */
+.tarjeta-estado.es-err .estado-ico{background:var(--err-fill);color:var(--err-ink)}
+main > .state-ok,main > .state-loading,main > .state-empty,main > .state-error{display:none}
+.state-ok{flex-direction:column;flex:1;min-height:0}
+/* El icono de un botón hereda el color del botón. Sin esta línea, el gris
+   del bloque de estado pintaba también el icono de «Reintentar» sobre el
+   verde de acento: 1,03:1 de contraste, con 3:1 de mínimo. */
+.state .btn .msi{color:inherit;font-size:17px}
+.state h2{font-size:18px;font-weight:700;text-wrap:balance}
+.state p{color:var(--text-2);font-size:var(--fs-dense);max-width:36ch;line-height:1.55}
+.state .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
+.state .acc{display:flex;gap:var(--sp-2);flex-wrap:wrap;justify-content:center;
+  margin-top:var(--sp-1)}
+main[data-state="ok"] .state-ok{display:flex}
+main[data-state="empty"] .state-empty{display:flex}
+main[data-state="error"] .state-ok{display:flex}
+main[data-state="error"] .aviso-error{display:flex}
+main[data-state="loading"] .state-loading{display:flex}
+.sk{flex-direction:column;gap:var(--sp-3);padding:var(--sp-4) var(--sp-6)}
+@media (max-width:1280px){.sk{padding-left:var(--sp-4);padding-right:var(--sp-4)}}
+.sk-fila{display:grid;gap:var(--sp-4);align-items:center}
+@media (max-width:900px){.sk-fila{grid-template-columns:1fr !important}}
+.sk-caja{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
+  padding:var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-3)}
+/* @fin ARQ-ESTADOS */
+
+/* ARQ-DEMO */
+.demo{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;
+  background:var(--surface);border-top:1px solid var(--border-2);padding:8px 12px;
+  box-shadow:0 -2px 10px var(--velo-suave);z-index:80}
+.demo .et-g{font-size:10.5px;color:var(--text-3);font-weight:700;letter-spacing:.06em;padding:0 6px}
+.demo button{border:0;background:transparent;color:var(--text-2);border-radius:var(--r-pill);
+  padding:6px 12px;font:600 var(--fs-meta) var(--font-ui);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.demo button:hover{background:var(--surface-2);color:var(--text)}
+.demo button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.demo .div{width:1px;height:20px;background:var(--border);margin:0 6px}
+/* @fin ARQ-DEMO */
+
+.form-h{display:flex;flex-direction:column;gap:var(--sp-3)}
+.aviso-canal{display:flex;gap:var(--sp-3);align-items:flex-start;border-radius:var(--r-ctrl);
+  padding:var(--sp-2) var(--sp-3);font-size:var(--fs-meta);line-height:1.5;margin-top:var(--sp-2)}
+.aviso-canal.si{background:var(--ok-bg);color:var(--ok-ink)}
+.aviso-canal.no{background:var(--warn-bg);color:var(--warn-ink)}
+.aviso-canal .msi{margin-top:1px}
+.mats{padding:0}
+.mats table{min-width:0}
+.mats td,.mats th{white-space:normal}
+.mats tfoot td,.mats tfoot th{font-weight:700;background:var(--surface-2);border-bottom:0}
+.quitar{color:var(--err-ink)}
+.tope{font-size:var(--fs-meta);color:var(--text-3);line-height:1.45}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="lgrad" x1="1233.32" y1="931.42" x2="1233.32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c361e"/><stop offset="0.14" stop-color="#12572b"/><stop offset="0.32" stop-color="#2e823d"/><stop offset="0.48" stop-color="#60a84b"/><stop offset="0.64" stop-color="#76b552"/><stop offset="0.78" stop-color="#a5c86a"/><stop offset="1" stop-color="#c7d97b"/></linearGradient><symbol id="dproma-mark" viewBox="740 0 970 932"><path fill="url(#lgrad)" d="M869.35,924.63H811.84c-39.82,0-66.56-40.83-50.66-77.33L1048.86,108C1083.11,29.8,1146.12,0,1243.39,0c95.89,0,158.91,29.8,191.79,108L1705.76,854.8c15.27,36.41-11.47,76.62-51,76.62h-59.54a55.27,55.27,0,0,1-51-34L1285.73,191c-8.22-19.86-23.29-28.56-45.21-28.56s-37,8.7-46.58,28.56L920,891.4A55.26,55.26,0,0,1,869.35,924.63Z"/></symbol></defs></svg>
+<div class="hoja">
+<div class="app"><button class="velo-menu" data-cromo type="button" aria-label="Cerrar el menú" tabindex="-1"></button><nav class="side" data-cromo id="menu-lateral" aria-label="Navegación principal"><div class="logo"><svg width="44" height="42" aria-hidden="true"><use href="#dproma-mark" width="44" height="42"/></svg><span class="wordmark" translate="no">SIO-DPROMA</span></div><div class="side-scroll"><div class="bloque"><p class="grp" id="g-principal" aria-hidden="true">Principal</p><ul aria-labelledby="g-principal"><li><a class="it" href="#" title="Tablero"><span class="msi" aria-hidden="true" translate="no">dashboard</span><span class="et">Tablero</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-operacion" aria-hidden="true">Operación</p><ul aria-labelledby="g-operacion"><li><a class="it" href="#" aria-current="page" title="Padrón de clientes"><span class="msi" aria-hidden="true" translate="no">group</span><span class="et">Padrón de clientes</span></a></li><li><a class="it" href="#" title="Viáticos"><span class="msi" aria-hidden="true" translate="no">credit_card</span><span class="et">Viáticos</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-icev" aria-hidden="true">ICEV</p><ul aria-labelledby="g-icev"><li><a class="it" href="#" title="Órdenes de instalación"><span class="msi" aria-hidden="true" translate="no">description</span><span class="et">Órdenes de instalación</span></a></li><li><a class="it" href="#" title="Instaladores y agenda"><span class="msi" aria-hidden="true" translate="no">credit_card</span><span class="et">Instaladores y agenda</span></a></li><li><a class="it" href="#" title="Trámites CFE"><span class="msi" aria-hidden="true" translate="no">bolt</span><span class="et">Trámites CFE</span></a></li><li><a class="it" href="#" title="Recetas de despacho"><span class="msi" aria-hidden="true" translate="no">inventory_2</span><span class="et">Recetas de despacho</span></a></li><li><a class="it" href="#" title="Compras de almacén"><span class="msi" aria-hidden="true" translate="no">receipt_long</span><span class="et">Compras de almacén</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-tramites-vehiculares" aria-hidden="true">Trámites vehiculares</p><ul aria-labelledby="g-tramites-vehiculares"><li><a class="it" href="#" title="Trámites vehiculares"><span class="msi" aria-hidden="true" translate="no">folder</span><span class="et">Trámites vehiculares</span></a></li><li><a class="it" href="#" title="Trámites concluidos"><span class="msi" aria-hidden="true" translate="no">check_circle</span><span class="et">Trámites concluidos</span></a></li><li><a class="it" href="#" title="Gestoría"><span class="msi" aria-hidden="true" translate="no">folder</span><span class="et">Gestoría</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-direccion-y-administracion" aria-hidden="true">Dirección y Administración</p><ul aria-labelledby="g-direccion-y-administracion"><li><a class="it" href="#" title="Cuentas por cobrar"><span class="msi" aria-hidden="true" translate="no">trending_up</span><span class="et">Cuentas por cobrar</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-soporte" aria-hidden="true">Soporte</p><ul aria-labelledby="g-soporte"><li><a class="it" href="#" title="Usuarios"><span class="msi" aria-hidden="true" translate="no">group</span><span class="et">Usuarios</span></a></li><li><a class="it" href="#" title="Incidencias de servicio"><span class="msi" aria-hidden="true" translate="no">error</span><span class="et">Incidencias de servicio</span></a></li><li><a class="it" href="#" title="Tickets TI"><span class="msi" aria-hidden="true" translate="no">confirmation_number</span><span class="et">Tickets TI</span></a></li></ul></div></div></nav><div class="area"><header class="cromo-top" data-cromo>
+<button class="iconbtn hamburguesa" type="button" id="menu-btn" aria-label="Abrir el menú" aria-expanded="false" aria-controls="menu-lateral"><span class="msi" aria-hidden="true" translate="no">menu</span></button>
+<div class="hueco" aria-hidden="true"></div>
+<div class="derecha">
+<button class="iconbtn" type="button" id="tema" aria-label="Cambiar a tema claro" aria-pressed="false"><span class="msi" id="tema-ico" aria-hidden="true" translate="no">dark_mode</span></button>
+<button class="cromo-prof" type="button" aria-label="Cuenta de Alex Rai, Administración de sistemas" aria-expanded="false">
+<span class="cromo-av" aria-hidden="true">AR</span>
+<span class="cromo-quien"><b>Alex Rai</b><small>Administración de sistemas</small></span>
+<span class="msi msi-sm" aria-hidden="true" translate="no">expand_more</span>
+</button>
+</div>
+</header><div class="main">
+<header class="p4"><div class="p4-t"><h1>Nuevo cliente</h1><span class="resumen">Alta de una razón social en el padrón</span></div></header>
+<main id="contenido" data-state="ok" tabindex="-1">
+<div class="state-ok "><div class="form">
+<div class="banda banda-err aviso-error" id="aviso-error" role="alert">
+<span class="msi" aria-hidden="true" translate="no">error</span>
+<div><p><b>No se pudo dar de alta el cliente.</b> El servicio del padrón no respondió. El cliente
+no se creó, pero <b>lo que capturaste sigue aquí</b>: vuelve a intentar sin recapturar nada.</p>
+<p class="ref" translate="no">Referencia del error: PAD-20260821-1401</p>
+<button class="btn" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">refresh</span>Reintentar</button></div>
+</div>
+<nav class="migas" aria-label="Ruta"><a href="#">Padrón de clientes</a><span class="msi msi-sm" aria-hidden="true" translate="no">arrow_downward</span><span>Nuevo cliente</span></nav>
+<div class="banda banda-info">
+<span class="msi" aria-hidden="true" translate="no">error</span>
+<p><b>Para dar de alta bastan la razón social y el RFC.</b> El resto se puede completar
+después, pero sin datos fiscales y documentos no se le podrá programar una instalación ni
+facturar. <button class="mas-ayuda" type="button" aria-expanded="false" aria-controls="ayuda-alta">Ver el detalle</button></p>
+</div>
+<div class="ayuda-larga" id="ayuda-alta" hidden>
+<p>Un cliente sin los dos documentos se registra, se edita y se consulta sin estorbo. Lo que
+no podrá hacer hasta tenerlos es que se le programe una instalación o se le facture: si ya
+tiene fecha, conviene subirlos ahora.</p>
+<p>Los datos se tratan según el <a class="lnk" href="https://www.dproma.com/aviso-de-privacidad" target="_blank" rel="noopener noreferrer">aviso de privacidad de DPROMA<span class="sr"> (se abre en una ventana nueva)</span></a>. No hace falta que el cliente firme nada: basta con informarle.</p>
+</div>
+<section class="seccion">
+<header><span class="idx tnum">1</span><h2>Identificación</h2><span class="est" data-seccion="1"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Completa</span></header>
+<div class="rejilla"><div class="ctrl ancho">
+<label for="rs">Razón social <span class="nivel nivel-alta">para dar de alta</span></label>
+<input type="text" id="rs" autocomplete="organization" required aria-required="true" value="Comercializadora Vértice del Bajío, S. A. de C. V." placeholder="">
+<span class="ayuda">Como aparece en la constancia de situación fiscal.</span>
+</div><div class="ctrl">
+<label for="rfc">RFC <span class="nivel nivel-alta">para dar de alta</span></label>
+<input type="text" id="rfc" required aria-required="true" value="CVB240118QT7" placeholder="">
+<span class="ayuda">12 caracteres para persona moral, 13 para física.</span>
+</div><div class="ctrl">
+<span class="et-dato" id="et-tipo">Tipo de cliente</span>
+<span class="dato-calc" role="group" aria-labelledby="et-tipo"><span class="valor">Empresa</span><button class="pista-calc" type="button" aria-describedby="ayuda-tipo" aria-label="Cómo se calcula el tipo de cliente"><span class="msi msi-xs" aria-hidden="true" translate="no">error</span>Se deduce del RFC</button></span>
+<span class="ayuda" id="ayuda-tipo">Un RFC de 13 posiciones es persona física; de 12, empresa. Si el cliente tiene agencia, agencia manda sobre el RFC.</span>
+</div></div>
+</section><section class="seccion">
+<header><span class="idx tnum">2</span><h2>Datos fiscales y documentos</h2><span class="est" data-seccion="2">Falta: domicilio fiscal</span></header>
+<div class="rejilla"><div class="ctrl">
+<label for="cp">Código postal fiscal <span class="nivel nivel-fact">para facturar</span></label>
+<input type="text" id="cp" value="76090" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" placeholder="">
+
+</div><div class="ctrl">
+<label for="reg">Régimen fiscal <span class="nivel nivel-fact">para facturar</span></label>
+<select id="reg"><option selected>General de ley personas morales</option><option>Personas morales con fines no lucrativos</option><option>Sueldos y salarios</option></select>
+
+</div><div class="ctrl ancho">
+<label for="dom">Domicilio fiscal <span class="nivel nivel-fact">para facturar</span></label>
+<input type="text" id="dom" value="" autocomplete="street-address" placeholder="Calle, número, colonia, ciudad y estado" aria-describedby="a-dom">
+<span class="ayuda" id="a-dom">Sin domicilio fiscal no se puede timbrar una factura a este cliente.</span>
+<span class="mal" id="e-dom" hidden><span class="msi msi-xs" aria-hidden="true" translate="no">error</span>Falta el domicilio fiscal.</span>
+</div><div class="ctrl ancho">
+<label for="car">Constancia de situación fiscal <span class="nivel nivel-op">para facturar</span></label>
+<div class="subida"><input type="file" id="car" accept=".pdf" aria-describedby="a-car"><label class="subida-caja" for="car"><span class="msi" aria-hidden="true" translate="no">upload</span><span><b>Arrastra el archivo o pulsa para elegirlo</b><br>PDF, hasta 10&nbsp;MB</span></label></div>
+<span class="ayuda" id="a-car">Opcional para dar de alta; necesaria para programar y facturar.</span>
+</div><div class="ctrl ancho">
+<label for="ide">Identificación del representante <span class="nivel nivel-op">para facturar</span></label>
+<div class="subida"><input type="file" id="ide" accept=".pdf,.jpg,.jpeg,.png" aria-describedby="a-ide"><label class="subida-caja" for="ide"><span class="msi" aria-hidden="true" translate="no">upload</span><span><b>Arrastra el archivo o pulsa para elegirlo</b><br>PDF, JPG o PNG, hasta 10&nbsp;MB</span></label></div>
+<span class="ayuda" id="a-ide">Opcional para dar de alta; necesaria para programar y facturar.</span>
+</div></div>
+</section><section class="seccion">
+<header><span class="idx tnum">3</span><h2>Grupo y marca</h2><span class="est" data-seccion="3">Opcional</span></header>
+<div class="rejilla"><div class="ctrl">
+<label for="grp">Grupo automotriz</label>
+<select id="grp"><option selected>— sin grupo —</option><option>Grupo Automotriz Vértice</option><option>Grupo Bajío Motors</option></select>
+<span class="ayuda">Sirve para agrupar la cobranza por grupo, no sólo por agencia.</span>
+</div><div class="ctrl">
+<label for="mar">Marca</label>
+<select id="mar"><option selected>— sin marca —</option><option>Otro</option></select>
+<span class="ayuda">«Otro» siempre está disponible: una marca que falte no debe bloquear el alta.</span>
+</div></div>
+</section><section class="seccion">
+<header><span class="idx tnum">4</span><h2>Primer contacto</h2><span class="est" data-seccion="4">Opcional</span></header>
+<div class="rejilla"><div class="ctrl">
+<label for="cn">Nombre de la persona</label>
+<input type="text" id="cn" autocomplete="name" value="" placeholder="Rosalía Mendieta Quiroz">
+
+</div><div class="ctrl">
+<label for="cr">Rol</label>
+<select id="cr"><option selected>Gerente</option><option>Responsable de pagos</option><option>Otro</option></select>
+
+</div><div class="ctrl">
+<label for="cc">Correo</label>
+<input type="email" id="cc" autocomplete="email" value="" placeholder="nombre@empresa.example">
+<span class="ayuda">Después se pueden registrar hasta cuatro correos, cuatro teléfonos, cuatro direcciones y cuatro domicilios de agencia.</span>
+</div><div class="ctrl">
+<label for="ct">Teléfono</label>
+<input type="tel" id="ct" autocomplete="tel" value="" placeholder="+52 442 000 0000">
+
+</div></div>
+</section>
+</div></div>
+<div class="state-loading sk" role="status" aria-label="Cargando"><div class="sk-caja"><span class="skel" style="width:26%"></span><span class="skel" style="width:92%;height:38px"></span><span class="skel" style="width:46%;height:38px"></span><span class="skel" style="width:46%;height:38px"></span></div><div class="sk-caja"><span class="skel" style="width:24%"></span><span class="skel" style="width:46%;height:38px"></span><span class="skel" style="width:46%;height:38px"></span><span class="skel" style="width:92%;height:38px"></span></div></div>
+<div class="state state-empty">
+<div class="tarjeta-estado">
+  <span class="estado-ico"><span class="msi" aria-hidden="true" translate="no">add</span></span>
+  <h2>El formulario está en blanco</h2>
+  <p>No has capturado nada todavía. <b>Con la razón social, el RFC y el tipo basta para dar de alta</b>; lo demás se puede completar más adelante desde la ficha del cliente.</p>
+  <div class="acc"><button class="btn p" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span>Empezar por la razón social</button><button class="btn" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">search</span>Buscar si ya está dado de alta</button></div>
+</div>
+</div>
+</main>
+<p class="sr" id="live" aria-live="polite"></p>
+<div class="barra-form">
+<span class="izq" id="estado-borrador" role="status"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Borrador guardado hace <b>1 min</b>. Puedes salir y volver.</span>
+<div class="der"><button class="btn" type="button">Cancelar</button><button class="btn p" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Dar de alta</button></div></div>
+<button class="fab" data-cromo type="button" aria-label="Abrir el asistente del sistema" title="Asistente del sistema"><span class="ring"></span><svg width="26" height="24" aria-hidden="true"><use href="#dproma-mark" width="26" height="24"/></svg></button><span class="desvanece" aria-hidden="true"></span></div></div></div>
+</div>
+<div class="demo" data-andamio role="group" aria-label="Controles de la maqueta: ver la pantalla en sus distintos estados">
+<span class="et-g">Vista de maqueta</span>
+<button type="button" data-set="ok" aria-pressed="true">Con datos</button>
+<button type="button" data-set="loading" aria-pressed="false">Cargando</button>
+<button type="button" data-set="empty" aria-pressed="false">Vacío</button>
+<button type="button" data-set="error" aria-pressed="false">Error</button>
+</div>
+<script>
+(function(){
+var raiz=document.documentElement;
+var cont=document.getElementById('contenido');
+var bt=document.getElementById('tema');
+var ico=document.getElementById('tema-ico');
+var mq=window.matchMedia('(prefers-color-scheme: dark)');
+function oscuro(){var t=raiz.getAttribute('data-theme');return t?t==='dark':mq.matches;}
+function pinta(){
+  var o=oscuro();
+  bt.setAttribute('aria-pressed',String(o));
+  bt.setAttribute('aria-label',o?'Cambiar a tema claro':'Cambiar a tema oscuro');
+  ico.textContent=o?'light_mode':'dark_mode';
+  var m=document.querySelector('meta[name="theme-color"]');
+  if(m)m.setAttribute('content',getComputedStyle(document.body).backgroundColor);
+}
+/* El cambio de vista se anuncia y el foco viaja al contenido. Sin las dos
+   cosas, quien usa lector de pantalla no se entera de que la pantalla cambió:
+   el <main tabindex="-1"> ya estaba preparado y nadie le mandaba el foco. */
+var DICE={
+  ok:'Formulario de alta de cliente.',
+  loading:'Cargando el formulario de alta.',
+  empty:'Formulario de alta en blanco.',
+  error:'No se pudo dar de alta el cliente. El formulario sigue relleno.'};
+var live=document.getElementById('live');
+function muestra(clave,mueveFoco){
+  cont.setAttribute('data-state',clave);
+  document.querySelectorAll('.demo [data-set]').forEach(function(o){
+    o.setAttribute('aria-pressed',String(o.dataset.set===clave));});
+  live.textContent=DICE[clave]||'';
+  if(mueveFoco)cont.focus();
+}
+document.querySelectorAll('.demo [data-set]').forEach(function(b){
+  b.addEventListener('click',function(){muestra(b.dataset.set,true);});
+});
+bt.addEventListener('click',function(){raiz.setAttribute('data-theme',oscuro()?'light':'dark');pinta();});
+mq.addEventListener('change',pinta);
+pinta();
+/* — La validación aparece cuando la persona ha pasado por el campo, no antes.
+     El domicilio fiscal salía en rojo con el campo vacío, antes de que nadie
+     escribiera nada (doc §6.16, regla 4). — */
+var dom=document.getElementById('dom'), errDom=document.getElementById('e-dom');
+if(dom){
+  dom.addEventListener('blur',function(){
+    var vacio=!dom.value.trim();
+    errDom.hidden=!vacio;
+    dom.closest('.ctrl').dataset.error=String(vacio);
+    dom.setAttribute('aria-invalid',String(vacio));
+    dom.setAttribute('aria-describedby', vacio?'a-dom e-dom':'a-dom');
+    pintaSecciones();
+  });
+  dom.addEventListener('input',function(){
+    if(dom.value.trim()){errDom.hidden=true;dom.closest('.ctrl').dataset.error='false';
+      dom.setAttribute('aria-invalid','false');pintaSecciones();}
+  });
+}
+
+/* — El contador de sección habla en español, no en aritmética (doc §6.16, regla 7). — */
+function pintaSecciones(){
+  document.querySelectorAll('.seccion').forEach(function(sec){
+    var est=sec.querySelector('.est'); if(!est||est.dataset.seccion==='3')return;
+    var faltan=[].slice.call(sec.querySelectorAll('input,select')).filter(function(c){
+      return c.type!=='file' && c.hasAttribute('aria-required') && !c.value.trim();
+    });
+    if(est.dataset.seccion==='2' && dom && !dom.value.trim()) faltan.push(dom);
+    if(faltan.length===0){
+      est.innerHTML='<span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Completa';
+    } else if(faltan.length===1){
+      var lab=sec.querySelector('label[for="'+faltan[0].id+'"]');
+      est.textContent='Falta: '+(lab?lab.childNodes[0].textContent.trim().toLowerCase():'un campo');
+    } else {
+      est.textContent='Faltan '+faltan.length+' campos';
+    }
+  });
+}
+
+/* — Subida de archivo: el archivo cargado se ve, con su nombre, y se puede
+     quitar (doc §6.17). — */
+document.querySelectorAll('.subida input[type="file"]').forEach(function(inp){
+  var caja=inp.parentNode, texto=caja.querySelector('.subida-caja span:last-child');
+  var original=texto.innerHTML;
+  inp.addEventListener('change',function(){
+    var f=inp.files&&inp.files[0];
+    var quitar=caja.querySelector('.quitar-archivo');
+    if(quitar)quitar.remove();
+    if(!f){caja.dataset.cargado='false';texto.innerHTML=original;return;}
+    caja.dataset.cargado='true';
+    texto.innerHTML='<b>'+f.name+'</b><br>Subido hoy · '+Math.max(1,Math.round(f.size/1024))+' KB';
+    var bt=document.createElement('button');
+    bt.type='button'; bt.className='quitar-archivo'; bt.textContent='Quitar';
+    bt.addEventListener('click',function(e){
+      e.preventDefault(); inp.value=''; inp.dispatchEvent(new Event('change'));
+    });
+    caja.querySelector('.subida-caja').appendChild(bt);
+    live.textContent='Archivo '+f.name+' añadido.';
+  });
+});
+
+/* — La ayuda larga se abre a petición. — */
+document.querySelectorAll('.mas-ayuda').forEach(function(bt){
+  var caja=document.getElementById(bt.getAttribute('aria-controls'));
+  bt.addEventListener('click',function(){
+    var abierta=bt.getAttribute('aria-expanded')==='true';
+    bt.setAttribute('aria-expanded',String(!abierta));
+    caja.hidden=abierta;
+  });
+});
+
+pintaSecciones();
+
+var mb=document.getElementById('menu-btn');
+var velo=document.querySelector('.velo-menu');
+function menu(abierto){
+  if(abierto)raiz.setAttribute('data-menu','abierto');else raiz.removeAttribute('data-menu');
+  mb.setAttribute('aria-expanded',String(abierto));
+  mb.setAttribute('aria-label',abierto?'Cerrar el menú':'Abrir el menú');
+  if(velo)velo.tabIndex=abierto?0:-1;
+}
+if(mb)mb.addEventListener('click',function(){menu(raiz.getAttribute('data-menu')!=='abierto');});
+if(velo)velo.addEventListener('click',function(){menu(false);});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')menu(false);});
+})();
+</script>
+</body>
+</html>
