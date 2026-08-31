@@ -497,9 +497,22 @@ falta tocarlos por icono; se heredan en `font-variation-settings` de `.msi`.
   width:1em;height:1em;overflow:hidden;  /* si el icono no está en el subconjunto o la fuente
     no carga, el navegador pinta el nombre en letras — la caja fija de 1em×1em evita que eso
     rompa el layout */
+  text-transform:none;letter-spacing:normal;font-feature-settings:'liga';
   font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24}
 .msi-sm{font-size:17px} .msi-lg{font-size:24px}
 ```
+
+**`text-transform:none` y `letter-spacing:normal` no son adorno: son lo que hace que el icono
+sea un icono.** El glifo se pide por ligadura —el navegador lee las letras `location_on` y las
+sustituye por el dibujo—, así que cualquier ancestro que transforme ese texto rompe la
+correspondencia y pinta el nombre en letras. Y los dos ancestros que lo hacen son de los más
+comunes del sistema: las cabeceras de tabla (`text-transform:uppercase` + `letter-spacing:.04em`)
+y los rótulos en mayúsculas. Pasó de verdad: la flecha de orden de cada columna y el icono del
+encabezado de sucursales salían como «ARROW_DOWNWARD» y «LOCATION_ON» recortados a un cuadrado.
+
+Se ve en cuanto se abre la pantalla, pero solo si la fuente carga. Con la fuente bloqueada, el
+fallo se confunde con el respaldo de la caja de 1em, que hace exactamente lo mismo. De ahí que
+la comprobación de iconos tenga que hacerse con red.
 
 Siempre `aria-hidden="true"` y `translate="no"` (el nombre del icono no se traduce):
 

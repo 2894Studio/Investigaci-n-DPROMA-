@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,arrow_downward,bolt,check_circle,confirmation_number,credit_card,dark_mode,dashboard,description,download,edit,error,expand_more,folder,group,inventory_2,light_mode,link,location_on,menu,pause_circle,receipt_long,refresh,schedule,search,shield,trending_up,view_column,visibility,warning&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,arrow_downward,bolt,check_circle,close,confirmation_number,credit_card,dark_mode,dashboard,description,download,edit,error,expand_more,folder,group,inventory_2,light_mode,link,location_on,menu,more_horiz,pause_circle,receipt_long,refresh,schedule,search,shield,trending_up,view_column,visibility,warning&display=block" rel="stylesheet">
 <style>
 :root{
 --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -536,6 +536,110 @@ tbody th:first-child::after,thead th:first-child::after{content:"";position:abso
 
 
 
+/* ARQ-FILTROS ─ El resumen y los filtros llegaron en la misma fila y con la
+   misma forma de pastilla: no se distinguía qué era lectura y qué control.
+   Son dos zonas (doc §6.12). */
+.resumen{display:flex;gap:var(--sp-6);padding:var(--sp-3) var(--sp-6) var(--sp-2);
+  align-items:flex-end;flex-wrap:wrap}
+.grupo-est{display:flex;flex-direction:column;gap:5px}
+.grupo-est .et-est{font-size:10.5px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--text-3)}
+.grupo-est .chips{display:flex;gap:var(--sp-2);flex-wrap:wrap}
+.filtros{display:flex;gap:var(--sp-2);padding:var(--sp-2) var(--sp-6) var(--sp-3);
+  align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+.filtros .tools{margin-left:auto;display:flex;gap:var(--sp-2);align-items:center}
+.f{display:inline-flex;align-items:center;gap:6px;min-height:32px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r-pill);padding:6px 12px;
+  font-size:var(--fs-meta);color:var(--text-2);cursor:pointer}
+.f:hover{border-color:var(--border-2);color:var(--text)}
+.f b{color:var(--text)}
+/* Se resalta solo si filtra de verdad. «Tipo: Todos» venía resaltado como si
+   filtrara, y «Todos» no filtra nada: el resalte perdía su significado. */
+.f[data-activo="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
+.aplicados{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.aplicado{display:inline-flex;align-items:center;gap:4px;min-height:26px;padding:3px 4px 3px 10px;
+  border-radius:var(--r-pill);background:var(--accent-soft);color:var(--text);
+  font-size:var(--fs-meta);font-weight:600}
+.aplicado button{width:24px;height:24px;border:0;background:transparent;cursor:pointer;
+  color:var(--text-2);border-radius:50%;display:grid;place-items:center}
+.aplicado button:hover{background:var(--surface-2);color:var(--text)}
+.quitar-todos{background:transparent;border:0;color:var(--link);font:600 var(--fs-meta) var(--font-ui);
+  cursor:pointer;min-height:24px;padding:0 4px;border-radius:4px;text-decoration:underline}
+
+/* Menú de acciones de fila. Tres iconos sin etiqueta no se deducen (doc §6.14). */
+.menu-cont{position:relative;display:inline-flex}
+.menu{position:absolute;right:0;top:calc(100% + 4px);z-index:40;min-width:230px;
+  background:var(--surface);border:1px solid var(--border-2);border-radius:var(--r-card);
+  box-shadow:var(--sh-modal);padding:5px;display:flex;flex-direction:column}
+.menu button{display:flex;align-items:center;gap:9px;min-height:36px;padding:8px 10px;border:0;
+  background:transparent;color:var(--text);font:500 var(--fs-dense) var(--font-ui);
+  cursor:pointer;border-radius:var(--r-ctrl);text-align:left;white-space:nowrap}
+.menu button:hover{background:var(--surface-2)}
+.menu button.destructiva{color:var(--err-ink)}
+.menu button.destructiva:hover{background:var(--err-bg)}
+.menu hr{border:0;border-top:1px solid var(--border);margin:4px 2px}
+
+/* Panel de columnas. El botón existía y no abría nada (doc §6.11, regla 5). */
+.panel-col{position:absolute;right:0;top:calc(100% + 6px);z-index:40;min-width:252px;
+  background:var(--surface);border:1px solid var(--border-2);border-radius:var(--r-card);
+  box-shadow:var(--sh-modal);padding:var(--sp-3);text-align:left}
+.panel-col h3{font-size:var(--fs-meta);text-transform:uppercase;letter-spacing:.08em;
+  color:var(--text-3);margin:0 0 var(--sp-2);font-weight:700}
+.panel-col label{display:flex;align-items:center;gap:9px;min-height:32px;padding:2px 4px;
+  border-radius:var(--r-ctrl);font-size:var(--fs-dense);cursor:pointer;font-weight:400}
+.panel-col label:hover{background:var(--surface-2)}
+/* Ninguna columna desaparece en silencio (doc §6.11, regla 5). */
+.aviso-col{display:inline-flex;align-items:center;gap:6px;min-height:26px;padding:3px 10px;
+  border-radius:var(--r-pill);background:var(--warn-bg);color:var(--warn-ink);
+  font-size:var(--fs-meta);font-weight:600}
+.por-pagina{display:inline-flex;align-items:center;gap:6px;margin-left:var(--sp-4)}
+.por-pagina select{min-height:28px;border:1px solid var(--border);border-radius:var(--r-ctrl);
+  background:var(--surface);color:var(--text);font:500 var(--fs-meta) var(--font-ui);padding:3px 6px}
+
+/* Confirmación de la acción destructiva, y su deshacer (doc §6.13). */
+dialog.confirmar{border:0;border-radius:var(--r-modal);padding:0;max-width:470px;
+  width:calc(100% - 32px);background:var(--surface);color:var(--text);box-shadow:var(--sh-modal)}
+dialog.confirmar::backdrop{background:var(--velo-modal)}
+dialog.confirmar .interior{padding:var(--sp-6)}
+dialog.confirmar h2{font-size:var(--fs-sub);margin:0 0 var(--sp-2)}
+dialog.confirmar p{font-size:var(--fs-dense);color:var(--text-2);line-height:1.55;margin:0 0 var(--sp-3)}
+dialog.confirmar .acc{display:flex;gap:var(--sp-2);justify-content:flex-end;flex-wrap:wrap}
+.deshacer{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);z-index:70;
+  display:flex;align-items:center;gap:var(--sp-3);background:var(--text);color:var(--bg);
+  border-radius:var(--r-pill);padding:10px 12px 10px 18px;box-shadow:var(--sh-modal);
+  font-size:var(--fs-dense);max-width:calc(100% - 32px)}
+.deshacer button{min-height:28px;border:0;background:transparent;color:var(--bg);
+  font:700 var(--fs-dense) var(--font-ui);cursor:pointer;text-decoration:underline;
+  padding:0 6px;border-radius:4px}
+
+/* La tarjeta de duplicados llega plegada: es valiosa pero puntual, y empujaba
+   la tabla fuera de la pantalla todos los días (hallazgo 2.1). */
+.dups summary{display:flex;align-items:center;gap:var(--sp-2);min-height:44px;
+  padding:var(--sp-2) var(--sp-4);background:var(--surface-2);cursor:pointer;
+  border-bottom:1px solid transparent;list-style:none;font-size:var(--fs-dense)}
+.dups summary::-webkit-details-marker{display:none}
+.dups summary:hover{background:var(--border)}
+.dups summary .ttl{font-weight:700}
+.dups summary .pista{color:var(--link);font-weight:600;text-decoration:underline}
+.dups summary .chev{margin-left:auto;transition:transform var(--dur-base) var(--ease-out)}
+.dups[open] summary{border-bottom-color:var(--border)}
+.dups[open] summary .chev{transform:rotate(180deg)}
+
+/* Densidad compacta: reduce contenido, no solo espacio. Bajar la fila y dejar
+   la misma información se lee peor sin ganar nada (doc §6.11, regla 6). */
+[data-density="compact"] tbody th,[data-density="compact"] td{height:var(--row-compact)}
+[data-density="compact"] .rz small{display:none}
+[data-density="compact"] .mov small{display:none}
+[data-density="compact"] .suc-lista{display:none}
+
+/* Columna apagada desde el panel */
+[data-col-oculta~="tipo"] .col-tipo,
+[data-col-oculta~="sucursales"] .col-sucursales,
+[data-col-oculta~="documentos"] .col-documentos,
+[data-col-oculta~="movimiento"] .col-movimiento,
+[data-col-oculta~="comercial"] .col-comercial{display:none}
+/* @fin ARQ-FILTROS */
+
 /* ARQ-ESTADOS */
 .skel{display:block;height:12px;border-radius:4px;
   background:linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%);
@@ -624,11 +728,15 @@ main[data-state="loading"] .state-loading{display:flex}
 .mov small{color:var(--text-3);font-size:var(--fs-meta);line-height:1.4}
 .frio b{color:var(--text-3);font-weight:600}
 
-.barra-sel{display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap;
+.barra-sel{display:none;align-items:center;gap:var(--sp-3);flex-wrap:wrap;
   padding:var(--sp-3) var(--sp-6);background:var(--accent-soft);border-bottom:1px solid var(--border);flex-shrink:0}
+.barra-sel[data-hay="true"]{display:flex}
+/* La destructiva se separa del grupo: estaba a un clic de «Exportar
+   selección», que no cambia nada (doc §6.13). */
+.barra-sel .destructiva{margin-left:auto;border-color:var(--err);color:var(--err-ink)}
+.barra-sel .destructiva:hover{background:var(--err-bg)}
 .barra-sel .cuenta{font-size:var(--fs-dense);font-weight:600}
 .barra-sel .cuenta b{font-variant-numeric:tabular-nums}
-.barra-sel .quitar{margin-left:auto}
 @media (max-width:1280px){.barra-sel{padding-left:var(--sp-4);padding-right:var(--sp-4)}}
 
 .dups{margin:var(--sp-4) var(--sp-6) 0}
@@ -670,21 +778,55 @@ main[data-state="loading"] .state-loading{display:flex}
 </div>
 </header><div class="main">
 <div class="p4">
-<div class="p4-t"><h1>Padrón de clientes</h1><span class="resumen"><b>1,248</b> clientes · <b>214</b> razones sociales con dos o más sucursales</span><div class="acc"><button class="iconbtn" type="button" aria-label="Exportar"><span class="msi" aria-hidden="true" translate="no">download</span></button><button class="btn" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">view_column</span>Columnas</button><button class="btn p" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Nuevo cliente</button></div></div>
+<div class="p4-t"><h1>Padrón de clientes</h1><span class="resumen"><b>1,248</b> clientes · <b>214</b> razones sociales con dos o más sucursales</span><div class="acc"><button class="iconbtn" type="button" aria-label="Exportar"><span class="msi" aria-hidden="true" translate="no">download</span></button><span class="menu-cont"><button class="btn" type="button" id="bt-col" aria-haspopup="dialog" aria-expanded="false" aria-controls="panel-col"><span class="msi msi-sm" aria-hidden="true" translate="no">view_column</span>Columnas</button><div class="panel-col" id="panel-col" hidden><h3 id="h-col">Columnas de la tabla</h3><div role="group" aria-labelledby="h-col"><label><input type="checkbox" data-col="tipo" checked> Tipo</label><label><input type="checkbox" data-col="sucursales" checked> Sucursales</label><label><input type="checkbox" data-col="documentos" checked> Documentos fiscales</label><label><input type="checkbox" data-col="movimiento" checked> Último movimiento</label><label><input type="checkbox" data-col="comercial" checked> Comercial</label></div></div></span><button class="btn p" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Nuevo cliente</button></div></div>
 <div class="p4-b"><div class="search"><span class="msi msi-sm" aria-hidden="true" translate="no">search</span><input id="buscar" type="search" placeholder="Buscar por razón social o RFC…" aria-label="Buscar en el padrón de clientes"></div></div>
-<div class="p4-f"><button class="schip c-err" type="button" aria-pressed="false" data-f="sin-documentos"><span class="msi msi-xs" aria-hidden="true" translate="no">error</span><b class="tnum">42</b> sin los dos documentos</button><button class="schip c-warn" type="button" aria-pressed="false" data-f="documento-por-vencer"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span><b class="tnum">7</b> con un documento por vencer</button><button class="schip c-neutro" type="button" aria-pressed="false" data-f="sin-ordenes-90d"><span class="msi msi-xs" aria-hidden="true" translate="no">pause_circle</span><b class="tnum">9</b> agencias sin órdenes en 90 días</button><button class="schip c-ok" type="button" aria-pressed="false" data-f="activos"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span><b class="tnum">1,189</b> activos</button><div class="tools"><div class="seg" role="group" aria-label="Densidad de la tabla"><button type="button" aria-pressed="true">Cómoda</button><button type="button" aria-pressed="false">Compacta</button></div></div></div>
+<!-- Resumen: se lee. Los cuatro contadores respondían a preguntas distintas
+     —expediente, actividad, estado— y se presentaban iguales, así que parecían
+     cuatro valores del mismo campo (hallazgo 2.4). -->
+<section class="resumen" aria-labelledby="h-resumen">
+<h2 class="sr" id="h-resumen">Resumen del padrón</h2>
+<div class="grupo-est"><span class="et-est">Expediente</span><div class="chips">
+<button class="schip c-err" type="button" aria-pressed="false" data-filtro="documentos" data-valor="Sin los dos"><span class="msi msi-xs" aria-hidden="true" translate="no">error</span><b class="tnum">42</b> sin los dos documentos</button>
+<button class="schip c-warn" type="button" aria-pressed="false" data-filtro="documentos" data-valor="Por vencer"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span><b class="tnum">7</b> con un documento por vencer</button>
+</div></div>
+<div class="grupo-est"><span class="et-est">Actividad</span><div class="chips">
+<button class="schip c-neutro" type="button" aria-pressed="false" data-filtro="actividad" data-valor="Sin órdenes en 90 días"><span class="msi msi-xs" aria-hidden="true" translate="no">pause_circle</span><b class="tnum">9</b> agencias sin órdenes en 90 días</button>
+</div></div>
+<div class="grupo-est"><span class="et-est">Estado</span><div class="chips">
+<button class="schip c-ok" type="button" aria-pressed="false" data-filtro="estado" data-valor="Activos"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span><b class="tnum">1,189</b> activos</button>
+</div></div>
+</section>
+
+<!-- Filtros: se manipulan. Un chip de arriba es un atajo y, al pulsarlo, mueve
+     el filtro de aquí: el estado del filtro vive en un solo sitio (hallazgo 1.5). -->
+<section class="filtros" aria-labelledby="h-filtros">
+<h2 class="sr" id="h-filtros">Filtros</h2>
+<button class="f" type="button" data-filtro="tipo" data-def="Todos" data-activo="false" aria-haspopup="listbox">Tipo: <b>Todos</b><span class="msi msi-xs" aria-hidden="true" translate="no">expand_more</span></button>
+<button class="f" type="button" data-filtro="estado" data-def="Todos" data-activo="false" aria-haspopup="listbox">Estado: <b>Todos</b><span class="msi msi-xs" aria-hidden="true" translate="no">expand_more</span></button>
+<button class="f" type="button" data-filtro="documentos" data-def="Todos" data-activo="false" aria-haspopup="listbox">Documentos: <b>Todos</b><span class="msi msi-xs" aria-hidden="true" translate="no">expand_more</span></button>
+<button class="f" type="button" data-filtro="actividad" data-def="Toda" data-activo="false" aria-haspopup="listbox">Actividad: <b>Toda</b><span class="msi msi-xs" aria-hidden="true" translate="no">expand_more</span></button>
+<span class="aplicados" id="aplicados"></span>
+<button class="quitar-todos" type="button" id="quitar-filtros" hidden>Quitar todos los filtros</button>
+<div class="tools">
+<span class="aviso-col" id="aviso-col" hidden><span class="msi msi-xs" aria-hidden="true" translate="no">view_column</span><span id="aviso-col-txt"></span></span>
+<div class="seg" role="group" aria-label="Densidad de la tabla">
+<button type="button" data-densidad="comfy" aria-pressed="true">Cómoda</button>
+<button type="button" data-densidad="compact" aria-pressed="false">Compacta</button>
+</div>
+</div>
+</section>
 </div><main id="contenido" data-state="ok" tabindex="-1">
 <div class="state-ok "><div class="pad">
 
-<div class="barra-sel">
-<span class="cuenta"><b class="tnum">2</b> seleccionados</span>
+<div class="barra-sel" id="barra-sel" data-hay="false" role="region" aria-label="Acciones sobre la selección">
+<span class="cuenta"><b class="tnum" id="sel-n">0</b> <span id="sel-txt">seleccionados</span></span>
 <button class="btn" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">link</span>Pedir por correo lo que falta</button>
 <button class="btn" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">download</span>Exportar selección</button>
-<button class="btn" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">pause_circle</span>Cambiar a inactivo</button>
-<span class="quitar"><button class="btn mini" type="button">Quitar la selección</button></span>
+<button class="btn mini" type="button" id="quitar-sel">Quitar la selección</button>
+<button class="btn destructiva" type="button" id="desactivar"><span class="msi msi-sm" aria-hidden="true" translate="no">pause_circle</span>Cambiar a inactivo</button>
 </div>
 
-<section class="tarjeta dups"><header><span class="msi" aria-hidden="true" translate="no">group</span><h2>Dos pares de razones sociales se parecen demasiado</h2><span class="n tnum">2</span></header>
+<details class="tarjeta dups"><summary><span class="msi" aria-hidden="true" translate="no">group</span><span class="ttl">2 posibles duplicados</span><span class="pista">revisar</span><span class="msi msi-sm chev" aria-hidden="true" translate="no">expand_more</span></summary>
 <div class="par">
 <span class="lado"><b translate="no">Comercializadora Vértice del Bajío</b><small translate="no">CVB-880125-3B2 · alta 12 ene 2024 · 31 órdenes</small></span>
 <span class="vs">contra</span>
@@ -697,8 +839,8 @@ main[data-state="loading"] .state-loading{display:flex}
 <span class="lado"><b translate="no">Refaccionaria Altiplano del Bajío</b><small translate="no">RAB-011130-7C5 · alta 09 jun 2026 · 0 órdenes</small></span>
 <span class="der"><span class="puntaje">71 % de parecido</span><button class="btn mini p" type="button">Comparar y decidir</button></span>
 </div>
-<p class="nota" style="border-bottom:0"><span class="msi" aria-hidden="true" translate="no">shield</span><span><b>El sistema propone; nadie fusiona solo.</b> El parecido se calcula comparando los nombres por tramos de tres letras y el RFC — no hay modelo de por medio y el resultado es siempre el mismo. <b>La fusión la ejecuta una persona</b> y conserva los dos historiales: las órdenes y los documentos del registro absorbido siguen consultables, con el nombre con el que se capturaron. Unir mal dos clientes cuesta más que convivir con el duplicado.</span></p>
-</section>
+<p class="nota" style="border-bottom:0"><span class="msi" aria-hidden="true" translate="no">shield</span><span><b>El sistema propone; la fusión la ejecuta una persona.</b> Al fusionar se conservan los dos historiales: las órdenes y los documentos del registro absorbido siguen consultables.</span></p>
+</details>
 
 <div class="tabla-caja" style="margin-top:var(--sp-4)">
 <table><caption>Padrón de clientes con RFC, tipo, sucursales, documentos fiscales, último movimiento y estado comercial</caption>
@@ -707,27 +849,23 @@ main[data-state="loading"] .state-loading{display:flex}
 <col style="width:23%"><col style="width:15%"><col style="width:10%"><col style="width:136px">
 </colgroup>
 <thead><tr>
-<th scope="col"><span class="selcab"><label class="casilla"><input type="checkbox" id="selall" aria-label="Seleccionar todos los clientes de esta página"></label><button data-c="1" data-t="text">Razón social / RFC<span class="msi sort" aria-hidden="true" translate="no">arrow_downward</span></button></span></th>
-<th scope="col">Tipo</th>
-<th scope="col">Sucursales</th>
-<th scope="col">Documentos fiscales</th>
-<th scope="col" aria-sort="descending"><button data-c="5" data-t="num">Último movimiento<span class="msi sort" aria-hidden="true" translate="no">arrow_downward</span></button></th>
-<th scope="col">Comercial</th>
+<th scope="col" aria-sort="none" class="col-razon"><span class="selcab"><label class="casilla"><input type="checkbox" id="selall" aria-label="Seleccionar todos los clientes de esta página"></label><button data-c="0" data-t="text">Razón social / RFC<span class="msi sort" aria-hidden="true" translate="no">arrow_downward</span></button></span></th>
+<th scope="col" class="col-tipo">Tipo</th>
+<th scope="col" class="col-sucursales">Sucursales</th>
+<th scope="col" class="col-documentos">Documentos fiscales</th>
+<th scope="col" aria-sort="descending" class="col-movimiento"><button data-c="4" data-t="num">Último movimiento<span class="msi sort" aria-hidden="true" translate="no">arrow_downward</span></button></th>
+<th scope="col" class="col-comercial">Comercial</th>
 <th scope="col"><span class="sr">Acciones</span></th>
 </tr></thead>
 <tbody><tr data-selected="true">
 <th scope="row" data-et="Razón social / RFC"><span class="selfila"><label class="casilla"><input type="checkbox" class="rowsel" checked aria-label="Seleccionar Grupo Automotriz Vértice"></label><span class="rz"><b translate="no">Grupo Automotriz Vértice</b><small translate="no">GAV-940312-K71</small></span></span></th>
-<td data-et="Tipo"><span class="p-type p-s1">Agencia</span></td>
-<td data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="true" aria-controls="suc-gav" aria-label="Ver las 4 sucursales de Grupo Automotriz Vértice"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>4<span class="msi msi-xs chev" aria-hidden="true" translate="no">arrow_downward</span></button></td>
-<td data-et="Documentos fiscales"><span class="exp"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Los dos</span><span class="falta">Constancia e identificación, <b>revisadas y vigentes</b>. Puede programar y facturar.</span></span></td>
-<td data-et="Último movimiento"><span class="mov"><b>18 ago 2026</b><small>Orden ORD-202608-0392 programada</small></span></td>
-<td data-et="Comercial"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Activo</span></td>
-<td data-et="Acciones"><div class="acciones">
-<button class="iconbtn" type="button" aria-label="Ver ficha de Grupo Automotriz Vértice"><span class="msi msi-sm" aria-hidden="true" translate="no">visibility</span></button>
-<button class="iconbtn" type="button" aria-label="Editar Grupo Automotriz Vértice"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button>
-<button class="iconbtn" type="button" aria-label="Ver órdenes de Grupo Automotriz Vértice"><span class="msi msi-sm" aria-hidden="true" translate="no">receipt_long</span></button>
-</div></td>
-</tr><tr class="hijas" id="suc-gav">
+<td class="col-tipo" data-et="Tipo"><span class="p-type p-s1">Agencia</span></td>
+<td class="col-sucursales" data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="false" aria-controls="suc-gav" aria-label="Ver las 4 sucursales de Grupo Automotriz Vértice"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>4<span class="msi msi-xs chev" aria-hidden="true" translate="no">expand_more</span></button></td>
+<td class="col-documentos" data-et="Documentos fiscales"><span class="exp" title="Constancia e identificación, revisadas y vigentes. Puede programar y facturar."><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Los dos</span></span></td>
+<td class="col-movimiento" data-et="Último movimiento" data-v="2026-08-18"><span class="mov"><b>18 ago 2026</b><small>Orden ORD-202608-0392 programada</small></span></td>
+<td class="col-comercial" data-et="Comercial"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Activo</span></td>
+<td data-et="Acciones"><div class="acciones"><button class="iconbtn" type="button" title="Ver ficha" aria-label="Ver ficha de Grupo Automotriz Vértice"><span class="msi msi-sm" aria-hidden="true" translate="no">visibility</span></button><span class="menu-cont"><button class="iconbtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="m-grupo-automotriz-vertice" title="Más acciones" aria-label="Más acciones para Grupo Automotriz Vértice"><span class="msi msi-sm" aria-hidden="true" translate="no">more_horiz</span></button><div class="menu" id="m-grupo-automotriz-vertice" role="menu" hidden><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span>Editar cliente</button><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">receipt_long</span>Ver órdenes</button><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">link</span>Reenviar liga de registro</button><hr><button type="button" role="menuitem" class="destructiva" data-desactivar="Grupo Automotriz Vértice"><span class="msi msi-sm" aria-hidden="true" translate="no">pause_circle</span>Cambiar a inactivo</button></div></span></div></td>
+</tr><tr class="hijas" id="suc-gav" hidden>
 <td colspan="7" data-et="Razón social / RFC"><div class="caja">
 <div class="enc"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>Sucursales de esta razón social</div>
 <ul class="suc-lista">
@@ -740,74 +878,85 @@ main[data-state="loading"] .state-loading{display:flex}
 </div></td>
 </tr><tr data-selected="true">
 <th scope="row" data-et="Razón social / RFC"><span class="selfila"><label class="casilla"><input type="checkbox" class="rowsel" checked aria-label="Seleccionar Comercializadora Vértice del Bajío"></label><span class="rz"><b translate="no">Comercializadora Vértice del Bajío</b><small translate="no">CVB-880125-3B2</small></span></span></th>
-<td data-et="Tipo"><span class="p-type p-s2">Empresa</span></td>
-<td data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="false" aria-controls="suc-cvb" aria-label="Ver las 2 sucursales de Comercializadora Vértice del Bajío"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>2<span class="msi msi-xs chev" aria-hidden="true" translate="no">arrow_downward</span></button></td>
-<td data-et="Documentos fiscales"><span class="exp"><span class="pill p-warn"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span>Falta 1</span><span class="falta">Falta la <b>constancia de situación fiscal</b>. Se puede seguir trabajando el cliente; <b>no se le puede programar ni facturar</b> hasta que esté.</span></span></td>
-<td data-et="Último movimiento"><span class="mov"><b>15 ago 2026</b><small>Cotización enviada</small></span></td>
-<td data-et="Comercial"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Activo</span></td>
-<td data-et="Acciones"><div class="acciones">
-<button class="iconbtn" type="button" aria-label="Ver ficha de Comercializadora Vértice del Bajío"><span class="msi msi-sm" aria-hidden="true" translate="no">visibility</span></button>
-<button class="iconbtn" type="button" aria-label="Editar Comercializadora Vértice del Bajío"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button>
-<button class="iconbtn" type="button" aria-label="Ver órdenes de Comercializadora Vértice del Bajío"><span class="msi msi-sm" aria-hidden="true" translate="no">receipt_long</span></button>
+<td class="col-tipo" data-et="Tipo"><span class="p-type p-s2">Empresa</span></td>
+<td class="col-sucursales" data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="false" aria-controls="suc-cvb" aria-label="Ver las 2 sucursales de Comercializadora Vértice del Bajío"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>2<span class="msi msi-xs chev" aria-hidden="true" translate="no">expand_more</span></button></td>
+<td class="col-documentos" data-et="Documentos fiscales"><span class="exp" title="Falta la constancia de situación fiscal. Se puede seguir trabajando el cliente; no se le puede programar ni facturar hasta que esté."><span class="pill p-warn"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span>Falta 1</span></span></td>
+<td class="col-movimiento" data-et="Último movimiento" data-v="2026-08-15"><span class="mov"><b>15 ago 2026</b><small>Cotización enviada</small></span></td>
+<td class="col-comercial" data-et="Comercial"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Activo</span></td>
+<td data-et="Acciones"><div class="acciones"><button class="iconbtn" type="button" title="Ver ficha" aria-label="Ver ficha de Comercializadora Vértice del Bajío"><span class="msi msi-sm" aria-hidden="true" translate="no">visibility</span></button><span class="menu-cont"><button class="iconbtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="m-comercializadora-vertice-del" title="Más acciones" aria-label="Más acciones para Comercializadora Vértice del Bajío"><span class="msi msi-sm" aria-hidden="true" translate="no">more_horiz</span></button><div class="menu" id="m-comercializadora-vertice-del" role="menu" hidden><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span>Editar cliente</button><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">receipt_long</span>Ver órdenes</button><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">link</span>Reenviar liga de registro</button><hr><button type="button" role="menuitem" class="destructiva" data-desactivar="Comercializadora Vértice del Bajío"><span class="msi msi-sm" aria-hidden="true" translate="no">pause_circle</span>Cambiar a inactivo</button></div></span></div></td>
+</tr><tr class="hijas" id="suc-cvb" hidden>
+<td colspan="7" data-et="Razón social / RFC"><div class="caja">
+<div class="enc"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>Sucursales de esta razón social</div>
+<ul class="suc-lista">
+<li><span class="nom"><b translate="no">Irapuato · Guanajuato</b><span>Blvd. Díaz Ordaz 1450, 36660 Irapuato, Gto.</span></span><span class="der"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Puede recibir órdenes</span><button class="btn mini" type="button">Ver órdenes</button></span></li>
+<li><span class="nom"><b translate="no">León · Guanajuato</b><span>Av. López Mateos 3020, 37530 León, Gto.</span></span><span class="der"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Puede recibir órdenes</span><button class="btn mini" type="button">Ver órdenes</button></span></li>
+</ul>
 </div></td>
 </tr><tr>
 <th scope="row" data-et="Razón social / RFC"><span class="selfila"><label class="casilla"><input type="checkbox" class="rowsel" aria-label="Seleccionar Autotransportes Cerro Azul"></label><span class="rz"><b translate="no">Autotransportes Cerro Azul</b><small translate="no">ACA-020618-QX0</small></span></span></th>
-<td data-et="Tipo"><span class="p-type p-s2">Empresa</span></td>
-<td data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="false" aria-controls="suc-aca" aria-label="Ver las 1 sucursales de Autotransportes Cerro Azul"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>1<span class="msi msi-xs chev" aria-hidden="true" translate="no">arrow_downward</span></button></td>
-<td data-et="Documentos fiscales"><span class="exp"><span class="pill p-warn"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span>Por vencer</span><span class="falta">La <b>identificación del representante</b> vence el <b>2 sep 2026</b>. Jurídico ya recibió el aviso de 30 días. Hoy todavía puede programar.</span></span></td>
-<td data-et="Último movimiento"><span class="mov"><b>02 ago 2026</b><small>Trámite CFE-2026-00219 admitido</small></span></td>
-<td data-et="Comercial"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Activo</span></td>
-<td data-et="Acciones"><div class="acciones">
-<button class="iconbtn" type="button" aria-label="Ver ficha de Autotransportes Cerro Azul"><span class="msi msi-sm" aria-hidden="true" translate="no">visibility</span></button>
-<button class="iconbtn" type="button" aria-label="Editar Autotransportes Cerro Azul"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button>
-<button class="iconbtn" type="button" aria-label="Ver órdenes de Autotransportes Cerro Azul"><span class="msi msi-sm" aria-hidden="true" translate="no">receipt_long</span></button>
+<td class="col-tipo" data-et="Tipo"><span class="p-type p-s2">Empresa</span></td>
+<td class="col-sucursales" data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="false" aria-controls="suc-aca" aria-label="Ver la sucursal de Autotransportes Cerro Azul"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>1<span class="msi msi-xs chev" aria-hidden="true" translate="no">expand_more</span></button></td>
+<td class="col-documentos" data-et="Documentos fiscales"><span class="exp" title="La identificación del representante vence el 2 sep 2026. Jurídico ya recibió el aviso de 30 días. Hoy todavía puede programar."><span class="pill p-warn"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span>Por vencer</span></span></td>
+<td class="col-movimiento" data-et="Último movimiento" data-v="2026-08-02"><span class="mov"><b>02 ago 2026</b><small>Trámite CFE-2026-00219 admitido</small></span></td>
+<td class="col-comercial" data-et="Comercial"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Activo</span></td>
+<td data-et="Acciones"><div class="acciones"><button class="iconbtn" type="button" title="Ver ficha" aria-label="Ver ficha de Autotransportes Cerro Azul"><span class="msi msi-sm" aria-hidden="true" translate="no">visibility</span></button><span class="menu-cont"><button class="iconbtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="m-autotransportes-cerro-azul" title="Más acciones" aria-label="Más acciones para Autotransportes Cerro Azul"><span class="msi msi-sm" aria-hidden="true" translate="no">more_horiz</span></button><div class="menu" id="m-autotransportes-cerro-azul" role="menu" hidden><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span>Editar cliente</button><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">receipt_long</span>Ver órdenes</button><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">link</span>Reenviar liga de registro</button><hr><button type="button" role="menuitem" class="destructiva" data-desactivar="Autotransportes Cerro Azul"><span class="msi msi-sm" aria-hidden="true" translate="no">pause_circle</span>Cambiar a inactivo</button></div></span></div></td>
+</tr><tr class="hijas" id="suc-aca" hidden>
+<td colspan="7" data-et="Razón social / RFC"><div class="caja">
+<div class="enc"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>Sucursales de esta razón social</div>
+<ul class="suc-lista">
+<li><span class="nom"><b translate="no">Matriz · Poza Rica</b><span>Carr. Poza Rica–Tuxpan km 4, 93230 Poza Rica, Ver.</span></span><span class="der"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Puede recibir órdenes</span><button class="btn mini" type="button">Ver órdenes</button></span></li>
+</ul>
 </div></td>
 </tr><tr>
 <th scope="row" data-et="Razón social / RFC"><span class="selfila"><label class="casilla"><input type="checkbox" class="rowsel" aria-label="Seleccionar Laura Núñez Peralta"></label><span class="rz"><b translate="no">Laura Núñez Peralta</b><small translate="no">NUPL-910403-MN4</small></span></span></th>
-<td data-et="Tipo"><span class="p-type p-s0">Persona física</span></td>
-<td data-et="Sucursales"><span class="pill p-neutro">Sin sucursales</span></td>
-<td data-et="Documentos fiscales"><span class="exp"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Los dos</span><span class="falta">Constancia e identificación, <b>revisadas y vigentes</b>. Puede programar y facturar.</span></span></td>
-<td data-et="Último movimiento"><span class="mov"><b>20 jul 2026</b><small>Instalación cerrada</small></span></td>
-<td data-et="Comercial"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Activo</span></td>
-<td data-et="Acciones"><div class="acciones">
-<button class="iconbtn" type="button" aria-label="Ver ficha de Laura Núñez Peralta"><span class="msi msi-sm" aria-hidden="true" translate="no">visibility</span></button>
-<button class="iconbtn" type="button" aria-label="Editar Laura Núñez Peralta"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button>
-<button class="iconbtn" type="button" aria-label="Ver órdenes de Laura Núñez Peralta"><span class="msi msi-sm" aria-hidden="true" translate="no">receipt_long</span></button>
-</div></td>
+<td class="col-tipo" data-et="Tipo"><span class="p-type p-s0">Persona física</span></td>
+<td class="col-sucursales" data-et="Sucursales"><span class="pill p-neutro">Sin sucursales</span></td>
+<td class="col-documentos" data-et="Documentos fiscales"><span class="exp" title="Constancia e identificación, revisadas y vigentes. Puede programar y facturar."><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Los dos</span></span></td>
+<td class="col-movimiento" data-et="Último movimiento" data-v="2026-07-20"><span class="mov"><b>20 jul 2026</b><small>Instalación cerrada</small></span></td>
+<td class="col-comercial" data-et="Comercial"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Activo</span></td>
+<td data-et="Acciones"><div class="acciones"><button class="iconbtn" type="button" title="Ver ficha" aria-label="Ver ficha de Laura Núñez Peralta"><span class="msi msi-sm" aria-hidden="true" translate="no">visibility</span></button><span class="menu-cont"><button class="iconbtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="m-laura-nunez-peralta" title="Más acciones" aria-label="Más acciones para Laura Núñez Peralta"><span class="msi msi-sm" aria-hidden="true" translate="no">more_horiz</span></button><div class="menu" id="m-laura-nunez-peralta" role="menu" hidden><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span>Editar cliente</button><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">receipt_long</span>Ver órdenes</button><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">link</span>Reenviar liga de registro</button><hr><button type="button" role="menuitem" class="destructiva" data-desactivar="Laura Núñez Peralta"><span class="msi msi-sm" aria-hidden="true" translate="no">pause_circle</span>Cambiar a inactivo</button></div></span></div></td>
 </tr><tr>
 <th scope="row" data-et="Razón social / RFC"><span class="selfila"><label class="casilla"><input type="checkbox" class="rowsel" aria-label="Seleccionar Refaccionaria del Altiplano"></label><span class="rz"><b translate="no">Refaccionaria del Altiplano</b><small translate="no">RDA-970214-8H1</small></span></span></th>
-<td data-et="Tipo"><span class="p-type p-s1">Agencia</span></td>
-<td data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="false" aria-controls="suc-rda" aria-label="Ver las 3 sucursales de Refaccionaria del Altiplano"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>3<span class="msi msi-xs chev" aria-hidden="true" translate="no">arrow_downward</span></button></td>
-<td data-et="Documentos fiscales"><span class="exp"><span class="pill p-err"><span class="msi msi-xs" aria-hidden="true" translate="no">error</span>Faltan los 2</span><span class="falta">No hay <b>constancia</b> ni <b>identificación</b>. El cliente existe y se puede editar; <b>programarle una instalación, no</b>.</span></span></td>
-<td data-et="Último movimiento"><span class="mov frio"><b>12 may 2026</b><small>Sin movimiento desde hace 101 días</small></span></td>
-<td data-et="Comercial"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Activo</span></td>
-<td data-et="Acciones"><div class="acciones">
-<button class="iconbtn" type="button" aria-label="Ver ficha de Refaccionaria del Altiplano"><span class="msi msi-sm" aria-hidden="true" translate="no">visibility</span></button>
-<button class="iconbtn" type="button" aria-label="Editar Refaccionaria del Altiplano"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button>
-<button class="iconbtn" type="button" aria-label="Ver órdenes de Refaccionaria del Altiplano"><span class="msi msi-sm" aria-hidden="true" translate="no">receipt_long</span></button>
+<td class="col-tipo" data-et="Tipo"><span class="p-type p-s1">Agencia</span></td>
+<td class="col-sucursales" data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="false" aria-controls="suc-rda" aria-label="Ver las 3 sucursales de Refaccionaria del Altiplano"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>3<span class="msi msi-xs chev" aria-hidden="true" translate="no">expand_more</span></button></td>
+<td class="col-documentos" data-et="Documentos fiscales"><span class="exp" title="No hay constancia ni identificación. El cliente existe y se puede editar; programarle una instalación, no."><span class="pill p-err"><span class="msi msi-xs" aria-hidden="true" translate="no">error</span>Faltan los 2</span></span></td>
+<td class="col-movimiento" data-et="Último movimiento" data-v="2026-05-12"><span class="mov frio"><b>12 may 2026</b><small>Sin movimiento desde hace 101 días</small></span></td>
+<td class="col-comercial" data-et="Comercial"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Activo</span></td>
+<td data-et="Acciones"><div class="acciones"><button class="iconbtn" type="button" title="Ver ficha" aria-label="Ver ficha de Refaccionaria del Altiplano"><span class="msi msi-sm" aria-hidden="true" translate="no">visibility</span></button><span class="menu-cont"><button class="iconbtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="m-refaccionaria-del-altiplano" title="Más acciones" aria-label="Más acciones para Refaccionaria del Altiplano"><span class="msi msi-sm" aria-hidden="true" translate="no">more_horiz</span></button><div class="menu" id="m-refaccionaria-del-altiplano" role="menu" hidden><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span>Editar cliente</button><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">receipt_long</span>Ver órdenes</button><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">link</span>Reenviar liga de registro</button><hr><button type="button" role="menuitem" class="destructiva" data-desactivar="Refaccionaria del Altiplano"><span class="msi msi-sm" aria-hidden="true" translate="no">pause_circle</span>Cambiar a inactivo</button></div></span></div></td>
+</tr><tr class="hijas" id="suc-rda" hidden>
+<td colspan="7" data-et="Razón social / RFC"><div class="caja">
+<div class="enc"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>Sucursales de esta razón social</div>
+<ul class="suc-lista">
+<li><span class="nom"><b translate="no">Matriz · San Luis Potosí</b><span>Av. Salvador Nava 780, 78290 San Luis Potosí, S.L.P.</span></span><span class="der"><span class="pill p-warn"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span>Bloqueada: faltan documentos</span><button class="btn mini" type="button">Ver órdenes</button></span></li>
+<li><span class="nom"><b translate="no">Soledad · San Luis Potosí</b><span>Carr. a Matehuala 155, 78430 Soledad, S.L.P.</span></span><span class="der"><span class="pill p-warn"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span>Bloqueada: faltan documentos</span><button class="btn mini" type="button">Ver órdenes</button></span></li>
+<li><span class="nom"><b translate="no">Aguascalientes</b><span>Av. Aguascalientes Sur 601, 20328 Aguascalientes, Ags.</span></span><span class="der"><span class="pill p-warn"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span>Bloqueada: faltan documentos</span><button class="btn mini" type="button">Ver órdenes</button></span></li>
+</ul>
 </div></td>
 </tr><tr>
 <th scope="row" data-et="Razón social / RFC"><span class="selfila"><label class="casilla"><input type="checkbox" class="rowsel" aria-label="Seleccionar Distribuidora Peña y Asociados"></label><span class="rz"><b translate="no">Distribuidora Peña y Asociados</b><small translate="no">DPA-051108-P44</small></span></span></th>
-<td data-et="Tipo"><span class="p-type p-s2">Empresa</span></td>
-<td data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="false" aria-controls="suc-dpa" aria-label="Ver las 1 sucursales de Distribuidora Peña y Asociados"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>1<span class="msi msi-xs chev" aria-hidden="true" translate="no">arrow_downward</span></button></td>
-<td data-et="Documentos fiscales"><span class="exp"><span class="pill p-neutro"><span class="msi msi-xs" aria-hidden="true" translate="no">warning</span>Sin calcular</span><span class="falta">⛔ <b>No es lo mismo que «faltan».</b> El servidor no pudo calcularlo en esta consulta, y prefiere decirlo a enseñar un «incompleto» que quizá no sea cierto — un incompleto falso bloquearía una instalación que sí se podía programar.</span></span></td>
-<td data-et="Último movimiento"><span class="mov frio"><b>11 feb 2026</b><small>Sin movimiento desde hace 191 días</small></span></td>
-<td data-et="Comercial"><span class="pill p-neutro"><span class="msi msi-xs" aria-hidden="true" translate="no">pause_circle</span>Inactivo</span></td>
-<td data-et="Acciones"><div class="acciones">
-<button class="iconbtn" type="button" aria-label="Ver ficha de Distribuidora Peña y Asociados"><span class="msi msi-sm" aria-hidden="true" translate="no">visibility</span></button>
-<button class="iconbtn" type="button" aria-label="Editar Distribuidora Peña y Asociados"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span></button>
-<button class="iconbtn" type="button" aria-label="Ver órdenes de Distribuidora Peña y Asociados"><span class="msi msi-sm" aria-hidden="true" translate="no">receipt_long</span></button>
+<td class="col-tipo" data-et="Tipo"><span class="p-type p-s2">Empresa</span></td>
+<td class="col-sucursales" data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="false" aria-controls="suc-dpa" aria-label="Ver la sucursal de Distribuidora Peña y Asociados"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>1<span class="msi msi-xs chev" aria-hidden="true" translate="no">expand_more</span></button></td>
+<td class="col-documentos" data-et="Documentos fiscales"><span class="exp" title="No es lo mismo que «faltan». El servidor no pudo calcularlo en esta consulta, y prefiere decirlo a enseñar un «incompleto» que quizá no sea cierto — un incompleto falso bloquearía una instalación que sí se podía programar."><span class="pill p-neutro"><span class="msi msi-xs" aria-hidden="true" translate="no">warning</span>Sin calcular</span></span></td>
+<td class="col-movimiento" data-et="Último movimiento" data-v="2026-02-11"><span class="mov frio"><b>11 feb 2026</b><small>Sin movimiento desde hace 191 días</small></span></td>
+<td class="col-comercial" data-et="Comercial"><span class="pill p-neutro"><span class="msi msi-xs" aria-hidden="true" translate="no">pause_circle</span>Inactivo</span></td>
+<td data-et="Acciones"><div class="acciones"><button class="iconbtn" type="button" title="Ver ficha" aria-label="Ver ficha de Distribuidora Peña y Asociados"><span class="msi msi-sm" aria-hidden="true" translate="no">visibility</span></button><span class="menu-cont"><button class="iconbtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="m-distribuidora-pena-y-asociad" title="Más acciones" aria-label="Más acciones para Distribuidora Peña y Asociados"><span class="msi msi-sm" aria-hidden="true" translate="no">more_horiz</span></button><div class="menu" id="m-distribuidora-pena-y-asociad" role="menu" hidden><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span>Editar cliente</button><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">receipt_long</span>Ver órdenes</button><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">link</span>Reenviar liga de registro</button><hr><button type="button" role="menuitem" class="destructiva" data-desactivar="Distribuidora Peña y Asociados"><span class="msi msi-sm" aria-hidden="true" translate="no">pause_circle</span>Cambiar a inactivo</button></div></span></div></td>
+</tr><tr class="hijas" id="suc-dpa" hidden>
+<td colspan="7" data-et="Razón social / RFC"><div class="caja">
+<div class="enc"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>Sucursales de esta razón social</div>
+<ul class="suc-lista">
+<li><span class="nom"><b translate="no">Matriz · Toluca</b><span>Paseo Tollocan 1201, 50140 Toluca, Méx.</span></span><span class="der"><span class="pill p-warn"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span>Bloqueada: faltan documentos</span><button class="btn mini" type="button">Ver órdenes</button></span></li>
+</ul>
 </div></td>
 </tr></tbody></table>
 </div>
 
-<div class="tfoot"><span>Mostrando <b class="tnum">6</b> de <b class="tnum">1,248</b> · orden: movimiento más reciente primero</span><div class="pag"><button type="button">‹ Anteriores</button><button type="button" aria-current="page">1</button><button type="button">2</button><button type="button">3</button><button type="button">Siguientes ›</button></div></div>
+<div class="tfoot"><span>Mostrando <b class="tnum" id="rango">1–25</b> de <b class="tnum">1,248</b> · orden: movimiento más reciente primero</span><span class="por-pagina"><label for="porpag">Por página</label><select id="porpag"><option>10</option><option selected>25</option><option>50</option><option>100</option></select></span><div class="pag"><button type="button">‹ Anteriores</button><button type="button" aria-current="page">1</button><button type="button">2</button><button type="button">3</button><button type="button">Siguientes ›</button></div></div>
 
-<p class="nota"><span class="msi" aria-hidden="true" translate="no">shield</span><span><b>Los dos documentos son opcionales aquí y obligatorios para programar.</b> Un cliente sin ellos se da de alta, se edita y se consulta sin estorbo — lo que no se puede es <b>programarle una instalación ni facturarle</b>. Por eso el aviso vive en esta columna y no en un candado sobre la fila.<br><br>⚠️ <b>Y se mide de la razón social, no de la sucursal.</b> Los documentos acreditan a quien firma y a quien se factura, que es la razón social entera; la orden cuelga de una sucursal, pero el papel que la habilita no es de la sucursal.</span></p>
+<p class="nota"><span class="msi" aria-hidden="true" translate="no">shield</span><span>Sin los dos documentos, un cliente se da de alta y se consulta, pero <b>no se le puede programar una instalación ni facturarle</b>. Se miden de la razón social, no de la sucursal.</span></p>
 
-<p class="nota"><span class="msi" aria-hidden="true" translate="no">warning</span><span><b>«Sin calcular» no es «faltan», y la diferencia importa.</b> Cuando el servidor no puede resolver si los documentos están, lo dice en vez de suponer que faltan. Un «faltan» inventado bloquearía una instalación que sí se podía programar — y el bloqueo se notaría, pero el motivo falso no.</span></p>
+<p class="nota"><span class="msi" aria-hidden="true" translate="no">warning</span><span><b>«Sin calcular» no es «faltan».</b> Cuando el servidor no puede resolver si los documentos están, lo dice en vez de suponerlo.</span></p>
 
-<p class="nota"><span class="msi" aria-hidden="true" translate="no">view_column</span><span><b>Tres columnas se pueden ocultar, y una viene oculta.</b> <b>Tipo</b>, <b>contacto principal</b> y <b>último movimiento</b> se encienden y apagan desde «Columnas». Vienen apagadas <b>contacto principal</b> —se cortaba en casi todas las filas, y entero se lee en la ficha— y encendidas las otras dos.<br><br>⚠️ <b>Ocultar no es quitar, y la diferencia importa.</b> Quien necesite el contacto en la tabla lo enciende; quien no, tiene la tabla ancha. Quitarlas del todo habría decidido por los dos.<br><br>El <b>historial de cambios</b> sí está fuera: en un renglón no cabe y aquí nadie lo consulta de pasada. Vive en la ficha.</span></p>
+<p class="nota"><span class="msi" aria-hidden="true" translate="no">view_column</span><span>Las columnas se encienden y apagan desde <b>«Columnas»</b>. Ocultar no es quitar: el dato sigue en la ficha del cliente.</span></p>
 
 </div></div>
 <div class="state-loading sk" role="status" aria-label="Cargando"><div class="sk-fila" style="grid-template-columns:26% 11% 10% 23% 15% 10% 120px"><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span></div><div class="sk-fila" style="grid-template-columns:26% 11% 10% 23% 15% 10% 120px"><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span></div><div class="sk-fila" style="grid-template-columns:26% 11% 10% 23% 15% 10% 120px"><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span></div><div class="sk-fila" style="grid-template-columns:26% 11% 10% 23% 15% 10% 120px"><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span></div><div class="sk-fila" style="grid-template-columns:26% 11% 10% 23% 15% 10% 120px"><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span></div><div class="sk-fila" style="grid-template-columns:26% 11% 10% 23% 15% 10% 120px"><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span></div></div>
@@ -826,6 +975,17 @@ main[data-state="loading"] .state-loading{display:flex}
 </div>
 </main>
 <p class="sr" id="live" aria-live="polite"></p>
+<dialog class="confirmar" id="dlg" aria-labelledby="dlg-t">
+<div class="interior">
+<h2 id="dlg-t">Cambiar a inactivo</h2>
+<p id="dlg-txt"></p>
+<p>Dejarán de aparecer en el padrón activo. <b>Sus órdenes y documentos siguen consultables</b>, y se pueden reactivar desde la ficha.</p>
+<div class="acc">
+<button class="btn" type="button" id="dlg-no">Cancelar</button>
+<button class="btn destructiva" type="button" id="dlg-si"><span class="msi msi-sm" aria-hidden="true" translate="no">pause_circle</span>Cambiar a inactivo</button>
+</div>
+</div>
+</dialog>
 <button class="fab" data-cromo type="button" aria-label="Abrir el asistente del sistema" title="Asistente del sistema"><span class="ring"></span><svg width="22" height="21" viewBox="740 0 970 932" aria-hidden="true"><use href="#dproma-mark"/></svg></button><span class="desvanece" aria-hidden="true"></span></div></div></div>
 </div>
 <div class="demo" data-andamio role="group" aria-label="Controles de la maqueta: ver la pantalla en sus distintos estados">
@@ -873,6 +1033,266 @@ document.querySelectorAll('.demo [data-set]').forEach(function(b){
 bt.addEventListener('click',function(){raiz.setAttribute('data-theme',oscuro()?'light':'dark');pinta();});
 mq.addEventListener('change',pinta);
 pinta();
+/* ══ Capa interactiva ══════════════════════════════════════════════════════
+   La maqueta llegó sin manejadores: los chips no filtraban, las columnas no se
+   ordenaban, la selección no contaba, las sucursales no se desplegaban y
+   «Columnas» no abría nada. Todo eso se anuncia en la interfaz, así que tiene
+   que existir. ── */
+
+/* — Superficies flotantes: menús de fila y panel de columnas.
+     Escape cierra y el foco vuelve al disparador (doc §6.14). — */
+var abierta=null;
+function cierra(devuelveFoco){
+  if(!abierta)return;
+  abierta.panel.hidden=true;
+  abierta.bt.setAttribute('aria-expanded','false');
+  if(devuelveFoco)abierta.bt.focus();
+  abierta=null;
+}
+function alterna(bt,panel){
+  var yaAbierta=abierta&&abierta.panel===panel;
+  cierra(false);
+  if(yaAbierta)return;
+  panel.hidden=false;
+  bt.setAttribute('aria-expanded','true');
+  abierta={bt:bt,panel:panel};
+  var primero=panel.querySelector('button,input');
+  if(primero)primero.focus();
+}
+document.querySelectorAll('[aria-controls]').forEach(function(bt){
+  var panel=document.getElementById(bt.getAttribute('aria-controls'));
+  if(!panel||(!panel.classList.contains('menu')&&!panel.classList.contains('panel-col')))return;
+  bt.addEventListener('click',function(e){e.stopPropagation();alterna(bt,panel);});
+});
+document.addEventListener('click',function(e){
+  if(abierta&&!abierta.panel.contains(e.target)&&e.target!==abierta.bt)cierra(false);
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&abierta)cierra(true);});
+
+/* — Filtros. Un chip del resumen es un atajo del filtro de abajo: al pulsarlo
+     mueve el desplegable, para que el estado del filtro esté en un solo sitio
+     (hallazgo 1.5). Y un filtro se resalta solo si su valor difiere del
+     predeterminado (hallazgo 1.6). — */
+var aplicados=document.getElementById('aplicados');
+var quitarTodos=document.getElementById('quitar-filtros');
+function filtroDe(nombre){return document.querySelector('.f[data-filtro="'+nombre+'"]');}
+function ponFiltro(nombre,valor){
+  var f=filtroDe(nombre); if(!f)return;
+  f.querySelector('b').textContent=valor;
+  f.dataset.activo=String(valor!==f.dataset.def);
+  document.querySelectorAll('.schip[data-filtro="'+nombre+'"]').forEach(function(c){
+    c.setAttribute('aria-pressed',String(c.dataset.valor===valor));});
+  pintaAplicados();
+}
+function pintaAplicados(){
+  var activos=[].slice.call(document.querySelectorAll('.f[data-activo="true"]'));
+  aplicados.innerHTML='';
+  activos.forEach(function(f){
+    var et=document.createElement('span'); et.className='aplicado';
+    et.append(f.dataset.filtro+': '+f.querySelector('b').textContent);
+    var x=document.createElement('button');
+    x.type='button';
+    x.setAttribute('aria-label','Quitar el filtro de '+f.dataset.filtro);
+    x.innerHTML='<span class="msi msi-xs" aria-hidden="true" translate="no">close</span>';
+    x.addEventListener('click',function(){ponFiltro(f.dataset.filtro,f.dataset.def);anuncia();});
+    et.appendChild(x); aplicados.appendChild(et);
+  });
+  quitarTodos.hidden=activos.length===0;
+}
+function anuncia(){
+  var n=document.querySelectorAll('.f[data-activo="true"]').length;
+  live.textContent=n?n+(n===1?' filtro aplicado':' filtros aplicados'):'Sin filtros. Mostrando los 1.248 clientes.';
+}
+document.querySelectorAll('.schip[data-filtro]').forEach(function(c){
+  c.addEventListener('click',function(){
+    var f=filtroDe(c.dataset.filtro);
+    var puesto=c.getAttribute('aria-pressed')==='true';
+    ponFiltro(c.dataset.filtro,puesto?f.dataset.def:c.dataset.valor);
+    anuncia();
+  });
+});
+quitarTodos.addEventListener('click',function(){
+  document.querySelectorAll('.f').forEach(function(f){ponFiltro(f.dataset.filtro,f.dataset.def);});
+  anuncia();
+});
+
+/* — Densidad. Compacta reduce contenido, no solo espacio (doc §6.11, regla 6). — */
+document.querySelectorAll('.seg [data-densidad]').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.seg [data-densidad]').forEach(function(o){
+      o.setAttribute('aria-pressed',String(o===b));});
+    raiz.setAttribute('data-density',b.dataset.densidad);
+    live.textContent='Densidad '+(b.dataset.densidad==='comfy'?'cómoda':'compacta');
+  });
+});
+
+/* — Columnas. Ninguna desaparece en silencio: si hay alguna apagada, se dice
+     cuántas y desde dónde se recuperan (doc §6.11, regla 5). — */
+var avisoCol=document.getElementById('aviso-col'), avisoTxt=document.getElementById('aviso-col-txt');
+function pintaColumnas(){
+  var off=[].slice.call(document.querySelectorAll('#panel-col input:not(:checked)'))
+            .map(function(i){return i.dataset.col;});
+  raiz.setAttribute('data-col-oculta',off.join(' '));
+  avisoCol.hidden=off.length===0;
+  avisoTxt.textContent=off.length===1?'1 columna oculta':off.length+' columnas ocultas';
+}
+document.querySelectorAll('#panel-col input').forEach(function(i){
+  i.addEventListener('change',function(){
+    pintaColumnas();
+    live.textContent=(i.checked?'Columna mostrada: ':'Columna oculta: ')+i.parentNode.textContent.trim();
+  });
+});
+pintaColumnas();
+
+/* — Orden por columna. — */
+var tabla=document.querySelector('table');
+tabla.querySelectorAll('thead th button[data-c]').forEach(function(bt){
+  bt.addEventListener('click',function(){
+    var th=bt.closest('th'), col=+bt.dataset.c, tipo=bt.dataset.t;
+    var asc=th.getAttribute('aria-sort')!=='ascending';
+    tabla.querySelectorAll('thead th[aria-sort]').forEach(function(h){h.setAttribute('aria-sort','none');});
+    th.setAttribute('aria-sort',asc?'ascending':'descending');
+    var cuerpo=tabla.tBodies[0];
+    // Cada fila madre viaja con su fila hija de sucursales.
+    var grupos=[],actual=null;
+    [].slice.call(cuerpo.rows).forEach(function(r){
+      if(r.classList.contains('hijas')){ if(actual)actual.push(r); }
+      else { actual=[r]; grupos.push(actual); }
+    });
+    var valor=function(g){
+      var c=g[0].cells[col]; if(!c)return '';
+      return tipo==='num'?Date.parse(c.getAttribute('data-v')||0)||0:c.textContent.trim();
+    };
+    grupos.sort(function(a,b){
+      var va=valor(a),vb=valor(b);
+      var r=tipo==='num'?va-vb:String(va).localeCompare(String(vb),'es-MX');
+      return asc?r:-r;
+    }).forEach(function(g){g.forEach(function(r){cuerpo.appendChild(r);});});
+    live.textContent='Ordenado por '+bt.textContent.trim()+', '+(asc?'ascendente':'descendente');
+  });
+});
+
+/* — Selección. La barra aparece solo cuando hay algo seleccionado, y la
+     casilla de cabecera pasa por indeterminada (doc §6.13). — */
+var barra=document.getElementById('barra-sel'), selN=document.getElementById('sel-n'),
+    selTxt=document.getElementById('sel-txt'), selAll=document.getElementById('selall');
+function refrescaSeleccion(){
+  var cajas=[].slice.call(document.querySelectorAll('.rowsel'));
+  var marcadas=cajas.filter(function(c){return c.checked;});
+  cajas.forEach(function(c){
+    var tr=c.closest('tr');
+    if(c.checked)tr.setAttribute('aria-selected','true'); else tr.removeAttribute('aria-selected');
+  });
+  selN.textContent=marcadas.length;
+  selTxt.textContent=marcadas.length===1?'seleccionado':'seleccionados';
+  barra.dataset.hay=String(marcadas.length>0);
+  if(selAll){
+    selAll.checked=marcadas.length===cajas.length&&cajas.length>0;
+    selAll.indeterminate=marcadas.length>0&&marcadas.length<cajas.length;
+  }
+  return marcadas;
+}
+document.querySelectorAll('.rowsel').forEach(function(c){c.addEventListener('change',refrescaSeleccion);});
+if(selAll)selAll.addEventListener('change',function(){
+  document.querySelectorAll('.rowsel').forEach(function(c){c.checked=selAll.checked;});
+  var n=refrescaSeleccion().length;
+  live.textContent=n?n+' clientes seleccionados':'Selección vacía';
+});
+document.getElementById('quitar-sel').addEventListener('click',function(){
+  document.querySelectorAll('.rowsel').forEach(function(c){c.checked=false;});
+  refrescaSeleccion(); live.textContent='Selección vacía';
+});
+
+/* — La acción destructiva confirma diciendo a cuántos y a quiénes afecta, y se
+     puede deshacer (doc §6.13). — */
+var dlg=document.getElementById('dlg'), dlgTxt=document.getElementById('dlg-txt'), disparador=null;
+function nombresSeleccionados(){
+  return [].slice.call(document.querySelectorAll('.rowsel:checked')).map(function(c){
+    return c.closest('tr').querySelector('.rz b').textContent;});
+}
+function pideConfirmacion(nombres,bt){
+  disparador=bt;
+  dlgTxt.innerHTML=nombres.length===1
+    ? 'Vas a cambiar a inactivo a <b>'+nombres[0]+'</b>.'
+    : 'Vas a cambiar a inactivos <b>'+nombres.length+' clientes</b>: '+nombres.join(', ')+'.';
+  dlg.returnValue='';
+  dlg.showModal();
+}
+document.getElementById('desactivar').addEventListener('click',function(e){
+  var n=nombresSeleccionados(); if(n.length)pideConfirmacion(n,e.currentTarget);
+});
+document.querySelectorAll('[data-desactivar]').forEach(function(b){
+  b.addEventListener('click',function(){cierra(false);pideConfirmacion([b.dataset.desactivar],b);});
+});
+document.getElementById('dlg-no').addEventListener('click',function(){dlg.close();});
+document.getElementById('dlg-si').addEventListener('click',function(){
+  dlg.close();
+  var texto=dlgTxt.textContent.replace('Vas a cambiar','Se cambió').replace('.','');
+  ofreceDeshacer(texto);
+});
+dlg.addEventListener('close',function(){if(disparador)disparador.focus();});
+
+var avisoDeshacer=null,relojDeshacer=null;
+function ofreceDeshacer(texto){
+  if(avisoDeshacer)avisoDeshacer.remove();
+  clearTimeout(relojDeshacer);
+  avisoDeshacer=document.createElement('div');
+  avisoDeshacer.className='deshacer'; avisoDeshacer.setAttribute('role','status');
+  var t=document.createElement('span'); t.textContent=texto;
+  var b=document.createElement('button'); b.type='button'; b.textContent='Deshacer';
+  b.addEventListener('click',function(){
+    avisoDeshacer.remove(); avisoDeshacer=null; live.textContent='Cambio deshecho.';
+  });
+  avisoDeshacer.append(t,b); document.body.appendChild(avisoDeshacer);
+  relojDeshacer=setTimeout(function(){
+    if(avisoDeshacer){avisoDeshacer.remove();avisoDeshacer=null;}
+  },9000);
+}
+
+/* — Sucursales dentro de la fila. Escape cierra y el foco vuelve al botón
+     que la abrió (hallazgo 2.6). — */
+document.querySelectorAll('.suc-btn[aria-controls]').forEach(function(bt){
+  var hija=document.getElementById(bt.getAttribute('aria-controls'));
+  if(!hija)return;
+  bt.addEventListener('click',function(){
+    var abierto=bt.getAttribute('aria-expanded')==='true';
+    bt.setAttribute('aria-expanded',String(!abierto));
+    hija.hidden=abierto;
+    live.textContent=(abierto?'Sucursales ocultas: ':'Sucursales desplegadas: ')
+      +bt.closest('tr').querySelector('.rz b').textContent;
+  });
+  // Escape cierra desde el propio botón y desde dentro de la fila desplegada:
+  // tras pulsar, el foco sigue en el botón, no dentro de lo que se abrió.
+  function cierraSuc(e){
+    if(e.key!=='Escape'||bt.getAttribute('aria-expanded')!=='true')return;
+    e.stopPropagation();
+    bt.setAttribute('aria-expanded','false'); hija.hidden=true; bt.focus();
+  }
+  bt.addEventListener('keydown',cierraSuc);
+  hija.addEventListener('keydown',cierraSuc);
+});
+
+/* — Buscar y registros por página. — */
+var buscar=document.getElementById('buscar');
+if(buscar)buscar.addEventListener('input',function(){
+  var q=buscar.value.trim().toLowerCase(), visibles=0;
+  [].slice.call(tabla.tBodies[0].rows).forEach(function(r){
+    if(r.classList.contains('hijas'))return;
+    var hay=!q||r.textContent.toLowerCase().indexOf(q)>-1;
+    r.hidden=!hay; if(hay)visibles++;
+  });
+  muestra(q&&visibles===0?'empty':'ok',false);
+  if(q)live.textContent=visibles+(visibles===1?' cliente coincide':' clientes coinciden')+' con «'+buscar.value.trim()+'»';
+});
+var porPag=document.getElementById('porpag'), rango=document.getElementById('rango');
+if(porPag)porPag.addEventListener('change',function(){
+  rango.textContent='1–'+porPag.value;
+  live.textContent='Mostrando '+porPag.value+' registros por página.';
+});
+
+refrescaSeleccion();
+pintaAplicados();
+
 var mb=document.getElementById('menu-btn');
 var velo=document.querySelector('.velo-menu');
 function menu(abierto){
