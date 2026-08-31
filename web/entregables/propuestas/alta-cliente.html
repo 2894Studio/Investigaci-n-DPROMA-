@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,arrow_downward,bolt,check_circle,confirmation_number,credit_card,dark_mode,dashboard,description,edit,error,expand_more,folder,group,inventory_2,light_mode,menu,receipt_long,refresh,search,trending_up,warning&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,arrow_downward,bolt,check_circle,confirmation_number,credit_card,dark_mode,dashboard,description,edit,error,expand_more,folder,group,inventory_2,light_mode,menu,receipt_long,refresh,search,trending_up,upload&display=block" rel="stylesheet">
 <style>
 :root{
 --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -250,7 +250,7 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--accent);width:16px
 .side .logo{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:4px 8px 12px;
   border-bottom:1px solid var(--chrome-line);margin-bottom:8px}
 .side .bloque{margin-bottom:2px}
-.grp{margin:9px 8px 2px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}
+.grp{text-transform:uppercase;margin:9px 8px 2px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}
 .side ul{list-style:none}
 .it{display:flex;align-items:center;gap:9px;padding:6px 9px;border-radius:7px;color:var(--chrome-dim);
   font-size:var(--fs-dense);text-decoration:none;border-left:3px solid transparent;
@@ -270,7 +270,7 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--accent);width:16px
   border-radius:var(--r-pill);padding:4px 10px 4px 4px;cursor:pointer;color:var(--text);max-width:260px}
 .cromo-prof:hover{background:var(--surface-2);border-color:var(--border)}
 .cromo-av{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--text);
-  display:grid;place-items:center;font:700 11px var(--font-ui);flex-shrink:0}
+  display:grid;place-items:center;font:700 var(--fs-meta) var(--font-ui);flex-shrink:0}
 .cromo-quien{display:flex;flex-direction:column;align-items:flex-start;min-width:0;line-height:1.25}
 .cromo-quien b{font-size:var(--fs-dense);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
 .cromo-quien small{font-size:var(--fs-meta);color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
@@ -523,14 +523,16 @@ tbody th:first-child::after,thead th:first-child::after{content:"";position:abso
 .ctrl{display:flex;flex-direction:column;gap:5px;min-width:0}
 .ctrl > label{font-size:var(--fs-meta);font-weight:600;color:var(--text-2)}
 .ctrl > label .req{color:var(--err-ink)}
-.ctrl input[type="text"],.ctrl input[type="date"],.ctrl input[type="number"],.ctrl select,.ctrl textarea{
+/* Por exclusión, no por enumeración: enumerar tipos deja fuera cualquiera que
+   se añada después (pasó con email y tel, que se quedaron en 19px de alto). */
+.ctrl input:not([type="file"]):not([type="checkbox"]):not([type="radio"]),.ctrl select,.ctrl textarea{
   border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:var(--r-ctrl);
   padding:9px 12px;font:400 var(--fs-dense) var(--font-ui);width:100%;outline:0;
   transition:border-color var(--dur-micro) var(--ease-out),box-shadow var(--dur-micro) var(--ease-out)}
 .ctrl textarea{resize:vertical;min-height:76px;line-height:1.5}
 .ctrl input:focus,.ctrl select:focus,.ctrl textarea:focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 @media (pointer:coarse){input,select,textarea{font-size:max(16px,var(--fs-dense))}}
-.ctrl input[type="text"]:focus-visible,.ctrl input[type="date"]:focus-visible,.ctrl input[type="number"]:focus-visible,.ctrl input:focus-visible,.ctrl select:focus-visible,.ctrl textarea:focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}
+.ctrl input:focus-visible,.ctrl select:focus-visible,.ctrl textarea:focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}
 .ctrl .ayuda{font-size:var(--fs-meta);color:var(--text-3);line-height:1.45}
 .ctrl .mal{font-size:var(--fs-meta);color:var(--err-ink);line-height:1.45;font-weight:600;display:flex;gap:5px;align-items:flex-start}
 .ctrl.error input,.ctrl.error select,.ctrl.error textarea{border-color:var(--err);box-shadow:0 0 0 1px var(--err)}
@@ -538,9 +540,62 @@ tbody th:first-child::after,thead th:first-child::after{content:"";position:abso
 .barra-form{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-6);
   border-top:1px solid var(--border);background:var(--surface);flex-wrap:wrap;flex-shrink:0}
 @media (max-width:1280px){.barra-form{padding-left:var(--sp-4);padding-right:var(--sp-4)}}
-.barra-form .izq{font-size:var(--fs-meta);color:var(--text-3);line-height:1.5}
-.barra-form .der{margin-left:auto;display:flex;gap:var(--sp-2);flex-wrap:wrap}
+.barra-form .izq{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-meta);color:var(--text-3);line-height:1.5}
+.barra-form .der{margin-left:auto;display:flex;gap:var(--sp-2);flex-wrap:wrap;
+  margin-right:68px}  /* hueco del botón flotante, que caía encima de «Dar de alta» */
 /* @fin ARQ-P5 */
+
+/* ARQ-ALTA-EXTRA */
+.migas a{min-height:24px;display:inline-flex;align-items:center;padding:2px 0}
+/* Dos niveles de obligatoriedad, con palabras distintas: el asterisco decía
+   «obligatorio» para dos cosas que no lo son igual (doc §6.16, regla 2). */
+.nivel{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;padding:2px 7px;border-radius:var(--r-pill);margin-left:6px;
+  vertical-align:middle;letter-spacing:.05em}
+.nivel-alta{background:var(--accent-soft);color:var(--accent)}
+.nivel-fact,.nivel-op{background:var(--surface-2);color:var(--text-2)}
+
+/* Un dato calculado se muestra como dato, no como campo: era un input editable
+   con el valor «Se calcula solo» dentro (doc §6.16, regla 1). */
+.et-dato{font-size:var(--fs-meta);font-weight:600;color:var(--text-2)}
+.dato-calc{display:flex;align-items:center;gap:var(--sp-2);min-height:38px;padding:8px 0}
+.dato-calc .valor{font-size:var(--fs-base);font-weight:600;color:var(--text)}
+.pista-calc{display:inline-flex;align-items:center;gap:5px;min-height:24px;padding:2px 8px;
+  border:1px dashed var(--border-2);border-radius:var(--r-pill);background:transparent;
+  color:var(--text-2);font:600 var(--fs-meta) var(--font-ui);cursor:help}
+
+/* Subida de archivo (doc §6.17). */
+.subida{position:relative}
+.subida input[type="file"]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.subida input[type="file"]:focus-visible + .subida-caja{outline:2px solid var(--accent);outline-offset:2px}
+.subida-caja{display:flex;align-items:center;gap:var(--sp-3);min-height:64px;padding:var(--sp-3) var(--sp-4);
+  border:1px dashed var(--border-2);border-radius:var(--r-ctrl);background:var(--bg);
+  color:var(--text-2);font-size:var(--fs-meta);line-height:1.5;cursor:pointer}
+.subida-caja b{color:var(--text);font-size:var(--fs-dense)}
+.subida-caja .msi{font-size:24px;color:var(--text-3)}
+.subida:hover .subida-caja{border-color:var(--accent);background:var(--accent-soft)}
+.subida[data-cargado="true"] .subida-caja{border-style:solid;border-color:var(--ok);background:var(--ok-bg)}
+.subida[data-cargado="true"] .subida-caja .msi{color:var(--ok-ink)}
+.quitar-archivo{position:relative;z-index:2;margin-left:auto;min-height:28px;padding:4px 10px;
+  border:1px solid var(--border-2);border-radius:var(--r-ctrl);background:var(--surface);
+  color:var(--text);font:600 var(--fs-meta) var(--font-ui);cursor:pointer}
+
+/* El error va encima del formulario, no en lugar del formulario. */
+.banda-info{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}
+.banda-err{background:var(--err-bg);color:var(--err-ink)}
+.banda-err .msi{color:var(--err-ink)}
+.aviso-error{display:none;gap:var(--sp-3);align-items:flex-start;margin-bottom:var(--sp-4)}
+.aviso-error p{margin:0 0 var(--sp-2)}
+.aviso-error .ref{font-size:var(--fs-meta);opacity:.85;font-variant-numeric:tabular-nums}
+.mas-ayuda{background:transparent;border:0;color:var(--link);cursor:pointer;
+  font:600 var(--fs-dense) var(--font-ui);text-decoration:underline;min-height:24px;
+  padding:0 2px;border-radius:4px}
+.ayuda-larga{margin:0 0 var(--sp-4);padding:var(--sp-3) var(--sp-4);background:var(--surface-2);
+  border-radius:var(--r-ctrl)}
+.ayuda-larga p{font-size:var(--fs-dense);color:var(--text-2);line-height:1.55;margin:0 0 var(--sp-2)}
+.ayuda-larga p:last-child{margin-bottom:0}
+.seccion > header .est{display:inline-flex;align-items:center;gap:5px}
+/* @fin ARQ-ALTA-EXTRA */
 
 /* ARQ-ESTADOS */
 .skel{display:block;height:12px;border-radius:4px;
@@ -563,7 +618,8 @@ main > .state-ok,main > .state-loading,main > .state-empty,main > .state-error{d
 .state .acc{display:flex;gap:var(--sp-2);flex-wrap:wrap;justify-content:center;margin-top:var(--sp-1)}
 main[data-state="ok"] .state-ok{display:flex}
 main[data-state="empty"] .state-empty{display:flex}
-main[data-state="error"] .state-error{display:flex}
+main[data-state="error"] .state-ok{display:flex}
+main[data-state="error"] .aviso-error{display:flex}
 main[data-state="loading"] .state-loading{display:flex}
 .sk{flex-direction:column;gap:var(--sp-3);padding:var(--sp-4) var(--sp-6)}
 @media (max-width:1280px){.sk{padding-left:var(--sp-4);padding-right:var(--sp-4)}}
@@ -579,7 +635,7 @@ main[data-state="loading"] .state-loading{display:flex}
   box-shadow:0 -2px 10px var(--velo-suave);z-index:80}
 .demo .et-g{font-size:10.5px;color:var(--text-3);font-weight:700;letter-spacing:.06em;padding:0 6px}
 .demo button{border:0;background:transparent;color:var(--text-2);border-radius:var(--r-pill);
-  padding:6px 12px;font:600 11.5px var(--font-ui);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  padding:6px 12px;font:600 var(--fs-meta) var(--font-ui);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 .demo button:hover{background:var(--surface-2);color:var(--text)}
 .demo button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .demo .div{width:1px;height:20px;background:var(--border);margin:0 6px}
@@ -603,7 +659,7 @@ main[data-state="loading"] .state-loading{display:flex}
 <a class="skip" href="#contenido">Saltar al contenido</a>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="lgrad" x1="1233.32" y1="931.42" x2="1233.32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c361e"/><stop offset="0.14" stop-color="#12572b"/><stop offset="0.32" stop-color="#2e823d"/><stop offset="0.48" stop-color="#60a84b"/><stop offset="0.64" stop-color="#76b552"/><stop offset="0.78" stop-color="#a5c86a"/><stop offset="1" stop-color="#c7d97b"/></linearGradient><symbol id="dproma-mark" viewBox="740 0 970 932"><path fill="url(#lgrad)" d="M869.35,924.63H811.84c-39.82,0-66.56-40.83-50.66-77.33L1048.86,108C1083.11,29.8,1146.12,0,1243.39,0c95.89,0,158.91,29.8,191.79,108L1705.76,854.8c15.27,36.41-11.47,76.62-51,76.62h-59.54a55.27,55.27,0,0,1-51-34L1285.73,191c-8.22-19.86-23.29-28.56-45.21-28.56s-37,8.7-46.58,28.56L920,891.4A55.26,55.26,0,0,1,869.35,924.63Z"/></symbol></defs></svg>
 <div class="hoja">
-<div class="app"><button class="velo-menu" data-cromo type="button" aria-label="Cerrar el menú" tabindex="-1"></button><nav class="side" data-cromo id="menu-lateral" aria-label="Navegación principal"><div class="logo"><svg width="44" height="42" viewBox="740 0 970 932" aria-hidden="true"><use href="#dproma-mark"/></svg><span class="wordmark" translate="no">SIO-DPROMA</span></div><div class="side-scroll"><div class="bloque"><p class="grp" id="g-principal" aria-hidden="true">Principal</p><ul aria-labelledby="g-principal"><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">dashboard</span><span class="et">Tablero</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-operacion" aria-hidden="true">Operación</p><ul aria-labelledby="g-operacion"><li><a class="it" href="#" aria-current="page"><span class="msi" aria-hidden="true" translate="no">group</span><span class="et">Padrón de clientes</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">credit_card</span><span class="et">Viáticos</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-icev" aria-hidden="true">ICEV</p><ul aria-labelledby="g-icev"><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">description</span><span class="et">Órdenes de instalación</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">credit_card</span><span class="et">Instaladores y agenda</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">bolt</span><span class="et">Trámites CFE</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">inventory_2</span><span class="et">Recetas de despacho</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">receipt_long</span><span class="et">Compras de almacén</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-tramites-vehiculares" aria-hidden="true">Trámites vehiculares</p><ul aria-labelledby="g-tramites-vehiculares"><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">folder</span><span class="et">Trámites vehiculares</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">check_circle</span><span class="et">Trámites concluidos</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">folder</span><span class="et">Gestoría</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-direccion-y-administracion" aria-hidden="true">Dirección y Administración</p><ul aria-labelledby="g-direccion-y-administracion"><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">trending_up</span><span class="et">Cuentas por cobrar</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-soporte" aria-hidden="true">Soporte</p><ul aria-labelledby="g-soporte"><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">group</span><span class="et">Usuarios</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">error</span><span class="et">Incidencias de servicio</span></a></li><li><a class="it" href="#"><span class="msi" aria-hidden="true" translate="no">confirmation_number</span><span class="et">Tickets TI</span></a></li></ul></div></div></nav><div class="area"><header class="cromo-top" data-cromo>
+<div class="app"><button class="velo-menu" data-cromo type="button" aria-label="Cerrar el menú" tabindex="-1"></button><nav class="side" data-cromo id="menu-lateral" aria-label="Navegación principal"><div class="logo"><svg width="44" height="42" viewBox="740 0 970 932" aria-hidden="true"><use href="#dproma-mark"/></svg><span class="wordmark" translate="no">SIO-DPROMA</span></div><div class="side-scroll"><div class="bloque"><p class="grp" id="g-principal" aria-hidden="true">Principal</p><ul aria-labelledby="g-principal"><li><a class="it" href="#" title="Tablero"><span class="msi" aria-hidden="true" translate="no">dashboard</span><span class="et">Tablero</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-operacion" aria-hidden="true">Operación</p><ul aria-labelledby="g-operacion"><li><a class="it" href="#" aria-current="page" title="Padrón de clientes"><span class="msi" aria-hidden="true" translate="no">group</span><span class="et">Padrón de clientes</span></a></li><li><a class="it" href="#" title="Viáticos"><span class="msi" aria-hidden="true" translate="no">credit_card</span><span class="et">Viáticos</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-icev" aria-hidden="true">ICEV</p><ul aria-labelledby="g-icev"><li><a class="it" href="#" title="Órdenes de instalación"><span class="msi" aria-hidden="true" translate="no">description</span><span class="et">Órdenes de instalación</span></a></li><li><a class="it" href="#" title="Instaladores y agenda"><span class="msi" aria-hidden="true" translate="no">credit_card</span><span class="et">Instaladores y agenda</span></a></li><li><a class="it" href="#" title="Trámites CFE"><span class="msi" aria-hidden="true" translate="no">bolt</span><span class="et">Trámites CFE</span></a></li><li><a class="it" href="#" title="Recetas de despacho"><span class="msi" aria-hidden="true" translate="no">inventory_2</span><span class="et">Recetas de despacho</span></a></li><li><a class="it" href="#" title="Compras de almacén"><span class="msi" aria-hidden="true" translate="no">receipt_long</span><span class="et">Compras de almacén</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-tramites-vehiculares" aria-hidden="true">Trámites vehiculares</p><ul aria-labelledby="g-tramites-vehiculares"><li><a class="it" href="#" title="Trámites vehiculares"><span class="msi" aria-hidden="true" translate="no">folder</span><span class="et">Trámites vehiculares</span></a></li><li><a class="it" href="#" title="Trámites concluidos"><span class="msi" aria-hidden="true" translate="no">check_circle</span><span class="et">Trámites concluidos</span></a></li><li><a class="it" href="#" title="Gestoría"><span class="msi" aria-hidden="true" translate="no">folder</span><span class="et">Gestoría</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-direccion-y-administracion" aria-hidden="true">Dirección y Administración</p><ul aria-labelledby="g-direccion-y-administracion"><li><a class="it" href="#" title="Cuentas por cobrar"><span class="msi" aria-hidden="true" translate="no">trending_up</span><span class="et">Cuentas por cobrar</span></a></li></ul></div><div class="bloque"><p class="grp" id="g-soporte" aria-hidden="true">Soporte</p><ul aria-labelledby="g-soporte"><li><a class="it" href="#" title="Usuarios"><span class="msi" aria-hidden="true" translate="no">group</span><span class="et">Usuarios</span></a></li><li><a class="it" href="#" title="Incidencias de servicio"><span class="msi" aria-hidden="true" translate="no">error</span><span class="et">Incidencias de servicio</span></a></li><li><a class="it" href="#" title="Tickets TI"><span class="msi" aria-hidden="true" translate="no">confirmation_number</span><span class="et">Tickets TI</span></a></li></ul></div></div></nav><div class="area"><header class="cromo-top" data-cromo>
 <button class="iconbtn hamburguesa" type="button" id="menu-btn" aria-label="Abrir el menú" aria-expanded="false" aria-controls="menu-lateral"><span class="msi" aria-hidden="true" translate="no">menu</span></button>
 <div class="hueco" aria-hidden="true"></div>
 <div class="derecha">
@@ -618,48 +674,67 @@ main[data-state="loading"] .state-loading{display:flex}
 <header class="p4"><div class="p4-t"><h1>Nuevo cliente</h1><span class="resumen">Alta de una razón social en el padrón</span></div></header>
 <main id="contenido" data-state="ok" tabindex="-1">
 <div class="state-ok "><div class="form">
+<div class="banda banda-err aviso-error" id="aviso-error" role="alert">
+<span class="msi" aria-hidden="true" translate="no">error</span>
+<div><p><b>No se pudo dar de alta el cliente.</b> El servicio del padrón no respondió. El cliente
+no se creó, pero <b>lo que capturaste sigue aquí</b>: vuelve a intentar sin recapturar nada.</p>
+<p class="ref" translate="no">Referencia del error: PAD-20260821-1401</p>
+<button class="btn" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">refresh</span>Reintentar</button></div>
+</div>
 <nav class="migas" aria-label="Ruta"><a href="#">Padrón de clientes</a><span class="msi msi-sm" aria-hidden="true" translate="no">arrow_downward</span><span>Nuevo cliente</span></nav>
-<div class="banda b-info"><span class="msi" aria-hidden="true" translate="no">warning</span><p>El alta necesita <b>razón social y RFC</b>. Todo lo demás se puede completar después, <b>y los dos documentos son opcionales</b>: un cliente sin ellos se registra, se edita y se consulta sin estorbo.<br><br>Lo que no podrá hacer hasta tenerlos es <b>que se le programe una instalación o se le facture</b>. Si el cliente ya tiene fecha, conviene subirlos ahora; si no, no hay ninguna prisa.<br><br>Los datos que captures aquí se tratan según el <a class="lnk" href="https://www.dproma.com/aviso-de-privacidad" target="_blank" rel="noopener noreferrer">aviso de privacidad de DPROMA</a>. <b>No hace falta que el cliente firme nada</b>: basta con informarle, y el aviso ya existía antes que este sistema.</p></div>
+<div class="banda banda-info">
+<span class="msi" aria-hidden="true" translate="no">error</span>
+<p><b>Para dar de alta bastan la razón social y el RFC.</b> El resto se puede completar
+después, pero sin datos fiscales y documentos no se le podrá programar una instalación ni
+facturar. <button class="mas-ayuda" type="button" aria-expanded="false" aria-controls="ayuda-alta">Ver el detalle</button></p>
+</div>
+<div class="ayuda-larga" id="ayuda-alta" hidden>
+<p>Un cliente sin los dos documentos se registra, se edita y se consulta sin estorbo. Lo que
+no podrá hacer hasta tenerlos es que se le programe una instalación o se le facture: si ya
+tiene fecha, conviene subirlos ahora.</p>
+<p>Los datos se tratan según el <a class="lnk" href="https://www.dproma.com/aviso-de-privacidad" target="_blank" rel="noopener noreferrer">aviso de privacidad de DPROMA<span class="sr"> (se abre en una ventana nueva)</span></a>. No hace falta que el cliente firme nada: basta con informarle.</p>
+</div>
 <section class="seccion">
-<header><span class="idx tnum">1</span><h2>Identificación</h2><span class="est">2 de 2 capturados</span></header>
+<header><span class="idx tnum">1</span><h2>Identificación</h2><span class="est" data-seccion="1"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Completa</span></header>
 <div class="rejilla"><div class="ctrl ancho">
-<label for="rs">Razón social <span class="req">*</span></label>
-<input type="text" id="rs" value="Comercializadora Vértice del Bajío, S. A. de C. V." placeholder="">
+<label for="rs">Razón social <span class="nivel nivel-alta">para dar de alta</span></label>
+<input type="text" id="rs" autocomplete="organization" required aria-required="true" value="Comercializadora Vértice del Bajío, S. A. de C. V." placeholder="">
 <span class="ayuda">Como aparece en la constancia de situación fiscal.</span>
 </div><div class="ctrl">
-<label for="rfc">RFC <span class="req">*</span></label>
-<input type="text" id="rfc" value="CVB240118QT7" placeholder="">
+<label for="rfc">RFC <span class="nivel nivel-alta">para dar de alta</span></label>
+<input type="text" id="rfc" required aria-required="true" value="CVB240118QT7" placeholder="">
 <span class="ayuda">12 caracteres para persona moral, 13 para física.</span>
 </div><div class="ctrl">
-<label for="tipoderiv">Tipo de cliente</label>
-<input type="text" id="tipoderiv" value="Se calcula solo" placeholder="">
-<span class="ayuda">No se elige: sale del RFC y de si el cliente tiene agencia. RFC de 13 posiciones es persona física; de 12, empresa; y si tiene agencia, agencia — eso manda sobre el RFC. Si el RFC no mide 12 ni 13, el tipo queda en blanco en vez de inventarse uno.</span>
+<span class="et-dato" id="et-tipo">Tipo de cliente</span>
+<span class="dato-calc" role="group" aria-labelledby="et-tipo"><span class="valor">Empresa</span><button class="pista-calc" type="button" aria-describedby="ayuda-tipo" aria-label="Cómo se calcula el tipo de cliente"><span class="msi msi-xs" aria-hidden="true" translate="no">error</span>Se deduce del RFC</button></span>
+<span class="ayuda" id="ayuda-tipo">Un RFC de 13 posiciones es persona física; de 12, empresa. Si el cliente tiene agencia, agencia manda sobre el RFC.</span>
 </div></div>
 </section><section class="seccion">
-<header><span class="idx tnum">2</span><h2>Datos fiscales y documentos</h2><span class="est">2 de 3 obligatorios · 0 de 2 documentos</span></header>
+<header><span class="idx tnum">2</span><h2>Datos fiscales y documentos</h2><span class="est" data-seccion="2">Falta: domicilio fiscal</span></header>
 <div class="rejilla"><div class="ctrl">
-<label for="cp">Código postal fiscal <span class="req">*</span></label>
-<input type="text" id="cp" value="76090" placeholder="">
+<label for="cp">Código postal fiscal <span class="nivel nivel-fact">para facturar</span></label>
+<input type="text" id="cp" value="76090" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" placeholder="">
 
 </div><div class="ctrl">
-<label for="reg">Régimen fiscal <span class="req">*</span></label>
+<label for="reg">Régimen fiscal <span class="nivel nivel-fact">para facturar</span></label>
 <select id="reg"><option selected>General de ley personas morales</option><option>Personas morales con fines no lucrativos</option><option>Sueldos y salarios</option></select>
 
-</div><div class="ctrl ancho error">
-<label for="dom">Domicilio fiscal <span class="req">*</span></label>
-<input type="text" id="dom" value="" placeholder="Calle, número, colonia, ciudad y estado">
-<span class="mal"><span class="msi msi-xs" aria-hidden="true" translate="no">error</span>Falta el domicilio fiscal. Sin él no se puede timbrar una factura a este cliente.</span>
-</div><div class="ctrl">
-<label for="car">Constancia de situación fiscal</label>
-<input type="text" id="car" value="" placeholder="">
-<span class="ayuda">PDF. Opcional para dar de alta; necesaria para programar y facturar.</span>
-</div><div class="ctrl">
-<label for="ide">Identificación del representante</label>
-<input type="text" id="ide" value="" placeholder="">
-<span class="ayuda">PDF o foto. Opcional para dar de alta; necesaria para programar y facturar.</span>
+</div><div class="ctrl ancho">
+<label for="dom">Domicilio fiscal <span class="nivel nivel-fact">para facturar</span></label>
+<input type="text" id="dom" value="" autocomplete="street-address" placeholder="Calle, número, colonia, ciudad y estado" aria-describedby="a-dom">
+<span class="ayuda" id="a-dom">Sin domicilio fiscal no se puede timbrar una factura a este cliente.</span>
+<span class="mal" id="e-dom" hidden><span class="msi msi-xs" aria-hidden="true" translate="no">error</span>Falta el domicilio fiscal.</span>
+</div><div class="ctrl ancho">
+<label for="car">Constancia de situación fiscal <span class="nivel nivel-op">para facturar</span></label>
+<div class="subida"><input type="file" id="car" accept=".pdf" aria-describedby="a-car"><label class="subida-caja" for="car"><span class="msi" aria-hidden="true" translate="no">upload</span><span><b>Arrastra el archivo o pulsa para elegirlo</b><br>PDF, hasta 10&nbsp;MB</span></label></div>
+<span class="ayuda" id="a-car">Opcional para dar de alta; necesaria para programar y facturar.</span>
+</div><div class="ctrl ancho">
+<label for="ide">Identificación del representante <span class="nivel nivel-op">para facturar</span></label>
+<div class="subida"><input type="file" id="ide" accept=".pdf,.jpg,.jpeg,.png" aria-describedby="a-ide"><label class="subida-caja" for="ide"><span class="msi" aria-hidden="true" translate="no">upload</span><span><b>Arrastra el archivo o pulsa para elegirlo</b><br>PDF, JPG o PNG, hasta 10&nbsp;MB</span></label></div>
+<span class="ayuda" id="a-ide">Opcional para dar de alta; necesaria para programar y facturar.</span>
 </div></div>
 </section><section class="seccion">
-<header><span class="idx tnum">3</span><h2>Grupo y marca</h2><span class="est">opcional</span></header>
+<header><span class="idx tnum">3</span><h2>Grupo y marca</h2><span class="est" data-seccion="3">Opcional</span></header>
 <div class="rejilla"><div class="ctrl">
 <label for="grp">Grupo automotriz</label>
 <select id="grp"><option selected>— sin grupo —</option><option>Grupo Automotriz Vértice</option><option>Grupo Bajío Motors</option></select>
@@ -670,10 +745,10 @@ main[data-state="loading"] .state-loading{display:flex}
 <span class="ayuda">«Otro» siempre está disponible: una marca que falte no debe bloquear el alta.</span>
 </div></div>
 </section><section class="seccion">
-<header><span class="idx tnum">4</span><h2>Primer contacto</h2><span class="est">0 de 2 capturados</span></header>
+<header><span class="idx tnum">4</span><h2>Primer contacto</h2><span class="est" data-seccion="4">Opcional</span></header>
 <div class="rejilla"><div class="ctrl">
 <label for="cn">Nombre de la persona</label>
-<input type="text" id="cn" value="" placeholder="Rosalía Mendieta Quiroz">
+<input type="text" id="cn" autocomplete="name" value="" placeholder="Rosalía Mendieta Quiroz">
 
 </div><div class="ctrl">
 <label for="cr">Rol</label>
@@ -681,11 +756,11 @@ main[data-state="loading"] .state-loading{display:flex}
 
 </div><div class="ctrl">
 <label for="cc">Correo</label>
-<input type="text" id="cc" value="" placeholder="nombre@empresa.example">
+<input type="email" id="cc" autocomplete="email" value="" placeholder="nombre@empresa.example">
 <span class="ayuda">Después se pueden registrar hasta cuatro correos, cuatro teléfonos, cuatro direcciones y cuatro domicilios de agencia.</span>
 </div><div class="ctrl">
 <label for="ct">Teléfono</label>
-<input type="text" id="ct" value="" placeholder="+52 442 000 0000">
+<input type="tel" id="ct" autocomplete="tel" value="" placeholder="+52 442 000 0000">
 
 </div></div>
 </section>
@@ -697,16 +772,11 @@ main[data-state="loading"] .state-loading{display:flex}
 <p>No has capturado nada todavía. <b>Con la razón social, el RFC y el tipo basta para dar de alta</b>; lo demás se puede completar más adelante desde la ficha del cliente.</p>
 <div class="acc"><button class="btn p" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span>Empezar por la razón social</button><button class="btn" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">search</span>Buscar si ya está dado de alta</button></div>
 </div>
-<div class="state state-error">
-<span class="msi" style="color:var(--err-ink)" aria-hidden="true" translate="no">error</span>
-<h2>No se pudo dar de alta el cliente</h2>
-<p>El servicio del padrón no respondió. <b>El cliente no se creó, pero lo que capturaste no se perdió</b>: sigue en el borrador de esta pantalla. Vuelve a intentar sin recapturar nada.</p>
-<p class="ref" translate="no">Referencia del error: PAD-20260821-1401</p>
-<div class="acc"><button class="btn p" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">refresh</span>Reintentar</button></div>
-</div>
 </main>
 <p class="sr" id="live" aria-live="polite"></p>
-<div class="barra-form"><span class="izq">Borrador guardado hace <b>1 min</b>. Puedes salir y volver.</span><div class="der"><button class="btn" type="button">Cancelar</button><button class="btn" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">check_circle</span>Guardar borrador</button><button class="btn p" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Dar de alta</button></div></div>
+<div class="barra-form">
+<span class="izq" id="estado-borrador" role="status"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Borrador guardado hace <b>1 min</b>. Puedes salir y volver.</span>
+<div class="der"><button class="btn" type="button">Cancelar</button><button class="btn p" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Dar de alta</button></div></div>
 <button class="fab" data-cromo type="button" aria-label="Abrir el asistente del sistema" title="Asistente del sistema"><span class="ring"></span><svg width="22" height="21" viewBox="740 0 970 932" aria-hidden="true"><use href="#dproma-mark"/></svg></button><span class="desvanece" aria-hidden="true"></span></div></div></div>
 </div>
 <div class="demo" data-andamio role="group" aria-label="Controles de la maqueta: ver la pantalla en sus distintos estados">
@@ -754,6 +824,78 @@ document.querySelectorAll('.demo [data-set]').forEach(function(b){
 bt.addEventListener('click',function(){raiz.setAttribute('data-theme',oscuro()?'light':'dark');pinta();});
 mq.addEventListener('change',pinta);
 pinta();
+/* — La validación aparece cuando la persona ha pasado por el campo, no antes.
+     El domicilio fiscal salía en rojo con el campo vacío, antes de que nadie
+     escribiera nada (doc §6.16, regla 4). — */
+var dom=document.getElementById('dom'), errDom=document.getElementById('e-dom');
+if(dom){
+  dom.addEventListener('blur',function(){
+    var vacio=!dom.value.trim();
+    errDom.hidden=!vacio;
+    dom.closest('.ctrl').dataset.error=String(vacio);
+    dom.setAttribute('aria-invalid',String(vacio));
+    dom.setAttribute('aria-describedby', vacio?'a-dom e-dom':'a-dom');
+    pintaSecciones();
+  });
+  dom.addEventListener('input',function(){
+    if(dom.value.trim()){errDom.hidden=true;dom.closest('.ctrl').dataset.error='false';
+      dom.setAttribute('aria-invalid','false');pintaSecciones();}
+  });
+}
+
+/* — El contador de sección habla en español, no en aritmética (doc §6.16, regla 7). — */
+function pintaSecciones(){
+  document.querySelectorAll('.seccion').forEach(function(sec){
+    var est=sec.querySelector('.est'); if(!est||est.dataset.seccion==='3')return;
+    var faltan=[].slice.call(sec.querySelectorAll('input,select')).filter(function(c){
+      return c.type!=='file' && c.hasAttribute('aria-required') && !c.value.trim();
+    });
+    if(est.dataset.seccion==='2' && dom && !dom.value.trim()) faltan.push(dom);
+    if(faltan.length===0){
+      est.innerHTML='<span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Completa';
+    } else if(faltan.length===1){
+      var lab=sec.querySelector('label[for="'+faltan[0].id+'"]');
+      est.textContent='Falta: '+(lab?lab.childNodes[0].textContent.trim().toLowerCase():'un campo');
+    } else {
+      est.textContent='Faltan '+faltan.length+' campos';
+    }
+  });
+}
+
+/* — Subida de archivo: el archivo cargado se ve, con su nombre, y se puede
+     quitar (doc §6.17). — */
+document.querySelectorAll('.subida input[type="file"]').forEach(function(inp){
+  var caja=inp.parentNode, texto=caja.querySelector('.subida-caja span:last-child');
+  var original=texto.innerHTML;
+  inp.addEventListener('change',function(){
+    var f=inp.files&&inp.files[0];
+    var quitar=caja.querySelector('.quitar-archivo');
+    if(quitar)quitar.remove();
+    if(!f){caja.dataset.cargado='false';texto.innerHTML=original;return;}
+    caja.dataset.cargado='true';
+    texto.innerHTML='<b>'+f.name+'</b><br>Subido hoy · '+Math.max(1,Math.round(f.size/1024))+' KB';
+    var bt=document.createElement('button');
+    bt.type='button'; bt.className='quitar-archivo'; bt.textContent='Quitar';
+    bt.addEventListener('click',function(e){
+      e.preventDefault(); inp.value=''; inp.dispatchEvent(new Event('change'));
+    });
+    caja.querySelector('.subida-caja').appendChild(bt);
+    live.textContent='Archivo '+f.name+' añadido.';
+  });
+});
+
+/* — La ayuda larga se abre a petición. — */
+document.querySelectorAll('.mas-ayuda').forEach(function(bt){
+  var caja=document.getElementById(bt.getAttribute('aria-controls'));
+  bt.addEventListener('click',function(){
+    var abierta=bt.getAttribute('aria-expanded')==='true';
+    bt.setAttribute('aria-expanded',String(!abierta));
+    caja.hidden=abierta;
+  });
+});
+
+pintaSecciones();
+
 var mb=document.getElementById('menu-btn');
 var velo=document.querySelector('.velo-menu');
 function menu(abierto){
