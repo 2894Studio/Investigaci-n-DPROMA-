@@ -149,9 +149,10 @@ section + section{ border-top:1px solid var(--border); }
 .tarjeta .interior{ padding:var(--sp-4); font-size:var(--fs-dense); color:var(--text-2); }
 
 /* .glass — tarjeta translúcida del acceso, único sitio del sistema donde la superficie no es opaca */
-.glass-demo{ max-width:320px; padding:var(--sp-6); background:rgba(250,252,253,.66); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(27,36,48,.10); box-shadow:var(--sh-modal); border-radius:var(--r-modal); position:relative; }
-.glass-demo-bg{ position:relative; padding:2.5rem 1.5rem; border-radius:var(--r-card); background:linear-gradient(135deg,#1E4E79,#3E7A4C); display:flex; justify-content:center; }
-@media (prefers-color-scheme: dark){ .glass-demo{ background:rgba(23,31,44,.66); border-color:rgba(231,236,242,.12); } }
+.glass-demo{ max-width:340px; padding:var(--sp-6) var(--sp-6) var(--sp-5); background:rgba(250,252,253,.74); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(27,36,48,.10); box-shadow:var(--sh-modal); border-radius:var(--r-modal); position:relative; }
+.glass-demo-bg{ position:relative; padding:3rem 1.5rem; border-radius:var(--r-card); background:#071120; display:flex; justify-content:center; overflow:hidden; }
+.glass-demo-bg::before{ content:""; position:absolute; inset:0; background:radial-gradient(ellipse at 30% 20%, rgba(30,78,121,.55), transparent 60%), radial-gradient(ellipse at 75% 80%, rgba(62,122,76,.35), transparent 55%); }
+@media (prefers-color-scheme: dark){ .glass-demo{ background:rgba(29,39,53,.66); border-color:rgba(231,236,242,.12); } }
 @supports not (backdrop-filter: blur(1px)){ .glass-demo{ background:var(--surface); } }
 
 .pill{ display:inline-flex; align-items:center; gap:5px; border-radius:var(--r-ctrl); padding:3px 9px; font-size:var(--fs-meta); font-weight:700; white-space:nowrap; }
@@ -389,10 +390,25 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
           <div class="eyebrow" style="margin-bottom:.6rem;">Acceso</div>
           <h3 style="font-size:1.1rem; margin-bottom:.5rem;">Entra a SIO-DPROMA</h3>
           <p style="font-size:var(--fs-dense); color:var(--text-2); margin:0 0 1rem;">La única superficie translúcida del sistema — <code>backdrop-filter:blur(16px)</code> sobre <code>--glass</code>.</p>
-          <button class="gbtn"><span class="msi" aria-hidden="true" translate="no">visibility</span>Continuar con Google</button>
+          <button class="gbtn" id="gbtnDemo" type="button" aria-busy="false">
+            <span class="msi" aria-hidden="true" translate="no">visibility</span>
+            <span class="spin" aria-hidden="true"></span>
+            <span id="gbtnDemoText">Continuar con Google</span>
+          </button>
         </div>
       </div>
       <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;">Lleva respaldo sólido para navegadores sin soporte de <code>backdrop-filter</code>: <code>@supports not (backdrop-filter:blur(1px)){ .glass{ background:var(--surface) } }</code>. Es exclusiva de la pantalla de entrada — en el dashboard las superficies son siempre opacas.</p>
+    </div>
+
+    <div class="comp-block">
+      <h3>Botón con motion — estado ocupado (.gbtn[aria-busy])</h3>
+      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 1rem;">Pulsa el botón: se bloquea de verdad en el <strong>manejador de JS</strong>, no solo con CSS — <code>pointer-events:none</code> detiene el ratón pero no el teclado. Un giro (<code>--dur-micro</code> aparte) marca el estado "ocupado" mientras dura la comprobación.</p>
+      <div class="comp-row">
+        <button class="gbtn" id="gbtnMotion" type="button" aria-busy="false" style="max-width:260px;">
+          <span class="spin" aria-hidden="true"></span>
+          <span id="gbtnMotionText">Simular comprobación</span>
+        </button>
+      </div>
     </div>
 
     <div class="comp-block">
@@ -494,5 +510,25 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
   </div>
 </footer>
 
+<script>
+(function(){
+  var boton = document.getElementById('gbtnMotion');
+  var texto = document.getElementById('gbtnMotionText');
+  var ocupado = false;
+  if (boton) {
+    boton.addEventListener('click', function(){
+      if (ocupado) return;               // el guardián real: bloquea también el teclado
+      ocupado = true;
+      boton.setAttribute('aria-busy', 'true');
+      texto.textContent = 'Comprobando…';
+      setTimeout(function(){
+        ocupado = false;
+        boton.setAttribute('aria-busy', 'false');
+        texto.textContent = 'Simular comprobación';
+      }, 1800);
+    });
+  }
+})();
+</script>
 </body>
 </html>
