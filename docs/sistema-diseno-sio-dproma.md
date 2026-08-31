@@ -1128,7 +1128,36 @@ Todo lo que lleve `data-andamio` se retira en la versión real. Un solo selector
 
 ---
 
-## 10. Checklist al añadir un componente nuevo
+## 10. Cuatro trampas comprobadas
+
+No son teoría: las cuatro aparecieron aplicando este documento al módulo de clientes, y las
+cuatro se ven solo si se comprueba en el navegador, no leyendo la hoja de estilos.
+
+**El tamaño se mide en el navegador, no en el CSS.** La regla de los 12px se puede burlar sin
+querer con la forma abreviada `font:`, donde el tamaño no aparece como `font-size`. Los avatares
+del cromo llevaban `font:700 11px var(--font-ui)` y sobrevivieron a una revisión completa de
+todos los `font-size` del archivo. Se comprueba con el estilo calculado de cada elemento que
+tenga texto.
+
+**Selectores por exclusión, no por enumeración.** El tamaño de los campos estaba definido como
+`.ctrl input[type="text"], .ctrl input[type="date"], .ctrl input[type="number"]`. Al cambiar dos
+campos a `type="email"` y `type="tel"` —que es lo correcto— se quedaron fuera y colapsaron a
+19px de alto. Lo que aplica a todos los campos se escribe
+`.ctrl input:not([type="file"]):not([type="checkbox"]):not([type="radio"])`.
+
+**`[hidden]` gana a cualquier regla de estado.** La base del sistema declara
+`[hidden]{display:none !important}`. Una vista que se muestre según el estado de la pantalla no
+puede llevar `hidden` en el HTML: su visibilidad la gobierna el estado. Con las dos cosas a la
+vez, el estado no puede mostrarla nunca y el fallo es silencioso.
+
+**El destino táctil es la región que acepta la pulsación, no el elemento.** Una casilla de 16px
+dentro de una `<label>` de 24×24 cumple, porque la etiqueta es el destino. Y al revés: un campo
+de búsqueda dentro de un `<div>` con forma de pastilla **no** cumple, porque pulsar la pastilla
+no hace nada. El contenedor tiene que ser una `<label for="…">`.
+
+---
+
+## 11. Checklist al añadir un componente nuevo
 
 **Color y tipografía**
 - ¿El contraste está **medido**, no supuesto? 4,5:1 texto / 3:1 gráficos, en los dos temas.
@@ -1163,3 +1192,11 @@ Todo lo que lleve `data-andamio` se retira en la versión real. Un solo selector
 - ¿Toda animación que dure más de 5s se puede pausar pulsándola, sin botón aparte?
 - ¿El texto en pantalla dice qué se puede hacer, y no por qué se decidió así?
 - ¿Lo que es andamiaje de maqueta lleva `data-andamio` y está rotulado?
+
+**Comprobado en el navegador, no solo leído** (§10)
+- ¿El tamaño se midió con el estilo calculado, y no buscando `font-size` en la hoja?
+- ¿El selector cubre por exclusión, de modo que no deje fuera un tipo que se añada después?
+- ¿Ninguna vista de estado lleva `hidden` en el HTML, que anularía la regla del estado?
+- ¿El destino de 24px es el contenedor que acepta la pulsación, y ese contenedor es pulsable?
+- ¿Los iconos se vieron con la fuente cargada? Sin red, un glifo roto y el respaldo de la caja
+  de 1em se ven igual.
