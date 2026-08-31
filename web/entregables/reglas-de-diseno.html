@@ -128,11 +128,30 @@ section + section{ border-top:1px solid var(--border); }
 .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:36px; padding:8px 14px; border-radius:var(--r-ctrl); border:1px solid var(--border-2); background:var(--surface); color:var(--text); font:600 var(--fs-dense) var(--font-ui); cursor:default; }
 .btn.p{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
 .btn.mini{ min-height:28px; padding:5px 10px; font-size:var(--fs-meta); }
+.btn .msi{ color:inherit; font-size:17px; }
+
+/* .gbtn — botón primario del acceso, 48px, icono + estado ocupado */
+.gbtn{ width:100%; max-width:280px; min-height:48px; display:flex; align-items:center; justify-content:center; gap:11px; padding:13px; border-radius:var(--r-ctrl); border:1px solid var(--border-2); background:var(--surface); color:var(--text); font:600 var(--fs-base) var(--font-ui); box-shadow:var(--sh-rest); }
+.gbtn:hover{ box-shadow:var(--sh-float); border-color:var(--text-3); }
+.gbtn[aria-busy="true"]{ color:var(--text-2); }
+.gbtn .spin{ display:none; width:16px; height:16px; border:2px solid var(--border-2); border-top-color:var(--accent); border-radius:50%; animation:spin .6s linear infinite; }
+.gbtn[aria-busy="true"] .spin{ display:block; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* icono mal vs. bien: color explícito rompe la herencia del botón */
+.icon-bad .msi{ color:var(--text-3); }
+.icon-good .msi{ color:inherit; }
 
 .tarjeta{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-card); box-shadow:var(--sh-rest); overflow:hidden; max-width:320px; }
 .tarjeta > header{ display:flex; align-items:center; gap:var(--sp-2); padding:var(--sp-3) var(--sp-4); background:var(--surface-2); border-bottom:1px solid var(--border); }
 .tarjeta > header h3{ font-size:var(--fs-base); font-weight:600; margin:0; }
 .tarjeta .interior{ padding:var(--sp-4); font-size:var(--fs-dense); color:var(--text-2); }
+
+/* .glass — tarjeta translúcida del acceso, único sitio del sistema donde la superficie no es opaca */
+.glass-demo{ max-width:320px; padding:var(--sp-6); background:rgba(250,252,253,.66); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(27,36,48,.10); box-shadow:var(--sh-modal); border-radius:var(--r-modal); position:relative; }
+.glass-demo-bg{ position:relative; padding:2.5rem 1.5rem; border-radius:var(--r-card); background:linear-gradient(135deg,#1E4E79,#3E7A4C); display:flex; justify-content:center; }
+@media (prefers-color-scheme: dark){ .glass-demo{ background:rgba(23,31,44,.66); border-color:rgba(231,236,242,.12); } }
+@supports not (backdrop-filter: blur(1px)){ .glass-demo{ background:var(--surface); } }
 
 .pill{ display:inline-flex; align-items:center; gap:5px; border-radius:var(--r-ctrl); padding:3px 9px; font-size:var(--fs-meta); font-weight:700; white-space:nowrap; }
 .pill .msi{ font-size:15px; }
@@ -299,12 +318,29 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
     </div>
 
     <div class="comp-block">
-      <h3>Botones (.btn / .btn.p / .btn.mini)</h3>
+      <h3>Botones (.btn / .btn.p / .btn.mini / .gbtn)</h3>
       <div class="comp-row">
-        <button class="btn">Secundario</button>
-        <button class="btn p">Acción primaria</button>
-        <button class="btn mini">Mini</button>
+        <button class="btn"><span class="msi" aria-hidden="true" translate="no">visibility</span>Secundario</button>
+        <button class="btn p"><span class="msi" aria-hidden="true" translate="no">check_circle</span>Acción primaria</button>
+        <button class="btn mini"><span class="msi" aria-hidden="true" translate="no">add</span>Mini</button>
       </div>
+      <div class="comp-row" style="margin-top:1rem;">
+        <button class="gbtn"><span class="msi" aria-hidden="true" translate="no">visibility</span>Continuar con Google</button>
+        <button class="gbtn" aria-busy="true"><span class="spin" aria-hidden="true"></span>Comprobando…</button>
+      </div>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><code>.gbtn</code> — el botón primario del acceso: 48px de alto, se bloquea en el <strong>manejador de JS</strong>, no solo con CSS. <code>pointer-events:none</code> detiene el ratón pero no el teclado — en la maqueta original, cuatro <kbd>Intro</kbd> sobre el botón «ocupado» disparaban cuatro envíos.</p>
+
+      <div class="comp-row" style="margin-top:1.25rem; gap:1.5rem;">
+        <div>
+          <div class="icon-bad" style="margin-bottom:.35rem;"><button class="btn p"><span class="msi" aria-hidden="true" translate="no">refresh</span>Reintentar</button></div>
+          <p style="font-size:.75rem; color:var(--text-3); margin:0;">✗ Mal — <code>.estado .msi{ color:var(--text-3) }</code> pinta el icono de gris aunque el botón sea de acento. Contraste 1,03:1.</p>
+        </div>
+        <div>
+          <div class="icon-good" style="margin-bottom:.35rem;"><button class="btn p"><span class="msi" aria-hidden="true" translate="no">refresh</span>Reintentar</button></div>
+          <p style="font-size:.75rem; color:var(--text-3); margin:0;">✓ Bien — <code>.estado .btn .msi{ color:inherit }</code> hereda del botón. Sube a 4,89:1.</p>
+        </div>
+      </div>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Regla:</strong> un icono dentro de un botón hereda el color del botón (<code>color:inherit</code>). No se le da color propio — si el icono necesita un color distinto, es señal de que el botón lo necesita.</p>
     </div>
 
     <div class="comp-block">
@@ -313,6 +349,19 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
         <header><h3>Ficha de cliente</h3></header>
         <div class="interior">Una sola receta de superficie: fondo, borde, radio y sombra de reposo. No se reimplementa por pantalla.</div>
       </div>
+    </div>
+
+    <div class="comp-block">
+      <h3>Tarjeta translúcida del acceso (.glass)</h3>
+      <div class="glass-demo-bg">
+        <div class="glass-demo">
+          <div class="eyebrow" style="margin-bottom:.6rem;">Acceso</div>
+          <h3 style="font-size:1.1rem; margin-bottom:.5rem;">Entra a SIO-DPROMA</h3>
+          <p style="font-size:var(--fs-dense); color:var(--text-2); margin:0 0 1rem;">La única superficie translúcida del sistema — <code>backdrop-filter:blur(16px)</code> sobre <code>--glass</code>.</p>
+          <button class="gbtn"><span class="msi" aria-hidden="true" translate="no">visibility</span>Continuar con Google</button>
+        </div>
+      </div>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;">Lleva respaldo sólido para navegadores sin soporte de <code>backdrop-filter</code>: <code>@supports not (backdrop-filter:blur(1px)){ .glass{ background:var(--surface) } }</code>. Es exclusiva de la pantalla de entrada — en el dashboard las superficies son siempre opacas.</p>
     </div>
 
     <div class="comp-block">
