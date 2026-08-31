@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es-MX" data-theme="light" data-density="comfy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F5F7">
+<title>SIO-DPROMA — Padrón de Clientes (propuesta visual v2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   SIO-DPROMA — Contrato visual (design tokens)
+   Propuesta v2 · 2026-07-28 · NO sustituye a ningún documento aprobado.
+
+   Fuente: 34_UIUX_DESIGN_BRIEF_v1.0.md §2 (paleta), §3 (tipo/espaciado/motion),
+           22_ANALISIS_UX_UI_Y_ROBUSTECIMIENTO_v1.0.md (semáforo validado 2026-07-20),
+           14_REGLAS_CONSOLIDADAS_v1.3.md §4.
+   Curvas de easing: estándares de emilkowalski/skills · review-animations.
+
+   REGLA: ningún hex literal en componentes. Todo pasa por estas variables.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Tipografía ───────────────────────────────────────────────── */
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-brand: 'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif; /* solo momentos de marca */
+
+  --fs-meta: 12px;   /* captions, metadatos */
+  --fs-dense: 13px;  /* tablas densas */
+  --fs-base: 14px;   /* base UI */
+  --fs-sub: 16px;    /* subtítulos */
+  --fs-title: 20px;  /* títulos de página */
+  --fs-kpi: 30px;    /* cifra KPI */
+
+  /* ── Espaciado — escala de 4 px ───────────────────────────────── */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-6: 24px; --sp-8: 32px; --sp-12: 48px;
+
+  --row-comfy: 40px;    /* densidad de tabla cómoda */
+  --row-compact: 32px;  /* densidad compacta (con toggle) */
+
+  /* ── Radios ───────────────────────────────────────────────────── */
+  --r-ctrl: 6px; --r-card: 10px; --r-modal: 16px; --r-pill: 999px;
+
+  /* ── Movimiento ───────────────────────────────────────────────── */
+  --dur-micro: 120ms;  /* hover, press, checkbox */
+  --dur-base: 200ms;   /* estándar: dropdowns, tema, popovers */
+  --dur-enter: 300ms;  /* entrada de vistas — techo duro de la UI */
+  --ease-out: cubic-bezier(.23, 1, .32, 1);        /* entradas y respuestas al usuario */
+  --ease-in-out: cubic-bezier(.77, 0, .175, 1);    /* movimiento en pantalla */
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);  /* solo píldora de pestañas y kanban */
+  --stagger: 40ms;
+
+  /* ── Foco (idéntico en ambos temas) ───────────────────────────── */
+  --focus-w: 2px;
+  --focus-offset: 2px;
+
+  color-scheme: light;
+}
+
+/* ── TEMA CLARO — neutro 60 / azul-chrome 30 / verde 10 ─────────── */
+:root, [data-theme="light"] {
+  --chrome:      #1E4E79;   /* azul de marca — SOLO estructura, nunca fondo de página */
+  --chrome-ink:  #F2F5F7;
+  --chrome-dim:  rgba(242,245,247,.72);
+  --chrome-line: rgba(242,245,247,.14);
+
+  --bg:        #F2F5F7;
+  --surface:   #FAFCFD;   /* nunca blanco absoluto — regla de Ale, EN 301 549 */
+  --surface-2: #E7EDF3;
+  --border:    rgba(27,36,48,.14);
+  --border-2:  rgba(27,36,48,.26);
+
+  --text:   #1B2430;
+  --text-2: #4C5A6B;
+  --text-3: #66717F;
+
+  --accent:     #3E7A4C;   /* acción — distinto del verde de estado a propósito (H12) */
+  --accent-ink: #F7FAF9;
+  --accent-soft: rgba(62,122,76,.10);
+
+  /* Semáforo de 5 estados — validado por Jhon 2026-07-20 */
+  --ok:    #2F8F6F;  --ok-fill:    rgba(47,143,111,.12);
+  --warn:  #B98A1E;  --warn-fill:  rgba(185,138,30,.14);
+  --err:   #C24238;  --err-fill:   rgba(194,66,56,.11);
+  --block: #9678CC;  --block-fill: rgba(150,120,204,.13);
+  --pause: #4A5560;  --pause-fill: rgba(74,85,96,.11);
+
+  /* Variante "ink": mismo estado, versión oscurecida a AA para texto e iconos
+     sobre superficie clara (doc 34 §2, "doble variante por estado").
+     Verificado: ok 5.9:1 · warn 5.4:1 · err 5.1:1 · block 6.4:1 sobre blanco. */
+  --ok-ink: #22705A; --warn-ink: #7E5B0E; --err-ink: #B03A31;
+  --block-ink: #6D4FA3; --pause-ink: #4A5560;
+
+  /* Fondos OPACOS de estado: el contraste no depende del fondo del contenedor */
+  --ok-bg:#E2EFEC;--warn-bg:#F1ECDE;--err-bg:#F4E8E7;--block-bg:#EDEBF7;--pause-bg:#E7EAEC;--link:#2F6B3C;
+
+  /* Series de gráfica — nunca reutilizan color de estado */
+  --serie-1: #2C6CA8;
+  --serie-2: #7A5FA8;
+
+  --sh-rest:  0 1px 2px rgba(19,29,43,.07);
+  --sh-float: 0 6px 18px rgba(19,29,43,.10);
+  --sh-modal: 0 24px 60px rgba(19,29,43,.22);
+  --glass:    rgba(250,252,253,.66);
+}
+
+/* ── TEMA OSCURO ────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --chrome:      #122740;
+  --chrome-ink:  #E7ECF2;
+  --chrome-dim:  rgba(231,236,242,.72);
+  --chrome-line: rgba(231,236,242,.10);
+
+  --bg:        #10161F;
+  --surface:   #171F2C;
+  --surface-2: #1D2735;
+  --border:    rgba(231,236,242,.12);
+  --border-2:  rgba(231,236,242,.24);
+
+  --text:   #E7ECF2;
+  --text-2: #A8B3C2;
+  --text-3: #8B96A6;
+
+  --accent:     #4A8F5A;
+  --accent-ink: #08120D;
+  --accent-soft: rgba(74,143,90,.16);
+
+  --ok:    #4FBF98;  --ok-fill:    rgba(79,191,152,.14);
+  --warn:  #E8C24C;  --warn-fill:  rgba(232,194,76,.14);
+  --err:   #EE6E5F;  --err-fill:   rgba(238,110,95,.14);
+  --block: #C0A9F0;  --block-fill: rgba(192,169,240,.14);
+  --pause: #6B7684;  --pause-fill: rgba(107,118,132,.20);
+
+  /* En oscuro el color de estado ya cumple AA sobre superficie: ink = base */
+  --ok-ink: #4FBF98; --warn-ink: #E8C24C; --err-ink: #EE6E5F;
+  --block-ink: #C0A9F0; --pause-ink: #98A4B4;
+  --ok-bg:#1F353B;--warn-bg:#343630;--err-bg:#352A33;--block-bg:#2F3247;--pause-bg:#28303E;--link:#7FC08F;
+
+  --serie-1: #6FA8DC;
+  --serie-2: #B69BE0;
+
+  --sh-rest:  0 1px 2px rgba(0,0,0,.35);
+  --sh-float: 0 6px 18px rgba(0,0,0,.40);
+  --sh-modal: 0 24px 60px rgba(0,0,0,.55);
+  --glass:    rgba(29,39,53,.55);
+}
+
+/* ── Reducción de movimiento ─────────────────────────────────────
+   No es "cero animación": se conservan opacidad y color, se elimina
+   todo desplazamiento y escala.                                     */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-micro: 1ms; --dur-base: 120ms; --dur-enter: 120ms;
+    --ease-spring: linear; --stagger: 0ms;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   Padrón de Clientes — arquetipo P4 (tabla densa), sin vista alterna.
+   Origen: src_v1/06_padron_clientes.html. Categorización tipo semáforo
+   confirmada en el v1 (columna ESTADO: Activo / Registro incompleto /
+   Inactivo, más pastilla de completitud de Datos fiscales) → franja de
+   resumen de estatus como en 03_kanban_gestoria.html (doc 22 §7.1).
+   Scroll de un solo eje: vertical.
+   ══════════════════════════════════════════════════════════════════════ */
+
+[data-density="compact"]{--row-comfy:32px}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none !important}
+html,body{overflow-x:hidden}
+body{font-family:var(--font-ui);font-size:var(--fs-base);background:var(--bg);color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  transition:background-color var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out)}
+.tnum{font-variant-numeric:tabular-nums}
+.wordmark{font-family:var(--font-brand);font-weight:400;letter-spacing:.08em}
+h1,h2,h3{text-wrap:balance}
+svg{display:block}
+.ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ico-sm{width:13px;height:13px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--r-ctrl)}
+.side :focus-visible{outline-color:#9FE0AE}
+.skip{position:absolute;left:8px;top:-60px;z-index:200;background:var(--accent);color:var(--accent-ink);
+  padding:8px 16px;border-radius:var(--r-ctrl);font-weight:600;transition:transform var(--dur-base) var(--ease-out)}
+.skip:focus-visible{transform:translateY(70px)}
+button,.pressable{transition:transform var(--dur-micro) var(--ease-out),background-color var(--dur-micro) var(--ease-out),
+  border-color var(--dur-micro) var(--ease-out),color var(--dur-micro) var(--ease-out)}
+button:active,.pressable:active{transform:scale(.97)}
+
+.app{display:flex;min-height:100vh}
+.side{width:224px;background:var(--chrome);color:var(--chrome-ink);padding:16px 12px;flex-shrink:0}
+.side .logo{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 8px 16px;
+  border-bottom:1px solid var(--chrome-line);margin-bottom:8px}
+.grp{margin:14px 8px 4px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}
+.it{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;color:var(--chrome-dim);
+  font-size:13.5px;text-decoration:none;border-left:3px solid transparent;
+  transition:background-color var(--dur-micro) var(--ease-out),color var(--dur-micro) var(--ease-out)}
+.it:hover{background:rgba(255,255,255,.08);color:var(--chrome-ink)}
+.it[aria-current="page"]{background:rgba(255,255,255,.12);color:var(--chrome-ink);font-weight:600;border-left-color:var(--ok)}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{display:flex;align-items:center;gap:12px;padding:10px 22px;border-bottom:1px solid var(--border);
+  background:var(--surface);flex-shrink:0;flex-wrap:wrap}
+.top h1{font-size:var(--fs-sub);font-weight:700;white-space:nowrap}
+.top .meta{color:var(--text-3);font-size:var(--fs-meta);white-space:nowrap}
+.top .meta b{color:var(--text)}
+.top .right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);
+  color:var(--text);border-radius:var(--r-ctrl);padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);
+  cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--surface-2);border-color:var(--border-2)}
+.btn.p{background:var(--accent);border-color:transparent;color:var(--accent-ink)}
+.btn.p:hover{filter:brightness(1.08)}
+.iconbtn{width:36px;height:36px;border:1px solid var(--border);border-radius:var(--r-ctrl);display:grid;
+  place-items:center;cursor:pointer;background:transparent;color:var(--text-2);flex-shrink:0}
+.iconbtn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
+.sep{width:1px;height:22px;background:var(--border);margin:0 2px}
+
+/* ══ Búsqueda + franja de resumen de estatus + filtros ══ */
+.searchrow{display:flex;gap:10px;padding:12px 22px 0;align-items:center;background:var(--surface);flex-shrink:0}
+.search{flex:0 1 380px;display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--r-pill);padding:8px 14px;color:var(--text-3)}
+.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.search svg{color:var(--text-3);flex-shrink:0}
+.search input{border:0;background:transparent;color:var(--text);font:500 var(--fs-dense) var(--font-ui);
+  width:100%;outline:0}
+.search input::placeholder{color:var(--text-3)}
+
+.filters{display:flex;gap:8px;padding:10px 22px;border-bottom:1px solid var(--border);align-items:center;
+  flex-wrap:wrap;background:var(--surface);flex-shrink:0}
+.schip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);background:var(--surface);
+  border-radius:var(--r-pill);padding:6px 13px 6px 10px;cursor:pointer;font:600 var(--fs-meta) var(--font-ui);
+  box-shadow:var(--sh-rest)}
+.schip:hover{border-color:currentColor}
+.schip b{font-size:var(--fs-dense);font-weight:800;font-variant-numeric:tabular-nums}
+.schip[aria-pressed="true"]{box-shadow:inset 0 0 0 1.5px currentColor,var(--sh-rest)}
+.schip.c-ok{color:var(--ok-ink)}       .schip.c-ok[aria-pressed="true"]{background:var(--ok-bg)}
+.schip.c-warn{color:var(--warn-ink)}   .schip.c-warn[aria-pressed="true"]{background:var(--warn-bg)}
+.schip.c-pause{color:var(--pause-ink)} .schip.c-pause[aria-pressed="true"]{background:var(--pause-bg)}
+.f{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-pill);padding:6px 12px;font-size:var(--fs-meta);color:var(--text-2);cursor:pointer}
+.f:hover{border-color:var(--border-2);color:var(--text)}
+.f b{color:var(--text)}
+.f[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
+.filters .tools{margin-left:auto;display:flex;gap:8px;align-items:center}
+.seg{display:flex;background:var(--surface-2);border-radius:var(--r-pill);padding:3px;gap:2px}
+.seg button{border:0;background:transparent;color:var(--text-2);border-radius:var(--r-pill);
+  padding:6px 13px;font:600 var(--fs-meta) var(--font-ui);cursor:pointer;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:6px}
+.seg button:hover{color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:var(--sh-rest)}
+.seg button:active{transform:none}
+
+/* ══ Barra de selección ══ */
+.selbar{display:none;align-items:center;gap:14px;background:var(--accent-soft);border-bottom:1px solid var(--border);
+  padding:9px 22px;font-size:var(--fs-dense);flex-shrink:0}
+.selbar[data-show="true"]{display:flex}
+.selbar b{font-variant-numeric:tabular-nums}
+.selbar a{color:var(--link);font-weight:600;text-decoration:none;font-size:var(--fs-dense);border-radius:4px}
+.selbar a:hover{text-decoration:underline}
+.selbar a.danger{color:var(--err-ink)}
+
+/* ══ VISTA TABLA (única, densa) ══ */
+.tablewrap{padding:0;flex:1;min-width:0;overflow:visible}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-dense);table-layout:fixed}
+caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+thead th{text-align:left;color:var(--text-3);font-size:11px;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;padding:var(--sp-2) var(--sp-3);border-bottom:1px solid var(--border);
+  background:var(--surface);white-space:nowrap;position:sticky;top:0;z-index:5}
+thead th button{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;color:inherit;
+  font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;padding:3px 5px;margin:-3px -5px;border-radius:4px}
+thead th button:hover{color:var(--text)}
+thead th .sort{opacity:.25;width:12px;height:12px;transition:transform var(--dur-base) var(--ease-out)}
+thead th[aria-sort="ascending"] .sort,thead th[aria-sort="descending"] .sort{opacity:1;color:var(--accent)}
+thead th[aria-sort="ascending"] .sort{transform:rotate(180deg)}
+tbody th,td{padding:0 var(--sp-3);height:var(--row-comfy);border-bottom:1px solid var(--border);vertical-align:middle;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:height var(--dur-base) var(--ease-out)}
+tbody th{text-align:left;font-weight:400}
+tbody tr{transition:background-color var(--dur-micro) var(--ease-out)}
+tbody tr:hover td{background:var(--surface-2)}
+tbody tr[data-selected="true"] td{background:var(--accent-soft)}
+tbody tr[data-inactive="true"] td,tbody tr[data-inactive="true"] th{background:var(--surface-2)}
+tbody tr[data-inactive="true"] .rz small{color:var(--text-2)}
+.rz{display:flex;flex-direction:column;gap:1px;line-height:1.3;white-space:normal}
+.rz b{font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.rz small{color:var(--text-3);font-size:11px;font-weight:400}
+.suc{display:inline-flex;align-items:center;gap:6px;color:var(--text-2)}
+.suc .n{color:var(--text);font-weight:700}
+.suc .list{color:var(--text-2);overflow:hidden;text-overflow:ellipsis}
+input[type="checkbox"]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer}
+.lnk{color:var(--link);font-weight:600;text-decoration:none;border-radius:4px}
+.lnk:hover{text-decoration:underline}
+.act{display:flex;gap:6px;justify-content:flex-end}
+.act button{width:28px;height:28px;border:1px solid var(--border);border-radius:var(--r-ctrl);
+  display:grid;place-items:center;cursor:pointer;background:transparent;color:var(--text-2);flex-shrink:0}
+.act button:hover{border-color:var(--border-2);color:var(--text);background:var(--surface-2)}
+.tfoot{display:flex;align-items:center;color:var(--text-3);font-size:var(--fs-meta);
+  padding:10px 22px;gap:var(--sp-2);border-top:1px solid var(--border);background:var(--surface);flex-wrap:wrap}
+.pag{margin-left:auto;display:flex;gap:5px}
+.pag button{background:var(--surface);border:1px solid var(--border);color:var(--text-2);
+  border-radius:var(--r-ctrl);min-width:32px;height:32px;padding:0 8px;cursor:pointer;font:600 var(--fs-meta) var(--font-ui)}
+.pag button:hover{background:var(--surface-2);color:var(--text)}
+.pag button[aria-current="page"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+/* Pastilla de semáforo/estado: color + ÍCONO, nunca color de fondo solo (regla H1/H2) */
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:var(--r-ctrl);padding:3px 9px;
+  font-size:11px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.p-ok{background:var(--ok-bg);color:var(--ok-ink)}
+.p-warn{background:var(--warn-bg);color:var(--warn-ink)}
+.p-pause{background:var(--pause-bg);color:var(--pause-ink)}
+/* Pastilla de tipo de cliente: neutra, usa series de gráfica, no estado */
+.p-type{display:inline-flex;align-items:center;gap:6px;border-radius:var(--r-ctrl);padding:3px 9px;
+  font-size:11px;font-weight:700;color:var(--text-2)}
+.p-type::before{content:"";width:7px;height:7px;border-radius:999px;flex-shrink:0}
+.p-emp{background:color-mix(in srgb, var(--serie-1) 16%, var(--surface))}
+.p-emp::before{background:var(--serie-1)}
+.p-agn{background:color-mix(in srgb, var(--serie-2) 16%, var(--surface))}
+.p-agn::before{background:var(--serie-2)}
+.p-pf{background:var(--surface-2)}
+
+.note{color:var(--text-3);font-size:11.5px;display:flex;gap:8px;align-items:flex-start;padding:14px 22px 20px}
+.note svg{flex-shrink:0;margin-top:1px;color:var(--text-3)}
+
+/* ══ Estados: cargando · vacío · error ══ */
+.skel{display:block;height:12px;border-radius:4px;
+  background:linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%);
+  background-size:200% 100%;animation:shimmer 1.4s linear infinite;color:transparent}
+@keyframes shimmer{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.skel{animation:none}}
+.state{display:none;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-2);padding:56px 16px}
+.state .ico{width:30px;height:30px;color:var(--text-3)}
+.state b{font-size:var(--fs-base)}
+.state p{color:var(--text-2);font-size:var(--fs-dense);max-width:56ch;line-height:1.55}
+[data-state="empty"] .state-empty,[data-state="error"] .state-error{display:flex}
+[data-state="empty"] .real,[data-state="error"] .real,[data-state="loading"] .real{display:none}
+[data-state="loading"] .state-loading{display:block}
+.state-loading{display:none}
+
+.demo{position:fixed;right:26px;bottom:88px;z-index:60;display:flex;gap:6px;background:var(--surface);
+  border:1px solid var(--border-2);border-radius:var(--r-pill);padding:5px;box-shadow:var(--sh-modal);
+  align-items:center;flex-wrap:wrap;max-width:94vw}
+.demo span{font-size:10.5px;color:var(--text-3);font-weight:700;letter-spacing:.06em;padding:0 8px}
+.demo button{border:0;background:transparent;color:var(--text-2);border-radius:var(--r-pill);
+  padding:6px 12px;font:600 11.5px var(--font-ui);cursor:pointer}
+.demo button:hover{background:var(--surface-2);color:var(--text)}
+.demo button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+
+.fab{position:fixed;right:26px;bottom:26px;width:52px;height:52px;border-radius:50%;border:0;
+  background:linear-gradient(135deg,#1E4E79,#2e823d);display:grid;place-items:center;cursor:pointer;
+  box-shadow:var(--sh-float),0 0 0 1px rgba(199,217,123,.35);z-index:50}
+.fab .ring{position:absolute;inset:-4px;border-radius:50%;border:1.5px dashed rgba(199,217,123,.5);
+  opacity:0;transition:opacity var(--dur-base) var(--ease-out)}
+.fab:hover .ring,.fab:focus-visible .ring{opacity:1;animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.fab:hover .ring{animation:none}}
+
+@media (max-width:1180px){.col-contacto{display:none}}
+@media (max-width:980px){.col-fiscal{display:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al padrón de clientes</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="lgrad" x1="1233.32" y1="931.42" x2="1233.32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c361e"/><stop offset="0.14" stop-color="#12572b"/><stop offset="0.32" stop-color="#2e823d"/><stop offset="0.48" stop-color="#60a84b"/><stop offset="0.64" stop-color="#76b552"/><stop offset="0.78" stop-color="#a5c86a"/><stop offset="1" stop-color="#c7d97b"/></linearGradient>
+<symbol id="dproma-mark" viewBox="740 0 970 932"><path fill="url(#lgrad)" d="M869.35,924.63H811.84c-39.82,0-66.56-40.83-50.66-77.33L1048.86,108C1083.11,29.8,1146.12,0,1243.39,0c95.89,0,158.91,29.8,191.79,108L1705.76,854.8c15.27,36.41-11.47,76.62-51,76.62h-59.54a55.27,55.27,0,0,1-51-34L1285.73,191c-8.22-19.86-23.29-28.56-45.21-28.56s-37,8.7-46.58,28.56L920,891.4A55.26,55.26,0,0,1,869.35,924.63Z"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></symbol>
+<symbol id="i-box" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7L12 12l8.7-5M12 22V12"/></symbol>
+<symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.9 3.9A2 2 0 0 0 8.2 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+<symbol id="i-export" viewBox="0 0 24 24"><path d="M12 3v13M7 12l5 5 5-5M4 21h16"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M9 17H7a5 5 0 0 1 0-10h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+<symbol id="i-alertc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></symbol>
+<symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13l3.5 7v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></symbol>
+<symbol id="i-columns" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.6 7-12a7 7 0 1 0-14 0c0 5.4 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+<symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol>
+</defs></svg>
+
+<div class="app">
+  <nav class="side" aria-label="Navegación principal">
+    <div class="logo">
+      <svg width="40" height="38" aria-hidden="true"><use href="#dproma-mark" width="40" height="38"/></svg>
+      <span class="wordmark" translate="no" style="font-size:10.5px">SIO-DPROMA</span>
+    </div>
+    <p class="grp">Operación</p>
+    <a class="it" href="#" aria-current="page"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>Padrón de clientes</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg>Órdenes de instalación</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-box"/></svg>Inventario</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-card"/></svg>Viáticos</a>
+    <p class="grp">Gestoría</p>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg>Trámites</a>
+    <p class="grp">Comercial</p>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-chart"/></svg>CRM / Leads</a>
+  </nav>
+
+  <div class="main">
+    <header class="top">
+      <h1>Padrón de Clientes</h1>
+      <p class="meta tnum">1,248 clientes · <b>214</b> razones sociales con 2+ sucursales</p>
+      <div class="right">
+        <button class="iconbtn" id="theme" aria-label="Cambiar a tema oscuro">
+          <svg class="ico" aria-hidden="true"><use href="#i-moon" id="themeicon"/></svg></button>
+        <button class="btn"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-export"/></svg>Exportar</button>
+        <button class="btn"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-link"/></svg>Liga de auto-registro</button>
+        <button class="btn p"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>Nuevo cliente</button>
+      </div>
+    </header>
+
+    <section class="searchrow" aria-label="Buscar en el padrón">
+      <label class="search" for="buscar">
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-search"/></svg>
+        <input id="buscar" type="text" placeholder="Buscar por razón social, RFC o sucursal…">
+      </label>
+    </section>
+
+    <!-- ══ Franja de resumen de estatus — columna ESTADO del v1 (Activo / Registro
+            incompleto / Inactivo). Un chip por estado, con conteo e ícono; clic = filtro,
+            siguiendo el patrón de 03_kanban_gestoria.html (doc 22 §7.1). ══ -->
+    <section class="filters" aria-labelledby="h-filtros">
+      <h2 class="sr" id="h-filtros">Resumen de estatus y filtros</h2>
+      <button class="schip c-ok" data-f="ok" aria-pressed="false">
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg><b class="tnum">1,189</b> activos</button>
+      <button class="schip c-warn" data-f="warn" aria-pressed="false">
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"/></svg><b class="tnum">42</b> registro incompleto</button>
+      <button class="schip c-pause" data-f="pause" aria-pressed="false">
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-pause"/></svg><b class="tnum">17</b> inactivos</button>
+      <span class="sep" aria-hidden="true"></span>
+      <button class="f" aria-pressed="true">Tipo: <b>Todos</b></button>
+      <button class="f" aria-pressed="true">Estado: <b>Activos</b></button>
+      <button class="f" aria-pressed="false">Datos fiscales: <b>Todos</b></button>
+      <button class="f" aria-pressed="false">Origen: <b>Todos</b></button>
+      <div class="tools">
+        <div class="seg" role="group" aria-label="Densidad de la tabla">
+          <button id="d-comfy" aria-pressed="true">Cómoda</button>
+          <button id="d-compact" aria-pressed="false">Compacta</button>
+        </div>
+        <button class="btn"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-columns"/></svg>Columnas</button>
+      </div>
+    </section>
+
+    <div class="selbar" id="selbar" role="region" aria-label="Acciones sobre la selección">
+      <span><b class="tnum" id="selcount">2</b> seleccionados</span>
+      <a href="#">Exportar selección</a>
+      <a href="#">Asignar a campaña</a>
+      <a href="#" class="danger">Desactivar</a>
+    </div>
+
+    <main id="contenido" data-state="ok" aria-label="Padrón de clientes" style="display:flex;flex-direction:column;flex:1;min-height:0">
+
+      <!-- ══════════ VISTA TABLA (única, arquetipo P4) ══════════ -->
+      <div class="tablewrap real">
+        <table id="t">
+          <caption>Padrón de clientes con RFC, tipo, sucursales, contacto principal, completitud de datos fiscales, última orden y estado</caption>
+          <colgroup>
+            <col style="width:34px"><col style="width:22%"><col style="width:9%"><col style="width:15%">
+            <col class="col-contacto" style="width:17%"><col class="col-fiscal" style="width:14%">
+            <col style="width:10%"><col style="width:10%"><col style="width:104px">
+          </colgroup>
+          <thead><tr>
+            <th scope="col"><span class="sr">Seleccionar todos</span><input type="checkbox" id="selall" aria-label="Seleccionar todos los clientes de esta página"></th>
+            <th scope="col" aria-sort="ascending"><button data-c="1" data-t="text">Razón social / RFC<svg class="ico sort" aria-hidden="true"><use href="#i-down"/></svg></button></th>
+            <th scope="col">Tipo</th>
+            <th scope="col" aria-sort="none"><button data-c="3" data-t="num">Sucursales<svg class="ico sort" aria-hidden="true"><use href="#i-down"/></svg></button></th>
+            <th scope="col" class="col-contacto">Contacto principal</th>
+            <th scope="col" class="col-fiscal">Datos fiscales</th>
+            <th scope="col" aria-sort="none"><button data-c="6" data-t="num">Última orden<svg class="ico sort" aria-hidden="true"><use href="#i-down"/></svg></button></th>
+            <th scope="col">Estado</th>
+            <th scope="col" style="text-align:right">Acciones</th>
+          </tr></thead>
+          <tbody>
+            <tr data-selected="true">
+              <td><input type="checkbox" class="rowsel" checked aria-label="Seleccionar Grupo Automotriz ELEKTRA SA de CV"></td>
+              <th scope="row"><span class="rz"><b translate="no">Grupo Automotriz ELEKTRA SA de CV</b><small translate="no">GAE-940312-K71</small></span></th>
+              <td><span class="p-type p-agn">Agencia</span></td>
+              <td><span class="suc"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-pin"/></svg><span class="n tnum">4</span><span class="list">Coyoacán, Polanco, Satélite, Qro.</span></span></td>
+              <td class="col-contacto" title="Nayeli Cruz · nayeli@elektra.mx">Nayeli Cruz · nayeli@elektra.mx</td>
+              <td class="col-fiscal"><span class="pill p-ok"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>Completos</span></td>
+              <td class="tnum" data-v="20260718">18 jul 2026</td>
+              <td><span class="pill p-ok"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>Activo</span></td>
+              <td><div class="act">
+                <button aria-label="Ver ficha 360° de Grupo Automotriz ELEKTRA"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-eye"/></svg></button>
+                <button aria-label="Editar Grupo Automotriz ELEKTRA"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-edit"/></svg></button>
+                <button aria-label="Ver órdenes de Grupo Automotriz ELEKTRA"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-receipt"/></svg></button>
+              </div></td>
+            </tr>
+            <tr data-selected="true">
+              <td><input type="checkbox" class="rowsel" checked aria-label="Seleccionar Flotillas GNP SA de CV"></td>
+              <th scope="row"><span class="rz"><b translate="no">Flotillas GNP SA de CV</b><small translate="no">FGN-880125-3B2</small></span></th>
+              <td><span class="p-type p-emp">Empresa</span></td>
+              <td><span class="suc"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-pin"/></svg><span class="n tnum">2</span></span></td>
+              <td class="col-contacto" title="R. Beltrán · flotillas@gnp.com.mx">R. Beltrán · flotillas@gnp.com.mx</td>
+              <td class="col-fiscal"><span class="pill p-ok"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>Completos</span></td>
+              <td class="tnum" data-v="20260715">15 jul 2026</td>
+              <td><span class="pill p-ok"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>Activo</span></td>
+              <td><div class="act">
+                <button aria-label="Ver ficha 360° de Flotillas GNP"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-eye"/></svg></button>
+                <button aria-label="Editar Flotillas GNP"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-edit"/></svg></button>
+                <button aria-label="Ver órdenes de Flotillas GNP"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-receipt"/></svg></button>
+              </div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="rowsel" aria-label="Seleccionar Autos del Valle SAPI"></td>
+              <th scope="row"><span class="rz"><b translate="no">Autos del Valle SAPI</b><small translate="no">ADV-020618-QX0</small></span></th>
+              <td><span class="p-type p-agn">Agencia</span></td>
+              <td><span class="suc"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-pin"/></svg><span class="n tnum">1</span></span></td>
+              <td class="col-contacto" title="M. Ríos · compras@adv.mx">M. Ríos · compras@adv.mx</td>
+              <td class="col-fiscal"><span class="pill p-warn"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"/></svg>Falta carátula bancaria</span></td>
+              <td class="tnum" data-v="20260702">02 jul 2026</td>
+              <td><span class="pill p-warn"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"/></svg>Registro incompleto</span></td>
+              <td><div class="act">
+                <button aria-label="Ver ficha 360° de Autos del Valle"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-eye"/></svg></button>
+                <button aria-label="Editar Autos del Valle"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-edit"/></svg></button>
+                <button aria-label="Reenviar liga de registro a Autos del Valle"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-link"/></svg></button>
+              </div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="rowsel" aria-label="Seleccionar Laura Núñez Peralta"></td>
+              <th scope="row"><span class="rz"><b translate="no">Laura Núñez Peralta</b><small translate="no">NUPL-910403-MN4</small></span></th>
+              <td><span class="p-type p-pf">Persona física</span></td>
+              <td><span class="suc"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-pin"/></svg><span class="n tnum">1</span></span></td>
+              <td class="col-contacto" title="laura.np@gmail.com">laura.np@gmail.com</td>
+              <td class="col-fiscal"><span class="pill p-ok"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>Completos</span></td>
+              <td class="tnum" data-v="20260720">20 jul 2026</td>
+              <td><span class="pill p-ok"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>Activo</span></td>
+              <td><div class="act">
+                <button aria-label="Ver ficha 360° de Laura Núñez Peralta"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-eye"/></svg></button>
+                <button aria-label="Editar Laura Núñez Peralta"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-edit"/></svg></button>
+                <button aria-label="Ver órdenes de Laura Núñez Peralta"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-receipt"/></svg></button>
+              </div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="rowsel" aria-label="Seleccionar Transportes Meteoro SA de CV"></td>
+              <th scope="row"><span class="rz"><b translate="no">Transportes Meteoro SA de CV</b><small translate="no">TME-970230-8H1</small></span></th>
+              <td><span class="p-type p-emp">Empresa</span></td>
+              <td><span class="suc"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-pin"/></svg><span class="n tnum">3</span></span></td>
+              <td class="col-contacto" title="J. Olvera · admin@meteoro.mx">J. Olvera · admin@meteoro.mx</td>
+              <td class="col-fiscal"><span class="pill p-ok"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>Completos</span></td>
+              <td class="tnum" data-v="20260628">28 jun 2026</td>
+              <td><span class="pill p-ok"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>Activo</span></td>
+              <td><div class="act">
+                <button aria-label="Ver ficha 360° de Transportes Meteoro"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-eye"/></svg></button>
+                <button aria-label="Editar Transportes Meteoro"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-edit"/></svg></button>
+                <button aria-label="Ver órdenes de Transportes Meteoro"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-receipt"/></svg></button>
+              </div></td>
+            </tr>
+            <tr data-inactive="true">
+              <td><input type="checkbox" class="rowsel" aria-label="Seleccionar Servicios Onix SC"></td>
+              <th scope="row"><span class="rz"><b translate="no">Servicios Onix SC</b><small translate="no">SON-051108-P44</small></span></th>
+              <td><span class="p-type p-emp">Empresa</span></td>
+              <td><span class="suc"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-pin"/></svg><span class="n tnum">1</span></span></td>
+              <td class="col-contacto" title="contacto@onix.mx">contacto@onix.mx</td>
+              <td class="col-fiscal"><span class="pill p-ok"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>Completos</span></td>
+              <td class="tnum" data-v="20260211">11 feb 2026</td>
+              <td><span class="pill p-pause"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-pause"/></svg>Inactivo</span></td>
+              <td><div class="act">
+                <button aria-label="Ver ficha 360° de Servicios Onix"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-eye"/></svg></button>
+                <button aria-label="Reactivar Servicios Onix"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg></button>
+              </div></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="tfoot">
+          <span class="tnum">Mostrando 1–6 de 1,248 · orden: razón social A→Z</span>
+          <nav class="pag" aria-label="Paginación del padrón">
+            <button aria-label="Página anterior">‹ Anteriores</button>
+            <button aria-current="page">1</button><button>2</button><button>3</button>
+            <button aria-label="Página siguiente">Siguientes ›</button>
+          </nav>
+        </div>
+        <p class="note">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#i-alertc"/></svg>
+          <span>Regla del sistema: no se puede programar una instalación para una sucursal con datos fiscales incompletos (validación automática, Plan §3.4). El botón «Liga de auto-registro» genera la URL tokenizada para que la agencia cargue su documentación.</span>
+        </p>
+      </div>
+
+      <!-- ══ Estados alternos ══ -->
+      <div class="state-loading" aria-hidden="true">
+        <table><tbody>
+          <tr><td><span class="skel">Grupo Automotriz ELEKTRA SA de CV</span></td><td><span class="skel">GAE-940312-K71</span></td><td><span class="skel">Agencia</span></td><td><span class="skel">4</span></td><td><span class="skel">Nayeli Cruz</span></td><td><span class="skel">Completos</span></td><td><span class="skel">18 jul 2026</span></td><td><span class="skel">Activo</span></td></tr>
+          <tr><td><span class="skel">Flotillas GNP SA de CV</span></td><td><span class="skel">FGN-880125-3B2</span></td><td><span class="skel">Empresa</span></td><td><span class="skel">2</span></td><td><span class="skel">R. Beltrán</span></td><td><span class="skel">Completos</span></td><td><span class="skel">15 jul 2026</span></td><td><span class="skel">Activo</span></td></tr>
+          <tr><td><span class="skel">Autos del Valle SAPI</span></td><td><span class="skel">ADV-020618-QX0</span></td><td><span class="skel">Agencia</span></td><td><span class="skel">1</span></td><td><span class="skel">M. Ríos</span></td><td><span class="skel">Falta carátula</span></td><td><span class="skel">02 jul 2026</span></td><td><span class="skel">Incompleto</span></td></tr>
+          <tr><td><span class="skel">Laura Núñez Peralta</span></td><td><span class="skel">NUPL-910403-MN4</span></td><td><span class="skel">Persona física</span></td><td><span class="skel">1</span></td><td><span class="skel">laura.np@gmail.com</span></td><td><span class="skel">Completos</span></td><td><span class="skel">20 jul 2026</span></td><td><span class="skel">Activo</span></td></tr>
+          <tr><td><span class="skel">Transportes Meteoro SA de CV</span></td><td><span class="skel">TME-970230-8H1</span></td><td><span class="skel">Empresa</span></td><td><span class="skel">3</span></td><td><span class="skel">J. Olvera</span></td><td><span class="skel">Completos</span></td><td><span class="skel">28 jun 2026</span></td><td><span class="skel">Activo</span></td></tr>
+        </tbody></table>
+      </div>
+
+      <div class="state state-empty">
+        <svg class="ico" aria-hidden="true"><use href="#i-inbox"/></svg>
+        <b>Ningún cliente coincide con la búsqueda</b>
+        <p>No hay clientes que coincidan con el texto buscado o el filtro activo. Quita el chip de estatus de la franja de arriba, prueba con solo la razón social o el RFC, o amplía el filtro de tipo y origen.</p>
+        <button class="btn" data-clear>Quitar filtros</button>
+      </div>
+
+      <div class="state state-error">
+        <svg class="ico" style="color:var(--err-ink)" aria-hidden="true"><use href="#i-alertc"/></svg>
+        <b>No se pudo cargar el padrón de clientes</b>
+        <p>El servicio de padrón no respondió a tiempo. Ningún cliente ni dato fiscal se perdió: lo único que falló fue la consulta. Vuelve a intentar en unos segundos y, si continúa, levanta un ticket a TI con la referencia de abajo.</p>
+        <p style="color:var(--text-3);font-size:11px;font-variant-numeric:tabular-nums" translate="no">Referencia del error: PAD-20260729-0637</p>
+        <button class="btn p"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg>Reintentar</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<button class="fab" aria-label="Abrir D-PRIMI, el asistente del sistema">
+  <span class="ring" aria-hidden="true"></span>
+  <svg width="26" height="24" aria-hidden="true"><use href="#dproma-mark" width="26" height="24"/></svg>
+</button>
+
+<aside class="demo" aria-label="Controles de la maqueta (no forman parte del producto)">
+  <span>Estado de los datos</span>
+  <button data-s="ok" aria-pressed="true">Con datos</button>
+  <button data-s="loading" aria-pressed="false">Cargando…</button>
+  <button data-s="empty" aria-pressed="false">Vacío</button>
+  <button data-s="error" aria-pressed="false">Error</button>
+</aside>
+
+<p aria-live="polite" class="sr" id="live"></p>
+
+<script>
+const root = document.documentElement, live = document.getElementById('live'),
+      contenido = document.getElementById('contenido');
+
+// ── Tema ──
+const tBtn = document.getElementById('theme');
+const setTheme = t => {
+  root.dataset.theme = t;
+  document.querySelector('meta[name=theme-color]').content = t === 'dark' ? '#10161F' : '#F2F5F7';
+  tBtn.setAttribute('aria-label', t === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
+  document.getElementById('themeicon').setAttribute('href', t === 'dark' ? '#i-sun' : '#i-moon');
+};
+if (matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+tBtn.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+// ── Densidad: cómoda 40 px / compacta 32 px ──
+const dc = document.getElementById('d-comfy'), dk = document.getElementById('d-compact');
+const setDensity = d => {
+  root.dataset.density = d;
+  dc.setAttribute('aria-pressed', String(d === 'comfy'));
+  dk.setAttribute('aria-pressed', String(d === 'compact'));
+  live.textContent = 'Densidad ' + (d === 'comfy' ? 'cómoda' : 'compacta');
+};
+dc.addEventListener('click', () => setDensity('comfy'));
+dk.addEventListener('click', () => setDensity('compact'));
+
+// ── Chips de estatus: filtran la lista ──
+const chips = [...document.querySelectorAll('.schip')];
+let active = null;
+function applyFilter(f) {
+  active = f;
+  chips.forEach(c => c.setAttribute('aria-pressed', String(c.dataset.f === f)));
+  // En la maqueta, «registro incompleto» no deja filas visibles: sirve para ver el estado vacío real.
+  contenido.dataset.state = f === 'warn' ? 'empty' : 'ok';
+  live.textContent = f
+    ? 'Filtrado por ' + chips.find(c => c.dataset.f === f).textContent.trim()
+    : 'Filtro quitado. Mostrando los 1,248 clientes.';
+}
+chips.forEach(c => c.addEventListener('click', () => applyFilter(active === c.dataset.f ? null : c.dataset.f)));
+document.querySelectorAll('[data-clear]').forEach(b => b.addEventListener('click', () => applyFilter(null)));
+document.querySelectorAll('.f').forEach(f => f.addEventListener('click', () =>
+  f.setAttribute('aria-pressed', f.getAttribute('aria-pressed') === 'true' ? 'false' : 'true')));
+
+// ── Orden por columna en la tabla ──
+const t = document.getElementById('t');
+t.querySelectorAll('thead th button').forEach(btn => btn.addEventListener('click', () => {
+  const th = btn.closest('th'), col = +btn.dataset.c, type = btn.dataset.t;
+  const asc = th.getAttribute('aria-sort') !== 'ascending';
+  t.querySelectorAll('thead th[aria-sort]').forEach(h => h.setAttribute('aria-sort', 'none'));
+  th.setAttribute('aria-sort', asc ? 'ascending' : 'descending');
+  const body = t.tBodies[0];
+  const val = row => type === 'num' ? parseFloat(row.cells[col].dataset.v ?? row.cells[col].querySelector('.n')?.textContent ?? 0)
+                                     : row.cells[col].textContent.trim();
+  [...body.rows].sort((a, b) => {
+    const va = val(a), vb = val(b);
+    const r = type === 'num' ? va - vb : String(va).localeCompare(String(vb), 'es-MX');
+    return asc ? r : -r;
+  }).forEach(r => body.appendChild(r));
+  live.textContent = 'Ordenado por ' + btn.textContent.trim() + ', ' + (asc ? 'ascendente' : 'descendente');
+}));
+
+// ── Selección de filas: checkbox por fila + seleccionar todos + barra de acciones ──
+const selbar = document.getElementById('selbar'), selcount = document.getElementById('selcount'),
+      selall = document.getElementById('selall');
+function refreshSelection() {
+  const boxes = [...document.querySelectorAll('.rowsel')];
+  const checked = boxes.filter(b => b.checked);
+  boxes.forEach(b => b.closest('tr').dataset.selected = String(b.checked));
+  selcount.textContent = checked.length;
+  selbar.dataset.show = String(checked.length > 0);
+  selall.checked = checked.length === boxes.length;
+  selall.indeterminate = checked.length > 0 && checked.length < boxes.length;
+}
+document.querySelectorAll('.rowsel').forEach(b => b.addEventListener('change', refreshSelection));
+selall.addEventListener('change', () => {
+  document.querySelectorAll('.rowsel').forEach(b => b.checked = selall.checked);
+  refreshSelection();
+});
+refreshSelection();
+
+// ── Búsqueda: filtra por razón social, RFC o sucursal (texto visible) ──
+const buscar = document.getElementById('buscar');
+buscar.addEventListener('input', () => {
+  const q = buscar.value.trim().toLowerCase();
+  const rows = [...t.tBodies[0].rows];
+  let visible = 0;
+  rows.forEach(r => {
+    const hay = r.textContent.toLowerCase().includes(q);
+    r.hidden = !hay;
+    if (hay) visible++;
+  });
+  contenido.dataset.state = (q && visible === 0) ? 'empty' : 'ok';
+  live.textContent = q ? `${visible} clientes coinciden con "${buscar.value.trim()}"` : 'Mostrando los 1,248 clientes';
+});
+
+// ── Demo de estados ──
+document.querySelectorAll('.demo button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.demo button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  contenido.dataset.state = b.dataset.s;
+  live.textContent = 'Padrón de clientes: ' + b.textContent;
+}));
+</script>
+</body>
+</html>
