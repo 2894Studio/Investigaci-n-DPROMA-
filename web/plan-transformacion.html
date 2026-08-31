@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Plan de transformación — DPROMA × 2894 Studio</title>
-<meta name="description" content="Visión, reto y matriz de priorización impacto/esfuerzo del plan de transformación digital de DPROMA." />
+<title>Plan de transformación digital — DPROMA × 2894 Studio</title>
+<meta name="description" content="Plan de transformación digital de DPROMA: diagnóstico, visión y objetivos, columna vertebral del sistema, hipótesis, roadmap, business case, gobernanza y gestión del cambio." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
@@ -92,7 +92,7 @@
   }
 
   a{ color: var(--accent); }
-  a:focus-visible, button:focus-visible{
+  a:focus-visible, button:focus-visible, summary:focus-visible{
     outline: 2px solid var(--accent);
     outline-offset: 3px;
     border-radius: 2px;
@@ -109,6 +109,14 @@
     letter-spacing: -0.01em;
     text-wrap: balance;
     margin: 0;
+  }
+
+  .prose p{ max-width: 66ch; color: var(--text-muted); }
+  .prose p + p{ margin-top: 1em; }
+
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
   }
 
   .eyebrow{
@@ -156,7 +164,7 @@
     text-transform: none;
     letter-spacing: 0;
   }
-  .masthead nav{ display:flex; gap: 1.5rem; }
+  .masthead nav{ display:flex; align-items:center; gap: 1.5rem; flex-wrap: wrap; }
   .masthead nav a{
     font-size: 0.875rem;
     font-weight: 500;
@@ -218,12 +226,6 @@
     max-width: 42ch;
     color: var(--text);
   }
-  .hero .lede{
-    margin-top: 1.5rem;
-    font-size: 1rem;
-    color: var(--text-muted);
-    max-width: 44ch;
-  }
 
   /* Sections */
   section{ padding: clamp(2.5rem, 6vw, 4rem) 0; }
@@ -240,12 +242,33 @@
     font-size: clamp(1.5rem, 3vw, 2rem);
   }
   .section-head .section-note{
-    max-width: 62ch;
+    max-width: 66ch;
     color: var(--text-muted);
     font-size: 0.9375rem;
+    margin: 0;
   }
 
-  /* HMW */
+  /* Reveal-on-scroll utility */
+  .reveal{ opacity:0; transform: translateY(16px); transition: opacity .5s ease, transform .5s ease; }
+  .reveal.is-visible{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion: reduce){
+    .reveal{ opacity:1 !important; transform:none !important; }
+  }
+
+  /* Cards */
+  .card-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  .card-grid.cols-2{ grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 900px){ .card-grid{ grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 560px){ .card-grid, .card-grid.cols-2{ grid-template-columns: 1fr; } }
+  .card{ border-radius: 18px; padding: 1.5rem; display:flex; flex-direction:column; gap: 0.75rem; box-shadow: var(--shadow); }
+  .card-neutral{ background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+  .card-brand{ background: var(--accent); color: var(--on-accent); }
+  .card-dark{ background: var(--dark-surface); color: var(--on-dark); }
+  .card h3{ font-size: 1.0625rem; font-weight: 700; }
+  .card p{ font-size: 0.9375rem; margin:0; opacity: 0.88; }
+  .card-neutral p{ color: var(--text-muted); opacity: 1; }
+
+  /* Reto */
   .hmw-card{
     position: relative;
     overflow: hidden;
@@ -254,6 +277,7 @@
     border-radius: 24px;
     padding: clamp(2rem, 5vw, 3.5rem);
     box-shadow: var(--shadow);
+    margin-bottom: 2rem;
   }
   .hmw-card::before{
     content:"";
@@ -276,251 +300,168 @@
   }
   .hmw-statement{
     position:relative;
+    margin: 0;
     font-size: clamp(1.375rem, 3.2vw, 2rem);
     font-weight: 700;
     line-height: 1.3;
     max-width: 32ch;
   }
 
-  /* Matriz de impacto/esfuerzo (mismo motor que la matriz del informe general) */
-  .matrix-wrap{
-    display:grid;
-    grid-template-columns: 1fr 320px;
-    gap: 2rem;
-    align-items: start;
-  }
-  @media (max-width: 900px){ .matrix-wrap{ grid-template-columns: 1fr; } }
+  /* Bloque destacado dentro de prosa */
+  .callout{ margin-top: 2rem; }
+  .callout p{ font-size: 1rem; max-width: 66ch; }
 
-  .matrix-figure{
-    display:grid;
-    grid-template-columns: 28px 1fr;
-    grid-template-rows: 1fr 28px;
-    gap: 0.5rem 0.75rem;
-  }
-  .matrix-axis-y{
-    grid-column: 1; grid-row: 1;
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-  .matrix-axis-x{
-    grid-column: 2; grid-row: 2;
-    text-align:center;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-  .matrix-plot{
-    grid-column: 2; grid-row: 1;
-    position: relative;
-    aspect-ratio: 1;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    background: var(--surface);
-    box-shadow: var(--shadow);
-  }
-  @media (max-width: 700px){ .matrix-plot{ aspect-ratio: 4 / 5; } }
-  .matrix-plot::before,
-  .matrix-plot::after{
-    content:"";
-    position:absolute;
-    border-color: var(--border);
-  }
-  .matrix-plot::before{ left:0; right:0; top:50%; border-top: 1px dashed var(--border); }
-  .matrix-plot::after{ top:0; bottom:0; left:50%; border-left: 1px dashed var(--border); }
-
-  .matrix-quadrant{
-    position:absolute;
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    opacity: 0.6;
-    pointer-events:none;
-  }
-  .matrix-quadrant.q-tl{ top: 0.85rem; left: 1rem; }
-  .matrix-quadrant.q-tr{ top: 0.85rem; right: 1rem; text-align:right; }
-  .matrix-quadrant.q-bl{ bottom: 0.85rem; left: 1rem; }
-  .matrix-quadrant.q-br{ bottom: 0.85rem; right: 1rem; text-align:right; }
-
-  .pill{
-    position:absolute;
-    transform: translate(-50%, -50%);
-    display:inline-flex;
-    align-items:center;
-    gap: 0.4em;
-    max-width: 150px;
-    padding: 0.4em 0.75em;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--accent);
-    font-family: inherit;
-    font-size: 0.75rem;
-    font-weight: 700;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    box-shadow: var(--shadow);
-    cursor: grab;
-    touch-action: none;
-  }
-  @media (max-width: 700px){ .pill{ max-width: 118px; font-size: 0.6875rem; } }
-  .pill span:last-child{ overflow:hidden; text-overflow:ellipsis; }
-  .pill[aria-pressed="true"]{
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--on-accent);
-    z-index: 4;
-  }
-  .pill.is-dragging{
-    cursor: grabbing;
-    z-index: 5;
-    transform: translate(-50%, -50%) scale(1.06);
+  /* Subtítulo dentro de sección */
+  .subhead{
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--text-muted); margin: 2rem 0 1rem;
   }
 
-  .matrix-side{ display:flex; flex-direction:column; gap: 1rem; }
-  #matrizDetail{ min-height: 210px; border-radius: 18px; padding: 1.5rem; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
-  #matrizDetail h3{ font-size: 1.0625rem; margin-bottom: 0.5rem; }
-  #matrizDetail p{ font-size: 0.9375rem; color: var(--text-muted); margin:0; }
-  .matrix-detail-empty{
-    font-size: 0.9375rem;
-    font-style: italic;
-    color: var(--text-muted);
-    margin: 0;
+  /* Hipótesis colapsables */
+  .finding-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap: 0; border-top: 1px solid var(--border); }
+  .finding{ list-style:none; border-bottom: 1px solid var(--border); }
+  .finding-details > summary{
+    cursor:pointer; list-style:none; display:grid; grid-template-columns: 2.5rem 1fr auto;
+    align-items:center; gap: 1rem; padding: 1.5rem 0;
   }
-  .matrix-controls{ display:flex; flex-wrap:wrap; gap: 1rem; align-items:center; }
-  .matrix-reset{
-    appearance:none;
-    font-family: inherit;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    color: var(--text);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 0.6em 1.1em;
-    cursor:pointer;
-  }
-  .matrix-reset:hover{ color: var(--accent); border-color: var(--accent); }
+  .finding-details > summary::-webkit-details-marker{ display:none; }
+  .finding-details .n{ font-weight: 700; color: var(--accent); font-size: 0.9375rem; }
+  .finding-details summary h3{ font-size: 1.0625rem; font-weight: 700; }
+  .finding-toggle{ position:relative; display:inline-block; width:0.8rem; height:0.8rem; color: var(--accent); transition: transform .2s ease; }
+  .finding-toggle::before, .finding-toggle::after{ content:""; position:absolute; top:50%; left:50%; background:currentColor; transform:translate(-50%,-50%); }
+  .finding-toggle::before{ width:100%; height:2px; }
+  .finding-toggle::after{ width:2px; height:100%; }
+  .finding-details[open] .finding-toggle{ transform: rotate(45deg); }
+  .finding-body{ padding: 0 0 1.5rem calc(2.5rem + 1rem); }
+  .finding-body p{ margin:0; color: var(--text-muted); font-size: 0.9375rem; max-width: 66ch; }
 
-  .matrix-add{ display:flex; flex-wrap:wrap; gap: 0.6rem; }
-  .matrix-add-input{
-    flex: 1 1 160px;
-    min-width: 0;
-    font-family: inherit;
-    font-size: 0.875rem;
-    color: var(--text);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 0.6em 1em;
+  /* Roadmap por horizontes */
+  .horizon-stack{ display:flex; flex-direction:column; gap: 1.5rem; }
+  .horizon{
+    border: 1px solid var(--border); border-radius: 20px; padding: 1.75rem 2rem;
+    background: var(--surface); box-shadow: var(--shadow);
   }
-  .matrix-add-input:focus-visible{
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+  .horizon-head h3{ font-size: 1.25rem; margin-top: 0.4rem; }
+  .horizon-head p{ margin: 0.6rem 0 0; color: var(--text-muted); font-size: 0.9375rem; max-width: 66ch; }
+  .horizon-impact{
+    margin-top: 1.1rem; padding-left: 1rem;
+    border-left: 3px solid var(--accent-soft);
   }
-  .matrix-add-btn{
-    appearance:none;
-    font-family: inherit;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    color: var(--on-accent);
-    background: var(--accent);
-    border: 1px solid var(--accent);
-    border-radius: 999px;
-    padding: 0.6em 1.1em;
-    cursor:pointer;
-    white-space: nowrap;
+  .horizon-impact-l{
+    display:block; font-size: 0.6875rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
   }
-  .matrix-add-btn:hover{ opacity: 0.9; }
+  .horizon-impact p{ margin: 0.3rem 0 0; color: var(--text); font-size: 0.9375rem; max-width: 66ch; }
+  .horizon-tracks{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; margin-top: 1.5rem; }
+  @media (max-width: 760px){ .horizon-tracks{ grid-template-columns: 1fr; gap: 1.5rem; } }
+  .horizon-track h4{
+    margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted);
+  }
+  .track-list{ list-style:none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
+  .track-list li{
+    padding: 0.7rem 0; border-bottom: 1px solid var(--border);
+    color: var(--text-muted); font-size: 0.9375rem;
+  }
+  .track-list li::before{ content:"•"; color: var(--accent); font-weight: 700; margin-right: 0.6em; }
 
-  .matrix-detail-actions{ display:flex; flex-wrap:wrap; gap: 0.6rem; margin-top: 1rem; }
-  .matrix-detail-edit, .matrix-detail-delete, .matrix-detail-cancel{
-    appearance:none;
-    font-family: inherit;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 0.5em 1em;
-    cursor:pointer;
-    color: var(--text);
-  }
-  .matrix-detail-edit:hover{ color: var(--accent); border-color: var(--accent); }
-  .matrix-detail-delete{ color: #c23b3b; border-color: color-mix(in srgb, #c23b3b 40%, var(--border)); }
-  .matrix-detail-delete:hover{ color: #fff; background: #c23b3b; border-color: #c23b3b; }
-  .matrix-detail-cancel:hover{ color: var(--accent); border-color: var(--accent); }
+  /* Cadencia de gobernanza */
+  .cadence-list{ list-style:none; margin: 0; padding: 0; border-top: 1px solid var(--border); max-width: 72ch; }
+  .cadence-list li{ padding: 0.85rem 0; border-bottom: 1px solid var(--border); color: var(--text-muted); font-size: 0.9375rem; }
+  .cadence-list strong{ color: var(--text); }
 
-  .matrix-detail-form{ display:flex; flex-direction:column; gap: 0.6rem; }
-  .matrix-edit-textarea{
-    font-family: inherit;
-    font-size: 0.875rem;
-    color: var(--text);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 0.6em 0.8em;
-    resize: vertical;
-    min-height: 4.5em;
-  }
-  .matrix-edit-textarea:focus-visible, .matrix-detail-edit:focus-visible, .matrix-detail-delete:focus-visible, .matrix-detail-cancel:focus-visible{
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+  /* Do / Don't */
+  .dodont-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap: 1.25rem; margin-top: 2rem; }
+  @media (max-width: 560px){ .dodont-grid{ grid-template-columns: 1fr; } }
+  .dodont-grid .card h3{ font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.85; }
+
+  /* Preguntas de cierre */
+  .question-list{ list-style:none; margin: 0; padding: 0; display:flex; flex-direction:column; gap: 1.5rem; }
+  .question-list li{
+    font-size: clamp(1.125rem, 2.4vw, 1.5rem);
+    font-weight: 700; line-height: 1.35; max-width: 44ch;
+    padding-left: 1.25rem; border-left: 3px solid var(--accent);
   }
 
-  #matrizPriority{ border-radius: 18px; padding: 1.5rem; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
-  #matrizPriority h3{ font-size: 1.0625rem; margin-bottom: 0.75rem; }
-  #matrizPriority ol{
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    counter-reset: priority-order;
-    display:flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  /* Diagnóstico a dos columnas: el texto a la izquierda y un electro a la
+     derecha, que estaba desaprovechada. Es decorativo, así que se congela con
+     movimiento reducido y lleva su propio control de pausa (WCAG 2.2.2). */
+  .diag-grid{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,.8fr);
+              gap:clamp(1.5rem,4vw,3rem); align-items:center; }
+  @media (max-width:860px){ .diag-grid{ grid-template-columns:minmax(0,1fr); } }
+  /* El propio trazo es el control de pausa, así que es un <button>: se pulsa
+     con el ratón y también con el teclado, y lleva su nombre en aria-label. */
+  .ecg{
+    position:relative; display:block; width:100%; max-width:26rem;
+    padding:.6rem .5rem 1.6rem; margin:0; border:0; background:transparent; cursor:pointer;
   }
-  #matrizPriority li{
-    counter-increment: priority-order;
-    display:flex;
-    align-items:baseline;
-    gap: 0.6em;
-    font-size: 0.875rem;
-    color: var(--text);
-    padding: 0.35em 0;
-    border-bottom: 1px solid var(--border);
+  .ecg-svg{ width:100%; height:auto; overflow:visible; display:block; }
+  .ecg-base, .ecg-live{ fill:none; stroke-linecap:round; stroke-linejoin:round; }
+  .ecg-base{ stroke:var(--border); stroke-width:1.6; }
+  .ecg-live{
+    stroke:var(--accent); stroke-width:2.2;
+    stroke-dasharray:70 930;
+    animation: ecg-run 3.4s linear infinite;
+    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent) 45%, transparent));
   }
-  #matrizPriority li:last-child{ border-bottom: none; }
-  #matrizPriority li::before{
-    content: counter(priority-order);
-    flex: none;
-    font-weight: 700;
-    font-size: 0.75rem;
-    color: var(--accent);
-    min-width: 1.4em;
+  @keyframes ecg-run{ from{ stroke-dashoffset:1000; } to{ stroke-dashoffset:0; } }
+  .ecg.is-paused .ecg-live{ animation-play-state:paused; }
+  /* La pista solo asoma al apuntar o al llegar con el teclado, y se va al
+     salir aunque esté en pausa: el control existe siempre, pero no se queda
+     ahí llamando la atención. */
+  .ecg-hint{
+    position:absolute; left:50%; bottom:-1.1rem; transform:translateX(-50%);
+    font-size:.6875rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--text-muted); opacity:0; transition:opacity .18s ease; pointer-events:none;
+  }
+  .ecg:hover .ecg-hint, .ecg:focus-visible .ecg-hint{ opacity:1; }
+  .ecg:hover .ecg-base{ stroke:color-mix(in srgb, var(--accent) 30%, var(--border)); }
+  @media (prefers-reduced-motion: reduce){
+    /* Sin movimiento: el trazo entero, quieto, y nada que pausar. */
+    .ecg-live{ animation:none; stroke-dasharray:none; opacity:.5; }
+    .ecg{ cursor:default; }
+    .ecg-hint{ display:none; }
   }
 
-  .sr-only{
-    position:absolute;
-    width:1px; height:1px;
-    padding:0; margin:-1px;
-    overflow:hidden;
-    clip:rect(0,0,0,0);
-    white-space:nowrap;
-    border:0;
+  /* Roadmap en pequeño: solo lectura, lee el estado real de la herramienta.
+     Si no hay conexión o falla, se esconde y queda el enlace, que es lo que
+     de verdad tiene que funcionar siempre. */
+  .mini{ margin-top: 2rem; padding: 1.5rem 1.75rem; --st-no:#8b8f9a; --st-curso:#0A46FF; --st-bloq:#b32d2d; --st-hecha:#1c7a4a; }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .mini{ --st-no:#9aa0ac; --st-curso:#5b83ff; --st-bloq:#ff7b7b; --st-hecha:#4bbd83; }
   }
+  :root[data-theme="dark"] .mini{ --st-no:#9aa0ac; --st-curso:#5b83ff; --st-bloq:#ff7b7b; --st-hecha:#4bbd83; }
+  .mini-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+  .mini-head h3{ font-size:1.25rem; }
+  .mini-cta{ font-weight:700; font-size:.9375rem; text-decoration:none; white-space:nowrap;
+             display:inline-flex; align-items:center; min-height:1.6rem; }
+  .mini-note{ margin:.7rem 0 0; color:var(--text-muted); font-size:.9375rem; max-width:66ch; }
+  .mini-body{ margin-top:1.1rem; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:var(--surface); }
+  .mini-axis{ position:relative; height:1.5rem; border-bottom:1px solid var(--border); }
+  .mini-cell{ position:absolute; top:0; bottom:0; padding-left:.4rem; display:flex; align-items:center;
+              font-size:.625rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+              color:var(--text-muted); border-left:1px solid var(--border); white-space:nowrap; overflow:hidden; }
+  .mini-cell:first-child{ border-left:0; }
+  .mini-lane{ position:relative; padding:.4rem 0; border-bottom:1px solid var(--border); }
+  .mini-lane:last-child{ border-bottom:0; }
+  .mini-lane-t{ position:absolute; left:.5rem; top:.3rem; z-index:2; font-size:.5625rem; font-weight:700;
+                letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); }
+  .mini-rows{ position:relative; margin-top:1rem; }
+  .mini-bar{ position:absolute; height:1.15rem; border-radius:4px; display:flex; align-items:center;
+             padding:0 .35rem; font-size:.625rem; white-space:nowrap; overflow:hidden;
+             background:color-mix(in srgb, var(--accent) 15%, var(--surface));
+             border:1px solid var(--accent); color:var(--text); }
+  .mini-bar[data-s="bloqueada"]{ border-color:var(--st-bloq); background:color-mix(in srgb, var(--st-bloq) 14%, var(--surface)); }
+  .mini-bar[data-s="hecha"]{ opacity:.7; }
+  .mini-dot{ flex:none; width:.35rem; height:.35rem; border-radius:50%; margin-right:.25rem; background:var(--st-no); }
+  .mini-bar[data-s="en-curso"] .mini-dot{ background:var(--st-curso); }
+  .mini-bar[data-s="bloqueada"] .mini-dot{ background:var(--st-bloq); }
+  .mini-bar[data-s="hecha"] .mini-dot{ background:var(--st-hecha); }
+  .mini-foot{ display:flex; align-items:center; gap:1rem; flex-wrap:wrap; margin-top:.7rem;
+              font-size:.75rem; color:var(--text-muted); }
+  .mini-key{ display:inline-flex; align-items:center; gap:.3rem; }
+  .mini-key i{ width:.5rem; height:.5rem; border-radius:50%; display:inline-block; font-style:normal; }
+  @media (max-width:640px){ .mini{ padding:1.25rem 1.1rem; } .mini-bar{ font-size:0; padding:0; } }
 
   footer{
     padding: clamp(3rem, 7vw, 4.5rem) 0 3rem;
@@ -543,7 +484,12 @@
   <div class="wrap masthead-inner">
     <a class="wordmark" href="/">2894 <span>Studio × DPROMA</span></a>
     <nav>
-      <a href="/">← Informe general</a>
+      <a href="/">Informe general</a>
+      <a href="#diagnostico">Diagnóstico</a>
+      <a href="#vision">Visión</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#gobernanza">Gobernanza</a>
+      <a href="/roadmap">Road Map</a>
       <a class="nav-cta" href="/entregables">Entregables</a>
     </nav>
   </div>
@@ -555,68 +501,376 @@
     <div class="cloud-grid-glow" id="cloudGridGlow"></div>
   </div>
   <div class="wrap hero-inner">
-    <div class="eyebrow">Plan de transformación</div>
-    <h1>DPROMA deja de ser una operación que depende de la memoria y disponibilidad de cada persona, para convertirse en la gestoría y proveedora de infraestructura de carga en México donde cualquier cliente, socio o colaborador puede ver, en cualquier momento, el estado exacto de lo que le importa.</h1>
+    <div class="eyebrow">Plan de transformación digital</div>
+    <h1>DPROMA deja de operar dependiente de la memoria y disponibilidad de cada persona, para convertirse en la gestoría y proveedora de infraestructura de carga en México donde cualquier cliente, socio o colaborador puede ver, en cualquier momento, el estado exacto de lo que le importa.</h1>
   </div>
 </section>
 
-<section id="reto">
+<section id="diagnostico">
   <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow">El reto</div>
-      <h2>Cómo lo resolvemos</h2>
+    <div class="section-head reveal">
+      <div class="eyebrow">Briefing</div>
+      <h2>Diagnóstico</h2>
     </div>
-    <div class="hmw-card">
-      <span class="hmw-tag">How might we</span>
-      <p class="hmw-statement">¿Cómo podríamos darle a cada cliente, socio y colaborador de DPROMA visibilidad inmediata y confiable de lo que necesita, sin depender de que alguien esté disponible para contestar?</p>
+    <div class="diag-grid">
+      <div class="prose reveal">
+        <p>Actualmente DPROMA gestiona la mayoría de sus operaciones de forma manual y dispersa. No existe una herramienta centralizada: la información se registra en hojas de cálculo (Excel), sin formatos comunes entre áreas. Las coordinaciones internas, con instaladores y clientes se realizan en gran medida por WhatsApp, lo que dificulta el seguimiento, la trazabilidad y la generación de reportes.</p>
+        <p>DPROMA opera hoy dos negocios de alto crecimiento, instalación de cargadores eléctricos y gestoría vehicular, sostenidos por la memoria y disponibilidad de las personas, sin una capa digital que centralice información, sin gobernanza sobre cómo se usan los datos o la IA, y sin un solo panel donde la dirección pueda ver el estado real de la operación.</p>
+      </div>
+      <button type="button" class="ecg reveal" id="ecgToggle" aria-pressed="false"
+              aria-label="Electrocardiograma decorativo en movimiento. Púlsalo para pausarlo.">
+        <svg class="ecg-svg" viewBox="0 8 120 56" aria-hidden="true">
+          <path class="ecg-base" pathLength="1000" d="M0,40 h18 q5,-7 10,0 h8 l4,3 l5,-26 l5,38 l4,-15 h10 q8,-9 16,0 h40"/>
+          <path class="ecg-live" pathLength="1000" d="M0,40 h18 q5,-7 10,0 h8 l4,3 l5,-26 l5,38 l4,-15 h10 q8,-9 16,0 h40"/>
+        </svg>
+        <span class="ecg-hint" aria-hidden="true">Pausar</span>
+      </button>
     </div>
   </div>
 </section>
 
-<section id="matriz">
+<section id="vision">
   <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow">Priorización</div>
-      <h2>Matriz de impacto y esfuerzo</h2>
-      <p class="section-note">Arrastra cualquier iniciativa si el equipo prioriza distinto.</p>
+    <div class="section-head reveal">
+      <div class="eyebrow">Plan de transformación digital</div>
+      <h2>Visión y objetivos</h2>
     </div>
-    <div class="matrix-wrap">
-      <div class="matrix-figure">
-        <div class="matrix-axis-y" aria-hidden="true">Impacto</div>
-        <div class="matrix-plot" id="matrizPlot">
-          <span class="matrix-quadrant q-tl" aria-hidden="true">Grandes apuestas</span>
-          <span class="matrix-quadrant q-tr" aria-hidden="true">Quick wins</span>
-          <span class="matrix-quadrant q-bl" aria-hidden="true">Evitar</span>
-          <span class="matrix-quadrant q-br" aria-hidden="true">Rellenos</span>
+
+    <div class="hmw-card reveal">
+      <span class="hmw-tag">Reto</span>
+      <p class="hmw-statement">¿Cómo diseñamos una operativa apoyada en Inteligencia Artificial donde la información esté disponible en todo momento y sea accesible únicamente para las personas correctas?</p>
+    </div>
+
+    <h3 class="subhead reveal">Objetivos de negocio</h3>
+    <div class="card-grid reveal">
+      <div class="card card-neutral"><p>Centralizar información operativa, comercial, financiera y jurídica en una sola herramienta.</p></div>
+      <div class="card card-neutral"><p>Conocer a profundidad cómo opera cada área para identificar cuellos de botella y qué flujos tienen mayor impacto y viabilidad para integrar IA.</p></div>
+      <div class="card card-neutral"><p>Integrar la IA de forma efectiva y responsable.</p></div>
+      <div class="card card-neutral"><p>Estandarizar procesos y formatos entre áreas.</p></div>
+      <div class="card card-neutral"><p>Formar al equipo en Gemini para lograr adopción real.</p></div>
+      <div class="card card-neutral"><p>Dotar a instaladores de campo de app móvil funcional en modo offline.</p></div>
+    </div>
+
+    <div class="callout card card-dark reveal">
+      <h3>Visión de crecimiento</h3>
+      <p>Expansión activa del equipo, horizonte de expansión a Latinoamérica y la herramienta interna como propuesta de valor que posiciona a DPROMA como empresa tecnológica.</p>
+    </div>
+  </div>
+</section>
+
+<section id="columna-vertebral">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Plan de transformación digital</div>
+      <h2>Columna vertebral del sistema</h2>
+    </div>
+    <div class="prose reveal">
+      <p>La columna vertebral es la base de información de negocio que todas las áreas deberían compartir y a las cuáles tener acceso, cliente, orden de servicio/instalación, vehículo, material/inventario, responsable, cómo se relacionan entre sí. La columna vertebral debería estar pensada además desde cuáles son los datos fundamentales, dónde viven, cuál es su nomenclatura estándar y en qué momento y bajo qué regla se captura cada dato.</p>
+      <p>El equipo construye la herramienta internamente, por áreas y prioridad. Ya hay diseño técnico avanzado en inventario (umbrales de stock, despacho parcial/completo, semáforo sobre saldos).</p>
+      <p>Antes de construir cada modulo o flujo de la herramienta se debería resolver la pregunta: ¿qué está listo hoy para soportar la transformación, y qué no? (datos limpios, sistemas integrados, procesos documentados...) Para esto se recomienda una sesión dedicada dentro de la cadencia ya existente con Jonathan de Martes y Viernes, para resolver esta pregunta.</p>
+    </div>
+    <div class="callout card card-dark reveal">
+      <p>Construir la herramienta sin resolver esto primero significa construir la misma fragmentación de hoy, solo que dentro de un sistema donde corregirla después es mucho más caro que corregirla en Excel.</p>
+    </div>
+  </div>
+</section>
+
+<section id="hipotesis">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Plan de transformación digital</div>
+      <h2>Hipótesis de transformación</h2>
+      <p class="section-note">Cada hipótesis se construye sobre evidencia directa de las entrevistas.</p>
+    </div>
+
+    <ol class="finding-list">
+      <li class="finding reveal">
+        <details class="finding-details">
+          <summary>
+            <span class="n">H1</span>
+            <h3>Validación de datos críticos en el alta del cliente</h3>
+            <span class="finding-toggle" aria-hidden="true"></span>
+          </summary>
+          <div class="finding-body">
+            <p>Si centralizamos la validación de datos críticos (TO, VIN, orden de servicio) en el alta del cliente y no en la facturación, esperamos reducir a cero las pérdidas por errores de datos.</p>
+          </div>
+        </details>
+      </li>
+      <li class="finding reveal">
+        <details class="finding-details">
+          <summary>
+            <span class="n">H2</span>
+            <h3>Gobernanza de datos antes de construir los módulos</h3>
+            <span class="finding-toggle" aria-hidden="true"></span>
+          </summary>
+          <div class="finding-body">
+            <p>Si definimos una política de gobernanza de datos (dueños, permisos, repositorios únicos) antes de construir los módulos de SIO, esperamos evitar que la herramienta herede la confusión de roles que hoy existe y la información esté segura.</p>
+          </div>
+        </details>
+      </li>
+      <li class="finding reveal">
+        <details class="finding-details">
+          <summary>
+            <span class="n">H3</span>
+            <h3>Evidencia fotográfica como dato de primera clase</h3>
+            <span class="finding-toggle" aria-hidden="true"></span>
+          </summary>
+          <div class="finding-body">
+            <p>Si tratamos la evidencia fotográfica y de video como dato de primera clase (con estructura y momento de captura definidos) en lugar de adjunto secundario, esperamos que el registro de instalaciones sea auditable.</p>
+          </div>
+        </details>
+      </li>
+      <li class="finding reveal">
+        <details class="finding-details">
+          <summary>
+            <span class="n">H4</span>
+            <h3>Portal de autoservicio para clientes y agencias</h3>
+            <span class="finding-toggle" aria-hidden="true"></span>
+          </summary>
+          <div class="finding-body">
+            <p>Si implementamos un portal de autoservicio para clientes y agencias (B2C / B2B) con estatus de trámite en tiempo real, esperamos reducir las consultas de seguimiento por WhatsApp.</p>
+          </div>
+        </details>
+      </li>
+      <li class="finding reveal">
+        <details class="finding-details">
+          <summary>
+            <span class="n">H5</span>
+            <h3>Capacitación de IA segmentada por tipo de tarea</h3>
+            <span class="finding-toggle" aria-hidden="true"></span>
+          </summary>
+          <div class="finding-body">
+            <p>Si segmentamos la capacitación de IA por tipo de tarea y no por jerarquía, esperamos una adopción más homogénea en el equipo entre quienes la usan a día de hoy y quienes desconfían de sus capacidades.</p>
+          </div>
+        </details>
+      </li>
+      <li class="finding reveal">
+        <details class="finding-details">
+          <summary>
+            <span class="n">H6</span>
+            <h3>El semáforo como patrón visual estándar</h3>
+            <span class="finding-toggle" aria-hidden="true"></span>
+          </summary>
+          <div class="finding-body">
+            <p>Si definimos el semáforo como patrón visual estándar en todos los módulos, esperamos que cualquier persona, entienda el estado de un proceso con solo mirarlo.</p>
+          </div>
+        </details>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Plan de transformación digital</div>
+      <h2>Roadmap</h2>
+      <p class="section-note">El roadmap fusiona actividades de dos fuentes, las iniciativas de negocio que fueron priorizadas en el ejercicio de impacto/esfuerzo, y las oportunidades de Discovery que surgieron en el proceso de entrevistas, estas se ubican en el horizonte donde tienen más sentido estratégico y, donde aplica, se vinculan a la iniciativa de negocio con la que conectan.</p>
+      <p class="section-note">Por su parte el roadmap está estructurado en 3 horizontes: Habilitación y Estandarización de Capacidades a corto plazo, Centralización y Optimización Operativa a medio, y Autonomía e Innovación de Producto Propio a largo.</p>
+    </div>
+
+    <div class="horizon-stack">
+      <article class="horizon reveal">
+        <div class="horizon-head">
+          <div class="eyebrow">Corto plazo</div>
+          <h3>Habilitación y Estandarización de Capacidades</h3>
+          <p>Iniciativas de menor esfuerzo y alto impacto, priorizadas para arrancar en paralelo sin depender de módulos aún no construidos.</p>
+          <div class="horizon-impact">
+            <span class="horizon-impact-l">Impacto estratégico y de negocio</span>
+            <p>Nivelación inmediata del equipo, acompañamiento en el proceso de construcción de SIO (diseño, accesibilidad e IA práctica).</p>
+          </div>
         </div>
-        <div class="matrix-axis-x" aria-hidden="true">Esfuerzo</div>
+        <div class="horizon-tracks">
+          <div class="horizon-track">
+            <h4>Negocio</h4>
+            <ul class="track-list">
+              <li>Formación IA audiovisual &amp; marketing</li>
+              <li>Seguimiento continuo con Jonathan (UX, UI, accesibilidad) por cada fase/área construida</li>
+              <li>Acompañamiento en integración de IA en flujos del sistema de operaciones</li>
+              <li>Área de atención al cliente - planteamiento</li>
+            </ul>
+          </div>
+          <div class="horizon-track">
+            <h4>Discovery</h4>
+            <ul class="track-list">
+              <li>Validación obligatoria de TO/VIN/orden de servicio al alta del cliente</li>
+              <li>Definir alcance formal del rol de asistente de dirección antes de diseñar permisos</li>
+              <li>Nomenclatura clara y consistente de perfiles en la herramienta</li>
+              <li>Política de montos pre-aprobados</li>
+              <li>Semáforo como patrón visual estándar en todos los módulos de la herramienta</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="horizon reveal">
+        <div class="horizon-head">
+          <div class="eyebrow">Medio plazo</div>
+          <h3>Centralización y Optimización Operativa</h3>
+          <p>Iniciativas que requieren que módulos operativos ya estén definidos o que tengan una base (gobernanza, patrones UX) para todo lo que viene después.</p>
+          <div class="horizon-impact">
+            <span class="horizon-impact-l">Impacto estratégico y de negocio</span>
+            <p>Adopción transversal de plataformas, nomenclaturas comunes y flujos asistidos por IA. Modelo de trabajo escalable y colaborativo.</p>
+          </div>
+        </div>
+        <div class="horizon-tracks">
+          <div class="horizon-track">
+            <h4>Negocio</h4>
+            <ul class="track-list">
+              <li>Seguimiento continuo con Jonathan (UX, UI, accesibilidad) por cada fase/área construida</li>
+              <li>Acompañamiento en integración de IA en flujos del sistema de operaciones</li>
+              <li>Área de atención al cliente — estructura y capa digital</li>
+              <li>Formación IA para todo el equipo</li>
+            </ul>
+          </div>
+          <div class="horizon-track">
+            <h4>Discovery</h4>
+            <ul class="track-list">
+              <li>"Área personal" del colaborador — contrato, nómina, vacaciones, asistencia, viáticos y firma digital en un solo lugar</li>
+              <li>Política de gobernanza de datos (dueños, permisos, fuente única de verdad)</li>
+              <li>Portal de autoservicio para clientes/agencias con estatus de trámite en tiempo real</li>
+              <li>Proceso único (no por área) para cotización y viáticos</li>
+              <li>Tratar la evidencia fotográfica como dato de primera clase</li>
+              <li>Disponibilizar información entre áreas / canales formales de comunicación</li>
+              <li>Capacitación de IA segmentada por tipo de tarea, no por jerarquía</li>
+              <li>Abordar la desconfianza a la IA desde el uso ético y responsable con conocimiento y criterios claros para incentivar la adopción</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="horizon reveal">
+        <div class="horizon-head">
+          <div class="eyebrow">Largo plazo</div>
+          <h3>Autonomía e Innovación de Producto Propio</h3>
+          <p>Iniciativas de mayor alcance, que dependen de que la base estructural (módulos operativos, gobernanza, atención al cliente manual) esté funcionando.</p>
+          <div class="horizon-impact">
+            <span class="horizon-impact-l">Impacto estratégico y de negocio</span>
+            <p>Maduración hacia el desarrollo de herramientas y capacidades internas propietarias. Se reduce la dependencia de terceros, se crea propiedad intelectual y se abren nuevas ventajas competitivas de negocio.</p>
+          </div>
+        </div>
+        <div class="horizon-tracks">
+          <div class="horizon-track">
+            <h4>Negocio</h4>
+            <ul class="track-list">
+              <li>Análisis de usabilidad de AMPECO</li>
+              <li>Auditoría inicial de la landing actual y estrategia de SEO/posicionamiento</li>
+              <li>Integración con Happy Robot para atención al cliente automatizada</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="mini card card-neutral reveal" id="mini">
+      <div class="mini-head">
+        <h3>Road Map de Iniciativas 2026</h3>
+        <a class="mini-cta" href="/roadmap">Abrir para editarlo →</a>
       </div>
-      <div class="matrix-side">
-        <div id="matrizDetail">
-          <p class="matrix-detail-empty">Selecciona una iniciativa del plano para ver su detalle completo.</p>
-        </div>
-        <form class="matrix-add" id="matrizAddForm">
-          <label class="sr-only" for="matrizAddInput">Nombre de la nueva iniciativa</label>
-          <input type="text" id="matrizAddInput" class="matrix-add-input" placeholder="Nueva iniciativa…" maxlength="80" required />
-          <button type="submit" class="matrix-add-btn">Añadir iniciativa</button>
-        </form>
-        <div id="matrizPriority">
-          <h3>Orden de priorización</h3>
-          <ol id="matrizPriorityList"></ol>
-        </div>
-        <div class="matrix-controls">
-          <button type="button" class="matrix-reset" id="matrizReset">Restablecer posiciones recomendadas</button>
-        </div>
-        <p class="sr-only" role="status" aria-live="polite" id="matrizAnnounce"></p>
+      <p class="mini-note">Las mismas iniciativas sobre un calendario, con sus entregables, su estado
+        y un hilo de comentarios por iniciativa. Ahí se arrastran las fechas y se deja constancia de
+        en qué va cada cosa; aquí abajo, cómo está ahora mismo.</p>
+      <div class="mini-body" id="miniBody" hidden>
+        <div class="mini-axis" id="miniAxis"></div>
+        <div id="miniLanes"></div>
+      </div>
+      <div class="mini-foot" id="miniFoot" hidden>
+        <span class="mini-key"><i style="background:var(--st-no)"></i>No iniciada</span>
+        <span class="mini-key"><i style="background:var(--st-curso)"></i>En curso</span>
+        <span class="mini-key"><i style="background:var(--st-bloq)"></i>Bloqueada</span>
+        <span class="mini-key"><i style="background:var(--st-hecha)"></i>Hecha</span>
+        <span id="miniPend"></span>
       </div>
     </div>
+  </div>
+</section>
+
+<section id="business-case">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Plan de transformación digital</div>
+      <h2>Business case resumido</h2>
+    </div>
+    <div class="prose reveal">
+      <p>Hoy no existen estimaciones de costo para ninguna iniciativa, ni del lado del negocio ni del lado de discovery, más allá de un dato aislado. Por lo cuál en este plan no se reflejan cifras y costos inmediatos ya que no están definidos.</p>
+    </div>
+
+    <h3 class="subhead reveal">Lo único cuantificado hoy</h3>
+    <div class="card-grid cols-2 reveal">
+      <div class="card card-neutral">
+        <h3>Validación de TO/VIN al alta</h3>
+        <p>Caso documentado de disputa cercano a los 2 millones de pesos, atribuible a validar datos críticos al facturar en lugar de al dar de alta al cliente. Costo de implementación bajo, retorno: evitar que se repita.</p>
+      </div>
+      <div class="card card-neutral">
+        <h3>Formación audiovisual &amp; marketing</h3>
+        <p>Costo de formación para 2 personas, no de desarrollo. Retorno esperado: desbloquear la operación de marketing sin esperar al resto de la herramienta.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="gobernanza">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Plan de transformación digital</div>
+      <h2>Modelo de gobernanza</h2>
+    </div>
+    <div class="prose reveal">
+      <p>Este modelo se propone desde cero, porque hoy no existe uno formalizado. Se organiza en tres horizontes de gobernanza, alineados con los horizontes del roadmap.</p>
+    </div>
+
+    <h3 class="subhead reveal">Cadencia propuesta por horizonte</h3>
+    <ul class="cadence-list reveal">
+      <li><strong>Corto (mensual):</strong> Diana + 2894 + Jonathan revisan el roadmap — qué se movió, qué bloqueadores aparecieron, qué quick win puede cerrarse.</li>
+      <li><strong>Medio (trimestral, con Arnulfo):</strong> estado de iniciativas estructurales y decisión sobre adelantar o esperar transformacionales.</li>
+      <li><strong>Largo (semestral / por cierre de fase):</strong> revisión formal Fase 1 → 2 → 3.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="gestion-cambio">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Plan de transformación digital</div>
+      <h2>Gestión del cambio y personas</h2>
+    </div>
+    <div class="prose reveal">
+      <p>La cultura de DPROMA no es un obstáculo, es un activo. La operativa actual se soporta gracias a la voluntad y conocimiento de las personas. El plan de transformación digital supone cambios que van a redefinir la forma en la que todos los profesionales de DPROMA trabajan a día de hoy. Nuevas herramientas, inclusión de IA, necesidad de acelerar la operativa apoyada en tecnología.</p>
+      <p>Es importante acompañar el cambio tecnológico con el cambio cultural y compartir la visión que la capa de liderazgo de DPROMA tiene para todo el equipo.</p>
+      <p>Compartir esta visión, avances, y que pueden aportar todos en cada momento del proceso es crucial para asegurar una transformación global: tecnológica y humana.</p>
+    </div>
+
+    <div class="dodont-grid reveal">
+      <div class="card card-brand">
+        <h3>Do</h3>
+        <p>Comunicar cada quick win entregado como evidencia.</p>
+      </div>
+      <div class="card card-dark">
+        <h3>Don't</h3>
+        <p>No lanzar la formación de IA de Fase 3 como evento único para todo el equipo — la adopción hoy es desigual.</p>
+        <p>No presentar la herramienta como reemplazo del criterio de las personas — el objetivo es quitar carga operativa, no criterio.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="preguntas">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Cierre</div>
+      <h2>Preguntas importantes a tener en cuenta</h2>
+    </div>
+    <ul class="question-list reveal">
+      <li>¿La columna vertebral de DPROMA está lista para soportar lo que queremos construir encima? (datos limpios, sistemas integrados, procesos documentados)</li>
+      <li>¿Qué capa de servicios digitales queremos construir, y en qué orden?</li>
+    </ul>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
     <div class="footer-meta">
-      <span>2894 Studio × DPROMA — plan de transformación, agosto 2026</span>
+      <span>2894 Studio × DPROMA — plan de transformación digital, agosto 2026</span>
       <a href="/">← Volver al informe general</a>
     </div>
   </div>
@@ -643,284 +897,120 @@
     glow.style.opacity = '0';
   });
 })();
+
+/* Reveal-on-scroll genérico */
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var els = document.querySelectorAll('.reveal');
+  if(reduced || !('IntersectionObserver' in window)){
+    els.forEach(function(el){ el.classList.add('is-visible'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('is-visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+  els.forEach(function(el){ io.observe(el); });
+})();
+
+/* Pausa del electro: arranca solo, se repite y convive con el texto, así que
+   necesita una forma de pararlo (WCAG 2.2.2). */
+(function(){
+  var ecg = document.getElementById('ecgToggle');
+  if(!ecg) return;
+  var pista = ecg.querySelector('.ecg-hint');
+  ecg.addEventListener('click', function(){
+    var quieto = ecg.classList.toggle('is-paused');
+    ecg.setAttribute('aria-pressed', quieto ? 'true' : 'false');
+    ecg.setAttribute('aria-label', quieto
+      ? 'Electrocardiograma decorativo, en pausa. Púlsalo para reanudarlo.'
+      : 'Electrocardiograma decorativo en movimiento. Púlsalo para pausarlo.');
+    if(pista) pista.textContent = quieto ? 'Reanudar' : 'Pausar';
+  });
+})();
 </script>
 
+<script src="/roadmap-config.js"></script>
 <script>
+/* Roadmap en pequeño, solo lectura.
+   Lee el estado real de la herramienta para que esta página no se quede
+   contando un plan que el equipo ya movió. Si no hay conexión, si falla o si
+   no hay nada programado, el bloque se queda escondido y sobrevive el enlace,
+   que es lo único que aquí tiene que funcionar siempre. */
 (function(){
-  var IDEAS = [
-    { rank:'01', title:'Formación audiovisual & marketing', desc:'Formar al equipo en producción de contenido audiovisual y marketing, con Nicole y Jimena.', recX:42, recY:32 },
-    { rank:'02', title:'Seguimiento con Jonathan (UX, UI, Accesibilidad)', desc:'Sesiones periódicas de seguimiento para revisar UX, UI y accesibilidad del sistema en desarrollo.', recX:78, recY:62 },
-    { rank:'03', title:'Acompañamiento integración IA en flujos del sistema de operaciones', desc:'Acompañar la integración de IA dentro de los flujos operativos del sistema, no como capa aparte.', recX:30, recY:88 },
-    { rank:'04', title:'Análisis AMPECO', desc:'Evaluar la plataforma AMPECO y su relación con la operación de administración vehicular.', recX:80, recY:48 },
-    { rank:'05', title:'Formaciones IA', desc:'Formaciones de IA para el equipo, alineadas al objetivo 5 del brief.', recX:58, recY:68 },
-    { rank:'06', title:'Integración Happy Robbot', desc:'Integrar Happy Robbot como canal conversacional adicional del sistema.', recX:38, recY:70 },
-    { rank:'07', title:'Landing DPROMA', desc:'Diseñar y publicar la landing page pública de DPROMA.', recX:50, recY:25 }
-  ];
+  var CFG = window.ROADMAP_CONFIG || {};
+  if(!CFG.url || !CFG.anonKey) return;
 
-  var plot = document.getElementById('matrizPlot');
-  var detail = document.getElementById('matrizDetail');
-  var announce = document.getElementById('matrizAnnounce');
-  var resetBtn = document.getElementById('matrizReset');
-  var addForm = document.getElementById('matrizAddForm');
-  var addInput = document.getElementById('matrizAddInput');
-  var priorityList = document.getElementById('matrizPriorityList');
-  if(!plot || !detail || !announce || !resetBtn || !addForm || !addInput || !priorityList) return;
+  var DAY = 86400000;
+  function dnum(x){ var p = String(x).split('-').map(Number); return Date.UTC(p[0], p[1]-1, p[2]) / DAY; }
+  function addMonths(iso, k){ var p = iso.split('-').map(Number);
+    return new Date(Date.UTC(p[0], p[1]-1+k, p[2])).toISOString().slice(0,10); }
+  var MES3 = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  function esc(t){ var d = document.createElement('div'); d.textContent = t == null ? '' : t; return d.innerHTML; }
 
-  var STORAGE_KEY = 'dproma-matriz-esfuerzo-v1';
-  var CUSTOM_KEY = 'dproma-matriz-custom-v1';
+  var h = { apikey: CFG.anonKey, 'Content-Type':'application/json' };
+  if(/^ey[A-Za-z0-9_-]+\./.test(CFG.anonKey)) h.Authorization = 'Bearer ' + CFG.anonKey;
+  function get(q){
+    return fetch(CFG.url.replace(/\/+$/,'') + '/rest/v1/' + q, { headers:h })
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); });
+  }
 
-  function loadSaved(){
-    try{
-      var raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : {};
-    }catch(e){ return {}; }
-  }
-  function savePos(rank, x, y){
-    try{
-      var saved = loadSaved();
-      saved[rank] = { x:x, y:y };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
-    }catch(e){}
-  }
-  function clearSaved(){
-    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
-  }
-  function loadCustom(){
-    try{
-      var raw = localStorage.getItem(CUSTOM_KEY);
-      return raw ? JSON.parse(raw) : [];
-    }catch(e){ return []; }
-  }
-  function saveCustom(list){
-    try{ localStorage.setItem(CUSTOM_KEY, JSON.stringify(list)); }catch(e){}
-  }
-  function clamp(v){ return Math.max(4, Math.min(96, v)); }
-  function quadrantLabel(x, y){
-    if(x >= 50 && y >= 50) return 'Quick win: impacto alto, esfuerzo bajo';
-    if(x < 50 && y >= 50) return 'Gran apuesta: impacto alto, esfuerzo alto';
-    if(x >= 50 && y < 50) return 'Relleno: impacto bajo, esfuerzo bajo';
-    return 'Evitar: impacto bajo, esfuerzo alto';
-  }
-  function setPos(el, x, y){
-    el.style.left = x + '%';
-    el.style.top = (100 - y) + '%';
-    el.dataset.x = x;
-    el.dataset.y = y;
-  }
-  function escapeHtml(str){
-    var div = document.createElement('div');
-    div.textContent = str == null ? '' : str;
-    return div.innerHTML;
-  }
-  function renderDetail(idea, pill){
-    var actions = '';
-    if(idea.isCustom){
-      actions = '<div class="matrix-detail-actions">' +
-        '<button type="button" class="matrix-detail-edit">Editar</button>' +
-        '<button type="button" class="matrix-detail-delete">Eliminar</button>' +
-        '</div>';
-    }
-    detail.innerHTML =
-      '<h3>' + escapeHtml(idea.title) + '</h3>' +
-      '<p>' + escapeHtml(idea.desc) + '</p>' + actions;
-    if(idea.isCustom){
-      detail.querySelector('.matrix-detail-edit').addEventListener('click', function(){ renderEditForm(idea, pill); });
-      detail.querySelector('.matrix-detail-delete').addEventListener('click', function(){ deleteIdea(idea, pill); });
-    }
-  }
-  function renderEditForm(idea, pill){
-    detail.innerHTML =
-      '<form class="matrix-detail-form">' +
-      '<label class="sr-only" for="matrizEditTitle">Título de la iniciativa</label>' +
-      '<input type="text" id="matrizEditTitle" class="matrix-add-input" maxlength="80" required />' +
-      '<label class="sr-only" for="matrizEditDesc">Descripción de la iniciativa</label>' +
-      '<textarea id="matrizEditDesc" class="matrix-edit-textarea" maxlength="240"></textarea>' +
-      '<div class="matrix-detail-actions">' +
-      '<button type="submit" class="matrix-add-btn">Guardar</button>' +
-      '<button type="button" class="matrix-detail-cancel">Cancelar</button>' +
-      '</div>' +
-      '</form>';
-    var titleInput = detail.querySelector('#matrizEditTitle');
-    var descInput = detail.querySelector('#matrizEditDesc');
-    titleInput.value = idea.title;
-    descInput.value = idea.desc;
-    detail.querySelector('form').addEventListener('submit', function(e){
-      e.preventDefault();
-      var newTitle = titleInput.value.trim();
-      if(!newTitle) return;
-      idea.title = newTitle;
-      idea.desc = descInput.value.trim();
-      pill.dataset.title = idea.title;
-      pill.innerHTML = '<span class="rank">' + escapeHtml(idea.rank) + '</span><span>' + escapeHtml(idea.title) + '</span>';
-      saveCustom(customIdeas);
-      renderPriorityList();
-      renderDetail(idea, pill);
-      announce.textContent = idea.title + ' actualizada.';
+  Promise.all([
+    get('initiatives?select=title,track,start_date,end_date,status,archived&order=start_date.asc'),
+    get('settings?select=value&key=eq.calendar_range')
+  ]).then(function(res){
+    var vivas = (res[0] || []).filter(function(i){ return !i.archived; });
+    var prog  = vivas.filter(function(i){ return i.start_date && i.end_date; });
+    if(!prog.length) return;
+
+    var rango = (res[1] && res[1][0] && res[1][0].value) || { start:'2026-08-01', end:'2026-12-31' };
+    var t0 = dnum(rango.start), t1 = dnum(rango.end);
+    prog.forEach(function(i){                       // que nada quede fuera del dibujo
+      t0 = Math.min(t0, dnum(i.start_date));
+      t1 = Math.max(t1, dnum(i.end_date));
     });
-    detail.querySelector('.matrix-detail-cancel').addEventListener('click', function(){
-      renderDetail(idea, pill);
-    });
-    titleInput.focus();
-  }
-  function deleteIdea(idea, pill){
-    if(!window.confirm('¿Eliminar la iniciativa "' + idea.title + '"?')) return;
-    plot.removeChild(pill);
-    pills = pills.filter(function(p){ return p !== pill; });
-    customIdeas = customIdeas.filter(function(i){ return i !== idea; });
-    saveCustom(customIdeas);
-    try{
-      var s = loadSaved();
-      delete s[idea.rank];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-    }catch(e){}
-    resetDetail();
-    renderPriorityList();
-    announce.textContent = idea.title + ' eliminada.';
-  }
-  function resetDetail(){
-    detail.innerHTML = '<p class="matrix-detail-empty">Selecciona una iniciativa del plano para ver su detalle completo.</p>';
-  }
-  function renderPriorityList(){
-    var order = pills.slice().sort(function(a, b){
-      var scoreA = parseFloat(a.dataset.x) + parseFloat(a.dataset.y);
-      var scoreB = parseFloat(b.dataset.x) + parseFloat(b.dataset.y);
-      return scoreB - scoreA;
-    });
-    priorityList.innerHTML = order.map(function(p){
-      return '<li>' + escapeHtml(p.dataset.title) + '</li>';
-    }).join('');
-  }
+    var dias = Math.max(1, t1 - t0 + 1);
+    function pct(n){ return ((n - t0) / dias * 100) + '%'; }
 
-  var saved = loadSaved();
-  var pills = [];
-  var nextRankNum = IDEAS.length;
-
-  function addPill(idea){
-    var pos = saved[idea.rank] || { x: idea.recX, y: idea.recY };
-    var pill = document.createElement('button');
-    pill.type = 'button';
-    pill.className = 'pill';
-    pill.setAttribute('aria-pressed', 'false');
-    pill.dataset.title = idea.title;
-    pill.innerHTML = '<span class="rank">' + escapeHtml(idea.rank) + '</span><span>' + escapeHtml(idea.title) + '</span>';
-    setPos(pill, pos.x, pos.y);
-    plot.appendChild(pill);
-    pills.push(pill);
-
-    var dragging = false;
-    var moved = false;
-
-    function select(){
-      pills.forEach(function(p){ p.setAttribute('aria-pressed', 'false'); });
-      pill.setAttribute('aria-pressed', 'true');
-      renderDetail(idea, pill);
-    }
-
-    pill.addEventListener('pointerdown', function(e){
-      dragging = true;
-      moved = false;
-      try{ pill.setPointerCapture(e.pointerId); }catch(err){}
-      pill.classList.add('is-dragging');
-    });
-
-    pill.addEventListener('pointermove', function(e){
-      if(!dragging) return;
-      moved = true;
-      var rect = plot.getBoundingClientRect();
-      var x = clamp(((e.clientX - rect.left) / rect.width) * 100);
-      var y = clamp(100 - ((e.clientY - rect.top) / rect.height) * 100);
-      setPos(pill, x, y);
-      renderPriorityList();
-    });
-
-    function endDrag(){
-      if(!dragging) return;
-      dragging = false;
-      pill.classList.remove('is-dragging');
-      var x = parseFloat(pill.dataset.x);
-      var y = parseFloat(pill.dataset.y);
-      if(moved){
-        savePos(idea.rank, x, y);
-        announce.textContent = idea.title + ' — ' + quadrantLabel(x, y);
-        renderPriorityList();
+    var ejeHtml = '', m = rango.start.slice(0,8) + '01';
+    if(dnum(m) > t0) m = new Date(t0 * DAY).toISOString().slice(0,8) + '01';
+    while(dnum(m) <= t1){
+      var sig = addMonths(m, 1);
+      var izq = Math.max(t0, dnum(m)), der = Math.min(t1 + 1, dnum(sig));
+      if(der > izq){
+        ejeHtml += '<span class="mini-cell" style="left:' + pct(izq) + ';width:' +
+                   ((der - izq) / dias * 100) + '%">' + MES3[+m.split('-')[1]-1] + '</span>';
       }
-      select();
+      m = sig;
     }
+    document.getElementById('miniAxis').innerHTML = ejeHtml;
 
-    pill.addEventListener('pointerup', endDrag);
-    pill.addEventListener('pointercancel', endDrag);
-
-    pill.addEventListener('keydown', function(e){
-      var step = e.shiftKey ? 10 : 2;
-      var x = parseFloat(pill.dataset.x);
-      var y = parseFloat(pill.dataset.y);
-      if(e.key === 'Enter' || e.key === ' '){
-        e.preventDefault();
-        select();
-        return;
-      }
-      var changed = true;
-      if(e.key === 'ArrowLeft') x = clamp(x - step);
-      else if(e.key === 'ArrowRight') x = clamp(x + step);
-      else if(e.key === 'ArrowUp') y = clamp(y + step);
-      else if(e.key === 'ArrowDown') y = clamp(y - step);
-      else changed = false;
-      if(changed){
-        e.preventDefault();
-        setPos(pill, x, y);
-        savePos(idea.rank, x, y);
-        announce.textContent = idea.title + ' — ' + quadrantLabel(x, y);
-        renderPriorityList();
-      }
+    var lanes = '';
+    [['negocio','Negocio'], ['discovery','Discovery']].forEach(function(tr){
+      var items = prog.filter(function(i){ return i.track === tr[0]; });
+      if(!items.length) return;
+      var filas = items.map(function(it, k){
+        return '<span class="mini-bar" data-s="' + esc(it.status) + '"' +
+               ' style="left:' + pct(dnum(it.start_date)) + ';width:' +
+               Math.max(1.2, (dnum(it.end_date) - dnum(it.start_date) + 1) / dias * 100) + '%;top:' + (k*22) + 'px"' +
+               ' title="' + esc(it.title) + '">' +
+               '<span class="mini-dot"></span>' + esc(it.title) + '</span>';
+      }).join('');
+      lanes += '<div class="mini-lane"><span class="mini-lane-t">' + tr[1] + '</span>' +
+               '<div class="mini-rows" style="height:' + (items.length*22) + 'px">' + filas + '</div></div>';
     });
+    document.getElementById('miniLanes').innerHTML = lanes;
+    document.getElementById('miniBody').hidden = false;
 
-    return pill;
-  }
-
-  IDEAS.forEach(addPill);
-
-  var customIdeas = loadCustom();
-  customIdeas.forEach(function(idea){
-    idea.isCustom = true;
-    IDEAS.push(idea);
-    addPill(idea);
-    var num = parseInt(idea.rank, 10);
-    if(!isNaN(num) && num > nextRankNum) nextRankNum = num;
-  });
-
-  renderPriorityList();
-
-  resetBtn.addEventListener('click', function(){
-    clearSaved();
-    IDEAS.forEach(function(idea, i){ setPos(pills[i], idea.recX, idea.recY); });
-    pills.forEach(function(p){ p.setAttribute('aria-pressed', 'false'); });
-    resetDetail();
-    renderPriorityList();
-    announce.textContent = 'Posiciones restablecidas a la recomendación de partida.';
-  });
-
-  addForm.addEventListener('submit', function(e){
-    e.preventDefault();
-    var title = addInput.value.trim();
-    if(!title) return;
-    nextRankNum += 1;
-    var rank = String(nextRankNum).padStart(2, '0');
-    var idea = {
-      rank: rank,
-      title: title,
-      desc: 'Iniciativa añadida por el equipo.',
-      recX: 50,
-      recY: 50,
-      isCustom: true
-    };
-    IDEAS.push(idea);
-    var pill = addPill(idea);
-    customIdeas.push(idea);
-    saveCustom(customIdeas);
-    addInput.value = '';
-    renderPriorityList();
-    pill.focus();
-  });
+    var sinFecha = vivas.length - prog.length;
+    document.getElementById('miniPend').textContent =
+      sinFecha ? '· ' + sinFecha + (sinFecha === 1 ? ' iniciativa sin programar' : ' iniciativas sin programar') : '';
+    document.getElementById('miniFoot').hidden = false;
+  }).catch(function(){ /* sin conexión: se queda el enlace y ya */ });
 })();
 </script>
 

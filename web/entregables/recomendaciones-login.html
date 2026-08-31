@@ -1,0 +1,1599 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Recomendaciones Login · Entregables DPROMA × 2894 Studio</title>
+<meta name="description" content="Recomendaciones de UX, UI y accesibilidad para el inicio de sesión, y revisión de las maquetas reales de acceso a SIO-DPROMA con una propuesta corregida navegable." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=check_circle,remove_circle,science,open_in_new&display=block" rel="stylesheet">
+<style>
+:root{
+  --cloud-white: #F7F8FA;
+  --soft-gray: #E6E8EC;
+  --ink-black: #0B0B0D;
+  --deep-cobalt: #0A46FF;
+  --sky-blue: #7DB7FF;
+
+  --bg: var(--cloud-white);
+  --surface: #FFFFFF;
+  --surface-alt: var(--soft-gray);
+  --text: var(--ink-black);
+  --text-muted: #53565f;
+  --border: #d8dbe2;
+  --accent: var(--deep-cobalt);
+  --accent-soft: var(--sky-blue);
+  --on-accent: var(--cloud-white);
+  --on-dark: var(--cloud-white);
+  --dark-surface: var(--ink-black);
+  --dark-surface-text-muted: #b9bec9;
+  --shadow: 0 1px 2px rgba(11,11,13,0.04), 0 8px 24px rgba(11,11,13,0.06);
+  /* Azules de las etiquetas de hallazgo. El acento de marca no llega a 4.5:1
+     sobre los fondos oscuros, así que en tema oscuro cambian de tono. */
+  --chip-ink: var(--deep-cobalt);
+  --chip-cliente-bg: var(--deep-cobalt);
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: #0B0B0D;
+    --surface: #16171c;
+    --surface-alt: #1c1e24;
+    --text: #F7F8FA;
+    --text-muted: #b9bec9;
+    --border: #2a2d35;
+    --accent: #3D6BFF;
+    --accent-soft: #9CC7FF;
+    --on-accent: #F7F8FA;
+    --dark-surface: #000000;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    --chip-ink: #9CC7FF;
+    --chip-cliente-bg: #2A4FC7;
+  }
+}
+:root[data-theme="dark"]{
+  --bg: #0B0B0D;
+  --surface: #16171c;
+  --surface-alt: #1c1e24;
+  --text: #F7F8FA;
+  --text-muted: #b9bec9;
+  --border: #2a2d35;
+  --accent: #3D6BFF;
+  --accent-soft: #9CC7FF;
+  --on-accent: #F7F8FA;
+  --dark-surface: #000000;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  --chip-ink: #9CC7FF;
+  --chip-cliente-bg: #2A4FC7;
+}
+:root[data-theme="light"]{
+  --bg: var(--cloud-white);
+  --surface: #FFFFFF;
+  --surface-alt: var(--soft-gray);
+  --text: var(--ink-black);
+  --text-muted: #53565f;
+  --border: #d8dbe2;
+  --accent: var(--deep-cobalt);
+  --accent-soft: var(--sky-blue);
+  --on-accent: var(--cloud-white);
+  --dark-surface: var(--ink-black);
+  --shadow: 0 1px 2px rgba(11,11,13,0.04), 0 8px 24px rgba(11,11,13,0.06);
+  --chip-ink: var(--deep-cobalt);
+  --chip-cliente-bg: var(--deep-cobalt);
+}
+
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior: auto; }
+  *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+a{ color: var(--accent); }
+a:focus-visible, button:focus-visible, summary:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.wrap{ max-width: 1120px; margin: 0 auto; padding: 0 clamp(1.25rem, 4vw, 2.5rem); }
+
+h1,h2,h3{ font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; margin: 0; }
+
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+.eyebrow{
+  display:inline-flex; align-items:center; gap: 0.5em;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent);
+}
+.eyebrow::before{ content:""; width: 0.5em; height: 0.5em; border-radius: 999px; background: var(--accent); display:inline-block; }
+
+/* Masthead */
+header.masthead{ padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
+.masthead-inner{ display:flex; align-items:center; justify-content:space-between; gap: 1rem; flex-wrap: wrap; }
+.wordmark{ font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em; text-transform: uppercase; text-decoration:none; color: var(--text); }
+.wordmark span{ color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+.masthead nav{ display:flex; align-items:center; gap: 1.5rem; flex-wrap: wrap; }
+.masthead nav a{ font-size: 0.875rem; font-weight: 500; color: var(--text-muted); text-decoration: none; }
+.masthead nav a:hover{ color: var(--accent); }
+.masthead nav a.nav-cta{
+  background: var(--chip-cliente-bg); color: var(--on-accent);
+  padding: 0.45em 1.1em; border-radius: 999px; font-weight: 700;
+}
+.masthead nav a.nav-cta:hover{ background: var(--chip-cliente-bg); opacity:.88; color: var(--on-accent); }
+
+/* Sections */
+section{ padding: clamp(2.5rem, 6vw, 4rem) 0; }
+section + section{ border-top: 1px solid var(--border); }
+.section-head{ display:flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.section-head h2{ font-size: clamp(1.5rem, 3vw, 2rem); margin-top: 0.5rem; }
+.section-head .section-note{ max-width: 56ch; color: var(--text-muted); font-size: 0.9375rem; margin-top: 0.25rem; }
+
+/* Reveal-on-scroll utility */
+.reveal{ opacity:0; transform: translateY(16px); transition: opacity .5s ease, transform .5s ease; }
+.reveal.is-visible{ opacity:1; transform:none; }
+@media (prefers-reduced-motion: reduce){
+  .reveal{ opacity:1 !important; transform:none !important; }
+}
+
+/* Claim con scroll-linked word reveal */
+.claim-scroller{ height: 220vh; position: relative; }
+.claim-sticky{ position: sticky; top: 0; height: 100vh; display:flex; flex-direction:column; justify-content:center; }
+.claim-text{
+  font-size: clamp(2rem, 6vw, 3.75rem);
+  line-height: 1.12;
+  max-width: 16ch;
+}
+.claim-word{ color: var(--text-muted); transition: color .25s ease; }
+.claim-word.is-lit{ color: var(--accent); }
+.claim-scroll-hint{
+  margin-top: 2rem; font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--text-muted); display:flex; align-items:center; gap:0.5em;
+}
+.claim-scroll-hint::after{ content:"↓"; animation: claim-bob 1.6s ease-in-out infinite; }
+@keyframes claim-bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(5px); } }
+@media (prefers-reduced-motion: reduce){
+  .claim-scroller{ height:auto; }
+  .claim-sticky{ position:static; height:auto; padding: clamp(3rem,8vw,5.5rem) 0 clamp(2.5rem,6vw,4rem); }
+  .claim-scroll-hint{ display:none; }
+}
+
+/* Cards (idénticas al resto de entregables) */
+.card{ border-radius: 18px; padding: 1.5rem; display:flex; flex-direction:column; gap: 0.75rem; box-shadow: var(--shadow); }
+.card-neutral{ background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+.card h3{ font-size: 1.0625rem; font-weight: 700; }
+
+.evidence-stack{ display:flex; flex-direction:column; gap: 1.25rem; }
+.evidence-card{ padding: 1.75rem 2rem; }
+
+/* Lista numerada de recomendaciones — mismo ritmo que .resp-list, con contador */
+.rec-list{ list-style:none; margin: 0; padding: 0; counter-reset: rec; border-top: 1px solid var(--border); }
+.rec-list li{
+  counter-increment: rec;
+  display:grid; grid-template-columns: 2.25rem minmax(0,1fr); gap: 0 1rem;
+  padding: 0.85rem 0; border-bottom: 1px solid var(--border);
+  color: var(--text-muted); font-size: 0.9375rem;
+}
+.rec-list li::before{
+  content: counter(rec, decimal-leading-zero);
+  font-weight: 700; color: var(--accent); font-size: 0.8125rem; line-height: 1.7;
+}
+.rec-list li > span{ max-width: 68ch; }
+@media (max-width: 560px){
+  .rec-list li{ grid-template-columns: 1.75rem minmax(0,1fr); gap: 0 0.75rem; }
+}
+
+/* ───────────── Simulaciones wireframe ─────────────
+   Maquetas de baja fidelidad animadas con CSS, sin librerías: enseñan el
+   comportamiento recomendado frente al habitual sin comprometer decisiones
+   visuales que todavía no están tomadas.
+   Cada figura declara su ciclo en --cyc y el fotograma en el que se congela
+   (--freeze) cuando el sistema pide movimiento reducido. */
+.wire{
+  --cyc: 9s;
+  --freeze: -6.2s;
+  --err: #b32d2d; /* 5.1:1 sobre el gris de la maqueta — el mínimo que pide este mismo entregable */
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 1.5rem 1.75rem 1.35rem;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .wire{ --err:#ff7b7b; } }
+:root[data-theme="dark"] .wire{ --err:#ff7b7b; }
+@media (max-width: 560px){ .wire{ padding: 1.25rem 1.1rem 1.1rem; } }
+
+.wire-head{ display:flex; align-items:center; gap:0.5rem 1rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+.wire-head .wire-title{ font-size:1.0625rem; font-weight:700; flex:1 1 16ch; }
+.wire-tag{
+  flex:none; font-size:0.6875rem; font-weight:700; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  padding:0.3em 0.7em; border-radius:999px;
+}
+.wire-toggle{
+  flex:none; appearance:none; font-family:inherit; font-size:0.75rem; font-weight:700;
+  color:var(--text-muted); background:var(--surface); border:1px solid var(--border);
+  border-radius:999px; padding:0 0.95em; min-height:2.25rem; cursor:pointer;
+}
+.wire-toggle:hover{ color:var(--accent); border-color:var(--accent); }
+
+.wire-stage{ display:grid; gap:1.5rem; }
+.wire-stage--split{ grid-template-columns:repeat(2,1fr); }
+@media (max-width: 720px){ .wire-stage--split{ grid-template-columns:1fr; } }
+.wire-panel{ display:flex; flex-direction:column; gap:0.65rem; min-width:0; }
+.wire-panel-label{
+  display:flex; align-items:center; gap:0.45em; font-size:0.75rem; font-weight:700;
+  letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted);
+}
+.wire-panel-label::before{ content:""; width:0.5em; height:0.5em; border-radius:999px; background:currentColor; flex:none; }
+.wire-panel.is-good .wire-panel-label{ color:var(--accent); }
+.wire-panel.is-bad .wire-panel-label{ color:var(--err); }
+.wire figcaption{ margin:1.1rem 0 0; font-size:0.8125rem; line-height:1.5; color:var(--text-muted); max-width:74ch; }
+.wire-refs{ display:block; margin-top:0.35rem; font-weight:700; color: var(--chip-ink); }
+
+/* Maqueta de la pantalla */
+.wf{
+  position:relative; overflow:hidden;
+  border:1.5px solid var(--border); border-radius:12px;
+  background:var(--surface-alt); padding:1.05rem 1.1rem 1.2rem;
+}
+.wf-logo{ width:2.1rem; height:2.1rem; border-radius:7px; border:1.5px dashed var(--border); margin-bottom:0.85rem; }
+.wf-label{ display:block; font-size:0.6875rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.3rem; }
+.wf-field{
+  position:relative; display:flex; align-items:center; gap:0.5rem;
+  height:2.5rem; padding:0 0.7rem; margin-bottom:0.8rem;
+  border:1.5px solid var(--border); border-radius:8px; background:var(--surface);
+}
+.wf-field.is-err{ border-color:var(--err); }
+.wf-field:last-of-type{ margin-bottom:0; }
+.wf-slot{ display:grid; min-width:0; }
+.wf-slot > *{ grid-area:1 / 1; }
+.wf-value{ font-size:0.8125rem; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.wf-value.is-ph{ color:var(--text-muted); }
+.wf-dots{ letter-spacing:0.16em; }
+.wf-eye{ position:relative; margin-left:auto; flex:none; width:1.3rem; height:1.3rem; color:var(--text-muted); }
+.wf-eye svg{ position:absolute; inset:0; width:100%; height:100%; }
+.wf-ico-err{ flex:none; width:1rem; height:1rem; color:var(--err); margin-left:auto; }
+
+.wf-check{ display:flex; align-items:center; gap:0.85rem; margin:0.85rem 0 0.9rem; font-size:0.75rem; color:var(--text-muted); }
+.wf-box{ position:relative; flex:none; width:1.05rem; height:1.05rem; border:1.5px solid var(--border); border-radius:4px; background:var(--surface); }
+
+.wf-btn{
+  position:relative; display:grid; place-items:center;
+  height:2.5rem; margin-top:0.9rem; border-radius:8px;
+  background:var(--accent); color:var(--on-accent);
+  font-size:0.8125rem; font-weight:700;
+}
+.wf-btn > span{ grid-area:1 / 1; display:flex; align-items:center; gap:0.5rem; }
+.wf-spin{ flex:none; width:0.9rem; height:0.9rem; border-radius:50%; border:2px solid currentColor; border-top-color:transparent; }
+
+.wf-msgbox{ min-height:3.6rem; padding-top:0.7rem; }
+.wf-msgbox--sm{ min-height:2.4rem; }
+.wf-msg{ margin:0; display:flex; align-items:flex-start; gap:0.4rem; font-size:0.75rem; line-height:1.35; color:var(--err); }
+.wf-msg .wf-ico{ flex:none; width:0.9rem; height:0.9rem; margin-top:0.08rem; }
+.wf-sub{ margin:0.35rem 0 0; font-size:0.75rem; line-height:1.35; color:var(--text-muted); }
+.wf-link{ display:inline-block; position:relative; margin-top:0.5rem; font-size:0.75rem; font-weight:700; color:var(--accent); }
+.wf-pad{ height:2.4rem; }
+
+/* Cursor y pulsación */
+.wf-cursor{ position:absolute; left:50%; top:50%; z-index:4; width:1.05rem; height:1.05rem; color:var(--text); pointer-events:none; }
+.wf-cursor svg{ width:100%; height:100%; display:block; filter:drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+.wf-ripple{
+  position:absolute; left:50%; top:50%; z-index:3; width:2.4rem; height:2.4rem;
+  margin:-1.2rem 0 0 -1.2rem; border-radius:50%; border:2px solid var(--on-accent); opacity:0; pointer-events:none;
+}
+.wf-ripple--dead{ border-color:var(--text-muted); }
+
+/* Anillo de foco para el recorrido de tabulación */
+.wf-focus{ position:absolute; inset:-5px; border:2px solid var(--accent); border-radius:10px; opacity:0; pointer-events:none; }
+.wf-focus--tight{ inset:-6px; border-radius:8px; }
+/* En objetivos pequeños pegados a su etiqueta, la insignia se pone a la
+   izquierda para no tapar el texto que está justo al lado. */
+.wf-focus--flip .wf-focus-n{ right:auto; left:-11px; }
+.wf-focus-n{
+  position:absolute; top:-10px; right:-10px; width:18px; height:18px; border-radius:50%;
+  background:var(--accent); color:var(--on-accent); font-size:10px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; line-height:1;
+}
+
+/* Tira de peticiones al servidor */
+.wf-net{ display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; margin-top:0.15rem; }
+.wf-net-l{ font-size:0.6875rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-muted); margin-right:0.15rem; }
+.wf-net-c{
+  font-size:0.6875rem; font-weight:700; color:var(--err);
+  border:1px solid color-mix(in srgb, var(--err) 40%, transparent);
+  background: color-mix(in srgb, var(--err) 10%, transparent);
+  border-radius:999px; padding:0.2em 0.6em; opacity:0;
+}
+.wf-net-c.is-ok{
+  color:var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* Etiqueta de estado de la simulación (figura del color) */
+.wire-note{ display:grid; margin-bottom:1rem; font-size:0.75rem; font-weight:700; color:var(--text-muted); min-height:1.2rem; }
+.wire-note > span{ grid-area:1 / 1; }
+
+/* Indicador de tecla */
+.wf-key{
+  display:inline-flex; align-items:center; justify-content:center; min-width:2.6rem; height:1.6rem;
+  border:1.5px solid var(--border); border-bottom-width:3px; border-radius:6px; background:var(--surface);
+  font-size:0.6875rem; font-weight:700; color:var(--text-muted);
+}
+.wf-step{ display:grid; min-height:1.3rem; font-size:0.75rem; font-weight:700; color:var(--accent); }
+.wf-step > span{ grid-area:1 / 1; }
+.wf-keyrow{ display:flex; align-items:center; gap:0.6rem; margin-top:0.9rem; }
+
+/* Motor de animación compartido */
+.wire .wa{
+  animation-duration: var(--d, var(--cyc));
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+.wire .wa--2s{ --d:2s; }
+.wire .wa--spin{ --d:0.75s; animation-name:wf-spin; }
+@keyframes wf-spin{ to{ transform:rotate(360deg) } }
+
+.wire.is-paused .wa{ animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce){
+  /* La regla global de la página fuerza animation-duration a 0.001ms, que
+     dejaría cada simulación en su último fotograma: todo oculto. Aquí se
+     restituye la duración solo para poder congelar la animación, en pausa
+     desde el primer momento, en el fotograma que explica el punto. No hay
+     movimiento en ningún caso; se usa el motor de animación como si fuera
+     una imagen fija. */
+  .wire .wa{
+    animation-duration: var(--d, var(--cyc)) !important;
+    animation-delay: var(--freeze) !important;
+    animation-play-state: paused !important;
+  }
+  .wire .wa--spin{ animation: none !important; }
+  .wire-toggle{ display:none; }
+}
+
+/* Figura 1 — el error conserva lo escrito */
+.wa-c1{ animation-name:w1-cursor; }
+.wa-r1{ animation-name:w1-ripple; }
+.wa-press1{ animation-name:w1-press; }
+.wa-clear{ animation-name:w1-clear; }
+.wa-keep{ animation-name:w1-keep; }
+.wa-err{ animation-name:w1-err; }
+.wa-show{ animation-name:w1-show; }
+@keyframes w1-cursor{
+  0%,8%    { transform:translate(64px,52px); opacity:0 }
+  13%      { transform:translate(64px,52px); opacity:1 }
+  23%      { transform:translate(-4px,2px);  opacity:1 }
+  88%      { transform:translate(-4px,2px);  opacity:1 }
+  95%,100% { transform:translate(-4px,2px);  opacity:0 }
+}
+@keyframes w1-ripple{
+  0%,24%   { opacity:0; transform:scale(.3) }
+  26%      { opacity:.85; transform:scale(.55) }
+  33%,100% { opacity:0; transform:scale(1.5) }
+}
+@keyframes w1-press{ 0%,24%{ transform:none } 26%{ transform:scale(.97) } 29%,100%{ transform:none } }
+@keyframes w1-clear{ 0%,29%{ opacity:1 } 33%,92%{ opacity:0 } 97%,100%{ opacity:1 } }
+@keyframes w1-keep{ 0%,100%{ opacity:1 } }
+@keyframes w1-err{
+  0%,29%   { border-color:var(--border) }
+  33%,92%  { border-color:var(--err) }
+  97%,100% { border-color:var(--border) }
+}
+@keyframes w1-show{ 0%,30%{ opacity:0 } 34%,92%{ opacity:1 } 97%,100%{ opacity:0 } }
+
+/* Figura 2 — el botón dice que está trabajando */
+.wa-c2{ animation-name:w2-cursor; }
+.wa-r2a{ animation-name:w2-r1; }
+.wa-r2b{ animation-name:w2-r2; }
+.wa-r2c{ animation-name:w2-r3; }
+.wa-chip1{ animation-name:w2-chip1; }
+.wa-chip2{ animation-name:w2-chip2; }
+.wa-chip3{ animation-name:w2-chip3; }
+.wa-idle{ animation-name:w2-idle; }
+.wa-busy{ animation-name:w2-busy; }
+.wa-dim{ animation-name:w2-dim; }
+@keyframes w2-cursor{
+  0%,7%    { transform:translate(64px,52px); opacity:0 }
+  12%      { transform:translate(64px,52px); opacity:1 }
+  19%      { transform:translate(-4px,2px);  opacity:1 }
+  23%      { transform:translate(3px,-4px) }
+  27%      { transform:translate(-4px,2px) }
+  31%      { transform:translate(-9px,-3px) }
+  35%      { transform:translate(-4px,2px) }
+  88%      { transform:translate(-4px,2px);  opacity:1 }
+  95%,100% { transform:translate(-4px,2px);  opacity:0 }
+}
+@keyframes w2-r1{ 0%,19%{opacity:0;transform:scale(.3)} 21%{opacity:.85;transform:scale(.55)} 26%,100%{opacity:0;transform:scale(1.5)} }
+@keyframes w2-r2{ 0%,27%{opacity:0;transform:scale(.3)} 29%{opacity:.85;transform:scale(.55)} 34%,100%{opacity:0;transform:scale(1.5)} }
+@keyframes w2-r3{ 0%,35%{opacity:0;transform:scale(.3)} 37%{opacity:.85;transform:scale(.55)} 42%,100%{opacity:0;transform:scale(1.5)} }
+@keyframes w2-chip1{ 0%,20%{opacity:0} 23%,90%{opacity:1} 96%,100%{opacity:0} }
+@keyframes w2-chip2{ 0%,28%{opacity:0} 31%,90%{opacity:1} 96%,100%{opacity:0} }
+@keyframes w2-chip3{ 0%,36%{opacity:0} 39%,90%{opacity:1} 96%,100%{opacity:0} }
+@keyframes w2-idle{ 0%,19%{opacity:1} 22%,92%{opacity:0} 97%,100%{opacity:1} }
+@keyframes w2-busy{ 0%,19%{opacity:0} 22%,92%{opacity:1} 97%,100%{opacity:0} }
+@keyframes w2-dim{ 0%,19%{opacity:1} 22%,92%{opacity:.5} 97%,100%{opacity:1} }
+
+/* Figura 3 — mostrar contraseña */
+.wa-c3{ animation-name:w3-cursor; }
+.wa-r3a{ animation-name:w3-r1; }
+.wa-r3b{ animation-name:w3-r2; }
+.wa-hide{ animation-name:w3-hide; }
+.wa-plain{ animation-name:w3-plain; }
+@keyframes w3-cursor{
+  0%,9%    { transform:translate(40px,40px); opacity:0 }
+  14%      { transform:translate(40px,40px); opacity:1 }
+  22%      { transform:translate(-2px,3px);  opacity:1 }
+  90%      { transform:translate(-2px,3px);  opacity:1 }
+  96%,100% { transform:translate(-2px,3px);  opacity:0 }
+}
+@keyframes w3-r1{ 0%,23%{opacity:0;transform:scale(.3)} 25%{opacity:.85;transform:scale(.5)} 31%,100%{opacity:0;transform:scale(1.4)} }
+@keyframes w3-r2{ 0%,62%{opacity:0;transform:scale(.3)} 64%{opacity:.85;transform:scale(.5)} 70%,100%{opacity:0;transform:scale(1.4)} }
+@keyframes w3-hide{ 0%,24%{opacity:1} 27%,62%{opacity:0} 66%,100%{opacity:1} }
+@keyframes w3-plain{ 0%,24%{opacity:0} 27%,62%{opacity:1} 66%,100%{opacity:0} }
+
+/* Figura 4 — el color no puede ser la única señal */
+.wa-gray{ animation-name:w4-gray; }
+.wa-lab1{ animation-name:w4-lab1; }
+.wa-lab2{ animation-name:w4-lab2; }
+@keyframes w4-gray{ 0%,30%{ filter:none } 38%,86%{ filter:grayscale(1) } 94%,100%{ filter:none } }
+@keyframes w4-lab1{ 0%,30%{opacity:1} 36%,88%{opacity:0} 94%,100%{opacity:1} }
+@keyframes w4-lab2{ 0%,32%{opacity:0} 38%,86%{opacity:1} 92%,100%{opacity:0} }
+
+/* Figura 5 — orden de tabulación */
+.wa-f1{ animation-name:w5-f1; }
+.wa-f2{ animation-name:w5-f2; }
+.wa-f3{ animation-name:w5-f3; }
+.wa-f4{ animation-name:w5-f4; }
+.wa-f5{ animation-name:w5-f5; }
+.wa-f6{ animation-name:w5-f6; }
+.wa-tab{ animation-name:w5-tab; }
+@keyframes w5-f1{ 0%,15.2%{opacity:1} 16.8%,100%{opacity:0} }
+@keyframes w5-f2{ 0%,15.2%{opacity:0} 16.8%,31.9%{opacity:1} 33.5%,100%{opacity:0} }
+@keyframes w5-f3{ 0%,31.9%{opacity:0} 33.5%,48.6%{opacity:1} 50.2%,100%{opacity:0} }
+@keyframes w5-f4{ 0%,48.6%{opacity:0} 50.2%,65.3%{opacity:1} 66.9%,100%{opacity:0} }
+@keyframes w5-f5{ 0%,65.3%{opacity:0} 66.9%,82%{opacity:1} 83.6%,100%{opacity:0} }
+@keyframes w5-f6{ 0%,82%{opacity:0} 83.6%,98%{opacity:1} 99.5%,100%{opacity:0} }
+@keyframes w5-tab{ 0%{transform:scale(1)} 9%{transform:scale(1.15)} 30%,100%{transform:scale(1)} }
+
+.wire-panel .wf{ flex:1 1 auto; }
+.wire-stage--solo{ max-width:23rem; }
+.wf-msgbox--lg{ min-height:5.4rem; }
+
+
+/* ═══ Pestañas ══════════════════════════════════════════════════════════════
+   El aspecto viene de .flow-tabs de las páginas de área; el marcado no: allí
+   hay un role="tablist" con botones que no son pestañas. Aquí sí lo son. */
+.tabs-wrap{ padding: clamp(2rem, 5vw, 3rem) 0 0; }
+.tabs{ display:inline-flex; gap:0.4rem; background:var(--surface-alt); padding:0.3rem;
+  border-radius:999px; border:1px solid var(--border); max-width:100%; flex-wrap:wrap; }
+.tab{ appearance:none; font-family:inherit; font-size:0.875rem; font-weight:700;
+  padding:0.62em 1.25em; border-radius:999px; border:none; background:transparent;
+  color:var(--text-muted); cursor:pointer; min-height:2.5rem;
+  transition: background-color 160ms ease, color 160ms ease; }
+.tab:hover{ color:var(--text); }
+.tab[aria-selected="true"]{ background:var(--chip-cliente-bg); color:var(--on-accent); }
+.tab:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+.tabs-note{ margin-top:0.85rem; font-size:0.8125rem; color:var(--text-muted); max-width:62ch; }
+.panel:focus{ outline:none; }
+.panel[hidden]{ display:none; }
+
+/* ═══ Revisión SIO-DPROMA ═══════════════════════════════════════════════════ */
+.msi{ font-family:'Material Symbols Rounded'; font-weight:normal; font-style:normal;
+  font-size:20px; line-height:1; letter-spacing:normal; text-transform:none;
+  display:inline-block; white-space:nowrap; word-wrap:normal; direction:ltr;
+  width:1em; height:1em; overflow:hidden;
+  -webkit-font-feature-settings:'liga'; -webkit-font-smoothing:antialiased; flex-shrink:0;
+  font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24; }
+
+.sio-lead{ font-size:1rem; line-height:1.65; margin-bottom:1rem; max-width:66ch; }
+.sio-h3{ font-size:1.0625rem; margin-bottom:0.85rem; letter-spacing:-0.01em; }
+.sio-alcance{ list-style:none; margin:1.4rem 0 0; padding:0; display:flex; flex-direction:column; gap:0.7rem; }
+.sio-alcance li{ display:grid; grid-template-columns:auto minmax(0,1fr); gap:0 0.65rem;
+  align-items:start; font-size:0.9375rem; line-height:1.6; color:var(--text-muted); }
+.sio-alcance .msi{ font-size:19px; color:var(--accent); margin-top:2px; }
+.sio-alcance li:last-child .msi{ color:var(--text-muted); }
+
+.hallazgo{ padding: clamp(1.4rem, 3vw, 2rem); }
+.hallazgo-head{ display:grid; grid-template-columns:auto minmax(0,1fr); gap:0 0.85rem;
+  align-items:baseline; }
+.h-num{ font-size:0.75rem; font-weight:700; letter-spacing:0.06em; color:var(--chip-ink);
+  background:var(--surface-alt); border-radius:999px; padding:0.28em 0.7em; flex-shrink:0; }
+.hallazgo-head h3{ font-size:1.0625rem; line-height:1.35; letter-spacing:-0.01em; text-wrap:balance; }
+.h-chips{ display:flex; flex-wrap:wrap; gap:0.35rem; margin:0.85rem 0 0.9rem; }
+.h-chip{ font-size:0.6875rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;
+  color:var(--text-muted); border:1px solid var(--border); border-radius:999px; padding:0.3em 0.7em; }
+.h-chip--cliente{ color:var(--on-accent); background:var(--chip-cliente-bg);
+  border-color:var(--chip-cliente-bg); }
+.hallazgo p{ font-size:0.9375rem; line-height:1.68; color:var(--text-muted); max-width:68ch; }
+.hallazgo p + p{ margin-top:0.85rem; }
+.hallazgo strong{ color:var(--text); font-weight:700; }
+.hallazgo code{ font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:0.86em;
+  background:var(--surface-alt); border-radius:4px; padding:0.1em 0.38em; color:var(--text); }
+.h-prueba{ display:grid; grid-template-columns:auto minmax(0,1fr); gap:0 0.7rem;
+  align-items:start; background:var(--surface-alt);
+  border-radius:10px; padding:0.9rem 1rem; border-left:3px solid var(--accent); }
+.h-prueba .msi{ font-size:19px; color:var(--accent); margin-top:1px; }
+
+/* Los aciertos no son una lista numerada de tareas: se marcan, no se cuentan. */
+.rec-list--ok li::before{ content:"\2713"; font-size:1rem; line-height:1.5; }
+
+/* Tarjeta de apoyo: mismo sistema que .card-neutral, pero se distingue de las
+   fichas de hallazgo para que no se lean como uno más. */
+.card-aparte{ background:var(--surface-alt); border:1px solid var(--border);
+  border-left:3px solid var(--accent); color:var(--text); }
+.card-aparte p{ font-size:0.9375rem; line-height:1.68; color:var(--text-muted); max-width:68ch; }
+.card-aparte strong{ color:var(--text); }
+.copy-prop{ margin-top:1rem; background:var(--surface-alt); border:1px solid var(--border);
+  border-radius:12px; padding:1.15rem 1.25rem; max-width:44ch; }
+.copy-prop-t{ font-size:1rem !important; font-weight:700; color:var(--text) !important;
+  margin-bottom:0.5rem; }
+.copy-prop-btns{ display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.9rem !important; }
+.copy-prop-btns span{ font-size:0.8125rem; font-weight:700; border:1px solid var(--border);
+  border-radius:6px; padding:0.5em 0.9em; color:var(--text); }
+.copy-prop-btns span:first-child{ background:var(--chip-cliente-bg); color:var(--on-accent);
+  border-color:var(--chip-cliente-bg); }
+.copy-prop-ref{ font-size:0.75rem !important; margin-top:0.8rem !important;
+  font-variant-numeric:tabular-nums; letter-spacing:0.03em; }
+
+/* Antes y después */
+.comparativa{ margin-top:0.5rem; }
+.comparativa-par{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:1rem; }
+.lado{ display:flex; flex-direction:column; gap:0.55rem; min-width:0; }
+.lado-et{ font-size:0.6875rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+  color:var(--text-muted); }
+.lado-et--ok{ color:var(--chip-ink); }
+.lado img{ display:block; width:100%; height:auto; border-radius:10px; border:1px solid var(--border);
+  background:var(--surface-alt); }
+.comparativa figcaption{ margin-top:1rem; font-size:0.875rem; line-height:1.65;
+  color:var(--text-muted); max-width:72ch; }
+@media (max-width: 720px){ .comparativa-par{ grid-template-columns:minmax(0,1fr); } }
+
+.sio-cta{ margin-top:1.4rem; }
+.btn-prop{ display:inline-flex; align-items:center; flex-wrap:wrap; max-width:100%;
+  gap:0.55rem; min-height:2.75rem;
+  padding:0.7em 1.3em; border-radius:8px; background:var(--chip-cliente-bg); color:var(--on-accent);
+  text-decoration:none; font-weight:700; font-size:0.9375rem; }
+.btn-prop:hover{ filter:brightness(1.08); }
+.btn-prop .msi{ font-size:19px; }
+
+footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
+.footer-meta{ display:flex; justify-content: space-between; align-items:center; flex-wrap: wrap; gap: 1rem; font-size: 0.8125rem; color: var(--text-muted); }
+.footer-meta a{ color: var(--text-muted); }
+.footer-nav{ margin-bottom: 1.5rem; }
+.footer-nav a{ color: var(--chip-ink); text-decoration:none; font-weight: 500; font-size: 0.9375rem; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="wordmark" href="/">2894 <span>Studio × DPROMA</span></a>
+    <nav>
+      <a href="/">Informe general</a>
+      <a href="#ux">UX</a>
+      <a href="#ui">UI</a>
+      <a href="#accesibilidad">Accesibilidad</a>
+      <a href="#sio">Revisión SIO-DPROMA</a>
+      <a class="nav-cta" href="/entregables">Entregables</a>
+    </nav>
+  </div>
+</header>
+
+<section class="claim-hero" id="claim">
+  <div class="claim-scroller" id="claimScroller">
+    <div class="claim-sticky">
+      <div class="wrap">
+        <div class="eyebrow">Entregable · Recomendaciones</div>
+        <h1 class="claim-text" id="claimText">
+          <span class="claim-word">Recomendaciones</span>
+          <span class="claim-word">para</span>
+          <span class="claim-word">la</span>
+          <span class="claim-word">pantalla</span>
+          <span class="claim-word">de</span>
+          <span class="claim-word">login.</span>
+        </h1>
+        <p class="claim-scroll-hint" id="claimScrollHint">Sigue bajando</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<div class="tabs-wrap">
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Contenido del entregable">
+      <button type="button" class="tab" id="t-general" role="tab"
+              aria-selected="true" aria-controls="p-general">Recomendaciones generales</button>
+      <button type="button" class="tab" id="t-sio" role="tab"
+              aria-selected="false" aria-controls="p-sio" tabindex="-1">Revisión SIO-DPROMA</button>
+    </div>
+    <p class="tabs-note">Las recomendaciones generales valen para cualquier pantalla de acceso. La
+      revisión es sobre las maquetas reales de SIO-DPROMA, con una propuesta corregida que se puede
+      abrir y probar.</p>
+  </div>
+</div>
+
+<div class="panel" id="p-general" role="tabpanel" aria-labelledby="t-general" tabindex="-1">
+<section id="ux">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Recomendaciones Login</div>
+        <h2>UX / Arquitectura de la información</h2>
+      </div>
+    </div>
+
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list">
+          <li><span>Recuerda el email/usuario en el siguiente intento tras un error (nunca borrar el campo entero).</span></li>
+          <li><span>Si hay MFA, indica claramente qué método se usará antes de pedirlo (app authenticator, SMS, email) y ofrece un método de respaldo.</span></li>
+          <li><span>No bloquear el pegado de contraseñas (rompe gestores de contraseñas).</span></li>
+          <li><span>No re-pidas datos ya introducidos en el mismo flujo.</span></li>
+          <li><span>Mensajes de error específicos y accionables, por ejemplo: "La contraseña debe tener al menos 8 caracteres", no sirven mensajes tipo "Dato inválido" que no dan ninguna información del problema real.</span></li>
+          <li><span>Por seguridad, en error de credenciales usa un mensaje neutro ("Usuario o contraseña incorrectos") sin indicar cuál de los dos falló, pero sigue siendo claro y no genérico.</span></li>
+          <li><span>Indica intentos restantes antes de un bloqueo de cuenta, y qué hacer si se bloquea (contactar a TI, link directo).</span></li>
+          <li><span>Feedback de carga visible en el botón de iniciar sesión o login (spinner + texto "Verificando…") para evitar doble click y dar certeza de que algo está pasando.</span></li>
+          <li><span>Usa placeholder para indicar el tipo de dato que debe introducirse en cada campo.</span></li>
+          <li><span>Enlace de "¿Olvidaste tu contraseña?" siempre visible, no solo tras un error.</span></li>
+        </ul>
+      </article>
+
+      <figure class="wire reveal" style="--cyc:9s; --freeze:-6.2s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">Un error no debería borrar lo que ya escribiste</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Lo habitual</span>
+            <div class="wf">
+              <div class="wf-logo"></div>
+              <span class="wf-label">Usuario</span>
+              <div class="wf-field wa wa-err"><span class="wf-value wa wa-clear">operaciones@dproma.mx</span></div>
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field wa wa-err"><span class="wf-value wf-dots wa wa-clear">••••••••••</span></div>
+              <div class="wf-btn wa wa-press1">
+                <span>Iniciar sesión</span>
+                <span class="wf-ripple wa wa-r1"></span>
+                <span class="wf-cursor wa wa-c1"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span>
+              </div>
+              <div class="wf-msgbox wf-msgbox--lg">
+                <p class="wf-msg wa wa-show">Dato inválido</p>
+                <span class="wf-link wa wa-show">¿Olvidaste tu contraseña?</span>
+              </div>
+            </div>
+          </div>
+          <div class="wire-panel is-good">
+            <span class="wire-panel-label">Recomendado</span>
+            <div class="wf">
+              <div class="wf-logo"></div>
+              <span class="wf-label">Usuario</span>
+              <div class="wf-field wa wa-err"><span class="wf-value wa wa-keep">operaciones@dproma.mx</span></div>
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field wa wa-err"><span class="wf-value wf-dots wa wa-clear">••••••••••</span></div>
+              <div class="wf-btn wa wa-press1">
+                <span>Iniciar sesión</span>
+                <span class="wf-ripple wa wa-r1"></span>
+                <span class="wf-cursor wa wa-c1"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span>
+              </div>
+              <div class="wf-msgbox wf-msgbox--lg">
+                <p class="wf-msg wa wa-show"><svg class="wf-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.8 2 20.2h20z"/><path d="M12 9.8v4.4"/><path d="M12 17.3h.01"/></svg>Usuario o contraseña incorrectos</p>
+                <p class="wf-sub wa wa-show">Te quedan 2 de 5 intentos antes del bloqueo.</p>
+                <span class="wf-link">¿Olvidaste tu contraseña?</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption>Las dos pantallas reciben el mismo error. La habitual vacía los dos campos y responde «Dato inválido», que no dice qué corregir, y el enlace de recuperación solo aparece cuando ya se ha fallado. La recomendada conserva el correo, no revela cuál de los dos campos falló, avisa de cuántos intentos quedan y mantiene el enlace visible desde el principio. Reintentar cuesta una contraseña, no un formulario entero.
+          <span class="wire-refs">Puntos 1, 5, 6, 7 y 10</span>
+        </figcaption>
+      </figure>
+      <figure class="wire reveal" style="--cyc:10s; --freeze:-6s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">El botón tiene que decir que está trabajando</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Sin feedback</span>
+            <div class="wf">
+              <div class="wf-logo"></div>
+              <span class="wf-label">Usuario</span>
+              <div class="wf-field"><span class="wf-value">operaciones@dproma.mx</span></div>
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field"><span class="wf-value wf-dots">••••••••••</span></div>
+              <div class="wf-btn">
+                <span>Iniciar sesión</span>
+                <span class="wf-ripple wa wa-r2a"></span>
+                <span class="wf-ripple wa wa-r2b"></span>
+                <span class="wf-ripple wa wa-r2c"></span>
+                <span class="wf-cursor wa wa-c2"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span>
+              </div>
+              <div class="wf-pad"></div>
+            </div>
+            <div class="wf-net">
+              <span class="wf-net-l">Al servidor</span>
+              <span class="wf-net-c wa wa-chip1">POST /login</span>
+              <span class="wf-net-c wa wa-chip2">POST /login</span>
+              <span class="wf-net-c wa wa-chip3">POST /login</span>
+            </div>
+          </div>
+          <div class="wire-panel is-good">
+            <span class="wire-panel-label">Con feedback</span>
+            <div class="wf">
+              <div class="wf-logo"></div>
+              <span class="wf-label">Usuario</span>
+              <div class="wf-field"><span class="wf-value">operaciones@dproma.mx</span></div>
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field"><span class="wf-value wf-dots">••••••••••</span></div>
+              <div class="wf-btn wa wa-dim">
+                <span class="wa wa-idle">Iniciar sesión</span>
+                <span class="wa wa-busy"><span class="wf-spin wa wa--spin"></span>Verificando…</span>
+                <span class="wf-ripple wa wa-r2a"></span>
+                <span class="wf-ripple wf-ripple--dead wa wa-r2b"></span>
+                <span class="wf-ripple wf-ripple--dead wa wa-r2c"></span>
+                <span class="wf-cursor wa wa-c2"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span>
+              </div>
+              <div class="wf-pad"></div>
+            </div>
+            <div class="wf-net">
+              <span class="wf-net-l">Al servidor</span>
+              <span class="wf-net-c is-ok wa wa-chip1">POST /login</span>
+            </div>
+          </div>
+        </div>
+        <figcaption>Las dos reciben tres pulsaciones. Sin feedback el botón no cambia de aspecto en ningún momento, así que volver a pulsar es la reacción natural: salen tres peticiones de acceso por un solo intento real. Con feedback el botón se apaga y pasa a «Verificando…» en la primera pulsación; las dos siguientes rebotan y solo sale una petición.
+          <span class="wire-refs">Punto 8</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="ui">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Recomendaciones Login</div>
+        <h2>UI / Visual y estados</h2>
+      </div>
+    </div>
+
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list">
+          <li><span>Contraste de texto ≥4.5:1 (normal) y ≥3:1 (texto grande) — revisa especialmente el placeholder y los mensajes de ayuda, que suelen quedar en gris claro insuficiente.</span></li>
+          <li><span>Define visualmente los estados de cada campo / botón (Default, hover, focus, active, disabled).</span></li>
+          <li><span>Usar toggle de "mostrar contraseña" (icono de ojo), mejora usabilidad y reduce errores de tecleo, especialmente en desktop donde no hay autocorrección del móvil.</span></li>
+          <li><span>En desktop aprovecha el espacio usando el formulario centrado, evitando que quede perdido en pantallas grandes.</span></li>
+          <li><span>No uses solo color para indicar error, un error común es usar solo borde rojo sin icono ni texto.</span></li>
+        </ul>
+      </article>
+
+      <figure class="wire reveal" style="--cyc:8s; --freeze:-3.5s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">El ojo de mostrar contraseña</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <div class="wire-stage wire-stage--solo" aria-hidden="true">
+          <div class="wire-panel">
+            <div class="wf">
+              <div class="wf-logo"></div>
+              <span class="wf-label">Usuario</span>
+              <div class="wf-field"><span class="wf-value">operaciones@dproma.mx</span></div>
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field">
+                <span class="wf-slot">
+                  <span class="wf-value wf-dots wa wa-hide">••••••••••</span>
+                  <span class="wf-value wa wa-plain">Dpr0ma·2026</span>
+                </span>
+                <span class="wf-eye">
+                  <svg class="wa wa-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3.4 21 21"/><path d="M10.4 6.2A9.9 9.9 0 0 1 12 6.1c6 0 9.6 5.9 9.6 5.9a17.3 17.3 0 0 1-3.4 3.9"/><path d="M6.7 8A16.8 16.8 0 0 0 2.4 12s3.6 5.9 9.6 5.9a9.6 9.6 0 0 0 3.6-.7"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                  <svg class="wa wa-plain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.4 12S6 6.1 12 6.1 21.6 12 21.6 12 18 17.9 12 17.9 2.4 12 2.4 12Z"/><circle cx="12" cy="12" r="2.9"/></svg>
+                  <span class="wf-ripple wa wa-r3a"></span>
+                  <span class="wf-ripple wa wa-r3b"></span>
+                  <span class="wf-cursor wa wa-c3"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span>
+                </span>
+              </div>
+              <div class="wf-btn"><span>Iniciar sesión</span></div>
+            </div>
+          </div>
+        </div>
+        <figcaption>El icono alterna entre ocultar y mostrar sin recargar nada ni perder lo escrito. En escritorio no hay autocorrección del móvil que avise de un error de tecleo: comprobar la contraseña antes de enviarla es la única forma de no gastar un intento en una errata. El objetivo mide 24×24 px como mínimo y entra en el orden de tabulación.
+          <span class="wire-refs">Punto 3 de UI · Punto 2 de accesibilidad</span>
+        </figcaption>
+      </figure>
+      <figure class="wire reveal" style="--cyc:9s; --freeze:-1.5s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">El color no puede ser la única señal</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <p class="wire-note" aria-hidden="true">
+          <span class="wa wa-lab1">Con color</span>
+          <span class="wa wa-lab2">Simulación: el color no llega</span>
+        </p>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Solo borde rojo</span>
+            <div class="wf wa wa-gray">
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field is-err"><span class="wf-value wf-dots">••••••</span></div>
+              <div class="wf-msgbox wf-msgbox--sm"></div>
+            </div>
+          </div>
+          <div class="wire-panel is-good">
+            <span class="wire-panel-label">Borde, icono y texto</span>
+            <div class="wf wa wa-gray">
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field is-err">
+                <span class="wf-value wf-dots">••••••</span>
+                <svg class="wf-ico-err" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.8 2 20.2h20z"/><path d="M12 9.8v4.4"/><path d="M12 17.3h.01"/></svg>
+              </div>
+              <div class="wf-msgbox wf-msgbox--sm">
+                <p class="wf-msg">La contraseña debe tener al menos 8 caracteres</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption>Los dos campos están en el mismo error. La simulación retira el color a mitad del ciclo, que es lo que ocurre con una deficiencia en la percepción del rojo, con brillo alto en pantalla o al imprimir. Sin color, el campo que solo tenía borde rojo deja de comunicar que algo falla y parece un campo normal; el que suma icono y texto lo sigue diciendo, y además explica qué corregir.
+          <span class="wire-refs">Punto 5 de UI · Punto 5 de UX</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="accesibilidad">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Recomendaciones Login</div>
+        <h2>Accesibilidad</h2>
+      </div>
+    </div>
+
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list">
+          <li><span>Orden de tabulación lógico: usuario → contraseña → mostrar/ocultar → "recordarme" → submit → "olvidé mi contraseña".</span></li>
+          <li><span>Tamaño mínimo de objetivo interactivo: 24×24px CSS, recomendado 44×44px para checkboxes y toggles (2.5.8), aunque sea desktop conviene por trackpads/precisión.</span></li>
+        </ul>
+      </article>
+
+      <figure class="wire reveal" style="--cyc:12s; --freeze:-2.5s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">El recorrido de tabulación, parada por parada</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <div class="wire-stage wire-stage--solo" aria-hidden="true">
+          <div class="wire-panel">
+            <div class="wf">
+              <div class="wf-logo"></div>
+              <span class="wf-label">Usuario</span>
+              <div class="wf-field">
+                <span class="wf-value">operaciones@dproma.mx</span>
+                <span class="wf-focus wa wa-f1"><span class="wf-focus-n">1</span></span>
+              </div>
+              <span class="wf-label">Contraseña</span>
+              <div class="wf-field">
+                <span class="wf-value wf-dots">••••••••••</span>
+                <span class="wf-eye">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3.4 21 21"/><path d="M10.4 6.2A9.9 9.9 0 0 1 12 6.1c6 0 9.6 5.9 9.6 5.9a17.3 17.3 0 0 1-3.4 3.9"/><path d="M6.7 8A16.8 16.8 0 0 0 2.4 12s3.6 5.9 9.6 5.9a9.6 9.6 0 0 0 3.6-.7"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                  <span class="wf-focus wf-focus--tight wa wa-f3"><span class="wf-focus-n">3</span></span>
+                </span>
+                <span class="wf-focus wa wa-f2"><span class="wf-focus-n">2</span></span>
+              </div>
+              <div class="wf-check">
+                <span class="wf-box"><span class="wf-focus wf-focus--tight wf-focus--flip wa wa-f4"><span class="wf-focus-n">4</span></span></span>
+                <span>Recordarme en este equipo</span>
+              </div>
+              <div class="wf-btn">
+                <span>Iniciar sesión</span>
+                <span class="wf-focus wa wa-f5"><span class="wf-focus-n">5</span></span>
+              </div>
+              <div class="wf-msgbox wf-msgbox--sm">
+                <span class="wf-link">¿Olvidaste tu contraseña?<span class="wf-focus wf-focus--tight wa wa-f6"><span class="wf-focus-n">6</span></span></span>
+              </div>
+            </div>
+            <div class="wf-keyrow">
+              <span class="wf-key wa wa--2s wa-tab">Tab</span>
+              <span class="wf-step">
+                <span class="wa wa-f1">1 · Usuario</span>
+                <span class="wa wa-f2">2 · Contraseña</span>
+                <span class="wa wa-f3">3 · Mostrar u ocultar</span>
+                <span class="wa wa-f4">4 · Recordarme</span>
+                <span class="wa wa-f5">5 · Iniciar sesión</span>
+                <span class="wa wa-f6">6 · ¿Olvidaste tu contraseña?</span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <figcaption>Seis paradas en el mismo orden en que se lee la pantalla, sin saltos hacia atrás ni elementos que se queden fuera del recorrido. El foco se ve siempre: quien navega con teclado sabe en todo momento dónde está y qué va a activar al pulsar Intro.
+          <span class="wire-refs">Punto 1 de accesibilidad</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+</div><!-- /#p-general -->
+
+<div class="panel" id="p-sio" role="tabpanel" aria-labelledby="t-sio" tabindex="-1" hidden>
+<section id="sio-intro">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Revisión SIO-DPROMA</div>
+        <h2>Lo que revisamos, y cómo</h2>
+      </div>
+    </div>
+
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <p class="sio-lead">La otra pestaña son buenas prácticas: valen para cualquier pantalla de
+          acceso. Esta es distinta. Aquí abrimos las maquetas reales de SIO-DPROMA en un navegador,
+          medimos lo que se podía medir y anotamos lo que encontramos.</p>
+        <p class="sio-lead">Son <strong>19 puntos</strong>: los <strong>cinco que pidió DPROMA</strong>,
+          marcados como tales, y catorce nuestros. Cada punto dice a qué nivel afecta —lo que vive el
+          usuario, la arquitectura de la pantalla, el acabado visual o la accesibilidad— y, cuando la
+          comprobación era objetiva, el resultado de la medición.</p>
+        <ul class="sio-alcance">
+          <li><span class="msi" aria-hidden="true" translate="no">check_circle</span>
+            <span><strong>La pantalla de acceso</strong> completa: la maqueta con la columna de marca
+              y la tarjeta de entrada.</span></li>
+          <li><span class="msi" aria-hidden="true" translate="no">check_circle</span>
+            <span><strong>Tres estados</strong> de la segunda maqueta: cargando, sin permisos y error.</span></li>
+          <li><span class="msi" aria-hidden="true" translate="no">remove_circle</span>
+            <span>Su estado «con datos» queda fuera: esa pantalla ya la cubre la de acceso. Tampoco
+              revisamos su barra lateral ni su menú.</span></li>
+        </ul>
+      </article>
+
+      <article class="evidence-card card card-aparte reveal">
+        <h3 class="sio-h3">Tres cosas que dimos por malas y no lo eran</h3>
+        <p>Antes de escribir esta revisión medimos cada sospecha. Tres se cayeron, y las contamos
+          porque el resultado es tan útil como los fallos:</p>
+        <ul class="rec-list rec-list--ok">
+          <li><span><strong>El contraste está bien.</strong> Los textos pequeños en gris parecían
+            flojos. Medidos: 4,74:1 la instrucción, 4,74:1 el pie, 5,93:1 el aviso, 6,73:1 el
+            subtítulo, 11,17:1 el texto sobre la ilustración. El mínimo exigible es 4,5:1. Pasan
+            todos.</span></li>
+          <li><span><strong>En el móvil se entra sin bajar.</strong> Comprobado a 360, 375, 390 y
+            412 px de ancho: el botón de acceso siempre queda por encima del pliegue.</span></li>
+          <li><span><strong>La tarjeta translúcida no es un riesgo.</strong> Se apoya sobre un fondo
+            liso, no sobre la ilustración, así que en un navegador sin desenfoque sigue
+            leyéndose.</span></li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="sio-login">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Bloque A</div>
+        <h2>La pantalla de acceso</h2>
+      </div>
+      <p class="section-note">La puerta de entrada al sistema. Nueve puntos: dos pedidos por DPROMA
+        y siete nuestros.</p>
+    </div>
+
+    <div class="evidence-stack">
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">A1</span>
+          <h3>La única instrucción de la pantalla es lo más pequeño de la pantalla</h3>
+        </div>
+        <div class="h-chips">
+          <span class="h-chip h-chip--cliente">Pedido por DPROMA</span>
+          <span class="h-chip">Usuario</span><span class="h-chip">UI</span>
+        </div>
+        <p>«Se abrirá la ventana de Google: elige tu correo @dproma.com y confirma la verificación
+          en tu teléfono» va hoy en un párrafo de 12 px, en gris claro y centrado, debajo del botón.
+          Es lo que más falta le hace a quien entra por primera vez, y tiene el menor peso visual
+          de la tarjeta.</p>
+        <p><strong>Qué hacer:</strong> convertirlo en tres pasos con icono —elegir el correo,
+          confirmar en el teléfono, entrar—, colocados <em>antes</em> del botón. Una frase corrida
+          se lee o no se lee; tres pasos numerados se recorren con la vista.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">A2</span>
+          <h3>Para recuperar la contraseña hay que llegar antes al sitio donde falla</h3>
+        </div>
+        <div class="h-chips">
+          <span class="h-chip h-chip--cliente">Pedido por DPROMA</span>
+          <span class="h-chip">Usuario</span><span class="h-chip">UX</span>
+        </div>
+        <p>El aviso dice que la contraseña se recupera «desde la misma ventana de Google». Es
+          cierto, pero obliga a pulsar el botón, esperar a que abra Google y buscar allí el enlace
+          — justo el recorrido que no puede completar quien no recuerda su contraseña.</p>
+        <p><strong>Qué hacer:</strong> un enlace directo a la recuperación de Google en la propia
+          tarjeta, visible desde el principio y no solo después de fallar.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">A3</span>
+          <h3>Con el teclado, el botón «ocupado» acepta todos los envíos que le pidas</h3>
+        </div>
+        <div class="h-chips"><span class="h-chip">UX</span><span class="h-chip">Accesibilidad</span></div>
+        <p>Mientras el botón dice «Abriendo Google…» se bloquea con <code>pointer-events:none</code>,
+          que detiene el ratón y nada más. El teclado sigue llegando.</p>
+        <p class="h-prueba"><span class="msi" aria-hidden="true" translate="no">science</span>
+          <span><strong>Medido:</strong> con el ratón, cuatro pulsaciones producen <strong>1</strong>
+            envío. Con el teclado, cuatro Intro producen <strong>4</strong>. Es el mismo problema de
+            doble envío que la otra pestaña recomienda evitar, presente en la maqueta y solo para
+            quien navega con teclado.</span></p>
+        <p><strong>Qué hacer:</strong> bloquear en el manejador, no en el CSS, y marcar el botón con
+          <code>aria-busy</code> para que un lector de pantalla anuncie que está trabajando.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">A4</span>
+          <h3>Si Google no abre, la pantalla vuelve al principio sin decir nada</h3>
+        </div>
+        <div class="h-chips"><span class="h-chip">Usuario</span><span class="h-chip">UX</span></div>
+        <p>A los 2,2 segundos el botón se restaura solo, pase lo que pase.</p>
+        <p class="h-prueba"><span class="msi" aria-hidden="true" translate="no">science</span>
+          <span><strong>Medido:</strong> a los 2,2 s el botón vuelve a «Continuar con Google» y el
+            aviso para lectores de pantalla se vacía. Si el navegador bloqueó la ventana emergente,
+            el usuario ve exactamente la pantalla del principio y no tiene forma de saber qué pasó:
+            vuelve a pulsar esperando otro resultado.</span></p>
+        <p><strong>Qué hacer:</strong> que el fallo tenga su propia pantalla, con qué ha ocurrido y
+          qué puede hacer — reintentar, permitir ventanas emergentes o avisar a Sistemas.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">A5</span>
+          <h3>Dos bloques seguidos dicen casi lo mismo</h3>
+        </div>
+        <div class="h-chips"><span class="h-chip">UX</span><span class="h-chip">Contenido</span></div>
+        <p>Debajo del botón hay un párrafo sobre la ventana de Google y, pegado, un aviso que vuelve
+          a hablar de Google y de la contraseña. El segundo repite al primero y le quita fuerza.</p>
+        <p><strong>Qué hacer:</strong> con los pasos del punto A1 delante, el aviso se queda solo
+          con lo que aporta y nadie más dice: <em>SIO-DPROMA no guarda tu contraseña ni puede
+          verla</em>. Eso es tranquilizador; el resto era relleno.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">A6</span>
+          <h3>Un selector de idioma que no lleva a ningún sitio</h3>
+        </div>
+        <div class="h-chips"><span class="h-chip">UX</span><span class="h-chip">Accesibilidad</span></div>
+        <p>Arriba a la derecha hay un control «es-MX» con una flecha de desplegable. No tiene menú
+          detrás, no declara que abra uno y el sistema solo tiene un idioma.</p>
+        <p><strong>Qué hacer:</strong> o se implementa de verdad, o se retira. Un control que
+          promete algo y no lo cumple gasta la confianza del usuario en todos los demás.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">A7</span>
+          <h3>«Bienvenido de vuelta» falla justo la primera vez</h3>
+        </div>
+        <div class="h-chips"><span class="h-chip">Usuario</span><span class="h-chip">Contenido</span></div>
+        <p>El titular da la bienvenida de regreso a alguien que quizá nunca ha entrado — que es
+          precisamente quien más necesita que la pantalla le explique qué va a pasar.</p>
+        <p><strong>Qué hacer:</strong> un titular que funcione en los dos casos y diga qué hay que
+          hacer: <em>«Entra con tu cuenta de trabajo»</em>.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">A8</span>
+          <h3>Tres animaciones en bucle que no se pueden detener</h3>
+        </div>
+        <div class="h-chips"><span class="h-chip">Accesibilidad</span></div>
+        <p class="h-prueba"><span class="msi" aria-hidden="true" translate="no">science</span>
+          <span><strong>Medido:</strong> tres animaciones infinitas en la ilustración — un pulso de
+            5,6 s repetido tres veces y un recorrido de energía de 2,2 s. Ninguna tiene control de
+            parada.</span></p>
+        <p>Están bien hechas: son lentas, sin destellos, y respetan la preferencia de movimiento
+          reducido del sistema. Falta lo que pide el criterio 2.2.2: cualquier movimiento que
+          arranque solo, dure más de cinco segundos y conviva con texto necesita una forma de
+          pararlo, para quien no ha configurado esa preferencia en su equipo.</p>
+        <p><strong>Qué hacer:</strong> el criterio de este proyecto — se pausa pulsando la propia
+          ilustración, sin botón aparte que ensucie la pantalla.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">A9</span>
+          <h3>El enlace de ayuda del pie es demasiado fino para pulsarlo</h3>
+        </div>
+        <div class="h-chips"><span class="h-chip">Accesibilidad</span><span class="h-chip">UI</span></div>
+        <p class="h-prueba"><span class="msi" aria-hidden="true" translate="no">science</span>
+          <span><strong>Medido:</strong> «¿Problemas para entrar? Levanta un ticket a TI» ocupa
+            318 × <strong>14 px</strong>. El mínimo del criterio 2.5.8 es 24 px de alto.</span></p>
+        <p>No es un enlace dentro de una frase, que estaría exento: va suelto en el pie. Y es el
+          enlace al que acude quien ya está atascado.</p>
+        <p><strong>Qué hacer:</strong> relleno vertical hasta los 24 px, sin mover nada de sitio.</p>
+      </article>
+
+      <article class="evidence-card card card-aparte reveal">
+        <h3 class="sio-h3">Lo que la maqueta ya resuelve bien</h3>
+        <ul class="rec-list rec-list--ok">
+          <li><span><strong>No pedir contraseña.</strong> Es la decisión de fondo, y elimina de un
+            golpe media docena de los problemas de la otra pestaña: no hay campo que se borre al
+            fallar, ni bloqueo de pegado, ni contraseña que el sistema pueda perder.</span></li>
+          <li><span><strong>Avisa a los lectores de pantalla</strong> cuando se abre la ventana de
+            Google, que es el momento en que la pantalla parece no hacer nada.</span></li>
+          <li><span><strong>El foco se ve siempre</strong>, con un anillo propio y más claro sobre la
+            columna oscura.</span></li>
+          <li><span><strong>Respeta la preferencia de movimiento reducido</strong> del sistema
+            operativo.</span></li>
+        </ul>
+      </article>
+
+      <figure class="comparativa reveal">
+        <div class="comparativa-par">
+          <div class="lado">
+            <span class="lado-et">Maqueta actual</span>
+            <img src="/entregables/img/sio/login-antes.jpg" width="1920" height="1290" loading="lazy"
+                 alt="Pantalla de acceso actual: la instrucción sobre Google va en un párrafo pequeño y gris bajo el botón, y sobre él aparece un selector de idioma.">
+          </div>
+          <div class="lado">
+            <span class="lado-et lado-et--ok">Propuesta</span>
+            <img src="/entregables/img/sio/login-despues.jpg" width="1920" height="1290" loading="lazy"
+                 alt="Propuesta: la misma pantalla con tres pasos numerados con icono antes del botón, un enlace de recuperación de contraseña bajo él y sin selector de idioma.">
+          </div>
+        </div>
+        <figcaption>La instrucción sube y se convierte en tres pasos; el enlace de recuperación deja
+          de estar escondido detrás de Google; el selector de idioma desaparece; el aviso se queda
+          con la única frase que aportaba. La tarjeta ocupa lo mismo.
+          <span class="wire-refs">Puntos A1, A2, A5, A6 y A7</span>
+        </figcaption>
+      </figure>
+
+    </div>
+  </div>
+</section>
+
+<section id="sio-estados">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Bloque B</div>
+        <h2>Los estados</h2>
+      </div>
+      <p class="section-note">Lo que el usuario ve cuando algo tarda, cuando no tiene permisos y
+        cuando falla. Diez puntos: tres pedidos por DPROMA y siete nuestros.</p>
+    </div>
+
+    <div class="evidence-stack">
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">B1</span>
+          <h3>Los iconos grises no fallan el contraste, fallan el mensaje</h3>
+        </div>
+        <div class="h-chips">
+          <span class="h-chip h-chip--cliente">Pedido por DPROMA</span>
+          <span class="h-chip">UI</span><span class="h-chip">Accesibilidad</span>
+        </div>
+        <p class="h-prueba"><span class="msi" aria-hidden="true" translate="no">science</span>
+          <span><strong>Medido:</strong> el icono del estado vacío da <strong>4,53:1</strong> sobre
+            el fondo. El mínimo para un elemento gráfico es 3:1, así que técnicamente cumple.</span></p>
+        <p>Pero la observación de DPROMA es correcta y la medición no la contradice: el problema no
+          es el número. Es un trazo de 1,6 px en gris neutro, el mismo gris que todo el sistema usa
+          para lo deshabilitado. Y este estado no está deshabilitado — está diciendo algo importante
+          sobre la cuenta de quien mira.</p>
+        <p><strong>Qué hacer:</strong> iconos de Material Design en versión rellena, con color de
+          estado, sobre un círculo de fondo. Se leen de un vistazo y dejan de parecer apagados.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">B2</span>
+          <h3>Los estados flotan sueltos, sin contenedor</h3>
+        </div>
+        <div class="h-chips">
+          <span class="h-chip h-chip--cliente">Pedido por DPROMA</span>
+          <span class="h-chip">UI</span>
+        </div>
+        <p class="h-prueba"><span class="msi" aria-hidden="true" translate="no">science</span>
+          <span><strong>Comprobado:</strong> «vacío» y «error» no tienen fondo, ni borde, ni esquinas
+            redondeadas, ni sombra. Texto centrado sobre el fondo de la página.</span></p>
+        <p>La pantalla se lee como si le faltara algo, o como si la maqueta estuviera a medias.</p>
+        <p><strong>Qué hacer:</strong> meterlos en la misma tarjeta que usa el acceso. Así la
+          pantalla no cambia de forma según lo que tenga que decir: el estado se lee como una
+          respuesta del sistema, en el sitio donde el usuario ya estaba mirando.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">B3</span>
+          <h3>El mensaje de error tiene 144 palabras</h3>
+        </div>
+        <div class="h-chips">
+          <span class="h-chip h-chip--cliente">Pedido por DPROMA</span>
+          <span class="h-chip">Usuario</span><span class="h-chip">Contenido</span>
+        </div>
+        <p class="h-prueba"><span class="msi" aria-hidden="true" translate="no">science</span>
+          <span><strong>Medido:</strong> 144 palabras, 816 caracteres. Nadie lee 144 palabras cuando
+            lo único que quiere es entrar a trabajar.</span></p>
+        <p><strong>Qué hacer:</strong> quedarse con lo que el usuario necesita en ese momento — qué
+          ha pasado, que no es culpa suya, y qué hacer ahora. Propuesta, 35 palabras:</p>
+        <div class="copy-prop">
+          <p class="copy-prop-t">No pudimos verificar tu cuenta</p>
+          <p>El servicio que comprueba la identidad no respondió. No es un problema de tu cuenta ni
+            de tu contraseña: inténtalo otra vez en un momento.</p>
+          <p class="copy-prop-btns"><span>Reintentar</span><span>Avisar a Sistemas</span></p>
+          <p class="copy-prop-ref">Referencia: ACC-20260824-1121</p>
+        </div>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">B4</span>
+          <h3>El error le explica al usuario cómo está organizado por dentro</h3>
+        </div>
+        <div class="h-chips"><span class="h-chip">Usuario</span><span class="h-chip">Contenido</span></div>
+        <p>Buena parte de esas 144 palabras son esto: «Éste es uno de cuatro mensajes distintos, y
+          la diferencia importa. No es lo mismo que el servidor no conteste, que este equipo no
+          tenga configurado el acceso…».</p>
+        <p><strong>La decisión de fondo es buena</strong> — cuatro fallos distintos merecen cuatro
+          mensajes distintos, y un texto único mandaría a media plantilla al sitio equivocado. Pero
+          esa es una nota de diseño defendiendo un criterio, no un mensaje de producto. El usuario
+          atascado no necesita el organigrama de los errores.</p>
+        <p><strong>Qué hacer:</strong> el criterio se documenta aquí, en este entregable, y la
+          pantalla se queda con el mensaje que toca.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">B5</span>
+          <h3>El esqueleto de carga se lee en voz alta como basura</h3>
+        </div>
+        <div class="h-chips"><span class="h-chip">Accesibilidad</span></div>
+        <p class="h-prueba"><span class="msi" aria-hidden="true" translate="no">science</span>
+          <span><strong>Medido:</strong> las barras grises llevan texto real escondido con
+            <code>color:transparent</code>. Un lector de pantalla anuncia
+            «<em>marca SIO-DPROMA entrar aviso</em>» — y encima dentro de una zona marcada para que
+            se lea automáticamente.</span></p>
+        <p>Invisible no es inexistente: bajar la opacidad de un texto no lo saca del árbol de
+          accesibilidad.</p>
+        <p><strong>Qué hacer:</strong> vaciar las barras y dejar que la etiqueta de la zona diga lo
+          único que hay que decir: «Comprobando tu acceso».</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">B6</span>
+          <h3>Ningún estado tiene título de verdad</h3>
+        </div>
+        <div class="h-chips"><span class="h-chip">Accesibilidad</span></div>
+        <p class="h-prueba"><span class="msi" aria-hidden="true" translate="no">science</span>
+          <span><strong>Medido:</strong> los titulares están puestos en negrita, no como encabezado,
+            y la pantalla no tiene ningún encabezado de primer nivel.</span></p>
+        <p>Se ven bien y se leen igual con la vista. La diferencia aparece con un lector de
+          pantalla: saltar de encabezado en encabezado es la forma habitual de orientarse en una
+          página, y aquí no hay a dónde saltar.</p>
+        <p><strong>Qué hacer:</strong> que el titular de cada estado sea un encabezado. Es un cambio
+          de etiqueta, sin ningún efecto visual.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">B7</span>
+          <h3>La pantalla cambia por completo y nadie se entera</h3>
+        </div>
+        <div class="h-chips"><span class="h-chip">Accesibilidad</span><span class="h-chip">UX</span></div>
+        <p class="h-prueba"><span class="msi" aria-hidden="true" translate="no">science</span>
+          <span><strong>Medido:</strong> al pasar de un estado a otro no se anuncia nada y el foco
+            del teclado se queda donde estaba.</span></p>
+        <p>Quien pulsa «Entrar» sin ver la pantalla se queda esperando una respuesta que ya llegó.</p>
+        <p><strong>Qué hacer:</strong> anunciar el cambio y llevar el foco a la tarjeta, para que lo
+          siguiente que se lea sea la respuesta y no el principio de la página.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">B8</span>
+          <h3>«Pedirlo a Sistemas» no dice adónde lleva</h3>
+        </div>
+        <div class="h-chips"><span class="h-chip">Usuario</span><span class="h-chip">UX</span></div>
+        <p>En el estado sin permisos hay dos botones. El primero no aclara si abre un ticket, un
+          correo o un chat; el segundo dice «Salir» y lleva un icono de enlace, que significa otra
+          cosa.</p>
+        <p><strong>Qué hacer:</strong> «Solicitar acceso» con icono de soporte y «Cerrar sesión» con
+          icono de salida. El icono y la palabra tienen que contar lo mismo.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">B9</span>
+          <h3>Cuando falla, la única salida es volver a intentarlo</h3>
+        </div>
+        <div class="h-chips"><span class="h-chip">Usuario</span><span class="h-chip">UX</span></div>
+        <p>El estado de error ofrece «Reintentar» y nada más. Si el servicio de identidad está caído
+          —que es lo que ese mensaje describe— reintentar no va a funcionar, y el usuario se queda
+          pulsando un botón sin plan B.</p>
+        <p><strong>Qué hacer:</strong> junto a «Reintentar», una vía para escalarlo con la
+          referencia del error ya a la vista, que es lo que Sistemas va a pedir.</p>
+      </article>
+
+      <article class="hallazgo card card-neutral reveal">
+        <div class="hallazgo-head">
+          <span class="h-num">B10</span>
+          <h3>El botón de tema está roto, y se lleva por delante el menú</h3>
+        </div>
+        <div class="h-chips"><span class="h-chip">Defecto</span><span class="h-chip">UI</span></div>
+        <p class="h-prueba"><span class="msi" aria-hidden="true" translate="no">science</span>
+          <span><strong>Medido:</strong> el guion busca un control de tema que no existe en la
+            página. Lanza un <code>TypeError</code> nada más cargar, y el fallo se lleva por delante
+            todo el código que venía después — incluido el menú.</span></p>
+        <p>Es un defecto, no una decisión de diseño: se arregla en una línea. Lo señalamos porque
+          desde fuera parece que el tema oscuro «no está hecho», cuando en realidad está hecho y no
+          se ejecuta.</p>
+      </article>
+
+      <figure class="comparativa reveal">
+        <div class="comparativa-par">
+          <div class="lado">
+            <span class="lado-et">Maqueta actual</span>
+            <img src="/entregables/img/sio/vacio-antes.jpg" width="1920" height="1290" loading="lazy"
+                 alt="Estado sin permisos actual: icono gris de trazo fino, título en negrita y texto centrado sueltos sobre el fondo de la página, sin contenedor.">
+          </div>
+          <div class="lado">
+            <span class="lado-et lado-et--ok">Propuesta</span>
+            <img src="/entregables/img/sio/vacio-despues.jpg" width="1920" height="1290" loading="lazy"
+                 alt="Propuesta del estado sin permisos: dentro de la misma tarjeta del acceso, con icono relleno de Material Design, título y dos botones, Solicitar acceso y Cerrar sesión.">
+          </div>
+        </div>
+        <figcaption>El estado deja de flotar y ocupa la tarjeta del acceso, en el mismo sitio donde
+          el usuario ya estaba mirando. El icono pasa a relleno y deja de parecer deshabilitado, y
+          las dos acciones dicen qué hacen.
+          <span class="wire-refs">Puntos B1, B2, B6 y B8</span>
+        </figcaption>
+      </figure>
+
+      <figure class="comparativa reveal">
+        <div class="comparativa-par">
+          <div class="lado">
+            <span class="lado-et">Maqueta actual</span>
+            <img src="/entregables/img/sio/error-antes.jpg" width="1920" height="1290" loading="lazy"
+                 alt="Estado de error actual: un bloque de texto de 144 palabras que incluye la explicación de que existen cuatro mensajes de error distintos.">
+          </div>
+          <div class="lado">
+            <span class="lado-et lado-et--ok">Propuesta</span>
+            <img src="/entregables/img/sio/error-despues.jpg" width="1920" height="1290" loading="lazy"
+                 alt="Propuesta del estado de error: 35 palabras dentro de la tarjeta, con los botones Reintentar y Avisar a Sistemas y la referencia del error debajo.">
+          </div>
+        </div>
+        <figcaption>De 144 palabras a 35. Se va la explicación de la taxonomía interna, que pertenece
+          a este documento y no a la pantalla, y llega una segunda salida para cuando reintentar no
+          sirve. La referencia del error se queda: es lo primero que pide Sistemas.
+          <span class="wire-refs">Puntos B3, B4 y B9</span>
+        </figcaption>
+      </figure>
+
+      <figure class="comparativa reveal">
+        <div class="comparativa-par">
+          <div class="lado">
+            <span class="lado-et">Maqueta actual</span>
+            <img src="/entregables/img/sio/carga-antes.jpg" width="1920" height="1290" loading="lazy"
+                 alt="Estado de carga actual: barras grises de esqueleto que contienen texto oculto y se anuncian en voz alta.">
+          </div>
+          <div class="lado">
+            <span class="lado-et lado-et--ok">Propuesta</span>
+            <img src="/entregables/img/sio/carga-despues.jpg" width="1920" height="1290" loading="lazy"
+                 alt="Propuesta del estado de carga: el esqueleto ocupa la tarjeta del acceso y reproduce su forma, sin texto oculto dentro.">
+          </div>
+        </div>
+        <figcaption>El esqueleto se queda —es un buen recurso: anticipa la forma de lo que va a
+          llegar— pero dentro de la tarjeta y sin el texto escondido que un lector de pantalla leía
+          en voz alta.
+          <span class="wire-refs">Puntos B2 y B5</span>
+        </figcaption>
+      </figure>
+
+    </div>
+  </div>
+</section>
+
+<section id="sio-propuesta">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Bloque C</div>
+        <h2>Pruébala</h2>
+      </div>
+    </div>
+
+    <div class="evidence-stack">
+      <article class="evidence-card card card-aparte reveal">
+        <h3 class="sio-h3">La propuesta, funcionando</h3>
+        <p>Las capturas de arriba salen de una pantalla real, no de un dibujo. Está construida con
+          los mismos tokens, la misma tipografía y la misma ilustración de la maqueta original, con
+          los 19 puntos aplicados.</p>
+        <p>Se puede abrir, cambiar entre los cuatro estados, probar el tema claro y oscuro, recorrerla
+          con el teclado y pulsar la ilustración para detenerla. Sirve como referencia para
+          desarrollo: lo que se ve es lo que hay que construir.</p>
+        <p class="sio-cta">
+          <a class="btn-prop" href="/entregables/propuestas/acceso-sio-dproma.html">
+            <span class="msi" aria-hidden="true" translate="no">open_in_new</span>
+            Abrir la propuesta
+          </a>
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+</div><!-- /#p-sio -->
+
+<footer>
+  <div class="wrap">
+    <div class="footer-nav"><a href="/entregables">← Volver a Entregables</a></div>
+    <div class="footer-meta">
+      <span>2894 Studio × DPROMA · Entregable, agosto 2026</span>
+      <a href="/">Ver la síntesis completa →</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* Pestañas. El panel oculto no dispara el IntersectionObserver de .reveal, así
+   que al abrirlo hay que revelar lo suyo o el contenido se queda invisible. */
+(function(){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  if(!tabs.length) return;
+  var paneles = tabs.map(function(t){ return document.getElementById(t.getAttribute('aria-controls')); });
+
+  function revela(panel){
+    panel.querySelectorAll('.reveal:not(.is-visible)').forEach(function(el){
+      el.classList.add('is-visible');
+    });
+  }
+  function activa(tab, mueveFoco){
+    tabs.forEach(function(t, i){
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      paneles[i].hidden = !on;
+      if(on) revela(paneles[i]);
+    });
+    if(mueveFoco) tab.focus();
+  }
+  tabs.forEach(function(tab, i){
+    tab.addEventListener('click', function(){ activa(tab, false); });
+    tab.addEventListener('keydown', function(e){
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if(d){ e.preventDefault(); activa(tabs[(i + d + tabs.length) % tabs.length], true); }
+      else if(e.key === 'Home'){ e.preventDefault(); activa(tabs[0], true); }
+      else if(e.key === 'End'){ e.preventDefault(); activa(tabs[tabs.length - 1], true); }
+    });
+  });
+
+  /* Un enlace a una sección abre antes la pestaña que la contiene: si no, el
+     navegador no encuentra a dónde desplazarse. */
+  function abrePara(hash){
+    if(!hash || hash === '#') return false;
+    var destino;
+    try { destino = document.querySelector(hash); } catch(err){ return false; }
+    if(!destino) return false;
+    var panel = destino.closest('.panel');
+    if(!panel) return false;
+    var i = paneles.indexOf(panel);
+    if(i < 0 || !panel.hidden) return false;
+    activa(tabs[i], false);
+    return true;
+  }
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(){
+      if(abrePara(a.getAttribute('href'))){
+        var destino = document.querySelector(a.getAttribute('href'));
+        requestAnimationFrame(function(){ destino.scrollIntoView({ block:'start' }); });
+      }
+    });
+  });
+
+  /* #sio abre la pestaña de la revisión: sirve para enviar el enlace directo. */
+  function porHash(){
+    var h = location.hash;
+    if(h === '#sio'){ activa(tabs[1], false); return; }
+    abrePara(h);
+  }
+  window.addEventListener('hashchange', porHash);
+  porHash();
+})();
+
+/* Reveal-on-scroll genérico */
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var els = document.querySelectorAll('.reveal');
+  if(reduced || !('IntersectionObserver' in window)){
+    els.forEach(function(el){ el.classList.add('is-visible'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('is-visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+  els.forEach(function(el){ io.observe(el); });
+})();
+
+/* Claim con scroll-linked word reveal */
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var scroller = document.getElementById('claimScroller');
+  var words = Array.prototype.slice.call(document.querySelectorAll('.claim-word'));
+  var hint = document.getElementById('claimScrollHint');
+  if(!scroller || !words.length) return;
+
+  if(reduced){
+    words.forEach(function(w){ w.classList.add('is-lit'); });
+    return;
+  }
+
+  var raf = null;
+  function update(){
+    var rect = scroller.getBoundingClientRect();
+    var total = scroller.offsetHeight - window.innerHeight;
+    var scrolled = -rect.top;
+    var progress = Math.max(0, Math.min(1, total > 0 ? scrolled / total : 1));
+    var lit = Math.round(progress * words.length);
+    words.forEach(function(w, i){ w.classList.toggle('is-lit', i < lit); });
+    if(hint) hint.style.opacity = progress > 0.05 ? '0' : '1';
+  }
+  window.addEventListener('scroll', function(){
+    if(raf) return;
+    raf = requestAnimationFrame(function(){ update(); raf = null; });
+  }, { passive: true });
+  update();
+})();
+
+/* Pausa de las simulaciones — WCAG 2.2.2: todo movimiento que arranca solo,
+   dura más de 5s y convive con texto necesita una forma de detenerlo. */
+(function(){
+  document.querySelectorAll('[data-wire-toggle]').forEach(function(btn){
+    var fig = btn.closest('.wire');
+    if(!fig) return;
+    btn.addEventListener('click', function(){
+      var paused = fig.classList.toggle('is-paused');
+      btn.setAttribute('aria-pressed', paused ? 'true' : 'false');
+      btn.textContent = paused ? 'Reproducir' : 'Pausar';
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
