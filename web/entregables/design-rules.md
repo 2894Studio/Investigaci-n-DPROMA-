@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 1.4.0
+version: 1.5.0
 last_updated: 2026-09-01
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -1204,6 +1204,80 @@ fuera de la capa superior, así que el panel de estados deja de ser pulsable en 
 abre. Mientras está abierto, el panel se traslada dentro del `<dialog>`. Es código de maqueta —
 en el producto no existe— pero sin él la maqueta no se puede recorrer.
 
+### 6.19 Botón-icono (`.iconbtn`)
+
+Un botón cuadrado sin texto, para acciones que se repiten en una fila o que viven en el cromo,
+donde una etiqueta escrita ocuparía más que la propia acción.
+
+```css
+.iconbtn{width:36px;height:36px;border:1px solid var(--border);border-radius:var(--r-ctrl);
+  display:grid;place-items:center;cursor:pointer;background:transparent;
+  color:var(--text-2);flex-shrink:0}
+.iconbtn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
+```
+
+**Tres medidas, según dónde esté:**
+
+| Medida | Dónde | Por qué |
+|---|---|---|
+| 36px | Suelto: cromo superior, cabecera de pantalla | Es la acción de su zona, no compite con nada |
+| 28px | Dentro de `.acciones`, en una fila densa | Dos o tres por fila, repetidos en cada renglón |
+| 46px | Táctil (`data-tacto="dedo"`) | Se pulsa con el dedo, no con el ratón |
+
+**La variante de tamaño puede matar la regla táctil sin avisar.** Pasó, y no se ve leyendo el
+CSS. La ficha de cliente escribió la regla táctil sin el `:root` que este documento prescribe:
+
+```css
+[data-tacto="dedo"] .iconbtn{width:46px;height:46px}  /* (0,2,0) */
+.acciones .iconbtn{width:28px;height:28px}            /* (0,2,0), va después → gana */
+```
+
+Empatan en especificidad y gana la última. Medido con `data-tacto="dedo"` puesto, los botones de
+fila **seguían a 28×28**. Cumplían el mínimo de 24px, así que no era una infracción: la regla
+simplemente no hacía nada. Con el `:root` delante sube a (0,3,0) y gana, y los mismos botones
+miden 46. **Toda regla táctil lleva `:root`; toda variante de tamaño se comprueba midiendo con el
+modo dedo activado, no leyendo el archivo.**
+
+**Nunca viaja solo.** Sin texto, necesita `title` y `aria-label` (§6.5). Y el `aria-label` nombra
+**el dato concreto**, no la acción a secas: en una lista de cuatro correos, cuatro botones
+«Copiar» son indistinguibles al tabular.
+
+```html
+<button class="iconbtn" type="button" title="Copiar"
+        aria-label="Copiar r.mendieta@verticebajio.example"
+        data-copiar="r.mendieta@verticebajio.example">
+  <span class="msi msi-sm" aria-hidden="true" translate="no">content_copy</span>
+</button>
+```
+
+**El orden dentro de un grupo**: lo frecuente y reversible primero, lo destructivo al final.
+Copiar · editar · retirar, no al revés. Quien va deprisa pulsa el primero.
+
+#### La variante que confirma en el sitio
+
+Una acción que se resuelve sola —copiar, marcar, fijar— confirma en el propio botón en vez de
+abrir nada. Y confirma **tres cosas, no una**:
+
+```css
+.iconbtn.copiar.hecho{color:var(--ok-ink);border-color:var(--ok);background:var(--ok-bg)}
+```
+
+1. **El icono cambia** (`content_copy` → `check_circle`) — para quien mira.
+2. **El `aria-label` cambia** («Copiado: …») — para quien navega por botones.
+3. **Se anuncia por `aria-live`** — para quien no tiene ninguna de las dos.
+
+Las tres, porque un icono que cambia no lo percibe quien usa lector de pantalla, y el §6.4 exige
+que un cambio de estado se anuncie. Vuelve al estado inicial en ~1,6s: es una confirmación, no un
+estado nuevo del dato.
+
+**Y si falla, se dice.** En silencio, la persona cree que ya lo tiene y pega lo anterior. La API
+de portapapeles exige contexto seguro, así que hay respaldo por `textarea` para cuando la maqueta
+se abre desde `file://`, y un mensaje si tampoco eso funciona.
+
+**Contraste**: el icono es un elemento gráfico, mínimo 3:1. Medido en reposo 6,84:1 en claro y
+7,80:1 en oscuro; confirmado 5,04:1 y 5,67:1.
+
+
 ## 7. Layout
 
 ### 7.1 Entrada al sistema (`.split`)
@@ -1249,6 +1323,13 @@ principal de la pantalla o el uso es en campo o tableta.
 :root[data-tacto="dedo"] .iconbtn,
 :root[data-tacto="dedo"] .btn{min-height:46px}
 ```
+
+**El `:root` no es adorno: es lo que hace que la regla gane.** Con `:root` delante, el selector
+suma (0,3,0); sin él se queda en (0,2,0) y lo empata cualquier variante de tamaño del propio
+componente —`.acciones .iconbtn{width:28px}`—, que al ir declarada después gana. La ficha de
+cliente lo escribió sin `:root` y, medido con el modo dedo activado, sus botones de fila seguían
+a 28×28. No es una infracción —28 supera el mínimo de 24— pero la regla no hacía nada, y eso solo
+se ve midiendo. Ver §6.19.
 
 Ese bloque existía en las tres maquetas y **nunca se activaba**: el atributo `data-tacto` no
 aparecía ni en el markup ni en el JS. Y aunque se hubiera activado, dejaba fuera justo los dos
@@ -1392,6 +1473,10 @@ usados - declarados  →  tiene que ser vacío
 
 **Interacción**
 - ¿Todo objetivo interactivo mide 24px o más? (44px si es la acción principal.)
+- ¿La regla táctil lleva `:root`, y ninguna variante de tamaño del componente la anula por ir
+  después con la misma especificidad? Se comprueba **midiendo con `data-tacto="dedo"` puesto**.
+- ¿Una acción que confirma en el sitio cambia el icono **y** la etiqueta **y** lo anuncia por
+  `aria-live`? Las tres: un icono que cambia no lo percibe quien usa lector.
 - ¿Un cambio de estado se anuncia (`aria-live`) y mueve el foco?
 - ¿Toda acción destructiva confirma, dice a cuántos afecta y se puede deshacer?
 - ¿Un botón «ocupado» se bloquea en el manejador, no solo con `pointer-events`?
@@ -1442,3 +1527,4 @@ usados - declarados  →  tiene que ser vacío
 | 1.2.0 | 2026-08-31 | Documenta cuándo usar cada tarjeta (`.tarjeta`, `.seccion`, `.glass`), a partir del uso real en acceso, padrón y ficha de cliente. |
 | 1.3.0 | 2026-08-31 | Reescribe el racional de tarjetas a dos principios generales, alineados con buenas prácticas de UI (NN/g, Material Design): contener un flujo pequeño autocontenido, o agrupar información para que no quede suelta en la interfaz. Añade la regla de no anidar tarjetas. |
 | 1.4.0 | 2026-09-01 | El estado de vacío y error va en tarjeta con medallón, no suelto sobre el fondo (§6.4). El suelo de botón —36px, 28px en `.mini`— hay que declararlo con `min-height`, no confiarlo al relleno (§6.2). El esqueleto necesita el mismo alto y el mismo punto de ruptura que el contenido que sustituye, y aplanar el fondo en movimiento reducido (§6.7). Sexta trampa: copiar una regla de otra pantalla puede traerse un token que allí existe y aquí no (§10). Cuatro comprobaciones nuevas en el checklist (§11). |
+| 1.5.0 | 2026-09-01 | Documenta el botón-icono (`.iconbtn`), que se usaba en tres secciones sin estar definido: sus tres medidas, que el `aria-label` nombra el dato y no la acción, y que en un grupo va primero lo frecuente y último lo destructivo (§6.19). Añade la variante que confirma en el sitio —copiar—, que cambia icono, etiqueta y anuncio por `aria-live`, las tres. Y el caso medido del `:root`: sin él, la regla táctil se queda en (0,2,0) y la anula cualquier variante de tamaño declarada después (§7.3). |
