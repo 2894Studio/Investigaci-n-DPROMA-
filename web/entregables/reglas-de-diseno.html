@@ -123,7 +123,7 @@ section + section{ border-top:1px solid var(--border); }
 .msi-lg{ font-size:28px; }
 
 .comp-block{ margin-top:1.25rem; padding:1.25rem; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-card); box-shadow:var(--sh-rest); }
-.comp-block h3{ font-size:.9375rem; margin-bottom:.9rem; }
+.comp-block > h4{ font-size:.9375rem; margin:0 0 .9rem; }
 .comp-row{ display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; }
 
 .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:36px; padding:8px 14px; border-radius:var(--r-ctrl); border:1px solid var(--border-2); background:var(--surface); color:var(--text); font:600 var(--fs-dense) var(--font-ui); cursor:default; }
@@ -182,6 +182,21 @@ thead th{ text-align:left; color:var(--text-2); font-size:var(--fs-meta); font-w
 tbody th,tbody td{ text-align:left; padding:var(--sp-2) var(--sp-3); height:var(--row-comfy,40px); border-bottom:1px solid var(--border); vertical-align:middle; font-weight:400; }
 tbody tr:last-child td{ border-bottom:none; }
 tbody tr:hover td{ background:var(--surface-2); }
+
+/* Agrupación de la galería: la sección tenía doce cards seguidas sin jerarquía */
+.grupo-comp{ margin-top:2.5rem; padding-top:1.25rem; border-top:2px solid var(--border); scroll-margin-top:1rem; }
+.grupo-comp:first-of-type{ margin-top:1rem; }
+.grupo-comp h3{ font-size:1.125rem; display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap; }
+.grupo-comp .cuantos{ font-size:.8125rem; font-weight:400; color:var(--text-3); }
+.indice-comp{ display:flex; gap:.5rem; flex-wrap:wrap; margin:0 0 .5rem; padding:0; list-style:none; }
+.indice-comp a{ display:inline-flex; align-items:center; min-height:32px; padding:.35em .9em;
+  border:1px solid var(--border); border-radius:var(--r-pill); background:var(--surface);
+  font-size:.8125rem; font-weight:600; color:var(--text-2); text-decoration:none; }
+.indice-comp a:hover{ background:var(--surface-2); color:var(--text); border-color:var(--border-2); }
+/* Subtítulo de variante dentro de una card */
+.variante{ font-size:.875rem; margin:1.75rem 0 .6rem; padding-top:1rem;
+  border-top:1px solid var(--border); color:var(--text); }
+.variante code{ font-weight:400; color:var(--text-2); }
 
 /* Botón-icono — §6.19 */
 .iconbtn{ width:36px; height:36px; border:1px solid var(--border); border-radius:var(--r-ctrl); display:grid; place-items:center; cursor:pointer; background:transparent; color:var(--text-2); flex-shrink:0; }
@@ -367,8 +382,17 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       <p class="section-note">Objetivo táctil mínimo 24×24px (44px si es la acción principal). Todo objetivo de esta página cumple.</p>
     </div>
 
+    <ul class="indice-comp">
+      <li><a href="#g-botones">Botones</a></li>
+      <li><a href="#g-tarjetas">Tarjetas</a></li>
+      <li><a href="#g-estados">Estado y avisos</a></li>
+      <li><a href="#g-datos">Datos y listas</a></li>
+    </ul>
+
+    <h3 class="grupo-comp" id="g-botones">Botones <span class="cuantos">acción principal, secundaria, solo icono</span></h3>
+
     <div class="comp-block">
-      <h3>Botones (.btn / .btn.p / .btn.mini / .gbtn)</h3>
+      <h4>Botones (.btn / .btn.p / .btn.mini / .gbtn)</h4>
       <div class="comp-row">
         <button class="btn"><span class="msi" aria-hidden="true" translate="no">visibility</span>Secundario</button>
         <button class="btn p"><span class="msi" aria-hidden="true" translate="no">check_circle</span>Acción primaria</button>
@@ -379,29 +403,10 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
         <button class="btn p">Acción primaria</button>
         <button class="btn mini">Mini</button>
       </div>
-      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>El icono es opcional, el texto no.</strong> Un botón puede llevar icono + texto (refuerza el reconocimiento en un flujo denso) o solo texto (cuando la acción no tiene un icono universal claro, o añadirlo sería ruido). Lo que no se admite es icono solo, salvo con etiqueta emergente y <code>aria-label</code> — ver §6.5, "un icono nunca es la única forma de entender un control".</p>
-      <div class="comp-row" style="margin-top:1rem;">
-        <button class="gbtn"><span class="msi" aria-hidden="true" translate="no">visibility</span>Continuar con Google</button>
-        <button class="gbtn" aria-busy="true"><span class="spin" aria-hidden="true"></span>Comprobando…</button>
-      </div>
-      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><code>.gbtn</code> — el botón primario del acceso: 48px de alto, se bloquea en el <strong>manejador de JS</strong>, no solo con CSS. <code>pointer-events:none</code> detiene el ratón pero no el teclado — en la maqueta original, cuatro <kbd>Intro</kbd> sobre el botón «ocupado» disparaban cuatro envíos.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>El icono es opcional, el texto no.</strong> Un botón puede llevar icono + texto (refuerza el reconocimiento en un flujo denso) o solo texto (cuando la acción no tiene un icono universal claro, o añadirlo sería ruido). Lo que no se admite es icono solo <em>a secas</em>: sin texto visible hace falta etiqueta emergente y <code>aria-label</code>, y entonces es otra variante — <code>.iconbtn</code>, aquí debajo.</p>
 
-      <div class="comp-row" style="margin-top:1.25rem; gap:1.5rem;">
-        <div>
-          <div class="icon-bad" style="margin-bottom:.35rem;"><button class="btn p"><span class="msi" aria-hidden="true" translate="no">autorenew</span>Reintentar</button></div>
-          <p style="font-size:.75rem; color:var(--text-3); margin:0;">✗ Mal — <code>.estado .msi{ color:var(--text-3) }</code> pinta el icono de gris aunque el botón sea de acento. Contraste 1,03:1.</p>
-        </div>
-        <div>
-          <div class="icon-good" style="margin-bottom:.35rem;"><button class="btn p"><span class="msi" aria-hidden="true" translate="no">autorenew</span>Reintentar</button></div>
-          <p style="font-size:.75rem; color:var(--text-3); margin:0;">✓ Bien — <code>.estado .btn .msi{ color:inherit }</code> hereda del botón. Sube a 4,89:1.</p>
-        </div>
-      </div>
-      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Regla:</strong> un icono dentro de un botón hereda el color del botón (<code>color:inherit</code>). No se le da color propio — si el icono necesita un color distinto, es señal de que el botón lo necesita.</p>
-    </div>
-
-    <div class="comp-block">
-      <h3>Botón-icono (.iconbtn)</h3>
-      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 1rem;">Para acciones que se repiten en una fila o viven en el cromo, donde una etiqueta escrita ocuparía más que la propia acción. <strong>Tres medidas, según dónde esté.</strong></p>
+      <h5 class="variante">Solo icono — <code>.iconbtn</code></h5>
+      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 .9rem;">Para acciones que se repiten en una fila o viven en el cromo, donde una etiqueta escrita ocuparía más que la propia acción. <strong>Tres medidas, según dónde esté.</strong></p>
       <div class="medidas">
         <figure><button class="iconbtn" type="button" title="Exportar" aria-label="Exportar la ficha"><span class="msi" aria-hidden="true" translate="no">download</span></button><figcaption>36px — suelto</figcaption></figure>
         <figure><span class="acciones-demo"><button class="iconbtn" type="button" title="Editar" aria-label="Editar el correo de ejemplo"><span class="msi" aria-hidden="true" translate="no">edit</span></button></span><figcaption>28px — en fila densa</figcaption></figure>
@@ -417,16 +422,47 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
           <button class="iconbtn" type="button" title="Retirar" aria-label="Retirar r.mendieta@verticebajio.example"><span class="msi" aria-hidden="true" translate="no">close</span></button>
         </span>
       </div>
-
-      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Nunca viaja solo.</strong> Sin texto, necesita <code>title</code> y <code>aria-label</code> (§6.5). Y el <code>aria-label</code> nombra <strong>el dato concreto</strong>, no la acción a secas: en una lista de cuatro correos, cuatro botones «Copiar» son indistinguibles al tabular.</p>
-
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Nunca viaja solo.</strong> El <code>aria-label</code> nombra <strong>el dato concreto</strong>, no la acción a secas: en una lista de cuatro correos, cuatro botones «Copiar» son indistinguibles al tabular.</p>
       <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>La variante que confirma en el sitio cambia tres cosas, no una:</strong> el icono (para quien mira), el <code>aria-label</code> (para quien navega por botones) y un anuncio por <code>aria-live</code> (para quien no tiene ninguna de las dos). Un icono que cambia no lo percibe quien usa lector de pantalla. Y si falla se dice: en silencio, la persona cree que ya lo tiene.</p>
-
       <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>La variante de tamaño puede matar la regla táctil sin avisar.</strong> <code>[data-tacto="dedo"] .iconbtn</code> suma (0,2,0) y lo empata <code>.acciones .iconbtn{width:28px}</code>, que al ir declarada después gana: medido, los botones de fila seguían a 28px con el modo dedo activado. Con <code>:root</code> delante sube a (0,3,0) y gana. Toda regla táctil lleva <code>:root</code>, y se comprueba midiendo, no leyendo.</p>
+
+      <h5 class="variante">Primario del acceso — <code>.gbtn</code></h5>
+      <div class="comp-row">
+        <button class="gbtn"><span class="msi" aria-hidden="true" translate="no">visibility</span>Continuar con Google</button>
+        <button class="gbtn" aria-busy="true"><span class="spin" aria-hidden="true"></span>Comprobando…</button>
+      </div>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><code>.gbtn</code> — el botón primario del acceso: 48px de alto, se bloquea en el <strong>manejador de JS</strong>, no solo con CSS. <code>pointer-events:none</code> detiene el ratón pero no el teclado — en la maqueta original, cuatro <kbd>Intro</kbd> sobre el botón «ocupado» disparaban cuatro envíos.</p>
+
+      <h5 class="variante">El icono hereda el color del botón</h5>
+      <div class="comp-row" style="gap:1.5rem;">
+        <div>
+          <div class="icon-bad" style="margin-bottom:.35rem;"><button class="btn p"><span class="msi" aria-hidden="true" translate="no">autorenew</span>Reintentar</button></div>
+          <p style="font-size:.75rem; color:var(--text-3); margin:0;">✗ Mal — <code>.estado .msi{ color:var(--text-3) }</code> pinta el icono de gris aunque el botón sea de acento. Contraste 1,03:1.</p>
+        </div>
+        <div>
+          <div class="icon-good" style="margin-bottom:.35rem;"><button class="btn p"><span class="msi" aria-hidden="true" translate="no">autorenew</span>Reintentar</button></div>
+          <p style="font-size:.75rem; color:var(--text-3); margin:0;">✓ Bien — <code>.estado .btn .msi{ color:inherit }</code> hereda del botón. Sube a 4,89:1.</p>
+        </div>
+      </div>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Regla:</strong> un icono dentro de un botón hereda el color del botón (<code>color:inherit</code>). No se le da color propio — si el icono necesita un color distinto, es señal de que el botón lo necesita.</p>
     </div>
 
+
+        <div class="comp-block">
+      <h4>Botón con motion — estado ocupado (.gbtn[aria-busy])</h4>
+      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 1rem;">Pulsa el botón: se bloquea de verdad en el <strong>manejador de JS</strong>, no solo con CSS — <code>pointer-events:none</code> detiene el ratón pero no el teclado. Un giro (<code>--dur-micro</code> aparte) marca el estado "ocupado" mientras dura la comprobación.</p>
+      <div class="comp-row">
+        <button class="gbtn" id="gbtnMotion" type="button" aria-busy="false" style="max-width:260px;">
+          <span class="spin" aria-hidden="true"></span>
+          <span id="gbtnMotionText">Simular comprobación</span>
+        </button>
+      </div>
+    </div>
+
+    <h3 class="grupo-comp" id="g-tarjetas">Tarjetas <span class="cuantos">superficie, translúcida, y cuándo usar cada una</span></h3>
+
     <div class="comp-block">
-      <h3>Tarjeta (.tarjeta)</h3>
+      <h4>Tarjeta (.tarjeta)</h4>
       <div class="tarjeta">
         <header><h3>Ficha de cliente</h3></header>
         <div class="interior">Una sola receta de superficie: fondo, borde, radio y sombra de reposo. No se reimplementa por pantalla.</div>
@@ -434,7 +470,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
     </div>
 
     <div class="comp-block">
-      <h3>Tarjeta translúcida del acceso (.glass)</h3>
+      <h4>Tarjeta translúcida del acceso (.glass)</h4>
       <div class="glass-demo-bg">
         <div class="glass-demo">
           <div class="eyebrow" style="margin-bottom:.6rem;">Acceso</div>
@@ -451,7 +487,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
     </div>
 
     <div class="comp-block">
-      <h3>Cuándo usar una tarjeta, y cuál</h3>
+      <h4>Cuándo usar una tarjeta, y cuál</h4>
       <p style="font-size:.85rem; color:var(--text-2); margin:0 0 1rem;">Dos razones, no cuatro clases — alineadas con el consenso general de patrones de UI (Nielsen Norman Group, Material Design): una tarjeta es un objeto o un flujo autocontenido, no el contenedor por defecto de todo lo que hay en pantalla.</p>
       <div class="table-scroll">
         <table>
@@ -472,19 +508,11 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       </div>
     </div>
 
-    <div class="comp-block">
-      <h3>Botón con motion — estado ocupado (.gbtn[aria-busy])</h3>
-      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 1rem;">Pulsa el botón: se bloquea de verdad en el <strong>manejador de JS</strong>, no solo con CSS — <code>pointer-events:none</code> detiene el ratón pero no el teclado. Un giro (<code>--dur-micro</code> aparte) marca el estado "ocupado" mientras dura la comprobación.</p>
-      <div class="comp-row">
-        <button class="gbtn" id="gbtnMotion" type="button" aria-busy="false" style="max-width:260px;">
-          <span class="spin" aria-hidden="true"></span>
-          <span id="gbtnMotionText">Simular comprobación</span>
-        </button>
-      </div>
-    </div>
+
+    <h3 class="grupo-comp" id="g-estados">Estado y avisos <span class="cuantos">lo que comunica en qué situación está algo</span></h3>
 
     <div class="comp-block">
-      <h3>Etiqueta de estado (.pill) vs. clasificación (.p-type)</h3>
+      <h4>Etiqueta de estado (.pill) vs. clasificación (.p-type)</h4>
       <p style="font-size:.85rem; color:var(--text-2); margin:0 0 .75rem;">Dos familias que se parecen y no son lo mismo — confundirlas fue el problema transversal más extendido de las maquetas de origen.</p>
       <div class="comp-row">
         <span class="pill p-ok"><span class="msi" aria-hidden="true" translate="no">check_circle</span>Vigente</span>
@@ -495,7 +523,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
     </div>
 
     <div class="comp-block">
-      <h3>Avisos (.banda)</h3>
+      <h4>Avisos (.banda)</h4>
       <div style="display:flex; flex-direction:column; gap:.6rem;">
         <div class="banda banda-info"><span class="msi" aria-hidden="true" translate="no">error</span>Informativo — no altera el resultado.</div>
         <div class="banda banda-warn"><span class="msi" aria-hidden="true" translate="no">schedule</span>Falta un documento antes de vencer.</div>
@@ -503,8 +531,10 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       </div>
     </div>
 
+    <h3 class="grupo-comp" id="g-datos">Datos y listas <span class="cuantos">la tabla y lo que la acompaña mientras carga</span></h3>
+
     <div class="comp-block">
-      <h3>Tabla densa (arquetipo del padrón)</h3>
+      <h4>Tabla densa (arquetipo del padrón)</h4>
       <div class="tabla-caja">
         <table>
           <thead><tr><th>Razón social / RFC</th><th>Tipo</th><th>Estado</th></tr></thead>
@@ -517,7 +547,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
     </div>
 
     <div class="comp-block">
-      <h3>Chip</h3>
+      <h4>Chip</h4>
       <div class="comp-row">
         <button class="chip"><span class="msi" aria-hidden="true" translate="no">visibility</span>Tema</button>
         <button class="chip"><span class="msi" aria-hidden="true" translate="no">more_horiz</span>Más</button>
@@ -525,7 +555,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
     </div>
 
     <div class="comp-block">
-      <h3>Esqueleto de carga (.skel)</h3>
+      <h4>Esqueleto de carga (.skel)</h4>
       <p style="font-size:.85rem; color:var(--text-2); margin:0 0 1rem;">Imita la forma de lo que va a llegar — mismas columnas y anchos que el contenido real, para que no salte al aparecer.</p>
       <div class="skels" role="status" aria-label="Cargando el padrón de clientes">
         <span class="skel" style="width:52px; height:52px; border-radius:50%; align-self:center;"></span>
