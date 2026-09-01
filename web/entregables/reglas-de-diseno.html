@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,check_circle,error,schedule,visibility,more_horiz,pause_circle,download,autorenew" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,autorenew,check_circle,close,content_copy,download,edit,error,more_horiz,pause_circle,schedule,visibility" rel="stylesheet">
 <style>
 :root{
   /* §1.1 Superficies y texto */
@@ -182,6 +182,19 @@ thead th{ text-align:left; color:var(--text-2); font-size:var(--fs-meta); font-w
 tbody th,tbody td{ text-align:left; padding:var(--sp-2) var(--sp-3); height:var(--row-comfy,40px); border-bottom:1px solid var(--border); vertical-align:middle; font-weight:400; }
 tbody tr:last-child td{ border-bottom:none; }
 tbody tr:hover td{ background:var(--surface-2); }
+
+/* Botón-icono — §6.19 */
+.iconbtn{ width:36px; height:36px; border:1px solid var(--border); border-radius:var(--r-ctrl); display:grid; place-items:center; cursor:pointer; background:transparent; color:var(--text-2); flex-shrink:0; }
+.iconbtn:hover{ background:var(--surface-2); color:var(--text); border-color:var(--border-2); }
+.acciones-demo{ display:flex; gap:6px; }
+.acciones-demo .iconbtn{ width:28px; height:28px; }
+.iconbtn-dedo .iconbtn{ width:46px; height:46px; }
+.iconbtn.copiar.hecho{ color:var(--ok-ink); border-color:var(--ok); background:var(--ok-bg); }
+.fila-demo{ display:flex; align-items:center; gap:var(--sp-4); padding:var(--sp-2) 0; }
+.fila-demo .valor{ font-size:var(--fs-dense); color:var(--text); }
+.medidas{ display:flex; gap:1.5rem; align-items:flex-end; flex-wrap:wrap; }
+.medidas figure{ margin:0; text-align:center; }
+.medidas figcaption{ font-size:.75rem; color:var(--text-3); margin-top:.4rem; font-family:ui-monospace,monospace; }
 
 .chip{ display:inline-flex; align-items:center; justify-content:center; gap:7px; min-width:40px; min-height:34px; border:1px solid var(--border); background:var(--surface); color:var(--text-2); border-radius:var(--r-ctrl); padding:8px 12px; font:600 var(--fs-dense) var(--font-ui); }
 
@@ -387,6 +400,32 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
     </div>
 
     <div class="comp-block">
+      <h3>Botón-icono (.iconbtn)</h3>
+      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 1rem;">Para acciones que se repiten en una fila o viven en el cromo, donde una etiqueta escrita ocuparía más que la propia acción. <strong>Tres medidas, según dónde esté.</strong></p>
+      <div class="medidas">
+        <figure><button class="iconbtn" type="button" title="Exportar" aria-label="Exportar la ficha"><span class="msi" aria-hidden="true" translate="no">download</span></button><figcaption>36px — suelto</figcaption></figure>
+        <figure><span class="acciones-demo"><button class="iconbtn" type="button" title="Editar" aria-label="Editar el correo de ejemplo"><span class="msi" aria-hidden="true" translate="no">edit</span></button></span><figcaption>28px — en fila densa</figcaption></figure>
+        <figure><span class="iconbtn-dedo"><button class="iconbtn" type="button" title="Editar" aria-label="Editar, en modo táctil"><span class="msi" aria-hidden="true" translate="no">edit</span></button></span><figcaption>46px — táctil</figcaption></figure>
+      </div>
+
+      <p style="font-size:.85rem; color:var(--text-2); margin:1.25rem 0 .5rem;"><strong>En un grupo, primero lo frecuente y reversible; último lo destructivo.</strong> Quien va deprisa pulsa el primero. Pruébalo: el de copiar funciona.</p>
+      <div class="fila-demo">
+        <span class="valor" translate="no">r.mendieta@verticebajio.example</span>
+        <span class="acciones-demo">
+          <button class="iconbtn copiar" type="button" title="Copiar" aria-label="Copiar r.mendieta@verticebajio.example" data-copiar="r.mendieta@verticebajio.example"><span class="msi" aria-hidden="true" translate="no">content_copy</span></button>
+          <button class="iconbtn" type="button" title="Editar" aria-label="Editar r.mendieta@verticebajio.example"><span class="msi" aria-hidden="true" translate="no">edit</span></button>
+          <button class="iconbtn" type="button" title="Retirar" aria-label="Retirar r.mendieta@verticebajio.example"><span class="msi" aria-hidden="true" translate="no">close</span></button>
+        </span>
+      </div>
+
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Nunca viaja solo.</strong> Sin texto, necesita <code>title</code> y <code>aria-label</code> (§6.5). Y el <code>aria-label</code> nombra <strong>el dato concreto</strong>, no la acción a secas: en una lista de cuatro correos, cuatro botones «Copiar» son indistinguibles al tabular.</p>
+
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>La variante que confirma en el sitio cambia tres cosas, no una:</strong> el icono (para quien mira), el <code>aria-label</code> (para quien navega por botones) y un anuncio por <code>aria-live</code> (para quien no tiene ninguna de las dos). Un icono que cambia no lo percibe quien usa lector de pantalla. Y si falla se dice: en silencio, la persona cree que ya lo tiene.</p>
+
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>La variante de tamaño puede matar la regla táctil sin avisar.</strong> <code>[data-tacto="dedo"] .iconbtn</code> suma (0,2,0) y lo empata <code>.acciones .iconbtn{width:28px}</code>, que al ir declarada después gana: medido, los botones de fila seguían a 28px con el modo dedo activado. Con <code>:root</code> delante sube a (0,3,0) y gana. Toda regla táctil lleva <code>:root</code>, y se comprueba midiendo, no leyendo.</p>
+    </div>
+
+    <div class="comp-block">
       <h3>Tarjeta (.tarjeta)</h3>
       <div class="tarjeta">
         <header><h3>Ficha de cliente</h3></header>
@@ -550,6 +589,8 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
   </div>
 </section>
 
+<p class="sr-only" id="live" aria-live="polite" style="position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap"></p>
+
 <footer>
   <div class="wrap">
     <div class="footer-nav"><a href="/entregables">← Volver a Entregables</a></div>
@@ -578,6 +619,40 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       }, 1800);
     });
   }
+})();
+
+/* Copiar — muestra viva del §6.19. Tres señales: icono, aria-label y anuncio. */
+(function(){
+  var live = document.getElementById('live');
+  function alPortapapeles(t){
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(t);
+    return new Promise(function(res, rej){
+      var ta=document.createElement('textarea'); ta.value=t; ta.setAttribute('readonly','');
+      ta.style.cssText='position:fixed;top:-1000px;opacity:0';
+      document.body.appendChild(ta); ta.select();
+      var ok=false; try{ ok=document.execCommand('copy'); }catch(e){ ok=false; }
+      document.body.removeChild(ta); ok?res():rej(new Error('sin portapapeles'));
+    });
+  }
+  document.querySelectorAll('.iconbtn.copiar').forEach(function(boton){
+    var valor=boton.dataset.copiar, etiqueta=boton.getAttribute('aria-label');
+    var glifo=boton.querySelector('.msi'), vuelta=null;
+    boton.addEventListener('click', function(){
+      alPortapapeles(valor).then(function(){
+        clearTimeout(vuelta);
+        boton.classList.add('hecho'); glifo.textContent='check_circle';
+        boton.title='Copiado'; boton.setAttribute('aria-label','Copiado: '+valor);
+        live.textContent='Copiado al portapapeles: '+valor;
+        vuelta=setTimeout(function(){
+          boton.classList.remove('hecho'); glifo.textContent='content_copy';
+          boton.title='Copiar'; boton.setAttribute('aria-label',etiqueta);
+        }, 1600);
+      }).catch(function(){
+        live.textContent='No se pudo copiar. Selecciona el dato y cópialo a mano.';
+        boton.title='No se pudo copiar';
+      });
+    });
+  });
 })();
 </script>
 </body>
