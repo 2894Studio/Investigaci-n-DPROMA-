@@ -1,0 +1,1193 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SIO-DPROMA — Entrega a desarrollo · Módulo de clientes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
+<style>
+/* ───────────────────────────────────────────────────────────────────
+   Documento de entrega — pensado para papel A4 y para pantalla.
+   La paleta y la tipografía salen del propio sistema que documenta
+   (docs/sistema-diseno-sio-dproma.md), para que el documento sea
+   coherente con lo que describe.
+   ─────────────────────────────────────────────────────────────────── */
+:root{
+  --tinta:#1B2430; --tinta-2:#4C5A6B; --tinta-3:#5C6675;
+  --papel:#FFFFFF; --velo:#F2F5F7; --velo-2:#E7EDF3;
+  --acento:#3E7A4C; --acento-suave:rgba(62,122,76,.10);
+  --linea:rgba(27,36,48,.14); --linea-2:rgba(27,36,48,.26);
+  --ok:#2F8F6F; --warn:#B98A1E; --err:#C24238; --pause:#4A5560;
+  --ok-ink:#1F6B52; --warn-ink:#7E5C10; --err-ink:#9B3129;
+  --lima:#C7D97B;
+  --ui:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --marca:"Michroma","Inter",system-ui,sans-serif;
+  --mono:"DejaVu Sans Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+
+@page{ size:A4; margin:18mm 16mm 16mm; }
+@page:first{ margin:0; }
+
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact; print-color-adjust:exact}
+body{
+  margin:0; background:var(--papel); color:var(--tinta);
+  font-family:var(--ui); font-size:10.2pt; line-height:1.58;
+  text-rendering:optimizeLegibility;
+}
+
+/* ── Portada ─────────────────────────────────────────────────────── */
+.portada{
+  height:297mm; padding:32mm 24mm 22mm; display:flex; flex-direction:column;
+  background:#12202A; color:#E7ECF2; break-after:page;
+}
+.portada .marca{
+  font-family:var(--marca); font-size:15pt; letter-spacing:.10em;
+  color:#FFFFFF; margin:0 0 2mm;
+}
+.portada .filete{ width:34mm; height:3px; background:var(--lima); margin:6mm 0 14mm; border:0; }
+.portada h1{
+  font-size:31pt; line-height:1.1; font-weight:700; margin:0 0 5mm;
+  letter-spacing:-.015em; text-wrap:balance; color:#FFFFFF;
+}
+.portada .sub{ font-size:13pt; font-weight:400; color:#A8B3C2; margin:0 0 auto; max-width:120mm; line-height:1.5 }
+.portada dl{
+  display:grid; grid-template-columns:auto 1fr; gap:2.4mm 9mm; margin:0;
+  font-size:9.4pt; border-top:1px solid rgba(231,236,242,.22); padding-top:8mm;
+}
+.portada dt{ color:#8B96A6; font-size:8pt; font-weight:700; letter-spacing:.10em; text-transform:uppercase; white-space:nowrap; align-self:center }
+.portada dd{ margin:0; color:#E7ECF2 }
+
+/* ── Estructura ──────────────────────────────────────────────────── */
+h2{
+  font-size:17pt; font-weight:700; letter-spacing:-.01em; line-height:1.2;
+  margin:0 0 5mm; padding-bottom:2.5mm; border-bottom:2px solid var(--tinta);
+  break-after:avoid; text-wrap:balance;
+}
+h2 .n{ color:var(--acento); font-variant-numeric:tabular-nums; margin-right:3mm }
+h3{ font-size:12.4pt; font-weight:700; margin:9mm 0 2.5mm; break-after:avoid; text-wrap:balance; letter-spacing:-.005em }
+h4{ font-size:10.6pt; font-weight:700; margin:6mm 0 1.5mm; break-after:avoid; color:var(--tinta) }
+h5{
+  font-size:8pt; font-weight:700; letter-spacing:.10em; text-transform:uppercase;
+  color:var(--tinta-3); margin:5mm 0 1.5mm; break-after:avoid;
+}
+section.cap{ break-before:page }
+h3.corte{ break-before:page; margin-top:0 }
+p{ margin:0 0 3mm; max-width:none }
+ul,ol{ margin:0 0 3.5mm; padding-left:5.5mm }
+li{ margin-bottom:1.4mm }
+li::marker{ color:var(--tinta-3) }
+b,strong{ font-weight:600 }
+a{ color:var(--acento); text-decoration:none; border-bottom:1px solid var(--acento-suave) }
+small{ font-size:8.6pt; color:var(--tinta-3) }
+.guia{ color:var(--tinta-2) }
+
+/* ── Índice ──────────────────────────────────────────────────────── */
+.indice{ list-style:none; padding:0; margin:0; column-count:1 }
+.indice li{ display:flex; align-items:baseline; gap:2.5mm; padding:2mm 0; border-bottom:1px solid var(--linea) }
+.indice .num{ font-variant-numeric:tabular-nums; font-weight:700; color:var(--acento); min-width:7mm }
+.indice .qu{ color:var(--tinta-3); font-size:9pt; margin-left:auto; text-align:right; max-width:78mm }
+
+/* ── Tablas ──────────────────────────────────────────────────────── */
+table{
+  width:100%; border-collapse:collapse; margin:0 0 4mm;
+  font-size:9pt; break-inside:avoid;
+}
+caption{
+  caption-side:top; text-align:left; font-size:8pt; font-weight:700;
+  letter-spacing:.10em; text-transform:uppercase; color:var(--tinta-3);
+  padding-bottom:1.8mm;
+}
+th,td{ padding:2.1mm 2.6mm; text-align:left; vertical-align:top; border-bottom:1px solid var(--linea) }
+thead th{
+  background:var(--velo-2); font-size:8pt; font-weight:700; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--tinta-2); border-bottom:1px solid var(--linea-2);
+}
+tbody tr:nth-child(even){ background:var(--velo) }
+td.num,th.num{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap }
+.tabla-envoltura{ break-inside:avoid }
+.mejor{ color:var(--ok-ink); font-weight:600 }
+.peor{ color:var(--err-ink); font-weight:600 }
+
+/* ── Código ──────────────────────────────────────────────────────── */
+pre{
+  background:var(--velo); border:1px solid var(--linea); border-left:3px solid var(--acento);
+  border-radius:3px; padding:3mm 3.5mm; margin:0 0 4mm; overflow-x:auto;
+  font-family:var(--mono); font-size:7.5pt; line-height:1.5; break-inside:avoid;
+  white-space:pre-wrap; word-break:break-word; color:#28313D;
+}
+code{ font-family:var(--mono); font-size:.90em; background:var(--velo-2); padding:.4mm 1mm; border-radius:2px; word-break:break-word }
+pre code{ background:none; padding:0; font-size:1em }
+.pre-tit{
+  font-size:7.6pt; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--tinta-3); margin:0 0 1.2mm;
+}
+
+/* ── Avisos ──────────────────────────────────────────────────────── */
+.nota{
+  border:1px solid var(--linea); border-left:3px solid var(--tinta-3);
+  background:var(--velo); border-radius:3px; padding:3mm 3.5mm; margin:0 0 4mm;
+  break-inside:avoid; font-size:9.2pt;
+}
+.nota > :last-child{ margin-bottom:0 }
+.nota .et{
+  display:block; font-size:7.6pt; font-weight:700; letter-spacing:.10em;
+  text-transform:uppercase; color:var(--tinta-3); margin-bottom:1.4mm;
+}
+.nota.trampa{ border-left-color:var(--warn); background:#FBF7EC }
+.nota.trampa .et{ color:var(--warn-ink) }
+.nota.brecha{ border-left-color:var(--err); background:#FCF1F0 }
+.nota.brecha .et{ color:var(--err-ink) }
+.nota.hecho{ border-left-color:var(--ok); background:#EFF7F3 }
+.nota.hecho .et{ color:var(--ok-ink) }
+
+/* ── Figuras ─────────────────────────────────────────────────────── */
+figure{ margin:0 0 5mm; break-inside:avoid }
+.par figure:first-of-type{ margin-bottom:3mm }
+figure img{ width:100%; display:block; border:1px solid var(--linea-2); border-radius:3px }
+figcaption{
+  font-size:8.2pt; color:var(--tinta-3); margin-top:1.6mm; line-height:1.45;
+}
+figcaption b{ color:var(--tinta); font-weight:700 }
+.par figure{ margin-bottom:4mm }
+/* Ficha + antes + después no se separan: comparar de una página a otra no es
+   comparar. Al 94 % de ancho, el conjunto entra en una plana de A4. */
+.comparativa{ break-inside:avoid }
+.comparativa .ficha-pant{ margin-bottom:4mm }
+.comparativa figure img{ width:90%; margin:0 auto }
+.et-antes,.et-despues{
+  display:inline-block; font-size:7.4pt; font-weight:700; letter-spacing:.10em;
+  text-transform:uppercase; padding:.6mm 2mm; border-radius:2px; margin-bottom:1.6mm;
+}
+.et-antes{ background:var(--velo-2); color:var(--tinta-2) }
+.et-despues{ background:var(--acento-suave); color:var(--acento) }
+
+/* ── Ficha de pantalla ───────────────────────────────────────────── */
+.ficha-pant{
+  display:grid; grid-template-columns:auto 1fr; gap:1.8mm 6mm; margin:0 0 5mm;
+  padding:3mm 3.5mm; background:var(--velo); border:1px solid var(--linea); border-radius:3px;
+  font-size:9pt; break-inside:avoid;
+}
+.ficha-pant dt{ font-size:7.6pt; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--tinta-3); white-space:nowrap; align-self:center }
+.ficha-pant dd{ margin:0; word-break:break-word }
+
+/* ── Lista de comprobación ───────────────────────────────────────── */
+.chk{ list-style:none; padding:0; margin:0 0 4mm }
+.chk li{ padding-left:6mm; position:relative; margin-bottom:1.8mm }
+.chk li::before{
+  content:"□"; position:absolute; left:0; top:-.2mm; color:var(--tinta-3); font-size:11pt;
+}
+
+/* ── Decisiones ──────────────────────────────────────────────────── */
+.decision{ break-inside:avoid; margin:0 0 5mm; padding-bottom:4mm; border-bottom:1px solid var(--linea) }
+.decision:last-child{ border-bottom:0 }
+.decision h4{ margin-top:0 }
+.decision .campo{ display:grid; grid-template-columns:26mm 1fr; gap:1.2mm 4mm; font-size:9.2pt }
+.decision .campo dt{ font-size:7.6pt; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--tinta-3); padding-top:.6mm }
+.decision .campo dd{ margin:0 }
+.decision .campo dd.validar{ color:var(--warn-ink) }
+
+/* ── Pantalla (no impresión) ─────────────────────────────────────── */
+@media screen{
+  body{ max-width:196mm; margin:0 auto; padding:0 0 24mm; box-shadow:0 0 0 1px var(--linea) }
+  section.cap{ padding:14mm 16mm 0 }
+  .indice-envoltura{ padding:14mm 16mm 0 }
+}
+@media print{
+  .solo-pantalla{ display:none }
+}
+</style>
+</head>
+<body>
+
+<div class="portada">
+  <p class="marca">SIO-DPROMA</p>
+  <hr class="filete">
+  <h1>Entrega a desarrollo<br>Módulo de clientes</h1>
+  <p class="sub">Qué cambió respecto a las maquetas originales, por qué, y qué tiene
+     que resolver quien lo construya.</p>
+  <dl>
+    <dt>Pantallas</dt><dd>Padrón · Ficha 360° · Alta · Editar (diálogo)</dd>
+    <dt>Base</dt><dd>Maquetas originales 27, 21, 41 y 59</dd>
+    <dt>Sistema</dt><dd>Sistema de diseño SIO-DPROMA 1.5.0</dd>
+    <dt>Fecha</dt><dd>1 de septiembre de 2026</dd>
+    <dt>Autoría</dt><dd>2894 Studio para DPROMA</dd>
+  </dl>
+</div>
+
+<section class="cap">
+<h2><span class="n">1</span>Cómo usar este documento</h2>
+
+<p>Las cuatro pantallas del módulo de clientes se rediseñaron sobre las maquetas que DPROMA
+entregó, aplicando los hallazgos del informe de recomendaciones del padrón. El resultado vive
+en cuatro archivos HTML navegables, en un sistema de diseño de 1.510 líneas y en un registro
+de decisiones de producto.</p>
+
+<p>Este documento reúne lo que hace falta para <b>construirlo</b>: el diff real contra cada
+original, el patrón nuevo con su código, y —lo que las maquetas no pueden contar— qué tiene
+que resolver el backend detrás de cada pantalla.</p>
+
+<h3>Para quién es</h3>
+<ul>
+  <li><b>Quien programe la interfaz.</b> Las secciones 3 y 4 llevan el CSS y el markup
+      copiables, y dicen de dónde salen los valores.</li>
+  <li><b>Quien programe el servidor.</b> Cada pantalla cierra con «qué tiene que resolver
+      quien lo programe»: campos, estados, validaciones y lo que hay que poder distinguir.</li>
+  <li><b>Quien decida producto en DPROMA.</b> La sección 5 lista nueve decisiones que tomamos
+      nosotros y que conviene confirmar antes de construir.</li>
+</ul>
+
+<h3>Las maquetas son la fuente de verdad de la interacción</h3>
+<p>Las capturas de este documento son fijas: no muestran el foco, ni el paso del cursor, ni la
+transición entre estados, ni cómo se reordena la pantalla al estrecharla. Para eso están las
+maquetas, que se abren en cualquier navegador:</p>
+
+<div class="tabla-envoltura">
+<table>
+  <caption>Maquetas navegables</caption>
+  <thead><tr><th>Pantalla</th><th>Archivo</th><th>Dirección</th></tr></thead>
+  <tbody>
+    <tr><td>Padrón de clientes</td><td><code>padron-clientes.html</code></td><td><a href="https://investigaci-n-dproma.vercel.app/entregables/propuestas/padron-clientes">…/propuestas/padron-clientes</a></td></tr>
+    <tr><td>Ficha de cliente 360°</td><td><code>ficha-cliente.html</code></td><td><a href="https://investigaci-n-dproma.vercel.app/entregables/propuestas/ficha-cliente">…/propuestas/ficha-cliente</a></td></tr>
+    <tr><td>Alta de cliente</td><td><code>alta-cliente.html</code></td><td><a href="https://investigaci-n-dproma.vercel.app/entregables/propuestas/alta-cliente">…/propuestas/alta-cliente</a></td></tr>
+    <tr><td>Editar cliente (diálogo)</td><td><code>editar-cliente.html</code></td><td><a href="https://investigaci-n-dproma.vercel.app/entregables/propuestas/editar-cliente">…/propuestas/editar-cliente</a></td></tr>
+    <tr><td>Acceso al sistema</td><td><code>acceso-sio-dproma.html</code></td><td><a href="https://investigaci-n-dproma.vercel.app/entregables/propuestas/acceso-sio-dproma">…/propuestas/acceso-sio-dproma</a></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Todas llevan abajo un panel de andamiaje —<code>[data-andamio]</code>— para ver la pantalla
+en sus cuatro estados sin tocar código. <b>No es una función del producto: se retira al
+construir.</b> En las capturas de este documento va oculto.</p>
+
+<div class="nota">
+  <span class="et">Una pantalla queda fuera</span>
+  <p>El <b>acceso al sistema</b> se cita como referencia —de ahí salieron el sistema de diseño
+  y el patrón de estados— pero no se documenta su «antes»: no disponemos de su maqueta
+  original, y reconstruirla de memoria sería inventarla.</p>
+</div>
+
+<h3>Contenido</h3>
+<ol class="indice">
+  <li><span class="num">1</span><span>Cómo usar este documento</span></li>
+  <li><span class="num">2</span><span>Resumen de cambios</span><span class="qu">El diff medido, archivo por archivo</span></li>
+  <li><span class="num">3</span><span>Lo transversal</span><span class="qu">Lo que se implementa una sola vez para las cuatro</span></li>
+  <li><span class="num">4</span><span>Pantalla por pantalla</span><span class="qu">Antes, después, patrón y contrato con el servidor</span></li>
+  <li><span class="num">5</span><span>Decisiones de producto por validar</span><span class="qu">Nueve decisiones nuestras, revocables</span></li>
+  <li><span class="num">6</span><span>Brechas conocidas</span><span class="qu">Lo que no está resuelto y hay que saber</span></li>
+  <li><span class="num">7</span><span>Anexo: documentos fuente</span></li>
+</ol>
+</section>
+
+<section class="cap">
+<h2><span class="n">2</span>Resumen de cambios</h2>
+
+<p>Todas las cifras de esta tabla se recalculan desde los archivos con el script
+<code>docs/entrega/metricas.py</code>. No son estimaciones.</p>
+
+<div class="tabla-envoltura">
+<table>
+  <caption>El diff medido — original → propuesta</caption>
+  <thead>
+    <tr><th>Medida</th><th class="num">Padrón</th><th class="num">Ficha</th><th class="num">Alta</th><th class="num">Editar</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Líneas de archivo</td><td class="num">932 → 1.319</td><td class="num">952 → 1.051</td><td class="num">807 → 933</td><td class="num">1.019 → 941</td></tr>
+    <tr><td>Símbolos SVG de trazo</td><td class="num">39 → 1</td><td class="num">39 → 1</td><td class="num">39 → 1</td><td class="num">39 → 1</td></tr>
+    <tr><td>Iconos Material</td><td class="num">0 → 123</td><td class="num">0 → 95</td><td class="num">0 → 33</td><td class="num">0 → 30</td></tr>
+    <tr><td>Regiones <code>aria-live</code></td><td class="num">0 → 1</td><td class="num">0 → 1</td><td class="num">0 → 1</td><td class="num">0 → 1</td></tr>
+    <tr><td><code>id</code> repetidos</td><td class="num">0</td><td class="num peor">4 → 0</td><td class="num">0</td><td class="num peor">2 → 0</td></tr>
+    <tr><td>Campos <code>type="file"</code></td><td class="num">—</td><td class="num">—</td><td class="num mejor">0 → 6</td><td class="num">—</td></tr>
+    <tr><td>Campos obligatorios reales</td><td class="num">—</td><td class="num">—</td><td class="num mejor">0 → 5</td><td class="num mejor">0 → 2</td></tr>
+    <tr><td>Declaraciones bajo 12&nbsp;px</td><td class="num">28 → 5</td><td class="num">23 → 6</td><td class="num">22 → 5</td><td class="num">20 → 5</td></tr>
+    <tr><td>Manejadores de evento</td><td class="num">6 → 28</td><td class="num">6 → 9</td><td class="num">6 → 11</td><td class="num">6 → 13</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Dos cifras que hay que leer bien</h3>
+
+<p><b>Las declaraciones bajo 12&nbsp;px no llegan a cero, y no deben.</b> Las que quedan son
+todas de <code>10.5px</code>: rótulos de grupo en mayúsculas con <code>letter-spacing</code>
+—«CLASIFICACIÓN», «PARA FACTURAR»—, que es la única excepción que admite el suelo tipográfico
+del sistema (§2.1). Las que se fueron eran las que sí dolían: el RFC a 11&nbsp;px bajo cada
+razón social, las píldoras de estado, las cabeceras de tabla.</p>
+
+<p><b>«Editar» encoge, y es lo correcto.</b> Es la única pantalla que pierde líneas
+(1.019&nbsp;→&nbsp;941) porque cambió de naturaleza: el original era un documento anotado
+<em>sobre</em> un diálogo dibujado a mano; el nuevo es un diálogo que funciona. La
+especificación en prosa salió del HTML y vive ahora en
+<code>docs/patron-dialogo-sio-dproma.md</code>.</p>
+
+<h3>Qué archivo sale de qué original</h3>
+<div class="tabla-envoltura">
+<table>
+  <thead><tr><th>Original entregado</th><th>Archivo propuesto</th></tr></thead>
+  <tbody>
+    <tr><td><code>27_padron_clientes.html</code></td><td><code>web/entregables/propuestas/padron-clientes.html</code></td></tr>
+    <tr><td><code>21_ficha_cliente.html</code></td><td><code>web/entregables/propuestas/ficha-cliente.html</code></td></tr>
+    <tr><td><code>41_alta_cliente.html</code></td><td><code>web/entregables/propuestas/alta-cliente.html</code></td></tr>
+    <tr><td><code>59_editar_cliente.html</code></td><td><code>web/entregables/propuestas/editar-cliente.html</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="nota trampa">
+  <span class="et">Detalle que sorprende al abrir un original</span>
+  <p>Las cuatro maquetas originales <b>declaran <code>Inter</code> sin cargarla nunca</b>: no
+  enlazan ninguna hoja de fuentes (<code>document.fonts.size === 0</code>). En un navegador
+  real se veían en la fuente del sistema, no en la que el CSS nombra. Por eso las capturas del
+  «antes» de este documento se renderizan <b>sin</b> inyectar la fuente: enseñar Inter en el
+  antes mostraría algo mejor de lo que el cliente veía.</p>
+</div>
+</section>
+
+<section class="cap">
+<h2><span class="n">3</span>Lo transversal</h2>
+
+<p>Cuatro asuntos aplican a las cuatro pantallas y conviene implementarlos <b>una sola vez</b>,
+antes de tocar ninguna. La especificación completa está en
+<code>docs/sistema-diseno-sio-dproma.md</code>; aquí va lo que hace falta para empezar y las
+trampas que ya nos costaron tiempo.</p>
+
+<h3>3.1 Tokens: ningún componente lleva un hex literal</h3>
+
+<p>Todo el color, el espaciado, los radios, las sombras y los tamaños de fuente salen de
+propiedades personalizadas declaradas en <code>:root</code>. Un componente que escriba
+<code>#3E7A4C</code> en vez de <code>var(--accent)</code> deja de responder al tema oscuro y
+al día siguiente ya no coincide con el resto.</p>
+
+<div class="tabla-envoltura">
+<table>
+  <caption>Superficies y texto — los ocho que más se usan</caption>
+  <thead><tr><th>Token</th><th>Claro</th><th>Oscuro</th><th>Para qué</th></tr></thead>
+  <tbody>
+    <tr><td><code>--bg</code></td><td><code>#F2F5F7</code></td><td><code>#10161F</code></td><td>Fondo de página</td></tr>
+    <tr><td><code>--surface</code></td><td><code>#FAFCFD</code></td><td><code>#171F2C</code></td><td>Tarjetas, tablas, botones</td></tr>
+    <tr><td><code>--surface-2</code></td><td><code>#E7EDF3</code></td><td><code>#1D2735</code></td><td>Cabeceras, hover, filas inactivas, esqueleto</td></tr>
+    <tr><td><code>--border</code></td><td><code>rgba(27,36,48,.14)</code></td><td><code>rgba(231,236,242,.12)</code></td><td>Borde sutil</td></tr>
+    <tr><td><code>--border-2</code></td><td><code>rgba(27,36,48,.26)</code></td><td><code>rgba(231,236,242,.24)</code></td><td>Borde de control interactivo</td></tr>
+    <tr><td><code>--text</code></td><td><code>#1B2430</code></td><td><code>#E7ECF2</code></td><td>Texto principal</td></tr>
+    <tr><td><code>--text-2</code></td><td><code>#4C5A6B</code></td><td><code>#A8B3C2</code></td><td>Texto secundario</td></tr>
+    <tr><td><code>--text-3</code></td><td><code>#5C6675</code></td><td><code>#8B96A6</code></td><td>Texto auxiliar</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>El semáforo son <b>cinco</b> estados, no dos, y cada uno tiene tres variantes. Un cliente no
+está solo bien o mal: puede estar esperando un documento (<code>warn</code>), bloqueado por algo
+que no depende de quien mira (<code>block</code>), o simplemente inactivo (<code>pause</code>),
+que no es un fallo.</p>
+
+<div class="tabla-envoltura">
+<table>
+  <caption>Semáforo — base para gráficos, <code>-ink</code> para texto, <code>-bg</code> para fondo</caption>
+  <thead><tr><th>Token</th><th>Significa</th><th>Claro</th><th>Oscuro</th><th class="num">Contraste <code>-ink</code>/<code>-bg</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>--ok</code></td><td>Correcto, completo, vigente</td><td><code>#2F8F6F</code></td><td><code>#4FBF98</code></td><td class="num">5,04:1</td></tr>
+    <tr><td><code>--warn</code></td><td>Falta algo, o vence pronto</td><td><code>#B98A1E</code></td><td><code>#E8C24C</code></td><td class="num">5,25:1</td></tr>
+    <tr><td><code>--err</code></td><td>Falta lo que impide operar</td><td><code>#C24238</code></td><td><code>#EE6E5F</code></td><td class="num">5,02:1</td></tr>
+    <tr><td><code>--block</code></td><td>Bloqueado por condición externa</td><td><code>#9678CC</code></td><td><code>#C0A9F0</code></td><td class="num">5,41:1</td></tr>
+    <tr><td><code>--pause</code></td><td>Inactivo — no es un fallo</td><td><code>#4A5560</code></td><td><code>#6B7684</code></td><td class="num">6,30:1</td></tr>
+  </tbody>
+</table>
+</div>
+
+<ul>
+  <li><b>base</b> (<code>--ok</code>) — solo para elementos gráficos: un punto, un borde, una
+      barra. Nunca para texto sobre fondo claro.</li>
+  <li><b><code>-ink</code></b> — la versión oscurecida hasta cumplir AA. Es la del texto y el
+      icono de una etiqueta.</li>
+  <li><b><code>-bg</code></b> — fondo <b>opaco</b>, no una transparencia. Una transparencia
+      hereda lo que haya detrás y el contraste cambia según dónde caiga la etiqueta.</li>
+</ul>
+
+<div class="nota trampa">
+  <span class="et">La trampa del <code>var()</code> sin resolver</span>
+  <p>Un <code>var()</code> que apunte a un token inexistente <b>no degrada: invalida la
+  declaración entera, en silencio</b>. No hay error en consola, no hay aviso: la regla
+  simplemente no se aplica. Nos pasó cuatro veces —<code>--sp-5</code>,
+  <code>--err-soft</code>, <code>--glass-line</code>, <code>--chip-cliente-bg</code>—
+  arrastrando CSS entre pantallas que no comparten el mismo juego de tokens. Al copiar una
+  regla de una pantalla a otra, comprobar que todos sus tokens existen ahí.</p>
+</div>
+
+<h3>3.2 Iconos: de 39 símbolos SVG a Material Symbols por subconjunto</h3>
+
+<p>Cada original arrastraba un sprite de <b>39 símbolos SVG de trazo</b> definidos a mano.
+Ahora hay uno solo —la marca— y los iconos son Material Symbols Rounded en variante rellena
+(<code>FILL@1</code>), cargados <b>por subconjunto</b>: solo los nombres que la pantalla usa.</p>
+
+<div class="pre-tit">El enlace — uno por pantalla, con su lista</div>
+<pre><code>&lt;link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&amp;icon_names=add,check_circle,error,schedule&amp;display=block"&gt;</code></pre>
+
+<p>Los cuatro ejes (<code>opsz,wght,FILL,GRAD@24,500,1,0</code>) fijan el aspecto de todos los
+iconos que pidas con ese enlace. No hace falta tocarlos por icono: se heredan en
+<code>font-variation-settings</code> de <code>.msi</code>.</p>
+
+<div class="pre-tit">La clase</div>
+<pre><code>.msi{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;
+  font-size:20px;line-height:1;display:inline-block;white-space:nowrap;direction:ltr;
+  width:1em;height:1em;overflow:hidden;  /* si el icono no está en el subconjunto o la
+    fuente no carga, el navegador pinta el NOMBRE en letras — la caja fija de 1em×1em
+    evita que eso rompa el layout */
+  text-transform:none;letter-spacing:normal;font-feature-settings:'liga';
+  font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24}
+.msi-sm{font-size:17px} .msi-lg{font-size:24px}</code></pre>
+
+<div class="pre-tit">El markup — siempre <code>aria-hidden</code> y <code>translate="no"</code></div>
+<pre><code>&lt;span class="msi msi-sm" aria-hidden="true" translate="no"&gt;content_copy&lt;/span&gt;</code></pre>
+
+<div class="nota trampa">
+  <span class="et">Un icono ausente de la lista tumba TODOS los iconos</span>
+  <p>Si el markup usa un nombre que no está en <code>icon_names</code>, Google Fonts
+  <b>no sirve una fuente incompleta: devuelve HTTP 400</b>, y con ella se caen todos los
+  iconos de la página, no solo el que falta. Es el fallo más fácil de cometer —se añade un
+  icono y se olvida la lista— y el más difícil de diagnosticar, porque el síntoma no señala
+  al culpable.</p>
+  <p>La comprobación es exacta y cuesta una línea. Debe salir vacío:</p>
+<pre><code>const enLista = decodeURIComponent(
+  document.querySelector('link[href*="icon_names="]').href.split('icon_names=')[1].split('&amp;')[0]
+).split(',');
+[...document.querySelectorAll('.msi')].map(e =&gt; e.textContent.trim())
+  .filter(n =&gt; !enLista.includes(n));      // tiene que salir vacío</code></pre>
+  <p>Ejecutada hoy sobre las cinco pantallas publicadas, sale vacía en las cinco.
+  <b>Hay que volver a ejecutarla cada vez que se toque el markup.</b></p>
+</div>
+
+<h3>3.3 Los cuatro estados de una pantalla</h3>
+
+<p>Toda pantalla que pida datos tiene cuatro formas de presentarse: <b>con datos, cargando,
+vacía y con error</b>. No son un extra: son la pantalla. Ninguno de los cuatro originales
+tenía más que el primero.</p>
+
+<p><b>Un solo contenedor, las cuatro vistas dentro como hermanas.</b> No una tarjeta suelta por
+estado: la pantalla no debe cambiar de forma según lo que tenga que decir, para que quien mira
+no pierda la referencia visual al pasar de cargando a error. El conmutador es un atributo:</p>
+
+<div class="pre-tit">El contenedor</div>
+<pre><code>&lt;main id="contenido" data-state="ok" tabindex="-1"&gt;
+  &lt;div class="state-ok"&gt;…la tabla…&lt;/div&gt;
+  &lt;div class="state-loading sk sk-tabla" role="status"
+       aria-label="Cargando el padrón de clientes"&gt;…&lt;/div&gt;
+  &lt;div class="state state-empty"&gt;&lt;div class="tarjeta-estado"&gt;…&lt;/div&gt;&lt;/div&gt;
+  &lt;div class="state state-error"&gt;&lt;div class="tarjeta-estado es-err"&gt;…&lt;/div&gt;&lt;/div&gt;
+&lt;/main&gt;
+&lt;p class="sr" id="live" aria-live="polite"&gt;&lt;/p&gt;</code></pre>
+
+<div class="pre-tit">El conmutador</div>
+<pre><code>main &gt; .state-ok, main &gt; .state-loading,
+main &gt; .state-empty, main &gt; .state-error{display:none}
+main[data-state="ok"]     .state-ok{display:flex}
+main[data-state="loading"] .state-loading{display:block}
+main[data-state="empty"]  .state-empty{display:flex}
+main[data-state="error"]  .state-error{display:flex}</code></pre>
+
+<p>Cada cambio de estado <b>se anuncia</b> escribiendo en <code>#live</code>. Verificado sobre
+la maqueta del padrón: con <code>data-state="empty"</code> la región dice «Ningún cliente
+coincide con los filtros activos.»; con <code>error</code>, «No se pudo cargar el padrón de
+clientes.». Sin eso, quien navega con lector de pantalla no se entera de que la tabla
+desapareció.</p>
+
+<h4>La tarjeta de estado</h4>
+<p>Vacío y error usan la misma tarjeta que la pantalla de acceso —mismo radio, misma sombra,
+mismo relleno— reproducida con <b>superficie opaca</b>. El translúcido pertenece a la pantalla
+de entrada, no al escritorio.</p>
+
+<pre><code>.state{display:none;align-items:center;justify-content:center;flex:1;
+  padding:var(--sp-8) var(--sp-4)}
+.tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-modal);box-shadow:var(--sh-modal);
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-3)}
+.estado-ico{width:52px;height:52px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--accent-soft);color:var(--accent)}
+.estado-ico .msi{font-size:28px}
+.tarjeta-estado.es-err .estado-ico{background:var(--err-fill);color:var(--err-ink)}
+/* El icono de un botón hereda el color del botón. Sin esta línea, el gris del bloque
+   de estado pintaba también el icono de «Reintentar» sobre el verde de acento:
+   1,03:1 de contraste, con 3:1 de mínimo. */
+.state .btn .msi{color:inherit;font-size:17px}</code></pre>
+
+<figure>
+  <span class="et-despues">Estado: cargando</span>
+  <img src="img/estado-loading.jpg" alt="El padrón en estado de carga: un esqueleto con la forma exacta de la tabla.">
+  <figcaption>El esqueleto tiene <b>la forma de lo que va a llegar</b>: mismas siete columnas,
+  misma altura de fila (67&nbsp;px) y misma cabecera (35&nbsp;px). Un esqueleto genérico hace
+  que la pantalla salte al cargar.</figcaption>
+</figure>
+
+<figure>
+  <span class="et-despues">Estado: vacío</span>
+  <img src="img/estado-empty.jpg" alt="El padrón vacío: una tarjeta que explica que hay 1.248 clientes pero ninguno pasa los filtros.">
+  <figcaption>Vacío <b>no es lo mismo que sin datos</b>: aquí hay 1.248 clientes y ninguno pasa
+  los filtros, así que la salida es quitar filtros, no dar de alta. El texto nombra el chip que
+  más suele dejar la tabla en blanco.</figcaption>
+</figure>
+
+<figure>
+  <span class="et-despues">Estado: error</span>
+  <img src="img/estado-error.jpg" alt="El padrón con error: una tarjeta roja que aclara que ningún dato cambió y da una referencia del error.">
+  <figcaption>El error dice <b>qué NO pasó</b> —ningún cliente se dio de alta, se fusionó ni
+  cambió de estado— y da una referencia citable para soporte. La duda que deja un error mudo
+  cuesta más que el error.</figcaption>
+</figure>
+
+<div class="nota">
+  <span class="et">Lo que tiene que resolver el servidor</span>
+  <p><b>Vacío y error no son el mismo caso y no pueden llegar iguales.</b> «Cero resultados» es
+  una consulta que fue bien y no encontró nada; «error» es una consulta que no llegó a
+  ejecutarse. La respuesta tiene que permitir distinguirlos sin adivinar, y el error tiene que
+  traer una <b>referencia citable</b> —del estilo <code>PAD-20260821-1655</code>— que la
+  pantalla pinta tal cual.</p>
+</div>
+
+<h3>3.4 Objetivos táctiles y el suelo tipográfico</h3>
+
+<p>Todo destino interactivo mide <b>24×24&nbsp;px como mínimo</b> (WCAG 2.2, criterio 2.5.8), y
+44&nbsp;px si es la acción principal de la pantalla o el uso es en campo o tableta.</p>
+
+<pre><code>:root[data-tacto="dedo"] .it,
+:root[data-tacto="dedo"] .iconbtn,
+:root[data-tacto="dedo"] .btn{min-height:46px}</code></pre>
+
+<div class="nota trampa">
+  <span class="et">El <code>:root</code> no es adorno: es lo que hace que la regla gane</span>
+  <p>Con <code>:root</code> delante el selector suma (0,3,0); sin él se queda en (0,2,0) y lo
+  empata cualquier variante de tamaño del propio componente —<code>.acciones .iconbtn{width:28px}</code>—
+  que, al ir declarada después, gana por orden de aparición. La ficha lo escribió sin
+  <code>:root</code> y, con el modo dedo activado, sus botones de fila <b>seguían midiendo
+  28×28</b>. No es una infracción —28 supera el mínimo de 24— pero la regla no hacía nada, y
+  eso solo se ve midiendo.</p>
+</div>
+
+<p>Ese bloque existía en tres de las maquetas originales y <b>nunca se activaba</b>: el
+atributo <code>data-tacto</code> no aparecía ni en el markup ni en el JS. Y aunque se hubiera
+activado, dejaba fuera justo los dos casos que fallaban:</p>
+
+<ul>
+  <li><b>Casillas de selección de 15×15&nbsp;px.</b> Se amplía el área pulsable sin agrandar el
+      dibujo:
+      <pre><code>.selfila{display:flex;align-items:center;min-height:24px;padding:4px;margin:-4px}
+input[type="checkbox"]{width:16px;height:16px;accent-color:var(--accent)}</code></pre></li>
+  <li><b>Botones de orden de cabecera</b>, a ~19&nbsp;px de alto por un <code>margin</code>
+      negativo que compensaba el espaciado visual sin agrandar el área. Se les da
+      <code>min-height:24px</code> real.</li>
+</ul>
+
+<p><b>El suelo del texto son 12&nbsp;px</b>, con una sola excepción: rótulos de grupo en
+mayúsculas con <code>letter-spacing</code>, que pueden bajar a 10,5&nbsp;px porque el
+espaciado y las versales compensan. Un dato que alguien tiene que leer —un RFC, una fecha, un
+estado— nunca baja de 12.</p>
+
+<div class="nota trampa">
+  <span class="et">El botón no tiene suelo si no se lo declaras</span>
+  <p>Las cuatro maquetas definían <code>.btn</code> <b>sin <code>min-height</code></b>: con
+  <code>padding:8px 13px</code> sobre el tamaño denso salían a <b>35&nbsp;px</b>, uno por debajo
+  de los 36 documentados. Un píxel no se ve, pero significa que la altura del botón dependía
+  del texto que llevara dentro. Hay que declarar el suelo.</p>
+</div>
+</section>
+
+<section class="cap">
+<h2><span class="n">4</span>Pantalla por pantalla</h2>
+
+<h3>4.1 Padrón de clientes</h3>
+
+<div class="comparativa">
+<dl class="ficha-pant">
+  <dt>Original</dt><dd><code>27_padron_clientes.html</code> — 932 líneas</dd>
+  <dt>Propuesta</dt><dd><code>web/entregables/propuestas/padron-clientes.html</code> — 1.319 líneas</dd>
+  <dt>Es</dt><dd>El listado maestro: 1.248 clientes, siete columnas, selección múltiple y acciones en lote</dd>
+</dl>
+
+<figure class="par">
+  <span class="et-antes">Antes</span>
+  <img src="img/padron-clientes-antes.jpg" alt="El padrón original: chips de estado sin agrupar, panel de duplicados desplegado ocupando media pantalla, y el logo de marca descuadrado.">
+</figure>
+<figure class="par">
+  <span class="et-despues">Después</span>
+  <img src="img/padron-clientes-despues.jpg" alt="El padrón propuesto: resumen agrupado bajo rótulos, fila de filtros, acción destructiva separada en rojo y panel de duplicados plegado a un renglón.">
+  <figcaption>Mismo contenido, seis cambios estructurales. Las diferencias se leen mejor
+  comparando de arriba abajo: marca, resumen, filtros, barra de selección, duplicados,
+  tabla.</figcaption>
+</figure>
+</div>
+
+<h4>Qué fallaba</h4>
+<ul>
+  <li><b>La marca salía descuadrada.</b> El <code>&lt;svg&gt;</code> envoltorio repetía el
+      <code>viewBox</code> del <code>&lt;symbol&gt;</code> mientras el <code>&lt;use&gt;</code>
+      iba sin dimensiones. Un <code>&lt;use&gt;</code> sin <code>width</code>/<code>height</code>
+      toma el 100&nbsp;% del <em>viewport actual</em>, no del símbolo: medido, el dibujo se
+      pintaba 32,5&nbsp;px a la izquierda de su caja. Afectaba al logo de la barra lateral y al
+      botón flotante de las cuatro pantallas.</li>
+  <li><b>Cuatro chips de resumen sin decir de qué hablaban.</b> «42 sin los dos documentos» y
+      «1.189 activos» son ejes distintos —expediente y estado comercial— presentados como si
+      fueran la misma lista.</li>
+  <li><b>Ningún filtro.</b> Sobre 1.248 registros solo había búsqueda por texto.</li>
+  <li><b>«Cambiar a inactivo» a un clic de «Exportar selección»</b>, sin confirmación y sin
+      decir qué implica. Dos acciones contiguas, una inocua y otra no.</li>
+  <li><b>El panel de duplicados ocupaba media pantalla</b> desplegado por omisión, empujando la
+      tabla —que es a lo que se viene— fuera de la vista.</li>
+  <li><b>Seis registros por página</b> sobre un padrón de 1.248, sin forma de cambiarlo.</li>
+  <li><b>«Columnas» no abría nada</b>, y el selector de densidad Cómoda/Compacta competía con
+      él sin que ninguno de los dos resolviera el problema real (qué columnas ver).</li>
+  <li><b>Ni carga, ni vacío, ni error.</b> 28 declaraciones de texto por debajo de 12&nbsp;px,
+      entre ellas el RFC bajo cada razón social.</li>
+</ul>
+
+<h4>El patrón nuevo</h4>
+<ul>
+  <li><b>Resumen agrupado bajo rótulos</b> —EXPEDIENTE, ACTIVIDAD, ESTADO— para que se lea qué
+      eje mide cada cifra.</li>
+  <li><b>Fila de filtros</b>: Tipo, Estado, Documentos, Actividad. Cada uno recorta la tabla y
+      alimenta el texto del estado vacío.</li>
+  <li><b>La acción destructiva se separa</b> del grupo, se va al extremo derecho, se pinta con
+      <code>--err</code> y confirma nombrando a cuántos y a quiénes afecta. Y se puede
+      deshacer.</li>
+  <li><b>El panel de duplicados se pliega</b> a un renglón: «2 posibles duplicados · revisar».</li>
+  <li><b>Acciones de fila reducidas a dos</b>: ver, y un menú con el resto. Tres botones por
+      fila multiplicados por 25 filas son 75 destinos compitiendo por la atención.</li>
+  <li><b>Pie con paginación real</b>: 10/25/50/100, con 25 de partida.</li>
+  <li><b>El selector de densidad se retira</b> y «Columnas» se construye (ver §5.1 y §5.9).</li>
+</ul>
+
+<div class="pre-tit">Confirmación de la acción destructiva</div>
+<pre><code>&lt;dialog class="confirmar" id="dlg" aria-labelledby="dlg-t"&gt;
+  &lt;div class="interior"&gt;
+    &lt;h2 id="dlg-t"&gt;Cambiar a inactivo&lt;/h2&gt;
+    &lt;p id="dlg-txt"&gt;&lt;!-- se rellena con los nombres reales --&gt;&lt;/p&gt;
+    &lt;p&gt;Dejarán de aparecer en el padrón activo. &lt;b&gt;Sus órdenes y documentos siguen
+       consultables&lt;/b&gt;, y se pueden reactivar desde la ficha.&lt;/p&gt;
+    &lt;div class="acc"&gt;
+      &lt;button class="btn" type="button" id="dlg-no"&gt;Cancelar&lt;/button&gt;
+      &lt;button class="btn destructiva" type="button" id="dlg-si"&gt;…&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/dialog&gt;</code></pre>
+
+<p>El texto <b>nombra a los clientes afectados</b>, no dice «2 elementos». Se abre con
+<code>showModal()</code>, nunca con una clase: el diálogo nativo trae la captura de foco, la
+tecla Escape y el velo sin escribir una línea.</p>
+
+<div class="nota">
+  <span class="et">Qué tiene que resolver quien lo programe</span>
+  <ul>
+    <li><b>Filtrado y orden en el servidor</b>, no en el navegador: con 1.248 registros y
+        paginación de 25, filtrar en cliente obliga a traerlo todo.</li>
+    <li><b>La columna «Documentos fiscales» tiene cuatro valores, no dos</b>: los dos, falta 1,
+        faltan los 2, y <b>sin calcular</b>. El último es real —un cliente cuyo expediente
+        todavía no se ha evaluado— y no se puede pintar como «faltan los 2».</li>
+    <li><b>«Cambiar a inactivo» necesita ser reversible</b> durante una ventana corta, porque
+        la pantalla ofrece deshacer. O se difiere la escritura, o se guarda el estado anterior.</li>
+    <li><b>La preferencia de columnas y de registros por página se guarda por persona.</b> Hoy
+        vive en el navegador y se pierde al cambiar de equipo; hace falta una tabla de
+        preferencias de usuario que no está en el esquema (ver §5.1).</li>
+    <li><b>La detección de duplicados</b> compara nombres por tramos de tres letras y el RFC.
+        No hay modelo de por medio y el resultado es siempre el mismo. <b>La fusión la ejecuta
+        una persona</b> y conserva los dos historiales.</li>
+  </ul>
+</div>
+
+<h3 class="corte">4.2 Ficha de cliente 360°</h3>
+
+<div class="comparativa">
+<dl class="ficha-pant">
+  <dt>Original</dt><dd><code>21_ficha_cliente.html</code> — 952 líneas</dd>
+  <dt>Propuesta</dt><dd><code>web/entregables/propuestas/ficha-cliente.html</code> — 1.051 líneas</dd>
+  <dt>Es</dt><dd>La vista completa de un cliente: identidad, contactos con cuatro listas cada uno, y actividad en otros módulos</dd>
+</dl>
+
+<figure class="par">
+  <span class="et-antes">Antes</span>
+  <img src="img/ficha-cliente-antes.jpg" alt="La ficha original: cuatro chips en una fila sin distinguir, párrafo explicativo de cinco líneas, y un solo botón de lápiz por dato.">
+</figure>
+<figure class="par">
+  <span class="et-despues">Después</span>
+  <img src="img/ficha-cliente-despues.jpg" alt="La ficha propuesta: bloque de identidad con rótulos CLASIFICACIÓN y ESTADO, botón de copiar junto a cada correo y teléfono, y tres acciones por dato.">
+  <figcaption>El bloque de identidad pasa a una lista de definición con rótulos, y cada dato
+  copiable gana su botón.</figcaption>
+</figure>
+</div>
+
+<h4>Qué fallaba</h4>
+<ul>
+  <li><b>Cuatro <code>id</code> repetidos</b> —<code>tope-CORREO</code>,
+      <code>tope-TELEFONO</code>, <code>tope-DIRECCION</code>, <code>l-DIRECCION-16</code>—
+      porque el markup de un contacto se duplicó para el segundo. Un <code>id</code> repetido
+      rompe <code>aria-labelledby</code> y <code>&lt;label for&gt;</code>: el segundo contacto
+      queda apuntando a las etiquetas del primero.</li>
+  <li><b>Cuatro chips en una fila sin distinguir</b>: «Empresa» (clasificación),
+      «Comercialmente activo» (estado), «Falta 1 de 2 documentos» (expediente) y «Grupo
+      Automotriz Vértice» (pertenencia) alineados como si fueran lo mismo.</li>
+  <li><b>Correos y teléfonos sin forma de copiarlos.</b> Seleccionar un correo con el ratón
+      dentro de una celda estrecha, sin arrastrar de más, es una operación que se hace decenas
+      de veces al día.</li>
+  <li><b>Un solo lápiz por dato.</b> No se podía retirar un correo obsoleto: solo editarlo
+      encima, lo que borra el rastro.</li>
+  <li><b>Un párrafo de cinco líneas</b> explicando cómo funcionan las listas, antes de dejar
+      ver ninguna.</li>
+</ul>
+
+<h4>El patrón nuevo</h4>
+
+<h5>Identidad como lista de definición</h5>
+<pre><code>.marcas{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-2) var(--sp-4);
+  align-items:center;margin:0}
+.marcas dt{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--text-3);white-space:nowrap}
+.marcas dd{margin:0;display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center}</code></pre>
+<p>Dos rótulos, alineados a la izquierda: <b>CLASIFICACIÓN</b> (qué es el cliente) y
+<b>ESTADO</b> (cómo está). La cuadrícula de dos columnas mantiene los valores alineados aunque
+los rótulos midan distinto.</p>
+
+<h5>Botón-icono de copiar</h5>
+<pre><code>&lt;button class="iconbtn copiar" type="button" title="Copiar"
+        aria-label="Copiar r.mendieta@verticebajio.example"
+        data-copiar="r.mendieta@verticebajio.example"&gt;
+  &lt;span class="msi msi-sm" aria-hidden="true" translate="no"&gt;content_copy&lt;/span&gt;
+&lt;/button&gt;</code></pre>
+
+<pre><code>.iconbtn{width:36px;height:36px;border:1px solid var(--border);border-radius:var(--r-ctrl);
+  display:grid;place-items:center;cursor:pointer;background:transparent;
+  color:var(--text-2);flex-shrink:0}
+.iconbtn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
+.iconbtn.copiar.hecho{color:var(--ok-ink);border-color:var(--ok);background:var(--ok-bg)}</code></pre>
+
+<p>Once botones: dos correos y dos teléfonos por cada uno de los dos contactos, más los del
+contacto principal en la cabecera. La confirmación cambia <b>tres cosas a la vez</b>, porque
+un cambio de color solo lo ve quien mira:</p>
+
+<pre><code>boton.classList.add('hecho');
+glifo.textContent = 'check_circle';                        // 1 · el icono
+boton.setAttribute('aria-label', 'Copiado: ' + valor);     // 2 · la etiqueta
+live.textContent = 'Copiado al portapapeles: ' + valor;    // 3 · el anuncio
+setTimeout(function(){ /* …se revierte a los 1.600 ms… */ }, CONFIRMA);</code></pre>
+
+<p>Y si falla, <b>se dice</b>: en silencio la persona creería que ya lo tiene. La maqueta lleva
+un repliegue con <code>textarea</code> + <code>execCommand('copy')</code> porque
+<code>navigator.clipboard</code> exige contexto seguro y las maquetas se abren también desde
+<code>file://</code>. <b>En producción, sobre HTTPS, el repliegue sobra.</b></p>
+
+<div class="nota">
+  <span class="et">Qué tiene que resolver quien lo programe</span>
+  <ul>
+    <li><b>Los <code>id</code> se generan, no se escriben.</b> Cada contacto tiene cuatro
+        listas y cada renglón necesita identificadores únicos: derivarlos del id del contacto,
+        nunca del tipo de lista.</li>
+    <li><b>Retirar un contacto no es borrarlo.</b> Un correo retirado deja de ofrecerse para
+        avisos nuevos, pero los acuses ya enviados a esa dirección siguen siendo ciertos: hace
+        falta baja lógica con fecha, no <code>DELETE</code> (ver §5.4).</li>
+    <li><b>El tope de cuatro por lista</b> —«2 de 4»— es una regla de producto que el servidor
+        también tiene que aplicar: la pantalla no puede ser el único sitio donde exista.</li>
+    <li><b>El alcance recorta las listas.</b> La ficha avisa de que hay sucursales fuera del
+        alcance de quien mira, así que el conteo tiene que poder decir «ninguno
+        <em>en tu alcance</em>», que no es «ninguno».</li>
+  </ul>
+</div>
+
+<h3 class="corte">4.3 Alta de cliente</h3>
+
+<div class="comparativa">
+<dl class="ficha-pant">
+  <dt>Original</dt><dd><code>41_alta_cliente.html</code> — 807 líneas</dd>
+  <dt>Propuesta</dt><dd><code>web/entregables/propuestas/alta-cliente.html</code> — 933 líneas</dd>
+  <dt>Es</dt><dd>El formulario de alta de una razón social, en secciones numeradas con estado por sección</dd>
+</dl>
+
+<figure class="par">
+  <span class="et-antes">Antes</span>
+  <img src="img/alta-cliente-antes.jpg" alt="El alta original: aviso de cuatro párrafos, asteriscos rojos como única marca de obligatoriedad, y un campo gris que dice «Se calcula solo».">
+</figure>
+<figure class="par">
+  <span class="et-despues">Después</span>
+  <img src="img/alta-cliente-despues.jpg" alt="El alta propuesta: aviso de un renglón con enlace al detalle, etiquetas PARA DAR DE ALTA y PARA FACTURAR, tipo de cliente resuelto, y zona de subida de archivo.">
+  <figcaption>La obligatoriedad deja de ser un símbolo y pasa a decir <b>para qué</b> hace falta
+  cada campo.</figcaption>
+</figure>
+</div>
+
+<h4>Qué fallaba</h4>
+<ul>
+  <li><b>Un aviso de cuatro párrafos antes del primer campo.</b> Explicaba tres cosas distintas
+      —qué es obligatorio, qué bloquea, y el aviso de privacidad— apiladas.</li>
+  <li><b>Un solo asterisco rojo para dos obligatoriedades distintas.</b> «Razón social» hace
+      falta para dar de alta; «Código postal fiscal» solo para facturar. Marcarlos igual
+      convierte un alta de dos campos en un formulario de siete.</li>
+  <li><b>Ningún campo era obligatorio de verdad.</b> Cero atributos <code>required</code> en
+      todo el archivo: el asterisco era pintura.</li>
+  <li><b>«Tipo de cliente» era un campo gris que decía «Se calcula solo»</b>, con siete líneas
+      de ayuda explicando la regla. Un campo que no se rellena no debería parecer un campo.</li>
+  <li><b>«Constancia de situación fiscal» era un campo de texto.</b> Ningún
+      <code>type="file"</code> en la maqueta: se pedía escribir a mano el nombre de un
+      documento que hay que subir.</li>
+  <li><b>El estado de sección era un contador</b> —«2 de 3 obligatorios»— que dice cuántos
+      faltan pero no cuáles.</li>
+  <li><b>Tres botones en el pie</b>: Cancelar, Guardar borrador y Dar de alta, con «Guardar
+      borrador» compitiendo con el autoguardado que el propio pie anunciaba.</li>
+</ul>
+
+<h4>El patrón nuevo</h4>
+
+<h5>Dos niveles de obligatoriedad, con nombres distintos</h5>
+<pre><code>&lt;label for="rs"&gt;Razón social &lt;span class="nivel nivel-alta"&gt;para dar de alta&lt;/span&gt;&lt;/label&gt;
+&lt;input type="text" id="rs" autocomplete="organization" required aria-required="true"&gt;
+
+&lt;label for="cp"&gt;Código postal fiscal &lt;span class="nivel nivel-op"&gt;para facturar&lt;/span&gt;&lt;/label&gt;</code></pre>
+
+<pre><code>.nivel{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;padding:2px 6px;border-radius:999px}
+.nivel-alta{background:var(--accent-soft);color:var(--accent)}
+.nivel-fact,.nivel-op{background:var(--surface-2);color:var(--text-2)}</code></pre>
+
+<p>Cinco campos llevan <code>required</code> real y <code>aria-required</code>. La etiqueta
+dice para qué hace falta, no que haga falta: es la diferencia entre «esto es obligatorio» y
+«sin esto no podrás facturar».</p>
+
+<h5>El estado de sección dice qué falta, no cuántos</h5>
+<p>«Completa» cuando lo está; <b>«Falta: domicilio fiscal»</b> cuando no. Un contador obliga a
+recorrer la sección buscando el hueco.</p>
+
+<h5>Subida de archivo real</h5>
+<pre><code>&lt;div class="subida"&gt;
+  &lt;input type="file" id="car" accept=".pdf" aria-describedby="a-car"&gt;
+  &lt;label class="subida-caja" for="car"&gt;
+    &lt;span class="msi" aria-hidden="true" translate="no"&gt;upload&lt;/span&gt;
+    &lt;span&gt;&lt;b&gt;Arrastra el archivo o pulsa para elegirlo&lt;/b&gt;&lt;br&gt;PDF, hasta 10&amp;nbsp;MB&lt;/span&gt;
+  &lt;/label&gt;
+&lt;/div&gt;
+&lt;span class="ayuda" id="a-car"&gt;Opcional para dar de alta; necesaria para programar y facturar.&lt;/span&gt;</code></pre>
+
+<p>Seis campos <code>type="file"</code>, cada uno con su <code>accept</code> y su tope de
+tamaño escrito donde se lee antes de elegir el archivo, no después de rechazarlo.</p>
+
+<div class="nota">
+  <span class="et">Qué tiene que resolver quien lo programe</span>
+  <ul>
+    <li><b>El tipo de cliente se deduce, no se elige.</b> Un RFC de 13 posiciones es persona
+        física; de 12, empresa. Y si el cliente tiene agencia, agencia manda sobre el RFC. Si
+        el RFC no mide 12 ni 13, el tipo <b>queda en blanco</b> en vez de inventarse uno.</li>
+    <li><b>El alta solo exige razón social y RFC.</b> Todo lo demás llega después. Lo que el
+        servidor tiene que impedir es distinto: <b>programar una instalación o facturar</b> a
+        un cliente sin datos fiscales y sin los dos documentos. Esa comprobación va en esas
+        operaciones, no en el alta.</li>
+    <li><b>Autoguardado de borrador, con marca de tiempo.</b> El pie dice «Borrador guardado
+        hace 1 min. Puedes salir y volver», así que hace falta persistencia del borrador con
+        su instante, no un guardado al enviar (ver §5.6).</li>
+    <li><b>Los ficheros se validan en servidor</b>: tipo real, no extensión, y tope de tamaño.
+        El <code>accept</code> del navegador es una sugerencia del selector de archivos, no una
+        restricción.</li>
+    <li><b>Detección de duplicados en el momento del alta</b>, por RFC y por parecido de
+        nombre, entregada plegada para que no interrumpa la captura (ver §5.8).</li>
+  </ul>
+</div>
+
+<h3 class="corte">4.4 Editar cliente — el patrón de diálogo</h3>
+
+<div class="comparativa">
+<dl class="ficha-pant">
+  <dt>Original</dt><dd><code>59_editar_cliente.html</code> — 1.019 líneas</dd>
+  <dt>Propuesta</dt><dd><code>web/entregables/propuestas/editar-cliente.html</code> — 941 líneas</dd>
+  <dt>Es</dt><dd>El sexto diálogo del sistema: el único que nadie había dibujado. Ahora es la implementación de referencia del patrón</dd>
+</dl>
+
+<figure class="par">
+  <span class="et-antes">Antes</span>
+  <img src="img/editar-cliente-antes.jpg" alt="El original de editar: un documento anotado con prosa sobre un diálogo dibujado encima de una página falsa de barras grises.">
+</figure>
+<figure class="par">
+  <span class="et-despues">Después</span>
+  <img src="img/editar-cliente-despues.jpg" alt="La propuesta: una tabla real de tres clientes, cada fila con un botón «Cambiar razón social» que abre el diálogo.">
+  <figcaption>Deja de ser un documento <em>sobre</em> el diálogo y pasa a ser el diálogo. La
+  especificación en prosa —foco, medidas, qué formularios caben— se movió a
+  <code>docs/patron-dialogo-sio-dproma.md</code>.</figcaption>
+</figure>
+</div>
+
+<figure class="par">
+  <span class="et-despues">El diálogo abierto</span>
+  <img src="img/editar-cliente-dialogo.jpg" alt="El diálogo de editar cliente abierto sobre la tabla, con el campo de razón social enfocado y el RFC de solo lectura con su motivo al lado.">
+  <figcaption>Verificado en navegador: el elemento cumple <code>:modal</code> y el foco entra
+  en <b>el campo de razón social</b> —no en el diálogo ni en el aspa—. Quien pulsa «Cambiar
+  razón social» viene a escribir.</figcaption>
+</figure>
+
+<h4>Qué fallaba</h4>
+<ul>
+  <li><b>Dos <code>id</code> repetidos cuatro veces cada uno</b> —<code>nombre-legal</code> y
+      <code>rfc-ro</code>— porque el mismo diálogo estaba dibujado cuatro veces en la página
+      para ilustrar cuatro momentos. Ocho apariciones para dos identificadores.</li>
+  <li><b>El diálogo no era un diálogo.</b> Ocho <code>role="dialog"</code> pintados a mano,
+      cero <code>&lt;dialog&gt;</code>: sin captura de foco, sin Escape, sin velo real.</li>
+  <li><b>Ninguna de las tres salidas cerraba bien mientras había una operación en vuelo</b>:
+      ni Escape, ni el aspa, ni el clic en el velo. Cerrar a medio guardar deja a alguien sin
+      saber si se guardó.</li>
+  <li><b>«Guardando» no se anunciaba</b>: un botón que cambia de color no llega a un lector de
+      pantalla.</li>
+</ul>
+
+<h4>El patrón nuevo</h4>
+<ul>
+  <li><b><code>&lt;dialog&gt;</code> nativo abierto con <code>showModal()</code>.</b> Captura de
+      foco, Escape y velo vienen dados. Cuatro diálogos, cada uno con su propósito.</li>
+  <li><b>El foco entra al primer campo editable</b>, no al contenedor.</li>
+  <li><b>Mientras hay una operación en vuelo, ninguna salida cierra</b>, y el estado se anuncia
+      por <code>aria-live</code>.</li>
+  <li><b>El RFC se enseña y no se puede escribir, con el motivo al lado.</b> Un campo en gris
+      sin explicación se lee como una carencia del formulario; con el motivo se lee como lo que
+      es, una decisión.</li>
+</ul>
+
+<div class="nota">
+  <span class="et">Qué tiene que resolver quien lo programe</span>
+  <ul>
+    <li><b>El RFC no se edita aquí, a propósito.</b> Es la identidad fiscal y la clave única del
+        cliente: cambiarlo no es editar un cliente, es decir que era otro. Necesita su propio
+        circuito, con su propio rastro. El servidor <b>tiene que rechazar</b> un
+        <code>rfc</code> entrante en esta operación, no ignorarlo en silencio.</li>
+    <li><b>Qué formularios caben en un diálogo</b> y cuáles piden pantalla propia está resuelto
+        en <code>docs/patron-dialogo-sio-dproma.md</code>. La regla corta: si no cabe sin
+        desplazamiento interno, no es un diálogo.</li>
+    <li><b>Guardar tiene que ser idempotente o estar protegido</b>: la pantalla impide el doble
+        envío, pero la red no.</li>
+  </ul>
+</div>
+</section>
+
+<section class="cap">
+<h2><span class="n">5</span>Decisiones de producto por validar</h2>
+
+<p>Nueve hallazgos del informe de recomendaciones <b>no se arreglaban con CSS</b>: para
+resolverlos había que decidir cómo se comporta el producto, y esa decisión no estaba tomada en
+ninguna parte.</p>
+
+<p>Se implementaron, porque dejar una pantalla a medias por no decidir cuesta más que decidir y
+anotarlo. Pero son <b>decisiones nuestras, no de DPROMA</b>. Esta sección existe para que se
+sepan cuáles son y se puedan revocar sin arqueología. El registro completo, con el
+razonamiento de cada una, está en <code>docs/decisiones-producto-padron.md</code>.</p>
+
+<div class="decision">
+  <h4>5.1 · El botón «Columnas» ahora hace algo</h4>
+  <dl class="campo">
+    <dt>Pasaba</dt><dd>Junto al selector de densidad había un botón «Columnas» que no abría nada.</dd>
+    <dt>Decidimos</dt><dd>Se construye: elegir qué columnas se ven, reordenarlas, y guardar la preferencia por persona.</dd>
+    <dt class="validar">A validar</dt><dd class="validar">Dónde se guarda la preferencia. Si es por persona, necesita una tabla de preferencias de usuario que hoy no está en el esquema. Mientras tanto queda en el navegador, y se pierde al cambiar de equipo.</dd>
+  </dl>
+</div>
+
+<div class="decision">
+  <h4>5.2 · Registros por página elegibles</h4>
+  <dl class="campo">
+    <dt>Pasaba</dt><dd>El pie fijaba seis registros sobre un padrón de 1.248.</dd>
+    <dt>Decidimos</dt><dd>Selector de 10 / 25 / 50 / 100, con 25 de partida y la elección recordada entre sesiones.</dd>
+    <dt class="validar">A validar</dt><dd class="validar">Si el listado se va a exportar con frecuencia, quizá el tope alto deba superar 100. Depende de cuánto aguante la consulta.</dd>
+  </dl>
+</div>
+
+<div class="decision">
+  <h4>5.3 · Desactivar un cliente confirma y se puede deshacer</h4>
+  <dl class="campo">
+    <dt>Pasaba</dt><dd>«Desactivar» estaba a un clic de «Exportar selección», sin confirmación y sin explicar qué implica.</dd>
+    <dt>Decidimos</dt><dd>La acción se separa del grupo, confirma nombrando a cuántos y a quiénes afecta, y se puede deshacer. Desactivar <b>oculta del padrón activo pero no borra ni desvincula nada</b>.</dd>
+    <dt class="validar">A validar</dt><dd class="validar"><b>Es la decisión de más calado de la lista.</b> Si desactivar debe además impedir facturar, bloquear órdenes en curso o liberar el RFC para otro registro, el texto de confirmación miente y hay que rehacerlo.</dd>
+  </dl>
+</div>
+
+<div class="decision">
+  <h4>5.4 · Se pueden retirar contactos</h4>
+  <dl class="campo">
+    <dt>Pasaba</dt><dd>Cada correo, teléfono y dirección solo tenía botón de editar. Al llegar al tope de cuatro, el sistema decía «Retira uno para añadir otro» — y no existía ninguna forma de retirarlo. Callejón sin salida.</dd>
+    <dt>Decidimos</dt><dd>Se añade «Retirar» en cada renglón, con confirmación breve, y el mensaje del tope enlaza a esa acción.</dd>
+    <dt class="validar">A validar</dt><dd class="validar">Si por trazabilidad no se puede borrar un dato de contacto —porque cuelga de él un acuse enviado—, la acción debe ser «Archivar» o «Marcar como no vigente». La interfaz es la misma; cambia el verbo y lo que pasa por debajo. <b>Hay que preguntarlo antes de construirlo.</b></dd>
+  </dl>
+</div>
+
+<div class="decision">
+  <h4>5.5 · Los documentos se suben, no se escriben</h4>
+  <dl class="campo">
+    <dt>Pasaba</dt><dd>«Constancia de situación fiscal» e «Identificación del representante» eran campos de texto vacíos, aunque la ayuda dijera que se espera un PDF o una foto.</dd>
+    <dt>Decidimos</dt><dd>Control de subida real, con el archivo cargado visible con su nombre y fecha, y opción de reemplazar o quitar. Límites: <b>PDF, JPG y PNG, hasta 10&nbsp;MB</b>.</dd>
+    <dt class="validar">A validar</dt><dd class="validar">El peso máximo y si se admiten fotos de móvil sin procesar, que superan los 10&nbsp;MB con facilidad. Y dónde se guardan: el plan del padrón menciona expediente en Drive.</dd>
+  </dl>
+</div>
+
+<div class="decision">
+  <h4>5.6 · Guardado automático, sin botón de guardar</h4>
+  <dl class="campo">
+    <dt>Pasaba</dt><dd>La barra inferior decía «Borrador guardado hace 1 min» y a la vez ofrecía un botón «Guardar borrador».</dd>
+    <dt>Decidimos</dt><dd>Guardado automático. El botón desaparece; queda el indicador de estado.</dd>
+    <dt class="validar">A validar</dt><dd class="validar">Cada cuánto guarda, y qué pasa con un borrador que nadie retoma. Si un alta a medias bloquea el RFC para otra persona, hace falta una regla de caducidad.</dd>
+  </dl>
+</div>
+
+<div class="decision">
+  <h4>5.7 · Dos niveles de obligatoriedad, con nombres distintos</h4>
+  <dl class="campo">
+    <dt>Pasaba</dt><dd>El aviso decía que para dar de alta bastaban razón social y RFC; a la vez, tres campos llevaban asterisco y el domicilio fiscal mostraba error antes de que nadie escribiera nada.</dd>
+    <dt>Decidimos</dt><dd>No es un error de redacción: son dos conceptos que compartían marca. <b>Para dar de alta</b> — razón social y RFC. <b>Para facturar o programar</b> — domicilio fiscal, código postal, régimen fiscal y los dos documentos.</dd>
+    <dt class="validar">A validar</dt><dd class="validar">El reparto exacto de campos entre los dos niveles. Es nuestra lectura de las notas de las maquetas, no una lista que nos hayan dado.</dd>
+  </dl>
+</div>
+
+<div class="decision">
+  <h4>5.8 · El aviso de duplicados llega plegado</h4>
+  <dl class="campo">
+    <dt>Pasaba</dt><dd>La tarjeta de razones sociales parecidas ocupaba la parte alta del contenido, antes de la tabla, aunque nadie fuera a resolver duplicados ese día.</dd>
+    <dt>Decidimos</dt><dd>Un aviso de una línea, plegado por omisión, que se despliega al pulsarlo.</dd>
+    <dt class="validar">A validar</dt><dd class="validar">Si resolver duplicados resulta ser tarea frecuente y no puntual, el sitio correcto es una sección propia dentro del padrón. Es una pregunta de frecuencia real, que se sabrá con el padrón cargado.</dd>
+  </dl>
+</div>
+
+<div class="decision">
+  <h4>5.9 · El control de densidad se retira</h4>
+  <dl class="campo">
+    <dt>Pasaba</dt><dd>«Cómoda» y «Compacta» reducían el espaciado sin reducir contenido: la vista compacta se leía peor sin mostrar más.</dd>
+    <dt>Decidimos</dt><dd>Se retira el control. La tabla se queda en densidad cómoda.</dd>
+    <dt class="validar">A validar</dt><dd class="validar">Si al cargar el padrón real hay quien pide ver más de un vistazo, la salida no es devolver los dos botones: es que la densidad sea una preferencia de la persona, guardada junto a la de columnas.</dd>
+  </dl>
+</div>
+
+<div class="nota">
+  <span class="et">Dos cosas que quedaron fuera a propósito</span>
+  <p><b>El flujo del padrón</b> —de la entrada del cliente al inicio del trámite, con los tres
+  orígenes (ICEV, Gestoría, Comercial)— es diseño de proceso, no de interfaz. Explica
+  <em>por qué</em> existen ciertos estados en estas pantallas, pero no se maqueta aquí.</p>
+  <p><b>Los hallazgos propios del diálogo de edición.</b> Cuando se escribió el registro de
+  decisiones, ese archivo original todavía no había llegado; llegó después y la pantalla se
+  rehízo (§4.4). Esa nota del registro está desactualizada, y sus ocho hallazgos merecen una
+  relectura contra lo que hoy está construido.</p>
+</div>
+</section>
+
+<section class="cap">
+<h2><span class="n">6</span>Brechas conocidas</h2>
+
+<p>Esta sección es la que hace fiable al resto. Lo que sigue no está resuelto, y saberlo antes
+de empezar cuesta menos que descubrirlo a mitad.</p>
+
+<div class="nota brecha">
+  <span class="et">1 · No todo el CSS de estos archivos está vivo</span>
+  <p><b>La ficha arrastra 36 reglas de tabla y el alta 39, en pantallas sin una sola
+  <code>&lt;table&gt;</code>.</b> Selectores como <code>thead th[aria-sort]</code>,
+  <code>.tabla-caja tbody tr:hover</code> o <code>.denso tbody th</code> viajaron desde los
+  originales —donde ya sobraban— y no se limpiaron, porque limpiarlos habría hecho ilegible el
+  diff contra la maqueta entregada.</p>
+  <p>Al portar el CSS a componentes, <b>no se traduce el archivo entero</b>: se traduce lo que
+  la pantalla usa. Una forma rápida de saberlo es contrastar cada selector contra el DOM
+  renderizado.</p>
+</div>
+
+<div class="nota brecha">
+  <span class="et">2 · El sistema documenta un nombre y las pantallas usan otro</span>
+  <p>El conmutador de estados aparece con <b>dos nomenclaturas</b>:</p>
+  <ul>
+    <li><code>data-vista</code> + <code>.vista</code> — en la pantalla de acceso, que es la que
+        el sistema de diseño (§6.4) documenta.</li>
+    <li><code>data-state</code> + <code>.state-*</code> — en las cuatro pantallas de clientes,
+        que es lo que muestra la §3.3 de este documento.</li>
+  </ul>
+  <p>Funcionan igual y ninguna está mal, pero <b>hay que elegir una antes de escribir el
+  primer componente</b> y unificar. Si no, la divergencia se multiplica por cada pantalla nueva.</p>
+</div>
+
+<div class="nota brecha">
+  <span class="et">3 · La regla táctil sin <code>:root</code> sigue latente</span>
+  <p>Se corrigió en la ficha, donde causaba el fallo medible. En <b>padrón, alta y editar</b> la
+  regla sigue escrita sin <code>:root</code>. Hoy no cambia nada, porque en esas pantallas no
+  hay una variante de tamaño que la empate; en cuanto se añada una, dejará de aplicarse en
+  silencio. Ver §3.4.</p>
+</div>
+
+<div class="nota brecha">
+  <span class="et">4 · Los datos son de maqueta</span>
+  <p>Nombres, RFC, folios y direcciones son inventados y consistentes entre pantallas para que
+  la navegación tenga sentido. <b>No hay una sola llamada de red en ninguna de las cuatro.</b>
+  Y el panel de andamiaje <code>[data-andamio]</code> del pie, que sirve para ver los cuatro
+  estados, no es una función del producto: se retira al construir.</p>
+</div>
+
+<div class="nota hecho">
+  <span class="et">Lo que sí está comprobado hoy</span>
+  <ul>
+    <li>Las cinco pantallas cargan <b>sin un solo error de consola ni de página</b>, en tema
+        claro y oscuro.</li>
+    <li>Todo icono usado está en su <code>icon_names</code>: la comprobación de §3.2 sale vacía
+        en las cinco.</li>
+    <li>Los <code>id</code> repetidos de la ficha (4) y de editar (2) están resueltos: cero en
+        las cuatro pantallas.</li>
+    <li>Los cuatro estados conmutan dejando <b>una sola vista visible</b>, y cada transición se
+        anuncia por <code>aria-live</code> con texto real.</li>
+    <li>El diálogo de edición abre como modal verdadero (<code>:modal</code>) y coloca el foco
+        en el primer campo editable.</li>
+  </ul>
+</div>
+</section>
+
+<section class="cap">
+<h2><span class="n">7</span>Anexo: documentos fuente</h2>
+
+<div class="tabla-envoltura">
+<table>
+  <thead><tr><th>Documento</th><th>Qué contiene</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>docs/sistema-diseno-sio-dproma.md</code><br><small>1.510 líneas · 11 secciones · v1.5.0</small></td>
+      <td>El sistema completo: color con contrastes medidos, tipografía, espaciado, movimiento,
+          19 componentes con su CSS, layout, voz de producto, seis trampas comprobadas y la
+          lista de comprobación para añadir un componente nuevo.</td>
+    </tr>
+    <tr>
+      <td><code>docs/decisiones-producto-padron.md</code><br><small>195 líneas</small></td>
+      <td>Las nueve decisiones de la §5 con su razonamiento completo, y lo que se dejó fuera
+          a propósito.</td>
+    </tr>
+    <tr>
+      <td><code>docs/patron-dialogo-sio-dproma.md</code><br><small>110 líneas</small></td>
+      <td>El patrón de diálogo: foco, medidas, salidas, comportamiento mientras hay una
+          operación en vuelo, y qué formularios caben en un diálogo y cuáles piden pantalla.</td>
+    </tr>
+    <tr>
+      <td><code>docs/criterios-de-animacion.md</code></td>
+      <td>Duraciones, curvas y qué se anima. Y qué hace <code>prefers-reduced-motion</code>,
+          que no es solo <code>animation:none</code>.</td>
+    </tr>
+    <tr>
+      <td><code>docs/roadmap-supabase.md</code></td>
+      <td>El plan de datos: esquema, fases y qué habilita cada una.</td>
+    </tr>
+    <tr>
+      <td><code>web/entregables/reglas-de-diseno.html</code></td>
+      <td>El sistema publicado como página navegable, con muestras vivas de cada componente en
+          los dos temas. Incluye el <code>.md</code> descargable.</td>
+    </tr>
+    <tr>
+      <td><code>docs/entrega/metricas.py</code></td>
+      <td>El script que recalcula la tabla de la §2 desde los archivos originales y los
+          propuestos. Si alguien toca una pantalla, esto dice si las cifras siguen siendo
+          ciertas.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Qué mirar primero</h3>
+<ol>
+  <li><b>Las maquetas</b>, en un navegador, con el panel de andamiaje. Media hora ahí ahorra
+      medio documento.</li>
+  <li><b>La §3 de este documento</b>, que es lo que se implementa una vez y sirve para las
+      cuatro.</li>
+  <li><b>La §5</b>, para llevar a DPROMA las preguntas que hay que cerrar antes de construir —
+      empezando por la 5.3 y la 5.4.</li>
+</ol>
+
+<p class="guia"><small>Documento generado desde el repositorio del proyecto. Las cifras de la
+§2 y las comprobaciones de la §6 se recalculan desde los archivos; las capturas se generan con
+el navegador a partir de los originales entregados y de las propuestas publicadas.</small></p>
+</section>
+
+</body>
+</html>
