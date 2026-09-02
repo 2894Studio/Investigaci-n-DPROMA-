@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 1.5.0
-last_updated: 2026-09-01
+version: 1.5.1
+last_updated: 2026-09-02
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -1528,3 +1528,4 @@ usados - declarados  →  tiene que ser vacío
 | 1.3.0 | 2026-08-31 | Reescribe el racional de tarjetas a dos principios generales, alineados con buenas prácticas de UI (NN/g, Material Design): contener un flujo pequeño autocontenido, o agrupar información para que no quede suelta en la interfaz. Añade la regla de no anidar tarjetas. |
 | 1.4.0 | 2026-09-01 | El estado de vacío y error va en tarjeta con medallón, no suelto sobre el fondo (§6.4). El suelo de botón —36px, 28px en `.mini`— hay que declararlo con `min-height`, no confiarlo al relleno (§6.2). El esqueleto necesita el mismo alto y el mismo punto de ruptura que el contenido que sustituye, y aplanar el fondo en movimiento reducido (§6.7). Sexta trampa: copiar una regla de otra pantalla puede traerse un token que allí existe y aquí no (§10). Cuatro comprobaciones nuevas en el checklist (§11). |
 | 1.5.0 | 2026-09-01 | Documenta el botón-icono (`.iconbtn`), que se usaba en tres secciones sin estar definido: sus tres medidas, que el `aria-label` nombra el dato y no la acción, y que en un grupo va primero lo frecuente y último lo destructivo (§6.19). Añade la variante que confirma en el sitio —copiar—, que cambia icono, etiqueta y anuncio por `aria-live`, las tres. Y el caso medido del `:root`: sin él, la regla táctil se queda en (0,2,0) y la anula cualquier variante de tamaño declarada después (§7.3). |
+| 1.5.1 | 2026-09-02 | Corrige el hover de la barra de navegación de secciones de esta página (`.nav-secciones a:hover`): pasaba de un gris a otro gris sobre fondo ya claro, con muy poco cambio de estado. Se sustituye por el par ya documentado y usado en `.btn.p` — fondo `--accent` y texto `--accent-ink`, definido explícitamente como "texto e iconos sobre --accent" (§1.2). Cambio acotado a esta página: la barra de secciones es chrome propio del entregable, no un componente del sistema documentado en §6, así que no toca `docs/sistema-diseno-sio-dproma.md`. |
