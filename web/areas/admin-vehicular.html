@@ -256,6 +256,32 @@ tbody tr:hover{ background: var(--surface-alt); }
 }
 .flow-node.is-exception .flow-node-pp p{ color:var(--on-dark); }
 
+/* Bloque de mejora del TO-BE — misma estructura que el de pain point, solo
+   cambia el color. La simetría es intencional: las dos pestañas se leen en
+   paralelo y el lector reconoce la forma antes de leer el texto. */
+.flow-node-gain{
+  margin-top:0.6rem;
+  padding:0.5rem 0.65rem;
+  border-radius:10px;
+  background: color-mix(in srgb, var(--positive) 10%, transparent);
+  border:1px solid var(--positive);
+}
+.flow-gain-tag{
+  display:block;
+  font-size:0.6875rem;
+  font-weight:700;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  color:var(--positive);
+  margin-bottom:0.25rem;
+}
+.flow-node-gain p{
+  margin:0;
+  font-size:0.8125rem;
+  color:var(--text);
+  line-height:1.4;
+}
+
 /* Variantes/excepciones anidadas dentro de la tarjeta que las dispara —
    la relación se ve por contención, no hace falta una flecha ni un carril aparte. */
 .flow-nested-wrap{
@@ -297,16 +323,27 @@ tbody tr:hover{ background: var(--surface-alt); }
 .flow-painpoints .pp-n{ flex:0 0 auto; width:1.5rem; height:1.5rem; border-radius:50%; background:var(--surface-alt); border:1px solid var(--border); color:var(--accent); font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
 .flow-painpoints p{ margin:0; font-size:0.875rem; color:var(--text-muted); }
 
-.flow-skeleton{ position:relative; }
-.construction-overlay{
-  position:sticky; top:1rem; z-index:6;
-  display:inline-block; margin-bottom:1.5rem;
-  background:var(--accent); color:var(--on-accent);
-  font-size:0.8125rem; font-weight:700;
-  padding:0.6em 1.1em; border-radius:999px; box-shadow:var(--shadow);
+/* La lista del TO-BE reusa .flow-painpoints y solo sustituye el disco numerado
+   por una marca: las mejoras no se numeran, porque el AS-IS solo numera algunos
+   de los dolores que el TO-BE resuelve. */
+.flow-gains .gain-n{
+  flex:0 0 auto; width:1.5rem; height:1.5rem; border-radius:50%;
+  background: color-mix(in srgb, var(--positive) 12%, transparent);
+  border:1px solid var(--positive);
+  position:relative;
 }
-.flow-canvas--skeleton{ opacity:0.5; filter:grayscale(0.3); }
-.skel-card{ background:var(--surface-alt); border:1px dashed var(--border); border-radius:14px; height:5.5rem; }
+.flow-gains .gain-n::after{
+  content:""; position:absolute; left:0.42rem; top:0.36rem;
+  width:0.32rem; height:0.6rem;
+  border:solid var(--positive); border-width:0 2px 2px 0;
+  transform:rotate(45deg);
+}
+
+.flow-caveat{
+  margin:1.75rem 0 0; padding:1rem 1.15rem;
+  border-left:3px solid var(--border);
+  font-size:0.875rem; color:var(--text-muted); max-width:76ch;
+}
 
 /* Sección de mejoras — misma receta que web/areas/almacen.html#mejoras */
 #mejoras .prose{ margin-bottom: 2.5rem; }
@@ -435,9 +472,9 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     <div class="section-head">
       <div>
         <div class="eyebrow">Flujos de trabajo</div>
-        <h2>Cómo opera el área hoy</h2>
+        <h2>Cómo opera el área</h2>
       </div>
-      <p class="section-note">Reconstruido a partir de la entrevista. Los números marcan los pain points confirmados.</p>
+      <p class="section-note">«Cómo es hoy» está reconstruido a partir de la entrevista, y los números marcan los pain points confirmados. «Cómo puede ser» es el rediseño propuesto sobre la especificación de Tecnología; las etiquetas verdes dicen qué dolor elimina cada paso.</p>
     </div>
 
     <div class="flow-controls">
@@ -459,10 +496,20 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     </div>
 
     <div class="flow-panel" data-panel="tobe" hidden>
-      <div class="flow-skeleton">
-        <div class="construction-overlay">TO-BE en diseño — próxima fase del proyecto</div>
-        <div class="flow-canvas flow-canvas--skeleton" id="flowSkeleton"></div>
+      <div class="flow-canvas" id="flowCanvasTobe">
+        <svg class="flow-svg" id="flowSvgTobe"></svg>
+        <div class="flow-grid" id="flowGridTobe"></div>
       </div>
+      <ol class="flow-painpoints flow-gains" id="flowGains"></ol>
+      <p class="flow-caveat">
+        Dos de estos seis pasos ya están construidos en la especificación de Tecnología: la plaza
+        que se asigna sola y el reloj de plazo en días hábiles. Los otros cuatro no: la alerta de
+        ingesta, el portal donde el cliente consulta solo, la política de montos exentos de
+        viáticos y el propio acuerdo sobre qué es un lote urgente son decisiones de operación y de
+        Dirección, no funciones que se programen sin más. El trámite en sí sigue siendo presencial
+        en 8 o 9 de cada 10 casos, y eso el sistema no lo cambia — lo que cambia es que deja de
+        depender de que alguien mire el WhatsApp correcto a tiempo.
+      </p>
     </div>
   </div>
 </section>
@@ -602,6 +649,17 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       ppBlock.appendChild(tag); ppBlock.appendChild(ppText);
       card.appendChild(ppBlock);
     }
+    /* Simétrico al bloque de pain point, pero sin índice: el AS-IS solo numera
+       algunos de los dolores que el TO-BE resuelve, así que una etiqueta numerada
+       apuntaría a un número que el lector no encuentra en la otra pestaña. El
+       texto de `gain` ya viene redactado como "Resuelve: …". */
+    if(node.gain){
+      var gainBlock = el('div','flow-node-gain');
+      var gainTag = el('span','flow-gain-tag'); gainTag.textContent = 'Mejora';
+      var gainText = el('p'); gainText.textContent = node.gain;
+      gainBlock.appendChild(gainTag); gainBlock.appendChild(gainText);
+      card.appendChild(gainBlock);
+    }
     return card;
   }
 
@@ -620,6 +678,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     gridEl.innerHTML = '';
 
     var pps = [];
+    var gains = [];
     var cardById = {};
     var mainCards = [];
     var edges = [];
@@ -627,6 +686,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     flow.cycle.forEach(function(node, i){
       var idx = null;
       if(node.pp){ pps.push(node); idx = pps.length; }
+      if(node.gain){ gains.push(node); }
       var card = renderNode(node, null, idx, i + 1);
       gridEl.appendChild(card);
       cardById[node.id] = card;
@@ -684,12 +744,22 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       attachNested('periodic', 'Proceso periódico', pLabel, flow.periodic.nodes, lastId);
     }
 
+    /* Un flujo es AS-IS (nodos con `pp`) o TO-BE (nodos con `gain`), nunca ambos:
+       la lista de debajo del diagrama se arma con lo que traiga el flujo. Los
+       dolores van numerados porque las tarjetas los numeran; las mejoras no. */
     ppListEl.innerHTML = '';
     pps.forEach(function(n, i){
       var li = el('li');
       var num = el('span','pp-n'); num.textContent = String(i+1);
       var p = el('p'); p.textContent = n.pp;
       li.appendChild(num); li.appendChild(p);
+      ppListEl.appendChild(li);
+    });
+    gains.forEach(function(n){
+      var li = el('li');
+      var mark = el('span','gain-n'); mark.setAttribute('aria-hidden','true');
+      var p = el('p'); p.textContent = n.gain;
+      li.appendChild(mark); li.appendChild(p);
       ppListEl.appendChild(li);
     });
 
@@ -784,17 +854,6 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     return { buildConnectors: function(){ layoutMainCards(); buildConnectors(); } };
   }
 
-  function renderSkeleton(flow, skelEl){
-    if(!skelEl) return;
-    skelEl.innerHTML = '';
-    skelEl.style.display = 'grid';
-    skelEl.style.gridTemplateColumns = 'repeat(' + flow.cycle.length + ', minmax(150px,1fr))';
-    skelEl.style.gap = '1.25rem';
-    flow.cycle.forEach(function(){
-      skelEl.appendChild(el('div','skel-card'));
-    });
-  }
-
   window.DPROMA_initFlows = function(rootId, peopleData){
     var root = document.getElementById(rootId);
     if(!root) return;
@@ -803,12 +862,14 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     var gridEl = root.querySelector('#flowGrid');
     var svgElement = root.querySelector('#flowSvg');
     var ppListEl = root.querySelector('#flowPainpoints');
-    var skelEl = root.querySelector('#flowSkeleton');
+    var gridTobeEl = root.querySelector('#flowGridTobe');
+    var svgTobeEl = root.querySelector('#flowSvgTobe');
+    var gainListEl = root.querySelector('#flowGains');
     var tabs = root.querySelectorAll('.flow-tab');
     var panels = root.querySelectorAll('.flow-panel');
 
     var state = { personIdx: 0, flowIdx: 0 };
-    var currentInstance = null;
+    var instances = { asis: null, tobe: null };
 
     function currentPerson(){ return peopleData[state.personIdx]; }
     function currentFlow(){ return currentPerson().flows[state.flowIdx]; }
@@ -838,8 +899,10 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       renderPersonPills();
       renderNamePills();
       var flow = currentFlow();
-      currentInstance = renderFlow(flow, gridEl, svgElement, ppListEl);
-      renderSkeleton(flow, skelEl);
+      instances.asis = renderFlow(flow, gridEl, svgElement, ppListEl);
+      instances.tobe = flow.tobe && gridTobeEl
+        ? renderFlow(flow.tobe, gridTobeEl, svgTobeEl, gainListEl)
+        : null;
     }
 
     Array.prototype.slice.call(tabs).forEach(function(tab){
@@ -848,7 +911,11 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
         tab.classList.add('is-active');
         var name = tab.dataset.tab;
         Array.prototype.slice.call(panels).forEach(function(p){ p.hidden = p.dataset.panel !== name; });
-        if(name === 'asis' && currentInstance) currentInstance.buildConnectors();
+        /* Los conectores se calculan midiendo el DOM, y dentro de un panel con
+           `hidden` todo mide 0 — el TO-BE se renderiza oculto y llegaría sin
+           flechas. Se rehacen sobre la instancia del panel que acaba de aparecer. */
+        var shown = instances[name];
+        if(shown) shown.buildConnectors();
       });
     });
 
@@ -884,6 +951,21 @@ DPROMA_initFlows('flujos', [
           triggerId: 'n6',
           label: '↓ Excepción — cliente pregunta estatus',
           node: { id:'e1', title:'Responde manualmente', desc:'Si el cliente pregunta el estatus, se responde manualmente por WhatsApp — no existe portal de autoservicio.', icon:'alert', pp:'Sin portal de trazabilidad para el cliente — depende de que alguien del equipo esté disponible para responder por WhatsApp.' }
+        },
+        tobe: {
+          cycle: [
+            { id:'t1', title:'La solicitud entra y avisa sola', desc:'Llegue por correo, por la plataforma del cliente o por WhatsApp, el trámite se registra en un único punto de entrada y dispara una alerta al equipo de la plaza que le toca. Nadie tiene que estar mirando el canal correcto en el momento correcto.', icon:'alert',
+              gain:'Resuelve: el día completo que se pierde cuando un lote de 200 trámites llega y no se comparte a tiempo.' },
+            { id:'t2', title:'La plaza se asigna sola', desc:'Según la ubicación capturada, el trámite queda en su plaza, con un coordinador responsable visible también para el cliente. El reparto deja de depender de a quién se le asigne cada lote.', icon:'send',
+              gain:'Resuelve: el desacuerdo interno sobre repartir por persona o por ciudad, que salió en la propia entrevista sin cerrarse.' },
+            { id:'t3', title:'Expediente con reloj de plazo', desc:'Al admitirse formalmente, el trámite arranca su plazo en días hábiles de lunes a sábado, por tipo y por plaza. Si queda observado, el reloj sigue corriendo — y eso se ve, en vez de descubrirse cuando ya venció.', icon:'doc',
+              gain:'Resuelve: el número de reporte y la bitácora de fechas que hoy no existen por trámite.' },
+            { id:'t4', title:'Se ejecuta ante la autoridad', desc:'Sigue siendo presencial en 8 o 9 de cada 10 casos, porque así lo exige la dependencia. Lo que cambia no es el trámite: es que su avance se registra donde todos lo ven, no en la cabeza de quien fue a la ventanilla.', icon:'check' },
+            { id:'t5', title:'Cierre con acuse, y el cliente lo ve solo', desc:'Generar el acuse de entrega cierra el trámite, lo saca de la bandeja activa y deja constancia firmada, sin borrar el expediente. Y el cliente consulta el estatus en su propio panel, en vez de preguntar por WhatsApp.', icon:'sheet',
+              gain:'Resuelve: el Excel compartido con el cliente editando sin control, y la hora de espera cuando alguien pregunta «¿cómo va lo mío?».' },
+            { id:'t6', title:'Viáticos con regla, no con cadena', desc:'Una política de montos exentos y de tiempos máximos por nivel: lo pequeño y urgente no recorre las mismas cuatro firmas que lo grande, y cada nivel sabe en cuánto tiene que responder.', icon:'quote',
+              gain:'Resuelve: los 4 niveles de aprobación secuencial que hoy frenan hasta un viático menor.' }
+          ]
         }
       }
     ]
