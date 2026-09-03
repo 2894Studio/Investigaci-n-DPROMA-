@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Administración Vehicular · Entregables DPROMA × 2894 Studio</title>
+<meta name="description" content="Revisión de UX, UI y accesibilidad de las 4 pantallas de Administración Vehicular en SIO-DPROMA, contra la especificación de Tecnología y el sistema de diseño, con las pantallas ya corregidas para abrir." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cloud-white: #F7F8FA;
+  --soft-gray: #E6E8EC;
+  --ink-black: #0B0B0D;
+  --deep-cobalt: #0A46FF;
+  --sky-blue: #7DB7FF;
+
+  --bg: var(--cloud-white);
+  --surface: #FFFFFF;
+  --surface-alt: var(--soft-gray);
+  --text: var(--ink-black);
+  --text-muted: #53565f;
+  --border: #d8dbe2;
+  --accent: var(--deep-cobalt);
+  --accent-soft: var(--sky-blue);
+  --on-accent: var(--cloud-white);
+  --on-dark: var(--cloud-white);
+  --dark-surface: var(--ink-black);
+  --dark-surface-text-muted: #b9bec9;
+  --positive: #0B7A52;
+  --shadow: 0 1px 2px rgba(11,11,13,0.04), 0 8px 24px rgba(11,11,13,0.06);
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: #0B0B0D;
+    --surface: #16171c;
+    --surface-alt: #1c1e24;
+    --text: #F7F8FA;
+    --text-muted: #b9bec9;
+    --border: #2a2d35;
+    --accent: #3D6BFF;
+    --accent-soft: #9CC7FF;
+    --on-accent: #F7F8FA;
+    --dark-surface: #000000;
+    --positive: #3FD39A;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg: #0B0B0D;
+  --surface: #16171c;
+  --surface-alt: #1c1e24;
+  --text: #F7F8FA;
+  --text-muted: #b9bec9;
+  --border: #2a2d35;
+  --accent: #3D6BFF;
+  --accent-soft: #9CC7FF;
+  --on-accent: #F7F8FA;
+  --dark-surface: #000000;
+  --positive: #3FD39A;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+}
+:root[data-theme="light"]{
+  --bg: var(--cloud-white);
+  --surface: #FFFFFF;
+  --surface-alt: var(--soft-gray);
+  --text: var(--ink-black);
+  --text-muted: #53565f;
+  --border: #d8dbe2;
+  --accent: var(--deep-cobalt);
+  --accent-soft: var(--sky-blue);
+  --on-accent: var(--cloud-white);
+  --dark-surface: var(--ink-black);
+  --positive: #0B7A52;
+  --shadow: 0 1px 2px rgba(11,11,13,0.04), 0 8px 24px rgba(11,11,13,0.06);
+}
+
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior: auto; }
+  *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+a{ color: var(--accent); }
+a:focus-visible, button:focus-visible{ outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+.wrap{ max-width: 1120px; margin: 0 auto; padding: 0 clamp(1.25rem, 4vw, 2.5rem); }
+
+h1,h2,h3{ font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; margin: 0; }
+
+.prose p{ max-width: 72ch; color: var(--text-muted); }
+.prose p + p{ margin-top: 1em; }
+
+.eyebrow{
+  display:inline-flex; align-items:center; gap: 0.5em;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent);
+}
+.eyebrow::before{ content:""; width: 0.5em; height: 0.5em; border-radius: 999px; background: var(--accent); display:inline-block; }
+
+header.masthead{ padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
+.masthead-inner{ display:flex; align-items:center; justify-content:space-between; gap: 1rem; flex-wrap: wrap; }
+.wordmark{ font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em; text-transform: uppercase; text-decoration:none; color: var(--text); }
+.wordmark span{ color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+.masthead nav{ display:flex; align-items:center; gap: 1.5rem; flex-wrap: wrap; }
+.masthead nav a{ font-size: 0.875rem; font-weight: 500; color: var(--text-muted); text-decoration: none; }
+.masthead nav a:hover{ color: var(--accent); }
+.masthead nav a.nav-cta{ background: var(--accent); color: var(--on-accent); padding: 0.45em 1.1em; border-radius: 999px; font-weight: 700; }
+.masthead nav a.nav-cta:hover{ background: var(--accent); opacity:.88; color: var(--on-accent); }
+
+.hero{ padding: clamp(3rem, 8vw, 5.5rem) 0 clamp(2.5rem, 6vw, 4rem); }
+.hero h1{ font-size: clamp(2rem, 4.4vw, 3.25rem); line-height: 1.08; margin-top: 0.75rem; }
+.hero .lede{ margin-top: 1.25rem; font-size: 1.0625rem; color: var(--text-muted); max-width: 68ch; }
+
+section{ padding: clamp(2.5rem, 6vw, 4rem) 0; }
+section + section{ border-top: 1px solid var(--border); }
+
+.section-head{ display:flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.section-head h2{ font-size: clamp(1.5rem, 3vw, 2rem); margin-top: 0.5rem; }
+.section-head .section-note{ max-width: 34ch; color: var(--text-muted); font-size: 0.9375rem; }
+
+.card-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+@media (max-width: 900px){ .card-grid{ grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 560px){ .card-grid{ grid-template-columns: 1fr; } }
+
+.card{ border-radius: 18px; padding: 1.5rem; display:flex; flex-direction:column; gap: 0.75rem; box-shadow: var(--shadow); }
+.card-neutral{ background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+.card-brand{ background: var(--accent); color: var(--on-accent); }
+.card-dark{ background: var(--dark-surface); color: var(--on-dark); }
+.card h3{ font-size: 1.0625rem; font-weight: 700; }
+.card p{ font-size: 0.9375rem; margin:0; opacity: 0.88; }
+.card-neutral p{ color: var(--text-muted); opacity: 1; }
+
+/* Tabla de contraste — cruce entrevista / especificación de Tecnología / pantalla construida */
+.table-scroll{ overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; }
+.spec-table{ border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.875rem; }
+.spec-table th, .spec-table td{ text-align: left; padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.spec-table thead th{ font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700; background: var(--surface-alt); }
+.spec-table tbody tr:last-child td{ border-bottom: none; }
+.spec-table tbody tr:hover{ background: var(--surface-alt); }
+.spec-grupo td{ font-size:0.75rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); background:var(--surface-alt); }
+.marca{ display:inline-block; font-size:0.6875rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; padding:0.3em 0.7em; border-radius:999px; white-space:nowrap; }
+.marca-ok{ background:var(--surface-alt); color:var(--text-muted); border:1px solid var(--border); }
+.marca-brecha{ background:var(--accent); color:var(--on-accent); }
+.marca-nueva{ background:transparent; color:var(--accent); border:1px solid var(--accent); }
+
+/* Mejoras propuestas — igual receta que web/areas/almacen.html#mejoras */
+.mejora-grupo + .mejora-grupo{ margin-top: 3rem; }
+.mejora-grupo > h3{ font-size:1.125rem; margin-bottom:0.5rem; }
+.mejora-grupo > p.mejora-intro{ margin:0 0 1.5rem; color:var(--text-muted); font-size:0.9375rem; max-width:72ch; }
+.mejora-id{ font-size:0.75rem; font-weight:700; letter-spacing:0.08em; color:var(--text-muted); display:block; margin-bottom:0.35rem; }
+.mejora-badges{ display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:auto; padding-top:1rem; }
+.mejora-badge{ font-size:0.6875rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; padding:0.3em 0.7em; border-radius:999px; border:1px solid var(--border); color:var(--text-muted); }
+.mejora-badge.is-listo{ border-color:var(--positive); color:var(--positive); }
+.mejora-badge.is-brecha{ border-color:var(--accent); color:var(--accent); }
+.card.mejora{ display:flex; flex-direction:column; }
+
+/* Enlaces a las pantallas corregidas — misma receta que padron-clientes.html */
+.maquetas-lista{ list-style:none; margin:2rem 0 0; padding:0; display:flex; flex-direction:column; gap:0; border-top:1px solid var(--border); }
+.maquetas-lista li{ border-bottom:1px solid var(--border); }
+.maquetas-lista a{ display:block; padding:1.25rem 0.25rem; text-decoration:none; color:var(--text); }
+.maquetas-lista a:hover b{ color:var(--accent); }
+.maquetas-lista b{ display:block; font-size:1.0625rem; }
+.maquetas-lista a > span{ display:block; margin-top:0.35rem; font-size:0.9375rem; color:var(--text-muted); max-width:74ch; }
+.maquetas-lista .maquetas-cambio{ margin-top:0.5rem; }
+.maquetas-lista code{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:0.85em; color:var(--accent); }
+.maquetas-pie{ margin-top:1.5rem; font-size:0.875rem; color:var(--text-muted); max-width:76ch; }
+
+.mejora-shot-link{ display:block; text-decoration:none; margin-top:1rem; }
+.mejora-shot{ width:100%; height:auto; border-radius:12px; border:1px solid var(--border); box-shadow:var(--shadow); display:block; }
+.mejora-zoom{ display:block; margin-top:0.5rem; font-size:0.8125rem; color:var(--accent); }
+.shot-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-top:1rem; }
+@media (max-width:760px){ .shot-grid{ grid-template-columns:1fr; } }
+
+footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
+.footer-meta{ display:flex; justify-content: space-between; align-items:center; flex-wrap: wrap; gap: 1rem; font-size: 0.8125rem; color: var(--text-muted); }
+.footer-meta a{ color: var(--text-muted); }
+.footer-nav{ margin-bottom: 1.5rem; }
+.footer-nav a{ color: var(--accent); text-decoration:none; font-weight: 500; font-size: 0.9375rem; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="wordmark" href="/">2894 <span>Studio × DPROMA</span></a>
+    <nav>
+      <a href="/">Informe general</a>
+      <a href="#diagnostico">Diagnóstico</a>
+      <a href="#contraste">Contraste</a>
+      <a href="#mejoras">Mejoras</a>
+      <a href="#pantallas">Las pantallas</a>
+      <a class="nav-cta" href="/entregables">Entregables</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Entregable · UX, UI y accesibilidad</div>
+    <h1>Administración Vehicular, antes Gestoría.</h1>
+    <p class="lede">Revisión de UX, UI y accesibilidad de las 4 pantallas ya construidas para Administración Vehicular en SIO-DPROMA (Tablero, Trámites vehiculares, Detalle de trámite, Trámites concluidos), contra la especificación de Tecnología y el sistema de diseño. Las mejoras funcionales del área — lo que todavía no tiene pantalla — se documentan en <a href="/areas/admin-vehicular#mejoras">el perfil del área</a>.</p>
+  </div>
+</section>
+
+<section id="diagnostico">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Tres fuentes, un cruce</div>
+        <h2>Lo que dice la entrevista, lo que especifica Tecnología, lo que hay construido.</h2>
+        <p class="section-note">Sin inventar: cada hallazgo está en al menos dos de las tres fuentes.</p>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>El equipo de Administración Vehicular describió en la entrevista una operación de 300 a 900 trámites mensuales por cliente, 80-90% resueltos en persona ante una autoridad, con el control viviendo en un Excel colaborativo con macros y semáforos —editado también por los propios clientes— y la coordinación dependiendo de más de 400 grupos de WhatsApp. Dos dolores concretos: si un lote grande no se comparte a tiempo se pierde un día completo de seguimiento, y no había un criterio único para repartir el trabajo entre plazas.</p>
+      <p>La especificación de Tecnología (Tablero principal, Plazas, Calendario laboral, Trámites concluidos) ya resuelve una parte real de eso: la plaza se asigna sola según la ubicación del trámite, con un coordinador responsable visible; el plazo corre en días hábiles y no se detiene solo porque el trámite quede observado; y cerrar un trámite genera un acuse formal que lo saca de la bandeja activa sin borrar el expediente.</p>
+      <p>Las cuatro pantallas que ya construyó el equipo (Tablero, Trámites vehiculares, Detalle de trámite, Trámites concluidos) implementan casi toda esa especificación con fidelidad — el reloj de plazo del detalle, por ejemplo, es exactamente el descrito en el documento de Calendario laboral. Pero arrastran un aviso de nomenclatura que la propia documentación de Tecnología deja explícito y que no se aplicó en pantalla: el módulo se llamaba <b>Gestoría</b> y ahora es oficialmente <b>Administración Vehicular</b>, en toda referencia de cara al usuario.</p>
+    </div>
+  </div>
+</section>
+
+<section id="contraste">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Contraste con la especificación</div>
+        <h2>Lo que ya está resuelto y lo que sigue abierto.</h2>
+        <p class="section-note">Cruce entre los 4 documentos de Tecnología, las 4 pantallas recibidas y los pain points de la entrevista.</p>
+      </div>
+    </div>
+
+    <div class="table-scroll">
+      <table class="spec-table">
+        <thead><tr><th>Punto</th><th>En detalle</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr class="spec-grupo"><td colspan="3">Confirmado</td></tr>
+          <tr><td>Asignación por plaza</td><td>La plaza se asigna sola según la ubicación capturada; resuelve el desacuerdo interno «por persona vs. por ciudad» que salió en la entrevista</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
+          <tr><td>Reloj de plazo</td><td>Días hábiles de lunes a sábado, arranca en la admisión, no se detiene con el trámite observado</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
+          <tr><td>Cierre con acuse</td><td>El acuse agrupa folio, cliente y vehículos; advierte si el lote mezcla más de un cliente</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
+          <tr><td>Archivado sin borrado</td><td>Un trámite archivado deja de listarse por defecto, pero el expediente sigue completo y consultable</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
+          <tr><td>Enlace directo a un concluido</td><td>Redirige a Trámites concluidos con aviso, en vez de un «no encontrado»</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
+
+          <tr class="spec-grupo"><td colspan="3">Sigue abierto en pantalla</td></tr>
+          <tr><td>Nomenclatura</td><td>Las 4 pantallas seguían diciendo «Gestoría» en título, menú, permisos y mensajes de error — contra el aviso explícito de la propia documentación</td><td><span class="marca marca-brecha">Brecha</span></td></tr>
+          <tr><td>Ítem de menú duplicado</td><td>«Gestoría» aparecía como tercer ítem del menú, junto a «Trámites vehiculares» y «Trámites concluidos»</td><td><span class="marca marca-brecha">Brecha</span></td></tr>
+          <tr><td>Bloques del Tablero principal</td><td>El Tablero solo cubría plazas y semáforo; faltaban total, concluidos del mes, viáticos pendientes de autorizar e incidencias abiertas</td><td><span class="marca marca-brecha">Brecha</span></td></tr>
+          <tr><td>Vistas de estado</td><td>Vacío y error iban con icono suelto y un <code>&lt;b&gt;</code> como título, sin la tarjeta ni el encabezado real que exige el sistema de diseño (§6.4)</td><td><span class="marca marca-brecha">Brecha</span></td></tr>
+
+        </tbody>
+      </table>
+    </div>
+    <p class="prose" style="margin-top:1.25rem">Portal de autoconsulta del cliente, alerta al llegar un lote grande y el flujo de aprobación de viáticos son brechas funcionales, no de interfaz: ninguna de las 4 pantallas es el lugar para resolverlas. Se documentan como mejoras propuestas en el <a href="/areas/admin-vehicular#mejoras">perfil del área</a>.</p>
+  </div>
+</section>
+
+<section id="mejoras">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Correcciones de UX, UI y accesibilidad</div>
+        <h2>Qué se corrigió en las 4 pantallas.</h2>
+      </div>
+      <p class="section-note">Agrupadas por lo que resuelven, cada una con su estado real de madurez.</p>
+    </div>
+
+    <div class="mejora-grupo">
+      <h3>1 · Nomenclatura y navegación</h3>
+      <p class="mejora-intro">La documentación de Tecnología es explícita: «Gestoría» queda sustituida por «Administración Vehicular» en pantallas y en cualquier texto de cara al usuario. Las 4 pantallas no lo habían aplicado.</p>
+      <div class="card-grid">
+        <div class="card card-neutral mejora">
+          <span class="mejora-id">1.1</span>
+          <h3>Renombrar el módulo en las 4 pantallas</h3>
+          <p>Título, encabezado, resumen de cabecera, etiquetas de permiso («lo ven: Administración Vehicular y Dirección») y los mensajes de estado vacío/error, que decían «bandeja de gestoría» o «el servicio de gestoría no respondió».</p>
+          <div class="mejora-badges"><span class="mejora-badge is-listo">Aplicado</span></div>
+        </div>
+        <div class="card card-neutral mejora">
+          <span class="mejora-id">1.2</span>
+          <h3>Quitar el ítem de menú duplicado</h3>
+          <p>El menú lateral traía «Gestoría» como tercer ítem, junto a «Trámites vehiculares» y «Trámites concluidos», bajo el mismo grupo. Apuntaban al mismo módulo con nombres distintos — se retira y queda un único ítem por pantalla.</p>
+          <div class="mejora-badges"><span class="mejora-badge is-listo">Aplicado</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mejora-grupo">
+      <h3>2 · Lo que el Tablero principal todavía no mostraba</h3>
+      <p class="mejora-intro">La especificación pide que el bloque de Administración Vehicular muestre total, en proceso, por vencer, concluidos del mes, vencidos y desglose por plaza — más viáticos pendientes de autorizar e incidencias de servicio abiertas. El mock cubría plazas y semáforo; el resto faltaba.</p>
+      <div class="card-grid">
+        <div class="card card-neutral mejora">
+          <span class="mejora-id">2.1</span>
+          <h3>Total y concluidos del mes en el resumen</h3>
+          <p>El resumen de cabecera pasa de «36 trámites en tus plazas» a «56 trámites en tus plazas este mes (36 abiertos · 20 concluidos)» — sin agregar un componente nuevo, extendiendo el que ya existía.</p>
+          <div class="mejora-badges"><span class="mejora-badge is-listo">Aplicado</span></div>
+        </div>
+        <div class="card card-neutral mejora">
+          <span class="mejora-id">2.2</span>
+          <h3>Viáticos pendientes e incidencias abiertas</h3>
+          <p>Se añade una segunda sección al Tablero, «Otros pendientes de Administración Vehicular», con dos tarjetas que reusan exactamente el componente de plaza ya existente en la pantalla, no uno nuevo.</p>
+          <div class="mejora-badges"><span class="mejora-badge is-listo">Aplicado</span></div>
+        </div>
+        <div class="card card-neutral mejora">
+          <span class="mejora-id">2.3</span>
+          <h3>Ocultar el bloque, no mostrar cero</h3>
+          <p>La regla de la especificación —un bloque que no se puede medir se oculta, nunca se muestra en cero— todavía no está representada con datos reales por rol y alcance: es una decisión de datos, no de maqueta, y queda para cuando el bloque se conecte a información real.</p>
+          <div class="mejora-badges"><span class="mejora-badge is-brecha">Pendiente de datos reales</span></div>
+        </div>
+      </div>
+      <a class="mejora-shot-link" href="/entregables/img/admin-vehicular-tablero.png" target="_blank" rel="noopener">
+        <img class="mejora-shot" src="/entregables/img/admin-vehicular-tablero.png" loading="lazy" alt="Tablero de Administración Vehicular, ya corregido: título renombrado, resumen con total y concluidos del mes, y la nueva sección de viáticos pendientes de autorizar e incidencias de servicio abiertas.">
+        <span class="mejora-zoom">Ver el tablero corregido →</span>
+      </a>
+    </div>
+
+    <div class="mejora-grupo">
+      <h3>3 · Vistas de estado — receta del sistema de diseño (§6.4)</h3>
+      <p class="mejora-intro">El propio <a href="/entregables/reglas-de-diseno">sistema de diseño</a> señala este mismo defecto como ya cometido una vez en las maquetas del padrón de clientes: un icono suelto y un <code>&lt;b&gt;</code> a modo de título no son un estado, son un mensaje sin forma. Reaparecía igual en las 4 pantallas de Administración Vehicular.</p>
+      <div class="card-grid">
+        <div class="card card-neutral mejora">
+          <span class="mejora-id">3.1</span>
+          <h3>Tarjeta y medallón, no icono suelto</h3>
+          <p>Cada estado vacío y de error queda envuelto en <code>.tarjeta-estado</code> (<code>--r-modal</code> / <code>--sh-modal</code>), con el icono dentro del medallón <code>.estado-ico</code> — en rojo (<code>.es-err</code>) para los de error.</p>
+          <div class="mejora-badges"><span class="mejora-badge is-listo">Aplicado</span></div>
+        </div>
+        <div class="card card-neutral mejora" style="grid-column:1/-1">
+          <span class="mejora-id">Antes / después</span>
+          <h3>El estado vacío del detalle de trámite</h3>
+          <p>A la izquierda, el icono suelto y el <code>&lt;b&gt;</code> como título que traía la maqueta. A la derecha, la tarjeta con medallón, encabezado real y el resto de la receta del §6.4 ya aplicada.</p>
+          <div class="shot-grid">
+            <a class="mejora-shot-link" href="/entregables/img/admin-vehicular-detalle-vacio.png" target="_blank" rel="noopener">
+              <img class="mejora-shot" src="/entregables/img/admin-vehicular-detalle-vacio.png" loading="lazy" alt="Estado vacío del detalle de trámite, ya corregido: la tarjeta con medallón verde, el encabezado «Este trámite todavía no tiene movimientos» y el botón Registrar avance.">
+              <span class="mejora-zoom">Estado vacío, corregido →</span>
+            </a>
+            <a class="mejora-shot-link" href="/entregables/img/admin-vehicular-detalle-error.png" target="_blank" rel="noopener">
+              <img class="mejora-shot" src="/entregables/img/admin-vehicular-detalle-error.png" loading="lazy" alt="Estado de error del detalle de trámite, ya corregido: la tarjeta con medallón rojo, el encabezado «No se pudo cargar el trámite» y la referencia AV-20260901-1131.">
+              <span class="mejora-zoom">Estado de error, corregido →</span>
+            </a>
+          </div>
+        </div>
+        <div class="card card-neutral mejora">
+          <span class="mejora-id">3.2</span>
+          <h3>Encabezado real, no un <code>&lt;b&gt;</code></h3>
+          <p>El título de cada estado pasa a <code>&lt;h2&gt;</code>, para que se pueda navegar la pantalla saltando de encabezado en encabezado con un lector de pantalla.</p>
+          <div class="mejora-badges"><span class="mejora-badge is-listo">Aplicado</span></div>
+        </div>
+        <div class="card card-neutral mejora">
+          <span class="mejora-id">3.3</span>
+          <h3>El cambio se anuncia y mueve el foco</h3>
+          <p>Se añadió la región <code>aria-live="polite"</code> que faltaba y el envío de foco al contenido en cada cambio de estado — la única de las cuatro reglas no opcionales del §6.4 que las pantallas no traían.</p>
+          <div class="mejora-badges"><span class="mejora-badge is-listo">Aplicado</span></div>
+        </div>
+        <div class="card card-neutral mejora">
+          <span class="mejora-id">3.4</span>
+          <h3>El error dice qué no se perdió</h3>
+          <p>Las tres partes del mensaje de error —qué pasó, qué no se perdió, qué hacer— más la referencia de error ya venían bien resueltas en las 4 pantallas; solo se corrigió el prefijo de la referencia (de <code>GES-</code> a <code>AV-</code>) para que coincida con el nuevo nombre del módulo.</p>
+          <div class="mejora-badges"><span class="mejora-badge is-listo">Ya estaba bien</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-dark" style="margin-top:3rem;">
+      <h3>Por qué esto importa más que un cambio de nombre</h3>
+      <p>«Gestoría» y «Administración Vehicular» no son sinónimos intercambiables aquí: son dos nombres para el mismo módulo conviviendo en la misma pantalla, y eso es exactamente el tipo de inconsistencia que el objetivo 4 del brief —estandarizar procesos y formatos entre áreas— pide eliminar. Una pantalla que no puede decidir cómo se llama a sí misma tampoco transmite confianza sobre si el plazo que muestra es el correcto.</p>
+      <p>Las mejoras funcionales del área — lo que ninguna de estas 4 pantallas resuelve todavía — se documentan en el <a href="/areas/admin-vehicular#mejoras" style="color:var(--on-dark);text-decoration:underline">perfil del área</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section id="pantallas">
+  <div class="wrap">
+    <h2>Las pantallas, para abrirlas</h2>
+    <p class="prose" style="margin-top:1rem">No son dibujos: son las 4 pantallas que compartió el equipo, con las correcciones de nomenclatura, navegación y estados ya aplicadas. Se pueden abrir, cambiar entre sus estados —con datos, cargando, vacío y error—, probar el tema claro y el oscuro, y recorrerlas solo con el teclado.</p>
+    <ul class="maquetas-lista">
+      <li><a href="/entregables/propuestas/administracion-vehicular-tablero">
+        <b>Tablero de Administración Vehicular</b>
+        <span>Trámites por plaza con semáforo de plazo, más viáticos pendientes de autorizar e incidencias de servicio abiertas.</span>
+        <span class="maquetas-cambio">Se corrige la nomenclatura, se retira el ítem de menú duplicado, se añaden los dos bloques que faltaban y se reconstruyen los estados vacío/error según el §6.4 del sistema de diseño.</span></a></li>
+      <li><a href="/entregables/propuestas/administracion-vehicular-tramites">
+        <b>Trámites vehiculares</b>
+        <span>El listado activo, con búsqueda por folio, cliente, placas o VIN y filtro por plaza.</span>
+        <span class="maquetas-cambio">Mismas correcciones de nomenclatura, menú y estados que el resto de la familia.</span></a></li>
+      <li><a href="/entregables/propuestas/administracion-vehicular-tramite-detalle">
+        <b>Detalle de trámite</b>
+        <span>El reloj de plazo en días hábiles y la bitácora del trámite, incluido el aviso de que un trámite observado sigue venciendo.</span>
+        <span class="maquetas-cambio">Es la pantalla donde el defecto de las vistas de estado era más visible — el icono suelto sin tarjeta ni encabezado real — y donde se aplicó primero la corrección del §6.4.</span></a></li>
+      <li><a href="/entregables/propuestas/administracion-vehicular-concluidos">
+        <b>Trámites concluidos</b>
+        <span>El listado de trámites ya entregados y cerrados, con su acuse y la acción de archivar.</span>
+        <span class="maquetas-cambio">Mismas correcciones; además, sus estados eran los que más se apoyaban en la palabra «gestoría» para explicar de dónde vienen los trámites.</span></a></li>
+    </ul>
+    <p class="maquetas-pie">El sistema de diseño que comparten las 4 pantallas se documenta en el entregable <a href="/entregables/reglas-de-diseno">Sistema de diseño</a>. Los hallazgos de investigación citados aquí (pp-081 a pp-089, pp-040 a pp-052) están en <code>data/insights/2026-07-23_comercial-administracion-vehicular.json</code> y <code>data/insights/2026-07-31_administracion-vehicular-equipo.json</code>.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-nav"><a href="/entregables">← Volver a Entregables</a></div>
+    <div class="footer-meta">
+      <span>2894 Studio × DPROMA — entregable de área</span>
+      <a href="/">Ver la síntesis completa →</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
