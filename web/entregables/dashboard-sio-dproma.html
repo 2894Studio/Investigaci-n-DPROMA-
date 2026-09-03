@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="es" data-density="comfy">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Capa de dashboard · SIO-DPROMA</title>
+<meta name="description" content="Los componentes de dato visual de SIO-DPROMA: KPI, barras de estado, dona, ranking, tendencia, sparkline y progreso, con sus tokens, sus reglas y su alternativa accesible." />
+<style>
+/* ───────────────────────────────────────────────────────────────────────────
+   Tokens de aplicación de SIO-DPROMA. Son los mismos del resto de pantallas:
+   esta página no inventa paleta, la muestra. Lo único nuevo son los cuatro
+   colores de serie de §1.4, que se validaron con el script del método.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root{
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --fs-meta: 12px; --fs-dense: 13px; --fs-base: 14px;
+  --fs-sub: 16px;  --fs-title: 20px; --fs-kpi: 30px;
+
+  --sp-1: 4px; --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-12: 48px;
+
+  --r-ctrl: 6px; --r-card: 10px; --r-modal: 16px; --r-pill: 999px;
+  --dur-base: 200ms; --ease-out: cubic-bezier(.23, 1, .32, 1);
+  --focus-w: 2px; --focus-offset: 2px;
+
+  color-scheme: light;
+
+  --bg: #F2F5F7;
+  --surface: #FAFCFD;
+  --surface-2: #E7EDF3;
+  --border: rgba(27,36,48,.14);
+  --border-2: rgba(27,36,48,.26);
+
+  --text: #1B2430;
+  --text-2: #4C5A6B;
+  --text-3: #66717F;
+
+  --accent: #3E7A4C;
+  --accent-ink: #F7FAF9;
+  --accent-soft: rgba(62,122,76,.10);
+
+  --ok:    #2F8F6F;  --ok-fill:    rgba(47,143,111,.12);
+  --warn:  #B98A1E;  --warn-fill:  rgba(185,138,30,.14);
+  --err:   #C24238;  --err-fill:   rgba(194,66,56,.11);
+  --block: #9678CC;  --block-fill: rgba(150,120,204,.13);
+  --pause: #4A5560;  --pause-fill: rgba(74,85,96,.11);
+
+  --ok-ink: #22705A; --warn-ink: #7E5B0E; --err-ink: #B03A31;
+  --block-ink: #6D4FA3; --pause-ink: #4A5560;
+  --ok-bg:#E2EFEC; --warn-bg:#F1ECDE; --err-bg:#F4E8E7; --block-bg:#EDEBF7; --pause-bg:#E7EAEC;
+
+  /* §1.4 — Paleta categórica. Cuatro slots en orden fijo, nunca ciclados.
+     Validados con scripts/validate_palette.js en los dos temas. */
+  --serie-1: #2a78d6;   /* azul */
+  --serie-2: #eb6834;   /* naranja */
+  --serie-3: #4a3aa7;   /* violeta */
+  --serie-4: #e87ba4;   /* magenta — bajo 3:1 en claro, exige etiqueta o tabla */
+
+  /* Tinta sobre relleno sólido de color. Voltea por tema: blanco literal
+     falla en oscuro (2,27:1 sobre --ok). */
+  --on-state: #F7FAF9;
+
+  --grid: rgba(27,36,48,.10);
+
+  --sh-rest:  0 1px 2px rgba(19,29,43,.07);
+  --sh-float: 0 6px 18px rgba(19,29,43,.10);
+}
+
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg: #10161F;
+    --surface: #171F2C;
+    --surface-2: #1D2735;
+    --border: rgba(231,236,242,.12);
+    --border-2: rgba(231,236,242,.24);
+    --text: #E7ECF2;
+    --text-2: #A8B3C2;
+    --text-3: #8B96A6;
+    --accent: #4A8F5A;
+    --accent-ink: #08120D;
+    --accent-soft: rgba(74,143,90,.16);
+    --ok:#4FBF98; --warn:#E8C24C; --err:#EE6E5F; --block:#C0A9F0; --pause:#6B7684;
+    --ok-ink:#4FBF98; --warn-ink:#E8C24C; --err-ink:#EE6E5F; --block-ink:#C0A9F0; --pause-ink:#98A4B4;
+    --ok-bg:#1F353B; --warn-bg:#343630; --err-bg:#352A33; --block-bg:#2F3247; --pause-bg:#28303E;
+    --serie-1:#3987e5; --serie-2:#d95926; --serie-3:#9085e9; --serie-4:#d55181;
+    --on-state: #08120D;
+    --grid: rgba(231,236,242,.10);
+    --sh-rest: 0 1px 2px rgba(0,0,0,.35);
+    --sh-float: 0 6px 18px rgba(0,0,0,.40);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg: #10161F;
+  --surface: #171F2C;
+  --surface-2: #1D2735;
+  --border: rgba(231,236,242,.12);
+  --border-2: rgba(231,236,242,.24);
+  --text: #E7ECF2;
+  --text-2: #A8B3C2;
+  --text-3: #8B96A6;
+  --accent: #4A8F5A;
+  --accent-ink: #08120D;
+  --accent-soft: rgba(74,143,90,.16);
+  --ok:#4FBF98; --warn:#E8C24C; --err:#EE6E5F; --block:#C0A9F0; --pause:#6B7684;
+  --ok-ink:#4FBF98; --warn-ink:#E8C24C; --err-ink:#EE6E5F; --block-ink:#C0A9F0; --pause-ink:#98A4B4;
+  --ok-bg:#1F353B; --warn-bg:#343630; --err-bg:#352A33; --block-bg:#2F3247; --pause-bg:#28303E;
+  --serie-1:#3987e5; --serie-2:#d95926; --serie-3:#9085e9; --serie-4:#d55181;
+  --on-state: #08120D;
+  --grid: rgba(231,236,242,.10);
+  --sh-rest: 0 1px 2px rgba(0,0,0,.35);
+  --sh-float: 0 6px 18px rgba(0,0,0,.40);
+}
+
+@media (prefers-reduced-motion:reduce){
+  :root{ --dur-base: 1ms; }
+  *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+}
+
+*{ box-sizing:border-box; margin:0; padding:0 }
+[hidden]{ display:none !important }
+body{
+  background:var(--bg); color:var(--text);
+  font-family:var(--font-ui); font-size:var(--fs-base); line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.tnum{ font-variant-numeric:tabular-nums }
+.sr{ position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap }
+:focus{ outline:none }
+:focus-visible{ outline:var(--focus-w) solid var(--accent); outline-offset:var(--focus-offset); border-radius:var(--r-ctrl) }
+a{ color:var(--accent) }
+h1,h2,h3,h4{ text-wrap:balance }
+code{ font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9em; color:var(--accent) }
+
+/* ── Cromo de la página de documentación ─────────────────────────────────── */
+.wrap{ max-width:1120px; margin:0 auto; padding:0 clamp(16px,4vw,32px) }
+header.top{ border-bottom:1px solid var(--border); background:var(--surface); position:sticky; top:0; z-index:20 }
+.top-in{ display:flex; align-items:center; justify-content:space-between; gap:var(--sp-4); padding:var(--sp-3) 0; flex-wrap:wrap }
+.marca{ font-weight:700; letter-spacing:.02em; text-decoration:none; color:var(--text) }
+.marca span{ font-weight:400; color:var(--text-3) }
+.top nav{ display:flex; gap:var(--sp-4); flex-wrap:wrap; align-items:center }
+.top nav a{ font-size:var(--fs-dense); color:var(--text-2); text-decoration:none }
+.top nav a:hover{ color:var(--accent) }
+.btn{ display:inline-flex; align-items:center; gap:6px; min-height:36px; padding:7px 14px;
+  border:1px solid var(--border); background:var(--surface); color:var(--text);
+  border-radius:var(--r-ctrl); font:600 var(--fs-dense)/1 var(--font-ui); cursor:pointer }
+.btn:hover{ background:var(--surface-2); border-color:var(--border-2) }
+.btn.p{ background:var(--accent); border-color:transparent; color:var(--accent-ink) }
+
+.hero{ padding:var(--sp-12) 0 var(--sp-8) }
+.hero h1{ font-size:clamp(26px,4vw,38px); line-height:1.12; margin-bottom:var(--sp-4) }
+.hero p{ color:var(--text-2); max-width:70ch }
+.hero p + p{ margin-top:var(--sp-3) }
+
+section{ padding:var(--sp-8) 0; border-top:1px solid var(--border) }
+.rot{ margin-bottom:var(--sp-5) }
+.rot .kicker{ display:inline-block; font-size:var(--fs-meta); font-weight:700; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:var(--sp-2) }
+.rot h2{ font-size:var(--fs-title); margin-bottom:var(--sp-2) }
+.rot p{ color:var(--text-2); max-width:74ch; font-size:var(--fs-dense) }
+
+.reglas{ list-style:none; margin-top:var(--sp-4); display:flex; flex-direction:column; gap:var(--sp-2) }
+.reglas li{ font-size:var(--fs-dense); color:var(--text-2); padding-left:var(--sp-4); position:relative; max-width:78ch }
+.reglas li::before{ content:"—"; position:absolute; left:0; color:var(--accent); font-weight:700 }
+
+pre{ margin-top:var(--sp-4); background:var(--surface-2); border:1px solid var(--border);
+  border-radius:var(--r-card); padding:var(--sp-4); overflow-x:auto }
+pre code{ color:var(--text-2); font-size:var(--fs-meta); line-height:1.6; white-space:pre }
+
+/* ── ARQ-DASH: la capa de dashboard ──────────────────────────────────────── */
+
+/* Rejilla. Doce columnas; cada widget declara cuántas ocupa. */
+/* align-items:start — sin esto, cada widget se estira hasta la altura del más
+   alto de su fila y aparecen huecos dentro de las tarjetas cortas. */
+.dash{ display:grid; grid-template-columns:repeat(12,1fr); gap:var(--sp-4); align-items:start }
+.dash > *{ grid-column:span 12 }
+@media (min-width:700px){
+  .dash > .w-3{ grid-column:span 6 }
+  .dash > .w-4{ grid-column:span 6 }
+  .dash > .w-6{ grid-column:span 12 }
+}
+@media (min-width:1040px){
+  .dash > .w-3{ grid-column:span 3 }
+  .dash > .w-4{ grid-column:span 4 }
+  .dash > .w-6{ grid-column:span 6 }
+  .dash > .w-8{ grid-column:span 8 }
+}
+
+/* Tarjeta de widget. Una sola receta de superficie; no se anidan tarjetas. */
+.widget{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-card);
+  box-shadow:var(--sh-rest); padding:var(--sp-4); display:flex; flex-direction:column; gap:var(--sp-3);
+  min-width:0 }
+.widget > header{ display:flex; align-items:baseline; justify-content:space-between; gap:var(--sp-2) }
+.widget > header h3{ font:700 var(--fs-dense)/1.3 var(--font-ui); color:var(--text-2);
+  text-transform:uppercase; letter-spacing:.06em }
+.widget > header .acc{ font-size:var(--fs-meta) }
+.widget .pie{ font-size:var(--fs-meta); color:var(--text-3); line-height:1.5 }
+
+/* KPI. La cifra es el dato; la variación es contexto y va debajo, no al lado. */
+.kpi{ display:flex; flex-direction:column; gap:var(--sp-1) }
+.kpi .cifra{ font:800 var(--fs-kpi)/1 var(--font-ui); font-variant-numeric:tabular-nums; letter-spacing:-.02em }
+.kpi .unidad{ font-size:var(--fs-dense); font-weight:600; color:var(--text-2); margin-left:6px }
+.kpi .var{ display:inline-flex; align-items:center; gap:4px; font-size:var(--fs-meta); font-weight:700;
+  font-variant-numeric:tabular-nums }
+.kpi .var.sube{ color:var(--ok-ink) }
+.kpi .var.baja{ color:var(--err-ink) }
+.kpi .var.plano{ color:var(--text-3) }
+.kpi .var .ctx{ font-weight:400; color:var(--text-3) }
+
+/* Barra apilada de estado. CSS, no librería: son tres rectángulos.
+   Separador de 2px del color de la superficie entre segmentos. */
+.barra{ display:flex; height:10px; border-radius:var(--r-pill); overflow:hidden; background:var(--surface-2) }
+.barra span{ display:block; box-shadow:inset 0 0 0 .5px rgba(0,0,0,.06) }
+.barra span + span{ border-left:2px solid var(--surface) }
+.barra .s-ok{ background:var(--ok) }
+.barra .s-warn{ background:var(--warn) }
+.barra .s-err{ background:var(--err) }
+.barra .s-block{ background:var(--block) }
+.barra .s-pause{ background:var(--pause) }
+
+/* Leyenda inline. El texto va en tinta de texto; el color lo lleva la marca. */
+.leyenda{ display:flex; flex-wrap:wrap; gap:var(--sp-3); font-size:var(--fs-meta) }
+.leyenda span{ display:inline-flex; align-items:center; gap:6px; color:var(--text-2) }
+.leyenda .mu{ width:9px; height:9px; border-radius:3px; flex:none }
+.leyenda b{ font-variant-numeric:tabular-nums; color:var(--text) }
+
+/* Barra de progreso contra meta. */
+.progreso{ display:flex; flex-direction:column; gap:6px }
+.progreso .via{ height:8px; border-radius:var(--r-pill); background:var(--surface-2); overflow:hidden }
+.progreso .via i{ display:block; height:100%; border-radius:var(--r-pill); background:var(--accent) }
+.progreso .cifras{ display:flex; justify-content:space-between; font-size:var(--fs-meta); color:var(--text-2) }
+.progreso .cifras b{ color:var(--text); font-variant-numeric:tabular-nums }
+
+/* Figura de gráfico: lienzo + alternativa en tabla. La tabla es la fuente de
+   verdad; el lienzo es la lectura rápida. */
+.viz{ display:flex; flex-direction:column; gap:var(--sp-2); min-width:0 }
+.viz-lienzo{ position:relative; width:100%; height:180px }
+.viz-lienzo.alto{ height:230px }
+.viz-lienzo.chico{ height:48px }
+.viz canvas{ display:block; width:100% !important; height:100% !important }
+.viz-tabla > summary{ font-size:var(--fs-meta); color:var(--text-2); cursor:pointer; padding:2px 0;
+  border-radius:var(--r-ctrl) }
+.viz-tabla > summary:hover{ color:var(--accent) }
+.viz-tabla table{ width:100%; border-collapse:collapse; font-size:var(--fs-meta); margin-top:var(--sp-2) }
+.viz-tabla th,.viz-tabla td{ text-align:left; padding:5px var(--sp-2); border-bottom:1px solid var(--border) }
+.viz-tabla th{ color:var(--text-2); font-weight:700; text-transform:uppercase; letter-spacing:.04em }
+.viz-tabla td{ font-variant-numeric:tabular-nums }
+.viz-tabla tr:last-child td,.viz-tabla tr:last-child th{ border-bottom:none }
+
+/* Si la librería no llega, el lienzo no se queda vacío: desaparece y la tabla
+   se abre. Un dashboard sin internet muestra datos, no un hueco. */
+.viz.sin-libreria .viz-lienzo{ display:none }
+.viz.sin-libreria .viz-tabla > summary{ display:none }
+.aviso-cdn{ display:none; font-size:var(--fs-meta); color:var(--warn-ink); background:var(--warn-bg);
+  border:1px solid var(--warn-ink); border-radius:var(--r-ctrl); padding:6px var(--sp-2) }
+.viz.sin-libreria .aviso-cdn{ display:block }
+
+/* Medallón de estado — relleno sólido, glifo en la tinta del par. */
+.medallon{ width:52px; height:52px; border-radius:50%; display:grid; place-items:center;
+  background:var(--accent); color:var(--on-state); flex:none; font-weight:800; font-size:18px }
+.medallon.es-err{ background:var(--err) }
+
+.muestras{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:var(--sp-3); margin-top:var(--sp-4) }
+.muestra{ border:1px solid var(--border); border-radius:var(--r-card); overflow:hidden; background:var(--surface) }
+.muestra .tono{ height:52px }
+.muestra .txt{ padding:var(--sp-2); font-size:var(--fs-meta); color:var(--text-2) }
+.muestra .txt b{ display:block; color:var(--text); font-size:var(--fs-dense) }
+
+footer{ padding:var(--sp-8) 0 var(--sp-12); border-top:1px solid var(--border); margin-top:var(--sp-8) }
+footer .fin{ display:flex; justify-content:space-between; gap:var(--sp-4); flex-wrap:wrap;
+  font-size:var(--fs-meta); color:var(--text-3) }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="marca" href="/entregables">SIO-DPROMA <span>· capa de dashboard</span></a>
+    <nav>
+      <a href="#paleta">Color de dato</a>
+      <a href="#piezas">Piezas</a>
+      <a href="#reglas">Reglas</a>
+      <a href="/entregables/reglas-de-diseno">Sistema de diseño</a>
+      <button class="btn" type="button" id="tema" aria-pressed="false">Tema oscuro</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+<div class="hero">
+  <h1>Los dashboards de SIO-DPROMA se construyen con estas piezas.</h1>
+  <p>El sistema de diseño ya define diecinueve componentes —tabla densa, filtros, pills, formularios, estados—, pero ninguno de dato visual. Esta es la capa que faltaba: nueve piezas para leer una operación de un vistazo, sobre los mismos tokens que el resto del producto.</p>
+  <p>Los gráficos con ejes o curvas se dibujan con <strong>Chart.js</strong>. Las barras de proporción y progreso son CSS: cargar una librería para pintar tres rectángulos es coste sin beneficio. Y todo gráfico lleva su tabla equivalente, que es la fuente de verdad del dato — si la librería no carga, aparece la tabla, no un hueco.</p>
+</div>
+
+<section id="paleta">
+  <div class="rot">
+    <div class="kicker">Color de dato</div>
+    <h2>Dos paletas que no se mezclan nunca</h2>
+    <p>El color de un dato responde al trabajo que hace. Si el dato tiene un juicio —va bien, se acerca al límite, ya venció— usa el semáforo de estado. Si solo distingue una cosa de otra —una plaza de otra plaza— usa la paleta categórica. Un color de estado jamás se reutiliza como serie: una barra verde se leería como «correcto» aunque solo signifique «Querétaro».</p>
+  </div>
+
+  <h3 style="font-size:var(--fs-dense);text-transform:uppercase;letter-spacing:.06em;color:var(--text-2)">Categórica — orden fijo, nunca ciclado</h3>
+  <div class="muestras">
+    <div class="muestra"><div class="tono" style="background:var(--serie-1)"></div><div class="txt"><b>Serie 1 · azul</b><code>--serie-1</code></div></div>
+    <div class="muestra"><div class="tono" style="background:var(--serie-2)"></div><div class="txt"><b>Serie 2 · naranja</b><code>--serie-2</code></div></div>
+    <div class="muestra"><div class="tono" style="background:var(--serie-3)"></div><div class="txt"><b>Serie 3 · violeta</b><code>--serie-3</code></div></div>
+    <div class="muestra"><div class="tono" style="background:var(--serie-4)"></div><div class="txt"><b>Serie 4 · magenta</b><code>--serie-4</code></div></div>
+  </div>
+
+  <ul class="reglas">
+    <li><strong>Los dos colores de serie anteriores no se distinguían entre sí.</strong> Medidos con el validador del método, <code>#2C6CA8</code> y <code>#7A5FA8</code> daban ΔE 1,1 en protanopia y 10,0 en visión normal — por debajo del suelo de 15. El sistema los había medido contra el fondo, nunca uno contra otro. Los cuatro nuevos pasan todas las comprobaciones en los dos temas: peor par adyacente ΔE 20,4 en protanopia y 31,9 en visión normal.</li>
+    <li><strong>Se asignan en orden fijo y no se ciclan.</strong> Una quinta serie no genera un color nuevo: se agrupa en «Otras» o se separa en gráficos pequeños. El color sigue a la entidad, no a su posición: si un filtro deja fuera una plaza, las demás no cambian de color.</li>
+    <li><strong>El magenta queda por debajo de 3:1 sobre la superficie clara</strong> (2,62:1). Es legal, pero obliga a lo que esta capa ya hace siempre: etiqueta visible o tabla equivalente.</li>
+    <li><strong>El texto nunca se pinta del color de la serie.</strong> Valores, rótulos y leyendas van en tinta de texto; el color lo lleva la marca que está al lado.</li>
+  </ul>
+</section>
+
+<section id="piezas">
+  <div class="rot">
+    <div class="kicker">Piezas</div>
+    <h2>Nueve componentes, con datos reales de Administración Vehicular</h2>
+    <p>Todo va dentro de una tarjeta de widget, que es la única receta de superficie. Los widgets se componen sobre una rejilla de doce columnas.</p>
+  </div>
+
+  <div class="dash">
+
+    <!-- 1 · KPI -->
+    <div class="widget w-3">
+      <header><h3>Trámites con reloj</h3></header>
+      <div class="kpi">
+        <div><span class="cifra tnum">26</span><span class="unidad">expedientes</span></div>
+        <div class="var sube">+4 <span class="ctx">vs. semana pasada</span></div>
+      </div>
+      <p class="pie">No incluye los 10 sin reloj.</p>
+    </div>
+
+    <!-- 2 · KPI con sparkline -->
+    <div class="widget w-3">
+      <header><h3>Cerrados este mes</h3></header>
+      <div class="kpi">
+        <div><span class="cifra tnum">20</span><span class="unidad">acuses</span></div>
+        <div class="var sube">+18% <span class="ctx">vs. mes anterior</span></div>
+      </div>
+      <figure class="viz">
+        <div class="viz-lienzo chico"><canvas id="v-spark" aria-label="Acuses cerrados por semana en las últimas ocho semanas"></canvas></div>
+        <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
+        <details class="viz-tabla">
+          <summary>Ver los datos en tabla</summary>
+          <table><caption class="sr">Acuses cerrados por semana</caption>
+            <thead><tr><th scope="col">Semana</th><th scope="col">Acuses</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">S1</th><td>2</td></tr><tr><th scope="row">S2</th><td>3</td></tr>
+              <tr><th scope="row">S3</th><td>3</td></tr><tr><th scope="row">S4</th><td>5</td></tr>
+              <tr><th scope="row">S5</th><td>4</td></tr><tr><th scope="row">S6</th><td>6</td></tr>
+              <tr><th scope="row">S7</th><td>5</td></tr><tr><th scope="row">S8</th><td>7</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </figure>
+    </div>
+
+    <!-- 3 · Barra apilada de estado -->
+    <div class="widget w-6">
+      <header><h3>Trámites con el reloj corriendo</h3></header>
+      <div class="kpi"><div><span class="cifra tnum">26</span><span class="unidad">expedientes</span></div></div>
+      <div class="barra" role="img" aria-label="18 en plazo, 5 por vencer, 3 vencidos, de 26 con el reloj corriendo">
+        <span class="s-ok"   style="width:69.2%"></span>
+        <span class="s-warn" style="width:19.2%"></span>
+        <span class="s-err"  style="width:11.6%"></span>
+      </div>
+      <div class="leyenda">
+        <span><i class="mu" style="background:var(--ok)"></i>En plazo <b>18</b></span>
+        <span><i class="mu" style="background:var(--warn)"></i>Por vencer <b>5</b></span>
+        <span><i class="mu" style="background:var(--err)"></i>Vencidos <b>3</b></span>
+      </div>
+      <p class="pie">No incluye los <b>10</b> sin reloj: aún sin admitir o ya cerrados, no tienen plazo contra el que medirse.</p>
+    </div>
+
+    <!-- 4 · Dona -->
+    <div class="widget w-4">
+      <header><h3>Reparto por tipo de trámite</h3></header>
+      <figure class="viz">
+        <div class="viz-lienzo"><canvas id="v-dona" aria-label="Reparto de trámites por tipo"></canvas></div>
+        <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
+        <details class="viz-tabla">
+          <summary>Ver los datos en tabla</summary>
+          <table><caption class="sr">Trámites por tipo</caption>
+            <thead><tr><th scope="col">Tipo</th><th scope="col">Trámites</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Alta de placas</th><td>12</td></tr>
+              <tr><th scope="row">Cambio de propietario</th><td>8</td></tr>
+              <tr><th scope="row">Baja de placas</th><td>4</td></tr>
+              <tr><th scope="row">Reemplacamiento</th><td>2</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </figure>
+    </div>
+
+    <!-- 5 · Ranking -->
+    <div class="widget w-8">
+      <header><h3>Carga por plaza</h3></header>
+      <figure class="viz">
+        <div class="viz-lienzo alto"><canvas id="v-rank" aria-label="Trámites con reloj corriendo por plaza"></canvas></div>
+        <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
+        <details class="viz-tabla">
+          <summary>Ver los datos en tabla</summary>
+          <table><caption class="sr">Trámites por plaza</caption>
+            <thead><tr><th scope="col">Plaza</th><th scope="col">Trámites</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Querétaro Centro</th><td>14</td></tr>
+              <tr><th scope="row">Querétaro Juriquilla</th><td>5</td></tr>
+              <tr><th scope="row">Celaya</th><td>4</td></tr>
+              <tr><th scope="row">Naucalpan</th><td>3</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </figure>
+    </div>
+
+    <!-- 6 · Tendencia -->
+    <div class="widget w-8">
+      <header><h3>Recibidos y concluidos por semana</h3></header>
+      <figure class="viz">
+        <div class="viz-lienzo alto"><canvas id="v-tend" aria-label="Trámites recibidos y concluidos por semana"></canvas></div>
+        <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
+        <details class="viz-tabla">
+          <summary>Ver los datos en tabla</summary>
+          <table><caption class="sr">Recibidos y concluidos por semana</caption>
+            <thead><tr><th scope="col">Semana</th><th scope="col">Recibidos</th><th scope="col">Concluidos</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">S1</th><td>6</td><td>2</td></tr><tr><th scope="row">S2</th><td>8</td><td>3</td></tr>
+              <tr><th scope="row">S3</th><td>5</td><td>3</td></tr><tr><th scope="row">S4</th><td>9</td><td>5</td></tr>
+              <tr><th scope="row">S5</th><td>7</td><td>4</td></tr><tr><th scope="row">S6</th><td>10</td><td>6</td></tr>
+              <tr><th scope="row">S7</th><td>8</td><td>5</td></tr><tr><th scope="row">S8</th><td>9</td><td>7</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </figure>
+    </div>
+
+    <!-- 7 · Progreso -->
+    <div class="widget w-4">
+      <header><h3>Meta del mes</h3></header>
+      <div class="progreso">
+        <div class="via"><i style="width:67%"></i></div>
+        <div class="cifras"><span><b>20</b> de <b>30</b> acuses</span><span><b>67%</b></span></div>
+      </div>
+      <p class="pie">Quedan 9 días hábiles.</p>
+    </div>
+
+  </div>
+</section>
+
+<section id="reglas">
+  <div class="rot">
+    <div class="kicker">Reglas</div>
+    <h2>Lo que hace que estas piezas sigan siendo del sistema</h2>
+  </div>
+  <ul class="reglas">
+    <li><strong>Chart.js obedece al sistema, no al revés.</strong> La versión va fijada, los colores se leen de <code>:root</code> en tiempo de ejecución —la librería no entiende variables CSS— y los gráficos se repintan al cambiar de tema. Sin eso, un dashboard en tema oscuro se queda con los colores del claro.</li>
+    <li><strong>Un <code>&lt;canvas&gt;</code> no es accesible.</strong> Cada gráfico lleva su tabla equivalente, y esa tabla es la fuente de verdad. No es un extra: es lo que hace que el dato exista para quien no ve el lienzo.</li>
+    <li><strong>Si la librería no carga, aparece la tabla.</strong> Estas maquetas se abrían desde disco sin internet; con una dependencia externa eso deja de ser cierto, así que la degradación es parte del componente, no un accidente.</li>
+    <li><strong>Un conteo medido en cero no se pinta.</strong> Si una plaza no tiene vencidos, no hay segmento rojo ni etiqueta: con el total declarado, la ausencia se lee como cero. Es distinto de la regla ya existente de ocultar un bloque cuando el dato <em>no se puede medir</em>.</li>
+    <li><strong>Sin animación bajo <code>prefers-reduced-motion</code>.</strong> Chart.js anima por defecto; hay que apagarlo explícitamente.</li>
+    <li><strong>Un solo eje.</strong> Nunca dos escalas verticales en el mismo gráfico. Dos medidas de magnitud distinta son dos gráficos.</li>
+    <li><strong>Marcas finas y rejilla discreta.</strong> Línea de 2px, punto de 8px o más, rejilla en <code>--grid</code>. La rejilla acompaña, no compite.</li>
+  </ul>
+
+  <pre><code>&lt;!-- El patrón de toda figura de gráfico --&gt;
+&lt;figure class="viz"&gt;
+  &lt;div class="viz-lienzo"&gt;&lt;canvas id="v-x" aria-label="…"&gt;&lt;/canvas&gt;&lt;/div&gt;
+  &lt;p class="aviso-cdn"&gt;Sin conexión con la librería de gráficos.&lt;/p&gt;
+  &lt;details class="viz-tabla"&gt;
+    &lt;summary&gt;Ver los datos en tabla&lt;/summary&gt;
+    &lt;table&gt;&lt;caption class="sr"&gt;…&lt;/caption&gt;…&lt;/table&gt;
+  &lt;/details&gt;
+&lt;/figure&gt;</code></pre>
+</section>
+
+</div>
+
+<footer>
+  <div class="wrap fin">
+    <span>2894 Studio × DPROMA — capa de dashboard de SIO-DPROMA</span>
+    <a href="/entregables">← Volver a Entregables</a>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+<script>
+(function(){
+  var raiz = document.documentElement;
+
+  /* Chart.js no entiende variables CSS: hay que leerlas del DOM en cada
+     repintado. Si se leen una sola vez al arrancar, el cambio de tema deja
+     los gráficos con los colores del tema anterior. */
+  function tokens(){
+    var cs = getComputedStyle(document.body);
+    var t = function(n){ return cs.getPropertyValue(n).trim(); };
+    return {
+      s1:t('--serie-1'), s2:t('--serie-2'), s3:t('--serie-3'), s4:t('--serie-4'),
+      ok:t('--ok'), warn:t('--warn'), err:t('--err'),
+      texto:t('--text-2'), tenue:t('--text-3'),
+      rejilla:t('--grid'), superficie:t('--surface'), borde:t('--border')
+    };
+  }
+  var quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hayLibreria = typeof Chart !== 'undefined';
+  var graficos = [];
+
+  /* Sin librería: el lienzo desaparece y la tabla se abre. Un dashboard sin
+     internet enseña datos, no un rectángulo vacío.
+     Ojo: esto NO puede cortar el resto del script. El botón de tema es cromo
+     de la página, no lógica de gráfico, y tiene que seguir funcionando
+     aunque el CDN no responda. */
+  if(!hayLibreria){
+    document.querySelectorAll('.viz').forEach(function(v){
+      v.classList.add('sin-libreria');
+      var d = v.querySelector('.viz-tabla'); if(d) d.open = true;
+    });
+  } else {
+    Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+    Chart.defaults.font.size = 12;
+  }
+  function registra(id, hacer){
+    if(!hayLibreria) return;
+    var el = document.getElementById(id);
+    if(!el) return;
+    var inst = new Chart(el, hacer(tokens()));
+    graficos.push({ id:id, el:el, hacer:hacer, inst:inst });
+  }
+  function base(extra){
+    return Object.assign({
+      responsive:true, maintainAspectRatio:false,
+      animation: quieto ? false : { duration:200 }
+    }, extra||{});
+  }
+
+  registra('v-spark', function(c){
+    return { type:'line',
+      data:{ labels:['S1','S2','S3','S4','S5','S6','S7','S8'],
+        datasets:[{ data:[2,3,3,5,4,6,5,7], borderColor:c.s1, borderWidth:2,
+          pointRadius:0, tension:.35, fill:false }] },
+      options: base({ plugins:{ legend:{display:false}, tooltip:{enabled:false} },
+        scales:{ x:{display:false}, y:{display:false} } }) };
+  });
+
+  registra('v-dona', function(c){
+    return { type:'doughnut',
+      data:{ labels:['Alta de placas','Cambio de propietario','Baja de placas','Reemplacamiento'],
+        datasets:[{ data:[12,8,4,2], backgroundColor:[c.s1,c.s2,c.s3,c.s4],
+          borderColor:c.superficie, borderWidth:2 }] },
+      options: base({ cutout:'62%',
+        plugins:{ legend:{ position:'bottom', labels:{ color:c.texto, boxWidth:9, boxHeight:9,
+          usePointStyle:true, pointStyle:'rectRounded', padding:12 } } } }) };
+  });
+
+  registra('v-rank', function(c){
+    return { type:'bar',
+      data:{ labels:['Querétaro Centro','Querétaro Juriquilla','Celaya','Naucalpan'],
+        datasets:[{ data:[14,5,4,3], backgroundColor:c.s1, borderRadius:4, borderSkipped:'start' }] },
+      options: base({ indexAxis:'y',
+        plugins:{ legend:{display:false} },
+        scales:{
+          x:{ grid:{ color:c.rejilla, drawBorder:false }, ticks:{ color:c.tenue }, border:{display:false} },
+          y:{ grid:{ display:false }, ticks:{ color:c.texto }, border:{display:false} } } }) };
+  });
+
+  registra('v-tend', function(c){
+    return { type:'line',
+      data:{ labels:['S1','S2','S3','S4','S5','S6','S7','S8'],
+        datasets:[
+          { label:'Recibidos', data:[6,8,5,9,7,10,8,9], borderColor:c.s1, backgroundColor:c.s1,
+            borderWidth:2, pointRadius:3, pointHoverRadius:5, tension:.3 },
+          { label:'Concluidos', data:[2,3,3,5,4,6,5,7], borderColor:c.s2, backgroundColor:c.s2,
+            borderWidth:2, pointRadius:3, pointHoverRadius:5, tension:.3 }] },
+      options: base({
+        interaction:{ mode:'index', intersect:false },
+        plugins:{ legend:{ position:'bottom', labels:{ color:c.texto, boxWidth:9, boxHeight:9,
+          usePointStyle:true, pointStyle:'rectRounded', padding:12 } } },
+        scales:{
+          x:{ grid:{ display:false }, ticks:{ color:c.tenue }, border:{ color:c.borde } },
+          y:{ beginAtZero:true, grid:{ color:c.rejilla }, ticks:{ color:c.tenue }, border:{display:false} } } }) };
+  });
+
+  /* Repintado al cambiar de tema: se destruye y se rehace con los tokens
+     nuevos. Actualizar solo los colores dejaría fuera leyenda y ejes. */
+  function repinta(){
+    var c = tokens();
+    graficos.forEach(function(g){
+      g.inst.destroy();
+      g.inst = new Chart(g.el, g.hacer(c));
+    });
+  }
+
+  var bt = document.getElementById('tema');
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+  function oscuro(){ var t = raiz.getAttribute('data-theme'); return t ? t === 'dark' : mq.matches; }
+  /* La etiqueta del botón y el repintado son cosas distintas: en el arranque
+     los gráficos ya nacieron con los tokens correctos, así que repintar ahí
+     los construiría dos veces por cada carga de página. */
+  function etiquetaTema(){
+    var o = oscuro();
+    bt.setAttribute('aria-pressed', String(o));
+    bt.textContent = o ? 'Tema claro' : 'Tema oscuro';
+  }
+  bt.addEventListener('click', function(){
+    raiz.setAttribute('data-theme', oscuro() ? 'light' : 'dark');
+    etiquetaTema(); repinta();
+  });
+  mq.addEventListener('change', function(){ etiquetaTema(); repinta(); });
+  etiquetaTema();
+})();
+</script>
+
+</body>
+</html>

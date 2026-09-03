@@ -120,15 +120,61 @@ Contraste medido de cada `-ink` sobre su `-bg`, que es la combinación real de u
 
 ### 1.4 Series de gráfica
 
-| Token | Claro | Oscuro |
-|---|---|---|
-| `--serie-1` | `#2C6CA8` | `#6FA8DC` |
-| `--serie-2` | `#7A5FA8` | `#B69BE0` |
+| Slot | Hue | Claro | Oscuro |
+|---|---|---|---|
+| `--serie-1` | azul | `#2a78d6` | `#3987e5` |
+| `--serie-2` | naranja | `#eb6834` | `#d95926` |
+| `--serie-3` | violeta | `#4a3aa7` | `#9085e9` |
+| `--serie-4` | magenta | `#e87ba4` | `#d55181` |
 
 **Una serie de gráfica nunca reutiliza un color de estado.** Si la barra de «Agencias» fuera
-verde, se leería como «agencias correctas». Estos dos azul-violeta existen justo para eso: para
-clasificar sin opinar. Se usan también en las etiquetas de tipo de cliente (§6.10). Medidos
-como elemento gráfico (mínimo 3:1): 5,35 / 5,06 en claro, 6,55 / 6,90 en oscuro.
+verde, se leería como «agencias correctas». Estos colores existen justo para eso: para
+clasificar sin opinar. Se usan también en las etiquetas de tipo de cliente (§6.10).
+
+**Los dos colores anteriores no se distinguían entre sí.** `#2C6CA8` y `#7A5FA8` estaban
+medidos contra el fondo —5,35 y 5,06 en claro— pero nunca uno contra otro, que es la
+comparación que de verdad importa en una gráfica. Medidos entre sí dan **ΔE 1,1 en protanopia
+y 10,0 en visión normal** (OKLab ×100), por debajo del suelo de 15: dos series pintadas con
+ellos son difíciles de separar incluso con visión de color completa, e idénticas para una
+persona con protanopia. Por eso se sustituyen, no se amplían.
+
+Los cuatro nuevos pasan las cinco comprobaciones en los dos temas —banda de luminosidad, suelo
+de croma, separación bajo daltonismo, suelo de visión normal y contraste contra la superficie—
+con peor par adyacente **ΔE 20,4 en protanopia y 31,9 en visión normal** en claro, y 16,0 / 19,7
+en oscuro. La columna oscura no es un volteo automático: son los mismos hues re-escalados
+contra `--surface` oscuro y validados ahí.
+
+**Tres reglas de uso:**
+
+1. **Se asignan en orden fijo y no se ciclan.** Una quinta serie no genera un color nuevo: se
+   agrupa en «Otras» o se separa en gráficos pequeños.
+2. **El color sigue a la entidad, no a su posición.** Si un filtro deja fuera una serie, las
+   demás conservan su color; repintarlas rompe la lectura entre dos vistas de lo mismo.
+3. **`--serie-4` queda en 2,62:1 sobre la superficie clara**, por debajo de 3:1. Es utilizable,
+   pero obliga a etiqueta visible o tabla equivalente — que es lo que la capa de dashboard
+   (§12) exige siempre de todos modos.
+
+Para reproducir cualquiera de estas cifras se usa el validador del método de visualización,
+no la estimación a ojo.
+
+### 1.4.1 Tinta sobre relleno sólido de color
+
+| Token | Claro | Oscuro |
+|---|---|---|
+| `--on-state` | `#F7FAF9` | `#08120D` |
+
+Un glifo o un texto que cae sobre un **relleno sólido** de color —el medallón de estado, un
+badge macizo— no usa un gris de texto: usa la tinta del par. Y esa tinta **voltea por tema**,
+porque blanco literal no vale: sobre `--ok` oscuro da 2,27:1 y sobre `--err` oscuro 2,99:1,
+ambos por debajo del mínimo de 3:1 para elemento gráfico. Con `--on-state` el resultado va de
+3,79 a 4,89:1 en claro y de 4,87 a 9,23:1 en oscuro.
+
+**Un selector que tiñe iconos por contexto se acota a hijo directo.** Es el caso medido en las
+maquetas de Administración Vehicular: `.state .ico{color:var(--text-3)}` alcanzaba en cascada
+los glifos de los botones dentro del propio bloque de estado, y dejaba el icono de un `.btn.p`
+—relleno verde sólido— pintado en `--text-3` a **1,03:1**, invisible. El mismo botón fuera del
+estado salía a 4,89:1. La regla es `.state > .ico`: un `.ico` puede estar dentro de un botón
+que ya tiene su propio color, y una regla de contexto no debe pisarlo.
 
 ### 1.5 Cromo de aplicación
 
@@ -1508,3 +1554,84 @@ usados - declarados  →  tiene que ser vacío
   Se comprueba midiendo: la caja del `<use>` debe empezar donde empieza la del `<svg>`.
 - ¿Todo token `var(--x)` que usa el archivo está declarado **en ese mismo archivo**? Copiar una
   regla de otra pantalla es la vía habitual de colar uno que no existe aquí.
+
+## 12. Capa de dashboard
+
+El sistema tenía diecinueve componentes y ninguno de dato visual: ni una cifra destacada, ni una
+barra, ni una tendencia. Esta capa cubre ese hueco. Galería viva con las nueve piezas y su
+marcado: `web/entregables/dashboard-sio-dproma.html`.
+
+### 12.1 Qué se dibuja con librería y qué no
+
+**Chart.js, versión fijada, por CDN** para lo que tiene ejes, curvas o sectores: tendencia,
+ranking, dona, sparkline. **CSS** para lo que es un rectángulo proporcional: barra apilada de
+estado y barra de progreso. Cargar una librería de gráficas para pintar tres rectángulos es
+coste sin beneficio, y una barra en CSS hereda los tokens sin envoltura.
+
+### 12.2 Las cuatro reglas de la envoltura
+
+Una librería de terceros no obedece al sistema por sí sola. Estas cuatro condiciones son lo que
+la hace parte del producto y no un cuerpo extraño:
+
+1. **Los colores se leen de `:root` en tiempo de ejecución.** Chart.js no entiende variables
+   CSS: hay que pasarle valores resueltos con `getComputedStyle`.
+2. **Los gráficos se repintan al cambiar de tema**, destruyendo y reconstruyendo con los tokens
+   nuevos. Actualizar solo el color de las series deja fuera leyenda, ejes y rejilla. Y el
+   repintado se dispara **solo en el cambio**: hacerlo también al arrancar construye cada
+   gráfico dos veces en cada carga.
+3. **Sin animación bajo `prefers-reduced-motion`.** Chart.js anima por defecto; hay que apagarlo.
+4. **El botón de tema no depende de la librería.** Si el script de gráficos corta la ejecución
+   cuando el CDN falla, se lleva por delante el resto del cromo de la página.
+
+### 12.3 El `<canvas>` no es accesible
+
+Cada gráfico lleva **su tabla equivalente, y esa tabla es la fuente de verdad del dato**. No es
+un añadido para cumplir: es lo que hace que la información exista para quien no ve el lienzo.
+
+De ahí sale la degradación, que es parte del componente y no un accidente: **si la librería no
+carga, el lienzo desaparece y la tabla se abre**. Estas maquetas se abrían desde disco sin
+internet; al introducir una dependencia externa eso deja de ser cierto, y un dashboard sin
+conexión tiene que enseñar datos, no un rectángulo vacío.
+
+```html
+<figure class="viz">
+  <div class="viz-lienzo"><canvas id="v-x" aria-label="…"></canvas></div>
+  <p class="aviso-cdn">Sin conexión con la librería de gráficos.</p>
+  <details class="viz-tabla">
+    <summary>Ver los datos en tabla</summary>
+    <table><caption class="sr">…</caption>…</table>
+  </details>
+</figure>
+```
+
+### 12.4 Las nueve piezas
+
+| Pieza | Clase | Para qué |
+|---|---|---|
+| Rejilla | `.dash` | Doce columnas; cada widget declara cuántas ocupa (`.w-3`, `.w-4`, `.w-6`, `.w-8`) |
+| Tarjeta de widget | `.widget` | El contenedor común. Reusa la receta de superficie de §6.3; no se anidan tarjetas |
+| KPI con variación | `.kpi` | Cifra en `--fs-kpi` y su delta debajo, no al lado |
+| Barra apilada de estado | `.barra` | Reparto de un total entre estados del semáforo |
+| Leyenda inline | `.leyenda` | Marca de color + rótulo en tinta de texto + cifra |
+| Dona | `canvas` | Proporción sobre un total, con hueco central |
+| Ranking horizontal | `canvas` | Comparar entidades entre sí |
+| Tendencia | `canvas` | Evolución en el tiempo, una o dos series |
+| Sparkline | `canvas` | Tendencia dentro de una tarjeta, sin ejes |
+| Barra de progreso | `.progreso` | Avance contra una meta declarada |
+
+### 12.5 Reglas de lectura
+
+- **Un solo eje.** Nunca dos escalas verticales en la misma gráfica; dos medidas de magnitud
+  distinta son dos gráficas.
+- **Un conteo medido en cero no se pinta.** Si una plaza no tiene vencidos, no hay segmento
+  rojo ni etiqueta: con el total declarado, la ausencia se lee como cero. Es **distinto** de la
+  regla de ocultar un bloque cuando el dato *no se puede medir* (§6.4): aquí el dato existe y
+  vale cero; allí no existe.
+- **El texto nunca se pinta del color de la serie.** Valores, rótulos y leyendas van en tinta de
+  texto; el color lo lleva la marca que está al lado, que es lo que permite leerlos sobre
+  cualquier superficie.
+- **Marcas finas y rejilla discreta.** Línea de 2px, punto de 8px o más, rejilla en `--grid`,
+  y 2px de superficie entre segmentos contiguos de una barra apilada.
+- **Color según el trabajo del dato.** Si el dato tiene juicio —va bien, vence pronto, ya
+  venció— es el semáforo de §1.3. Si solo distingue una cosa de otra, es la paleta categórica de
+  §1.4. Un color de estado nunca se reutiliza como serie.
