@@ -1723,8 +1723,8 @@ usados - declarados  →  tiene que ser vacío
 ## 12. Capa de dashboard
 
 El sistema tenía diecinueve componentes y ninguno de dato visual: ni una cifra destacada, ni una
-barra, ni una tendencia. Esta capa cubre ese hueco. Galería viva con las nueve piezas y su
-marcado: `web/entregables/dashboard-sio-dproma.html`.
+barra, ni una tendencia. Esta capa cubre ese hueco. Las nueve piezas están vivas, con su marcado, en la
+sección «Capa de dashboard» de la página del sistema (`web/entregables/reglas-de-diseno.html#dashboard`).
 
 ### 12.1 Qué se dibuja con librería y qué no
 

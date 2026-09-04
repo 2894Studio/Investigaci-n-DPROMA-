@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.2.1
+version: 2.2.2
 last_updated: 2026-09-04
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -1732,8 +1732,8 @@ usados - declarados  →  tiene que ser vacío
 ## 12. Capa de dashboard
 
 El sistema tenía diecinueve componentes y ninguno de dato visual: ni una cifra destacada, ni una
-barra, ni una tendencia. Esta capa cubre ese hueco. Galería viva con las nueve piezas y su
-marcado: `web/entregables/dashboard-sio-dproma.html`.
+barra, ni una tendencia. Esta capa cubre ese hueco. Las nueve piezas están vivas, con su marcado, en la
+sección «Capa de dashboard» de la página del sistema (`web/entregables/reglas-de-diseno.html#dashboard`).
 
 ### 12.1 Qué se dibuja con librería y qué no
 
@@ -1851,3 +1851,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.1.0 | 2026-09-04 | Resuelve una contradicción viva: §6.4 seguía prescribiendo el medallón de estado en `--accent-soft` con el glifo en `--accent` mientras §1.4.1 —añadida en 2.0.0— nombraba ese mismo medallón como caso de la tinta sobre relleno sólido. §6.4 pasa a ser aplicación de §1.4.1 (fondo a plena opacidad, glifo en `--on-state`) en vez de una alternativa a ella. Tres reglas nuevas salidas de construir las cuatro pantallas de Administración Vehicular: un control compuesto lleva un solo anillo de foco y lo lleva el envoltorio, medido en el buscador, que pintaba dos anillos verdes concéntricos (§1.7); el resumen de estatus no convive con un filtro de estatus equivalente, corolario de «un filtro, un sitio» (§6.12, regla 6); y la ficha de detalle, donde el indicador de urgencia declara su ancho en rejilla en vez de quedarse con lo que sobre, y el contacto del cliente va bajo la identidad del expediente, no al final de la columna secundaria (§6.20). Documenta además las composiciones de tablero —tarjeta de entidad, desglose en cascada, contador de marca, nota de método— y las dos reglas de la rejilla `.dash`, para que la siguiente pantalla las repita en vez de reinventarlas (§12.6). |
 | 2.2.0 | 2026-09-04 | Completa la barra de filtros, que en §6.12 se quedaba en botones sin panel y con un solo valor por dimensión: ahora cada filtro abre un desplegable con buscador y casillas de selección múltiple, con el conteo de cada opción a la derecha y un «Limpiar» acotado a esa dimensión. Tres dimensiones visibles y el resto detrás de un botón «+ Añadir filtro», para no llenar la barra de controles que casi nadie toca. Lo seleccionado baja a su propia fila de pastillas, con un tope de cuatro visibles y un «+N más» que despliega el resto —sin tope, seis filtros cruzados empujan la tabla fuera de la pantalla— más «Quitar todos los filtros». Incluye lo no negociable del teclado: `aria-expanded`, el foco que entra en el buscador al abrir, `Escape` que cierra y devuelve el foco al botón, y cada «×» diciendo qué quita (§6.21). |
 | 2.2.1 | 2026-09-04 | Corolario medido de §3.1: `:last-child` no distingue lo oculto. La corrección anterior ponía el relleno inferior de la cabecera en su último hijo, y funcionó hasta que la cabecera ganó la fila de pastillas de filtros aplicados, que nace con `hidden`; un elemento oculto no ocupa espacio pero sí es el último hijo, así que se llevaba el relleno y la tabla arrancaba a un píxel de los filtros. El relleno pasa al contenedor. Y la pastilla de estado viaja al filtro (§6.21): una dimensión cuyos valores tienen pastilla en la tabla —estatus, plazo— la lleva también en el panel, en el resumen del botón y en la pastilla aplicada, para que el color relacione el filtro con la fila sin leer el texto; las dimensiones sin juicio siguen en texto plano. De paso, «Observado» pasa de `--err` a `--block` en la tabla y el detalle, que era donde quedaba pendiente de aplicar la regla de rojo reservado a error y vencimiento (§1.3). |
+| 2.2.2 | 2026-09-04 | La capa de dashboard (§12) y la barra de filtros (§6.21) dejan de vivir en una página aparte y pasan a ser secciones de la propia página del sistema, con sus piezas vivas: los nueve componentes de dato con sus gráficos y sus tablas equivalentes, y la barra de filtros funcionando —se abre, se busca dentro, se marcan varias casillas y bajan a pastillas—. Son componentes transversales, no de un módulo: tenerlos fuera invitaba a reimplementarlos en cada pantalla en vez de reusarlos. No cambia ninguna regla ni ningún token; cambia dónde se leen y que ahora se pueden probar. |
