@@ -1403,6 +1403,68 @@ a ancho completo y con los datos en fila —a ancho completo una lista vertical 
 espacio desperdiciado—, antes de la bitácora y de los documentos. Ese orden es también el del
 recorrido con teclado, que es la otra razón por la que importa.
 
+### 6.21 Barra de filtros con desplegable, buscador y selección múltiple
+
+La barra de §6.12 quedó a medias: los desplegables eran botones sin panel, con un solo valor cada
+uno, y no había forma de pedir «Querétaro Centro **y** Celaya». Una pantalla de listado real
+necesita cruzar varias dimensiones a la vez, y por eso este apartado la completa.
+
+**Cinco dimensiones, y solo las que caben a la vista.** Administración Vehicular filtra por plaza,
+trámite, responsable, plazo y estatus. Mostrar los cinco de golpe llena la barra de controles que
+casi nadie toca, así que tres van visibles —los de uso diario— y el resto entra por un botón
+`+ Añadir filtro` de borde discontinuo, que abre la lista de los que faltan. El que se añade se
+queda en la barra con su panel ya abierto: quien lo pidió lo pidió para usarlo ahora.
+
+**El panel es siempre el mismo:** buscador arriba, lista de casillas en medio, y un pie con la
+cuenta de seleccionados y un «Limpiar» acotado a esa dimensión. El buscador filtra la lista
+mientras se escribe y, si nada coincide, lo dice en vez de dejar el hueco en blanco. Cada opción
+lleva su conteo a la derecha, que es lo que permite decidir sin aplicar el filtro para ver qué
+pasa. Las casillas son `<input type="checkbox">` de verdad, no un botón que finge serlo: la
+selección múltiple ya tiene un control estándar y no hace falta inventarlo.
+
+**El botón resume su propio estado.** Sin selección muestra el valor por omisión y va sin resalte
+(§6.12, regla 1). Con una, el nombre de esa opción. Con varias, «N seleccionados», porque
+enumerarlas dentro del botón lo estira hasta romper la fila. El resalte y el chevron en `--accent`
+aparecen solo cuando hay algo puesto.
+
+**Lo seleccionado baja a pastillas, en su propia fila.** Cada pastilla nombra la dimensión y el
+valor —«Plaza: Celaya»— y trae su «×». Mezclarlas con los desplegables, como estaban, hacía
+indistinguible el control del resultado. Y hay un tope: **cuatro pastillas visibles**, y el resto
+detrás de un «+N más» que las despliega. Sin tope, seis filtros cruzados empujan la tabla fuera
+de la pantalla, que es justo lo contrario de lo que se pretendía. Al final de la fila, «Quitar
+todos los filtros». La fila entera desaparece cuando no hay nada aplicado.
+
+```html
+<div class="p4-f"><div class="filtros" id="filtros" role="group" aria-label="Filtros"></div></div>
+<div class="p4-f aplicados" id="aplicados" hidden></div>
+```
+
+```html
+<div class="fwrap">
+  <button class="f" type="button" data-activo="true"
+          aria-expanded="false" aria-haspopup="true" aria-controls="pop-plaza">
+    Plaza: <b>2 seleccionados</b><svg class="ico ico-sm" aria-hidden="true"><use href="#m-expand_more"/></svg>
+  </button>
+  <div class="pop" id="pop-plaza" role="group" aria-label="Plaza" hidden>
+    <div class="pop-b"><input type="search" aria-label="Buscar en plaza" placeholder="Buscar en plaza…"></div>
+    <ul class="pop-l">
+      <li><label><input type="checkbox" value="qro"><span class="et">Querétaro Centro</span><span class="n">18</span></label></li>
+    </ul>
+    <div class="pop-p"><span class="cuenta">2 seleccionados</span><button class="fquitar" type="button">Limpiar</button></div>
+  </div>
+</div>
+```
+
+**Lo no negociable del teclado.** El botón declara `aria-expanded` y `aria-controls`; al abrir, el
+foco entra en el buscador; `Escape` cierra y **devuelve el foco al botón**, no al principio de la
+página; un clic fuera cierra. El contenedor de pastillas abre con un texto solo para lectores
+—«Filtros aplicados: N»— y cada «×» dice qué quita, no solo «quitar»: en una fila de seis, seis
+botones «×» idénticos son indistinguibles al tabular (§6.19).
+
+**Un panel no es un modal.** No atrapa el foco ni oscurece la pantalla: es un menú de un control
+de la barra, y la tabla de detrás sigue siendo legible mientras se decide. Por eso lleva
+`role="group"` con su etiqueta y no `role="dialog"`.
+
 ---
 
 ## 7. Layout

@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.1.0
+version: 2.2.0
 last_updated: 2026-09-04
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -1410,6 +1410,68 @@ a ancho completo y con los datos en fila —a ancho completo una lista vertical 
 espacio desperdiciado—, antes de la bitácora y de los documentos. Ese orden es también el del
 recorrido con teclado, que es la otra razón por la que importa.
 
+### 6.21 Barra de filtros con desplegable, buscador y selección múltiple
+
+La barra de §6.12 quedó a medias: los desplegables eran botones sin panel, con un solo valor cada
+uno, y no había forma de pedir «Querétaro Centro **y** Celaya». Una pantalla de listado real
+necesita cruzar varias dimensiones a la vez, y por eso este apartado la completa.
+
+**Cinco dimensiones, y solo las que caben a la vista.** Administración Vehicular filtra por plaza,
+trámite, responsable, plazo y estatus. Mostrar los cinco de golpe llena la barra de controles que
+casi nadie toca, así que tres van visibles —los de uso diario— y el resto entra por un botón
+`+ Añadir filtro` de borde discontinuo, que abre la lista de los que faltan. El que se añade se
+queda en la barra con su panel ya abierto: quien lo pidió lo pidió para usarlo ahora.
+
+**El panel es siempre el mismo:** buscador arriba, lista de casillas en medio, y un pie con la
+cuenta de seleccionados y un «Limpiar» acotado a esa dimensión. El buscador filtra la lista
+mientras se escribe y, si nada coincide, lo dice en vez de dejar el hueco en blanco. Cada opción
+lleva su conteo a la derecha, que es lo que permite decidir sin aplicar el filtro para ver qué
+pasa. Las casillas son `<input type="checkbox">` de verdad, no un botón que finge serlo: la
+selección múltiple ya tiene un control estándar y no hace falta inventarlo.
+
+**El botón resume su propio estado.** Sin selección muestra el valor por omisión y va sin resalte
+(§6.12, regla 1). Con una, el nombre de esa opción. Con varias, «N seleccionados», porque
+enumerarlas dentro del botón lo estira hasta romper la fila. El resalte y el chevron en `--accent`
+aparecen solo cuando hay algo puesto.
+
+**Lo seleccionado baja a pastillas, en su propia fila.** Cada pastilla nombra la dimensión y el
+valor —«Plaza: Celaya»— y trae su «×». Mezclarlas con los desplegables, como estaban, hacía
+indistinguible el control del resultado. Y hay un tope: **cuatro pastillas visibles**, y el resto
+detrás de un «+N más» que las despliega. Sin tope, seis filtros cruzados empujan la tabla fuera
+de la pantalla, que es justo lo contrario de lo que se pretendía. Al final de la fila, «Quitar
+todos los filtros». La fila entera desaparece cuando no hay nada aplicado.
+
+```html
+<div class="p4-f"><div class="filtros" id="filtros" role="group" aria-label="Filtros"></div></div>
+<div class="p4-f aplicados" id="aplicados" hidden></div>
+```
+
+```html
+<div class="fwrap">
+  <button class="f" type="button" data-activo="true"
+          aria-expanded="false" aria-haspopup="true" aria-controls="pop-plaza">
+    Plaza: <b>2 seleccionados</b><svg class="ico ico-sm" aria-hidden="true"><use href="#m-expand_more"/></svg>
+  </button>
+  <div class="pop" id="pop-plaza" role="group" aria-label="Plaza" hidden>
+    <div class="pop-b"><input type="search" aria-label="Buscar en plaza" placeholder="Buscar en plaza…"></div>
+    <ul class="pop-l">
+      <li><label><input type="checkbox" value="qro"><span class="et">Querétaro Centro</span><span class="n">18</span></label></li>
+    </ul>
+    <div class="pop-p"><span class="cuenta">2 seleccionados</span><button class="fquitar" type="button">Limpiar</button></div>
+  </div>
+</div>
+```
+
+**Lo no negociable del teclado.** El botón declara `aria-expanded` y `aria-controls`; al abrir, el
+foco entra en el buscador; `Escape` cierra y **devuelve el foco al botón**, no al principio de la
+página; un clic fuera cierra. El contenedor de pastillas abre con un texto solo para lectores
+—«Filtros aplicados: N»— y cada «×» dice qué quita, no solo «quitar»: en una fila de seis, seis
+botones «×» idénticos son indistinguibles al tabular (§6.19).
+
+**Un panel no es un modal.** No atrapa el foco ni oscurece la pantalla: es un menú de un control
+de la barra, y la tabla de detrás sigue siendo legible mientras se decide. Por eso lleva
+`role="group"` con su etiqueta y no `role="dialog"`.
+
 ---
 
 ## 7. Layout
@@ -1772,3 +1834,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.0.0 | 2026-09-03 | Abre la capa de dashboard: nueve piezas de dato visual —KPI, barra apilada de estado, dona, ranking, tendencia, sparkline, progreso, rejilla y tarjeta de widget— con la envoltura que obliga a Chart.js a obedecer los tokens, y la regla de que el `<canvas>` no es accesible: cada gráfico lleva su tabla equivalente, que es la fuente de verdad y la que aparece si el CDN no carga (§12). **Cambio que rompe:** `--serie-1` y `--serie-2` cambian de valor. Medidos uno contra otro daban ΔE 1,1 en protanopia y 10,0 en visión normal —el sistema los había medido solo contra el fondo— así que dos series pintadas con ellos eran indistinguibles; se sustituyen por cuatro slots validados en los dos temas (§1.4). Hay que revisar las etiquetas de tipo de cliente de §6.10, que los usaban: la segunda pasa de violeta a naranja. Añade `--on-state`, la tinta sobre relleno sólido de color, que voltea por tema porque el blanco literal falla en oscuro; y la regla de acotar a hijo directo un selector que tiñe iconos por contexto, a partir del caso medido de 1,03:1 en el que `.state .ico` dejaba invisible el icono de un botón verde (§1.4.1). |
 | 2.0.1 | 2026-09-03 | El relleno de un contenedor no puede vivir en un hijo opcional (§3.1). La cabecera de pantalla `.p4` cerraba gracias al `padding-bottom` de la fila de chips; al retirar los chips del tablero de Administración Vehicular el título quedó a 5px de su propio borde. Pasa al contenedor vía `:last-child`, que funciona lleve las filas que lleve. Y se documenta que una fila de tarjetas que se comparan entre sí va a la misma altura, frente al `align-items:start` que es el defecto correcto del resto de la rejilla. |
 | 2.1.0 | 2026-09-04 | Resuelve una contradicción viva: §6.4 seguía prescribiendo el medallón de estado en `--accent-soft` con el glifo en `--accent` mientras §1.4.1 —añadida en 2.0.0— nombraba ese mismo medallón como caso de la tinta sobre relleno sólido. §6.4 pasa a ser aplicación de §1.4.1 (fondo a plena opacidad, glifo en `--on-state`) en vez de una alternativa a ella. Tres reglas nuevas salidas de construir las cuatro pantallas de Administración Vehicular: un control compuesto lleva un solo anillo de foco y lo lleva el envoltorio, medido en el buscador, que pintaba dos anillos verdes concéntricos (§1.7); el resumen de estatus no convive con un filtro de estatus equivalente, corolario de «un filtro, un sitio» (§6.12, regla 6); y la ficha de detalle, donde el indicador de urgencia declara su ancho en rejilla en vez de quedarse con lo que sobre, y el contacto del cliente va bajo la identidad del expediente, no al final de la columna secundaria (§6.20). Documenta además las composiciones de tablero —tarjeta de entidad, desglose en cascada, contador de marca, nota de método— y las dos reglas de la rejilla `.dash`, para que la siguiente pantalla las repita en vez de reinventarlas (§12.6). |
+| 2.2.0 | 2026-09-04 | Completa la barra de filtros, que en §6.12 se quedaba en botones sin panel y con un solo valor por dimensión: ahora cada filtro abre un desplegable con buscador y casillas de selección múltiple, con el conteo de cada opción a la derecha y un «Limpiar» acotado a esa dimensión. Tres dimensiones visibles y el resto detrás de un botón «+ Añadir filtro», para no llenar la barra de controles que casi nadie toca. Lo seleccionado baja a su propia fila de pastillas, con un tope de cuatro visibles y un «+N más» que despliega el resto —sin tope, seis filtros cruzados empujan la tabla fuera de la pantalla— más «Quitar todos los filtros». Incluye lo no negociable del teclado: `aria-expanded`, el foco que entra en el buscador al abrir, `Escape` que cierra y devuelve el foco al botón, y cada «×» diciendo qué quita (§6.21). |
