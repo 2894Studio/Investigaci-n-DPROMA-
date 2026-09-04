@@ -72,6 +72,7 @@
 
   --accent:     #3E7A4C;   
   --accent-ink: #F7FAF9;
+  --on-state: #F7FAF9;
   --accent-soft: rgba(62,122,76,.10);
 
   
@@ -124,6 +125,7 @@ color-scheme: dark;
 
   --accent:     #4A8F5A;
   --accent-ink: #08120D;
+  --on-state: #08120D;
   --accent-soft: rgba(74,143,90,.16);
 
   --ok:    #4FBF98;  --ok-fill:    rgba(79,191,152,.14);
@@ -172,6 +174,7 @@ color-scheme: dark;
 
   --accent:     #4A8F5A;
   --accent-ink: #08120D;
+  --on-state: #08120D;
   --accent-soft: rgba(74,143,90,.16);
 
   --ok:    #4FBF98;  --ok-fill:    rgba(79,191,152,.14);
@@ -324,6 +327,8 @@ main[id="contenido"]::after{content:"";display:block;flex-shrink:0;height:var(--
 .p4-t .acc{margin-left:auto;display:flex;gap:var(--sp-2);align-items:center;flex-wrap:wrap}
 .p4-b{display:flex;gap:var(--sp-3);padding:var(--sp-3) var(--sp-6) 0;align-items:center;flex-wrap:wrap}
 .p4-f{display:flex;gap:var(--sp-2);padding:var(--sp-3) var(--sp-6);align-items:center;flex-wrap:wrap}
+/* El relleno inferior del contenedor no vive en un hijo opcional (§3.1). */
+.p4 > :last-child{padding-bottom:var(--sp-3)}
 .p4-f .tools{margin-left:auto;display:flex;gap:var(--sp-2);align-items:center}
 .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);
   color:var(--text);border-radius:var(--r-ctrl);padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);
@@ -340,10 +345,10 @@ main[id="contenido"]::after{content:"";display:block;flex-shrink:0;height:var(--
 .iconbtn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
 .search{width:100%;max-width:380px;min-width:0;flex-shrink:0;display:flex;align-items:center;gap:8px;background:var(--bg);
   border:1px solid var(--border);border-radius:var(--r-pill);padding:8px 14px;color:var(--text-3)}
-.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+/* Un control compuesto lleva un solo anillo de foco, y lo lleva el envoltorio (§1.7). */
+.search:focus-within{border-color:var(--accent);outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}
 .search svg{color:var(--text-3);flex-shrink:0}
 .search input{border:0;background:transparent;color:var(--text);font:500 var(--fs-dense) var(--font-ui);width:100%;outline:0}
-.search input:focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}
 .search input::placeholder{color:var(--text-3)}
 .schip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);background:var(--surface);
   border-radius:var(--r-pill);padding:6px 13px 6px 10px;cursor:pointer;font:600 var(--fs-meta) var(--font-ui);
@@ -640,9 +645,10 @@ main[data-state="loading"] .state-loading{display:flex}
 .sk-caja{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
   padding:var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-3)}
 .tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-modal);box-shadow:var(--sh-modal);display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-3);margin:0 auto}
-.estado-ico{width:52px;height:52px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent)}
+/* Medallón de estado: relleno sólido, glifo en --on-state (§1.4.1). */
+.estado-ico{width:52px;height:52px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--on-state)}
 .estado-ico .ico{width:26px;height:26px;color:inherit}
-.tarjeta-estado.es-err .estado-ico{background:var(--err-fill);color:var(--err-ink)}
+.tarjeta-estado.es-err .estado-ico{background:var(--err)}
 .tarjeta-estado h2{font:700 var(--fs-sub) var(--font-ui);margin:0}
 .tarjeta-estado p{color:var(--text-2);font-size:var(--fs-dense);line-height:1.6;max-width:36ch;margin:0}
 .tarjeta-estado .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
@@ -664,25 +670,30 @@ main[data-state="loading"] .state-loading{display:flex}
 .det{display:flex;flex-direction:column;gap:var(--sp-4);padding:var(--sp-4) var(--sp-6) var(--sp-8);flex:1;min-width:0}
 @media (max-width:1280px){.det{padding-left:var(--sp-4);padding-right:var(--sp-4)}}
 
+/* Bloque de identidad y reloj: rejilla de dos columnas para que el reloj tenga
+   ancho declarado en vez de quedarse con lo que sobre (§6). */
 .cab{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
-  box-shadow:var(--sh-rest);padding:var(--sp-4) var(--sp-6);display:flex;gap:var(--sp-6);
-  align-items:flex-start;flex-wrap:wrap}
-.cab .idt{flex:1;min-width:260px;display:flex;flex-direction:column;gap:var(--sp-2)}
+  box-shadow:var(--sh-rest);padding:var(--sp-5) var(--sp-6);display:grid;
+  grid-template-columns:minmax(0,1.6fr) minmax(300px,360px);gap:var(--sp-6);align-items:center}
+@media (max-width:1080px){.cab{grid-template-columns:1fr;align-items:start}}
+.cab .idt{min-width:0;display:flex;flex-direction:column;gap:var(--sp-3)}
 .cab h2{font-size:var(--fs-title);line-height:1.25;margin:0}
 .cab .folio-g{font-size:var(--fs-dense);color:var(--text-2);font-variant-numeric:tabular-nums}
 .marcas{display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center}
 
-.reloj{min-width:250px;max-width:330px;border-radius:var(--r-card);padding:var(--sp-3) var(--sp-4);
-  display:flex;flex-direction:column;gap:var(--sp-2)}
+.reloj{min-width:0;border-radius:var(--r-card);padding:var(--sp-4) var(--sp-5);
+  display:flex;flex-direction:column;gap:var(--sp-3)}
 .reloj.rojo{background:var(--err-bg);color:var(--err-ink)}
 .reloj.amarillo{background:var(--warn-bg);color:var(--warn-ink)}
 .reloj.verde{background:var(--ok-bg);color:var(--ok-ink)}
 .reloj.gris{background:var(--surface-2);color:var(--text-2)}
 .reloj .top{display:flex;align-items:center;gap:var(--sp-2)}
-.reloj .cifra{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.reloj .cifra{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
 .reloj .et{font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
 .reloj p{font-size:12px;line-height:1.55}
-.reloj dl{display:grid;grid-template-columns:auto 1fr;gap:2px var(--sp-3);font-size:12px}
+.reloj dl{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-2) var(--sp-4);font-size:12px;
+  padding-top:var(--sp-2);border-top:1px solid currentColor}
+.reloj dl{border-top-color:color-mix(in srgb, currentColor 22%, transparent)}
 .reloj dt{font-weight:700}
 .reloj dd{font-variant-numeric:tabular-nums}
 
@@ -696,7 +707,10 @@ main[data-state="loading"] .state-loading{display:flex}
 .dos-col{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:var(--sp-4);align-items:start}
 @media (max-width:1080px){.dos-col{grid-template-columns:1fr}}
 
-.contacto{display:flex;flex-direction:column;gap:var(--sp-3)}
+/* A ancho completo bajo la identidad del trámite: los datos van en fila,
+   no en una columna estrecha (§6). */
+.contacto{display:flex;flex-wrap:wrap;gap:var(--sp-3) var(--sp-8)}
+@media (max-width:720px){.contacto{flex-direction:column;gap:var(--sp-3)}}
 .dato{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
 .dato .et{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
   color:var(--text-3-fuerte);min-width:76px}
@@ -785,6 +799,19 @@ main[data-state="loading"] .state-loading{display:flex}
 </div>
 </div>
 
+<section class="bloque" aria-labelledby="b-con">
+<header><svg class="ico" aria-hidden="true" translate="no"><use href="#m-person"/></svg><h3 id="b-con">Contacto del cliente</h3></header>
+<div class="cuerpo">
+<div class="contacto">
+<div class="dato"><span class="et">Persona</span><span class="vl">Rosalía Mendieta Quiroz</span></div>
+<div class="dato"><span class="et">Correo</span><span class="vl" translate="no">r.mendieta@centronorte.example</span>
+<button class="copiar" type="button"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-content_paste"/></svg>Copiar</button></div>
+<div class="dato"><span class="et">Teléfono</span><span class="vl" translate="no">+52 442 000 0001</span>
+<button class="copiar" type="button"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-content_paste"/></svg>Copiar</button></div>
+</div>
+</div>
+</section>
+
 <div class="dos-col">
 
 <section class="bloque" aria-labelledby="b-bit">
@@ -839,18 +866,6 @@ main[data-state="loading"] .state-loading{display:flex}
 </div>
 </section>
 
-<section class="bloque" aria-labelledby="b-con">
-<header><svg class="ico" aria-hidden="true" translate="no"><use href="#m-person"/></svg><h3 id="b-con">Contacto del cliente</h3></header>
-<div class="cuerpo">
-<div class="contacto">
-<div class="dato"><span class="et">Persona</span><span class="vl">Rosalía Mendieta Quiroz</span></div>
-<div class="dato"><span class="et">Correo</span><span class="vl" translate="no">r.mendieta@centronorte.example</span>
-<button class="copiar" type="button"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-content_paste"/></svg>Copiar</button></div>
-<div class="dato"><span class="et">Teléfono</span><span class="vl" translate="no">+52 442 000 0001</span>
-<button class="copiar" type="button"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-content_paste"/></svg>Copiar</button></div>
-</div>
-</div>
-</section>
 
 </div>
 </div>

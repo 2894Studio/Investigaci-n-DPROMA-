@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.0.1
-last_updated: 2026-09-03
+version: 2.1.0
+last_updated: 2026-09-04
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -214,6 +214,22 @@ Texto normal 4,5:1 mínimo; texto grande (≥24px, o ≥18,66px en negrita) y el
 de darlo por bueno. No se asume por parecido visual, y no basta con medirlo sobre `--surface`:
 si el elemento puede caer sobre `--surface-2`, se mide también ahí. Es exactamente el error que
 tuvo `--text-3` durante toda la primera versión de este documento.
+
+**Un control compuesto lleva un solo anillo de foco, y lo lleva el envoltorio.** El buscador
+(`.search`) es un `div` con borde y radio de pastilla que contiene un `<input>` sin borde: para
+quien lo mira es un control, no dos. Estaba pintando dos anillos concéntricos —`box-shadow:0 0 0
+1px var(--accent)` en `:focus-within` sobre el envoltorio, más el `outline` estándar sobre el
+`input`— y el resultado eran dos líneas verdes paralelas alrededor de la misma caja. El anillo
+va una sola vez, en el elemento que el usuario percibe como el control, con el foco estándar del
+sistema:
+
+```css
+.search:focus-within{border-color:var(--accent);
+  outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}
+```
+
+y el hijo no añade el suyo. La regla general: si un contenedor reacciona a `:focus-within`
+dibujando foco, ningún descendiente suyo dibuja foco además.
 
 ---
 
@@ -563,13 +579,21 @@ glifo gris. El contenedor centra; la tarjeta de dentro es la que tiene forma.
   display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-3)}
 .estado-ico{width:52px;height:52px;border-radius:50%;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  background:var(--accent-soft);color:var(--accent)}
+  background:var(--accent);color:var(--on-state)}
 .estado-ico .msi{font-size:28px}
-.tarjeta-estado.es-err .estado-ico{background:var(--err-fill);color:var(--err-ink)}
+.tarjeta-estado.es-err .estado-ico{background:var(--err)}
 .tarjeta-estado p{color:var(--text-2);font-size:var(--fs-dense);line-height:1.6;max-width:36ch}
 .tarjeta-estado .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
 .tarjeta-estado .acc{display:flex;gap:var(--sp-2);flex-wrap:wrap;justify-content:center}
 ```
+
+**El medallón va con relleno sólido.** Hasta la versión 2.0.0 este apartado prescribía
+`--accent-soft` con el glifo en `--accent`: relleno translúcido al 10% y glifo del mismo color
+de familia. Se leía apagado, y contradecía la regla de tinta sobre relleno sólido de §1.4.1, que
+nombra este medallón como su caso de uso. La receta es ahora la de §1.4.1 —fondo del color de
+estado a plena opacidad, glifo en `--on-state`, que voltea por tema— y este apartado es su
+aplicación, no una alternativa. El glifo hereda con `color:inherit`; el error solo cambia el
+fondo, la tinta ya es la correcta.
 
 **El botón no se estira para llenar la tarjeta.** En el acceso, `.btn` lleva `flex:1 1 auto` y
 los botones ocupan el ancho de la tarjeta: son las dos acciones de toda la pantalla. En el
@@ -1023,6 +1047,13 @@ No se veía qué era resumen y qué era control.
 4. **Los filtros aplicados se ven y se quitan uno a uno**, como etiquetas con «×», más un enlace
    «Quitar todos los filtros».
 5. **Los desplegables se ven desplegables**: rótulo + valor + flecha.
+6. **El resumen no sobrevive a su propio filtro.** La regla 2 dice que un filtro vive en un
+   sitio; el corolario es que, cuando la pantalla ya tiene un desplegable de estatus, la fila de
+   contadores de estatus sobra y se retira. Es lo que pasaba en Trámites vehiculares: cuatro
+   `.schip` de estatus arriba y un «Estatus: Todos» debajo, dos controles del mismo campo a diez
+   píxeles uno del otro. El resumen se queda solo cuando responde a un criterio que **ningún**
+   filtro de la barra cubre, y entonces se agrupa según la regla 3. Los conteos que aporta un
+   resumen retirado no se pierden: viven en el tablero, que es la pantalla de lectura.
 
 ```css
 .resumen{display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center;
@@ -1350,6 +1381,37 @@ se abre desde `file://`, y un mensaje si tampoco eso funciona.
 7,80:1 en oscuro; confirmado 5,04:1 y 5,67:1.
 
 
+### 6.20 Ficha de detalle: el bloque de identidad manda el orden
+
+Una pantalla de detalle abre con un bloque de identidad —folio, nombre del expediente, marcas de
+estado— y a su derecha el indicador que decide la urgencia (el reloj de plazo, en Administración
+Vehicular). Dos reglas salen de haberlo construido mal primero:
+
+**El indicador de la derecha declara su ancho; no se queda con lo que sobre.** Estaba montado
+como `flex` con `.reloj{min-width:250px;max-width:330px}` frente a un `.idt{flex:1}`: el reloj
+recibía el resto, y el resto eran 250px para una cifra grande, un párrafo y tres filas de
+fechas. Se leía apretado porque lo estaba. Con rejilla el ancho es una decisión, no un residuo:
+
+```css
+.cab{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,360px);
+  gap:var(--sp-6);align-items:center;padding:var(--sp-5) var(--sp-6)}
+@media (max-width:1080px){.cab{grid-template-columns:1fr;align-items:start}}
+```
+
+`align-items:center` equilibra las dos columnas cuando una es más corta que la otra; por debajo
+del punto de ruptura vuelven a apilarse alineadas arriba. Y el propio indicador respira con el
+espaciado del sistema (`var(--sp-4) var(--sp-5)` de relleno, `--sp-3` entre partes), no con el
+mínimo que cabía.
+
+**Quién es el cliente va junto al expediente, no al final de la columna secundaria.** El contacto
+estaba de último bloque de la columna derecha, debajo de los documentos: para llamar a la persona
+del trámite había que recorrer la pantalla entera. Va inmediatamente bajo el bloque de identidad,
+a ancho completo y con los datos en fila —a ancho completo una lista vertical de tres filas es
+espacio desperdiciado—, antes de la bitácora y de los documentos. Ese orden es también el del
+recorrido con teclado, que es la otra razón por la que importa.
+
+---
+
 ## 7. Layout
 
 ### 7.1 Entrada al sistema (`.split`)
@@ -1671,6 +1733,31 @@ conexión tiene que enseñar datos, no un rectángulo vacío.
   venció— es el semáforo de §1.3. Si solo distingue una cosa de otra, es la paleta categórica de
   §1.4. Un color de estado nunca se reutiliza como serie.
 
+### 12.6 Composiciones de tablero
+
+Las piezas de §12.4 son componentes; lo que sigue son **composiciones**: combinaciones fijas que
+el tablero de Administración Vehicular usa y que conviene nombrar para que la siguiente pantalla
+las repita en vez de reinventarlas.
+
+| Composición | Clase | Qué es |
+|---|---|---|
+| Tarjeta de entidad | `.plaza2` | Nombre + total + `.barra` + solo los conteos accionables. En reposo no pasa de cuatro cifras |
+| Desglose en cascada | `.desglose` | El eje secundario —dónde está cada expediente— detrás de un botón con `aria-expanded`, dentro de la tarjeta de su entidad |
+| Contador de marca | `.alerta` | Un conteo que no es un estado de la barra sino una marca que convive con ella («observados»). Va en `--block`, nunca en `--err` |
+| Nota de método | `.nota-reloj` | Explica cómo se mide lo que la tarjeta muestra. Reusa `.note` (§6.9): es explicación, no error, y por tanto nunca caja roja |
+
+**Dos reglas de la rejilla.** `.dash` es rejilla de doce columnas con `align-items:start`, para
+que una tarjeta alta no estire a sus vecinas. Cuando una fila son varios widgets equivalentes que
+deben leerse como un conjunto —tres cifras del día, una al lado de otra— se marca `.dash.pares`,
+que pasa a `align-items:stretch` y los iguala en altura. Igualar por omisión es peor: obliga a
+las tarjetas cortas a inventar relleno.
+
+**Y una del componente de barra.** Los segmentos contiguos se separan con superficie, no con
+espacio: `.barra span + span{border-left:2px solid var(--surface)}`. Un hueco transparente
+dejaría ver el fondo del carril y parecería un cuarto valor.
+
+---
+
 ## Historial de cambios
 
 | Versión | Fecha | Cambios |
@@ -1684,3 +1771,4 @@ conexión tiene que enseñar datos, no un rectángulo vacío.
 | 1.5.1 | 2026-09-02 | Corrige el hover de la barra de navegación de secciones de esta página (`.nav-secciones a:hover`): pasaba de un gris a otro gris sobre fondo ya claro, con muy poco cambio de estado. Se sustituye por el par ya documentado y usado en `.btn.p` — fondo `--accent` y texto `--accent-ink`, definido explícitamente como "texto e iconos sobre --accent" (§1.2). Cambio acotado a esta página: la barra de secciones es chrome propio del entregable, no un componente del sistema documentado en §6, así que no toca `docs/sistema-diseno-sio-dproma.md`. |
 | 2.0.0 | 2026-09-03 | Abre la capa de dashboard: nueve piezas de dato visual —KPI, barra apilada de estado, dona, ranking, tendencia, sparkline, progreso, rejilla y tarjeta de widget— con la envoltura que obliga a Chart.js a obedecer los tokens, y la regla de que el `<canvas>` no es accesible: cada gráfico lleva su tabla equivalente, que es la fuente de verdad y la que aparece si el CDN no carga (§12). **Cambio que rompe:** `--serie-1` y `--serie-2` cambian de valor. Medidos uno contra otro daban ΔE 1,1 en protanopia y 10,0 en visión normal —el sistema los había medido solo contra el fondo— así que dos series pintadas con ellos eran indistinguibles; se sustituyen por cuatro slots validados en los dos temas (§1.4). Hay que revisar las etiquetas de tipo de cliente de §6.10, que los usaban: la segunda pasa de violeta a naranja. Añade `--on-state`, la tinta sobre relleno sólido de color, que voltea por tema porque el blanco literal falla en oscuro; y la regla de acotar a hijo directo un selector que tiñe iconos por contexto, a partir del caso medido de 1,03:1 en el que `.state .ico` dejaba invisible el icono de un botón verde (§1.4.1). |
 | 2.0.1 | 2026-09-03 | El relleno de un contenedor no puede vivir en un hijo opcional (§3.1). La cabecera de pantalla `.p4` cerraba gracias al `padding-bottom` de la fila de chips; al retirar los chips del tablero de Administración Vehicular el título quedó a 5px de su propio borde. Pasa al contenedor vía `:last-child`, que funciona lleve las filas que lleve. Y se documenta que una fila de tarjetas que se comparan entre sí va a la misma altura, frente al `align-items:start` que es el defecto correcto del resto de la rejilla. |
+| 2.1.0 | 2026-09-04 | Resuelve una contradicción viva: §6.4 seguía prescribiendo el medallón de estado en `--accent-soft` con el glifo en `--accent` mientras §1.4.1 —añadida en 2.0.0— nombraba ese mismo medallón como caso de la tinta sobre relleno sólido. §6.4 pasa a ser aplicación de §1.4.1 (fondo a plena opacidad, glifo en `--on-state`) en vez de una alternativa a ella. Tres reglas nuevas salidas de construir las cuatro pantallas de Administración Vehicular: un control compuesto lleva un solo anillo de foco y lo lleva el envoltorio, medido en el buscador, que pintaba dos anillos verdes concéntricos (§1.7); el resumen de estatus no convive con un filtro de estatus equivalente, corolario de «un filtro, un sitio» (§6.12, regla 6); y la ficha de detalle, donde el indicador de urgencia declara su ancho en rejilla en vez de quedarse con lo que sobre, y el contacto del cliente va bajo la identidad del expediente, no al final de la columna secundaria (§6.20). Documenta además las composiciones de tablero —tarjeta de entidad, desglose en cascada, contador de marca, nota de método— y las dos reglas de la rejilla `.dash`, para que la siguiente pantalla las repita en vez de reinventarlas (§12.6). |

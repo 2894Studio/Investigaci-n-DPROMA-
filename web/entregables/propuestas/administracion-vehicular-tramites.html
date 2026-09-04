@@ -72,6 +72,7 @@
 
   --accent:     #3E7A4C;   
   --accent-ink: #F7FAF9;
+  --on-state: #F7FAF9;
   --accent-soft: rgba(62,122,76,.10);
 
   
@@ -124,6 +125,7 @@ color-scheme: dark;
 
   --accent:     #4A8F5A;
   --accent-ink: #08120D;
+  --on-state: #08120D;
   --accent-soft: rgba(74,143,90,.16);
 
   --ok:    #4FBF98;  --ok-fill:    rgba(79,191,152,.14);
@@ -172,6 +174,7 @@ color-scheme: dark;
 
   --accent:     #4A8F5A;
   --accent-ink: #08120D;
+  --on-state: #08120D;
   --accent-soft: rgba(74,143,90,.16);
 
   --ok:    #4FBF98;  --ok-fill:    rgba(79,191,152,.14);
@@ -324,6 +327,8 @@ main[id="contenido"]::after{content:"";display:block;flex-shrink:0;height:var(--
 .p4-t .acc{margin-left:auto;display:flex;gap:var(--sp-2);align-items:center;flex-wrap:wrap}
 .p4-b{display:flex;gap:var(--sp-3);padding:var(--sp-3) var(--sp-6) 0;align-items:center;flex-wrap:wrap}
 .p4-f{display:flex;gap:var(--sp-2);padding:var(--sp-3) var(--sp-6);align-items:center;flex-wrap:wrap}
+/* El relleno inferior del contenedor no vive en un hijo opcional (§3.1). */
+.p4 > :last-child{padding-bottom:var(--sp-3)}
 .p4-f .tools{margin-left:auto;display:flex;gap:var(--sp-2);align-items:center}
 .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);
   color:var(--text);border-radius:var(--r-ctrl);padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);
@@ -340,10 +345,10 @@ main[id="contenido"]::after{content:"";display:block;flex-shrink:0;height:var(--
 .iconbtn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
 .search{width:100%;max-width:380px;min-width:0;flex-shrink:0;display:flex;align-items:center;gap:8px;background:var(--bg);
   border:1px solid var(--border);border-radius:var(--r-pill);padding:8px 14px;color:var(--text-3)}
-.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+/* Un control compuesto lleva un solo anillo de foco, y lo lleva el envoltorio (§1.7). */
+.search:focus-within{border-color:var(--accent);outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}
 .search svg{color:var(--text-3);flex-shrink:0}
 .search input{border:0;background:transparent;color:var(--text);font:500 var(--fs-dense) var(--font-ui);width:100%;outline:0}
-.search input:focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}
 .search input::placeholder{color:var(--text-3)}
 .schip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);background:var(--surface);
   border-radius:var(--r-pill);padding:6px 13px 6px 10px;cursor:pointer;font:600 var(--fs-meta) var(--font-ui);
@@ -640,9 +645,10 @@ main[data-state="loading"] .state-loading{display:flex}
 .sk-caja{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
   padding:var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-3)}
 .tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-modal);box-shadow:var(--sh-modal);display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-3);margin:0 auto}
-.estado-ico{width:52px;height:52px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent)}
+/* Medallón de estado: relleno sólido, glifo en --on-state (§1.4.1). */
+.estado-ico{width:52px;height:52px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--on-state)}
 .estado-ico .ico{width:26px;height:26px;color:inherit}
-.tarjeta-estado.es-err .estado-ico{background:var(--err-fill);color:var(--err-ink)}
+.tarjeta-estado.es-err .estado-ico{background:var(--err)}
 .tarjeta-estado h2{font:700 var(--fs-sub) var(--font-ui);margin:0}
 .tarjeta-estado p{color:var(--text-2);font-size:var(--fs-dense);line-height:1.6;max-width:36ch;margin:0}
 .tarjeta-estado .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
@@ -724,7 +730,7 @@ main[data-state="loading"] .state-loading{display:flex}
 <div class="p4">
 <div class="p4-t"><h1>Trámites vehiculares</h1><span class="resumen"><b>36</b> trámites en tus plazas · <b>3</b> vencidos · <b>3</b> observados</span><div class="acc"><button class="btn p" type="button"><svg class="ico ico-sm" aria-hidden="true" translate="no"><use href="#m-add"/></svg>Nuevo trámite</button></div></div>
 <div class="p4-b"><div class="search"><svg class="ico ico-sm" aria-hidden="true" translate="no"><use href="#m-search"/></svg><input id="buscar" type="search" placeholder="Buscar por folio, cliente, placas o VIN…" aria-label="Buscar trámites vehiculares"></div></div>
-<div class="p4-f"><button class="schip c-err" type="button" aria-pressed="false" data-f="vencidos"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-error"/></svg><b class="tnum">3</b> vencidos</button><button class="schip c-warn" type="button" aria-pressed="false" data-f="por-vencer"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-schedule"/></svg><b class="tnum">5</b> por vencer</button><button class="schip c-err" type="button" aria-pressed="false" data-f="observados"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-error"/></svg><b class="tnum">3</b> observados</button><button class="schip c-neutro" type="button" aria-pressed="false" data-f="sin-admitir"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-pause_circle"/></svg><b class="tnum">10</b> sin admitir</button><div class="tools"><div class="filtros" role="group" aria-label="Filtros">
+<div class="p4-f"><div class="filtros" role="group" aria-label="Filtros">
 <button class="f" type="button" aria-pressed="true" aria-haspopup="listbox">Plaza: <b>Querétaro Centro</b></button>
 <button class="f" type="button" aria-pressed="false" aria-haspopup="listbox">Estatus: <b>Todos</b></button>
 <button class="f" type="button" aria-pressed="false" aria-haspopup="listbox">Responsable: <b>Todos</b></button>
@@ -733,7 +739,7 @@ main[data-state="loading"] .state-loading{display:flex}
 <span class="fchip">Plaza: Querétaro Centro<button type="button" class="fx" aria-label="Quitar el filtro Plaza: Querétaro Centro">×</button></span>
 <button type="button" class="fquitar">Quitar todos los filtros</button>
 </div>
-</div></div></div>
+</div></div>
 </div><main id="contenido" data-state="ok" tabindex="-1"><p id="anuncio-estado" role="status" aria-live="polite" class="sr"></p>
 <div class="state-ok "><div class="lst">
 <div class="tabla-caja">
