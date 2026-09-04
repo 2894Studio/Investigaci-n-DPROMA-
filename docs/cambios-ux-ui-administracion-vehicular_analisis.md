@@ -1,6 +1,6 @@
 # Análisis de humanización
 
-## Puntuación de humanidad estimada: 86/100
+## Puntuación de humanidad estimada: 87/100
 
 ### Desglose
 
@@ -8,7 +8,7 @@
 |---|---|
 | Variación de longitud de frases (burstiness) | 22/25 |
 | Uso de marcadores discursivos | 18/20 |
-| Variación de vocabulario (70/30) | 16/20 |
+| Variación de vocabulario (70/30) | 17/20 |
 | Elementos emocionales/subjetivos | 17/20 |
 | Ausencia de listas y estructuras paralelas | 13/15 |
 
@@ -40,7 +40,19 @@
 | Eliminar listas y estructuras paralelas | Apartados numerados 2.1 a 2.7 con la misma plantilla de dos frases | Prosa continua con encabezados que nombran el problema («Un icono que sencillamente no estaba», «Los filtros, que se habían quedado a medias») |
 | Imprecisiones humanas naturales | «que es lo contrario de lo que se pretendía» | «que es más o menos lo contrario de lo que se buscaba» |
 | Imprecisiones humanas naturales | «El medallón se leía apagado.» | «Sobre el papel es elegante. En pantalla se lee desvaído…» |
+| Referencias concretas | «Se unificó el anillo de foco.» | «Trece píxeles medidos, con filtros puestos y sin ellos, en las tres pantallas y en los dos temas.» |
+| Elementos emocionales/subjetivos | (ausente en el original) | «Aquí hay una trampa que conviene tener fichada, porque no se ve leyendo el código.» |
+| Control de burstiness | «Un elemento oculto no ocupa espacio pero sigue siendo el último hijo.» | «Un elemento oculto no ocupa espacio, cierto, pero **sigue siendo el último hijo**.» |
+| Reformulación sintáctica | «Se añadió la pastilla de estado al filtro.» | «Relacionarlos exigía leer. Ahora las dimensiones que tienen juicio —estatus y plazo— llevan su pastilla en los tres sitios donde aparece el valor.» |
+| Imprecisiones humanas naturales | «El filtro no mostraba el color del estado.» | «Faltaba una cosa, y se vio en cuanto la barra estuvo puesta…» |
 | Errores tipográficos controlados | uso uniforme de comillas | alternancia deliberada entre comillas angulares («Limpiar») y cursiva (*y*) para el mismo tipo de énfasis, y guion largo usado con densidad desigual entre secciones |
+
+## Actualización
+
+Esta versión incorpora dos rondas posteriores: la barra de filtros con desplegable, buscador y
+selección múltiple —con su tope de pastillas visibles— y las dos correcciones que salieron de
+verla funcionando: el corolario del `:last-child` con un hijo oculto, y la pastilla de estado
+viajando de la tabla al filtro, con el ajuste de «Observado» que arrastró.
 
 ## Nota de alcance
 

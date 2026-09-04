@@ -127,6 +127,19 @@ son indistinguibles al tabular.
 La misma barra se llevó tal cual a Trámites concluidos, que no tenía ninguna. Que dos pantallas
 hermanas filtren distinto es una fuente de fricción gratuita.
 
+Faltaba una cosa, y se vio en cuanto la barra estuvo puesta: el filtro decía «Observado» en texto
+gris mientras la fila de la tabla, dos centímetros más abajo, lo decía en una pastilla de color.
+Relacionarlos exigía leer. Ahora las dimensiones que tienen juicio —estatus y plazo— llevan su
+pastilla en los tres sitios donde aparece el valor: dentro del panel, en el resumen del botón y en
+la pastilla de lo aplicado. El color hace el trabajo que hacía la lectura. Las otras tres —plaza,
+responsable, trámite— se quedan en texto plano a propósito, porque colorearlas les inventaría un
+significado que el dato no tiene.
+
+Y al ponerlos uno al lado del otro apareció una incoherencia vieja. «Observado» iba en rojo en la
+tabla y en el detalle, cuando la regla de reservar el rojo a error y vencimiento ya lo había movido
+al color de bloqueo en el tablero. Un trámite observado está parado por una condición externa, no
+es un error de nadie. Se alineó en los tres sitios.
+
 ## La ficha de detalle
 
 Tres cosas, y las tres venían de lo mismo: el bloque de cabecera estaba montado como caja flexible
@@ -140,8 +153,16 @@ ruptura vuelven a apilarse.
 
 Faltaba aire bajo el título de la pantalla, y resultó no ser un despiste sino un defecto del
 componente: el relleno inferior de la cabecera lo aportaba una fila de chips que es opcional. En
-cuanto se quitaron los chips, el título quedó a cinco píxeles de su propio borde. El relleno pasó
-al contenedor.
+cuanto se quitaron los chips, el título quedó a cinco píxeles de su propio borde.
+
+La primera corrección fue mover ese relleno al último hijo del contenedor, fuera cual fuera. Y
+duró exactamente hasta que la cabecera ganó una fila más: la de pastillas de filtros aplicados,
+que nace oculta. Aquí hay una trampa que conviene tener fichada, porque no se ve leyendo el código.
+Un elemento oculto no ocupa espacio, cierto, pero **sigue siendo el último hijo**. Así que se
+llevaba el relleno mientras la fila visible se quedaba sin cierre, y la tabla arrancaba a un píxel
+de los filtros. El relleno acabó donde tenía que estar desde el principio, en el contenedor, con
+cada fila declarando solo su parte de arriba. Trece píxeles medidos, con filtros puestos y sin
+ellos, en las tres pantallas y en los dos temas.
 
 Y el contacto del cliente estaba al final de la columna derecha, debajo de los documentos. Para
 llamar a la persona del trámite había que recorrer la pantalla entera. Subió justo bajo la
@@ -150,7 +171,7 @@ recorrido con teclado, que es la otra razón por la que importa.
 
 ## Qué queda escrito
 
-El sistema de diseño pasó de 1.5.1 a 2.2.0 a lo largo de estas rondas. Lo relevante no es el
+El sistema de diseño pasó de 1.5.1 a 2.2.1 a lo largo de estas rondas. Lo relevante no es el
 número sino que cada corrección dejó una regla en su sitio, con el caso medido al lado, en los tres
 archivos que tienen que decir lo mismo: la fuente técnica, la copia descargable con su historial y
 la página renderizada.

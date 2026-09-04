@@ -40,7 +40,14 @@ El buscador pintaba dos anillos concéntricos. Se unificó en un solo anillo sob
 ### 2.6 Barra de filtros
 
 Se completó con desplegables que incorporan buscador y selección múltiple, pastillas de lo
-aplicado con máximo visible, y un botón de añadir filtro.
+aplicado con máximo visible, y un botón de añadir filtro. Las dimensiones con juicio —estatus y
+plazo— muestran la pastilla de color del estado en el panel, en el resumen del botón y en la
+pastilla aplicada.
+
+### 2.6.1 Relleno de la cabecera con una fila oculta
+
+El relleno inferior declarado sobre el último hijo lo consumía la fila de filtros aplicados, que
+nace oculta. Se trasladó al contenedor.
 
 ### 2.7 Ficha de detalle
 
@@ -50,4 +57,4 @@ cliente se reubicó bajo la identidad del expediente.
 ## 3. Conclusiones
 
 Los cambios quedaron documentados en el sistema de diseño, que pasó de la versión 1.5.1 a la
-2.2.0.
+2.2.1.
