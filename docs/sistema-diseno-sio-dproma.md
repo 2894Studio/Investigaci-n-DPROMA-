@@ -333,12 +333,21 @@ La regla es que **el relleno de un contenedor lo declara el contenedor**, no el 
 casualmente va último:
 
 ```css
-.p4 > :last-child{ padding-bottom: var(--sp-3) }
+.p4{ padding-bottom: var(--sp-3) }   /* y cada fila declara solo su relleno superior */
 ```
 
 Así cierra igual lleve título y chips, título y filtros, o solo el título. Vale para cualquier
 bloque compuesto por filas opcionales: si al quitar una fila el bloque se descuadra, el relleno
 estaba en el sitio equivocado.
+
+**Corolario medido: `:last-child` no distingue lo oculto.** La primera corrección de esta regla usó
+`.p4 > :last-child{padding-bottom:var(--sp-3)}`, y funcionó hasta que la cabecera ganó una segunda
+fila —las pastillas de filtros aplicados— que nace con `hidden`. Un elemento con `hidden` no ocupa
+espacio pero **sí es el último hijo**, así que se llevaba el relleno mientras la fila visible se
+quedaba sin cierre: la tabla arrancaba a un píxel de los filtros. El relleno inferior va en el
+contenedor y punto —`.p4{padding-bottom:var(--sp-3)}`—, con los hijos declarando solo su relleno
+superior. Un selector estructural que dependa de qué hijo está visible es una regla que se rompe
+sola en cuanto la pantalla gana una fila condicional.
 
 **Una fila de tarjetas hermanas va a la misma altura.** `align-items:start` es el defecto
 correcto en una rejilla de dashboard —evita que una tarjeta corta se estire hasta la altura de
@@ -370,7 +379,6 @@ queda semitransparente y el texto se lee mal sobre lo que haya detrás:
 
 El translúcido es de la pantalla de entrada. En el dashboard las superficies son opacas: sobre
 una tabla densa, un fondo que deja ver lo de detrás resta legibilidad sin aportar nada.
-
 ---
 
 ## 5. Movimiento
@@ -1454,6 +1462,13 @@ todos los filtros». La fila entera desaparece cuando no hay nada aplicado.
   </div>
 </div>
 ```
+
+**Y la pastilla de estado viaja al filtro.** Una dimensión cuyos valores tienen pastilla en la
+tabla —estatus, plazo— la lleva también dentro del panel, en el resumen del botón y en la pastilla
+aplicada. Es lo que permite relacionar «Observado» de la barra con «Observado» de la fila sin leer
+el texto: el color hace el trabajo. Se reusa `.pill` con su clase de estado (§6.10), no una versión
+propia. Las dimensiones sin juicio —plaza, responsable, trámite— van en texto plano; ponerles color
+inventaría un significado que el dato no tiene.
 
 **Lo no negociable del teclado.** El botón declara `aria-expanded` y `aria-controls`; al abrir, el
 foco entra en el buscador; `Escape` cierra y **devuelve el foco al botón**, no al principio de la

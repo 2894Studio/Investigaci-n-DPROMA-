@@ -319,7 +319,7 @@ main[id="contenido"]::after{content:"";display:block;flex-shrink:0;height:var(--
 /* @fin ARQ-CROMO */
 
 /* ARQ-P4 */
-.p4{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.p4{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;padding-bottom:var(--sp-3)}
 .p4-t{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-6) 0;flex-wrap:wrap}
 .p4-t h1{font-size:var(--fs-title);font-weight:700;line-height:1.25}
 .p4-t .resumen{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums;line-height:1.5}
@@ -328,8 +328,7 @@ main[id="contenido"]::after{content:"";display:block;flex-shrink:0;height:var(--
 .p4-b{display:flex;gap:var(--sp-3);padding:var(--sp-3) var(--sp-6) 0;align-items:center;flex-wrap:wrap}
 .p4-f{display:flex;gap:var(--sp-2);padding:var(--sp-3) var(--sp-6) 0;align-items:center;flex-wrap:wrap}
 .p4-f.aplicados{padding-top:var(--sp-2)}
-/* El relleno inferior del contenedor no vive en un hijo opcional (§3.1). */
-.p4 > :last-child{padding-bottom:var(--sp-3)}
+/* El relleno inferior del contenedor lo lleva el contenedor (§3.1). */
 .p4-f .tools{margin-left:auto;display:flex;gap:var(--sp-2);align-items:center}
 .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);
   color:var(--text);border-radius:var(--r-ctrl);padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);
@@ -721,6 +720,11 @@ main[data-state="loading"] .state-loading{display:flex}
 @media (pointer:coarse){[data-tacto="dedo"] .f,[data-tacto="dedo"] .fquitar,
   [data-tacto="dedo"] .fmaschips,[data-tacto="dedo"] .pop-l li label{min-height:46px}
   [data-tacto="dedo"] .fx{width:46px;height:46px}}
+/* Estatus y plazo llevan en el filtro la misma pastilla que en la tabla:
+   el color es lo que relaciona el filtro con la fila (§6.21). */
+.pop-l .et .pill{max-width:100%;overflow:hidden;text-overflow:ellipsis;display:inline-block}
+.f .pill{margin-left:2px}
+.fchip .pill{margin:0 2px}
 @media (max-width:560px){.pop{width:min(268px,calc(100vw - var(--sp-8)))}}
 
 .conc table{min-width:1120px}
@@ -886,8 +890,8 @@ var FILTROS=[
  {v:'qro',t:'Querétaro Centro',n:4},{v:'cel',t:'Celaya',n:2},
  {v:'jur',t:'Juriquilla',n:2},{v:'nau',t:'Naucalpan',n:1}]},
 {id:'estatus',etiqueta:'Estatus de cierre',vacio:'Todos',fija:true,opciones:[
- {v:'sinacuse',t:'Sin acuse entregado',n:1},{v:'conacuse',t:'Con acuse',n:5},
- {v:'archivado',t:'Archivado',n:3}]},
+ {v:'sinacuse',t:'Sin acuse entregado',n:1,pill:'p-warn'},{v:'conacuse',t:'Con acuse',n:5,pill:'p-ok'},
+ {v:'archivado',t:'Archivado',n:3,pill:'p-neutro'}]},
 {id:'responsable',etiqueta:'Responsable',vacio:'Todos',fija:true,opciones:[
  {v:'ncruz',t:'N. Cruz',n:3},{v:'mrios',t:'M. Ríos',n:2},
  {v:'jpaz',t:'J. Paz',n:2},{v:'larce',t:'L. Arce',n:2}]},
@@ -912,6 +916,8 @@ var FILTROS=[
 
   function dim(id){ for(var i=0;i<FILTROS.length;i++) if(FILTROS[i].id===id) return FILTROS[i]; }
   function nombre(d,v){ for(var i=0;i<d.opciones.length;i++) if(d.opciones[i].v===v) return d.opciones[i].t; return v; }
+  function op(d,v){ for(var i=0;i<d.opciones.length;i++) if(d.opciones[i].v===v) return d.opciones[i]; return null; }
+  function marca(d,v){ var o=op(d,v); return o&&o.pill ? '<span class="pill '+o.pill+'">'+o.t+'</span>' : '<b>'+nombre(d,v)+'</b>'; }
   function total(){ var n=0; for(var k in sel) n+=sel[k].length; return n; }
 
   function cierra(){ if(!abierto) return; var b=abierto; abierto=null;
@@ -938,7 +944,9 @@ var FILTROS=[
     d.opciones.forEach(function(o){
       var li=document.createElement('li'), lab=document.createElement('label');
       var cb=document.createElement('input'); cb.type='checkbox'; cb.value=o.v;
-      var et=document.createElement('span'); et.className='et'; et.textContent=o.t;
+      var et=document.createElement('span'); et.className='et';
+      if(o.pill){ var pl=document.createElement('span'); pl.className='pill '+o.pill; pl.textContent=o.t; et.appendChild(pl); }
+      else et.textContent=o.t;
       lab.appendChild(cb); lab.appendChild(et);
       if(o.n!=null){ var n=document.createElement('span'); n.className='n'; n.textContent=o.n; lab.appendChild(n); }
       cb.addEventListener('change',function(){
@@ -1013,8 +1021,8 @@ var FILTROS=[
     visibles.forEach(function(id){
       var d=dim(id), w=control(d), n=sel[id].length;
       w._btn.setAttribute('data-activo',String(n>0));
-      var valor = n===0 ? d.vacio : (n===1 ? nombre(d,sel[id][0]) : n+' seleccionados');
-      w._btn.innerHTML=d.etiqueta+': <b>'+valor+'</b><svg class="ico ico-sm" aria-hidden="true" translate="no"><use href="#m-expand_more"/></svg>';
+      var valor = n===0 ? '<b>'+d.vacio+'</b>' : (n===1 ? marca(d,sel[id][0]) : '<b>'+n+' seleccionados</b>');
+      w._btn.innerHTML=d.etiqueta+': '+valor+'<svg class="ico ico-sm" aria-hidden="true" translate="no"><use href="#m-expand_more"/></svg>';
       Array.prototype.forEach.call(w._pop._ul.querySelectorAll('input'),function(cb){
         cb.checked=sel[id].indexOf(cb.value)>=0;
       });
@@ -1039,8 +1047,8 @@ var FILTROS=[
     var muestra = todoChips ? puestos : puestos.slice(0,MAX_CHIPS);
     muestra.forEach(function(p){
       var c=document.createElement('span'); c.className='fchip';
-      var t=nombre(p.d,p.v);
-      c.innerHTML='<span class="dim">'+p.d.etiqueta+':</span> '+t;
+      var t=nombre(p.d,p.v), o=op(p.d,p.v);
+      c.innerHTML='<span class="dim">'+p.d.etiqueta+':</span> '+(o&&o.pill?'<span class="pill '+o.pill+'">'+t+'</span>':t);
       var x=document.createElement('button');
       x.type='button'; x.className='fx'; x.textContent='×';
       x.setAttribute('aria-label','Quitar el filtro '+p.d.etiqueta+': '+t);

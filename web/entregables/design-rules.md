@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.2.0
+version: 2.2.1
 last_updated: 2026-09-04
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -340,12 +340,21 @@ La regla es que **el relleno de un contenedor lo declara el contenedor**, no el 
 casualmente va último:
 
 ```css
-.p4 > :last-child{ padding-bottom: var(--sp-3) }
+.p4{ padding-bottom: var(--sp-3) }   /* y cada fila declara solo su relleno superior */
 ```
 
 Así cierra igual lleve título y chips, título y filtros, o solo el título. Vale para cualquier
 bloque compuesto por filas opcionales: si al quitar una fila el bloque se descuadra, el relleno
 estaba en el sitio equivocado.
+
+**Corolario medido: `:last-child` no distingue lo oculto.** La primera corrección de esta regla usó
+`.p4 > :last-child{padding-bottom:var(--sp-3)}`, y funcionó hasta que la cabecera ganó una segunda
+fila —las pastillas de filtros aplicados— que nace con `hidden`. Un elemento con `hidden` no ocupa
+espacio pero **sí es el último hijo**, así que se llevaba el relleno mientras la fila visible se
+quedaba sin cierre: la tabla arrancaba a un píxel de los filtros. El relleno inferior va en el
+contenedor y punto —`.p4{padding-bottom:var(--sp-3)}`—, con los hijos declarando solo su relleno
+superior. Un selector estructural que dependa de qué hijo está visible es una regla que se rompe
+sola en cuanto la pantalla gana una fila condicional.
 
 **Una fila de tarjetas hermanas va a la misma altura.** `align-items:start` es el defecto
 correcto en una rejilla de dashboard —evita que una tarjeta corta se estire hasta la altura de
@@ -377,7 +386,6 @@ queda semitransparente y el texto se lee mal sobre lo que haya detrás:
 
 El translúcido es de la pantalla de entrada. En el dashboard las superficies son opacas: sobre
 una tabla densa, un fondo que deja ver lo de detrás resta legibilidad sin aportar nada.
-
 ---
 
 ## 5. Movimiento
@@ -1462,6 +1470,13 @@ todos los filtros». La fila entera desaparece cuando no hay nada aplicado.
 </div>
 ```
 
+**Y la pastilla de estado viaja al filtro.** Una dimensión cuyos valores tienen pastilla en la
+tabla —estatus, plazo— la lleva también dentro del panel, en el resumen del botón y en la pastilla
+aplicada. Es lo que permite relacionar «Observado» de la barra con «Observado» de la fila sin leer
+el texto: el color hace el trabajo. Se reusa `.pill` con su clase de estado (§6.10), no una versión
+propia. Las dimensiones sin juicio —plaza, responsable, trámite— van en texto plano; ponerles color
+inventaría un significado que el dato no tiene.
+
 **Lo no negociable del teclado.** El botón declara `aria-expanded` y `aria-controls`; al abrir, el
 foco entra en el buscador; `Escape` cierra y **devuelve el foco al botón**, no al principio de la
 página; un clic fuera cierra. El contenedor de pastillas abre con un texto solo para lectores
@@ -1835,3 +1850,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.0.1 | 2026-09-03 | El relleno de un contenedor no puede vivir en un hijo opcional (§3.1). La cabecera de pantalla `.p4` cerraba gracias al `padding-bottom` de la fila de chips; al retirar los chips del tablero de Administración Vehicular el título quedó a 5px de su propio borde. Pasa al contenedor vía `:last-child`, que funciona lleve las filas que lleve. Y se documenta que una fila de tarjetas que se comparan entre sí va a la misma altura, frente al `align-items:start` que es el defecto correcto del resto de la rejilla. |
 | 2.1.0 | 2026-09-04 | Resuelve una contradicción viva: §6.4 seguía prescribiendo el medallón de estado en `--accent-soft` con el glifo en `--accent` mientras §1.4.1 —añadida en 2.0.0— nombraba ese mismo medallón como caso de la tinta sobre relleno sólido. §6.4 pasa a ser aplicación de §1.4.1 (fondo a plena opacidad, glifo en `--on-state`) en vez de una alternativa a ella. Tres reglas nuevas salidas de construir las cuatro pantallas de Administración Vehicular: un control compuesto lleva un solo anillo de foco y lo lleva el envoltorio, medido en el buscador, que pintaba dos anillos verdes concéntricos (§1.7); el resumen de estatus no convive con un filtro de estatus equivalente, corolario de «un filtro, un sitio» (§6.12, regla 6); y la ficha de detalle, donde el indicador de urgencia declara su ancho en rejilla en vez de quedarse con lo que sobre, y el contacto del cliente va bajo la identidad del expediente, no al final de la columna secundaria (§6.20). Documenta además las composiciones de tablero —tarjeta de entidad, desglose en cascada, contador de marca, nota de método— y las dos reglas de la rejilla `.dash`, para que la siguiente pantalla las repita en vez de reinventarlas (§12.6). |
 | 2.2.0 | 2026-09-04 | Completa la barra de filtros, que en §6.12 se quedaba en botones sin panel y con un solo valor por dimensión: ahora cada filtro abre un desplegable con buscador y casillas de selección múltiple, con el conteo de cada opción a la derecha y un «Limpiar» acotado a esa dimensión. Tres dimensiones visibles y el resto detrás de un botón «+ Añadir filtro», para no llenar la barra de controles que casi nadie toca. Lo seleccionado baja a su propia fila de pastillas, con un tope de cuatro visibles y un «+N más» que despliega el resto —sin tope, seis filtros cruzados empujan la tabla fuera de la pantalla— más «Quitar todos los filtros». Incluye lo no negociable del teclado: `aria-expanded`, el foco que entra en el buscador al abrir, `Escape` que cierra y devuelve el foco al botón, y cada «×» diciendo qué quita (§6.21). |
+| 2.2.1 | 2026-09-04 | Corolario medido de §3.1: `:last-child` no distingue lo oculto. La corrección anterior ponía el relleno inferior de la cabecera en su último hijo, y funcionó hasta que la cabecera ganó la fila de pastillas de filtros aplicados, que nace con `hidden`; un elemento oculto no ocupa espacio pero sí es el último hijo, así que se llevaba el relleno y la tabla arrancaba a un píxel de los filtros. El relleno pasa al contenedor. Y la pastilla de estado viaja al filtro (§6.21): una dimensión cuyos valores tienen pastilla en la tabla —estatus, plazo— la lleva también en el panel, en el resumen del botón y en la pastilla aplicada, para que el color relacione el filtro con la fila sin leer el texto; las dimensiones sin juicio siguen en texto plano. De paso, «Observado» pasa de `--err` a `--block` en la tabla y el detalle, que era donde quedaba pendiente de aplicar la regla de rojo reservado a error y vencimiento (§1.3). |
