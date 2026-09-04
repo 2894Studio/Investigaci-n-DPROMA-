@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F2F5F7">
-<title>SIO-DPROMA — Tablero de Administración Vehicular</title>
+<title>SIO-DPROMA — Tablero de Administración Vehicular (variante KPI)</title>
 <style>
 :root{
 --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -813,6 +813,13 @@ main[data-state="loading"] .state-loading{display:flex}
 .tarjeta-estado p{ color:var(--text-2); font-size:var(--fs-dense); line-height:1.6; max-width:36ch; margin:0 }
 .tarjeta-estado .ref{ color:var(--text-3); font-size:var(--fs-meta); font-variant-numeric:tabular-nums }
 .tarjeta-estado .acc{ display:flex; gap:var(--sp-2); flex-wrap:wrap; justify-content:center }
+
+/* Variante: la fila «Hoy» como bloques de número, uno por estado. */
+.kpis{ display:grid; grid-template-columns:repeat(auto-fit,minmax(185px,1fr)); gap:var(--sp-4); align-items:stretch }
+.kpis .widget > header h3{ display:inline-flex; align-items:center; gap:6px }
+.marca{ width:9px; height:9px; border-radius:3px; flex:none }
+.m-ok{background:var(--ok)} .m-warn{background:var(--warn)} .m-err{background:var(--err)}
+.m-block{background:var(--block)} .m-fin{background:var(--accent)}
 /* @fin ARQ-DASH */
 
 </style>
@@ -843,34 +850,34 @@ main[data-state="loading"] .state-loading{display:flex}
 <div class="rot"><h2 id="r-hoy">Hoy</h2>
 <span class="alcance"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-visibility"/></svg>solo tus plazas</span></div>
 
-<div class="dash pares">
+<div class="kpis">
   <div class="widget">
-    <header><h3>Trámites con el reloj corriendo</h3></header>
-    <div class="kpi"><div><span class="cifra tnum">24</span><span class="unidad">expedientes</span></div></div>
-    <div class="barra" role="img" aria-label="16 en plazo, 5 por vencer, 3 vencidos, de 24 con el reloj corriendo"><span class="s-ok" style="width:66.67%"></span><span class="s-warn" style="width:20.83%"></span><span class="s-err" style="width:12.5%"></span></div>
-    <div class="leyenda">
-      <span><i class="mu" style="background:var(--ok)"></i>En plazo <b>16</b></span>
-      <span><i class="mu" style="background:var(--warn)"></i>Por vencer <b>5</b></span>
-      <span><i class="mu" style="background:var(--err)"></i>Vencidos <b>3</b></span>
-    </div>
-    <p class="pie">No incluye los <b>4</b> aún sin admitir: el reloj no ha arrancado y no tienen plazo contra el que medirse. Ni los <b>8</b> ya cerrados, cuyo reloj se detuvo.</p>
-  </div>
-
-  <div class="widget">
-    <header><h3>Observados</h3></header>
+    <header><h3><i class="marca m-err"></i>Vencidos</h3></header>
     <div class="kpi"><div><span class="cifra tnum">3</span><span class="unidad">expedientes</span></div></div>
-    <p class="pie">Están dentro de los 24 de arriba: la dependencia puso una observación, pero <b>su reloj sigue corriendo</b>.</p>
+    <p class="pie">Pasaron su fecha límite y siguen abiertos.</p>
   </div>
-
   <div class="widget">
-    <header><h3>Cerrados este mes</h3></header>
-    <div class="kpi">
-      <div><span class="cifra tnum">8</span><span class="unidad">con acuse</span></div>
-      <div class="var sube">+3 <span class="ctx">vs. mes anterior</span></div>
-    </div>
+    <header><h3><i class="marca m-warn"></i>Por vencer</h3></header>
+    <div class="kpi"><div><span class="cifra tnum">5</span><span class="unidad">expedientes</span></div></div>
+    <p class="pie">Les queda un día hábil o menos.</p>
+  </div>
+  <div class="widget">
+    <header><h3><i class="marca m-ok"></i>En plazo</h3></header>
+    <div class="kpi"><div><span class="cifra tnum">16</span><span class="unidad">expedientes</span></div></div>
+    <p class="pie">De los 24 con el reloj corriendo.</p>
+  </div>
+  <div class="widget">
+    <header><h3><i class="marca m-block"></i>Observados</h3></header>
+    <div class="kpi"><div><span class="cifra tnum">3</span><span class="unidad">expedientes</span></div></div>
+    <p class="pie">La dependencia puso una observación, pero <b>su reloj sigue corriendo</b>.</p>
+  </div>
+  <div class="widget">
+    <header><h3><i class="marca m-fin"></i>Cerrados este mes</h3></header>
+    <div class="kpi"><div><span class="cifra tnum">8</span><span class="unidad">con acuse</span></div><div class="var sube">+3 <span class="ctx">vs. mes anterior</span></div></div>
     <p class="pie"><a href="#">Ver Trámites concluidos →</a></p>
   </div>
 </div>
+<p class="pie" style="margin-top:var(--sp-3)">No se cuentan aquí los <b>4</b> aún sin admitir: el reloj no ha arrancado y no tienen plazo contra el que medirse.</p>
 </section>
 
 <section aria-labelledby="r-plazas">

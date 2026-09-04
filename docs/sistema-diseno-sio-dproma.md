@@ -304,6 +304,32 @@ Ver §6.11 para la regla de qué cambia además de la altura.
 
 ---
 
+### 3.1 El relleno de un contenedor no vive en un hijo opcional
+
+La cabecera de pantalla (`.p4`) repartía su relleno inferior entre sus filas: el título
+(`.p4-t`) y la búsqueda (`.p4-b`) llevaban `padding-bottom: 0`, y quien cerraba el bloque era la
+fila de chips (`.p4-f`), con `padding: var(--sp-3) var(--sp-6)`. Funcionaba mientras hubiera
+chips. Al retirarlos del tablero de Administración Vehicular, la cabecera se quedó con **5px
+entre el título y su propio borde** —solo el descuelgue de la línea— porque el único hijo que
+aportaba cierre ya no estaba.
+
+La regla es que **el relleno de un contenedor lo declara el contenedor**, no el hijo que
+casualmente va último:
+
+```css
+.p4 > :last-child{ padding-bottom: var(--sp-3) }
+```
+
+Así cierra igual lleve título y chips, título y filtros, o solo el título. Vale para cualquier
+bloque compuesto por filas opcionales: si al quitar una fila el bloque se descuadra, el relleno
+estaba en el sitio equivocado.
+
+**Una fila de tarjetas hermanas va a la misma altura.** `align-items:start` es el defecto
+correcto en una rejilla de dashboard —evita que una tarjeta corta se estire hasta la altura de
+la más larga—, pero cuando tres tarjetas se comparan entre sí, tamaños distintos sugieren
+importancia distinta. Para ese caso la fila lleva `align-items:stretch` y el mismo número de
+columnas por tarjeta.
+
 ## 4. Sombra y superficie translúcida
 
 ```css

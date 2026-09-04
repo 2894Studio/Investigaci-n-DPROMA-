@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.0.0
+version: 2.0.1
 last_updated: 2026-09-03
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -310,6 +310,32 @@ espaciado se vea raro, lo primero es comprobar que su token está definido.
 Ver §6.11 para la regla de qué cambia además de la altura.
 
 ---
+
+### 3.1 El relleno de un contenedor no vive en un hijo opcional
+
+La cabecera de pantalla (`.p4`) repartía su relleno inferior entre sus filas: el título
+(`.p4-t`) y la búsqueda (`.p4-b`) llevaban `padding-bottom: 0`, y quien cerraba el bloque era la
+fila de chips (`.p4-f`), con `padding: var(--sp-3) var(--sp-6)`. Funcionaba mientras hubiera
+chips. Al retirarlos del tablero de Administración Vehicular, la cabecera se quedó con **5px
+entre el título y su propio borde** —solo el descuelgue de la línea— porque el único hijo que
+aportaba cierre ya no estaba.
+
+La regla es que **el relleno de un contenedor lo declara el contenedor**, no el hijo que
+casualmente va último:
+
+```css
+.p4 > :last-child{ padding-bottom: var(--sp-3) }
+```
+
+Así cierra igual lleve título y chips, título y filtros, o solo el título. Vale para cualquier
+bloque compuesto por filas opcionales: si al quitar una fila el bloque se descuadra, el relleno
+estaba en el sitio equivocado.
+
+**Una fila de tarjetas hermanas va a la misma altura.** `align-items:start` es el defecto
+correcto en una rejilla de dashboard —evita que una tarjeta corta se estire hasta la altura de
+la más larga—, pero cuando tres tarjetas se comparan entre sí, tamaños distintos sugieren
+importancia distinta. Para ese caso la fila lleva `align-items:stretch` y el mismo número de
+columnas por tarjeta.
 
 ## 4. Sombra y superficie translúcida
 
@@ -1657,3 +1683,4 @@ conexión tiene que enseñar datos, no un rectángulo vacío.
 | 1.5.0 | 2026-09-01 | Documenta el botón-icono (`.iconbtn`), que se usaba en tres secciones sin estar definido: sus tres medidas, que el `aria-label` nombra el dato y no la acción, y que en un grupo va primero lo frecuente y último lo destructivo (§6.19). Añade la variante que confirma en el sitio —copiar—, que cambia icono, etiqueta y anuncio por `aria-live`, las tres. Y el caso medido del `:root`: sin él, la regla táctil se queda en (0,2,0) y la anula cualquier variante de tamaño declarada después (§7.3). |
 | 1.5.1 | 2026-09-02 | Corrige el hover de la barra de navegación de secciones de esta página (`.nav-secciones a:hover`): pasaba de un gris a otro gris sobre fondo ya claro, con muy poco cambio de estado. Se sustituye por el par ya documentado y usado en `.btn.p` — fondo `--accent` y texto `--accent-ink`, definido explícitamente como "texto e iconos sobre --accent" (§1.2). Cambio acotado a esta página: la barra de secciones es chrome propio del entregable, no un componente del sistema documentado en §6, así que no toca `docs/sistema-diseno-sio-dproma.md`. |
 | 2.0.0 | 2026-09-03 | Abre la capa de dashboard: nueve piezas de dato visual —KPI, barra apilada de estado, dona, ranking, tendencia, sparkline, progreso, rejilla y tarjeta de widget— con la envoltura que obliga a Chart.js a obedecer los tokens, y la regla de que el `<canvas>` no es accesible: cada gráfico lleva su tabla equivalente, que es la fuente de verdad y la que aparece si el CDN no carga (§12). **Cambio que rompe:** `--serie-1` y `--serie-2` cambian de valor. Medidos uno contra otro daban ΔE 1,1 en protanopia y 10,0 en visión normal —el sistema los había medido solo contra el fondo— así que dos series pintadas con ellos eran indistinguibles; se sustituyen por cuatro slots validados en los dos temas (§1.4). Hay que revisar las etiquetas de tipo de cliente de §6.10, que los usaban: la segunda pasa de violeta a naranja. Añade `--on-state`, la tinta sobre relleno sólido de color, que voltea por tema porque el blanco literal falla en oscuro; y la regla de acotar a hijo directo un selector que tiñe iconos por contexto, a partir del caso medido de 1,03:1 en el que `.state .ico` dejaba invisible el icono de un botón verde (§1.4.1). |
+| 2.0.1 | 2026-09-03 | El relleno de un contenedor no puede vivir en un hijo opcional (§3.1). La cabecera de pantalla `.p4` cerraba gracias al `padding-bottom` de la fila de chips; al retirar los chips del tablero de Administración Vehicular el título quedó a 5px de su propio borde. Pasa al contenedor vía `:last-child`, que funciona lleve las filas que lleve. Y se documenta que una fila de tarjetas que se comparan entre sí va a la misma altura, frente al `align-items:start` que es el defecto correcto del resto de la rejilla. |
