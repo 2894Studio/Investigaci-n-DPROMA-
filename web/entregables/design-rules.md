@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 1.5.1
-last_updated: 2026-09-02
+version: 2.2.3
+last_updated: 2026-09-04
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -127,15 +127,61 @@ Contraste medido de cada `-ink` sobre su `-bg`, que es la combinación real de u
 
 ### 1.4 Series de gráfica
 
-| Token | Claro | Oscuro |
-|---|---|---|
-| `--serie-1` | `#2C6CA8` | `#6FA8DC` |
-| `--serie-2` | `#7A5FA8` | `#B69BE0` |
+| Slot | Hue | Claro | Oscuro |
+|---|---|---|---|
+| `--serie-1` | azul | `#2a78d6` | `#3987e5` |
+| `--serie-2` | naranja | `#eb6834` | `#d95926` |
+| `--serie-3` | violeta | `#4a3aa7` | `#9085e9` |
+| `--serie-4` | magenta | `#e87ba4` | `#d55181` |
 
 **Una serie de gráfica nunca reutiliza un color de estado.** Si la barra de «Agencias» fuera
-verde, se leería como «agencias correctas». Estos dos azul-violeta existen justo para eso: para
-clasificar sin opinar. Se usan también en las etiquetas de tipo de cliente (§6.10). Medidos
-como elemento gráfico (mínimo 3:1): 5,35 / 5,06 en claro, 6,55 / 6,90 en oscuro.
+verde, se leería como «agencias correctas». Estos colores existen justo para eso: para
+clasificar sin opinar. Se usan también en las etiquetas de tipo de cliente (§6.10).
+
+**Los dos colores anteriores no se distinguían entre sí.** `#2C6CA8` y `#7A5FA8` estaban
+medidos contra el fondo —5,35 y 5,06 en claro— pero nunca uno contra otro, que es la
+comparación que de verdad importa en una gráfica. Medidos entre sí dan **ΔE 1,1 en protanopia
+y 10,0 en visión normal** (OKLab ×100), por debajo del suelo de 15: dos series pintadas con
+ellos son difíciles de separar incluso con visión de color completa, e idénticas para una
+persona con protanopia. Por eso se sustituyen, no se amplían.
+
+Los cuatro nuevos pasan las cinco comprobaciones en los dos temas —banda de luminosidad, suelo
+de croma, separación bajo daltonismo, suelo de visión normal y contraste contra la superficie—
+con peor par adyacente **ΔE 20,4 en protanopia y 31,9 en visión normal** en claro, y 16,0 / 19,7
+en oscuro. La columna oscura no es un volteo automático: son los mismos hues re-escalados
+contra `--surface` oscuro y validados ahí.
+
+**Tres reglas de uso:**
+
+1. **Se asignan en orden fijo y no se ciclan.** Una quinta serie no genera un color nuevo: se
+   agrupa en «Otras» o se separa en gráficos pequeños.
+2. **El color sigue a la entidad, no a su posición.** Si un filtro deja fuera una serie, las
+   demás conservan su color; repintarlas rompe la lectura entre dos vistas de lo mismo.
+3. **`--serie-4` queda en 2,62:1 sobre la superficie clara**, por debajo de 3:1. Es utilizable,
+   pero obliga a etiqueta visible o tabla equivalente — que es lo que la capa de dashboard
+   (§12) exige siempre de todos modos.
+
+Para reproducir cualquiera de estas cifras se usa el validador del método de visualización,
+no la estimación a ojo.
+
+### 1.4.1 Tinta sobre relleno sólido de color
+
+| Token | Claro | Oscuro |
+|---|---|---|
+| `--on-state` | `#F7FAF9` | `#08120D` |
+
+Un glifo o un texto que cae sobre un **relleno sólido** de color —el medallón de estado, un
+badge macizo— no usa un gris de texto: usa la tinta del par. Y esa tinta **voltea por tema**,
+porque blanco literal no vale: sobre `--ok` oscuro da 2,27:1 y sobre `--err` oscuro 2,99:1,
+ambos por debajo del mínimo de 3:1 para elemento gráfico. Con `--on-state` el resultado va de
+3,79 a 4,89:1 en claro y de 4,87 a 9,23:1 en oscuro.
+
+**Un selector que tiñe iconos por contexto se acota a hijo directo.** Es el caso medido en las
+maquetas de Administración Vehicular: `.state .ico{color:var(--text-3)}` alcanzaba en cascada
+los glifos de los botones dentro del propio bloque de estado, y dejaba el icono de un `.btn.p`
+—relleno verde sólido— pintado en `--text-3` a **1,03:1**, invisible. El mismo botón fuera del
+estado salía a 4,89:1. La regla es `.state > .ico`: un `.ico` puede estar dentro de un botón
+que ya tiene su propio color, y una regla de contexto no debe pisarlo.
 
 ### 1.5 Cromo de aplicación
 
@@ -168,6 +214,22 @@ Texto normal 4,5:1 mínimo; texto grande (≥24px, o ≥18,66px en negrita) y el
 de darlo por bueno. No se asume por parecido visual, y no basta con medirlo sobre `--surface`:
 si el elemento puede caer sobre `--surface-2`, se mide también ahí. Es exactamente el error que
 tuvo `--text-3` durante toda la primera versión de este documento.
+
+**Un control compuesto lleva un solo anillo de foco, y lo lleva el envoltorio.** El buscador
+(`.search`) es un `div` con borde y radio de pastilla que contiene un `<input>` sin borde: para
+quien lo mira es un control, no dos. Estaba pintando dos anillos concéntricos —`box-shadow:0 0 0
+1px var(--accent)` en `:focus-within` sobre el envoltorio, más el `outline` estándar sobre el
+`input`— y el resultado eran dos líneas verdes paralelas alrededor de la misma caja. El anillo
+va una sola vez, en el elemento que el usuario percibe como el control, con el foco estándar del
+sistema:
+
+```css
+.search:focus-within{border-color:var(--accent);
+  outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}
+```
+
+y el hijo no añade el suyo. La regla general: si un contenedor reacciona a `:focus-within`
+dibujando foco, ningún descendiente suyo dibuja foco además.
 
 ---
 
@@ -265,6 +327,41 @@ Ver §6.11 para la regla de qué cambia además de la altura.
 
 ---
 
+### 3.1 El relleno de un contenedor no vive en un hijo opcional
+
+La cabecera de pantalla (`.p4`) repartía su relleno inferior entre sus filas: el título
+(`.p4-t`) y la búsqueda (`.p4-b`) llevaban `padding-bottom: 0`, y quien cerraba el bloque era la
+fila de chips (`.p4-f`), con `padding: var(--sp-3) var(--sp-6)`. Funcionaba mientras hubiera
+chips. Al retirarlos del tablero de Administración Vehicular, la cabecera se quedó con **5px
+entre el título y su propio borde** —solo el descuelgue de la línea— porque el único hijo que
+aportaba cierre ya no estaba.
+
+La regla es que **el relleno de un contenedor lo declara el contenedor**, no el hijo que
+casualmente va último:
+
+```css
+.p4{ padding-bottom: var(--sp-3) }   /* y cada fila declara solo su relleno superior */
+```
+
+Así cierra igual lleve título y chips, título y filtros, o solo el título. Vale para cualquier
+bloque compuesto por filas opcionales: si al quitar una fila el bloque se descuadra, el relleno
+estaba en el sitio equivocado.
+
+**Corolario medido: `:last-child` no distingue lo oculto.** La primera corrección de esta regla usó
+`.p4 > :last-child{padding-bottom:var(--sp-3)}`, y funcionó hasta que la cabecera ganó una segunda
+fila —las pastillas de filtros aplicados— que nace con `hidden`. Un elemento con `hidden` no ocupa
+espacio pero **sí es el último hijo**, así que se llevaba el relleno mientras la fila visible se
+quedaba sin cierre: la tabla arrancaba a un píxel de los filtros. El relleno inferior va en el
+contenedor y punto —`.p4{padding-bottom:var(--sp-3)}`—, con los hijos declarando solo su relleno
+superior. Un selector estructural que dependa de qué hijo está visible es una regla que se rompe
+sola en cuanto la pantalla gana una fila condicional.
+
+**Una fila de tarjetas hermanas va a la misma altura.** `align-items:start` es el defecto
+correcto en una rejilla de dashboard —evita que una tarjeta corta se estire hasta la altura de
+la más larga—, pero cuando tres tarjetas se comparan entre sí, tamaños distintos sugieren
+importancia distinta. Para ese caso la fila lleva `align-items:stretch` y el mismo número de
+columnas por tarjeta.
+
 ## 4. Sombra y superficie translúcida
 
 ```css
@@ -289,7 +386,6 @@ queda semitransparente y el texto se lee mal sobre lo que haya detrás:
 
 El translúcido es de la pantalla de entrada. En el dashboard las superficies son opacas: sobre
 una tabla densa, un fondo que deja ver lo de detrás resta legibilidad sin aportar nada.
-
 ---
 
 ## 5. Movimiento
@@ -491,13 +587,21 @@ glifo gris. El contenedor centra; la tarjeta de dentro es la que tiene forma.
   display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-3)}
 .estado-ico{width:52px;height:52px;border-radius:50%;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  background:var(--accent-soft);color:var(--accent)}
+  background:var(--accent);color:var(--on-state)}
 .estado-ico .msi{font-size:28px}
-.tarjeta-estado.es-err .estado-ico{background:var(--err-fill);color:var(--err-ink)}
+.tarjeta-estado.es-err .estado-ico{background:var(--err)}
 .tarjeta-estado p{color:var(--text-2);font-size:var(--fs-dense);line-height:1.6;max-width:36ch}
 .tarjeta-estado .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
 .tarjeta-estado .acc{display:flex;gap:var(--sp-2);flex-wrap:wrap;justify-content:center}
 ```
+
+**El medallón va con relleno sólido.** Hasta la versión 2.0.0 este apartado prescribía
+`--accent-soft` con el glifo en `--accent`: relleno translúcido al 10% y glifo del mismo color
+de familia. Se leía apagado, y contradecía la regla de tinta sobre relleno sólido de §1.4.1, que
+nombra este medallón como su caso de uso. La receta es ahora la de §1.4.1 —fondo del color de
+estado a plena opacidad, glifo en `--on-state`, que voltea por tema— y este apartado es su
+aplicación, no una alternativa. El glifo hereda con `color:inherit`; el error solo cambia el
+fondo, la tinta ya es la correcta.
 
 **El botón no se estira para llenar la tarjeta.** En el acceso, `.btn` lleva `flex:1 1 auto` y
 los botones ocupan el ancho de la tarjeta: son las dos acciones de toda la pantalla. En el
@@ -951,6 +1055,13 @@ No se veía qué era resumen y qué era control.
 4. **Los filtros aplicados se ven y se quitan uno a uno**, como etiquetas con «×», más un enlace
    «Quitar todos los filtros».
 5. **Los desplegables se ven desplegables**: rótulo + valor + flecha.
+6. **El resumen no sobrevive a su propio filtro.** La regla 2 dice que un filtro vive en un
+   sitio; el corolario es que, cuando la pantalla ya tiene un desplegable de estatus, la fila de
+   contadores de estatus sobra y se retira. Es lo que pasaba en Trámites vehiculares: cuatro
+   `.schip` de estatus arriba y un «Estatus: Todos» debajo, dos controles del mismo campo a diez
+   píxeles uno del otro. El resumen se queda solo cuando responde a un criterio que **ningún**
+   filtro de la barra cubre, y entonces se agrupa según la regla 3. Los conteos que aporta un
+   resumen retirado no se pierden: viven en el tablero, que es la pantalla de lectura.
 
 ```css
 .resumen{display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center;
@@ -1278,6 +1389,106 @@ se abre desde `file://`, y un mensaje si tampoco eso funciona.
 7,80:1 en oscuro; confirmado 5,04:1 y 5,67:1.
 
 
+### 6.20 Ficha de detalle: el bloque de identidad manda el orden
+
+Una pantalla de detalle abre con un bloque de identidad —folio, nombre del expediente, marcas de
+estado— y a su derecha el indicador que decide la urgencia (el reloj de plazo, en Administración
+Vehicular). Dos reglas salen de haberlo construido mal primero:
+
+**El indicador de la derecha declara su ancho; no se queda con lo que sobre.** Estaba montado
+como `flex` con `.reloj{min-width:250px;max-width:330px}` frente a un `.idt{flex:1}`: el reloj
+recibía el resto, y el resto eran 250px para una cifra grande, un párrafo y tres filas de
+fechas. Se leía apretado porque lo estaba. Con rejilla el ancho es una decisión, no un residuo:
+
+```css
+.cab{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,360px);
+  gap:var(--sp-6);align-items:center;padding:var(--sp-5) var(--sp-6)}
+@media (max-width:1080px){.cab{grid-template-columns:1fr;align-items:start}}
+```
+
+`align-items:center` equilibra las dos columnas cuando una es más corta que la otra; por debajo
+del punto de ruptura vuelven a apilarse alineadas arriba. Y el propio indicador respira con el
+espaciado del sistema (`var(--sp-4) var(--sp-5)` de relleno, `--sp-3` entre partes), no con el
+mínimo que cabía.
+
+**Quién es el cliente va junto al expediente, no al final de la columna secundaria.** El contacto
+estaba de último bloque de la columna derecha, debajo de los documentos: para llamar a la persona
+del trámite había que recorrer la pantalla entera. Va inmediatamente bajo el bloque de identidad,
+a ancho completo y con los datos en fila —a ancho completo una lista vertical de tres filas es
+espacio desperdiciado—, antes de la bitácora y de los documentos. Ese orden es también el del
+recorrido con teclado, que es la otra razón por la que importa.
+
+### 6.21 Barra de filtros con desplegable, buscador y selección múltiple
+
+La barra de §6.12 quedó a medias: los desplegables eran botones sin panel, con un solo valor cada
+uno, y no había forma de pedir «Querétaro Centro **y** Celaya». Una pantalla de listado real
+necesita cruzar varias dimensiones a la vez, y por eso este apartado la completa.
+
+**Cinco dimensiones, y solo las que caben a la vista.** Administración Vehicular filtra por plaza,
+trámite, responsable, plazo y estatus. Mostrar los cinco de golpe llena la barra de controles que
+casi nadie toca, así que tres van visibles —los de uso diario— y el resto entra por un botón
+`+ Añadir filtro` de borde discontinuo, que abre la lista de los que faltan. El que se añade se
+queda en la barra con su panel ya abierto: quien lo pidió lo pidió para usarlo ahora.
+
+**El panel es siempre el mismo:** buscador arriba, lista de casillas en medio, y un pie con la
+cuenta de seleccionados y un «Limpiar» acotado a esa dimensión. El buscador filtra la lista
+mientras se escribe y, si nada coincide, lo dice en vez de dejar el hueco en blanco. Cada opción
+lleva su conteo a la derecha, que es lo que permite decidir sin aplicar el filtro para ver qué
+pasa. Las casillas son `<input type="checkbox">` de verdad, no un botón que finge serlo: la
+selección múltiple ya tiene un control estándar y no hace falta inventarlo.
+
+**El botón resume su propio estado.** Sin selección muestra el valor por omisión y va sin resalte
+(§6.12, regla 1). Con una, el nombre de esa opción. Con varias, «N seleccionados», porque
+enumerarlas dentro del botón lo estira hasta romper la fila. El resalte y el chevron en `--accent`
+aparecen solo cuando hay algo puesto.
+
+**Lo seleccionado baja a pastillas, en su propia fila.** Cada pastilla nombra la dimensión y el
+valor —«Plaza: Celaya»— y trae su «×». Mezclarlas con los desplegables, como estaban, hacía
+indistinguible el control del resultado. Y hay un tope: **cuatro pastillas visibles**, y el resto
+detrás de un «+N más» que las despliega. Sin tope, seis filtros cruzados empujan la tabla fuera
+de la pantalla, que es justo lo contrario de lo que se pretendía. Al final de la fila, «Quitar
+todos los filtros». La fila entera desaparece cuando no hay nada aplicado.
+
+```html
+<div class="p4-f"><div class="filtros" id="filtros" role="group" aria-label="Filtros"></div></div>
+<div class="p4-f aplicados" id="aplicados" hidden></div>
+```
+
+```html
+<div class="fwrap">
+  <button class="f" type="button" data-activo="true"
+          aria-expanded="false" aria-haspopup="true" aria-controls="pop-plaza">
+    Plaza: <b>2 seleccionados</b><svg class="ico ico-sm" aria-hidden="true"><use href="#m-expand_more"/></svg>
+  </button>
+  <div class="pop" id="pop-plaza" role="group" aria-label="Plaza" hidden>
+    <div class="pop-b"><input type="search" aria-label="Buscar en plaza" placeholder="Buscar en plaza…"></div>
+    <ul class="pop-l">
+      <li><label><input type="checkbox" value="qro"><span class="et">Querétaro Centro</span><span class="n">18</span></label></li>
+    </ul>
+    <div class="pop-p"><span class="cuenta">2 seleccionados</span><button class="fquitar" type="button">Limpiar</button></div>
+  </div>
+</div>
+```
+
+**Y la pastilla de estado viaja al filtro.** Una dimensión cuyos valores tienen pastilla en la
+tabla —estatus, plazo— la lleva también dentro del panel, en el resumen del botón y en la pastilla
+aplicada. Es lo que permite relacionar «Observado» de la barra con «Observado» de la fila sin leer
+el texto: el color hace el trabajo. Se reusa `.pill` con su clase de estado (§6.10), no una versión
+propia. Las dimensiones sin juicio —plaza, responsable, trámite— van en texto plano; ponerles color
+inventaría un significado que el dato no tiene.
+
+**Lo no negociable del teclado.** El botón declara `aria-expanded` y `aria-controls`; al abrir, el
+foco entra en el buscador; `Escape` cierra y **devuelve el foco al botón**, no al principio de la
+página; un clic fuera cierra. El contenedor de pastillas abre con un texto solo para lectores
+—«Filtros aplicados: N»— y cada «×» dice qué quita, no solo «quitar»: en una fila de seis, seis
+botones «×» idénticos son indistinguibles al tabular (§6.19).
+
+**Un panel no es un modal.** No atrapa el foco ni oscurece la pantalla: es un menú de un control
+de la barra, y la tabla de detrás sigue siendo legible mientras se decide. Por eso lleva
+`role="group"` con su etiqueta y no `role="dialog"`.
+
+---
+
 ## 7. Layout
 
 ### 7.1 Entrada al sistema (`.split`)
@@ -1518,6 +1729,112 @@ usados - declarados  →  tiene que ser vacío
 
 ---
 
+## 12. Capa de dashboard
+
+El sistema tenía diecinueve componentes y ninguno de dato visual: ni una cifra destacada, ni una
+barra, ni una tendencia. Esta capa cubre ese hueco. Las nueve piezas están vivas, con su marcado, en la
+sección «Capa de dashboard» de la página del sistema (`web/entregables/reglas-de-diseno.html#dashboard`).
+
+### 12.1 Qué se dibuja con librería y qué no
+
+**Chart.js, versión fijada, por CDN** para lo que tiene ejes, curvas o sectores: tendencia,
+ranking, dona, sparkline. **CSS** para lo que es un rectángulo proporcional: barra apilada de
+estado y barra de progreso. Cargar una librería de gráficas para pintar tres rectángulos es
+coste sin beneficio, y una barra en CSS hereda los tokens sin envoltura.
+
+### 12.2 Las cuatro reglas de la envoltura
+
+Una librería de terceros no obedece al sistema por sí sola. Estas cuatro condiciones son lo que
+la hace parte del producto y no un cuerpo extraño:
+
+1. **Los colores se leen de `:root` en tiempo de ejecución.** Chart.js no entiende variables
+   CSS: hay que pasarle valores resueltos con `getComputedStyle`.
+2. **Los gráficos se repintan al cambiar de tema**, destruyendo y reconstruyendo con los tokens
+   nuevos. Actualizar solo el color de las series deja fuera leyenda, ejes y rejilla. Y el
+   repintado se dispara **solo en el cambio**: hacerlo también al arrancar construye cada
+   gráfico dos veces en cada carga.
+3. **Sin animación bajo `prefers-reduced-motion`.** Chart.js anima por defecto; hay que apagarlo.
+4. **El botón de tema no depende de la librería.** Si el script de gráficos corta la ejecución
+   cuando el CDN falla, se lleva por delante el resto del cromo de la página.
+
+### 12.3 El `<canvas>` no es accesible
+
+Cada gráfico lleva **su tabla equivalente, y esa tabla es la fuente de verdad del dato**. No es
+un añadido para cumplir: es lo que hace que la información exista para quien no ve el lienzo.
+
+De ahí sale la degradación, que es parte del componente y no un accidente: **si la librería no
+carga, el lienzo desaparece y la tabla se abre**. Estas maquetas se abrían desde disco sin
+internet; al introducir una dependencia externa eso deja de ser cierto, y un dashboard sin
+conexión tiene que enseñar datos, no un rectángulo vacío.
+
+```html
+<figure class="viz">
+  <div class="viz-lienzo"><canvas id="v-x" aria-label="…"></canvas></div>
+  <p class="aviso-cdn">Sin conexión con la librería de gráficos.</p>
+  <details class="viz-tabla">
+    <summary>Ver los datos en tabla</summary>
+    <table><caption class="sr">…</caption>…</table>
+  </details>
+</figure>
+```
+
+### 12.4 Las nueve piezas
+
+| Pieza | Clase | Para qué |
+|---|---|---|
+| Rejilla | `.dash` | Doce columnas; cada widget declara cuántas ocupa (`.w-3`, `.w-4`, `.w-6`, `.w-8`) |
+| Tarjeta de widget | `.widget` | El contenedor común. Reusa la receta de superficie de §6.3; no se anidan tarjetas |
+| KPI con variación | `.kpi` | Cifra en `--fs-kpi` y su delta debajo, no al lado |
+| Barra apilada de estado | `.barra` | Reparto de un total entre estados del semáforo |
+| Leyenda inline | `.leyenda` | Marca de color + rótulo en tinta de texto + cifra |
+| Dona | `canvas` | Proporción sobre un total, con hueco central |
+| Ranking horizontal | `canvas` | Comparar entidades entre sí |
+| Tendencia | `canvas` | Evolución en el tiempo, una o dos series |
+| Sparkline | `canvas` | Tendencia dentro de una tarjeta, sin ejes |
+| Barra de progreso | `.progreso` | Avance contra una meta declarada |
+
+### 12.5 Reglas de lectura
+
+- **Un solo eje.** Nunca dos escalas verticales en la misma gráfica; dos medidas de magnitud
+  distinta son dos gráficas.
+- **Un conteo medido en cero no se pinta.** Si una plaza no tiene vencidos, no hay segmento
+  rojo ni etiqueta: con el total declarado, la ausencia se lee como cero. Es **distinto** de la
+  regla de ocultar un bloque cuando el dato *no se puede medir* (§6.4): aquí el dato existe y
+  vale cero; allí no existe.
+- **El texto nunca se pinta del color de la serie.** Valores, rótulos y leyendas van en tinta de
+  texto; el color lo lleva la marca que está al lado, que es lo que permite leerlos sobre
+  cualquier superficie.
+- **Marcas finas y rejilla discreta.** Línea de 2px, punto de 8px o más, rejilla en `--grid`,
+  y 2px de superficie entre segmentos contiguos de una barra apilada.
+- **Color según el trabajo del dato.** Si el dato tiene juicio —va bien, vence pronto, ya
+  venció— es el semáforo de §1.3. Si solo distingue una cosa de otra, es la paleta categórica de
+  §1.4. Un color de estado nunca se reutiliza como serie.
+
+### 12.6 Composiciones de tablero
+
+Las piezas de §12.4 son componentes; lo que sigue son **composiciones**: combinaciones fijas que
+el tablero de Administración Vehicular usa y que conviene nombrar para que la siguiente pantalla
+las repita en vez de reinventarlas.
+
+| Composición | Clase | Qué es |
+|---|---|---|
+| Tarjeta de entidad | `.plaza2` | Nombre + total + `.barra` + solo los conteos accionables. En reposo no pasa de cuatro cifras |
+| Desglose en cascada | `.desglose` | El eje secundario —dónde está cada expediente— detrás de un botón con `aria-expanded`, dentro de la tarjeta de su entidad |
+| Contador de marca | `.alerta` | Un conteo que no es un estado de la barra sino una marca que convive con ella («observados»). Va en `--block`, nunca en `--err` |
+| Nota de método | `.nota-reloj` | Explica cómo se mide lo que la tarjeta muestra. Reusa `.note` (§6.9): es explicación, no error, y por tanto nunca caja roja |
+
+**Dos reglas de la rejilla.** `.dash` es rejilla de doce columnas con `align-items:start`, para
+que una tarjeta alta no estire a sus vecinas. Cuando una fila son varios widgets equivalentes que
+deben leerse como un conjunto —tres cifras del día, una al lado de otra— se marca `.dash.pares`,
+que pasa a `align-items:stretch` y los iguala en altura. Igualar por omisión es peor: obliga a
+las tarjetas cortas a inventar relleno.
+
+**Y una del componente de barra.** Los segmentos contiguos se separan con superficie, no con
+espacio: `.barra span + span{border-left:2px solid var(--surface)}`. Un hueco transparente
+dejaría ver el fondo del carril y parecería un cuarto valor.
+
+---
+
 ## Historial de cambios
 
 | Versión | Fecha | Cambios |
@@ -1529,3 +1846,10 @@ usados - declarados  →  tiene que ser vacío
 | 1.4.0 | 2026-09-01 | El estado de vacío y error va en tarjeta con medallón, no suelto sobre el fondo (§6.4). El suelo de botón —36px, 28px en `.mini`— hay que declararlo con `min-height`, no confiarlo al relleno (§6.2). El esqueleto necesita el mismo alto y el mismo punto de ruptura que el contenido que sustituye, y aplanar el fondo en movimiento reducido (§6.7). Sexta trampa: copiar una regla de otra pantalla puede traerse un token que allí existe y aquí no (§10). Cuatro comprobaciones nuevas en el checklist (§11). |
 | 1.5.0 | 2026-09-01 | Documenta el botón-icono (`.iconbtn`), que se usaba en tres secciones sin estar definido: sus tres medidas, que el `aria-label` nombra el dato y no la acción, y que en un grupo va primero lo frecuente y último lo destructivo (§6.19). Añade la variante que confirma en el sitio —copiar—, que cambia icono, etiqueta y anuncio por `aria-live`, las tres. Y el caso medido del `:root`: sin él, la regla táctil se queda en (0,2,0) y la anula cualquier variante de tamaño declarada después (§7.3). |
 | 1.5.1 | 2026-09-02 | Corrige el hover de la barra de navegación de secciones de esta página (`.nav-secciones a:hover`): pasaba de un gris a otro gris sobre fondo ya claro, con muy poco cambio de estado. Se sustituye por el par ya documentado y usado en `.btn.p` — fondo `--accent` y texto `--accent-ink`, definido explícitamente como "texto e iconos sobre --accent" (§1.2). Cambio acotado a esta página: la barra de secciones es chrome propio del entregable, no un componente del sistema documentado en §6, así que no toca `docs/sistema-diseno-sio-dproma.md`. |
+| 2.0.0 | 2026-09-03 | Abre la capa de dashboard: nueve piezas de dato visual —KPI, barra apilada de estado, dona, ranking, tendencia, sparkline, progreso, rejilla y tarjeta de widget— con la envoltura que obliga a Chart.js a obedecer los tokens, y la regla de que el `<canvas>` no es accesible: cada gráfico lleva su tabla equivalente, que es la fuente de verdad y la que aparece si el CDN no carga (§12). **Cambio que rompe:** `--serie-1` y `--serie-2` cambian de valor. Medidos uno contra otro daban ΔE 1,1 en protanopia y 10,0 en visión normal —el sistema los había medido solo contra el fondo— así que dos series pintadas con ellos eran indistinguibles; se sustituyen por cuatro slots validados en los dos temas (§1.4). Hay que revisar las etiquetas de tipo de cliente de §6.10, que los usaban: la segunda pasa de violeta a naranja. Añade `--on-state`, la tinta sobre relleno sólido de color, que voltea por tema porque el blanco literal falla en oscuro; y la regla de acotar a hijo directo un selector que tiñe iconos por contexto, a partir del caso medido de 1,03:1 en el que `.state .ico` dejaba invisible el icono de un botón verde (§1.4.1). |
+| 2.0.1 | 2026-09-03 | El relleno de un contenedor no puede vivir en un hijo opcional (§3.1). La cabecera de pantalla `.p4` cerraba gracias al `padding-bottom` de la fila de chips; al retirar los chips del tablero de Administración Vehicular el título quedó a 5px de su propio borde. Pasa al contenedor vía `:last-child`, que funciona lleve las filas que lleve. Y se documenta que una fila de tarjetas que se comparan entre sí va a la misma altura, frente al `align-items:start` que es el defecto correcto del resto de la rejilla. |
+| 2.1.0 | 2026-09-04 | Resuelve una contradicción viva: §6.4 seguía prescribiendo el medallón de estado en `--accent-soft` con el glifo en `--accent` mientras §1.4.1 —añadida en 2.0.0— nombraba ese mismo medallón como caso de la tinta sobre relleno sólido. §6.4 pasa a ser aplicación de §1.4.1 (fondo a plena opacidad, glifo en `--on-state`) en vez de una alternativa a ella. Tres reglas nuevas salidas de construir las cuatro pantallas de Administración Vehicular: un control compuesto lleva un solo anillo de foco y lo lleva el envoltorio, medido en el buscador, que pintaba dos anillos verdes concéntricos (§1.7); el resumen de estatus no convive con un filtro de estatus equivalente, corolario de «un filtro, un sitio» (§6.12, regla 6); y la ficha de detalle, donde el indicador de urgencia declara su ancho en rejilla en vez de quedarse con lo que sobre, y el contacto del cliente va bajo la identidad del expediente, no al final de la columna secundaria (§6.20). Documenta además las composiciones de tablero —tarjeta de entidad, desglose en cascada, contador de marca, nota de método— y las dos reglas de la rejilla `.dash`, para que la siguiente pantalla las repita en vez de reinventarlas (§12.6). |
+| 2.2.0 | 2026-09-04 | Completa la barra de filtros, que en §6.12 se quedaba en botones sin panel y con un solo valor por dimensión: ahora cada filtro abre un desplegable con buscador y casillas de selección múltiple, con el conteo de cada opción a la derecha y un «Limpiar» acotado a esa dimensión. Tres dimensiones visibles y el resto detrás de un botón «+ Añadir filtro», para no llenar la barra de controles que casi nadie toca. Lo seleccionado baja a su propia fila de pastillas, con un tope de cuatro visibles y un «+N más» que despliega el resto —sin tope, seis filtros cruzados empujan la tabla fuera de la pantalla— más «Quitar todos los filtros». Incluye lo no negociable del teclado: `aria-expanded`, el foco que entra en el buscador al abrir, `Escape` que cierra y devuelve el foco al botón, y cada «×» diciendo qué quita (§6.21). |
+| 2.2.1 | 2026-09-04 | Corolario medido de §3.1: `:last-child` no distingue lo oculto. La corrección anterior ponía el relleno inferior de la cabecera en su último hijo, y funcionó hasta que la cabecera ganó la fila de pastillas de filtros aplicados, que nace con `hidden`; un elemento oculto no ocupa espacio pero sí es el último hijo, así que se llevaba el relleno y la tabla arrancaba a un píxel de los filtros. El relleno pasa al contenedor. Y la pastilla de estado viaja al filtro (§6.21): una dimensión cuyos valores tienen pastilla en la tabla —estatus, plazo— la lleva también en el panel, en el resumen del botón y en la pastilla aplicada, para que el color relacione el filtro con la fila sin leer el texto; las dimensiones sin juicio siguen en texto plano. De paso, «Observado» pasa de `--err` a `--block` en la tabla y el detalle, que era donde quedaba pendiente de aplicar la regla de rojo reservado a error y vencimiento (§1.3). |
+| 2.2.2 | 2026-09-04 | La capa de dashboard (§12) y la barra de filtros (§6.21) dejan de vivir en una página aparte y pasan a ser secciones de la propia página del sistema, con sus piezas vivas: los nueve componentes de dato con sus gráficos y sus tablas equivalentes, y la barra de filtros funcionando —se abre, se busca dentro, se marcan varias casillas y bajan a pastillas—. Son componentes transversales, no de un módulo: tenerlos fuera invitaba a reimplementarlos en cada pantalla en vez de reusarlos. No cambia ninguna regla ni ningún token; cambia dónde se leen y que ahora se pueden probar. |
+| 2.2.3 | 2026-09-04 | Regenera `icon_names` de la página del sistema, que se había quedado sin `expand_more` al incorporar la barra de filtros: el chevron de cada desplegable salía como la letra «E». Es exactamente el fallo que §6.5 ya describe —se añade un icono al markup y se olvida en la lista del subconjunto, y el navegador pinta el nombre en letras—, así que no hay regla nueva que escribir: la regla estaba y no se cumplió. Comprobado con el fragmento de tres líneas que el propio apartado prescribe, que ahora devuelve vacío. Cambio acotado a esta página; no toca `docs/sistema-diseno-sio-dproma.md`. |

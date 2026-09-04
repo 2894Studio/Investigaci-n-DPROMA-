@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,autorenew,check_circle,close,content_copy,download,edit,error,more_horiz,pause_circle,schedule,visibility" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,autorenew,check_circle,close,content_copy,download,edit,error,expand_more,more_horiz,pause_circle,schedule,visibility" rel="stylesheet">
 <style>
 :root{
   /* §1.1 Superficies y texto */
@@ -24,7 +24,9 @@
   --block:#9678CC; --block-ink:#5B4680; --block-bg:#EAE1F7;
   --pause:#4A5560; --pause-ink:#333B44; --pause-bg:#E2E6E9;
   /* §1.4 Series de gráfica */
-  --serie-1:#2C6CA8; --serie-2:#7A5FA8;
+  --serie-1:#2a78d6; --serie-2:#eb6834; --serie-3:#4a3aa7; --serie-4:#e87ba4;
+  --on-state:#F7FAF9;
+  --focus-w:2px; --focus-offset:2px;
   /* §1.5 Cromo de aplicación */
   --chrome:#1E4E79; --chrome-ink:#F2F5F7; --chrome-dim:rgba(242,245,247,.72);
   --chrome-line:rgba(242,245,247,.14); --chrome-focus:#9FE0AE;
@@ -49,7 +51,8 @@
     --err:#EE6E5F; --err-ink:#EE6E5F; --err-bg:#391D18;
     --block:#C0A9F0; --block-ink:#C0A9F0; --block-bg:#2A2140;
     --pause:#6B7684; --pause-ink:#6B7684; --pause-bg:#232C36;
-    --serie-1:#6FA8DC; --serie-2:#B69BE0;
+    --serie-1:#3987e5; --serie-2:#d95926; --serie-3:#9085e9; --serie-4:#d55181;
+    --on-state:#08120D;
     --chrome:#122740; --chrome-ink:#E7ECF2; --chrome-dim:rgba(231,236,242,.72);
     --chrome-hover:rgba(255,255,255,.08); --chrome-activo:rgba(255,255,255,.12);
     --sh-rest:0 1px 2px rgba(0,0,0,.3); --sh-float:0 6px 18px rgba(0,0,0,.35); --sh-modal:0 24px 60px rgba(0,0,0,.45);
@@ -241,6 +244,212 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 .footer-meta a{ color:var(--text-2); }
 .footer-nav{ margin-bottom:1.25rem; }
 .footer-nav a{ color:var(--accent); text-decoration:none; font-weight:500; font-size:.9rem; }
+
+/* ── Capa de dashboard ───────────────────────────────────────────────────── */
+/* ── ARQ-DASH: la capa de dashboard ──────────────────────────────────────── */
+
+/* Rejilla. Doce columnas; cada widget declara cuántas ocupa. */
+/* align-items:start — sin esto, cada widget se estira hasta la altura del más
+   alto de su fila y aparecen huecos dentro de las tarjetas cortas. */
+.dash{ display:grid; grid-template-columns:repeat(12,1fr); gap:var(--sp-4); align-items:start }
+.dash > *{ grid-column:span 12 }
+@media (min-width:700px){
+  .dash > .w-3{ grid-column:span 6 }
+  .dash > .w-4{ grid-column:span 6 }
+  .dash > .w-6{ grid-column:span 12 }
+}
+@media (min-width:1040px){
+  .dash > .w-3{ grid-column:span 3 }
+  .dash > .w-4{ grid-column:span 4 }
+  .dash > .w-6{ grid-column:span 6 }
+  .dash > .w-8{ grid-column:span 8 }
+}
+
+/* Tarjeta de widget. Una sola receta de superficie; no se anidan tarjetas. */
+.widget{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-card);
+  box-shadow:var(--sh-rest); padding:var(--sp-4); display:flex; flex-direction:column; gap:var(--sp-3);
+  min-width:0 }
+.widget > header{ display:flex; align-items:baseline; justify-content:space-between; gap:var(--sp-2) }
+.widget > header h3{ font:700 var(--fs-dense)/1.3 var(--font-ui); color:var(--text-2);
+  text-transform:uppercase; letter-spacing:.06em }
+.widget > header .acc{ font-size:var(--fs-meta) }
+.widget .pie{ font-size:var(--fs-meta); color:var(--text-3); line-height:1.5 }
+
+/* KPI. La cifra es el dato; la variación es contexto y va debajo, no al lado. */
+.kpi{ display:flex; flex-direction:column; gap:var(--sp-1) }
+.kpi .cifra{ font:800 var(--fs-kpi)/1 var(--font-ui); font-variant-numeric:tabular-nums; letter-spacing:-.02em }
+.kpi .unidad{ font-size:var(--fs-dense); font-weight:600; color:var(--text-2); margin-left:6px }
+.kpi .var{ display:inline-flex; align-items:center; gap:4px; font-size:var(--fs-meta); font-weight:700;
+  font-variant-numeric:tabular-nums }
+.kpi .var.sube{ color:var(--ok-ink) }
+.kpi .var.baja{ color:var(--err-ink) }
+.kpi .var.plano{ color:var(--text-3) }
+.kpi .var .ctx{ font-weight:400; color:var(--text-3) }
+
+/* Barra apilada de estado. CSS, no librería: son tres rectángulos.
+   Separador de 2px del color de la superficie entre segmentos. */
+.barra{ display:flex; height:10px; border-radius:var(--r-pill); overflow:hidden; background:var(--surface-2) }
+.barra span{ display:block; box-shadow:inset 0 0 0 .5px rgba(0,0,0,.06) }
+.barra span + span{ border-left:2px solid var(--surface) }
+.barra .s-ok{ background:var(--ok) }
+.barra .s-warn{ background:var(--warn) }
+.barra .s-err{ background:var(--err) }
+.barra .s-block{ background:var(--block) }
+.barra .s-pause{ background:var(--pause) }
+
+/* Leyenda inline. El texto va en tinta de texto; el color lo lleva la marca. */
+.leyenda{ display:flex; flex-wrap:wrap; gap:var(--sp-3); font-size:var(--fs-meta) }
+.leyenda span{ display:inline-flex; align-items:center; gap:6px; color:var(--text-2) }
+.leyenda .mu{ width:9px; height:9px; border-radius:3px; flex:none }
+.leyenda b{ font-variant-numeric:tabular-nums; color:var(--text) }
+
+/* Barra de progreso contra meta. */
+.progreso{ display:flex; flex-direction:column; gap:6px }
+.progreso .via{ height:8px; border-radius:var(--r-pill); background:var(--surface-2); overflow:hidden }
+.progreso .via i{ display:block; height:100%; border-radius:var(--r-pill); background:var(--accent) }
+.progreso .cifras{ display:flex; justify-content:space-between; font-size:var(--fs-meta); color:var(--text-2) }
+.progreso .cifras b{ color:var(--text); font-variant-numeric:tabular-nums }
+
+/* Figura de gráfico: lienzo + alternativa en tabla. La tabla es la fuente de
+   verdad; el lienzo es la lectura rápida. */
+.viz{ display:flex; flex-direction:column; gap:var(--sp-2); min-width:0 }
+.viz-lienzo{ position:relative; width:100%; height:180px }
+.viz-lienzo.alto{ height:230px }
+.viz-lienzo.chico{ height:48px }
+.viz canvas{ display:block; width:100% !important; height:100% !important }
+.viz-tabla > summary{ font-size:var(--fs-meta); color:var(--text-2); cursor:pointer; padding:2px 0;
+  border-radius:var(--r-ctrl) }
+.viz-tabla > summary:hover{ color:var(--accent) }
+.viz-tabla table{ width:100%; border-collapse:collapse; font-size:var(--fs-meta); margin-top:var(--sp-2) }
+.viz-tabla th,.viz-tabla td{ text-align:left; padding:5px var(--sp-2); border-bottom:1px solid var(--border) }
+.viz-tabla th{ color:var(--text-2); font-weight:700; text-transform:uppercase; letter-spacing:.04em }
+.viz-tabla td{ font-variant-numeric:tabular-nums }
+.viz-tabla tr:last-child td,.viz-tabla tr:last-child th{ border-bottom:none }
+
+/* Si la librería no llega, el lienzo no se queda vacío: desaparece y la tabla
+   se abre. Un dashboard sin internet muestra datos, no un hueco. */
+.viz.sin-libreria .viz-lienzo{ display:none }
+.viz.sin-libreria .viz-tabla > summary{ display:none }
+.aviso-cdn{ display:none; font-size:var(--fs-meta); color:var(--warn-ink); background:var(--warn-bg);
+  border:1px solid var(--warn-ink); border-radius:var(--r-ctrl); padding:6px var(--sp-2) }
+.viz.sin-libreria .aviso-cdn{ display:block }
+
+/* Medallón de estado — relleno sólido, glifo en la tinta del par. */
+.medallon{ width:52px; height:52px; border-radius:50%; display:grid; place-items:center;
+  background:var(--accent); color:var(--on-state); flex:none; font-weight:800; font-size:18px }
+.medallon.es-err{ background:var(--err) }
+
+.muestras{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:var(--sp-3); margin-top:var(--sp-4) }
+.muestra{ border:1px solid var(--border); border-radius:var(--r-card); overflow:hidden; background:var(--surface) }
+.muestra .tono{ height:52px }
+.muestra .txt{ padding:var(--sp-2); font-size:var(--fs-meta); color:var(--text-2) }
+.muestra .txt b{ display:block; color:var(--text); font-size:var(--fs-dense) }
+
+/* Cromo propio de la sección, acotado para no pisar el resto de la página. */
+#dashboard .rot{ margin-bottom:var(--sp-5) }
+#dashboard .rot .kicker{ display:inline-block; font-size:var(--fs-meta); font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:var(--sp-2) }
+#dashboard .rot h3{ font-size:var(--fs-title); margin-bottom:var(--sp-2) }
+#dashboard .rot p{ color:var(--text-2); max-width:74ch; font-size:var(--fs-dense) }
+#dashboard .bloque-dash{ margin-top:2.5rem; padding-top:1.25rem; border-top:2px solid var(--border) }
+#dashboard .bloque-dash:first-of-type{ margin-top:1rem; border-top:0; padding-top:0 }
+#dashboard .reglas{ list-style:none; margin:var(--sp-4) 0 0; padding:0;
+  display:flex; flex-direction:column; gap:var(--sp-2) }
+#dashboard .reglas li{ font-size:var(--fs-dense); color:var(--text-2); padding-left:var(--sp-4);
+  position:relative; max-width:78ch }
+#dashboard .reglas li::before{ content:"—"; position:absolute; left:0; color:var(--accent); font-weight:700 }
+#dashboard pre{ margin-top:var(--sp-4); background:var(--surface-2); border:1px solid var(--border);
+  border-radius:var(--r-card); padding:var(--sp-4); overflow-x:auto }
+#dashboard pre code{ color:var(--text-2); font-size:var(--fs-meta); line-height:1.6; white-space:pre }
+#dashboard .muestras{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:var(--sp-3); margin-top:var(--sp-4) }
+#dashboard .muestra{ border:1px solid var(--border); border-radius:var(--r-card); overflow:hidden;
+  background:var(--surface) }
+#dashboard .muestra .tono{ height:52px }
+#dashboard .muestra .txt{ padding:var(--sp-2); font-size:var(--fs-meta); color:var(--text-2) }
+#dashboard .muestra .txt b{ display:block; color:var(--text); font-size:var(--fs-dense) }
+
+
+/* ── Barra de filtros (§6.21) — demo viva ─────────────────────────────────── */
+/* ═ Barra de filtros: desplegable con buscador y selección múltiple ═══════
+   Cada dimensión es un botón que abre un panel con un buscador y una lista
+   de casillas. Lo seleccionado baja a pastillas bajo la barra (§6.12). */
+.filtros{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.fwrap{position:relative}
+.f{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-pill);padding:6px 10px 6px 12px;font-size:var(--fs-meta);color:var(--text-2);
+  cursor:pointer;min-height:32px}
+.f:hover{border-color:var(--border-2);color:var(--text)}
+.f b{color:var(--text);font-weight:700}
+.f .ico{width:16px;height:16px;color:var(--text-3);transition:transform .12s ease}
+.f .msi{color:var(--text-3);font-size:18px;transition:transform .12s ease}
+@media (prefers-reduced-motion:reduce){.f .ico{transition:none}}
+.f[aria-expanded="true"] .ico,.f[aria-expanded="true"] .msi{transform:rotate(180deg)}
+/* El resalte significa «aquí hay algo puesto», nunca un valor por omisión (§6.12 r.1). */
+.f[data-activo="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
+.f[data-activo="true"] .ico{color:var(--accent)}
+.f.fmas{border-style:dashed;color:var(--text-2)}
+
+.pop{position:absolute;z-index:60;top:calc(100% + 6px);left:0;width:268px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
+  box-shadow:var(--sh-modal);display:flex;flex-direction:column;overflow:hidden}
+.pop[hidden]{display:none}
+.pop-b{padding:var(--sp-2);border-bottom:1px solid var(--border)}
+.pop-b input{width:100%;border:1px solid var(--border);border-radius:var(--r-ctrl);background:var(--bg);
+  color:var(--text);font:500 var(--fs-dense) var(--font-ui);padding:7px 10px}
+.pop-b input::placeholder{color:var(--text-3)}
+.pop-l{list-style:none;margin:0;padding:var(--sp-1);max-height:232px;overflow-y:auto}
+.pop-l li label{display:flex;align-items:center;gap:var(--sp-2);padding:7px 8px;border-radius:var(--r-ctrl);
+  cursor:pointer;font-size:var(--fs-dense);color:var(--text);min-height:32px}
+.pop-l li label:hover{background:var(--surface-2)}
+.pop-l input[type="checkbox"]{width:16px;height:16px;accent-color:var(--accent);flex-shrink:0;margin:0}
+.pop-l .et{flex:1;min-width:0}
+.pop-l .n{color:var(--text-3-fuerte);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
+.pop-vacio{padding:var(--sp-4);text-align:center;color:var(--text-2);font-size:var(--fs-meta)}
+.pop-p{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);
+  padding:var(--sp-2) var(--sp-3);border-top:1px solid var(--border);background:var(--surface-2)}
+.pop-p .cuenta{font-size:var(--fs-meta);color:var(--text-2);font-variant-numeric:tabular-nums}
+.pop-menu li label{font-weight:600}
+
+.aplicados{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.aplicados[hidden]{display:none}
+.fchip{display:inline-flex;align-items:center;gap:4px;background:var(--accent-soft);
+  border:1px solid var(--accent);border-radius:var(--r-pill);padding:4px 6px 4px 12px;
+  font-size:var(--fs-meta);color:var(--text)}
+.fchip .dim{color:var(--text-2)}
+.fx{appearance:none;-webkit-appearance:none;border:0;background:none;cursor:pointer;color:var(--text-2);
+  font-size:16px;line-height:1;border-radius:50%;width:24px;height:24px;display:grid;place-items:center}
+.fx:hover{background:var(--surface);color:var(--text)}
+.fmaschips{appearance:none;-webkit-appearance:none;border:0;background:none;cursor:pointer;
+  color:var(--link);font-size:var(--fs-meta);font-weight:600;padding:4px;min-height:24px;border-radius:4px}
+.fmaschips:hover{text-decoration:underline}
+.fquitar{appearance:none;-webkit-appearance:none;border:0;background:none;cursor:pointer;
+  color:var(--link);font-size:var(--fs-meta);font-weight:600;padding:4px;min-height:24px;border-radius:4px}
+.fquitar:hover{text-decoration:underline}
+@media (pointer:coarse){[data-tacto="dedo"] .f,[data-tacto="dedo"] .fquitar,
+  [data-tacto="dedo"] .fmaschips,[data-tacto="dedo"] .pop-l li label{min-height:46px}
+  [data-tacto="dedo"] .fx{width:46px;height:46px}}
+/* Estatus y plazo llevan en el filtro la misma pastilla que en la tabla:
+   el color es lo que relaciona el filtro con la fila (§6.21). */
+.pop-l .et .pill{max-width:100%;overflow:hidden;text-overflow:ellipsis;display:inline-block}
+.f .pill{margin-left:2px}
+.fchip .pill{margin:0 2px}
+@media (max-width:560px){.pop{width:min(268px,calc(100vw - var(--sp-8)))}}
+.filtros-demo{ display:flex; flex-direction:column; gap:var(--sp-2) }
+.filtros-demo .sr{ position:absolute; width:1px; height:1px; margin:-1px; padding:0;
+  overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0 }
+.filtros-demo .aplicados[hidden]{ display:none }
+.filtros-demo .pill{ display:inline-flex; align-items:center; border-radius:var(--r-ctrl);
+  padding:3px 9px; font-size:12px; font-weight:700; white-space:nowrap }
+.filtros-demo .p-ok{ background:var(--ok-bg); color:var(--ok-ink) }
+.filtros-demo .p-warn{ background:var(--warn-bg); color:var(--warn-ink) }
+.filtros-demo .p-err{ background:var(--err-bg); color:var(--err-ink) }
+.filtros-demo .p-block{ background:var(--block-bg); color:var(--block-ink) }
+.filtros-demo .p-neutro{ background:var(--surface-2); color:var(--text-2) }
+.filtros-demo .f[data-activo="true"] .msi{ color:var(--accent) }
+.filtros-demo .f .pill{ margin-left:2px }
+.filtros-demo .fchip .pill{ margin:0 2px }
+
 </style>
 </head>
 <body>
@@ -260,7 +469,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
     <h1>El sistema de diseño real de SIO-DPROMA.</h1>
     <p class="lede">Es el sistema de <strong>producto</strong> de DPROMA, construido y verificado sobre las propuestas ya corregidas de <strong>acceso</strong> y <strong>padrón de clientes</strong>. Con cada token, componente y regla ya resueltos y documentados aquí, diseñar la siguiente pantalla de DPROMA es una decisión de contenido, no de estilo: sin reinventar color, tipografía o espaciado desde cero, ni esperar a que alguien lo defina. Cada token viene medido en el navegador, con su contraste comprobado en los dos temas.</p>
     <div class="hero-meta">
-      <span class="version-tag">Versión 1.5.1 · dashboard + acceso</span>
+      <span class="version-tag">Versión 2.2.3 · dashboard + acceso</span>
       <a class="download-btn" href="/entregables/design-rules.md" download><span class="msi" aria-hidden="true" translate="no">download</span> Descargar sistema completo (.md)</a>
     </div>
     <p class="source-note">Fuente completa: <code>docs/sistema-diseno-sio-dproma.md</code> · complementan <code>docs/sistema-diseno-acceso-sio-dproma.md</code>, <code>docs/decisiones-producto-padron.md</code>, <code>docs/patron-dialogo-sio-dproma.md</code> y <code>docs/criterios-de-animacion.md</code>.</p>
@@ -275,6 +484,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       <li><a href="#espaciado">Espaciado</a></li>
       <li><a href="#iconos">Iconos</a></li>
       <li><a href="#componentes">Componentes</a></li>
+      <li><a href="#dashboard">Capa de dashboard</a></li>
       <li><a href="#principios">Voz de producto</a></li>
       <li><a href="#historial">Historial</a></li>
     </ul>
@@ -307,6 +517,10 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
           <tr><td><code>--err</code></td><td>Falta lo que impide operar</td><td><span class="pill p-err"><span class="msi" aria-hidden="true" translate="no">error</span>Bloqueado</span></td></tr>
           <tr><td><code>--block</code></td><td>Bloqueado por condición externa</td><td><span class="pill p-block"><span class="msi" aria-hidden="true" translate="no">error</span>Retenido</span></td></tr>
           <tr><td><code>--pause</code></td><td>Inactivo — no es un fallo</td><td><span class="pill p-pause"><span class="msi" aria-hidden="true" translate="no">pause_circle</span>Inactivo</span></td></tr>
+          <tr><td>2.2.0</td><td>4 sep 2026</td><td>Completa la barra de filtros: cada dimensión abre un desplegable con buscador y casillas de selección múltiple, con el conteo de cada opción y un «Limpiar» propio. Tres visibles y el resto tras un «+ Añadir filtro». Lo seleccionado baja a una fila de pastillas con tope de cuatro visibles, un «+N más» y «Quitar todos los filtros». Con el teclado resuelto: <code>aria-expanded</code>, foco al buscador al abrir, <code>Escape</code> que devuelve el foco al botón, y cada «×» diciendo qué quita.</td></tr>
+          <tr><td>2.2.1</td><td>4 sep 2026</td><td>Corolario de §3.1: <code>:last-child</code> no distingue lo oculto —la fila de filtros aplicados nace con <code>hidden</code>, no ocupa espacio pero sí es el último hijo, y se llevaba el relleno—, así que pasa al contenedor. La pastilla de estado viaja al filtro: estatus y plazo la llevan en el panel, en el botón y en la pastilla aplicada, para relacionar filtro y fila por color. Y «Observado» pasa de <code>--err</code> a <code>--block</code> en tabla y detalle.</td></tr>
+          <tr><td>2.2.2</td><td>4 sep 2026</td><td>La capa de dashboard y la barra de filtros dejan de vivir en una página aparte y pasan a ser secciones de esta, con sus piezas vivas: los nueve componentes de dato con sus gráficos y sus tablas equivalentes, y la barra de filtros funcionando. Son componentes transversales, no de un módulo: tenerlos fuera invitaba a reimplementarlos en cada pantalla. No cambia ninguna regla ni ningún token.</td></tr>
+          <tr><td>2.2.3</td><td>4 sep 2026</td><td>Regenera <code>icon_names</code> de esta página, que se había quedado sin <code>expand_more</code> al incorporar la barra de filtros: el chevron de cada desplegable salía como la letra «E». Es el fallo que §6.5 ya describe, así que no hay regla nueva —la regla estaba y no se cumplió—. Comprobado con el fragmento que ese mismo apartado prescribe.</td></tr>
         </tbody>
       </table>
     </div>
@@ -542,6 +756,23 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       </div>
     </div>
 
+
+    <h3 class="grupo-comp" id="g-filtros">Filtros <span class="cuantos">desplegable con buscador, selección múltiple y pastillas de lo aplicado</span></h3>
+
+    <div class="comp-block">
+      <h4>Barra de filtros (.filtros / .pop / .aplicados)</h4>
+      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 1rem;">Está viva: abre un filtro, escribe en su buscador, marca varias casillas y mira cómo bajan a pastillas. Con el teclado también — <kbd>Esc</kbd> cierra y devuelve el foco al botón.</p>
+      <div class="filtros-demo">
+        <div class="filtros" id="filtros" role="group" aria-label="Filtros de ejemplo"></div>
+        <div class="aplicados" id="aplicados" hidden></div>
+      </div>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Tres dimensiones a la vista, el resto tras «+ Añadir filtro».</strong> Poner las cinco de golpe llena la barra de controles que casi nadie toca. El que se añade aparece con su panel ya abierto: quien lo pidió lo pidió para usarlo ahora.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>El botón resume su propio estado.</strong> Sin selección, el valor por omisión y sin resalte —un resalte sobre «Todos» deja de significar «aquí hay algo puesto»—. Con una, el nombre de la opción. Con varias, «N seleccionados»: enumerarlas dentro del botón lo estira hasta romper la fila.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>La pastilla de estado viaja al filtro.</strong> Una dimensión cuyos valores tienen pastilla en la tabla —estatus, plazo— la lleva también en el panel, en el botón y en lo aplicado: el color relaciona el filtro con la fila sin leer el texto. Las dimensiones sin juicio —plaza, responsable— van en texto plano; colorearlas inventaría un significado que el dato no tiene.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Máximo cuatro pastillas visibles</strong>, y el resto tras un «+N más». Sin tope, seis filtros cruzados empujan la tabla fuera de la pantalla, que es lo contrario de lo que se buscaba. La fila entera desaparece cuando no hay nada puesto.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Un panel no es un modal:</strong> no atrapa el foco ni oscurece la pantalla. Es el menú de un control de la barra, y lo de detrás sigue siendo legible mientras se decide. Por eso lleva <code>role="group"</code> con su etiqueta, no <code>role="dialog"</code>.</p>
+    </div>
+
     <h3 class="grupo-comp" id="g-datos">Datos y listas <span class="cuantos">la tabla y lo que la acompaña mientras carga</span></h3>
 
     <div class="comp-block">
@@ -577,6 +808,204 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       </div>
       <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Sin texto real dentro de las barras.</strong> El texto que imitan («razón social y RFC», por ejemplo) queda invisible por <code>color:transparent</code>, pero sigue en el árbol de accesibilidad y un lector de pantalla lo anuncia igual. Un <code>role="status"</code> con <code>aria-label</code> en el contenedor basta.</p>
     </div>
+  </div>
+</section>
+
+<section id="dashboard">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Capa de dashboard</div>
+      <h2>Nueve piezas de dato visual, vivas.</h2>
+      <p class="section-note">El sistema tenía diecinueve componentes y ninguno de dato: ni una cifra
+        destacada, ni una barra, ni una tendencia. Esta capa cubre ese hueco. Los gráficos de aquí
+        abajo son reales: cambian de color al cambiar de tema, y si la librería no carga aparece la
+        tabla equivalente en vez de un lienzo vacío.</p>
+    </div>
+<div class="bloque-dash" id="d-paleta">
+  <div class="rot">
+    <div class="kicker">Color de dato</div>
+    <h3>Dos paletas que no se mezclan nunca</h3>
+    <p>El color de un dato responde al trabajo que hace. Si el dato tiene un juicio —va bien, se acerca al límite, ya venció— usa el semáforo de estado. Si solo distingue una cosa de otra —una plaza de otra plaza— usa la paleta categórica. Un color de estado jamás se reutiliza como serie: una barra verde se leería como «correcto» aunque solo signifique «Querétaro».</p>
+  </div>
+
+  <h3 style="font-size:var(--fs-dense);text-transform:uppercase;letter-spacing:.06em;color:var(--text-2)">Categórica — orden fijo, nunca ciclado</h3>
+  <div class="muestras">
+    <div class="muestra"><div class="tono" style="background:var(--serie-1)"></div><div class="txt"><b>Serie 1 · azul</b><code>--serie-1</code></div></div>
+    <div class="muestra"><div class="tono" style="background:var(--serie-2)"></div><div class="txt"><b>Serie 2 · naranja</b><code>--serie-2</code></div></div>
+    <div class="muestra"><div class="tono" style="background:var(--serie-3)"></div><div class="txt"><b>Serie 3 · violeta</b><code>--serie-3</code></div></div>
+    <div class="muestra"><div class="tono" style="background:var(--serie-4)"></div><div class="txt"><b>Serie 4 · magenta</b><code>--serie-4</code></div></div>
+  </div>
+
+  <ul class="reglas">
+    <li><strong>Los dos colores de serie anteriores no se distinguían entre sí.</strong> Medidos con el validador del método, <code>#2C6CA8</code> y <code>#7A5FA8</code> daban ΔE 1,1 en protanopia y 10,0 en visión normal — por debajo del suelo de 15. El sistema los había medido contra el fondo, nunca uno contra otro. Los cuatro nuevos pasan todas las comprobaciones en los dos temas: peor par adyacente ΔE 20,4 en protanopia y 31,9 en visión normal.</li>
+    <li><strong>Se asignan en orden fijo y no se ciclan.</strong> Una quinta serie no genera un color nuevo: se agrupa en «Otras» o se separa en gráficos pequeños. El color sigue a la entidad, no a su posición: si un filtro deja fuera una plaza, las demás no cambian de color.</li>
+    <li><strong>El magenta queda por debajo de 3:1 sobre la superficie clara</strong> (2,62:1). Es legal, pero obliga a lo que esta capa ya hace siempre: etiqueta visible o tabla equivalente.</li>
+    <li><strong>El texto nunca se pinta del color de la serie.</strong> Valores, rótulos y leyendas van en tinta de texto; el color lo lleva la marca que está al lado.</li>
+  </ul>
+</div>
+
+<div class="bloque-dash" id="d-piezas">
+  <div class="rot">
+    <div class="kicker">Piezas</div>
+    <h3>Nueve componentes, con datos reales de Administración Vehicular</h3>
+    <p>Todo va dentro de una tarjeta de widget, que es la única receta de superficie. Los widgets se componen sobre una rejilla de doce columnas.</p>
+  </div>
+
+  <div class="dash">
+
+    <!-- 1 · KPI -->
+    <div class="widget w-3">
+      <header><h3>Trámites con reloj</h3></header>
+      <div class="kpi">
+        <div><span class="cifra tnum">26</span><span class="unidad">expedientes</span></div>
+        <div class="var sube">+4 <span class="ctx">vs. semana pasada</span></div>
+      </div>
+      <p class="pie">No incluye los 10 sin reloj.</p>
+    </div>
+
+    <!-- 2 · KPI con sparkline -->
+    <div class="widget w-3">
+      <header><h3>Cerrados este mes</h3></header>
+      <div class="kpi">
+        <div><span class="cifra tnum">20</span><span class="unidad">acuses</span></div>
+        <div class="var sube">+18% <span class="ctx">vs. mes anterior</span></div>
+      </div>
+      <figure class="viz">
+        <div class="viz-lienzo chico"><canvas id="v-spark" aria-label="Acuses cerrados por semana en las últimas ocho semanas"></canvas></div>
+        <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
+        <details class="viz-tabla">
+          <summary>Ver los datos en tabla</summary>
+          <table><caption class="sr">Acuses cerrados por semana</caption>
+            <thead><tr><th scope="col">Semana</th><th scope="col">Acuses</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">S1</th><td>2</td></tr><tr><th scope="row">S2</th><td>3</td></tr>
+              <tr><th scope="row">S3</th><td>3</td></tr><tr><th scope="row">S4</th><td>5</td></tr>
+              <tr><th scope="row">S5</th><td>4</td></tr><tr><th scope="row">S6</th><td>6</td></tr>
+              <tr><th scope="row">S7</th><td>5</td></tr><tr><th scope="row">S8</th><td>7</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </figure>
+    </div>
+
+    <!-- 3 · Barra apilada de estado -->
+    <div class="widget w-6">
+      <header><h3>Trámites con el reloj corriendo</h3></header>
+      <div class="kpi"><div><span class="cifra tnum">26</span><span class="unidad">expedientes</span></div></div>
+      <div class="barra" role="img" aria-label="18 en plazo, 5 por vencer, 3 vencidos, de 26 con el reloj corriendo">
+        <span class="s-ok"   style="width:69.2%"></span>
+        <span class="s-warn" style="width:19.2%"></span>
+        <span class="s-err"  style="width:11.6%"></span>
+      </div>
+      <div class="leyenda">
+        <span><i class="mu" style="background:var(--ok)"></i>En plazo <b>18</b></span>
+        <span><i class="mu" style="background:var(--warn)"></i>Por vencer <b>5</b></span>
+        <span><i class="mu" style="background:var(--err)"></i>Vencidos <b>3</b></span>
+      </div>
+      <p class="pie">No incluye los <b>10</b> sin reloj: aún sin admitir o ya cerrados, no tienen plazo contra el que medirse.</p>
+    </div>
+
+    <!-- 4 · Dona -->
+    <div class="widget w-4">
+      <header><h3>Reparto por tipo de trámite</h3></header>
+      <figure class="viz">
+        <div class="viz-lienzo"><canvas id="v-dona" aria-label="Reparto de trámites por tipo"></canvas></div>
+        <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
+        <details class="viz-tabla">
+          <summary>Ver los datos en tabla</summary>
+          <table><caption class="sr">Trámites por tipo</caption>
+            <thead><tr><th scope="col">Tipo</th><th scope="col">Trámites</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Alta de placas</th><td>12</td></tr>
+              <tr><th scope="row">Cambio de propietario</th><td>8</td></tr>
+              <tr><th scope="row">Baja de placas</th><td>4</td></tr>
+              <tr><th scope="row">Reemplacamiento</th><td>2</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </figure>
+    </div>
+
+    <!-- 5 · Ranking -->
+    <div class="widget w-8">
+      <header><h3>Carga por plaza</h3></header>
+      <figure class="viz">
+        <div class="viz-lienzo alto"><canvas id="v-rank" aria-label="Trámites con reloj corriendo por plaza"></canvas></div>
+        <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
+        <details class="viz-tabla">
+          <summary>Ver los datos en tabla</summary>
+          <table><caption class="sr">Trámites por plaza</caption>
+            <thead><tr><th scope="col">Plaza</th><th scope="col">Trámites</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Querétaro Centro</th><td>14</td></tr>
+              <tr><th scope="row">Querétaro Juriquilla</th><td>5</td></tr>
+              <tr><th scope="row">Celaya</th><td>4</td></tr>
+              <tr><th scope="row">Naucalpan</th><td>3</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </figure>
+    </div>
+
+    <!-- 6 · Tendencia -->
+    <div class="widget w-8">
+      <header><h3>Recibidos y concluidos por semana</h3></header>
+      <figure class="viz">
+        <div class="viz-lienzo alto"><canvas id="v-tend" aria-label="Trámites recibidos y concluidos por semana"></canvas></div>
+        <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
+        <details class="viz-tabla">
+          <summary>Ver los datos en tabla</summary>
+          <table><caption class="sr">Recibidos y concluidos por semana</caption>
+            <thead><tr><th scope="col">Semana</th><th scope="col">Recibidos</th><th scope="col">Concluidos</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">S1</th><td>6</td><td>2</td></tr><tr><th scope="row">S2</th><td>8</td><td>3</td></tr>
+              <tr><th scope="row">S3</th><td>5</td><td>3</td></tr><tr><th scope="row">S4</th><td>9</td><td>5</td></tr>
+              <tr><th scope="row">S5</th><td>7</td><td>4</td></tr><tr><th scope="row">S6</th><td>10</td><td>6</td></tr>
+              <tr><th scope="row">S7</th><td>8</td><td>5</td></tr><tr><th scope="row">S8</th><td>9</td><td>7</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </figure>
+    </div>
+
+    <!-- 7 · Progreso -->
+    <div class="widget w-4">
+      <header><h3>Meta del mes</h3></header>
+      <div class="progreso">
+        <div class="via"><i style="width:67%"></i></div>
+        <div class="cifras"><span><b>20</b> de <b>30</b> acuses</span><span><b>67%</b></span></div>
+      </div>
+      <p class="pie">Quedan 9 días hábiles.</p>
+    </div>
+
+  </div>
+</div>
+
+<div class="bloque-dash" id="d-reglas">
+  <div class="rot">
+    <div class="kicker">Reglas</div>
+    <h3>Lo que hace que estas piezas sigan siendo del sistema</h3>
+  </div>
+  <ul class="reglas">
+    <li><strong>Chart.js obedece al sistema, no al revés.</strong> La versión va fijada, los colores se leen de <code>:root</code> en tiempo de ejecución —la librería no entiende variables CSS— y los gráficos se repintan al cambiar de tema. Sin eso, un dashboard en tema oscuro se queda con los colores del claro.</li>
+    <li><strong>Un <code>&lt;canvas&gt;</code> no es accesible.</strong> Cada gráfico lleva su tabla equivalente, y esa tabla es la fuente de verdad. No es un extra: es lo que hace que el dato exista para quien no ve el lienzo.</li>
+    <li><strong>Si la librería no carga, aparece la tabla.</strong> Estas maquetas se abrían desde disco sin internet; con una dependencia externa eso deja de ser cierto, así que la degradación es parte del componente, no un accidente.</li>
+    <li><strong>Un conteo medido en cero no se pinta.</strong> Si una plaza no tiene vencidos, no hay segmento rojo ni etiqueta: con el total declarado, la ausencia se lee como cero. Es distinto de la regla ya existente de ocultar un bloque cuando el dato <em>no se puede medir</em>.</li>
+    <li><strong>Sin animación bajo <code>prefers-reduced-motion</code>.</strong> Chart.js anima por defecto; hay que apagarlo explícitamente.</li>
+    <li><strong>Un solo eje.</strong> Nunca dos escalas verticales en el mismo gráfico. Dos medidas de magnitud distinta son dos gráficos.</li>
+    <li><strong>Marcas finas y rejilla discreta.</strong> Línea de 2px, punto de 8px o más, rejilla en <code>--grid</code>. La rejilla acompaña, no compite.</li>
+  </ul>
+
+  <pre><code>&lt;!-- El patrón de toda figura de gráfico --&gt;
+&lt;figure class="viz"&gt;
+  &lt;div class="viz-lienzo"&gt;&lt;canvas id="v-x" aria-label="…"&gt;&lt;/canvas&gt;&lt;/div&gt;
+  &lt;p class="aviso-cdn"&gt;Sin conexión con la librería de gráficos.&lt;/p&gt;
+  &lt;details class="viz-tabla"&gt;
+    &lt;summary&gt;Ver los datos en tabla&lt;/summary&gt;
+    &lt;table&gt;&lt;caption class="sr"&gt;…&lt;/caption&gt;…&lt;/table&gt;
+  &lt;/details&gt;
+&lt;/figure&gt;</code></pre>
+</div>
   </div>
 </section>
 
@@ -625,6 +1054,9 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
           <tr><td>1.4.0</td><td>1 sep 2026</td><td>El estado de vacío y error va en tarjeta con medallón, no suelto sobre el fondo. El suelo de botón —36px, 28px en <code>.mini</code>— hay que declararlo con <code>min-height</code>, no confiarlo al relleno. El esqueleto necesita el mismo alto y el mismo punto de ruptura que el contenido que sustituye, y aplanar el fondo en movimiento reducido. Sexta trampa comprobada: copiar una regla de otra pantalla puede traerse un token que allí existe y aquí no.</td></tr>
           <tr><td>1.5.0</td><td>1 sep 2026</td><td>Documenta el botón-icono (<code>.iconbtn</code>), que se usaba en tres secciones sin estar definido: sus tres medidas, que el <code>aria-label</code> nombra el dato y no la acción, y que en un grupo va primero lo frecuente y último lo destructivo. Añade la variante que confirma en el sitio —copiar—, que cambia icono, etiqueta y anuncio por <code>aria-live</code>, las tres. Y el caso medido del <code>:root</code>: sin él, la regla táctil la anula cualquier variante de tamaño declarada después.</td></tr>
           <tr><td>1.5.1</td><td>2 sep 2026</td><td>Corrige el hover de esta barra de navegación de secciones: gris sobre gris con poco cambio de estado. Pasa a <code>background:var(--accent); color:var(--accent-ink)</code>, el mismo par ya usado en <code>.btn.p</code>. Cambio acotado a esta página, no toca el sistema fuente.</td></tr>
+          <tr><td>2.0.0</td><td>3 sep 2026</td><td>Abre la capa de dashboard: nueve piezas de dato visual con la envoltura que obliga a Chart.js a obedecer los tokens, y la regla de que el <code>&lt;canvas&gt;</code> no es accesible —cada gráfico lleva su tabla equivalente, que es la fuente de verdad y la que aparece si el CDN no carga. <b>Cambio que rompe:</b> <code>--serie-1</code> y <code>--serie-2</code> cambian de valor; medidos uno contra otro daban ΔE 1,1 en protanopia, así que se sustituyen por cuatro slots validados en los dos temas. Añade <code>--on-state</code>, la tinta sobre relleno sólido, y la regla de acotar a hijo directo un selector que tiñe iconos por contexto.</td></tr>
+          <tr><td>2.0.1</td><td>3 sep 2026</td><td>El relleno de un contenedor no vive en un hijo opcional: la cabecera <code>.p4</code> cerraba gracias al <code>padding-bottom</code> de la fila de chips, y al retirarlos el título quedó pegado a su borde. Pasa al contenedor vía <code>:last-child</code>.</td></tr>
+          <tr><td>2.1.0</td><td>4 sep 2026</td><td>Resuelve una contradicción viva: §6.4 seguía prescribiendo el medallón de estado en <code>--accent-soft</code> mientras §1.4.1 nombraba ese mismo medallón como caso de la tinta sobre relleno sólido. §6.4 pasa a ser aplicación de §1.4.1, no una alternativa. Tres reglas nuevas de las pantallas de Administración Vehicular: un control compuesto lleva un solo anillo de foco y lo lleva el envoltorio; el resumen de estatus no convive con un filtro de estatus equivalente; y en la ficha de detalle el indicador de urgencia declara su ancho en rejilla y el contacto del cliente va bajo la identidad del expediente. Documenta las composiciones de tablero y las dos reglas de la rejilla <code>.dash</code>.</td></tr>
         </tbody>
       </table>
     </div>
@@ -697,5 +1129,321 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
   });
 })();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+<script>
+(function(){
+  var raiz = document.documentElement;
+
+  /* Chart.js no entiende variables CSS: hay que leerlas del DOM en cada
+     repintado. Si se leen una sola vez al arrancar, el cambio de tema deja
+     los gráficos con los colores del tema anterior. */
+  function tokens(){
+    var cs = getComputedStyle(document.body);
+    var t = function(n){ return cs.getPropertyValue(n).trim(); };
+    return {
+      s1:t('--serie-1'), s2:t('--serie-2'), s3:t('--serie-3'), s4:t('--serie-4'),
+      ok:t('--ok'), warn:t('--warn'), err:t('--err'),
+      texto:t('--text-2'), tenue:t('--text-3'),
+      rejilla:t('--grid'), superficie:t('--surface'), borde:t('--border')
+    };
+  }
+  var quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hayLibreria = typeof Chart !== 'undefined';
+  var graficos = [];
+
+  /* Sin librería: el lienzo desaparece y la tabla se abre. Un dashboard sin
+     internet enseña datos, no un rectángulo vacío.
+     Ojo: esto NO puede cortar el resto del script. El botón de tema es cromo
+     de la página, no lógica de gráfico, y tiene que seguir funcionando
+     aunque el CDN no responda. */
+  if(!hayLibreria){
+    document.querySelectorAll('.viz').forEach(function(v){
+      v.classList.add('sin-libreria');
+      var d = v.querySelector('.viz-tabla'); if(d) d.open = true;
+    });
+  } else {
+    Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+    Chart.defaults.font.size = 12;
+  }
+  function registra(id, hacer){
+    if(!hayLibreria) return;
+    var el = document.getElementById(id);
+    if(!el) return;
+    var inst = new Chart(el, hacer(tokens()));
+    graficos.push({ id:id, el:el, hacer:hacer, inst:inst });
+  }
+  function base(extra){
+    return Object.assign({
+      responsive:true, maintainAspectRatio:false,
+      animation: quieto ? false : { duration:200 }
+    }, extra||{});
+  }
+
+  registra('v-spark', function(c){
+    return { type:'line',
+      data:{ labels:['S1','S2','S3','S4','S5','S6','S7','S8'],
+        datasets:[{ data:[2,3,3,5,4,6,5,7], borderColor:c.s1, borderWidth:2,
+          pointRadius:0, tension:.35, fill:false }] },
+      options: base({ plugins:{ legend:{display:false}, tooltip:{enabled:false} },
+        scales:{ x:{display:false}, y:{display:false} } }) };
+  });
+
+  registra('v-dona', function(c){
+    return { type:'doughnut',
+      data:{ labels:['Alta de placas','Cambio de propietario','Baja de placas','Reemplacamiento'],
+        datasets:[{ data:[12,8,4,2], backgroundColor:[c.s1,c.s2,c.s3,c.s4],
+          borderColor:c.superficie, borderWidth:2 }] },
+      options: base({ cutout:'62%',
+        plugins:{ legend:{ position:'bottom', labels:{ color:c.texto, boxWidth:9, boxHeight:9,
+          usePointStyle:true, pointStyle:'rectRounded', padding:12 } } } }) };
+  });
+
+  registra('v-rank', function(c){
+    return { type:'bar',
+      data:{ labels:['Querétaro Centro','Querétaro Juriquilla','Celaya','Naucalpan'],
+        datasets:[{ data:[14,5,4,3], backgroundColor:c.s1, borderRadius:4, borderSkipped:'start' }] },
+      options: base({ indexAxis:'y',
+        plugins:{ legend:{display:false} },
+        scales:{
+          x:{ grid:{ color:c.rejilla, drawBorder:false }, ticks:{ color:c.tenue }, border:{display:false} },
+          y:{ grid:{ display:false }, ticks:{ color:c.texto }, border:{display:false} } } }) };
+  });
+
+  registra('v-tend', function(c){
+    return { type:'line',
+      data:{ labels:['S1','S2','S3','S4','S5','S6','S7','S8'],
+        datasets:[
+          { label:'Recibidos', data:[6,8,5,9,7,10,8,9], borderColor:c.s1, backgroundColor:c.s1,
+            borderWidth:2, pointRadius:3, pointHoverRadius:5, tension:.3 },
+          { label:'Concluidos', data:[2,3,3,5,4,6,5,7], borderColor:c.s2, backgroundColor:c.s2,
+            borderWidth:2, pointRadius:3, pointHoverRadius:5, tension:.3 }] },
+      options: base({
+        interaction:{ mode:'index', intersect:false },
+        plugins:{ legend:{ position:'bottom', labels:{ color:c.texto, boxWidth:9, boxHeight:9,
+          usePointStyle:true, pointStyle:'rectRounded', padding:12 } } },
+        scales:{
+          x:{ grid:{ display:false }, ticks:{ color:c.tenue }, border:{ color:c.borde } },
+          y:{ beginAtZero:true, grid:{ color:c.rejilla }, ticks:{ color:c.tenue }, border:{display:false} } } }) };
+  });
+
+  /* Repintado al cambiar de tema: se destruye y se rehace con los tokens
+     nuevos. Actualizar solo los colores dejaría fuera leyenda y ejes. */
+  function repinta(){
+    var c = tokens();
+    graficos.forEach(function(g){
+      g.inst.destroy();
+      g.inst = new Chart(g.el, g.hacer(c));
+    });
+  }
+
+  /* El repintado se dispara solo en el cambio: en el arranque los gráficos ya
+     nacieron con los tokens correctos, y repintar ahí los construiría dos
+     veces por cada carga. Esta página no tiene botón de tema propio, así que
+     se escucha el ajuste del sistema y cualquier cambio de data-theme. */
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+  mq.addEventListener('change', repinta);
+  new MutationObserver(repinta).observe(raiz, { attributes:true, attributeFilter:['data-theme'] });
+})();
+</script>
+
+<script>
+var FILTROS=[
+{id:'plaza',etiqueta:'Plaza',vacio:'Todas',fija:true,opciones:[
+ {v:'qro',t:'Querétaro Centro',n:18},{v:'cel',t:'Celaya',n:7},
+ {v:'jur',t:'Juriquilla',n:6},{v:'nau',t:'Naucalpan',n:5}]},
+{id:'estatus',etiqueta:'Estatus',vacio:'Todos',fija:true,opciones:[
+ {v:'sin',t:'Recibido, sin admitir',n:10,pill:'p-neutro'},{v:'adm',t:'Admitido',n:6,pill:'p-ok'},
+ {v:'ing',t:'Ingresado en la dependencia',n:8,pill:'p-warn'},{v:'obs',t:'Observado',n:3,pill:'p-block'},
+ {v:'res',t:'Resuelto',n:5,pill:'p-ok'},{v:'ent',t:'Entregado al cliente',n:4,pill:'p-neutro'}]},
+{id:'responsable',etiqueta:'Responsable',vacio:'Todos',fija:true,opciones:[
+ {v:'ncruz',t:'N. Cruz',n:11},{v:'mrios',t:'M. Ríos',n:9},
+ {v:'jpaz',t:'J. Paz',n:8},{v:'larce',t:'L. Arce',n:5},{v:'sin',t:'Sin asignar',n:3}]},
+{id:'tramite',etiqueta:'Trámite',vacio:'Todos',opciones:[
+ {v:'cambio',t:'Cambio de propietario',n:12},{v:'alta',t:'Alta de placas',n:9},
+ {v:'baja',t:'Baja de placas',n:4},{v:'refrendo',t:'Refrendo anual',n:7}]},
+{id:'plazo',etiqueta:'Plazo',vacio:'Cualquiera',opciones:[
+ {v:'vencido',t:'Vencido',n:3,pill:'p-err'},{v:'hoy',t:'Vence hoy',n:2,pill:'p-warn'},
+ {v:'3d',t:'Vence en 3 días o menos',n:5,pill:'p-warn'},{v:'plazo',t:'En plazo',n:16,pill:'p-ok'},
+ {v:'sin',t:'Sin reloj (aún sin admitir)',n:10,pill:'p-neutro'}]}];
+/* ── Barra de filtros ─────────────────────────────────────────────────────
+   Una sola implementación para las pantallas de listado. Cada dimensión
+   declara sus opciones; el resto (panel, buscador, casillas, pastillas,
+   teclado) es común. §6.12 y §6.21. */
+(function(){
+  var barra=document.getElementById('filtros'), aplic=document.getElementById('aplicados');
+  if(!barra||!aplic||typeof FILTROS==='undefined') return;
+  var MAX_CHIPS=4;                       // pastillas visibles antes de plegar
+  var sel={}, visibles=[], todoChips=false, abierto=null;
+  FILTROS.forEach(function(d){ sel[d.id]=[]; if(d.fija) visibles.push(d.id); });
+
+  function dim(id){ for(var i=0;i<FILTROS.length;i++) if(FILTROS[i].id===id) return FILTROS[i]; }
+  function nombre(d,v){ for(var i=0;i<d.opciones.length;i++) if(d.opciones[i].v===v) return d.opciones[i].t; return v; }
+  function op(d,v){ for(var i=0;i<d.opciones.length;i++) if(d.opciones[i].v===v) return d.opciones[i]; return null; }
+  function marca(d,v){ var o=op(d,v); return o&&o.pill ? '<span class="pill '+o.pill+'">'+o.t+'</span>' : '<b>'+nombre(d,v)+'</b>'; }
+  function total(){ var n=0; for(var k in sel) n+=sel[k].length; return n; }
+
+  function cierra(){ if(!abierto) return; var b=abierto; abierto=null;
+    b.setAttribute('aria-expanded','false'); b.parentNode.querySelector('.pop').hidden=true; }
+
+  function panel(d,btn){
+    var pop=document.createElement('div');
+    pop.className='pop'; pop.hidden=true; pop.id='pop-'+d.id;
+    pop.setAttribute('role','group'); pop.setAttribute('aria-label',d.etiqueta);
+    var b=document.createElement('div'); b.className='pop-b';
+    var busc=document.createElement('input');
+    busc.type='search'; busc.placeholder='Buscar en '+d.etiqueta.toLowerCase()+'…';
+    busc.setAttribute('aria-label','Buscar en '+d.etiqueta.toLowerCase());
+    b.appendChild(busc); pop.appendChild(b);
+    var ul=document.createElement('ul'); ul.className='pop-l'; pop.appendChild(ul);
+    var vacio=document.createElement('p'); vacio.className='pop-vacio'; vacio.hidden=true;
+    vacio.textContent='Ningún valor coincide.'; pop.appendChild(vacio);
+    var pie=document.createElement('div'); pie.className='pop-p';
+    var cuenta=document.createElement('span'); cuenta.className='cuenta';
+    var limpiar=document.createElement('button');
+    limpiar.type='button'; limpiar.className='fquitar'; limpiar.textContent='Limpiar';
+    pie.appendChild(cuenta); pie.appendChild(limpiar); pop.appendChild(pie);
+
+    d.opciones.forEach(function(o){
+      var li=document.createElement('li'), lab=document.createElement('label');
+      var cb=document.createElement('input'); cb.type='checkbox'; cb.value=o.v;
+      var et=document.createElement('span'); et.className='et';
+      if(o.pill){ var pl=document.createElement('span'); pl.className='pill '+o.pill; pl.textContent=o.t; et.appendChild(pl); }
+      else et.textContent=o.t;
+      lab.appendChild(cb); lab.appendChild(et);
+      if(o.n!=null){ var n=document.createElement('span'); n.className='n'; n.textContent=o.n; lab.appendChild(n); }
+      cb.addEventListener('change',function(){
+        var lista=sel[d.id], i=lista.indexOf(o.v);
+        if(cb.checked){ if(i<0) lista.push(o.v); } else if(i>=0) lista.splice(i,1);
+        pinta();
+      });
+      li.appendChild(lab); ul.appendChild(li); li._v=o.t.toLowerCase();
+    });
+    busc.addEventListener('input',function(){
+      var q=busc.value.trim().toLowerCase(), n=0;
+      Array.prototype.forEach.call(ul.children,function(li){
+        var ok=!q||li._v.indexOf(q)>=0; li.hidden=!ok; if(ok) n++;
+      });
+      vacio.hidden=n>0;
+    });
+    limpiar.addEventListener('click',function(){ sel[d.id]=[]; pinta(); busc.focus(); });
+    pop._busc=busc; pop._cuenta=cuenta; pop._limpiar=limpiar; pop._ul=ul;
+    return pop;
+  }
+
+  function control(d){
+    var w=document.createElement('div'); w.className='fwrap';
+    var btn=document.createElement('button');
+    btn.type='button'; btn.className='f';
+    btn.setAttribute('aria-expanded','false'); btn.setAttribute('aria-haspopup','true');
+    btn.setAttribute('aria-controls','pop-'+d.id);
+    var pop=panel(d,btn);
+    btn.addEventListener('click',function(){
+      var abrir=abierto!==btn; cierra();
+      if(abrir){ abierto=btn; btn.setAttribute('aria-expanded','true'); pop.hidden=false; pop._busc.focus(); }
+    });
+    w.appendChild(btn); w.appendChild(pop);
+    w._d=d; w._btn=btn; w._pop=pop;
+    return w;
+  }
+
+  function botonMas(){
+    var restantes=FILTROS.filter(function(d){ return visibles.indexOf(d.id)<0; });
+    if(!restantes.length) return null;
+    var w=document.createElement('div'); w.className='fwrap';
+    var btn=document.createElement('button');
+    btn.type='button'; btn.className='f fmas';
+    btn.setAttribute('aria-expanded','false'); btn.setAttribute('aria-haspopup','true');
+    btn.setAttribute('aria-controls','pop-mas');
+    btn.innerHTML='<span class="msi" aria-hidden="true" translate="no">add</span>Añadir filtro';
+    var pop=document.createElement('div');
+    pop.className='pop'; pop.id='pop-mas'; pop.hidden=true;
+    pop.setAttribute('role','group'); pop.setAttribute('aria-label','Añadir un filtro');
+    var ul=document.createElement('ul'); ul.className='pop-l pop-menu';
+    restantes.forEach(function(d){
+      var li=document.createElement('li'), b=document.createElement('label');
+      b.style.cursor='pointer';
+      var s=document.createElement('span'); s.className='et'; s.textContent=d.etiqueta;
+      b.appendChild(s);
+      b.addEventListener('click',function(){ visibles.push(d.id); cierra(); pinta(true,d.id); });
+      li.appendChild(b); ul.appendChild(li);
+    });
+    pop.appendChild(ul);
+    btn.addEventListener('click',function(){
+      var abrir=abierto!==btn; cierra();
+      if(abrir){ abierto=btn; btn.setAttribute('aria-expanded','true'); pop.hidden=false;
+        var p=pop.querySelector('label'); if(p) p.focus(); }
+    });
+    w.appendChild(btn); w.appendChild(pop);
+    return w;
+  }
+
+  function pinta(abrirNuevo,idNuevo){
+    var abiertoId=abierto?abierto.getAttribute('aria-controls'):null;
+    barra.textContent='';
+    visibles.forEach(function(id){
+      var d=dim(id), w=control(d), n=sel[id].length;
+      w._btn.setAttribute('data-activo',String(n>0));
+      var valor = n===0 ? '<b>'+d.vacio+'</b>' : (n===1 ? marca(d,sel[id][0]) : '<b>'+n+' seleccionados</b>');
+      w._btn.innerHTML=d.etiqueta+': '+valor+'<span class="msi" aria-hidden="true" translate="no">expand_more</span>';
+      Array.prototype.forEach.call(w._pop._ul.querySelectorAll('input'),function(cb){
+        cb.checked=sel[id].indexOf(cb.value)>=0;
+      });
+      w._pop._cuenta.textContent = n===0 ? 'Sin selección' : n+(n===1?' seleccionado':' seleccionados');
+      w._pop._limpiar.disabled=n===0;
+      barra.appendChild(w);
+      if(w._pop.id===abiertoId||(abrirNuevo&&id===idNuevo)){
+        abierto=w._btn; w._btn.setAttribute('aria-expanded','true'); w._pop.hidden=false;
+        if(abrirNuevo&&id===idNuevo) w._pop._busc.focus();
+      }
+    });
+    var mas=botonMas(); if(mas) barra.appendChild(mas);
+
+    // Pastillas de lo aplicado
+    aplic.textContent='';
+    var puestos=[];
+    FILTROS.forEach(function(d){ sel[d.id].forEach(function(v){ puestos.push({d:d,v:v}); }); });
+    aplic.hidden=puestos.length===0;
+    if(!puestos.length) return;
+    var sr=document.createElement('span'); sr.className='sr';
+    sr.textContent='Filtros aplicados: '+puestos.length; aplic.appendChild(sr);
+    var muestra = todoChips ? puestos : puestos.slice(0,MAX_CHIPS);
+    muestra.forEach(function(p){
+      var c=document.createElement('span'); c.className='fchip';
+      var t=nombre(p.d,p.v), o=op(p.d,p.v);
+      c.innerHTML='<span class="dim">'+p.d.etiqueta+':</span> '+(o&&o.pill?'<span class="pill '+o.pill+'">'+t+'</span>':t);
+      var x=document.createElement('button');
+      x.type='button'; x.className='fx'; x.textContent='×';
+      x.setAttribute('aria-label','Quitar el filtro '+p.d.etiqueta+': '+t);
+      x.addEventListener('click',function(){
+        sel[p.d.id].splice(sel[p.d.id].indexOf(p.v),1); pinta();
+      });
+      c.appendChild(x); aplic.appendChild(c);
+    });
+    if(puestos.length>MAX_CHIPS){
+      var mb=document.createElement('button');
+      mb.type='button'; mb.className='fmaschips';
+      mb.textContent = todoChips ? 'Ver menos' : '+'+(puestos.length-MAX_CHIPS)+' más';
+      mb.setAttribute('aria-expanded',String(todoChips));
+      mb.addEventListener('click',function(){ todoChips=!todoChips; pinta(); });
+      aplic.appendChild(mb);
+    }
+    var q=document.createElement('button');
+    q.type='button'; q.className='fquitar'; q.textContent='Quitar todos los filtros';
+    q.addEventListener('click',function(){
+      FILTROS.forEach(function(d){ sel[d.id]=[]; }); todoChips=false; pinta();
+    });
+    aplic.appendChild(q);
+  }
+
+  document.addEventListener('click',function(e){
+    if(abierto && !e.target.closest('.fwrap')) cierra();
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'&&abierto){ var b=abierto; cierra(); b.focus(); }
+  });
+  pinta();
+})();
+</script>
+
 </body>
 </html>
