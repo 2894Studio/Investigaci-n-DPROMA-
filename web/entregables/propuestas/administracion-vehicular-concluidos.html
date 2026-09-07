@@ -822,7 +822,7 @@ main[data-state="loading"] .state-loading{display:flex}
 <td data-et="Acciones"><div class="acciones"><button class="btn mini" type="button">Desarchivar</button><button class="btn mini" type="button">Ver expediente</button></div></td>
 </tr></tbody></table>
 </div>
-<div class="tfoot"><span>Mostrando <b class="tnum">6</b> de <b class="tnum">184</b> que pasan los filtros · <b class="tnum">1</b> sin acuse entregado</span><nav class="pag" aria-label="Paginación"><button type="button">‹ Anteriores</button><button type="button" aria-current="page">1</button><button type="button">2</button><button type="button">3</button><button type="button">Siguientes ›</button></nav></div>
+<div class="tfoot"><span>Mostrando <b class="tnum">6</b> de <b class="tnum">184</b> que pasan los filtros · <b class="tnum">1</b> de ellos sin acuse entregado</span><nav class="pag" aria-label="Paginación"><button type="button">‹ Anteriores</button><button type="button" aria-current="page">1</button><button type="button">2</button><button type="button">3</button><button type="button">Siguientes ›</button></nav></div>
 </div></div>
 <div class="state-loading sk" role="status" aria-label="Cargando los trámites concluidos"><div class="sk-fila" style="grid-template-columns:130px 1fr 130px 190px 120px 130px 150px"><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span></div><div class="sk-fila" style="grid-template-columns:130px 1fr 130px 190px 120px 130px 150px"><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span></div><div class="sk-fila" style="grid-template-columns:130px 1fr 130px 190px 120px 130px 150px"><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span></div><div class="sk-fila" style="grid-template-columns:130px 1fr 130px 190px 120px 130px 150px"><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span></div><div class="sk-fila" style="grid-template-columns:130px 1fr 130px 190px 120px 130px 150px"><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span></div><div class="sk-fila" style="grid-template-columns:130px 1fr 130px 190px 120px 130px 150px"><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span><span class="skel" aria-hidden="true"></span></div></div>
 <div class="state state-empty">
@@ -838,7 +838,7 @@ main[data-state="loading"] .state-loading{display:flex}
 <span class="estado-ico"><svg class="ico" aria-hidden="true" translate="no"><use href="#m-error"/></svg></span>
 <h2>No se pudo cargar el listado de concluidos</h2>
 <p>El servicio no respondió. <b>Ningún expediente se archivó ni se desarchivó</b>, y ninguno se perdió: archivar nunca borra nada. Si acabas de archivar uno, comprueba que quedó guardado.</p>
-<p class="ref" translate="no">Referencia del error: CON-20260821-1622</p>
+<p class="ref" translate="no">Referencia del error: AV-20260821-1622</p>
 <div class="acc"><button class="btn p" type="button"><svg class="ico ico-sm" aria-hidden="true" translate="no"><use href="#m-refresh"/></svg>Reintentar</button></div>
 </div>
 </div>
@@ -1099,6 +1099,24 @@ var FILTROS=[
   var pintaBase=pinta;
   pinta=function(a,b){ pintaBase(a,b); anuncia(); };
   pintaBase();
+})();
+
+/* Recuperación del texto truncado: lo que se corta con puntos suspensivos
+   lleva su valor completo en title, o el dato deja de ser consultable. */
+(function(){
+  function marca(){
+    document.querySelectorAll('td, tbody th, .dos b, .veh b, .rz b').forEach(function(e){
+      if(e.scrollWidth > e.clientWidth + 1){
+        var t=e.textContent.trim();
+        if(t && e.getAttribute('title')!==t) e.setAttribute('title', t);
+      } else if(e.hasAttribute('title') && e.getAttribute('title')===e.textContent.trim()){
+        e.removeAttribute('title');
+      }
+    });
+  }
+  marca();
+  window.addEventListener('resize', marca);
+  new MutationObserver(marca).observe(document.body, {subtree:true, childList:true});
 })();
 </script>
 </body>

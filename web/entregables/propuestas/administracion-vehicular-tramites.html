@@ -796,7 +796,7 @@ main[data-state="loading"] .state-loading{display:flex}
 </div><main id="contenido" data-state="ok" tabindex="-1"><p id="anuncio-estado" role="status" aria-live="polite" class="sr"></p>
 <div class="state-ok "><div class="lst">
 <div class="tabla-caja">
-<table><caption>Trámites vehiculares con su plaza responsable, estatus, plazo y responsable</caption>
+<table><caption>Trámites vehiculares con su plaza, estatus, plazo y responsable</caption>
 <colgroup><col style="width:140px"><col style="width:22%"><col style="width:150px"><col style="width:16%"><col style="width:15%"><col style="width:15%"><col style="width:110px"><col style="width:110px"></colgroup>
 <thead><tr><th scope="col">Folio</th><th scope="col">Cliente y trámite</th><th scope="col">Vehículo</th><th scope="col">Plaza</th><th scope="col">Estatus</th><th scope="col">Plazo</th><th scope="col">Responsable</th></tr></thead>
 <tbody><tr>
@@ -813,7 +813,7 @@ main[data-state="loading"] .state-loading{display:flex}
 <td data-et="Vehículo"><span class="veh"><b translate="no">EJ-2287-B</b><small translate="no">EJEMPLO0000000418</small></span></td>
 <td data-et="Plaza"><span class="plaza-cel"><b>Querétaro Centro</b><small>Querétaro, Qro.</small></span></td>
 <td data-et="Estatus"><span class="pill p-block"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-error"/></svg>Observado</span></td>
-<td data-et="Plazo"><span class="sla rojo"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-error"/></svg>−1 d</span><span class="motivo">Observado, y el reloj sigue corriendo.</span></td>
+<td data-et="Plazo"><span class="sla rojo"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-error"/></svg>−1 d</span></td>
 <td data-et="Responsable">N. Cruz</td>
 </tr><tr>
 <th scope="row" data-et="Folio"><a class="folio" href="#" translate="no">TV-202609-0421</a></th>
@@ -821,7 +821,7 @@ main[data-state="loading"] .state-loading{display:flex}
 <td data-et="Vehículo"><span class="veh"><b translate="no">EJ-3390-C</b><small translate="no">EJEMPLO0000000421</small></span></td>
 <td data-et="Plaza"><span class="plaza-cel"><b>Celaya</b><small>Celaya, Gto.</small></span></td>
 <td data-et="Estatus"><span class="pill p-block"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-error"/></svg>Observado</span></td>
-<td data-et="Plazo"><span class="sla amarillo"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-schedule"/></svg>queda 1 d</span><span class="motivo">Observado, y el reloj sigue corriendo.</span></td>
+<td data-et="Plazo"><span class="sla amarillo"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-schedule"/></svg>queda 1 d</span></td>
 <td data-et="Responsable">M. Ríos</td>
 </tr><tr>
 <th scope="row" data-et="Folio"><a class="folio" href="#" translate="no">TV-202609-0424</a></th>
@@ -844,7 +844,7 @@ main[data-state="loading"] .state-loading{display:flex}
 <td data-et="Cliente y trámite"><span class="rz"><b>Distribuidora Peña y Asociados</b><small>Alta de placas</small></span></td>
 <td data-et="Vehículo"><span class="veh"><b translate="no">EJ-6604-F</b><small translate="no">EJEMPLO0000000430</small></span></td>
 <td data-et="Plaza"><span class="plaza-cel"><b>Celaya</b><small>Celaya, Gto.</small></span></td>
-<td data-et="Estatus"><span class="pill p-neutro"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-inbox"/></svg>Recibido · sin admitir</span></td>
+<td data-et="Estatus"><span class="pill p-neutro"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-inbox"/></svg>Recibido, sin admitir</span></td>
 <td data-et="Plazo"><span class="sla gris" title="El plazo arranca cuando la dependencia admite el trámite"><svg class="ico ico-xs" aria-hidden="true" translate="no"><use href="#m-pause_circle"/></svg>sin plazo</span></td>
 <td data-et="Responsable">Sin asignar</td>
 </tr></tbody></table>
@@ -1129,6 +1129,24 @@ var FILTROS=[
   var pintaBase=pinta;
   pinta=function(a,b){ pintaBase(a,b); anuncia(); };
   pintaBase();
+})();
+
+/* Recuperación del texto truncado: lo que se corta con puntos suspensivos
+   lleva su valor completo en title, o el dato deja de ser consultable. */
+(function(){
+  function marca(){
+    document.querySelectorAll('td, tbody th, .dos b, .veh b, .rz b').forEach(function(e){
+      if(e.scrollWidth > e.clientWidth + 1){
+        var t=e.textContent.trim();
+        if(t && e.getAttribute('title')!==t) e.setAttribute('title', t);
+      } else if(e.hasAttribute('title') && e.getAttribute('title')===e.textContent.trim()){
+        e.removeAttribute('title');
+      }
+    });
+  }
+  marca();
+  window.addEventListener('resize', marca);
+  new MutationObserver(marca).observe(document.body, {subtree:true, childList:true});
 })();
 </script>
 </body>
