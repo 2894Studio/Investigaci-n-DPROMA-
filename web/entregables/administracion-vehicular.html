@@ -738,6 +738,284 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
 }
 .fsim-tabla i{ transform-origin:left center }
 
+
+/* ═══ Listas de recomendaciones y simulaciones (mismo motor que el entregable de acceso) ═══ */
+/* Lista numerada de recomendaciones — mismo ritmo que .resp-list, con contador */
+.rec-list{ list-style:none; margin: 0; padding: 0; counter-reset: rec; border-top: 1px solid var(--border); }
+.rec-list li{
+  counter-increment: rec;
+  display:grid; grid-template-columns: 2.25rem minmax(0,1fr); gap: 0 1rem;
+  padding: 0.85rem 0; border-bottom: 1px solid var(--border);
+  color: var(--text-muted); font-size: 0.9375rem;
+}
+.rec-list li::before{
+  content: counter(rec, decimal-leading-zero);
+  font-weight: 700; color: var(--accent); font-size: 0.8125rem; line-height: 1.7;
+}
+.rec-list li > span{ max-width: 68ch; }
+@media (max-width: 560px){
+  .rec-list li{ grid-template-columns: 1.75rem minmax(0,1fr); gap: 0 0.75rem; }
+}
+
+/* ───────────── Simulaciones wireframe ─────────────
+   Maquetas de baja fidelidad animadas con CSS, sin librerías: enseñan el
+   comportamiento recomendado frente al habitual sin comprometer decisiones
+   visuales que todavía no están tomadas.
+   Cada figura declara su ciclo en --cyc y el fotograma en el que se congela
+   (--freeze) cuando el sistema pide movimiento reducido. */
+.wire{
+  --cyc: 9s;
+  --freeze: -6.2s;
+  --err: #b32d2d; /* 5.1:1 sobre el gris de la maqueta — el mínimo que pide este mismo entregable */
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 1.5rem 1.75rem 1.35rem;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .wire{ --err:#ff7b7b; } }
+:root[data-theme="dark"] .wire{ --err:#ff7b7b; }
+@media (max-width: 560px){ .wire{ padding: 1.25rem 1.1rem 1.1rem; } }
+
+.wire-head{ display:flex; align-items:center; gap:0.5rem 1rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+.wire-head .wire-title{ font-size:1.0625rem; font-weight:700; flex:1 1 16ch; }
+.wire-tag{
+  flex:none; font-size:0.6875rem; font-weight:700; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  padding:0.3em 0.7em; border-radius:999px;
+}
+.wire-toggle{
+  flex:none; appearance:none; font-family:inherit; font-size:0.75rem; font-weight:700;
+  color:var(--text-muted); background:var(--surface); border:1px solid var(--border);
+  border-radius:999px; padding:0 0.95em; min-height:2.25rem; cursor:pointer;
+}
+.wire-toggle:hover{ color:var(--accent); border-color:var(--accent); }
+
+.wire-stage{ display:grid; gap:1.5rem; }
+.wire-stage--split{ grid-template-columns:repeat(2,1fr); }
+@media (max-width: 720px){ .wire-stage--split{ grid-template-columns:1fr; } }
+.wire-panel{ display:flex; flex-direction:column; gap:0.65rem; min-width:0; }
+.wire-panel-label{
+  display:flex; align-items:center; gap:0.45em; font-size:0.75rem; font-weight:700;
+  letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted);
+}
+.wire-panel-label::before{ content:""; width:0.5em; height:0.5em; border-radius:999px; background:currentColor; flex:none; }
+.wire-panel.is-good .wire-panel-label{ color:var(--accent); }
+.wire-panel.is-bad .wire-panel-label{ color:var(--err); }
+.wire figcaption{ margin:1.1rem 0 0; font-size:0.8125rem; line-height:1.5; color:var(--text-muted); max-width:74ch; }
+.wire-refs{ display:block; margin-top:0.35rem; font-weight:700; color: var(--chip-ink); }
+
+/* Maqueta de la pantalla */
+.wf{
+  position:relative; overflow:hidden;
+  border:1.5px solid var(--border); border-radius:12px;
+  background:var(--surface-alt); padding:1.05rem 1.1rem 1.2rem;
+}
+.wf-logo{ width:2.1rem; height:2.1rem; border-radius:7px; border:1.5px dashed var(--border); margin-bottom:0.85rem; }
+.wf-label{ display:block; font-size:0.6875rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.3rem; }
+.wf-field{
+  position:relative; display:flex; align-items:center; gap:0.5rem;
+  height:2.5rem; padding:0 0.7rem; margin-bottom:0.8rem;
+  border:1.5px solid var(--border); border-radius:8px; background:var(--surface);
+}
+.wf-field.is-err{ border-color:var(--err); }
+.wf-field:last-of-type{ margin-bottom:0; }
+.wf-slot{ display:grid; min-width:0; }
+.wf-slot > *{ grid-area:1 / 1; }
+.wf-value{ font-size:0.8125rem; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.wf-value.is-ph{ color:var(--text-muted); }
+.wf-dots{ letter-spacing:0.16em; }
+.wf-eye{ position:relative; margin-left:auto; flex:none; width:1.3rem; height:1.3rem; color:var(--text-muted); }
+.wf-eye svg{ position:absolute; inset:0; width:100%; height:100%; }
+.wf-ico-err{ flex:none; width:1rem; height:1rem; color:var(--err); margin-left:auto; }
+
+.wf-check{ display:flex; align-items:center; gap:0.85rem; margin:0.85rem 0 0.9rem; font-size:0.75rem; color:var(--text-muted); }
+.wf-box{ position:relative; flex:none; width:1.05rem; height:1.05rem; border:1.5px solid var(--border); border-radius:4px; background:var(--surface); }
+
+.wf-btn{
+  position:relative; display:grid; place-items:center;
+  height:2.5rem; margin-top:0.9rem; border-radius:8px;
+  background:var(--accent); color:var(--on-accent);
+  font-size:0.8125rem; font-weight:700;
+}
+.wf-btn > span{ grid-area:1 / 1; display:flex; align-items:center; gap:0.5rem; }
+.wf-spin{ flex:none; width:0.9rem; height:0.9rem; border-radius:50%; border:2px solid currentColor; border-top-color:transparent; }
+
+.wf-msgbox{ min-height:3.6rem; padding-top:0.7rem; }
+.wf-msgbox--sm{ min-height:2.4rem; }
+.wf-msg{ margin:0; display:flex; align-items:flex-start; gap:0.4rem; font-size:0.75rem; line-height:1.35; color:var(--err); }
+.wf-msg .wf-ico{ flex:none; width:0.9rem; height:0.9rem; margin-top:0.08rem; }
+.wf-sub{ margin:0.35rem 0 0; font-size:0.75rem; line-height:1.35; color:var(--text-muted); }
+.wf-link{ display:inline-block; position:relative; margin-top:0.5rem; font-size:0.75rem; font-weight:700; color:var(--accent); }
+.wf-pad{ height:2.4rem; }
+
+/* Cursor y pulsación */
+.wf-cursor{ position:absolute; left:50%; top:50%; z-index:4; width:1.05rem; height:1.05rem; color:var(--text); pointer-events:none; }
+.wf-cursor svg{ width:100%; height:100%; display:block; filter:drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+.wf-ripple{
+  position:absolute; left:50%; top:50%; z-index:3; width:2.4rem; height:2.4rem;
+  margin:-1.2rem 0 0 -1.2rem; border-radius:50%; border:2px solid var(--on-accent); opacity:0; pointer-events:none;
+}
+.wf-ripple--dead{ border-color:var(--text-muted); }
+
+/* Anillo de foco para el recorrido de tabulación */
+.wf-focus{ position:absolute; inset:-5px; border:2px solid var(--accent); border-radius:10px; opacity:0; pointer-events:none; }
+.wf-focus--tight{ inset:-6px; border-radius:8px; }
+/* En objetivos pequeños pegados a su etiqueta, la insignia se pone a la
+   izquierda para no tapar el texto que está justo al lado. */
+.wf-focus--flip .wf-focus-n{ right:auto; left:-11px; }
+.wf-focus-n{
+  position:absolute; top:-10px; right:-10px; width:18px; height:18px; border-radius:50%;
+  background:var(--accent); color:var(--on-accent); font-size:10px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; line-height:1;
+}
+
+/* Tira de peticiones al servidor */
+.wf-net{ display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; margin-top:0.15rem; }
+.wf-net-l{ font-size:0.6875rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-muted); margin-right:0.15rem; }
+.wf-net-c{
+  font-size:0.6875rem; font-weight:700; color:var(--err);
+  border:1px solid color-mix(in srgb, var(--err) 40%, transparent);
+  background: color-mix(in srgb, var(--err) 10%, transparent);
+  border-radius:999px; padding:0.2em 0.6em; opacity:0;
+}
+.wf-net-c.is-ok{
+  color:var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* Etiqueta de estado de la simulación (figura del color) */
+.wire-note{ display:grid; margin-bottom:1rem; font-size:0.75rem; font-weight:700; color:var(--text-muted); min-height:1.2rem; }
+.wire-note > span{ grid-area:1 / 1; }
+
+/* Indicador de tecla */
+.wf-key{
+  display:inline-flex; align-items:center; justify-content:center; min-width:2.6rem; height:1.6rem;
+  border:1.5px solid var(--border); border-bottom-width:3px; border-radius:6px; background:var(--surface);
+  font-size:0.6875rem; font-weight:700; color:var(--text-muted);
+}
+.wf-step{ display:grid; min-height:1.3rem; font-size:0.75rem; font-weight:700; color:var(--accent); }
+.wf-step > span{ grid-area:1 / 1; }
+.wf-keyrow{ display:flex; align-items:center; gap:0.6rem; margin-top:0.9rem; }
+
+/* Motor de animación compartido */
+.wire .wa{
+  animation-duration: var(--d, var(--cyc));
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+.wire .wa--2s{ --d:2s; }
+.wire .wa--spin{ --d:0.75s; animation-name:wf-spin; }
+@keyframes wf-spin{ to{ transform:rotate(360deg) } }
+
+.wire.is-paused .wa{ animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce){
+  /* La regla global de la página fuerza animation-duration a 0.001ms, que
+     dejaría cada simulación en su último fotograma: todo oculto. Aquí se
+     restituye la duración solo para poder congelar la animación, en pausa
+     desde el primer momento, en el fotograma que explica el punto. No hay
+     movimiento en ningún caso; se usa el motor de animación como si fuera
+     una imagen fija. */
+  .wire .wa{
+    animation-duration: var(--d, var(--cyc)) !important;
+    animation-delay: var(--freeze) !important;
+    animation-play-state: paused !important;
+  }
+  .wire .wa--spin{ animation: none !important; }
+  .wire-toggle{ display:none; }
+}
+
+/* Los aciertos no son una lista numerada de tareas: se marcan, no se cuentan. */
+.rec-list--ok li::before{ content:"\2713"; font-size:1rem; line-height:1.5; }
+
+/* Tarjeta de apoyo: mismo sistema que .card-neutral, pero se distingue de las
+   fichas de hallazgo para que no se lean como uno más. */
+.card-aparte{ background:var(--surface-alt); border:1px solid var(--border);
+  border-left:3px solid var(--accent); color:var(--text); }
+.card-aparte p{ font-size:0.9375rem; line-height:1.68; color:var(--text-muted); max-width:68ch; }
+.card-aparte strong{ color:var(--text); }
+.copy-prop{ margin-top:1rem; background:var(--surface-alt); border:1px solid var(--border);
+  border-radius:12px; padding:1.15rem 1.25rem; max-width:44ch; }
+.copy-prop-t{ font-size:1rem !important; font-weight:700; color:var(--text) !important;
+  margin-bottom:0.5rem; }
+.copy-prop-btns{ display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.9rem !important; }
+.copy-prop-btns span{ font-size:0.8125rem; font-weight:700; border:1px solid var(--border);
+  border-radius:6px; padding:0.5em 0.9em; color:var(--text); }
+.copy-prop-btns span:first-child{ background:var(--chip-cliente-bg); color:var(--on-accent);
+  border-color:var(--chip-cliente-bg); }
+.copy-prop-ref{ font-size:0.75rem !important; margin-top:0.8rem !important;
+  font-variant-numeric:tabular-nums; letter-spacing:0.03em; }
+
+
+/* Con listas largas, la lista va a ancho completo y la simulación debajo:
+   en dos columnas la figura se estiraba hasta la altura de la lista. */
+#p-diag .evidence-stack{ grid-template-columns:1fr; align-items:start }
+
+/* Piezas propias de estas simulaciones */
+.wf-bar{ display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; }
+.wf-pill{ display:inline-flex; align-items:center; gap:.35rem; height:1.55rem; padding:0 .6rem;
+  border-radius:999px; font-size:.6875rem; font-weight:700; white-space:nowrap;
+  border:1.5px solid transparent; }
+.wf-pill--rojo{ background:color-mix(in srgb, var(--err) 14%, transparent); color:var(--err); }
+.wf-pill--ambar{ background:color-mix(in srgb, #9a6a00 14%, transparent); color:#7a5400; }
+.wf-pill--verde{ background:color-mix(in srgb, #2c6b41 14%, transparent); color:#245c37; }
+.wf-pill--morado{ background:color-mix(in srgb, #6b4fa8 16%, transparent); color:#57408a; }
+.wf-pill--gris{ background:var(--surface-alt); color:var(--text-muted); border-color:var(--border); }
+.wf-pill--punteado{ border-style:dashed; border-color:var(--border); background:transparent; color:var(--text-muted); }
+.wf-pill--control{ background:var(--surface); border-color:var(--border); color:var(--text); }
+.wf-pill .g{ font-size:.75rem; line-height:1 }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .wf-pill--ambar{ color:#f0c04a }
+  :root:not([data-theme="light"]) .wf-pill--verde{ color:#79d39a }
+  :root:not([data-theme="light"]) .wf-pill--morado{ color:#c3aef0 } }
+:root[data-theme="dark"] .wf-pill--ambar{ color:#f0c04a }
+:root[data-theme="dark"] .wf-pill--verde{ color:#79d39a }
+:root[data-theme="dark"] .wf-pill--morado{ color:#c3aef0 }
+.wf-zona{ border:1.5px dashed var(--border); border-radius:8px; padding:.55rem; }
+.wf-zona-et{ display:block; font-size:.625rem; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--text-muted); margin-bottom:.4rem; }
+.wf-fila{ display:flex; align-items:center; gap:.5rem; padding:.5rem .1rem;
+  border-bottom:1px solid var(--border); font-size:.75rem; color:var(--text-muted); }
+.wf-fila:last-child{ border-bottom:0 }
+.wf-fila .folio{ font-weight:700; color:var(--accent); white-space:nowrap }
+.wf-fila .sep{ margin-left:auto }
+.wf-mini{ display:inline-grid; place-items:center; height:1.4rem; padding:0 .5rem; border-radius:6px;
+  border:1.5px solid var(--border); background:var(--surface); font-size:.6875rem; font-weight:700;
+  color:var(--text-muted); }
+.wf-acc{ display:inline-flex; align-items:center }
+.wf-acc.juntos{ gap:6px }
+.wf-acc.juntos .wf-mini{ height:1.15rem; padding:0 .35rem; font-size:.625rem }
+.wf-acc.sueltos{ gap:1.1rem }
+.wf-acc.sueltos .wf-mini{ height:1.5rem; padding:0 .6rem }
+
+/* Escenas */
+@keyframes av-c-nombre{ 0%,100%{ opacity:0 } 12%,88%{ opacity:1 } }
+@keyframes av-lat{ 0%,45%{ opacity:0 } 55%,100%{ opacity:1 } }
+@keyframes av-parpadeo{ 0%,49%{ background:transparent } 50%,100%{ background:color-mix(in srgb, var(--accent) 10%, transparent) } }
+@keyframes av-cursor-filtro{
+  0%,6%   { transform:translate(1rem,5.4rem) }
+  22%,34% { transform:translate(4.6rem,1.5rem) }
+  50%,62% { transform:translate(9.4rem,1.5rem) }
+  78%,100%{ transform:translate(1rem,5.4rem) }
+}
+@keyframes av-press{
+  0%,20%  { opacity:0; transform:scale(.4) }
+  24%     { opacity:.75; transform:scale(.55) }
+  30%     { opacity:0; transform:scale(1.1) }
+  48%     { opacity:0; transform:scale(.4) }
+  52%     { opacity:.75; transform:scale(.55) }
+  58%,100%{ opacity:0; transform:scale(1.1) }
+}
+@keyframes av-press-pos{ 0%,40%{ transform:translate(4.6rem,1.5rem) } 41%,100%{ transform:translate(9.4rem,1.5rem) } }
+@keyframes av-cursor-tap{
+  0%,10%  { transform:translate(2rem,5.6rem) }
+  30%,55% { transform:translate(6.1rem,2.1rem) }
+  75%,100%{ transform:translate(2rem,5.6rem) }
+}
+@keyframes av-fallo{ 0%,32%{ opacity:0 } 38%,62%{ opacity:1 } 68%,100%{ opacity:0 } }
+
 </style>
 </head>
 
@@ -749,6 +1027,9 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     <nav>
       <a href="/">Informe general</a>
       <a href="#diagnostico">Diagnóstico</a>
+      <a href="#ux">UX</a>
+      <a href="#ui">Interfaz</a>
+      <a href="#accesibilidad">Accesibilidad</a>
       <a href="#pantallas">Las pantallas</a>
       <a class="nav-cta" href="/entregables">Entregables</a>
     </nav>
@@ -766,7 +1047,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
           <span class="claim-word">revisadas</span> <span class="claim-word">y</span>
           <span class="claim-word">construidas.</span>
         </h1>
-        <p class="claim-sub">Cuatro pantallas que ya existían y que aquí se revisan a fondo de experiencia, interfaz y accesibilidad. Cada corrección dejó además una regla escrita en el sistema de diseño.</p>
+        <p class="claim-sub">Revisión de diseño de las cuatro pantallas del flujo, ordenada de mayor a menor impacto. No es una auditoría de código: es lo que hoy ve y usa quien gestiona trámites.</p>
         <p class="claim-scroll-hint" id="claimScrollHint">Sigue bajando</p>
       </div>
     </div>
@@ -781,8 +1062,9 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       <button type="button" class="tab" id="t-pant" role="tab"
               aria-selected="false" aria-controls="p-pant" tabindex="-1">Las pantallas</button>
     </div>
-    <p class="tabs-note">El diagnóstico es el análisis del módulo tal como está hoy. Las pantallas
-      son la propuesta ya construida: se abren, se prueban y se recorren con el teclado.</p>
+    <p class="tabs-note">El diagnóstico es la revisión de diseño sobre lo que hoy ve y usa quien
+      gestiona trámites. Las pantallas son la propuesta ya construida: se abren, se prueban y se
+      recorren con el teclado.</p>
   </div>
 </div>
 
@@ -792,16 +1074,328 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
   <div class="wrap">
     <div class="section-head reveal">
       <div>
-        <div class="eyebrow">Qué duele hoy</div>
-        <h2>El diagnóstico está en preparación.</h2>
-        <p class="section-note">Este apartado recogerá el análisis del módulo tal como opera hoy,
-          cruzando las entrevistas con la especificación recibida. Todavía no está escrito.</p>
+        <div class="eyebrow">Observaciones generales</div>
+        <h2>Lo que se repite en las cuatro pantallas.</h2>
+        <p class="section-note">Patrones que conviene resolver una vez, a nivel de sistema, en lugar de pantalla por pantalla.</p>
       </div>
     </div>
-    <p class="maquetas-lede reveal">Mientras tanto, la pestaña <a href="#pantallas">Las pantallas</a>
-      ya tiene la propuesta construida y navegable.</p>
 
-    <figure class="fsim" aria-hidden="true">
+    <div class="card-grid">
+      <article class="card card-neutral reveal">
+        <span class="eyebrow">Vocabulario</span>
+        <h3>El mismo concepto cambia de nombre entre pantallas</h3>
+        <p>Lo que en el tablero es «sin reloj», en el listado es «sin admitir». Son lo mismo. Cada nombre nuevo obliga a volver a aprender el sistema.</p>
+      </article>
+      <article class="card card-neutral reveal">
+        <span class="eyebrow">Estado</span>
+        <h3>Las etiquetas no siguen una lógica única</h3>
+        <p>«Vencido» y «observado» comparten el mismo rojo siendo cosas distintas: un plazo incumplido y una petición de la dependencia. Unas etiquetas llevan borde continuo y otras punteado sin que se explique la diferencia.</p>
+      </article>
+      <article class="card card-neutral reveal">
+        <span class="eyebrow">Controles</span>
+        <h3>Filtros e información se ven igual</h3>
+        <p>Conteos, desplegables y filtros aplicados conviven en la misma franja con formas casi idénticas. No se distingue qué se puede pulsar de qué solo informa.</p>
+      </article>
+      <article class="card card-neutral reveal">
+        <span class="eyebrow">Cifras</span>
+        <h3>Los números no siempre cuadran entre sí</h3>
+        <p>El texto del título, las etiquetas de conteo y el pie de la tabla se refieren a alcances distintos (todo el listado, la página visible, los filtros activos) sin decirlo. Eso hace dudar del dato.</p>
+      </article>
+      <article class="card card-neutral reveal">
+        <span class="eyebrow">Jerarquía</span>
+        <h3>Doce tamaños de letra y cinco grosores</h3>
+        <p>Con tantas variantes el tamaño deja de indicar importancia. Los espaciados sueltos de 1, 3, 5, 6, 7 y 9 píxeles rompen además el ritmo, aunque cada pantalla por separado parezca correcta.</p>
+      </article>
+      <article class="card card-neutral reveal">
+        <span class="eyebrow">Cabecera</span>
+        <h3>Cada pantalla se compone de forma distinta</h3>
+        <p>Unas tienen buscador y otras no; unas filtros y otras solo etiquetas; la acción principal a veces es un botón con texto y a veces un icono suelto. No hay plantilla reconocible.</p>
+      </article>
+    </div>
+
+    <figure class="wire reveal" style="--cyc:8s; --freeze:-2.4s; margin-top:2.5rem">
+      <div class="wire-head">
+        <span class="wire-tag">Simulación</span>
+        <span class="wire-title">El mismo trámite, dos nombres</span>
+        <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+      </div>
+      <div class="wire-stage wire-stage--split" aria-hidden="true">
+        <div class="wire-panel is-bad">
+          <span class="wire-panel-label">Tablero</span>
+          <div class="wf">
+            <span class="wf-label">Querétaro Centro</span>
+            <div class="wf-bar">
+              <span class="wf-pill wf-pill--verde">18 en plazo</span>
+              <span class="wf-pill wf-pill--rojo">3 vencidos</span>
+              <span class="wf-pill wf-pill--punteado an" style="animation-name:av-parpadeo">10 sin reloj</span>
+            </div>
+          </div>
+        </div>
+        <div class="wire-panel is-bad">
+          <span class="wire-panel-label">Listado</span>
+          <div class="wf">
+            <span class="wf-label">Trámites vehiculares</span>
+            <div class="wf-bar">
+              <span class="wf-pill wf-pill--verde">18 en plazo</span>
+              <span class="wf-pill wf-pill--rojo">3 vencidos</span>
+              <span class="wf-pill wf-pill--gris an" style="animation-name:av-parpadeo">10 sin admitir</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>Los dos parpadeos son la misma cifra con dos nombres y dos formas. Un glosario corto de estados, acordado con Diana y Jhonatan, cierra la discusión de una vez.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="funciona">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Lo que ya funciona bien</div>
+        <h2>Decisiones acertadas que conviene convertir en norma.</h2>
+      </div>
+    </div>
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list rec-list--ok">
+          <li><span>Los mensajes de error y de pantalla vacía explican qué pasó, tranquilizan sobre lo que no se ha roto («ningún trámite cambió de estatus», «archivar nunca borra nada») y ofrecen una salida clara. Es el mejor material de las cuatro pantallas.</span></li>
+          <li><span>Cada error trae una referencia consultable, como <code>GES-20260901-1105</code>. Soporte y la persona hablan del mismo incidente. Debería extenderse a toda la herramienta.</span></li>
+          <li><span>Las cuatro situaciones de una pantalla están previstas: con datos, cargando, vacío y error. Evita que el equipo de desarrollo improvise esos casos.</span></li>
+          <li><span>El esqueleto de carga imita la forma real del contenido, así que no hay salto visual cuando llegan los datos.</span></li>
+          <li><span>La regla de negocio más delicada está explicada dentro de la pantalla: el reloj no se detiene cuando la dependencia observa un trámite.</span></li>
+          <li><span>«Observado» tiene fila propia y no se esconde dentro de «vencidos». Cuando algo sale en rojo, se ve el motivo.</span></li>
+          <li><span>En móvil la tabla se convierte en tarjetas con su etiqueta, así que no hace falta recordar el orden de las columnas.</span></li>
+          <li><span>El folio es un enlace y la fila completa es navegable. Coincide con cómo trabaja la gestoría: el folio es la unidad de conversación con el cliente y con la dependencia.</span></li>
+          <li><span>El aviso de datos personales del detalle dice qué es cada documento, para qué está y quién puede abrirlo.</span></li>
+          <li><span>Folios, placas y VIN están marcados para que ningún traductor automático los altere.</span></li>
+          <li><span>Hay tema claro y oscuro sobre las mismas variables: cambiar un color se hace en un solo sitio.</span></li>
+          <li><span>El orden del listado se explica en el pie: «los vencidos primero, después por lo que queda de plazo».</span></li>
+        </ul>
+      </article>
+      <article class="card card-aparte reveal">
+        <p><strong>La barra inferior de estados es andamiaje del prototipo.</strong> Conviene marcarla como tal para que el equipo de DPROMA no la interprete como funcionalidad a construir.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="ux">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Recomendaciones</div>
+        <h2>UX y arquitectura de la información</h2>
+        <p class="section-note">Cómo se organiza, se nombra y se recorre la información.</p>
+      </div>
+    </div>
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list">
+          <li><span>Fijar un único nombre por estado y usarlo en todas partes. Elegir entre «sin reloj» y «sin admitir», entre «gestoría» y «trámites vehiculares», y no alternar.</span></li>
+          <li><span>Separar dos ideas que hoy se mezclan: en qué fase está el trámite y cómo va de plazo. «En dependencia» es una fase; «vencido» es una condición de tiempo. Siempre dos datos distintos.</span></li>
+          <li><span>Decidir si «observado» es un estado o una alerta. Hoy actúa como las dos cosas. Recomendamos tratarlo como una señal que se superpone a la fase, igual que el plazo.</span></li>
+          <li><span>Separar visual y físicamente lo que filtra de lo que solo informa. Si una etiqueta de conteo filtra al pulsarla, debe parecer un control; si no filtra, no debe parecerlo.</span></li>
+          <li><span>Decir siempre a qué se refiere cada número: de todos tus trámites, de los que pasan el filtro, o de esta página.</span></li>
+          <li><span>Hacer que los filtros aplicados sean el único sitio donde se ve el estado del filtrado. Hoy está repartido entre el desplegable y la etiqueta, y se contradicen.</span></li>
+          <li><span>Permitir ordenar por plazo, fecha de conclusión y responsable. Hoy el orden lo fija el sistema y solo se explica en el pie.</span></li>
+          <li><span>Añadir filtro por rango de fechas en trámites concluidos. Con 184 registros y solo paginación, encontrar un trámite de julio exige recorrer páginas.</span></li>
+          <li><span>Unificar el buscador entre pantallas, y decir si busca en todo el histórico o solo en lo que se ve.</span></li>
+          <li><span>Nombrar cada acción por su resultado: «Exportar la lista filtrada a Excel», no un icono de descarga.</span></li>
+          <li><span>Dar salida a la acción que resuelve el problema. Si el trámite está observado porque falta la ficha técnica, el botón de subirla va junto al aviso, no al final de la lista de documentos.</span></li>
+          <li><span>Añadir la ruta de vuelta en el detalle, y permitir moverse al trámite anterior y siguiente dentro del mismo filtro.</span></li>
+          <li><span>Revisar la acción duplicada de las filas: el folio ya es un enlace, un botón «Abrir» en la misma fila añade ruido.</span></li>
+          <li><span>Definir qué pasa tras cada acción. Al archivar, ¿la fila desaparece, se atenúa, se puede deshacer? Es donde más se rompen las herramientas internas.</span></li>
+        </ul>
+      </article>
+
+      <figure class="wire reveal" style="--cyc:9s; --freeze:-5.6s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">Lo que filtra y lo que solo informa</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Lo habitual</span>
+            <div class="wf" style="position:relative">
+              <div class="wf-bar">
+                <span class="wf-pill wf-pill--rojo">3 vencidos</span>
+                <span class="wf-pill wf-pill--ambar">5 por vencer</span>
+                <span class="wf-pill wf-pill--control">Plaza</span>
+                <span class="wf-pill wf-pill--control">Estatus</span>
+              </div>
+              <div class="wf-pad"></div>
+              <div class="wf-fila"><span class="folio">TV-0412</span><span>Alta de placas</span></div>
+              <div class="wf-fila"><span class="folio">TV-0418</span><span>Cambio de propietario</span></div>
+              <span class="wf-ripple an" style="animation-name:av-press, av-press-pos"></span>
+              <span class="wf-cursor an" style="animation-name:av-cursor-filtro"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span>
+            </div>
+          </div>
+          <div class="wire-panel is-good">
+            <span class="wire-panel-label">Lo recomendado</span>
+            <div class="wf">
+              <div class="wf-zona" style="margin-bottom:.55rem">
+                <span class="wf-zona-et">Resumen</span>
+                <div class="wf-bar">
+                  <span class="wf-pill wf-pill--rojo">3 vencidos</span>
+                  <span class="wf-pill wf-pill--ambar">5 por vencer</span>
+                </div>
+              </div>
+              <div class="wf-zona">
+                <span class="wf-zona-et">Filtros</span>
+                <div class="wf-bar">
+                  <span class="wf-pill wf-pill--control">Plaza <span class="g">&#9662;</span></span>
+                  <span class="wf-pill wf-pill--control">Estatus <span class="g">&#9662;</span></span>
+                </div>
+              </div>
+              <div class="wf-pad"></div>
+              <div class="wf-fila"><span class="folio">TV-0412</span><span>Alta de placas</span></div>
+            </div>
+          </div>
+        </div>
+        <figcaption>A la izquierda el cursor prueba dos pastillas idénticas: una filtra y la otra no, y no hay forma de saberlo antes de pulsar. A la derecha cada zona declara para qué está.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="ui">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Recomendaciones</div>
+        <h2>Interfaz</h2>
+        <p class="section-note">Cómo se ve y cómo se comporta cada elemento.</p>
+      </div>
+    </div>
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list">
+          <li><span>Reducir la escala a cinco o seis tamaños y a tres grosores, y asignar una función a cada tamaño: título de pantalla, título de bloque, cuerpo, dato secundario y etiqueta.</span></li>
+          <li><span>Eliminar los tamaños fuera de escala. Los 10,5 y 11,5 píxeles no aportan diferencia perceptible y rompen la coherencia.</span></li>
+          <li><span>Limitar el texto en mayúsculas con espaciado. En tamaños pequeños cuesta leerlo.</span></li>
+          <li><span>Definir tres familias visuales distintas: etiqueta de fase, indicador de plazo y control de filtro. Hoy las tres comparten forma de píldora y tamaño parecido.</span></li>
+          <li><span>Retirar el borde punteado como distinción, o explicarlo en la leyenda si significa «todavía no cuenta plazo».</span></li>
+          <li><span>Dar a «observado» un color propio, distinto del rojo de vencido. El morado ya está en el sistema y hoy solo se usa para privacidad.</span></li>
+          <li><span>Hacer que los filtros activos se distingan sin depender del color: un cambio de forma o un icono de comprobación además del fondo.</span></li>
+          <li><span>Aplicar una única escala de espaciado, múltiplos de cuatro píxeles, sin valores sueltos intermedios.</span></li>
+          <li><span>Igualar la altura de las filas de tabla. La nota bajo el plazo, que unas filas llevan y otras no, puede mostrarse al pasar el cursor o en el detalle.</span></li>
+          <li><span>Unificar la cabecera de las cuatro pantallas: misma estructura, mismos huecos y mismo lugar para la acción principal.</span></li>
+          <li><span>Hacer evidente el paso del cursor, con cambio de fondo visible y no un matiz. Afecta al asistente, al menú lateral y a los botones secundarios.</span></li>
+          <li><span>Dar texto visible a la acción principal de cada pantalla, y dejar una sola acción principal por pantalla.</span></li>
+          <li><span>Prever los estados de las acciones que tardan: guardando, guardado, falló. Hoy solo existe el reposo.</span></li>
+          <li><span>Evitar que el texto de las celdas se corte sin recuperación. Razones sociales largas y VIN quedan truncados y no hay forma de ver el valor completo.</span></li>
+          <li><span>Revisar la posición del asistente flotante, que se sitúa justo encima de la paginación, y el degradado inferior de las listas, que hace creer que hay contenido oculto.</span></li>
+          <li><span>En el tablero, abrir por lo que vence hoy y mañana, no por el reparto por plaza. El reparto es contexto; el vencimiento es trabajo. Y añadir una marca de última actualización.</span></li>
+        </ul>
+      </article>
+
+      <figure class="wire reveal" style="--cyc:7s; --freeze:-3.5s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">Vencido y observado no son lo mismo</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Lo habitual</span>
+            <div class="wf">
+              <div class="wf-fila"><span class="folio">TV-0412</span><span class="sep"><span class="wf-pill wf-pill--rojo">Vencido</span></span></div>
+              <div class="wf-fila"><span class="folio">TV-0418</span><span class="sep"><span class="wf-pill wf-pill--rojo">Observado</span></span></div>
+              <div class="wf-fila"><span class="folio">TV-0421</span><span class="sep"><span class="wf-pill wf-pill--rojo">Observado</span></span></div>
+            </div>
+          </div>
+          <div class="wire-panel is-good">
+            <span class="wire-panel-label">Lo recomendado</span>
+            <div class="wf">
+              <div class="wf-fila"><span class="folio">TV-0412</span><span class="sep"><span class="wf-pill wf-pill--rojo">&#9888; Vencido</span></span></div>
+              <div class="wf-fila"><span class="folio">TV-0418</span><span class="sep"><span class="wf-pill wf-pill--morado an" style="animation-name:av-lat">&#9673; Observado</span></span></div>
+              <div class="wf-fila"><span class="folio">TV-0421</span><span class="sep"><span class="wf-pill wf-pill--morado an" style="animation-name:av-lat">&#9673; Observado</span></span></div>
+            </div>
+          </div>
+        </div>
+        <figcaption>Tres filas en el mismo rojo se leen como tres problemas iguales. Un plazo incumplido y una petición de la dependencia no lo son. El icono, además del color, sirve a quien confunde verde, ámbar y rojo.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="accesibilidad">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Recomendaciones</div>
+        <h2>Accesibilidad</h2>
+        <p class="section-note">Criterio de referencia: WCAG 2.2 nivel AA. La base es sólida. Las mejoras se concentran en contraste de elementos no textuales, tamaño de zonas pulsables y anuncio de cambios.</p>
+      </div>
+    </div>
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list">
+          <li><span>Subir el contraste de bordes y separadores. Los bordes de campos, botones y etiquetas rondan 1,3:1 frente al 3:1 exigido. En una pantalla clara o con reflejos, los campos desaparecen.</span></li>
+          <li><span>Reforzar el resalte al pasar el cursor y al seleccionar en el menú lateral. La diferencia actual sobre el azul es mínima.</span></li>
+          <li><span>No confiar solo en el color para el semáforo de plazo: añadir un icono distinto por estado. Lo mismo para «acuse entregado» y «falta entregar acuse».</span></li>
+          <li><span>Comprobar el tema oscuro con el mismo rasero. Los textos cumplen, pero los bordes bajan aún más que en el claro.</span></li>
+          <li><span>Subir a 24 píxeles como mínimo real todas las zonas pulsables en escritorio. Los botones pequeños de las filas, el aspa que quita un filtro y el botón de copiar quedan en el límite o por debajo.</span></li>
+          <li><span>Separar los botones que van juntos en una fila. «Archivar» y «Ver expediente» están a 6 píxeles: en pantalla táctil se pulsa uno por otro, y archivar por error genera desconfianza.</span></li>
+          <li><span>Revisar los botones de icono dentro de las tablas, que se quedan en 28 píxeles incluso en táctil.</span></li>
+          <li><span>Verificar que el anillo de foco se ve sobre todos los fondos, en especial sobre las etiquetas de color y sobre el menú azul.</span></li>
+          <li><span>Garantizar que el asistente flotante se alcanza con teclado, que el foco entra al abrirlo y vuelve al botón al cerrarlo.</span></li>
+          <li><span>Asegurar que los filtros desplegables funcionan con teclado y que se sale con escape sin perder la selección.</span></li>
+          <li><span>Anunciar el cambio de resultados al filtrar. Quien no ve la pantalla no percibe que la lista pasó de 36 a 3 elementos.</span></li>
+          <li><span>Anunciar también los estados de vacío y error. Hoy solo se avisa del de carga.</span></li>
+          <li><span>Convertir los títulos de las pantallas vacías y de error en encabezados reales, para poder navegar por ellos.</span></li>
+          <li><span>Revisar los títulos de grupo del menú lateral, marcados a la vez como decorativos y como nombre del grupo.</span></li>
+          <li><span>Describir la acción completa en los botones de icono: «Exportar los trámites concluidos que se están viendo».</span></li>
+          <li><span>Dar nombre único a los dieciséis enlaces del semáforo del tablero: «3 por vencer en Querétaro Centro».</span></li>
+          <li><span>Añadir una leyenda del semáforo en el listado y en el detalle, donde hoy los colores aparecen sin explicación.</span></li>
+          <li><span>Respetar la preferencia de movimiento reducido en todas las animaciones, incluida la del asistente flotante.</span></li>
+        </ul>
+      </article>
+
+      <figure class="wire reveal" style="--cyc:7s; --freeze:-2.1s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">Seis píxeles entre archivar y abrir</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Lo habitual</span>
+            <div class="wf" style="position:relative">
+              <div class="wf-fila"><span class="folio">TV-0412</span><span class="sep wf-acc juntos"><span class="wf-mini">Archivar</span><span class="wf-mini">Ver expediente</span></span></div>
+              <div class="wf-pad"></div>
+              <p class="wf-msg an" style="animation-name:av-fallo">Se archivó el trámite equivocado.</p>
+              <span class="wf-ripple wf-ripple--dead an" style="animation-name:av-press; transform:translate(6.1rem,2.1rem)"></span>
+              <span class="wf-cursor an" style="animation-name:av-cursor-tap"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span>
+            </div>
+          </div>
+          <div class="wire-panel is-good">
+            <span class="wire-panel-label">Lo recomendado</span>
+            <div class="wf">
+              <div class="wf-fila"><span class="folio">TV-0412</span><span class="sep wf-acc sueltos"><span class="wf-mini">Archivar</span><span class="wf-mini">Ver expediente</span></span></div>
+              <div class="wf-pad"></div>
+              <p class="wf-sub">Zonas de 24 píxeles con separación suficiente entre ellas.</p>
+            </div>
+          </div>
+        </div>
+        <figcaption>Archivar por error no es un fallo menor: es lo que hace que la gente deje de fiarse de la herramienta.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="componente-filtros">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Componente</div>
+        <h2>La barra de filtros, en movimiento.</h2>
+        <p class="section-note">Ya está construida y documentada en el <a href="/entregables/reglas-de-diseno#g-filtros">sistema de diseño</a>.</p>
+      </div>
+    </div>
+<figure class="fsim" aria-hidden="true">
       <div class="fsim-stage">
         <div class="fsim-bar">
           <span class="fsim-chip"><i class="w-md"></i><i class="w-lg"></i><span class="caret"></span></span>
@@ -841,7 +1435,6 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
         </span>
       </div>
     </figure>
-
   </div>
 </section>
 
@@ -1023,6 +1616,22 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     raf = requestAnimationFrame(function(){ update(); raf = null; });
   }, { passive: true });
   update();
+})();
+</script>
+
+<script>
+/* Pausa de las simulaciones. WCAG 2.2.2: todo movimiento que arranca solo,
+   dura más de 5s y convive con texto necesita una forma de detenerlo. */
+(function(){
+  document.querySelectorAll('[data-wire-toggle]').forEach(function(btn){
+    var fig = btn.closest('.wire');
+    if(!fig) return;
+    btn.addEventListener('click', function(){
+      var paused = fig.classList.toggle('is-paused');
+      btn.setAttribute('aria-pressed', paused ? 'true' : 'false');
+      btn.textContent = paused ? 'Reproducir' : 'Pausar';
+    });
+  });
 })();
 </script>
 
