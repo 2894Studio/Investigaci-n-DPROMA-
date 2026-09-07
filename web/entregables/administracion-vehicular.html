@@ -951,7 +951,7 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
 
 /* Observaciones generales: dos columnas de tarjetas breves. La regla de una
    sola columna es para las secciones con lista larga, no para estas. */
-#p-diag #diagnostico .evidence-stack{ grid-template-columns:repeat(2,1fr) }
+#p-diag #diagnostico .evidence-stack{ grid-template-columns:repeat(2,1fr); align-items:stretch }
 #diagnostico .evidence-card{ padding:1.35rem 1.5rem }
 #diagnostico .evidence-card h3{ font-size:1rem; line-height:1.35 }
 #diagnostico .evidence-card p{ font-size:0.875rem }
@@ -962,67 +962,135 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
 #p-diag .evidence-stack{ grid-template-columns:1fr; align-items:start }
 #funciona .evidence-stack{ grid-template-columns:1fr }
 
-/* Piezas propias de estas simulaciones */
-.wf-bar{ display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; }
-.wf-pill{ display:inline-flex; align-items:center; gap:.35rem; height:1.55rem; padding:0 .6rem;
-  border-radius:999px; font-size:.6875rem; font-weight:700; white-space:nowrap;
-  border:1.5px solid transparent; }
-.wf-pill--rojo{ background:color-mix(in srgb, var(--err) 14%, transparent); color:var(--err); }
-.wf-pill--ambar{ background:color-mix(in srgb, #9a6a00 14%, transparent); color:#7a5400; }
-.wf-pill--verde{ background:color-mix(in srgb, #2c6b41 14%, transparent); color:#245c37; }
-.wf-pill--morado{ background:color-mix(in srgb, #6b4fa8 16%, transparent); color:#57408a; }
-.wf-pill--gris{ background:var(--surface-alt); color:var(--text-muted); border-color:var(--border); }
-.wf-pill--punteado{ border-style:dashed; border-color:var(--border); background:transparent; color:var(--text-muted); }
-.wf-pill--control{ background:var(--surface); border-color:var(--border); color:var(--text); }
-.wf-pill .g{ font-size:.75rem; line-height:1 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .wf-pill--ambar{ color:#f0c04a }
-  :root:not([data-theme="light"]) .wf-pill--verde{ color:#79d39a }
-  :root:not([data-theme="light"]) .wf-pill--morado{ color:#c3aef0 } }
-:root[data-theme="dark"] .wf-pill--ambar{ color:#f0c04a }
-:root[data-theme="dark"] .wf-pill--verde{ color:#79d39a }
-:root[data-theme="dark"] .wf-pill--morado{ color:#c3aef0 }
-.wf-zona{ border:1.5px dashed var(--border); border-radius:8px; padding:.55rem; }
-.wf-zona-et{ display:block; font-size:.625rem; font-weight:700; letter-spacing:.08em;
-  text-transform:uppercase; color:var(--text-muted); margin-bottom:.4rem; }
-.wf-fila{ display:flex; align-items:center; gap:.5rem; padding:.5rem .1rem;
-  border-bottom:1px solid var(--border); font-size:.75rem; color:var(--text-muted); }
-.wf-fila:last-child{ border-bottom:0 }
-.wf-fila .folio{ font-weight:700; color:var(--accent); white-space:nowrap }
-.wf-fila .sep{ margin-left:auto }
-.wf-mini{ display:inline-grid; place-items:center; height:1.4rem; padding:0 .5rem; border-radius:6px;
-  border:1.5px solid var(--border); background:var(--surface); font-size:.6875rem; font-weight:700;
-  color:var(--text-muted); }
-.wf-acc{ display:inline-flex; align-items:center }
-.wf-acc.juntos{ gap:6px }
-.wf-acc.juntos .wf-mini{ height:1.15rem; padding:0 .35rem; font-size:.625rem }
-.wf-acc.sueltos{ gap:1.1rem }
-.wf-acc.sueltos .wf-mini{ height:1.5rem; padding:0 .6rem }
+
+/* Motor de las simulaciones del diagnóstico. */
+.wire .an{ animation-duration:var(--cyc); animation-iteration-count:infinite;
+  animation-timing-function:linear; animation-fill-mode:both }
+.wire.is-paused .an{ animation-play-state:paused }
+@media (prefers-reduced-motion: reduce){
+  .wire .an{ animation-duration:var(--cyc) !important; animation-delay:var(--freeze) !important;
+    animation-play-state:paused !important }
+}
+
+/* ── Fragmentos de pantalla con la paleta real de SIO-DPROMA ──────────────
+   Las simulaciones dejan de ser grises: usan los mismos tokens de estado que
+   la aplicación, para que lo que se ve aquí sea lo que se ve allí. */
+.wf{
+  --a-surface:#FAFCFD; --a-surface-2:#E7EDF3; --a-bg:#F2F5F7;
+  --a-border:rgba(27,36,48,.14); --a-ctrl:rgba(27,36,48,.50);
+  --a-text:#1B2430; --a-text-2:#4C5A6B; --a-text-3:#5D6774;
+  --a-link:#2F6B3C; --a-accent:#3E7A4C; --a-accent-ink:#F7FAF9;
+  --a-ok:#22705A; --a-ok-bg:#E2EFEC; --a-warn:#7E5B0E; --a-warn-bg:#F1ECDE;
+  --a-err:#B03A31; --a-err-bg:#F4E8E7; --a-block:#6D4FA3; --a-block-bg:#EDEBF7;
+  background:var(--a-bg); border-color:var(--a-border);
+  color:var(--a-text); font-size:.8125rem;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .wf{
+  --a-surface:#171F2C; --a-surface-2:#1D2735; --a-bg:#10161F;
+  --a-border:rgba(231,236,242,.12); --a-ctrl:rgba(231,236,242,.37);
+  --a-text:#E7ECF2; --a-text-2:#A8B3C2; --a-text-3:#8B96A6;
+  --a-link:#8FD3A2; --a-accent:#4A8F5A; --a-accent-ink:#08120D;
+  --a-ok:#7FD9B8; --a-ok-bg:#16302B; --a-warn:#F0C04A; --a-warn-bg:#332C15;
+  --a-err:#F09189; --a-err-bg:#37211F; --a-block:#C3AEF0; --a-block-bg:#272238; } }
+:root[data-theme="dark"] .wf{
+  --a-surface:#171F2C; --a-surface-2:#1D2735; --a-bg:#10161F;
+  --a-border:rgba(231,236,242,.12); --a-ctrl:rgba(231,236,242,.37);
+  --a-text:#E7ECF2; --a-text-2:#A8B3C2; --a-text-3:#8B96A6;
+  --a-link:#8FD3A2; --a-accent:#4A8F5A; --a-accent-ink:#08120D;
+  --a-ok:#7FD9B8; --a-ok-bg:#16302B; --a-warn:#F0C04A; --a-warn-bg:#332C15;
+  --a-err:#F09189; --a-err-bg:#37211F; --a-block:#C3AEF0; --a-block-bg:#272238; }
+
+/* Barra superior del fragmento: sitúa lo que se está mirando. */
+.wf-top{display:flex;align-items:baseline;gap:.5rem;margin:-.15rem 0 .8rem}
+.wf-top b{font-size:.875rem;font-weight:700;color:var(--a-text)}
+.wf-top span{font-size:.75rem;color:var(--a-text-3)}
+
+.wf-bar{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.wf-pill{display:inline-flex;align-items:center;gap:.35rem;height:1.5rem;padding:0 .55rem;
+  border-radius:6px;font-size:.6875rem;font-weight:700;white-space:nowrap;border:1px solid transparent}
+.wf-pill--err{background:var(--a-err-bg);color:var(--a-err)}
+.wf-pill--warn{background:var(--a-warn-bg);color:var(--a-warn)}
+.wf-pill--ok{background:var(--a-ok-bg);color:var(--a-ok)}
+.wf-pill--block{background:var(--a-block-bg);color:var(--a-block)}
+.wf-pill--gris{background:var(--a-surface-2);color:var(--a-text-2)}
+.wf-pill--punteado{border:1px dashed var(--a-ctrl);background:transparent;color:var(--a-text-2)}
+/* Un control se ve control: superficie propia, borde de control y chevron. */
+.wf-pill--control{background:var(--a-surface);border:1px solid var(--a-ctrl);color:var(--a-text);
+  border-radius:999px;height:1.75rem;padding:0 .7rem}
+.wf-pill .g{font-size:.6rem;color:var(--a-text-3)}
+.wf-pill .ic{width:.55rem;height:.55rem;border-radius:50%;background:currentColor;flex:none}
+
+/* Tabla del listado. */
+.wf-tabla{background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow:hidden}
+.wf-thead{display:flex;gap:.6rem;padding:.4rem .65rem;background:var(--a-surface-2);
+  font-size:.625rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--a-text-3)}
+.wf-fila{display:flex;align-items:center;gap:.6rem;padding:.5rem .65rem;
+  border-top:1px solid var(--a-border);font-size:.75rem;color:var(--a-text-2)}
+.wf-tabla .wf-fila:first-of-type{border-top:0}
+.wf-fila .folio{font-weight:700;color:var(--a-link);white-space:nowrap;min-width:5.2rem}
+.wf-fila .cli{color:var(--a-text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wf-fila .sep{margin-left:auto;flex:none}
+
+/* Zonas declaradas. */
+.wf-zona{border:1px dashed var(--a-ctrl);border-radius:8px;padding:.5rem .6rem;background:var(--a-surface)}
+.wf-zona-et{display:block;font-size:.625rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--a-text-3);margin-bottom:.4rem}
+
+/* Botones del fragmento. */
+.wf-mini{display:inline-grid;place-items:center;height:1.6rem;padding:0 .6rem;border-radius:6px;
+  border:1px solid var(--a-ctrl);background:var(--a-surface);font-size:.6875rem;font-weight:700;
+  color:var(--a-text-2)}
+.wf-mini.pri{background:var(--a-accent);border-color:transparent;color:var(--a-accent-ink)}
+.wf-acc{display:inline-flex;align-items:center}
+.wf-acc.juntos{gap:6px}
+.wf-acc.sueltos{gap:1.15rem}
+.wf-msg{margin:0;font-size:.75rem;font-weight:700;color:var(--a-err)}
+.wf-sub{margin:.3rem 0 0;font-size:.75rem;line-height:1.45;color:var(--a-text-2)}
+.wf-ref{margin:.45rem 0 0;font-size:.6875rem;color:var(--a-text-3)}
+.wf-pad{height:.7rem}
+
+/* Rótulo del paso: dice en palabras lo que está pasando en la simulación. */
+.wire-paso{display:grid;min-height:1.35rem;margin:0 0 .75rem;font-size:.75rem;font-weight:700;color:var(--accent)}
+.wire-paso > span{grid-area:1 / 1}
+
+.wf-cursor{position:absolute;z-index:5;left:0;top:0;width:1.05rem;height:1.05rem;
+  color:var(--a-text);pointer-events:none}
+.wf-cursor svg{width:100%;height:100%;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+.wf-ripple{position:absolute;z-index:4;width:2.2rem;height:2.2rem;margin:-1.1rem 0 0 -1.1rem;
+  border-radius:50%;border:2px solid var(--a-accent);opacity:0;pointer-events:none}
+.wf-ripple--dead{border-color:var(--a-err)}
+.wf-halo{position:absolute;z-index:2;border-radius:8px;border:2px solid var(--a-accent);opacity:0;pointer-events:none}
 
 /* Escenas */
-@keyframes av-c-nombre{ 0%,100%{ opacity:0 } 12%,88%{ opacity:1 } }
-@keyframes av-lat{ 0%,45%{ opacity:0 } 55%,100%{ opacity:1 } }
-@keyframes av-parpadeo{ 0%,49%{ background:transparent } 50%,100%{ background:color-mix(in srgb, var(--accent) 10%, transparent) } }
+@keyframes av-parpadeo{ 0%,44%{ box-shadow:none } 50%,72%{ box-shadow:0 0 0 3px var(--a-warn-bg) } 78%,100%{ box-shadow:none } }
+@keyframes av-lat{ 0%,45%{ opacity:.25 } 55%,100%{ opacity:1 } }
+@keyframes av-paso1{ 0%,30%{ opacity:1 } 34%,100%{ opacity:0 } }
+@keyframes av-paso2{ 0%,32%{ opacity:0 } 36%,64%{ opacity:1 } 68%,100%{ opacity:0 } }
+@keyframes av-paso3{ 0%,66%{ opacity:0 } 70%,100%{ opacity:1 } }
 @keyframes av-cursor-filtro{
-  0%,6%   { transform:translate(1rem,5.4rem) }
-  22%,34% { transform:translate(4.6rem,1.5rem) }
-  50%,62% { transform:translate(9.4rem,1.5rem) }
-  78%,100%{ transform:translate(1rem,5.4rem) }
+  0%,6%   { transform:translate(13rem,11rem) }
+  20%,32% { transform:translate(3.84rem,3.87rem) }
+  48%,62% { transform:translate(19.18rem,3.87rem) }
+  80%,100%{ transform:translate(13rem,11rem) }
 }
 @keyframes av-press{
-  0%,20%  { opacity:0; transform:scale(.4) }
-  24%     { opacity:.75; transform:scale(.55) }
-  30%     { opacity:0; transform:scale(1.1) }
-  48%     { opacity:0; transform:scale(.4) }
-  52%     { opacity:.75; transform:scale(.55) }
-  58%,100%{ opacity:0; transform:scale(1.1) }
+  0%,18%  { opacity:0; transform:scale(.4) }
+  22%     { opacity:.8; transform:scale(.55) }
+  30%     { opacity:0; transform:scale(1.15) }
+  46%     { opacity:0; transform:scale(.4) }
+  50%     { opacity:.8; transform:scale(.55) }
+  58%,100%{ opacity:0; transform:scale(1.15) }
 }
-@keyframes av-press-pos{ 0%,40%{ transform:translate(4.6rem,1.5rem) } 41%,100%{ transform:translate(9.4rem,1.5rem) } }
+@keyframes av-press-pos{ 0%,38%{ transform:translate(3.84rem,3.87rem) } 39%,100%{ transform:translate(19.18rem,3.87rem) } }
+@keyframes av-nada{ 0%,32%{ opacity:0 } 36%,44%{ opacity:1 } 48%,100%{ opacity:0 } }
+@keyframes av-filtra{ 0%,60%{ opacity:1; transform:none } 66%,100%{ opacity:.12; transform:translateX(-4px) } }
 @keyframes av-cursor-tap{
-  0%,10%  { transform:translate(2rem,5.6rem) }
-  30%,55% { transform:translate(6.1rem,2.1rem) }
-  75%,100%{ transform:translate(2rem,5.6rem) }
+  0%,12%  { transform:translate(3rem,5rem) }
+  34%,58% { transform:translate(21.3rem,2.47rem) }
+  80%,100%{ transform:translate(3rem,5rem) }
 }
-@keyframes av-fallo{ 0%,32%{ opacity:0 } 38%,62%{ opacity:1 } 68%,100%{ opacity:0 } }
+@keyframes av-fallo{ 0%,36%{ opacity:0; transform:translateY(3px) } 42%,68%{ opacity:1; transform:none } 74%,100%{ opacity:0; transform:translateY(3px) } }
+@keyframes av-halo{ 0%,40%{ opacity:0 } 46%,70%{ opacity:1 } 76%,100%{ opacity:0 } }
 
 </style>
 </head>
@@ -1118,38 +1186,35 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
       </article>
     </div>
 
-    <figure class="wire reveal" style="--cyc:8s; --freeze:-2.4s; margin-top:2.5rem">
-      <div class="wire-head">
-        <span class="wire-tag">Simulación</span>
-        <span class="wire-title">El mismo trámite, dos nombres</span>
-        <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
-      </div>
-      <div class="wire-stage wire-stage--split" aria-hidden="true">
-        <div class="wire-panel is-bad">
-          <span class="wire-panel-label">Tablero</span>
-          <div class="wf">
-            <span class="wf-label">Querétaro Centro</span>
-            <div class="wf-bar">
-              <span class="wf-pill wf-pill--verde">18 en plazo</span>
-              <span class="wf-pill wf-pill--rojo">3 vencidos</span>
-              <span class="wf-pill wf-pill--punteado an" style="animation-name:av-parpadeo">10 sin reloj</span>
-            </div>
+    <figure class="wire reveal" style="--cyc:9s; --freeze:-5s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">El mismo trámite, dos nombres</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Diez expedientes sin admitir.</span><span class="an" style="animation-name:av-paso2">El tablero los llama «sin reloj».</span><span class="an" style="animation-name:av-paso3">El listado los llama «sin admitir».</span></p>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Tablero</span>
+            <div class="wf"><div class="wf-top"><b>Querétaro Centro</b><span>Querétaro, Qro.</span></div>
+              <div class="wf-bar">
+                <span class="wf-pill wf-pill--ok"><i class="ic"></i>18 en plazo</span>
+                <span class="wf-pill wf-pill--err"><i class="ic"></i>3 vencidos</span>
+                <span class="wf-pill wf-pill--punteado an" style="animation-name:av-parpadeo">10 sin reloj</span>
+              </div></div>
+          </div>
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Listado</span>
+            <div class="wf"><div class="wf-top"><b>Trámites vehiculares</b><span>36 en tus plazas</span></div>
+              <div class="wf-bar">
+                <span class="wf-pill wf-pill--ok"><i class="ic"></i>18 en plazo</span>
+                <span class="wf-pill wf-pill--err"><i class="ic"></i>3 vencidos</span>
+                <span class="wf-pill wf-pill--gris an" style="animation-name:av-parpadeo">10 sin admitir</span>
+              </div></div>
           </div>
         </div>
-        <div class="wire-panel is-bad">
-          <span class="wire-panel-label">Listado</span>
-          <div class="wf">
-            <span class="wf-label">Trámites vehiculares</span>
-            <div class="wf-bar">
-              <span class="wf-pill wf-pill--verde">18 en plazo</span>
-              <span class="wf-pill wf-pill--rojo">3 vencidos</span>
-              <span class="wf-pill wf-pill--gris an" style="animation-name:av-parpadeo">10 sin admitir</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <figcaption>Los dos parpadeos son la misma cifra, con dos nombres y dos formas.</figcaption>
-    </figure>
+        <figcaption>La misma cifra, con dos nombres y dos formas.</figcaption>
+      </figure>
   </div>
 </section>
 
@@ -1179,33 +1244,32 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
         </ul>
       </article>
 
-      <figure class="wire reveal" style="--cyc:9s; --freeze:-6.4s">
+      <figure class="wire reveal" style="--cyc:9s; --freeze:-5.4s">
         <div class="wire-head">
           <span class="wire-tag">Simulación</span>
           <span class="wire-title">Un error que dice qué no se ha roto</span>
           <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
         </div>
+        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">El servicio no responde.</span><span class="an" style="animation-name:av-paso2">Uno solo dice que falló.</span><span class="an" style="animation-name:av-paso3">El otro dice qué sigue intacto, y con qué referencia.</span></p>
         <div class="wire-stage wire-stage--split" aria-hidden="true">
           <div class="wire-panel is-bad">
             <span class="wire-panel-label">Lo habitual</span>
-            <div class="wf">
+            <div class="wf"><div class="wf-top"><b>Trámites vehiculares</b></div>
               <p class="wf-msg">Error al cargar los datos.</p>
               <div class="wf-pad"></div>
-              <span class="wf-mini">Reintentar</span>
-            </div>
+              <span class="wf-mini">Reintentar</span></div>
           </div>
           <div class="wire-panel is-good">
             <span class="wire-panel-label">Lo que ya hace esta herramienta</span>
-            <div class="wf">
+            <div class="wf"><div class="wf-top"><b>Trámites vehiculares</b></div>
               <p class="wf-msg">No se pudo cargar la lista de trámites.</p>
-              <p class="wf-sub">Ningún trámite cambió de estatus. Lo que estaba en curso sigue igual.</p>
+              <p class="wf-sub">Ningún trámite cambió de estatus ni venció por esto. Los plazos los cuenta el servidor.</p>
               <div class="wf-pad"></div>
-              <span class="wf-acc sueltos"><span class="wf-mini">Reintentar</span><span class="wf-mini">Avisar a soporte</span></span>
-              <p class="wf-sub an" style="animation-name:av-lat">Referencia: GES-20260901-1105</p>
-            </div>
+              <span class="wf-acc sueltos"><span class="wf-mini pri">Reintentar</span><span class="wf-mini">Avisar a soporte</span></span>
+              <p class="wf-ref an" style="animation-name:av-lat">Referencia del error: AV-20260901-1105</p></div>
           </div>
         </div>
-        <figcaption>La referencia es lo que permite que soporte y la persona hablen del mismo incidente. Conviene extenderla a toda la herramienta.</figcaption>
+        <figcaption>La referencia es lo que permite que soporte y la persona hablen del mismo incidente.</figcaption>
       </figure>
 
       <article class="card card-aparte reveal">
@@ -1243,52 +1307,57 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
         </ul>
       </article>
 
-      <figure class="wire reveal" style="--cyc:9s; --freeze:-5.6s">
+      <figure class="wire reveal" style="--cyc:10s; --freeze:-5.6s">
         <div class="wire-head">
           <span class="wire-tag">Simulación</span>
           <span class="wire-title">Lo que filtra y lo que solo informa</span>
           <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
         </div>
+        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Cuatro pastillas con la misma forma.</span><span class="an" style="animation-name:av-paso2">Se pulsa «3 vencidos»: no pasa nada, solo informaba.</span><span class="an" style="animation-name:av-paso3">Se pulsa «Estatus»: esa sí filtra.</span></p>
         <div class="wire-stage wire-stage--split" aria-hidden="true">
           <div class="wire-panel is-bad">
             <span class="wire-panel-label">Lo habitual</span>
-            <div class="wf" style="position:relative">
+            <div class="wf"><div class="wf-top"><b>Trámites vehiculares</b></div>
               <div class="wf-bar">
-                <span class="wf-pill wf-pill--rojo">3 vencidos</span>
-                <span class="wf-pill wf-pill--ambar">5 por vencer</span>
-                <span class="wf-pill wf-pill--control">Plaza</span>
-                <span class="wf-pill wf-pill--control">Estatus</span>
+                <span class="wf-pill wf-pill--err">3 vencidos</span>
+                <span class="wf-pill wf-pill--warn">5 por vencer</span>
+                <span class="wf-pill wf-pill--gris">Plaza</span>
+                <span class="wf-pill wf-pill--gris">Estatus</span>
               </div>
+              <p class="wf-sub an" style="animation-name:av-nada">Nada cambia: esa pastilla solo informaba.</p>
               <div class="wf-pad"></div>
-              <div class="wf-fila"><span class="folio">TV-0412</span><span>Alta de placas</span></div>
-              <div class="wf-fila"><span class="folio">TV-0418</span><span>Cambio de propietario</span></div>
+              <div class="wf-tabla">
+                <div class="wf-fila"><span class="folio">TV-0412</span><span class="cli">Comercializadora Vértice</span><span class="sep"><span class="wf-pill wf-pill--err">−2 d</span></span></div>
+                <div class="wf-fila an" style="animation-name:av-filtra"><span class="folio">TV-0424</span><span class="cli">Autos del Valle SAPI</span><span class="sep"><span class="wf-pill wf-pill--ok">4 d</span></span></div>
+              </div>
               <span class="wf-ripple an" style="animation-name:av-press, av-press-pos"></span>
-              <span class="wf-cursor an" style="animation-name:av-cursor-filtro"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span>
-            </div>
+              <span class="wf-cursor an" style="animation-name:av-cursor-filtro"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--a-surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span></div>
           </div>
           <div class="wire-panel is-good">
             <span class="wire-panel-label">Lo recomendado</span>
-            <div class="wf">
-              <div class="wf-zona" style="margin-bottom:.55rem">
+            <div class="wf"><div class="wf-top"><b>Trámites vehiculares</b></div>
+              <div class="wf-zona" style="margin-bottom:.5rem">
                 <span class="wf-zona-et">Resumen</span>
                 <div class="wf-bar">
-                  <span class="wf-pill wf-pill--rojo">3 vencidos</span>
-                  <span class="wf-pill wf-pill--ambar">5 por vencer</span>
+                  <span class="wf-pill wf-pill--err">3 vencidos</span>
+                  <span class="wf-pill wf-pill--warn">5 por vencer</span>
                 </div>
               </div>
               <div class="wf-zona">
                 <span class="wf-zona-et">Filtros</span>
                 <div class="wf-bar">
-                  <span class="wf-pill wf-pill--control">Plaza <span class="g">&#9662;</span></span>
-                  <span class="wf-pill wf-pill--control">Estatus <span class="g">&#9662;</span></span>
+                  <span class="wf-pill wf-pill--control">Plaza: <b>Todas</b> <span class="g">&#9662;</span></span>
+                  <span class="wf-pill wf-pill--control">Estatus: <b>Todos</b> <span class="g">&#9662;</span></span>
                 </div>
               </div>
               <div class="wf-pad"></div>
-              <div class="wf-fila"><span class="folio">TV-0412</span><span>Alta de placas</span></div>
-            </div>
+              <div class="wf-tabla">
+                <div class="wf-fila"><span class="folio">TV-0412</span><span class="cli">Comercializadora Vértice</span><span class="sep"><span class="wf-pill wf-pill--err">−2 d</span></span></div>
+                <div class="wf-fila"><span class="folio">TV-0424</span><span class="cli">Autos del Valle SAPI</span><span class="sep"><span class="wf-pill wf-pill--ok">4 d</span></span></div>
+              </div></div>
           </div>
         </div>
-        <figcaption>El cursor prueba dos pastillas idénticas. Una filtra, la otra no, y no hay forma de saberlo antes de pulsar.</figcaption>
+        <figcaption>Cuatro pastillas idénticas, y solo dos filtran. A la derecha cada zona declara para qué está.</figcaption>
       </figure>
     </div>
   </div>
@@ -1324,31 +1393,34 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
         </ul>
       </article>
 
-      <figure class="wire reveal" style="--cyc:7s; --freeze:-3.5s">
+      <figure class="wire reveal" style="--cyc:8s; --freeze:-4.6s">
         <div class="wire-head">
           <span class="wire-tag">Simulación</span>
           <span class="wire-title">Vencido y observado no son lo mismo</span>
           <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
         </div>
+        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Tres filas en el mismo rojo.</span><span class="an" style="animation-name:av-paso2">Dos son observaciones de la dependencia, no plazos incumplidos.</span><span class="an" style="animation-name:av-paso3">Con color propio e icono, se separan de un vistazo.</span></p>
         <div class="wire-stage wire-stage--split" aria-hidden="true">
           <div class="wire-panel is-bad">
             <span class="wire-panel-label">Lo habitual</span>
-            <div class="wf">
-              <div class="wf-fila"><span class="folio">TV-0412</span><span class="sep"><span class="wf-pill wf-pill--rojo">Vencido</span></span></div>
-              <div class="wf-fila"><span class="folio">TV-0418</span><span class="sep"><span class="wf-pill wf-pill--rojo">Observado</span></span></div>
-              <div class="wf-fila"><span class="folio">TV-0421</span><span class="sep"><span class="wf-pill wf-pill--rojo">Observado</span></span></div>
-            </div>
+            <div class="wf"><div class="wf-tabla">
+                <div class="wf-thead"><span style="min-width:5.2rem">Folio</span><span>Cliente</span><span class="sep">Estatus</span></div>
+                <div class="wf-fila"><span class="folio">TV-0412</span><span class="cli">Comercializadora Vértice</span><span class="sep"><span class="wf-pill wf-pill--err">Vencido</span></span></div>
+                <div class="wf-fila"><span class="folio">TV-0418</span><span class="cli">Flotillas del Centro Norte</span><span class="sep"><span class="wf-pill wf-pill--err">Observado</span></span></div>
+                <div class="wf-fila"><span class="folio">TV-0421</span><span class="cli">Refaccionaria del Altiplano</span><span class="sep"><span class="wf-pill wf-pill--err">Observado</span></span></div>
+              </div></div>
           </div>
           <div class="wire-panel is-good">
             <span class="wire-panel-label">Lo recomendado</span>
-            <div class="wf">
-              <div class="wf-fila"><span class="folio">TV-0412</span><span class="sep"><span class="wf-pill wf-pill--rojo">&#9888; Vencido</span></span></div>
-              <div class="wf-fila"><span class="folio">TV-0418</span><span class="sep"><span class="wf-pill wf-pill--morado an" style="animation-name:av-lat">&#9673; Observado</span></span></div>
-              <div class="wf-fila"><span class="folio">TV-0421</span><span class="sep"><span class="wf-pill wf-pill--morado an" style="animation-name:av-lat">&#9673; Observado</span></span></div>
-            </div>
+            <div class="wf"><div class="wf-tabla">
+                <div class="wf-thead"><span style="min-width:5.2rem">Folio</span><span>Cliente</span><span class="sep">Estatus</span></div>
+                <div class="wf-fila"><span class="folio">TV-0412</span><span class="cli">Comercializadora Vértice</span><span class="sep"><span class="wf-pill wf-pill--err">&#9888; Vencido</span></span></div>
+                <div class="wf-fila"><span class="folio">TV-0418</span><span class="cli">Flotillas del Centro Norte</span><span class="sep"><span class="wf-pill wf-pill--block an" style="animation-name:av-lat">&#9673; Observado</span></span></div>
+                <div class="wf-fila"><span class="folio">TV-0421</span><span class="cli">Refaccionaria del Altiplano</span><span class="sep"><span class="wf-pill wf-pill--block an" style="animation-name:av-lat">&#9673; Observado</span></span></div>
+              </div></div>
           </div>
         </div>
-        <figcaption>Tres filas en el mismo rojo se leen como tres problemas iguales. Un plazo incumplido y una petición de la dependencia no lo son.</figcaption>
+        <figcaption>Un plazo incumplido y una petición de la dependencia son dos problemas distintos.</figcaption>
       </figure>
     </div>
   </div>
@@ -1387,33 +1459,32 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
         </ul>
       </article>
 
-      <figure class="wire reveal" style="--cyc:7s; --freeze:-2.1s">
+      <figure class="wire reveal" style="--cyc:8s; --freeze:-4.8s">
         <div class="wire-head">
           <span class="wire-tag">Simulación</span>
           <span class="wire-title">Seis píxeles entre archivar y abrir</span>
           <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
         </div>
+        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Dos acciones pegadas al final de la fila.</span><span class="an" style="animation-name:av-paso2">El dedo cae entre las dos.</span><span class="an" style="animation-name:av-paso3">Se archiva el trámite equivocado.</span></p>
         <div class="wire-stage wire-stage--split" aria-hidden="true">
           <div class="wire-panel is-bad">
             <span class="wire-panel-label">Lo habitual</span>
-            <div class="wf" style="position:relative">
-              <div class="wf-fila"><span class="folio">TV-0412</span><span class="sep wf-acc juntos"><span class="wf-mini">Archivar</span><span class="wf-mini">Ver expediente</span></span></div>
-              <div class="wf-pad"></div>
-              <p class="wf-msg an" style="animation-name:av-fallo">Se archivó el trámite equivocado.</p>
-              <span class="wf-ripple wf-ripple--dead an" style="animation-name:av-press; transform:translate(6.1rem,2.1rem)"></span>
-              <span class="wf-cursor an" style="animation-name:av-cursor-tap"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span>
-            </div>
+            <div class="wf"><div class="wf-tabla">
+                <div class="wf-fila"><span class="folio">TV-0412</span><span class="cli">Comercializadora Vértice</span><span class="sep wf-acc juntos"><span class="wf-mini">Archivar</span><span class="wf-mini">Ver expediente</span></span></div>
+              </div>
+              <p class="wf-msg an" style="animation-name:av-fallo" style2="">Se archivó el trámite equivocado.</p>
+              <span class="wf-ripple wf-ripple--dead an" style="animation-name:av-press; transform:translate(21.3rem,2.47rem)"></span>
+              <span class="wf-cursor an" style="animation-name:av-cursor-tap"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--a-surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span></div>
           </div>
           <div class="wire-panel is-good">
             <span class="wire-panel-label">Lo recomendado</span>
-            <div class="wf">
-              <div class="wf-fila"><span class="folio">TV-0412</span><span class="sep wf-acc sueltos"><span class="wf-mini">Archivar</span><span class="wf-mini">Ver expediente</span></span></div>
-              <div class="wf-pad"></div>
-              <p class="wf-sub">Zonas de 24 píxeles con separación suficiente entre ellas.</p>
-            </div>
+            <div class="wf"><div class="wf-tabla">
+                <div class="wf-fila"><span class="folio">TV-0412</span><span class="cli">Comercializadora Vértice</span><span class="sep wf-acc sueltos"><span class="wf-mini">Ver expediente</span><span class="wf-mini">Archivar</span></span></div>
+              </div>
+              <p class="wf-sub">Zonas de 24 píxeles, separadas, y lo destructivo al final.</p></div>
           </div>
         </div>
-        <figcaption>Seis píxeles de separación. En pantalla táctil se pulsa uno por otro.</figcaption>
+        <figcaption>Archivar por error es de los fallos que más desconfianza generan en una herramienta interna.</figcaption>
       </figure>
     </div>
   </div>
