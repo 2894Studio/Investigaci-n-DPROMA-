@@ -549,13 +549,25 @@ tbody tr:hover{ background: var(--surface-alt); }
 
 
 
-/* Propuesta con su ejemplo al lado: el texto explica y la maqueta enseña. */
-.mejora-fila{ display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1.15fr);
-  gap:1.25rem; align-items:start; margin-top:1.25rem }
+/* Propuesta con su ejemplo al lado: el texto explica y la maqueta enseña.
+   Las dos columnas comparten altura para que la fila se lea como una sola pieza. */
+.mejora-fila{ display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1.1fr);
+  gap:1.25rem; align-items:stretch; margin-top:1.25rem }
 @media (max-width: 900px){ .mejora-fila{ grid-template-columns:1fr } }
 .mejora-fila-texto{ display:grid; grid-template-columns:1fr; gap:0 }
-.wire--solo{ margin-top:0 }
+.mejora-fila-texto > .card{ height:100% }
+.wire.wire--solo{ margin:0; display:flex; flex-direction:column }
 .wire--solo .wire-stage{ display:block }
+.wire--solo .wf{ height:100% }
+/* Sin título propio: el nombre de la propuesta ya está en la tarjeta de al lado. */
+.wire--solo .wire-head{ margin-bottom:.9rem }
+.wire--solo .wire-toggle{ margin-left:auto }
+/* Un bloque que aparece con la animación reserva su hueco con un esqueleto,
+   para que la maqueta no muestre un vacío mientras espera su turno. */
+.wf-slot{ display:grid }
+.wf-slot > *{ grid-area:1 / 1 }
+.wf-blq.esq{ border-style:dashed }
+.wf-blq.esq .wf-linea:last-child{ width:62% }
 
 /* ── Piezas de las simulaciones de esta página ──────────────────────────── */
 .wire{ margin-top:2rem; }
@@ -603,6 +615,9 @@ tbody tr:hover{ background: var(--surface-alt); }
 @keyframes av-p1{ 0%,30%{opacity:1} 34%,100%{opacity:0} }
 @keyframes av-p2{ 0%,32%{opacity:0} 36%,64%{opacity:1} 68%,100%{opacity:0} }
 @keyframes av-p3{ 0%,66%{opacity:0} 70%,100%{opacity:1} }
+@keyframes av-esq{ 0%,20%{opacity:1} 28%,100%{opacity:0} }
+@keyframes av-esq-tarde{ 0%,55%{opacity:1} 62%,100%{opacity:0} }
+@keyframes av-esq-aviso{ 0%,22%{opacity:1} 30%,100%{opacity:0} }
 @keyframes av-entra{ 0%,20%{opacity:0;transform:translateY(4px)} 26%,100%{opacity:1;transform:none} }
 @keyframes av-tarde{ 0%,55%{opacity:0;transform:translateY(4px)} 62%,100%{opacity:1;transform:none} }
 @keyframes av-sello{ 0%,38%{opacity:0;transform:scale(1.25) rotate(-8deg)} 46%,100%{opacity:1;transform:scale(1) rotate(-8deg)} }
@@ -852,14 +867,16 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
 <figure class="wire wire--solo" style="--cyc:11s; --freeze:-7s">
           <div class="wire-head">
             <span class="wire-tag">Propuesta</span>
-            <span class="wire-title">Vigilancia de requisitos por dependencia</span>
             <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
           </div>
           <p class="wire-paso" aria-hidden="true"><span class="wa" style="animation-name:av-p1">La dependencia cambia un requisito.</span><span class="wa" style="animation-name:av-p2">El aviso llega antes de salir.</span><span class="wa" style="animation-name:av-p3">El checklist queda al día.</span></p>
           <div class="wire-stage" aria-hidden="true"><div class="wf"><div class="wf-top"><b>Antes de salir</b><span>Querétaro</span></div>
-              <div class="wf-blq wa" style="animation-name:av-aviso">
-                <span class="wf-et">Cambio detectado</span>
-                <p class="wf-nota"><strong>Querétaro añadió un requisito</strong> a cambio de propietario.</p>
+              <div class="wf-slot">
+                <div class="wf-blq esq wa" style="animation-name:av-esq-aviso"><span class="wf-linea"></span><span class="wf-linea"></span></div>
+                <div class="wf-blq wa" style="animation-name:av-aviso">
+                  <span class="wf-et">Cambio detectado</span>
+                  <p class="wf-nota"><strong>Querétaro añadió un requisito</strong> a cambio de propietario.</p>
+                </div>
               </div>
               <div class="wf-blq" style="margin-top:.5rem">
                 <span class="wf-et">Checklist actualizado</span>
@@ -880,13 +897,15 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
 <figure class="wire wire--solo" style="--cyc:10s; --freeze:-6.5s">
           <div class="wire-head">
             <span class="wire-tag">Propuesta</span>
-            <span class="wire-title">Borrador de respuesta al cliente</span>
             <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
           </div>
           <p class="wire-paso" aria-hidden="true"><span class="wa" style="animation-name:av-p1">Llega la pregunta del cliente.</span><span class="wa" style="animation-name:av-p2">El borrador se propone solo.</span><span class="wa" style="animation-name:av-p3">Una persona lo revisa y lo envía.</span></p>
           <div class="wire-stage" aria-hidden="true"><div class="wf"><div class="wf-top"><b>Borrador propuesto</b><span>listo para revisar</span></div>
-              <div class="wf-borrador wa" style="animation-name:av-entra">
-                Trámite <strong>TV-202609-0418</strong>. Ingresado en la dependencia el 28 de agosto. Fecha límite: 1 de septiembre.
+              <div class="wf-slot">
+                <div class="wf-blq esq wa" style="animation-name:av-esq"><span class="wf-linea"></span><span class="wf-linea"></span></div>
+                <div class="wf-borrador wa" style="animation-name:av-entra">
+                  Trámite <strong>TV-202609-0418</strong>. Ingresado en la dependencia el 28 de agosto. Fecha límite: 1 de septiembre.
+                </div>
               </div>
               <div class="wf-btns">
                 <span class="wf-btn2">Editar</span>
@@ -906,19 +925,24 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
 <figure class="wire wire--solo" style="--cyc:10s; --freeze:-6.5s">
           <div class="wire-head">
             <span class="wire-tag">Propuesta</span>
-            <span class="wire-title">Clasificador de observaciones</span>
             <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
           </div>
           <p class="wire-paso" aria-hidden="true"><span class="wa" style="animation-name:av-p1">Llega la observación de la dependencia.</span><span class="wa" style="animation-name:av-p2">La causa queda clasificada.</span><span class="wa" style="animation-name:av-p3">Se agrupa con las de su plaza.</span></p>
           <div class="wire-stage" aria-hidden="true"><div class="wf"><div class="wf-top"><b>Observación clasificada</b><span>TV-0418</span></div>
-              <div class="wf-blq wa" style="animation-name:av-entra">
-                <span class="wf-et">Causa</span>
-                <span class="wf-tag wf-tag--err">Documento faltante</span>
-                <p class="wf-nota" style="margin-top:.45rem"><strong>Ficha técnica del vehículo</strong></p>
+              <div class="wf-slot">
+                <div class="wf-blq esq wa" style="animation-name:av-esq"><span class="wf-linea"></span><span class="wf-linea"></span></div>
+                <div class="wf-blq wa" style="animation-name:av-entra">
+                  <span class="wf-et">Causa</span>
+                  <span class="wf-tag wf-tag--err">Documento faltante</span>
+                  <p class="wf-nota" style="margin-top:.45rem"><strong>Ficha técnica del vehículo</strong></p>
+                </div>
               </div>
-              <div class="wf-blq wa" style="animation-name:av-tarde">
-                <span class="wf-et">En esta plaza</span>
-                <p class="wf-nota">Misma causa en <strong>6 de las 9</strong> observaciones del mes.</p>
+              <div class="wf-slot" style="margin-top:.5rem">
+                <div class="wf-blq esq wa" style="animation-name:av-esq-tarde"><span class="wf-linea"></span></div>
+                <div class="wf-blq wa" style="animation-name:av-tarde">
+                  <span class="wf-et">En esta plaza</span>
+                  <p class="wf-nota">Misma causa en <strong>6 de las 9</strong> observaciones del mes.</p>
+                </div>
               </div></div>
           <figcaption>El texto de la dependencia es administrativo, no es un dato del cliente.</figcaption>
         </figure>
