@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Administración Vehicular · Entregables DPROMA × 2894 Studio</title>
-<meta name="description" content="Revisión de UX, UI y accesibilidad de las 4 pantallas de Administración Vehicular en SIO-DPROMA, contra la especificación de Tecnología y el sistema de diseño, con las pantallas ya corregidas para abrir." />
+<meta name="description" content="Entregable de UX/UI y accesibilidad del módulo de Administración Vehicular de SIO-DPROMA: las cuatro pantallas revisadas y construidas." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
@@ -23,12 +23,13 @@
   --text-muted: #53565f;
   --border: #d8dbe2;
   --accent: var(--deep-cobalt);
+  --accent-fill: var(--deep-cobalt);
+  --accent-text: #0A3FD6;
   --accent-soft: var(--sky-blue);
   --on-accent: var(--cloud-white);
   --on-dark: var(--cloud-white);
   --dark-surface: var(--ink-black);
   --dark-surface-text-muted: #b9bec9;
-  --positive: #0B7A52;
   --shadow: 0 1px 2px rgba(11,11,13,0.04), 0 8px 24px rgba(11,11,13,0.06);
 }
 
@@ -41,10 +42,11 @@
     --text-muted: #b9bec9;
     --border: #2a2d35;
     --accent: #3D6BFF;
+    --accent-fill: #2E56DE;
+    --accent-text: #8FA8FF;
     --accent-soft: #9CC7FF;
     --on-accent: #F7F8FA;
     --dark-surface: #000000;
-    --positive: #3FD39A;
     --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
   }
 }
@@ -56,10 +58,11 @@
   --text-muted: #b9bec9;
   --border: #2a2d35;
   --accent: #3D6BFF;
+  --accent-fill: #2E56DE;
+  --accent-text: #8FA8FF;
   --accent-soft: #9CC7FF;
   --on-accent: #F7F8FA;
   --dark-surface: #000000;
-  --positive: #3FD39A;
   --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
 }
 :root[data-theme="light"]{
@@ -70,10 +73,11 @@
   --text-muted: #53565f;
   --border: #d8dbe2;
   --accent: var(--deep-cobalt);
+  --accent-fill: var(--deep-cobalt);
+  --accent-text: #0A3FD6;
   --accent-soft: var(--sky-blue);
   --on-accent: var(--cloud-white);
   --dark-surface: var(--ink-black);
-  --positive: #0B7A52;
   --shadow: 0 1px 2px rgba(11,11,13,0.04), 0 8px 24px rgba(11,11,13,0.06);
 }
 
@@ -95,104 +99,1012 @@ body{
   -webkit-font-smoothing: antialiased;
 }
 
-a{ color: var(--accent); }
-a:focus-visible, button:focus-visible{ outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+a{ color: var(--accent-text); }
+a:focus-visible, button:focus-visible, summary:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
 
 .wrap{ max-width: 1120px; margin: 0 auto; padding: 0 clamp(1.25rem, 4vw, 2.5rem); }
 
 h1,h2,h3{ font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; margin: 0; }
 
-.prose p{ max-width: 72ch; color: var(--text-muted); }
+.prose p{ max-width: 66ch; color: var(--text-muted); }
 .prose p + p{ margin-top: 1em; }
+
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
 
 .eyebrow{
   display:inline-flex; align-items:center; gap: 0.5em;
   font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .eyebrow::before{ content:""; width: 0.5em; height: 0.5em; border-radius: 999px; background: var(--accent); display:inline-block; }
 
+/* Masthead */
 header.masthead{ padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
 .masthead-inner{ display:flex; align-items:center; justify-content:space-between; gap: 1rem; flex-wrap: wrap; }
 .wordmark{ font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em; text-transform: uppercase; text-decoration:none; color: var(--text); }
 .wordmark span{ color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
 .masthead nav{ display:flex; align-items:center; gap: 1.5rem; flex-wrap: wrap; }
-.masthead nav a{ font-size: 0.875rem; font-weight: 500; color: var(--text-muted); text-decoration: none; }
-.masthead nav a:hover{ color: var(--accent); }
-.masthead nav a.nav-cta{ background: var(--accent); color: var(--on-accent); padding: 0.45em 1.1em; border-radius: 999px; font-weight: 700; }
-.masthead nav a.nav-cta:hover{ background: var(--accent); opacity:.88; color: var(--on-accent); }
+.masthead nav a{ font-size: 0.875rem; font-weight: 500; color: var(--text-muted); text-decoration: none;
+  display:inline-flex; align-items:center; min-height: 24px; }
+.masthead nav a:hover{ color: var(--accent-text); }
+.masthead nav a.nav-cta{
+  background: var(--accent-fill); color: var(--on-accent);
+  padding: 0.45em 1.1em; border-radius: 999px; font-weight: 700;
+}
+.masthead nav a.nav-cta:hover{ background: var(--accent-fill); opacity:.88; color: var(--on-accent); }
 
-.hero{ padding: clamp(3rem, 8vw, 5.5rem) 0 clamp(2.5rem, 6vw, 4rem); }
-.hero h1{ font-size: clamp(2rem, 4.4vw, 3.25rem); line-height: 1.08; margin-top: 0.75rem; }
-.hero .lede{ margin-top: 1.25rem; font-size: 1.0625rem; color: var(--text-muted); max-width: 68ch; }
-
+/* Sections */
 section{ padding: clamp(2.5rem, 6vw, 4rem) 0; }
 section + section{ border-top: 1px solid var(--border); }
-
 .section-head{ display:flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem; }
 .section-head h2{ font-size: clamp(1.5rem, 3vw, 2rem); margin-top: 0.5rem; }
-.section-head .section-note{ max-width: 34ch; color: var(--text-muted); font-size: 0.9375rem; }
+.section-head .section-note{ max-width: 56ch; color: var(--text-muted); font-size: 0.9375rem; margin-top: 0.25rem; }
 
-.card-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-@media (max-width: 900px){ .card-grid{ grid-template-columns: repeat(2,1fr); } }
-@media (max-width: 560px){ .card-grid{ grid-template-columns: 1fr; } }
+/* Reveal-on-scroll */
+.reveal{ opacity:0; transform: translateY(16px); transition: opacity .5s ease, transform .5s ease; }
+.reveal.is-visible{ opacity:1; transform:none; }
+@media (prefers-reduced-motion: reduce){
+  .reveal{ opacity:1 !important; transform:none !important; }
+}
 
+/* Claim hero con scroll-linked word reveal */
+.claim-scroller{ height: 220vh; position: relative; }
+.claim-sticky{ position: sticky; top: 0; height: 100vh; display:flex; flex-direction:column; justify-content:center; }
+.claim-text{
+  font-size: clamp(2rem, 5.4vw, 3.5rem);
+  line-height: 1.12;
+  max-width: 18ch;
+}
+.claim-word{ color: var(--text-muted); transition: color .25s ease; }
+.claim-word.is-lit{ color: var(--accent-text); }
+.claim-sub{ margin-top: 1.5rem; max-width: 54ch; color: var(--text-muted); font-size: 1.0625rem; }
+.claim-scroll-hint{
+  margin-top: 2rem; font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--text-muted); display:flex; align-items:center; gap:0.5em;
+}
+.claim-scroll-hint::after{ content:"↓"; animation: claim-bob 1.6s ease-in-out infinite; }
+@keyframes claim-bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(5px); } }
+@media (prefers-reduced-motion: reduce){
+  .claim-scroller{ height:auto; }
+  .claim-sticky{ position:static; height:auto; padding: clamp(3rem,8vw,5.5rem) 0 clamp(2.5rem,6vw,4rem); }
+  .claim-scroll-hint{ display:none; }
+}
+
+/* Cards */
 .card{ border-radius: 18px; padding: 1.5rem; display:flex; flex-direction:column; gap: 0.75rem; box-shadow: var(--shadow); }
 .card-neutral{ background: var(--surface); border: 1px solid var(--border); color: var(--text); }
-.card-brand{ background: var(--accent); color: var(--on-accent); }
+.card-brand{ background: var(--accent-fill); color: var(--on-accent); }
 .card-dark{ background: var(--dark-surface); color: var(--on-dark); }
 .card h3{ font-size: 1.0625rem; font-weight: 700; }
 .card p{ font-size: 0.9375rem; margin:0; opacity: 0.88; }
 .card-neutral p{ color: var(--text-muted); opacity: 1; }
 
-/* Tabla de contraste — cruce entrevista / especificación de Tecnología / pantalla construida */
-.table-scroll{ overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; }
-.spec-table{ border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.875rem; }
-.spec-table th, .spec-table td{ text-align: left; padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
-.spec-table thead th{ font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700; background: var(--surface-alt); }
-.spec-table tbody tr:last-child td{ border-bottom: none; }
-.spec-table tbody tr:hover{ background: var(--surface-alt); }
-.spec-grupo td{ font-size:0.75rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); background:var(--surface-alt); }
-.marca{ display:inline-block; font-size:0.6875rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; padding:0.3em 0.7em; border-radius:999px; white-space:nowrap; }
+/* Diagnóstico */
+.evidence-stack{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+@media (max-width: 760px){ .evidence-stack{ grid-template-columns: 1fr; } }
+.evidence-card{ padding: 1.75rem 2rem; }
+
+/* Glosa: explica un término en español llano donde aparece */
+.glosa{
+  background: var(--surface-alt); border-left: 3px solid var(--accent-soft);
+  border-radius: 0 12px 12px 0; padding: 0.95rem 1.2rem; margin-top: 1.25rem;
+  font-size: 0.9375rem; color: var(--text-muted); max-width: 68ch;
+}
+.glosa b{ color: var(--text); font-weight: 700; }
+.glosa p{ margin: 0; }
+.glosa p + p{ margin-top: 0.6em; }
+
+/* Escenario: hoy contra después */
+.escenario{ display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.25rem; }
+@media (max-width: 720px){ .escenario{ grid-template-columns: 1fr; } }
+.escenario-col{
+  border: 1px solid var(--border); border-radius: 14px; padding: 1.15rem 1.3rem;
+  background: var(--surface);
+}
+.escenario-col.despues{
+  background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+  border-color: var(--accent-soft);
+}
+.escenario-col h4{
+  font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-muted); margin: 0 0 0.6rem; font-weight: 700;
+}
+.escenario-col.despues h4{ color: var(--accent-text); }
+.escenario-col ol{ margin:0; padding-left: 1.1rem; font-size: 0.9375rem; color: var(--text-muted); }
+.escenario-col li + li{ margin-top: 0.4rem; }
+
+/* Especificación técnica */
+.spec-scroll{ overflow-x: auto; margin-top: 1.25rem; }
+.spec-table{ width:100%; border-collapse: collapse; font-size: 0.875rem; }
+.spec-table th{
+  text-align:left; font-weight:700; font-size:0.75rem; text-transform:uppercase;
+  letter-spacing:0.08em; color:var(--text-muted); padding:0.6rem 0.75rem;
+  border-bottom:1px solid var(--border); white-space:nowrap;
+}
+.spec-table td{ padding:0.7rem 0.75rem; border-bottom:1px solid var(--border); color:var(--text-muted); vertical-align:top; }
+.spec-table td:first-child{ color:var(--text); font-weight:500; }
+.spec-table code{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8125rem; color: var(--accent-text); }
+.code{
+  background: var(--surface-alt); border: 1px solid var(--border); border-radius: 12px;
+  padding: 1rem 1.15rem; overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8125rem; line-height: 1.6; color: var(--text); margin-top: 1rem;
+  white-space: pre;
+}
+
+/* Listas numeradas colapsables */
+.finding-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap: 0; border-top: 1px solid var(--border); }
+.finding{ list-style:none; border-bottom: 1px solid var(--border); }
+.finding-details > summary{
+  cursor:pointer; list-style:none; display:grid; grid-template-columns: 2.5rem 1fr auto auto;
+  align-items:center; gap: 1rem; padding: 1.5rem 0;
+}
+.finding-details > summary::-webkit-details-marker{ display:none; }
+.finding-details .n{ font-weight: 700; color: var(--accent-text); font-size: 0.9375rem; }
+.finding-details summary h3{ font-size: 1.0625rem; font-weight: 700; }
+@media (max-width: 640px){ .finding-details > summary{ grid-template-columns: 2.5rem 1fr auto; } .finding-details summary .marca{ grid-column: 2; } }
+.finding-toggle{ position:relative; display:inline-block; width:0.8rem; height:0.8rem; color: var(--accent-text); transition: transform .2s ease; flex:none; }
+.finding-toggle::before, .finding-toggle::after{ content:""; position:absolute; top:50%; left:50%; background:currentColor; transform:translate(-50%,-50%); }
+.finding-toggle::before{ width:100%; height:2px; }
+.finding-toggle::after{ width:2px; height:100%; }
+.finding-details[open] > summary .finding-toggle{ transform: rotate(45deg); }
+.finding-body{ padding: 0 0 1.75rem calc(2.5rem + 1rem); }
+@media (max-width: 620px){ .finding-body{ padding-left: 0; } }
+.finding-body > p{ margin:0; color: var(--text-muted); font-size: 0.9375rem; max-width: 68ch; }
+.finding-body > * + p{ margin-top: 1.25rem; }
+.finding-body > p + p{ margin-top: 0.85em; }
+/* Especificidad igual a `.finding-body > p`, que si no gana y anula el margen */
+.finding-body > p.finding-cierre{
+  margin-top: 1.25rem; font-size: 0.9375rem; color: var(--text);
+  font-weight: 500; max-width: 68ch;
+}
+.finding-cierre b{ color: var(--accent-text); }
+
+/* Detalle técnico anidado */
+.tecnico{ margin-top: 1.25rem; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.tecnico > summary{
+  cursor:pointer; list-style:none; padding: 0.75rem 1.1rem; display:flex; align-items:center; gap:0.6rem;
+  font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-text);
+}
+.tecnico > summary::-webkit-details-marker{ display:none; }
+.tecnico > summary .finding-toggle{ width:0.65rem; height:0.65rem; }
+.tecnico[open] > summary .finding-toggle{ transform: rotate(45deg); }
+.tecnico-body{ padding: 0 1.1rem 1.25rem; }
+.tecnico-body p{ margin:0 0 0.5rem; font-size:0.875rem; color: var(--text-muted); max-width: 68ch; }
+.tecnico-body p b{ color: var(--text); }
+
+/* Sección de arquitectura: índice sticky + scroll-spy */
+.capas-layout{ display:grid; grid-template-columns: 220px 1fr; gap: 3rem; align-items:start; }
+/* Los hijos de grid y flex traen min-width:auto, así que un bloque de código
+   ancho estira la pista en vez de scrollear dentro de sí mismo. */
+.capas-layout > *, .capas-steps, .capas-step, .escenario > *,
+.evidence-stack > *, .finding-body, .tecnico, .tecnico-body,
+.fase > *{ min-width: 0; }
+.capas-sticky{ position:sticky; top: 1.5rem; }
+.capas-index{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap: 0.75rem; }
+.capas-index li{
+  padding-left: 0.9rem; border-left: 2px solid var(--border);
+  font-size: 0.875rem; color: var(--text-muted);
+  transition: color .2s ease, border-color .2s ease;
+}
+.capas-index li.is-active{ color: var(--accent-text); font-weight: 700; border-color: var(--accent); }
+.capas-steps{ display:flex; flex-direction:column; gap: 3rem; }
+.capas-step{
+  border: 1px solid var(--border); border-radius: 20px; padding: 1.75rem 2rem; box-shadow: var(--shadow);
+  background: var(--surface);
+}
+.capas-step h3{ font-size: 1.125rem; }
+.capas-step > p{ font-size: 0.9375rem; color: var(--text-muted); margin: 0.6rem 0 0; max-width: 68ch; }
+.resp-list{ list-style: none; margin: 1.1rem 0 0; padding: 0; border-top: 1px solid var(--border); }
+.resp-list li{ padding: 0.75rem 0; border-bottom: 1px solid var(--border); color: var(--text-muted); font-size: 0.9375rem; }
+.resp-list li::before{ content: "•"; color: var(--accent-text); font-weight: 700; margin-right: 0.6em; }
+.resp-list li b{ color: var(--text); font-weight: 600; }
+@media (max-width: 760px){
+  .capas-layout{ grid-template-columns: 1fr; gap: 1.5rem; }
+  .capas-sticky{ position:static; }
+  .capas-index{ flex-direction:row; flex-wrap:wrap; gap: 0.5rem 1.25rem; }
+}
+
+/* Mejoras de pantalla con captura anotada */
+.mejora-list{ list-style:none; margin:1.1rem 0 0; padding:0; border-top:1px solid var(--border); }
+.mejora{ border-bottom:1px solid var(--border); }
+.mejora summary{
+  cursor:pointer; list-style:none; display:flex; align-items:flex-start; gap:0.8rem;
+  padding:0.9rem 0; font-size:0.9375rem; color:var(--text-muted);
+}
+.mejora summary::-webkit-details-marker{ display:none; }
+.mejora summary::marker{ content:""; }
+.mejora summary b{ color:var(--text); font-weight:600; }
+.mejora summary .finding-toggle{ margin-top:0.28rem; }
+.mejora details[open] > summary .finding-toggle{ transform: rotate(45deg); }
+.mejora-body{ padding:0 0 1.25rem 1.6rem; }
+@media (max-width: 560px){ .mejora-body{ padding-left:0; } }
+.mejora-shot-link{ display:block; text-decoration:none; }
+.mejora-donde{
+  margin:0 0 0.7rem; font-size:0.8125rem; font-weight:700; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--accent-text);
+}
+.mejora-shot{
+  display:block; width:100%; height:auto; border-radius:12px;
+  border:1px solid var(--border); box-shadow:var(--shadow); background:#10161F;
+}
+.mejora-pie{ margin:0.6rem 0 0; font-size:0.875rem; color:var(--text-muted); max-width:66ch; }
+.mejora-zoom{ margin:0.45rem 0 0; font-size:0.8125rem; font-weight:500; color:var(--accent-text); }
+
+/* Animaciones de flujo: SVG + keyframes, sin librerías.
+   Ciclo compartido de 8s; cada nodo enciende en su fase y cada paquete
+   viaja en el hueco entre dos nodos. */
+.anim{
+  margin:1.25rem 0 0; border:1px solid var(--border); border-radius:14px;
+  background:var(--surface); padding:1.25rem 1.35rem 1.1rem;
+}
+.anim svg{ width:100%; height:auto; display:block; overflow:visible; }
+.anim figcaption{ margin:0.85rem 0 0; font-size:0.8125rem; color:var(--text-muted); }
+.anim text{ font-family:'DM Sans',system-ui,sans-serif; text-anchor:middle; }
+.anim .t1{ font-size:13px; font-weight:700; fill:var(--text); }
+.anim .t2{ font-size:11px; fill:var(--text-muted); }
+.anim .caja{ fill:var(--surface-alt); stroke:var(--border); stroke-width:1.2; }
+.anim .destino .caja{ fill:color-mix(in srgb, var(--accent) 12%, var(--surface)); stroke:var(--accent-soft); }
+.anim .puerta .caja{ fill:color-mix(in srgb, var(--accent) 16%, var(--surface)); stroke:var(--accent); stroke-width:1.8; }
+.anim .via{ stroke:var(--border); stroke-width:1.5; fill:none; }
+.anim .pk{ fill:var(--accent); }
+
+.anim .nodo{ opacity:.32; animation:8s linear infinite; }
+.anim .n1{ animation-name:anim-on1; }
+.anim .n2{ animation-name:anim-on2; }
+.anim .n3{ animation-name:anim-on3; }
+.anim .n4{ animation-name:anim-on4; }
+@keyframes anim-on1{ 0%,5%{opacity:.32} 11%,100%{opacity:1} }
+@keyframes anim-on2{ 0%,30%{opacity:.32} 36%,100%{opacity:1} }
+@keyframes anim-on3{ 0%,55%{opacity:.32} 61%,100%{opacity:1} }
+@keyframes anim-on4{ 0%,80%{opacity:.32} 86%,100%{opacity:1} }
+
+.anim .pk{ opacity:0; animation:8s linear infinite; }
+.anim .p1{ animation-name:anim-viaja1; }
+.anim .p2{ animation-name:anim-viaja2; }
+.anim .p3{ animation-name:anim-viaja3; }
+@keyframes anim-viaja1{
+  0%,11%   { transform:translate(0,0); opacity:0 }
+  14%      { transform:translate(calc(var(--dx)*.12), calc(var(--dy,0px)*.12)); opacity:1 }
+  27%      { transform:translate(calc(var(--dx)*.88), calc(var(--dy,0px)*.88)); opacity:1 }
+  30%,100% { transform:translate(var(--dx), var(--dy,0px)); opacity:0 }
+}
+@keyframes anim-viaja2{
+  0%,36%   { transform:translate(0,0); opacity:0 }
+  39%      { transform:translate(calc(var(--dx)*.12), calc(var(--dy,0px)*.12)); opacity:1 }
+  52%      { transform:translate(calc(var(--dx)*.88), calc(var(--dy,0px)*.88)); opacity:1 }
+  55%,100% { transform:translate(var(--dx), var(--dy,0px)); opacity:0 }
+}
+@keyframes anim-viaja3{
+  0%,61%   { transform:translate(0,0); opacity:0 }
+  64%      { transform:translate(calc(var(--dx)*.12), calc(var(--dy,0px)*.12)); opacity:1 }
+  77%      { transform:translate(calc(var(--dx)*.88), calc(var(--dy,0px)*.88)); opacity:1 }
+  80%,100% { transform:translate(var(--dx), var(--dy,0px)); opacity:0 }
+}
+
+/* Cuando el trazo se bifurca o curva, el paquete recorre la ruta real
+   con offset-path en lugar de cruzar en línea recta. */
+.anim .r1{ animation-name:anim-ruta1; }
+.anim .r2{ animation-name:anim-ruta2; }
+.anim .r3{ animation-name:anim-ruta3; }
+@keyframes anim-ruta1{
+  0%,11%   { offset-distance:0%;   opacity:0 }
+  14%      { offset-distance:12%;  opacity:1 }
+  27%      { offset-distance:88%;  opacity:1 }
+  30%,100% { offset-distance:100%; opacity:0 }
+}
+@keyframes anim-ruta2{
+  0%,36%   { offset-distance:0%;   opacity:0 }
+  39%      { offset-distance:12%;  opacity:1 }
+  52%      { offset-distance:88%;  opacity:1 }
+  55%,100% { offset-distance:100%; opacity:0 }
+}
+@keyframes anim-ruta3{
+  0%,61%   { offset-distance:0%;   opacity:0 }
+  64%      { offset-distance:12%;  opacity:1 }
+  77%      { offset-distance:88%;  opacity:1 }
+  80%,100% { offset-distance:100%; opacity:0 }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .anim .nodo{ animation:none; opacity:1; }
+  .anim .pk{ display:none; }
+}
+
+/* Esquema de datos y recorridos por rol */
+.esquema{
+  margin:1.25rem 0 0; border:1px solid var(--border); border-radius:14px;
+  background:var(--surface); padding:1.35rem;
+}
+.esquema svg{ width:100%; height:auto; display:block; }
+.esquema text{ font-family:'DM Sans',system-ui,sans-serif; }
+.esquema .caja{ fill:var(--surface-alt); stroke:var(--border); stroke-width:1.2; }
+.esquema .raiz .caja{ fill:color-mix(in srgb, var(--accent) 12%, var(--surface)); stroke:var(--accent); stroke-width:1.6; }
+.esquema .et{ font-size:13.5px; font-weight:700; fill:var(--text); }
+.esquema .ec{ font-size:10.5px; fill:var(--text-muted); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+.esquema .rel{ stroke:var(--border); stroke-width:1.4; fill:none; }
+.esquema .card{ font-size:10px; font-weight:700; fill:var(--accent); text-anchor:middle; }
+.esquema .eje{ font-size:10px; font-weight:700; fill:var(--text-muted); letter-spacing:0.1em; text-anchor:middle; }
+.esquema .cardg rect{ fill:var(--surface); stroke:none; }
+.esquema figcaption{ margin:0.9rem 0 0; font-size:0.8125rem; color:var(--text-muted); }
+
+.rol-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; margin-top:1.25rem; }
+@media (max-width: 760px){ .rol-grid{ grid-template-columns:1fr; } }
+.rol{
+  border:1px solid var(--border); border-radius:14px; padding:1.15rem 1.3rem;
+  background:var(--surface); min-width:0;
+}
+.rol.externo{ background:color-mix(in srgb, var(--accent) 7%, var(--surface)); border-color:var(--accent-soft); }
+.rol h4{ margin:0; font-size:1rem; font-weight:700; }
+.rol-entra{
+  margin:0.4rem 0 0; font-size:0.75rem; font-weight:700; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--accent-text);
+}
+.rol ol{ margin:0.85rem 0 0; padding-left:1.1rem; font-size:0.875rem; color:var(--text-muted); }
+.rol ol li + li{ margin-top:0.35rem; }
+.rol-limite{
+  margin:0.85rem 0 0; padding-top:0.7rem; border-top:1px solid var(--border);
+  font-size:0.8125rem; color:var(--text);
+}
+.rol-limite b{ color:var(--accent-text); font-weight:700; }
+
+/* Recomendación de tecnología */
+.tec-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; margin-top:1.25rem; }
+@media (max-width: 760px){ .tec-grid{ grid-template-columns:1fr; } }
+.tec{ border:1px solid var(--border); border-radius:14px; padding:1.15rem 1.3rem; background:var(--surface); min-width:0; }
+.tec.contra{ background:var(--surface-alt); border-style:dashed; }
+.tec h4{ margin:0 0 0.15rem; font-size:0.9375rem; font-weight:700; }
+.tec-para{ margin:0 0 0.6rem; font-size:0.75rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--accent-text); }
+.tec.contra .tec-para{ color:var(--text-muted); }
+.tec p{ margin:0; font-size:0.875rem; color:var(--text-muted); }
+.tec p + p{ margin-top:0.5rem; }
+.tec b{ color:var(--text); font-weight:600; }
+
+/* Etiquetas de estado: resuelto, brecha, propuesta */
+.marca{
+  display:inline-flex; align-items:center; gap:0.4em; font-size:0.6875rem;
+  font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+  padding:0.28em 0.75em; border-radius:999px; white-space:nowrap; flex:none;
+}
 .marca-ok{ background:var(--surface-alt); color:var(--text-muted); border:1px solid var(--border); }
-.marca-brecha{ background:var(--accent); color:var(--on-accent); }
-.marca-nueva{ background:transparent; color:var(--accent); border:1px solid var(--accent); }
+.marca-brecha{ background: var(--accent-fill); color:var(--on-accent); }
+.marca-nueva{ background:transparent; color:var(--accent-text); border:1px solid var(--accent); }
+.marca-fila{ display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; }
 
-/* Mejoras propuestas — igual receta que web/areas/almacen.html#mejoras */
-.mejora-grupo + .mejora-grupo{ margin-top: 3rem; }
-.mejora-grupo > h3{ font-size:1.125rem; margin-bottom:0.5rem; }
-.mejora-grupo > p.mejora-intro{ margin:0 0 1.5rem; color:var(--text-muted); font-size:0.9375rem; max-width:72ch; }
-.mejora-id{ font-size:0.75rem; font-weight:700; letter-spacing:0.08em; color:var(--text-muted); display:block; margin-bottom:0.35rem; }
-.mejora-badges{ display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:auto; padding-top:1rem; }
-.mejora-badge{ font-size:0.6875rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; padding:0.3em 0.7em; border-radius:999px; border:1px solid var(--border); color:var(--text-muted); }
-.mejora-badge.is-listo{ border-color:var(--positive); color:var(--positive); }
-.mejora-badge.is-brecha{ border-color:var(--accent); color:var(--accent); }
-.card.mejora{ display:flex; flex-direction:column; }
+/* Tabla de contraste */
+.contraste-table td:last-child{ white-space:nowrap; }
+.contraste-grupo td{
+  background:var(--surface-alt); color:var(--text); font-weight:700;
+  font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;
+}
 
-/* Enlaces a las pantallas corregidas — misma receta que padron-clientes.html */
-.maquetas-lista{ list-style:none; margin:2rem 0 0; padding:0; display:flex; flex-direction:column; gap:0; border-top:1px solid var(--border); }
-.maquetas-lista li{ border-bottom:1px solid var(--border); }
-.maquetas-lista a{ display:block; padding:1.25rem 0.25rem; text-decoration:none; color:var(--text); }
-.maquetas-lista a:hover b{ color:var(--accent); }
-.maquetas-lista b{ display:block; font-size:1.0625rem; }
-.maquetas-lista a > span{ display:block; margin-top:0.35rem; font-size:0.9375rem; color:var(--text-muted); max-width:74ch; }
-.maquetas-lista .maquetas-cambio{ margin-top:0.5rem; }
-.maquetas-lista code{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:0.85em; color:var(--accent); }
-.maquetas-pie{ margin-top:1.5rem; font-size:0.875rem; color:var(--text-muted); max-width:76ch; }
+/* Brechas desarrolladas */
+.brecha{
+  border:1px solid var(--border); border-radius:16px; padding:1.5rem 1.75rem;
+  background:var(--surface); box-shadow:var(--shadow); min-width:0;
+}
+.brecha + .brecha{ margin-top:1.25rem; }
+.brecha h3{ font-size:1.0625rem; margin:0.6rem 0 0; }
+.brecha > p{ margin:0.7rem 0 0; font-size:0.9375rem; color:var(--text-muted); max-width:68ch; }
+.brecha-efecto{
+  margin:1rem 0 0; padding-left:1rem; border-left:3px solid var(--accent-soft);
+  font-size:0.9375rem; color:var(--text);
+}
+.brecha-efecto b{ color:var(--accent-text); }
 
-.mejora-shot-link{ display:block; text-decoration:none; margin-top:1rem; }
-.mejora-shot{ width:100%; height:auto; border-radius:12px; border:1px solid var(--border); box-shadow:var(--shadow); display:block; }
-.mejora-zoom{ display:block; margin-top:0.5rem; font-size:0.8125rem; color:var(--accent); }
-.shot-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-top:1rem; }
-@media (max-width:760px){ .shot-grid{ grid-template-columns:1fr; } }
+/* Entidades */
+
+/* Fases de implementación */
+.fase-list{ display:flex; flex-direction:column; gap: 1rem; margin-top: 1.75rem; }
+.fase{
+  display:grid; grid-template-columns: 2.25rem 1fr; gap: 1.1rem; align-items:start;
+  border:1px solid var(--border); border-radius:16px; padding:1.25rem 1.5rem; background: var(--surface);
+}
+.fase-n{
+  display:inline-flex; align-items:center; justify-content:center; width:2.25rem; height:2.25rem;
+  border-radius:50%; background: var(--accent-fill); color: var(--on-accent); font-weight:700; font-size:0.875rem;
+}
+.fase h3{ font-size: 1rem; margin:0 0 0.3rem; }
+.fase p{ margin:0; font-size:0.9375rem; color: var(--text-muted); }
+
+.responsibility-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap: 1.25rem; margin-top: 1.75rem; max-width: 66ch; }
+@media (max-width: 560px){ .responsibility-grid{ grid-template-columns: 1fr; } }
+.tech-proposal{ margin-top: 2rem; }
+.tech-proposal p{ color: var(--text-muted); }
 
 footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
 .footer-meta{ display:flex; justify-content: space-between; align-items:center; flex-wrap: wrap; gap: 1rem; font-size: 0.8125rem; color: var(--text-muted); }
-.footer-meta a{ color: var(--text-muted); }
+.footer-meta a{ color: var(--text-muted); display:inline-flex; align-items:center; min-height: 24px; }
 .footer-nav{ margin-bottom: 1.5rem; }
-.footer-nav a{ color: var(--accent); text-decoration:none; font-weight: 500; font-size: 0.9375rem; }
+.footer-nav a{ color: var(--accent-text); text-decoration:none; font-weight: 500; font-size: 0.9375rem;
+  display:inline-flex; align-items:center; min-height: 24px; }
+
+/* ═══ Pestañas ═══════════════════════════════════════════════════════════════
+   Mismo patrón que el entregable del acceso, con una diferencia de color: allí
+   la pestaña elegida se rellena de acento con --chip-cliente-bg, token que aquí
+   no existe. Y rellenarla con --accent tampoco vale: en oscuro, --on-accent
+   sobre --accent da 4,16:1 y este texto va a 14px en negrita, que pide 4,5:1.
+   Así que la elegida se levanta sobre --surface con el texto en --text —19,7:1
+   en claro y 16,8:1 en oscuro— y se marca con un borde de acento, que como
+   elemento gráfico solo necesita 3:1 y da 5,14 y 3,76. */
+.tabs-wrap{padding:clamp(2rem,5vw,3rem) 0 0}
+.tabs{display:inline-flex;gap:.3rem;background:var(--surface-alt);padding:.3rem;
+  border-radius:999px;border:1px solid var(--border);max-width:100%;flex-wrap:wrap}
+.tab{appearance:none;font-family:inherit;font-size:.875rem;font-weight:700;
+  padding:.62em 1.25em;border-radius:999px;border:1px solid transparent;
+  background:transparent;color:var(--text-muted);cursor:pointer;min-height:2.75rem;
+  transition:background-color 160ms ease,color 160ms ease,border-color 160ms ease}
+.tab:hover{color:var(--text)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--text);
+  border-color:var(--accent);box-shadow:var(--shadow)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.panel:focus{outline:none}
+.panel[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.tab{transition:none}}
+
+/* Índice de las tres maquetas del módulo */
+.maquetas-mod{padding:clamp(2rem,5vw,3rem) 0 clamp(3rem,7vw,5rem)}
+.maquetas-lede{max-width:62ch;margin:.75rem 0 1.75rem}
+.maquetas-lista{list-style:none;padding:0;margin:0;display:grid;gap:1rem;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.maquetas-lista a{display:flex;flex-direction:column;gap:.4rem;height:100%;
+  padding:1.15rem 1.25rem;border:1px solid var(--border,#e5e7eb);border-radius:12px;
+  text-decoration:none;color:inherit;transition:border-color .2s,transform .2s}
+.maquetas-lista a:hover{border-color:currentColor;transform:translateY(-2px)}
+.maquetas-lista b{font-size:1.0625rem}
+.maquetas-lista span{font-size:.9375rem;color:var(--text-muted);line-height:1.5}
+.maquetas-cambio{font-size:.875rem;opacity:1;color:var(--text-muted);
+  margin-top:.5rem;padding-top:.7rem;border-top:1px solid var(--border)}
+.maquetas-cambio code{font-size:.875em;padding:.1em .3em;border-radius:4px;
+  background:rgba(127,127,127,.14)}
+.maquetas-pie{margin-top:1.5rem;font-size:.9375rem;color:var(--text-muted);max-width:70ch}
+.maquetas-pie code{font-size:.875em;padding:.1em .35em;border-radius:4px;
+  background:rgba(127,127,127,.14)}
+@media (prefers-reduced-motion:reduce){.maquetas-lista a:hover{transform:none}}
+
+/* ───────────── Simulación del componente de filtros ─────────────
+   Maqueta de baja fidelidad animada solo con CSS, sin librerías ni textos:
+   enseña el comportamiento del componente —abrir, buscar, marcar, bajar a
+   pastillas— sin comprometer el contenido, que todavía no está escrito.
+   El ciclo va en --cyc y el fotograma congelado en --freeze, para cuando el
+   sistema pide movimiento reducido. */
+.fsim{
+  --cyc: 11s;
+  --freeze: -5.4s;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 2rem 1.75rem;
+}
+@media (max-width: 560px){ .fsim{ padding: 1.4rem 1.1rem; } }
+
+.fsim-stage{
+  position: relative;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-alt);
+  padding: 1.1rem 1.15rem 1.25rem;
+  min-height: 15.5rem;
+}
+.fsim-bar{ display:flex; gap:.5rem; flex-wrap:wrap; }
+.fsim-chip{
+  display:flex; align-items:center; gap:.55rem;
+  height:2rem; padding:0 .75rem;
+  border:1.5px solid var(--border); border-radius:999px; background:var(--surface);
+}
+.fsim-chip i{ display:block; height:.5rem; border-radius:999px; background:var(--border); }
+.fsim-chip .w-lg{ width:2.6rem } .fsim-chip .w-md{ width:1.9rem } .fsim-chip .w-sm{ width:1.2rem }
+.fsim-chip .caret{ width:0; height:0; border-left:4px solid transparent; border-right:4px solid transparent;
+  border-top:5px solid var(--text-muted); border-radius:0; background:none; }
+.fsim-chip--mas{ border-style:dashed; }
+.fsim-chip--mas .mas{ position:relative; width:.6rem; height:.6rem; }
+.fsim-chip--mas .mas::before,.fsim-chip--mas .mas::after{ content:""; position:absolute; background:var(--text-muted); }
+.fsim-chip--mas .mas::before{ left:0; right:0; top:calc(50% - .5px); height:1px }
+.fsim-chip--mas .mas::after{ top:0; bottom:0; left:calc(50% - .5px); width:1px }
+/* El chip activo: es el que se pulsa en la simulación. */
+.fsim-chip--on{ border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+.fsim-chip--on i{ background:color-mix(in srgb, var(--accent) 55%, var(--border)); }
+.fsim-chip--on .caret{ border-top-color:var(--accent); }
+
+.fsim-pop{
+  position:absolute; z-index:3; top:3.3rem; left:1.15rem; width:14.5rem;
+  border:1.5px solid var(--border); border-radius:10px; background:var(--surface);
+  box-shadow:var(--shadow); padding:.5rem; transform-origin:top left;
+  opacity:0; transform:scale(.96) translateY(-4px);
+}
+.fsim-busc{ display:flex; align-items:center; gap:.45rem; height:1.9rem; padding:0 .55rem; margin-bottom:.35rem;
+  border:1.5px solid var(--border); border-radius:7px; background:var(--surface-alt); }
+.fsim-lupa{ flex:none; width:.7rem; height:.7rem; border:1.5px solid var(--text-muted); border-radius:50%; position:relative; }
+.fsim-lupa::after{ content:""; position:absolute; right:-3px; bottom:-2px; width:4px; height:1.5px;
+  background:var(--text-muted); transform:rotate(45deg); }
+.fsim-caret{ width:1px; height:.85rem; background:var(--accent); opacity:0; }
+.fsim-tecleo{ height:.45rem; width:0; border-radius:999px; background:var(--border); }
+.fsim-fila{ display:flex; align-items:center; gap:.55rem; height:1.9rem; padding:0 .5rem; border-radius:6px; }
+.fsim-box{ flex:none; width:.85rem; height:.85rem; border:1.5px solid var(--border); border-radius:3px;
+  background:var(--surface); position:relative; }
+.fsim-box .ll{ position:absolute; inset:-1.5px; border-radius:3px; background:var(--accent);
+  transform:scale(.2); opacity:0; }
+.fsim-box b{ position:absolute; z-index:2; left:3px; top:1px; width:4px; height:7px; opacity:0;
+  border:solid var(--on-accent); border-width:0 1.5px 1.5px 0; transform:rotate(42deg); }
+.fsim-fila i{ display:block; height:.5rem; border-radius:999px; background:var(--border); }
+.fsim-fila .n{ margin-left:auto; width:.9rem; height:.4rem; border-radius:999px; background:var(--border); opacity:.7 }
+
+.fsim-aplic{ display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; margin-top:.85rem; min-height:1.9rem; }
+.fsim-pill{
+  display:flex; align-items:center; gap:.45rem; height:1.6rem; padding:0 .35rem 0 .7rem;
+  border:1.5px solid var(--accent); border-radius:999px;
+  background:color-mix(in srgb, var(--accent) 10%, transparent);
+  opacity:0; transform:translateY(4px);
+}
+.fsim-pill i{ display:block; height:.45rem; border-radius:999px;
+  background:color-mix(in srgb, var(--accent) 55%, var(--border)); }
+.fsim-pill .x{ position:relative; flex:none; width:.9rem; height:.9rem; }
+.fsim-pill .x::before,.fsim-pill .x::after{ content:""; position:absolute; left:1px; right:1px;
+  top:calc(50% - .5px); height:1.2px; background:var(--text-muted); }
+.fsim-pill .x::before{ transform:rotate(45deg) } .fsim-pill .x::after{ transform:rotate(-45deg) }
+.fsim-quitar{ height:.45rem; width:3.4rem; border-radius:999px;
+  background:color-mix(in srgb, var(--accent) 45%, transparent); opacity:0; }
+
+.fsim-tabla{ margin-top:1.1rem; display:flex; flex-direction:column; gap:.45rem; }
+.fsim-tabla i{ display:block; height:.55rem; border-radius:999px; background:var(--border); opacity:.55 }
+
+.fsim-cursor{ position:absolute; z-index:5; left:0; top:0; width:1.05rem; height:1.05rem;
+  color:var(--text); pointer-events:none; }
+.fsim-cursor svg{ width:100%; height:100%; display:block; filter:drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+.fsim-ripple{ position:absolute; z-index:4; width:2.2rem; height:2.2rem; margin:-1.1rem 0 0 -1.1rem;
+  border-radius:50%; border:2px solid var(--accent); opacity:0; pointer-events:none; }
+
+/* Motor: todo comparte ciclo, cada pieza pone su propio nombre de animación. */
+.fsim .an{ animation-duration:var(--cyc); animation-iteration-count:infinite;
+  animation-timing-function:linear; animation-fill-mode:both; }
+@media (prefers-reduced-motion: reduce){
+  /* La regla global de la página aplana toda duración a 0.001ms. Aquí se
+     restituye solo para poder congelar un fotograma con delay negativo y
+     play-state pausado: no hay movimiento en ningún caso. */
+  .fsim .an{ animation-duration:var(--cyc) !important; animation-delay:var(--freeze) !important;
+    animation-play-state:paused !important; }
+}
+
+@keyframes fs-cursor{
+  0%,4%   { transform:translate(17.5rem,11.5rem) }
+  12%     { transform:translate(12.6rem,2.16rem) }
+  20%,30% { transform:translate(12.6rem,2.16rem) }
+  38%     { transform:translate(8.09rem,6.73rem) }
+  44%,52% { transform:translate(8.09rem,6.73rem) }
+  58%     { transform:translate(8.09rem,8.56rem) }
+  64%,74% { transform:translate(8.09rem,8.56rem) }
+  84%     { transform:translate(17.5rem,11.5rem) }
+  100%    { transform:translate(17.5rem,11.5rem) }
+}
+@keyframes fs-ripple{
+  0%,17%   { opacity:0; transform:scale(.4) }
+  19%      { opacity:.7; transform:scale(.5) }
+  25%      { opacity:0; transform:scale(1.1) }
+  40%      { opacity:0; transform:scale(.4) }
+  42%      { opacity:.7; transform:scale(.5) }
+  48%      { opacity:0; transform:scale(1.1) }
+  59%      { opacity:0; transform:scale(.4) }
+  61%      { opacity:.7; transform:scale(.5) }
+  67%,100% { opacity:0; transform:scale(1.1) }
+}
+@keyframes fs-ripple-pos{
+  0%,32%   { transform:translate(12.6rem,2.16rem) }
+  33%,56%  { transform:translate(8.09rem,6.73rem) }
+  57%,100% { transform:translate(8.09rem,8.56rem) }
+}
+@keyframes fs-chip-on{
+  0%,18%   { border-color:var(--border); background:var(--surface) }
+  20%,76%  { border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--surface)) }
+  78%,100% { border-color:var(--border); background:var(--surface) }
+}
+@keyframes fs-pop{
+  0%,18%   { opacity:0; transform:scale(.96) translateY(-4px); visibility:hidden }
+  21%,74%  { opacity:1; transform:scale(1) translateY(0); visibility:visible }
+  77%,100% { opacity:0; transform:scale(.96) translateY(-4px); visibility:hidden }
+}
+@keyframes fs-caret{
+  0%,23%   { opacity:0 }
+  24%,32%  { opacity:1 }
+  33%,100% { opacity:0 }
+}
+@keyframes fs-tecleo{
+  0%,24%   { width:0 }
+  32%      { width:3.2rem }
+  74%      { width:3.2rem }
+  75%,100% { width:0 }
+}
+@keyframes fs-marca{
+  0%,43%   { opacity:0; transform:scale(.2) }
+  46%,100% { opacity:1; transform:scale(1) }
+}
+@keyframes fs-marca-2{
+  0%,62%   { opacity:0; transform:scale(.2) }
+  65%,100% { opacity:1; transform:scale(1) }
+}
+@keyframes fs-tic{ 0%,45%{ opacity:0 } 48%,100%{ opacity:1 } }
+@keyframes fs-tic-2{ 0%,64%{ opacity:0 } 67%,100%{ opacity:1 } }
+@keyframes fs-pill{
+  0%,46%   { opacity:0; transform:translateY(4px) }
+  50%,100% { opacity:1; transform:translateY(0) }
+}
+@keyframes fs-pill-2{
+  0%,65%   { opacity:0; transform:translateY(4px) }
+  69%,100% { opacity:1; transform:translateY(0) }
+}
+@keyframes fs-quitar{ 0%,48%{ opacity:0 } 52%,100%{ opacity:.8 } }
+@keyframes fs-tabla{
+  0%,49%   { opacity:.55; transform:scaleX(1) }
+  54%,100% { opacity:.85; transform:scaleX(.72) }
+}
+.fsim-tabla i{ transform-origin:left center }
+
+
+/* ═══ Listas de recomendaciones y simulaciones (mismo motor que el entregable de acceso) ═══ */
+/* Lista numerada de recomendaciones — mismo ritmo que .resp-list, con contador */
+.rec-list{ list-style:none; margin: 0; padding: 0; counter-reset: rec; border-top: 1px solid var(--border); }
+.rec-list li{
+  counter-increment: rec;
+  display:grid; grid-template-columns: 2.25rem minmax(0,1fr); gap: 0 1rem;
+  padding: 0.85rem 0; border-bottom: 1px solid var(--border);
+  color: var(--text-muted); font-size: 0.9375rem;
+}
+.rec-list li::before{
+  content: counter(rec, decimal-leading-zero);
+  font-weight: 700; color: var(--accent-text); font-size: 0.8125rem; line-height: 1.7;
+}
+.rec-list li > span{ max-width: 68ch; }
+@media (max-width: 560px){
+  .rec-list li{ grid-template-columns: 1.75rem minmax(0,1fr); gap: 0 0.75rem; }
+}
+
+/* ───────────── Simulaciones wireframe ─────────────
+   Maquetas de baja fidelidad animadas con CSS, sin librerías: enseñan el
+   comportamiento recomendado frente al habitual sin comprometer decisiones
+   visuales que todavía no están tomadas.
+   Cada figura declara su ciclo en --cyc y el fotograma en el que se congela
+   (--freeze) cuando el sistema pide movimiento reducido. */
+.wire{
+  --cyc: 9s;
+  --freeze: -6.2s;
+  --err: #b32d2d; /* 5.1:1 sobre el gris de la maqueta — el mínimo que pide este mismo entregable */
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 1.5rem 1.75rem 1.35rem;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .wire{ --err:#ff7b7b; } }
+:root[data-theme="dark"] .wire{ --err:#ff7b7b; }
+@media (max-width: 560px){ .wire{ padding: 1.25rem 1.1rem 1.1rem; } }
+
+.wire-head{ display:flex; align-items:center; gap:0.5rem 1rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+.wire-head .wire-title{ font-size:1.0625rem; font-weight:700; flex:1 1 16ch; }
+.wire-tag{
+  flex:none; font-size:0.6875rem; font-weight:700; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--accent-text);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  padding:0.3em 0.7em; border-radius:999px;
+}
+.wire-toggle{
+  flex:none; appearance:none; font-family:inherit; font-size:0.75rem; font-weight:700;
+  color:var(--text-muted); background:var(--surface); border:1px solid var(--border);
+  border-radius:999px; padding:0 0.95em; min-height:2.25rem; cursor:pointer;
+}
+.wire-toggle:hover{ color:var(--accent-text); border-color:var(--accent); }
+
+.wire-stage{ display:grid; gap:1.5rem; }
+.wire-stage--split{ grid-template-columns:repeat(2,1fr); }
+@media (max-width: 720px){ .wire-stage--split{ grid-template-columns:1fr; } }
+.wire-panel{ display:flex; flex-direction:column; gap:0.65rem; min-width:0; }
+.wire-panel-label{
+  display:flex; align-items:center; gap:0.45em; font-size:0.75rem; font-weight:700;
+  letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted);
+}
+.wire-panel-label::before{ content:""; width:0.5em; height:0.5em; border-radius:999px; background:currentColor; flex:none; }
+.wire-panel.is-good .wire-panel-label{ color:var(--accent-text); }
+.wire-panel.is-bad .wire-panel-label{ color:var(--err); }
+.wire figcaption{ margin:1.1rem 0 0; font-size:0.8125rem; line-height:1.5; color:var(--text-muted); max-width:74ch; }
+.wire-refs{ display:block; margin-top:0.35rem; font-weight:700; color: var(--chip-ink); }
+
+/* Maqueta de la pantalla */
+.wf{
+  position:relative; overflow:hidden;
+  border:1.5px solid var(--border); border-radius:12px;
+  background:var(--surface-alt); padding:1.05rem 1.1rem 1.2rem;
+}
+.wf-logo{ width:2.1rem; height:2.1rem; border-radius:7px; border:1.5px dashed var(--border); margin-bottom:0.85rem; }
+.wf-label{ display:block; font-size:0.6875rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.3rem; }
+.wf-field{
+  position:relative; display:flex; align-items:center; gap:0.5rem;
+  height:2.5rem; padding:0 0.7rem; margin-bottom:0.8rem;
+  border:1.5px solid var(--border); border-radius:8px; background:var(--surface);
+}
+.wf-field.is-err{ border-color:var(--err); }
+.wf-field:last-of-type{ margin-bottom:0; }
+.wf-slot{ display:grid; min-width:0; }
+.wf-slot > *{ grid-area:1 / 1; }
+.wf-value{ font-size:0.8125rem; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.wf-value.is-ph{ color:var(--text-muted); }
+.wf-dots{ letter-spacing:0.16em; }
+.wf-eye{ position:relative; margin-left:auto; flex:none; width:1.3rem; height:1.3rem; color:var(--text-muted); }
+.wf-eye svg{ position:absolute; inset:0; width:100%; height:100%; }
+.wf-ico-err{ flex:none; width:1rem; height:1rem; color:var(--err); margin-left:auto; }
+
+.wf-check{ display:flex; align-items:center; gap:0.85rem; margin:0.85rem 0 0.9rem; font-size:0.75rem; color:var(--text-muted); }
+.wf-box{ position:relative; flex:none; width:1.05rem; height:1.05rem; border:1.5px solid var(--border); border-radius:4px; background:var(--surface); }
+
+.wf-btn{
+  position:relative; display:grid; place-items:center;
+  height:2.5rem; margin-top:0.9rem; border-radius:8px;
+  background: var(--accent-fill); color:var(--on-accent);
+  font-size:0.8125rem; font-weight:700;
+}
+.wf-btn > span{ grid-area:1 / 1; display:flex; align-items:center; gap:0.5rem; }
+.wf-spin{ flex:none; width:0.9rem; height:0.9rem; border-radius:50%; border:2px solid currentColor; border-top-color:transparent; }
+
+.wf-msgbox{ min-height:3.6rem; padding-top:0.7rem; }
+.wf-msgbox--sm{ min-height:2.4rem; }
+.wf-msg{ margin:0; display:flex; align-items:flex-start; gap:0.4rem; font-size:0.75rem; line-height:1.35; color:var(--err); }
+.wf-msg .wf-ico{ flex:none; width:0.9rem; height:0.9rem; margin-top:0.08rem; }
+.wf-sub{ margin:0.35rem 0 0; font-size:0.75rem; line-height:1.35; color:var(--text-muted); }
+.wf-link{ display:inline-block; position:relative; margin-top:0.5rem; font-size:0.75rem; font-weight:700; color:var(--accent-text); }
+.wf-pad{ height:2.4rem; }
+
+/* Cursor y pulsación */
+.wf-cursor{ position:absolute; left:50%; top:50%; z-index:4; width:1.05rem; height:1.05rem; color:var(--text); pointer-events:none; }
+.wf-cursor svg{ width:100%; height:100%; display:block; filter:drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+.wf-ripple{
+  position:absolute; left:50%; top:50%; z-index:3; width:2.4rem; height:2.4rem;
+  margin:-1.2rem 0 0 -1.2rem; border-radius:50%; border:2px solid var(--on-accent); opacity:0; pointer-events:none;
+}
+.wf-ripple--dead{ border-color:var(--text-muted); }
+
+/* Anillo de foco para el recorrido de tabulación */
+.wf-focus{ position:absolute; inset:-5px; border:2px solid var(--accent); border-radius:10px; opacity:0; pointer-events:none; }
+.wf-focus--tight{ inset:-6px; border-radius:8px; }
+/* En objetivos pequeños pegados a su etiqueta, la insignia se pone a la
+   izquierda para no tapar el texto que está justo al lado. */
+.wf-focus--flip .wf-focus-n{ right:auto; left:-11px; }
+.wf-focus-n{
+  position:absolute; top:-10px; right:-10px; width:18px; height:18px; border-radius:50%;
+  background: var(--accent-fill); color:var(--on-accent); font-size:10px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; line-height:1;
+}
+
+/* Tira de peticiones al servidor */
+.wf-net{ display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; margin-top:0.15rem; }
+.wf-net-l{ font-size:0.6875rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-muted); margin-right:0.15rem; }
+.wf-net-c{
+  font-size:0.6875rem; font-weight:700; color:var(--err);
+  border:1px solid color-mix(in srgb, var(--err) 40%, transparent);
+  background: color-mix(in srgb, var(--err) 10%, transparent);
+  border-radius:999px; padding:0.2em 0.6em; opacity:0;
+}
+.wf-net-c.is-ok{
+  color:var(--accent-text); border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* Etiqueta de estado de la simulación (figura del color) */
+.wire-note{ display:grid; margin-bottom:1rem; font-size:0.75rem; font-weight:700; color:var(--text-muted); min-height:1.2rem; }
+.wire-note > span{ grid-area:1 / 1; }
+
+/* Indicador de tecla */
+.wf-key{
+  display:inline-flex; align-items:center; justify-content:center; min-width:2.6rem; height:1.6rem;
+  border:1.5px solid var(--border); border-bottom-width:3px; border-radius:6px; background:var(--surface);
+  font-size:0.6875rem; font-weight:700; color:var(--text-muted);
+}
+.wf-step{ display:grid; min-height:1.3rem; font-size:0.75rem; font-weight:700; color:var(--accent-text); }
+.wf-step > span{ grid-area:1 / 1; }
+.wf-keyrow{ display:flex; align-items:center; gap:0.6rem; margin-top:0.9rem; }
+
+/* Motor de animación compartido */
+.wire .wa{
+  animation-duration: var(--d, var(--cyc));
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+.wire .wa--2s{ --d:2s; }
+.wire .wa--spin{ --d:0.75s; animation-name:wf-spin; }
+@keyframes wf-spin{ to{ transform:rotate(360deg) } }
+
+.wire.is-paused .wa{ animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce){
+  /* La regla global de la página fuerza animation-duration a 0.001ms, que
+     dejaría cada simulación en su último fotograma: todo oculto. Aquí se
+     restituye la duración solo para poder congelar la animación, en pausa
+     desde el primer momento, en el fotograma que explica el punto. No hay
+     movimiento en ningún caso; se usa el motor de animación como si fuera
+     una imagen fija. */
+  .wire .wa{
+    animation-duration: var(--d, var(--cyc)) !important;
+    animation-delay: var(--freeze) !important;
+    animation-play-state: paused !important;
+  }
+  .wire .wa--spin{ animation: none !important; }
+  .wire-toggle{ display:none; }
+}
+
+/* Los aciertos no son una lista numerada de tareas: se marcan, no se cuentan. */
+.rec-list--ok li::before{ content:"\2713"; font-size:1rem; line-height:1.5; }
+
+/* Tarjeta de apoyo: mismo sistema que .card-neutral, pero se distingue de las
+   fichas de hallazgo para que no se lean como uno más. */
+.card-aparte{ background:var(--surface-alt); border:1px solid var(--border);
+  border-left:3px solid var(--accent); color:var(--text); }
+.card-aparte p{ font-size:0.9375rem; line-height:1.68; color:var(--text-muted); max-width:68ch; }
+.card-aparte strong{ color:var(--text); }
+.copy-prop{ margin-top:1rem; background:var(--surface-alt); border:1px solid var(--border);
+  border-radius:12px; padding:1.15rem 1.25rem; max-width:44ch; }
+.copy-prop-t{ font-size:1rem !important; font-weight:700; color:var(--text) !important;
+  margin-bottom:0.5rem; }
+.copy-prop-btns{ display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.9rem !important; }
+.copy-prop-btns span{ font-size:0.8125rem; font-weight:700; border:1px solid var(--border);
+  border-radius:6px; padding:0.5em 0.9em; color:var(--text); }
+.copy-prop-btns span:first-child{ background:var(--chip-cliente-bg); color:var(--on-accent);
+  border-color:var(--chip-cliente-bg); }
+.copy-prop-ref{ font-size:0.75rem !important; margin-top:0.8rem !important;
+  font-variant-numeric:tabular-nums; letter-spacing:0.03em; }
+
+
+/* Observaciones generales: dos columnas de tarjetas breves. La regla de una
+   sola columna es para las secciones con lista larga, no para estas. */
+#p-diag #diagnostico .evidence-stack{ grid-template-columns:repeat(2,1fr); align-items:stretch }
+#diagnostico .evidence-card{ padding:1.35rem 1.5rem }
+#diagnostico .evidence-card h3{ font-size:1rem; line-height:1.35 }
+#diagnostico .evidence-card p{ font-size:0.875rem }
+@media (max-width:860px){ #p-diag #diagnostico .evidence-stack{ grid-template-columns:1fr } }
+
+/* Con listas largas, la lista va a ancho completo y la simulación debajo:
+   en dos columnas la figura se estiraba hasta la altura de la lista. */
+#p-diag .evidence-stack{ grid-template-columns:1fr; align-items:start }
+#funciona .evidence-stack{ grid-template-columns:1fr }
+
+
+/* Motor de las simulaciones del diagnóstico. */
+.wire .an{ animation-duration:var(--cyc); animation-iteration-count:infinite;
+  animation-timing-function:linear; animation-fill-mode:both }
+.wire.is-paused .an{ animation-play-state:paused }
+@media (prefers-reduced-motion: reduce){
+  .wire .an{ animation-duration:var(--cyc) !important; animation-delay:var(--freeze) !important;
+    animation-play-state:paused !important }
+}
+
+/* ── Fragmentos de pantalla con la paleta real de SIO-DPROMA ──────────────
+   Las simulaciones dejan de ser grises: usan los mismos tokens de estado que
+   la aplicación, para que lo que se ve aquí sea lo que se ve allí. */
+.wf{
+  --a-surface:#FAFCFD; --a-surface-2:#E7EDF3; --a-bg:#F2F5F7;
+  --a-border:rgba(27,36,48,.14); --a-ctrl:rgba(27,36,48,.50);
+  --a-text:#1B2430; --a-text-2:#4C5A6B; --a-text-3:#5D6774;
+  --a-link:#2F6B3C; --a-accent:#3E7A4C; --a-accent-ink:#F7FAF9;
+  --a-ok:#22705A; --a-ok-bg:#E2EFEC; --a-warn:#7E5B0E; --a-warn-bg:#F1ECDE;
+  --a-err:#B03A31; --a-err-bg:#F4E8E7; --a-block:#6D4FA3; --a-block-bg:#EDEBF7;
+  background:var(--a-bg); border-color:var(--a-border);
+  color:var(--a-text); font-size:.8125rem;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .wf{
+  --a-surface:#171F2C; --a-surface-2:#1D2735; --a-bg:#10161F;
+  --a-border:rgba(231,236,242,.12); --a-ctrl:rgba(231,236,242,.37);
+  --a-text:#E7ECF2; --a-text-2:#A8B3C2; --a-text-3:#8B96A6;
+  --a-link:#8FD3A2; --a-accent:#4A8F5A; --a-accent-ink:#08120D;
+  --a-ok:#7FD9B8; --a-ok-bg:#16302B; --a-warn:#F0C04A; --a-warn-bg:#332C15;
+  --a-err:#F09189; --a-err-bg:#37211F; --a-block:#C3AEF0; --a-block-bg:#272238; } }
+:root[data-theme="dark"] .wf{
+  --a-surface:#171F2C; --a-surface-2:#1D2735; --a-bg:#10161F;
+  --a-border:rgba(231,236,242,.12); --a-ctrl:rgba(231,236,242,.37);
+  --a-text:#E7ECF2; --a-text-2:#A8B3C2; --a-text-3:#8B96A6;
+  --a-link:#8FD3A2; --a-accent:#4A8F5A; --a-accent-ink:#08120D;
+  --a-ok:#7FD9B8; --a-ok-bg:#16302B; --a-warn:#F0C04A; --a-warn-bg:#332C15;
+  --a-err:#F09189; --a-err-bg:#37211F; --a-block:#C3AEF0; --a-block-bg:#272238; }
+
+/* Barra superior del fragmento: sitúa lo que se está mirando. */
+.wf-top{display:flex;align-items:baseline;gap:.5rem;margin:-.15rem 0 .8rem}
+.wf-top b{font-size:.875rem;font-weight:700;color:var(--a-text)}
+.wf-top span{font-size:.75rem;color:var(--a-text-3)}
+
+.wf-bar{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.wf-pill{display:inline-flex;align-items:center;gap:.35rem;height:1.5rem;padding:0 .55rem;
+  border-radius:6px;font-size:.6875rem;font-weight:700;white-space:nowrap;border:1px solid transparent}
+.wf-pill--err{background:var(--a-err-bg);color:var(--a-err)}
+.wf-pill--warn{background:var(--a-warn-bg);color:var(--a-warn)}
+.wf-pill--ok{background:var(--a-ok-bg);color:var(--a-ok)}
+.wf-pill--block{background:var(--a-block-bg);color:var(--a-block)}
+.wf-pill--gris{background:var(--a-surface-2);color:var(--a-text-2)}
+.wf-pill--punteado{border:1px dashed var(--a-ctrl);background:transparent;color:var(--a-text-2)}
+/* Un control se ve control: superficie propia, borde de control y chevron. */
+.wf-pill--control{background:var(--a-surface);border:1px solid var(--a-ctrl);color:var(--a-text);
+  border-radius:999px;height:1.75rem;padding:0 .7rem}
+.wf-pill .g{font-size:.6rem;color:var(--a-text-3)}
+.wf-pill .ic{width:.55rem;height:.55rem;border-radius:50%;background:currentColor;flex:none}
+
+/* Tabla del listado. */
+.wf-tabla{background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow:hidden}
+.wf-thead{display:flex;gap:.6rem;padding:.4rem .65rem;background:var(--a-surface-2);
+  font-size:.625rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--a-text-3)}
+.wf-fila{display:flex;align-items:center;gap:.6rem;padding:.5rem .65rem;
+  border-top:1px solid var(--a-border);font-size:.75rem;color:var(--a-text-2)}
+.wf-tabla .wf-fila:first-of-type{border-top:0}
+.wf-fila .folio{font-weight:700;color:var(--a-link);white-space:nowrap;min-width:5.2rem}
+.wf-fila .cli{color:var(--a-text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wf-fila .sep{margin-left:auto;flex:none}
+
+/* Zonas declaradas. */
+.wf-zona{border:1px dashed var(--a-ctrl);border-radius:8px;padding:.5rem .6rem;background:var(--a-surface)}
+.wf-zona-et{display:block;font-size:.625rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--a-text-3);margin-bottom:.4rem}
+
+/* Botones del fragmento. */
+.wf-mini{display:inline-grid;place-items:center;height:1.6rem;padding:0 .6rem;border-radius:6px;
+  border:1px solid var(--a-ctrl);background:var(--a-surface);font-size:.6875rem;font-weight:700;
+  color:var(--a-text-2)}
+.wf-mini.pri{background:var(--a-accent);border-color:transparent;color:var(--a-accent-ink)}
+.wf-acc{display:inline-flex;align-items:center}
+.wf-acc.juntos{gap:6px}
+.wf-acc.sueltos{gap:1.15rem}
+.wf-msg{margin:0;font-size:.75rem;font-weight:700;color:var(--a-err)}
+.wf-sub{margin:.3rem 0 0;font-size:.75rem;line-height:1.45;color:var(--a-text-2)}
+.wf-ref{margin:.45rem 0 0;font-size:.6875rem;color:var(--a-text-3)}
+.wf-pad{height:.7rem}
+
+/* Rótulo del paso: dice en palabras lo que está pasando en la simulación. */
+.wire-paso{display:grid;min-height:1.35rem;margin:0 0 .75rem;font-size:.75rem;font-weight:700;color:var(--accent-text)}
+.wire-paso > span{grid-area:1 / 1}
+
+.wf-cursor{position:absolute;z-index:5;left:0;top:0;width:1.05rem;height:1.05rem;
+  color:var(--a-text);pointer-events:none}
+.wf-cursor svg{width:100%;height:100%;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+.wf-ripple{position:absolute;z-index:4;width:2.2rem;height:2.2rem;margin:-1.1rem 0 0 -1.1rem;
+  border-radius:50%;border:2px solid var(--a-accent);opacity:0;pointer-events:none}
+.wf-ripple--dead{border-color:var(--a-err)}
+.wf-halo{position:absolute;z-index:2;border-radius:8px;border:2px solid var(--a-accent);opacity:0;pointer-events:none}
+
+/* Escenas */
+@keyframes av-parpadeo{ 0%,44%{ box-shadow:none } 50%,72%{ box-shadow:0 0 0 3px var(--a-warn-bg) } 78%,100%{ box-shadow:none } }
+@keyframes av-lat{ 0%,45%{ opacity:.25 } 55%,100%{ opacity:1 } }
+@keyframes av-paso1{ 0%,30%{ opacity:1 } 34%,100%{ opacity:0 } }
+@keyframes av-paso2{ 0%,32%{ opacity:0 } 36%,64%{ opacity:1 } 68%,100%{ opacity:0 } }
+@keyframes av-paso3{ 0%,66%{ opacity:0 } 70%,100%{ opacity:1 } }
+@keyframes av-cursor-filtro{
+  0%,6%   { transform:translate(13rem,11rem) }
+  20%,32% { transform:translate(3.84rem,3.87rem) }
+  48%,62% { transform:translate(19.18rem,3.87rem) }
+  80%,100%{ transform:translate(13rem,11rem) }
+}
+@keyframes av-press{
+  0%,18%  { opacity:0; transform:scale(.4) }
+  22%     { opacity:.8; transform:scale(.55) }
+  30%     { opacity:0; transform:scale(1.15) }
+  46%     { opacity:0; transform:scale(.4) }
+  50%     { opacity:.8; transform:scale(.55) }
+  58%,100%{ opacity:0; transform:scale(1.15) }
+}
+@keyframes av-press-pos{ 0%,38%{ transform:translate(3.84rem,3.87rem) } 39%,100%{ transform:translate(19.18rem,3.87rem) } }
+@keyframes av-nada{ 0%,32%{ opacity:0 } 36%,44%{ opacity:1 } 48%,100%{ opacity:0 } }
+@keyframes av-filtra{ 0%,60%{ opacity:1; transform:none } 66%,100%{ opacity:.12; transform:translateX(-4px) } }
+@keyframes av-cursor-tap{
+  0%,12%  { transform:translate(3rem,5rem) }
+  34%,58% { transform:translate(21.3rem,2.47rem) }
+  80%,100%{ transform:translate(3rem,5rem) }
+}
+@keyframes av-fallo{ 0%,36%{ opacity:0; transform:translateY(3px) } 42%,68%{ opacity:1; transform:none } 74%,100%{ opacity:0; transform:translateY(3px) } }
+@keyframes av-halo{ 0%,40%{ opacity:0 } 46%,70%{ opacity:1 } 76%,100%{ opacity:0 } }
+
 </style>
 </head>
+
 <body>
 
 <header class="masthead">
@@ -201,221 +1113,639 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     <nav>
       <a href="/">Informe general</a>
       <a href="#diagnostico">Diagnóstico</a>
-      <a href="#contraste">Contraste</a>
-      <a href="#mejoras">Mejoras</a>
+      <a href="#ux">UX</a>
+      <a href="#ui">Interfaz</a>
+      <a href="#accesibilidad">Accesibilidad</a>
       <a href="#pantallas">Las pantallas</a>
       <a class="nav-cta" href="/entregables">Entregables</a>
     </nav>
   </div>
 </header>
 
-<section class="hero">
-  <div class="wrap">
-    <div class="eyebrow">Entregable · UX, UI y accesibilidad</div>
-    <h1>Administración Vehicular, antes Gestoría.</h1>
-    <p class="lede">Revisión de UX, UI y accesibilidad de las 4 pantallas ya construidas para Administración Vehicular en SIO-DPROMA (Tablero, Trámites vehiculares, Detalle de trámite, Trámites concluidos), contra la especificación de Tecnología y el sistema de diseño. Las mejoras funcionales del área — lo que todavía no tiene pantalla — se documentan en <a href="/areas/admin-vehicular#mejoras">el perfil del área</a>.</p>
+<section class="claim-hero" id="claim">
+  <div class="claim-scroller" id="claimScroller">
+    <div class="claim-sticky">
+      <div class="wrap">
+        <div class="eyebrow">Entregable · Administración Vehicular</div>
+        <h1 class="claim-text" id="claimText">
+          <span class="claim-word">Administración</span> <span class="claim-word">Vehicular:</span>
+          <span class="claim-word">cuatro</span> <span class="claim-word">pantallas</span>
+          <span class="claim-word">revisadas</span> <span class="claim-word">y</span>
+          <span class="claim-word">construidas.</span>
+        </h1>
+        <p class="claim-sub">Tablero, trámites, detalle y concluidos. 48 recomendaciones ordenadas por impacto.</p>
+        <p class="claim-scroll-hint" id="claimScrollHint">Sigue bajando</p>
+      </div>
+    </div>
   </div>
 </section>
+
+<div class="tabs-wrap">
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Contenido del entregable">
+      <button type="button" class="tab" id="t-diag" role="tab"
+              aria-selected="true" aria-controls="p-diag">Diagnóstico</button>
+      <button type="button" class="tab" id="t-pant" role="tab"
+              aria-selected="false" aria-controls="p-pant" tabindex="-1">Las pantallas</button>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="p-diag" role="tabpanel" aria-labelledby="t-diag" tabindex="-1">
 
 <section id="diagnostico">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <div>
-        <div class="eyebrow">Tres fuentes, un cruce</div>
-        <h2>Lo que dice la entrevista, lo que especifica Tecnología, lo que hay construido.</h2>
-        <p class="section-note">Sin inventar: cada hallazgo está en al menos dos de las tres fuentes.</p>
+        <div class="eyebrow">Observaciones generales</div>
+        <h2>Lo que se repite en las cuatro pantallas.</h2>
+        <p class="section-note">Se resuelven una vez en el sistema, no pantalla por pantalla.</p>
       </div>
     </div>
 
-    <div class="prose">
-      <p>El equipo de Administración Vehicular describió en la entrevista una operación de 300 a 900 trámites mensuales por cliente, 80-90% resueltos en persona ante una autoridad, con el control viviendo en un Excel colaborativo con macros y semáforos —editado también por los propios clientes— y la coordinación dependiendo de más de 400 grupos de WhatsApp. Dos dolores concretos: si un lote grande no se comparte a tiempo se pierde un día completo de seguimiento, y no había un criterio único para repartir el trabajo entre plazas.</p>
-      <p>La especificación de Tecnología (Tablero principal, Plazas, Calendario laboral, Trámites concluidos) ya resuelve una parte real de eso: la plaza se asigna sola según la ubicación del trámite, con un coordinador responsable visible; el plazo corre en días hábiles y no se detiene solo porque el trámite quede observado; y cerrar un trámite genera un acuse formal que lo saca de la bandeja activa sin borrar el expediente.</p>
-      <p>Las cuatro pantallas que ya construyó el equipo (Tablero, Trámites vehiculares, Detalle de trámite, Trámites concluidos) implementan casi toda esa especificación con fidelidad — el reloj de plazo del detalle, por ejemplo, es exactamente el descrito en el documento de Calendario laboral. Pero arrastran un aviso de nomenclatura que la propia documentación de Tecnología deja explícito y que no se aplicó en pantalla: el módulo se llamaba <b>Gestoría</b> y ahora es oficialmente <b>Administración Vehicular</b>, en toda referencia de cara al usuario.</p>
-    </div>
-  </div>
-</section>
-
-<section id="contraste">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <div class="eyebrow">Contraste con la especificación</div>
-        <h2>Lo que ya está resuelto y lo que sigue abierto.</h2>
-        <p class="section-note">Cruce entre los 4 documentos de Tecnología, las 4 pantallas recibidas y los pain points de la entrevista.</p>
-      </div>
-    </div>
-
-    <div class="table-scroll">
-      <table class="spec-table">
-        <thead><tr><th>Punto</th><th>En detalle</th><th>Estado</th></tr></thead>
-        <tbody>
-          <tr class="spec-grupo"><td colspan="3">Confirmado</td></tr>
-          <tr><td>Asignación por plaza</td><td>La plaza se asigna sola según la ubicación capturada; resuelve el desacuerdo interno «por persona vs. por ciudad» que salió en la entrevista</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
-          <tr><td>Reloj de plazo</td><td>Días hábiles de lunes a sábado, arranca en la admisión, no se detiene con el trámite observado</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
-          <tr><td>Cierre con acuse</td><td>El acuse agrupa folio, cliente y vehículos; advierte si el lote mezcla más de un cliente</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
-          <tr><td>Archivado sin borrado</td><td>Un trámite archivado deja de listarse por defecto, pero el expediente sigue completo y consultable</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
-          <tr><td>Enlace directo a un concluido</td><td>Redirige a Trámites concluidos con aviso, en vez de un «no encontrado»</td><td><span class="marca marca-ok">Resuelto</span></td></tr>
-
-          <tr class="spec-grupo"><td colspan="3">Sigue abierto en pantalla</td></tr>
-          <tr><td>Nomenclatura</td><td>Las 4 pantallas seguían diciendo «Gestoría» en título, menú, permisos y mensajes de error — contra el aviso explícito de la propia documentación</td><td><span class="marca marca-brecha">Brecha</span></td></tr>
-          <tr><td>Ítem de menú duplicado</td><td>«Gestoría» aparecía como tercer ítem del menú, junto a «Trámites vehiculares» y «Trámites concluidos»</td><td><span class="marca marca-brecha">Brecha</span></td></tr>
-          <tr><td>Bloques del Tablero principal</td><td>El Tablero solo cubría plazas y semáforo; faltaban total, concluidos del mes, viáticos pendientes de autorizar e incidencias abiertas</td><td><span class="marca marca-brecha">Brecha</span></td></tr>
-          <tr><td>Vistas de estado</td><td>Vacío y error iban con icono suelto y un <code>&lt;b&gt;</code> como título, sin la tarjeta ni el encabezado real que exige el sistema de diseño (§6.4)</td><td><span class="marca marca-brecha">Brecha</span></td></tr>
-
-        </tbody>
-      </table>
-    </div>
-    <p class="prose" style="margin-top:1.25rem">Portal de autoconsulta del cliente, alerta al llegar un lote grande y el flujo de aprobación de viáticos son brechas funcionales, no de interfaz: ninguna de las 4 pantallas es el lugar para resolverlas. Se documentan como mejoras propuestas en el <a href="/areas/admin-vehicular#mejoras">perfil del área</a>.</p>
-  </div>
-</section>
-
-<section id="mejoras">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <div class="eyebrow">Correcciones de UX, UI y accesibilidad</div>
-        <h2>Qué se corrigió en las 4 pantallas.</h2>
-      </div>
-      <p class="section-note">Agrupadas por lo que resuelven, cada una con su estado real de madurez.</p>
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <span class="eyebrow">Vocabulario</span>
+        <h3>El mismo concepto cambia de nombre entre pantallas</h3>
+        <p>Lo que en el tablero es «sin reloj», en el listado es «sin admitir». Son lo mismo. Cada nombre nuevo obliga a volver a aprender el sistema.</p>
+      </article>
+      <article class="evidence-card card card-neutral reveal">
+        <span class="eyebrow">Estado</span>
+        <h3>Las etiquetas no siguen una lógica única</h3>
+        <p>«Vencido» y «observado» comparten el mismo rojo siendo cosas distintas: un plazo incumplido y una petición de la dependencia. Unas etiquetas llevan borde continuo y otras punteado sin que se explique la diferencia.</p>
+      </article>
+      <article class="evidence-card card card-neutral reveal">
+        <span class="eyebrow">Controles</span>
+        <h3>Filtros e información se ven igual</h3>
+        <p>Conteos, desplegables y filtros aplicados conviven en la misma franja con formas casi idénticas. No se distingue qué se puede pulsar de qué solo informa.</p>
+      </article>
+      <article class="evidence-card card card-neutral reveal">
+        <span class="eyebrow">Cifras</span>
+        <h3>Los números no siempre cuadran entre sí</h3>
+        <p>El texto del título, las etiquetas de conteo y el pie de la tabla se refieren a alcances distintos (todo el listado, la página visible, los filtros activos) sin decirlo. Eso hace dudar del dato.</p>
+      </article>
+      <article class="evidence-card card card-neutral reveal">
+        <span class="eyebrow">Jerarquía</span>
+        <h3>Doce tamaños de letra y cinco grosores</h3>
+        <p>Con tantas variantes el tamaño deja de indicar importancia. Los espaciados sueltos de 1, 3, 5, 6, 7 y 9 píxeles rompen además el ritmo, aunque cada pantalla por separado parezca correcta.</p>
+      </article>
+      <article class="evidence-card card card-neutral reveal">
+        <span class="eyebrow">Cabecera</span>
+        <h3>Cada pantalla se compone de forma distinta</h3>
+        <p>Unas tienen buscador y otras no; unas filtros y otras solo etiquetas; la acción principal a veces es un botón con texto y a veces un icono suelto. No hay plantilla reconocible.</p>
+      </article>
     </div>
 
-    <div class="mejora-grupo">
-      <h3>1 · Nomenclatura y navegación</h3>
-      <p class="mejora-intro">La documentación de Tecnología es explícita: «Gestoría» queda sustituida por «Administración Vehicular» en pantallas y en cualquier texto de cara al usuario. Las 4 pantallas no lo habían aplicado.</p>
-      <div class="card-grid">
-        <div class="card card-neutral mejora">
-          <span class="mejora-id">1.1</span>
-          <h3>Renombrar el módulo en las 4 pantallas</h3>
-          <p>Título, encabezado, resumen de cabecera, etiquetas de permiso («lo ven: Administración Vehicular y Dirección») y los mensajes de estado vacío/error, que decían «bandeja de gestoría» o «el servicio de gestoría no respondió».</p>
-          <div class="mejora-badges"><span class="mejora-badge is-listo">Aplicado</span></div>
+    <figure class="wire reveal" style="--cyc:9s; --freeze:-5s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">El mismo trámite, dos nombres</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
         </div>
-        <div class="card card-neutral mejora">
-          <span class="mejora-id">1.2</span>
-          <h3>Quitar el ítem de menú duplicado</h3>
-          <p>El menú lateral traía «Gestoría» como tercer ítem, junto a «Trámites vehiculares» y «Trámites concluidos», bajo el mismo grupo. Apuntaban al mismo módulo con nombres distintos — se retira y queda un único ítem por pantalla.</p>
-          <div class="mejora-badges"><span class="mejora-badge is-listo">Aplicado</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="mejora-grupo">
-      <h3>2 · Lo que el Tablero principal todavía no mostraba</h3>
-      <p class="mejora-intro">La especificación pide que el bloque de Administración Vehicular muestre total, en proceso, por vencer, concluidos del mes, vencidos y desglose por plaza — más viáticos pendientes de autorizar e incidencias de servicio abiertas. El mock cubría plazas y semáforo; el resto faltaba.</p>
-      <div class="card-grid">
-        <div class="card card-neutral mejora">
-          <span class="mejora-id">2.1</span>
-          <h3>Total y concluidos del mes en el resumen</h3>
-          <p>El resumen de cabecera pasa de «36 trámites en tus plazas» a «56 trámites en tus plazas este mes (36 abiertos · 20 concluidos)» — sin agregar un componente nuevo, extendiendo el que ya existía.</p>
-          <div class="mejora-badges"><span class="mejora-badge is-listo">Aplicado</span></div>
-        </div>
-        <div class="card card-neutral mejora">
-          <span class="mejora-id">2.2</span>
-          <h3>Viáticos pendientes e incidencias abiertas</h3>
-          <p>Se añade una segunda sección al Tablero, «Otros pendientes de Administración Vehicular», con dos tarjetas que reusan exactamente el componente de plaza ya existente en la pantalla, no uno nuevo.</p>
-          <div class="mejora-badges"><span class="mejora-badge is-listo">Aplicado</span></div>
-        </div>
-        <div class="card card-neutral mejora">
-          <span class="mejora-id">2.3</span>
-          <h3>Ocultar el bloque, no mostrar cero</h3>
-          <p>La regla de la especificación —un bloque que no se puede medir se oculta, nunca se muestra en cero— todavía no está representada con datos reales por rol y alcance: es una decisión de datos, no de maqueta, y queda para cuando el bloque se conecte a información real.</p>
-          <div class="mejora-badges"><span class="mejora-badge is-brecha">Pendiente de datos reales</span></div>
-        </div>
-      </div>
-      <a class="mejora-shot-link" href="/entregables/img/admin-vehicular-tablero.png" target="_blank" rel="noopener">
-        <img class="mejora-shot" src="/entregables/img/admin-vehicular-tablero.png" loading="lazy" alt="Tablero de Administración Vehicular, ya corregido: título renombrado, resumen con total y concluidos del mes, y la nueva sección de viáticos pendientes de autorizar e incidencias de servicio abiertas.">
-        <span class="mejora-zoom">Ver el tablero corregido →</span>
-      </a>
-    </div>
-
-    <div class="mejora-grupo">
-      <h3>3 · Vistas de estado — receta del sistema de diseño (§6.4)</h3>
-      <p class="mejora-intro">El propio <a href="/entregables/reglas-de-diseno">sistema de diseño</a> señala este mismo defecto como ya cometido una vez en las maquetas del padrón de clientes: un icono suelto y un <code>&lt;b&gt;</code> a modo de título no son un estado, son un mensaje sin forma. Reaparecía igual en las 4 pantallas de Administración Vehicular.</p>
-      <div class="card-grid">
-        <div class="card card-neutral mejora">
-          <span class="mejora-id">3.1</span>
-          <h3>Tarjeta y medallón, no icono suelto</h3>
-          <p>Cada estado vacío y de error queda envuelto en <code>.tarjeta-estado</code> (<code>--r-modal</code> / <code>--sh-modal</code>), con el icono dentro del medallón <code>.estado-ico</code> — en rojo (<code>.es-err</code>) para los de error.</p>
-          <div class="mejora-badges"><span class="mejora-badge is-listo">Aplicado</span></div>
-        </div>
-        <div class="card card-neutral mejora" style="grid-column:1/-1">
-          <span class="mejora-id">Antes / después</span>
-          <h3>El estado vacío del detalle de trámite</h3>
-          <p>A la izquierda, el icono suelto y el <code>&lt;b&gt;</code> como título que traía la maqueta. A la derecha, la tarjeta con medallón, encabezado real y el resto de la receta del §6.4 ya aplicada.</p>
-          <div class="shot-grid">
-            <a class="mejora-shot-link" href="/entregables/img/admin-vehicular-detalle-vacio.png" target="_blank" rel="noopener">
-              <img class="mejora-shot" src="/entregables/img/admin-vehicular-detalle-vacio.png" loading="lazy" alt="Estado vacío del detalle de trámite, ya corregido: la tarjeta con medallón verde, el encabezado «Este trámite todavía no tiene movimientos» y el botón Registrar avance.">
-              <span class="mejora-zoom">Estado vacío, corregido →</span>
-            </a>
-            <a class="mejora-shot-link" href="/entregables/img/admin-vehicular-detalle-error.png" target="_blank" rel="noopener">
-              <img class="mejora-shot" src="/entregables/img/admin-vehicular-detalle-error.png" loading="lazy" alt="Estado de error del detalle de trámite, ya corregido: la tarjeta con medallón rojo, el encabezado «No se pudo cargar el trámite» y la referencia AV-20260901-1131.">
-              <span class="mejora-zoom">Estado de error, corregido →</span>
-            </a>
+        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Diez expedientes sin admitir.</span><span class="an" style="animation-name:av-paso2">El tablero los llama «sin reloj».</span><span class="an" style="animation-name:av-paso3">El listado los llama «sin admitir».</span></p>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Tablero</span>
+            <div class="wf"><div class="wf-top"><b>Querétaro Centro</b><span>Querétaro, Qro.</span></div>
+              <div class="wf-bar">
+                <span class="wf-pill wf-pill--ok"><i class="ic"></i>18 en plazo</span>
+                <span class="wf-pill wf-pill--err"><i class="ic"></i>3 vencidos</span>
+                <span class="wf-pill wf-pill--punteado an" style="animation-name:av-parpadeo">10 sin reloj</span>
+              </div></div>
+          </div>
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Listado</span>
+            <div class="wf"><div class="wf-top"><b>Trámites vehiculares</b><span>36 en tus plazas</span></div>
+              <div class="wf-bar">
+                <span class="wf-pill wf-pill--ok"><i class="ic"></i>18 en plazo</span>
+                <span class="wf-pill wf-pill--err"><i class="ic"></i>3 vencidos</span>
+                <span class="wf-pill wf-pill--gris an" style="animation-name:av-parpadeo">10 sin admitir</span>
+              </div></div>
           </div>
         </div>
-        <div class="card card-neutral mejora">
-          <span class="mejora-id">3.2</span>
-          <h3>Encabezado real, no un <code>&lt;b&gt;</code></h3>
-          <p>El título de cada estado pasa a <code>&lt;h2&gt;</code>, para que se pueda navegar la pantalla saltando de encabezado en encabezado con un lector de pantalla.</p>
-          <div class="mejora-badges"><span class="mejora-badge is-listo">Aplicado</span></div>
-        </div>
-        <div class="card card-neutral mejora">
-          <span class="mejora-id">3.3</span>
-          <h3>El cambio se anuncia y mueve el foco</h3>
-          <p>Se añadió la región <code>aria-live="polite"</code> que faltaba y el envío de foco al contenido en cada cambio de estado — la única de las cuatro reglas no opcionales del §6.4 que las pantallas no traían.</p>
-          <div class="mejora-badges"><span class="mejora-badge is-listo">Aplicado</span></div>
-        </div>
-        <div class="card card-neutral mejora">
-          <span class="mejora-id">3.4</span>
-          <h3>El error dice qué no se perdió</h3>
-          <p>Las tres partes del mensaje de error —qué pasó, qué no se perdió, qué hacer— más la referencia de error ya venían bien resueltas en las 4 pantallas; solo se corrigió el prefijo de la referencia (de <code>GES-</code> a <code>AV-</code>) para que coincida con el nuevo nombre del módulo.</p>
-          <div class="mejora-badges"><span class="mejora-badge is-listo">Ya estaba bien</span></div>
-        </div>
+        <figcaption>La misma cifra, con dos nombres y dos formas.</figcaption>
+      </figure>
+  </div>
+</section>
+
+<section id="funciona">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Lo que ya funciona bien</div>
+        <h2>Decisiones acertadas que conviene convertir en norma.</h2>
       </div>
     </div>
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list rec-list--ok">
+          <li><span>Los mensajes de error y de pantalla vacía explican qué pasó, tranquilizan sobre lo que no se ha roto («ningún trámite cambió de estatus», «archivar nunca borra nada») y ofrecen una salida clara. Es el mejor material de las cuatro pantallas.</span></li>
+          <li><span>Cada error trae una referencia consultable, como <code>GES-20260901-1105</code>. Soporte y la persona hablan del mismo incidente. Debería extenderse a toda la herramienta.</span></li>
+          <li><span>Las cuatro situaciones de una pantalla están previstas: con datos, cargando, vacío y error. Evita que el equipo de desarrollo improvise esos casos.</span></li>
+          <li><span>El esqueleto de carga imita la forma real del contenido, así que no hay salto visual cuando llegan los datos.</span></li>
+          <li><span>La regla de negocio más delicada está explicada dentro de la pantalla: el reloj no se detiene cuando la dependencia observa un trámite.</span></li>
+          <li><span>«Observado» tiene fila propia y no se esconde dentro de «vencidos». Cuando algo sale en rojo, se ve el motivo.</span></li>
+          <li><span>En móvil la tabla se convierte en tarjetas con su etiqueta, así que no hace falta recordar el orden de las columnas.</span></li>
+          <li><span>El folio es un enlace y la fila completa es navegable. Coincide con cómo trabaja la gestoría: el folio es la unidad de conversación con el cliente y con la dependencia.</span></li>
+          <li><span>El aviso de datos personales del detalle dice qué es cada documento, para qué está y quién puede abrirlo.</span></li>
+          <li><span>Folios, placas y VIN están marcados para que ningún traductor automático los altere.</span></li>
+          <li><span>Hay tema claro y oscuro sobre las mismas variables: cambiar un color se hace en un solo sitio.</span></li>
+          <li><span>El orden del listado se explica en el pie: «los vencidos primero, después por lo que queda de plazo».</span></li>
+        </ul>
+      </article>
 
-    <div class="card card-dark" style="margin-top:3rem;">
-      <h3>Por qué esto importa más que un cambio de nombre</h3>
-      <p>«Gestoría» y «Administración Vehicular» no son sinónimos intercambiables aquí: son dos nombres para el mismo módulo conviviendo en la misma pantalla, y eso es exactamente el tipo de inconsistencia que el objetivo 4 del brief —estandarizar procesos y formatos entre áreas— pide eliminar. Una pantalla que no puede decidir cómo se llama a sí misma tampoco transmite confianza sobre si el plazo que muestra es el correcto.</p>
-      <p>Las mejoras funcionales del área — lo que ninguna de estas 4 pantallas resuelve todavía — se documentan en el <a href="/areas/admin-vehicular#mejoras" style="color:var(--on-dark);text-decoration:underline">perfil del área</a>.</p>
+      <figure class="wire reveal" style="--cyc:9s; --freeze:-5.4s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">Un error que dice qué no se ha roto</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">El servicio no responde.</span><span class="an" style="animation-name:av-paso2">Uno solo dice que falló.</span><span class="an" style="animation-name:av-paso3">El otro dice qué sigue intacto, y con qué referencia.</span></p>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Lo habitual</span>
+            <div class="wf"><div class="wf-top"><b>Trámites vehiculares</b></div>
+              <p class="wf-msg">Error al cargar los datos.</p>
+              <div class="wf-pad"></div>
+              <span class="wf-mini">Reintentar</span></div>
+          </div>
+          <div class="wire-panel is-good">
+            <span class="wire-panel-label">Lo que ya hace esta herramienta</span>
+            <div class="wf"><div class="wf-top"><b>Trámites vehiculares</b></div>
+              <p class="wf-msg">No se pudo cargar la lista de trámites.</p>
+              <p class="wf-sub">Ningún trámite cambió de estatus ni venció por esto. Los plazos los cuenta el servidor.</p>
+              <div class="wf-pad"></div>
+              <span class="wf-acc sueltos"><span class="wf-mini pri">Reintentar</span><span class="wf-mini">Avisar a soporte</span></span>
+              <p class="wf-ref an" style="animation-name:av-lat">Referencia del error: AV-20260901-1105</p></div>
+          </div>
+        </div>
+        <figcaption>La referencia es lo que permite que soporte y la persona hablen del mismo incidente.</figcaption>
+      </figure>
+
+      <article class="card card-aparte reveal">
+        <p><strong>La barra inferior de estados es andamiaje del prototipo.</strong> Conviene marcarla como tal para que el equipo de DPROMA no la interprete como funcionalidad a construir.</p>
+      </article>
     </div>
   </div>
 </section>
 
-<section id="pantallas">
+<section id="ux">
   <div class="wrap">
-    <h2>Las pantallas, para abrirlas</h2>
-    <p class="prose" style="margin-top:1rem">No son dibujos: son las 4 pantallas que compartió el equipo, con las correcciones de nomenclatura, navegación y estados ya aplicadas. Se pueden abrir, cambiar entre sus estados —con datos, cargando, vacío y error—, probar el tema claro y el oscuro, y recorrerlas solo con el teclado.</p>
-    <ul class="maquetas-lista">
-      <li><a href="/entregables/propuestas/administracion-vehicular-tablero">
-        <b>Tablero de Administración Vehicular</b>
-        <span>Trámites por plaza con semáforo de plazo, más viáticos pendientes de autorizar e incidencias de servicio abiertas.</span>
-        <span class="maquetas-cambio">Se corrige la nomenclatura, se retira el ítem de menú duplicado, se añaden los dos bloques que faltaban y se reconstruyen los estados vacío/error según el §6.4 del sistema de diseño.</span></a></li>
-      <li><a href="/entregables/propuestas/administracion-vehicular-tramites">
-        <b>Trámites vehiculares</b>
-        <span>El listado activo, con búsqueda por folio, cliente, placas o VIN y filtro por plaza.</span>
-        <span class="maquetas-cambio">Mismas correcciones de nomenclatura, menú y estados que el resto de la familia.</span></a></li>
-      <li><a href="/entregables/propuestas/administracion-vehicular-tramite-detalle">
-        <b>Detalle de trámite</b>
-        <span>El reloj de plazo en días hábiles y la bitácora del trámite, incluido el aviso de que un trámite observado sigue venciendo.</span>
-        <span class="maquetas-cambio">Es la pantalla donde el defecto de las vistas de estado era más visible — el icono suelto sin tarjeta ni encabezado real — y donde se aplicó primero la corrección del §6.4.</span></a></li>
-      <li><a href="/entregables/propuestas/administracion-vehicular-concluidos">
-        <b>Trámites concluidos</b>
-        <span>El listado de trámites ya entregados y cerrados, con su acuse y la acción de archivar.</span>
-        <span class="maquetas-cambio">Mismas correcciones; además, sus estados eran los que más se apoyaban en la palabra «gestoría» para explicar de dónde vienen los trámites.</span></a></li>
-    </ul>
-    <p class="maquetas-pie">El sistema de diseño que comparten las 4 pantallas se documenta en el entregable <a href="/entregables/reglas-de-diseno">Sistema de diseño</a>. Los hallazgos de investigación citados aquí (pp-081 a pp-089, pp-040 a pp-052) están en <code>data/insights/2026-07-23_comercial-administracion-vehicular.json</code> y <code>data/insights/2026-07-31_administracion-vehicular-equipo.json</code>.</p>
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Recomendaciones</div>
+        <h2>UX y arquitectura de la información</h2>
+      </div>
+    </div>
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list">
+          <li><span>Fijar un único nombre por estado y usarlo en todas partes. Elegir entre «sin reloj» y «sin admitir», entre «gestoría» y «trámites vehiculares», y no alternar.</span></li>
+          <li><span>Separar dos ideas que hoy se mezclan: en qué fase está el trámite y cómo va de plazo. «En dependencia» es una fase; «vencido» es una condición de tiempo. Siempre dos datos distintos.</span></li>
+          <li><span>Decidir si «observado» es un estado o una alerta. Hoy actúa como las dos cosas. Recomendamos tratarlo como una señal que se superpone a la fase, igual que el plazo.</span></li>
+          <li><span>Separar visual y físicamente lo que filtra de lo que solo informa. Si una etiqueta de conteo filtra al pulsarla, debe parecer un control; si no filtra, no debe parecerlo.</span></li>
+          <li><span>Decir siempre a qué se refiere cada número: de todos tus trámites, de los que pasan el filtro, o de esta página.</span></li>
+          <li><span>Hacer que los filtros aplicados sean el único sitio donde se ve el estado del filtrado. Hoy está repartido entre el desplegable y la etiqueta, y se contradicen.</span></li>
+          <li><span>Permitir ordenar por plazo, fecha de conclusión y responsable. Hoy el orden lo fija el sistema y solo se explica en el pie.</span></li>
+          <li><span>Añadir filtro por rango de fechas en trámites concluidos. Con 184 registros y solo paginación, encontrar un trámite de julio exige recorrer páginas.</span></li>
+          <li><span>Unificar el buscador entre pantallas, y decir si busca en todo el histórico o solo en lo que se ve.</span></li>
+          <li><span>Nombrar cada acción por su resultado: «Exportar la lista filtrada a Excel», no un icono de descarga.</span></li>
+          <li><span>Dar salida a la acción que resuelve el problema. Si el trámite está observado porque falta la ficha técnica, el botón de subirla va junto al aviso, no al final de la lista de documentos.</span></li>
+          <li><span>Añadir la ruta de vuelta en el detalle, y permitir moverse al trámite anterior y siguiente dentro del mismo filtro.</span></li>
+          <li><span>Revisar la acción duplicada de las filas: el folio ya es un enlace, un botón «Abrir» en la misma fila añade ruido.</span></li>
+          <li><span>Definir qué pasa tras cada acción. Al archivar, ¿la fila desaparece, se atenúa, se puede deshacer? Es donde más se rompen las herramientas internas.</span></li>
+        </ul>
+      </article>
+
+      <figure class="wire reveal" style="--cyc:10s; --freeze:-5.6s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">Lo que filtra y lo que solo informa</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Cuatro pastillas con la misma forma.</span><span class="an" style="animation-name:av-paso2">Se pulsa «3 vencidos»: no pasa nada, solo informaba.</span><span class="an" style="animation-name:av-paso3">Se pulsa «Estatus»: esa sí filtra.</span></p>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Lo habitual</span>
+            <div class="wf"><div class="wf-top"><b>Trámites vehiculares</b></div>
+              <div class="wf-bar">
+                <span class="wf-pill wf-pill--err">3 vencidos</span>
+                <span class="wf-pill wf-pill--warn">5 por vencer</span>
+                <span class="wf-pill wf-pill--gris">Plaza</span>
+                <span class="wf-pill wf-pill--gris">Estatus</span>
+              </div>
+              <p class="wf-sub an" style="animation-name:av-nada">Nada cambia: esa pastilla solo informaba.</p>
+              <div class="wf-pad"></div>
+              <div class="wf-tabla">
+                <div class="wf-fila"><span class="folio">TV-0412</span><span class="cli">Comercializadora Vértice</span><span class="sep"><span class="wf-pill wf-pill--err">−2 d</span></span></div>
+                <div class="wf-fila an" style="animation-name:av-filtra"><span class="folio">TV-0424</span><span class="cli">Autos del Valle SAPI</span><span class="sep"><span class="wf-pill wf-pill--ok">4 d</span></span></div>
+              </div>
+              <span class="wf-ripple an" style="animation-name:av-press, av-press-pos"></span>
+              <span class="wf-cursor an" style="animation-name:av-cursor-filtro"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--a-surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span></div>
+          </div>
+          <div class="wire-panel is-good">
+            <span class="wire-panel-label">Lo recomendado</span>
+            <div class="wf"><div class="wf-top"><b>Trámites vehiculares</b></div>
+              <div class="wf-zona" style="margin-bottom:.5rem">
+                <span class="wf-zona-et">Resumen</span>
+                <div class="wf-bar">
+                  <span class="wf-pill wf-pill--err">3 vencidos</span>
+                  <span class="wf-pill wf-pill--warn">5 por vencer</span>
+                </div>
+              </div>
+              <div class="wf-zona">
+                <span class="wf-zona-et">Filtros</span>
+                <div class="wf-bar">
+                  <span class="wf-pill wf-pill--control">Plaza: <b>Todas</b> <span class="g">&#9662;</span></span>
+                  <span class="wf-pill wf-pill--control">Estatus: <b>Todos</b> <span class="g">&#9662;</span></span>
+                </div>
+              </div>
+              <div class="wf-pad"></div>
+              <div class="wf-tabla">
+                <div class="wf-fila"><span class="folio">TV-0412</span><span class="cli">Comercializadora Vértice</span><span class="sep"><span class="wf-pill wf-pill--err">−2 d</span></span></div>
+                <div class="wf-fila"><span class="folio">TV-0424</span><span class="cli">Autos del Valle SAPI</span><span class="sep"><span class="wf-pill wf-pill--ok">4 d</span></span></div>
+              </div></div>
+          </div>
+        </div>
+        <figcaption>Cuatro pastillas idénticas, y solo dos filtran. A la derecha cada zona declara para qué está.</figcaption>
+      </figure>
+    </div>
   </div>
 </section>
+
+<section id="ui">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Recomendaciones</div>
+        <h2>Interfaz</h2>
+      </div>
+    </div>
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list">
+          <li><span>Reducir la escala a cinco o seis tamaños y a tres grosores, y asignar una función a cada tamaño: título de pantalla, título de bloque, cuerpo, dato secundario y etiqueta.</span></li>
+          <li><span>Eliminar los tamaños fuera de escala. Los 10,5 y 11,5 píxeles no aportan diferencia perceptible y rompen la coherencia.</span></li>
+          <li><span>Limitar el texto en mayúsculas con espaciado. En tamaños pequeños cuesta leerlo.</span></li>
+          <li><span>Definir tres familias visuales distintas: etiqueta de fase, indicador de plazo y control de filtro. Hoy las tres comparten forma de píldora y tamaño parecido.</span></li>
+          <li><span>Retirar el borde punteado como distinción, o explicarlo en la leyenda si significa «todavía no cuenta plazo».</span></li>
+          <li><span>Dar a «observado» un color propio, distinto del rojo de vencido. El morado ya está en el sistema y hoy solo se usa para privacidad.</span></li>
+          <li><span>Hacer que los filtros activos se distingan sin depender del color: un cambio de forma o un icono de comprobación además del fondo.</span></li>
+          <li><span>Aplicar una única escala de espaciado, múltiplos de cuatro píxeles, sin valores sueltos intermedios.</span></li>
+          <li><span>Igualar la altura de las filas de tabla. La nota bajo el plazo, que unas filas llevan y otras no, puede mostrarse al pasar el cursor o en el detalle.</span></li>
+          <li><span>Unificar la cabecera de las cuatro pantallas: misma estructura, mismos huecos y mismo lugar para la acción principal.</span></li>
+          <li><span>Hacer evidente el paso del cursor, con cambio de fondo visible y no un matiz. Afecta al asistente, al menú lateral y a los botones secundarios.</span></li>
+          <li><span>Dar texto visible a la acción principal de cada pantalla, y dejar una sola acción principal por pantalla.</span></li>
+          <li><span>Prever los estados de las acciones que tardan: guardando, guardado, falló. Hoy solo existe el reposo.</span></li>
+          <li><span>Evitar que el texto de las celdas se corte sin recuperación. Razones sociales largas y VIN quedan truncados y no hay forma de ver el valor completo.</span></li>
+          <li><span>Revisar la posición del asistente flotante, que se sitúa justo encima de la paginación, y el degradado inferior de las listas, que hace creer que hay contenido oculto.</span></li>
+          <li><span>En el tablero, abrir por lo que vence hoy y mañana, no por el reparto por plaza. El reparto es contexto; el vencimiento es trabajo. Y añadir una marca de última actualización.</span></li>
+        </ul>
+      </article>
+
+      <figure class="wire reveal" style="--cyc:8s; --freeze:-4.6s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">Vencido y observado no son lo mismo</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Tres filas en el mismo rojo.</span><span class="an" style="animation-name:av-paso2">Dos son observaciones de la dependencia, no plazos incumplidos.</span><span class="an" style="animation-name:av-paso3">Con color propio e icono, se separan de un vistazo.</span></p>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Lo habitual</span>
+            <div class="wf"><div class="wf-tabla">
+                <div class="wf-thead"><span style="min-width:5.2rem">Folio</span><span>Cliente</span><span class="sep">Estatus</span></div>
+                <div class="wf-fila"><span class="folio">TV-0412</span><span class="cli">Comercializadora Vértice</span><span class="sep"><span class="wf-pill wf-pill--err">Vencido</span></span></div>
+                <div class="wf-fila"><span class="folio">TV-0418</span><span class="cli">Flotillas del Centro Norte</span><span class="sep"><span class="wf-pill wf-pill--err">Observado</span></span></div>
+                <div class="wf-fila"><span class="folio">TV-0421</span><span class="cli">Refaccionaria del Altiplano</span><span class="sep"><span class="wf-pill wf-pill--err">Observado</span></span></div>
+              </div></div>
+          </div>
+          <div class="wire-panel is-good">
+            <span class="wire-panel-label">Lo recomendado</span>
+            <div class="wf"><div class="wf-tabla">
+                <div class="wf-thead"><span style="min-width:5.2rem">Folio</span><span>Cliente</span><span class="sep">Estatus</span></div>
+                <div class="wf-fila"><span class="folio">TV-0412</span><span class="cli">Comercializadora Vértice</span><span class="sep"><span class="wf-pill wf-pill--err">&#9888; Vencido</span></span></div>
+                <div class="wf-fila"><span class="folio">TV-0418</span><span class="cli">Flotillas del Centro Norte</span><span class="sep"><span class="wf-pill wf-pill--block an" style="animation-name:av-lat">&#9673; Observado</span></span></div>
+                <div class="wf-fila"><span class="folio">TV-0421</span><span class="cli">Refaccionaria del Altiplano</span><span class="sep"><span class="wf-pill wf-pill--block an" style="animation-name:av-lat">&#9673; Observado</span></span></div>
+              </div></div>
+          </div>
+        </div>
+        <figcaption>Un plazo incumplido y una petición de la dependencia son dos problemas distintos.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="accesibilidad">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Recomendaciones</div>
+        <h2>Accesibilidad</h2>
+        <p class="section-note">WCAG 2.2 nivel AA. El texto ya cumple; falta contraste de bordes, tamaño de zonas pulsables y anuncio de cambios.</p>
+      </div>
+    </div>
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list">
+          <li><span>Subir el contraste de bordes y separadores. Los bordes de campos, botones y etiquetas rondan 1,3:1 frente al 3:1 exigido. En una pantalla clara o con reflejos, los campos desaparecen.</span></li>
+          <li><span>Reforzar el resalte al pasar el cursor y al seleccionar en el menú lateral. La diferencia actual sobre el azul es mínima.</span></li>
+          <li><span>No confiar solo en el color para el semáforo de plazo: añadir un icono distinto por estado. Lo mismo para «acuse entregado» y «falta entregar acuse».</span></li>
+          <li><span>Comprobar el tema oscuro con el mismo rasero. Los textos cumplen, pero los bordes bajan aún más que en el claro.</span></li>
+          <li><span>Subir a 24 píxeles como mínimo real todas las zonas pulsables en escritorio. Los botones pequeños de las filas, el aspa que quita un filtro y el botón de copiar quedan en el límite o por debajo.</span></li>
+          <li><span>Separar los botones que van juntos en una fila. «Archivar» y «Ver expediente» están a 6 píxeles: en pantalla táctil se pulsa uno por otro, y archivar por error genera desconfianza.</span></li>
+          <li><span>Revisar los botones de icono dentro de las tablas, que se quedan en 28 píxeles incluso en táctil.</span></li>
+          <li><span>Verificar que el anillo de foco se ve sobre todos los fondos, en especial sobre las etiquetas de color y sobre el menú azul.</span></li>
+          <li><span>Garantizar que el asistente flotante se alcanza con teclado, que el foco entra al abrirlo y vuelve al botón al cerrarlo.</span></li>
+          <li><span>Asegurar que los filtros desplegables funcionan con teclado y que se sale con escape sin perder la selección.</span></li>
+          <li><span>Anunciar el cambio de resultados al filtrar. Quien no ve la pantalla no percibe que la lista pasó de 36 a 3 elementos.</span></li>
+          <li><span>Anunciar también los estados de vacío y error. Hoy solo se avisa del de carga.</span></li>
+          <li><span>Convertir los títulos de las pantallas vacías y de error en encabezados reales, para poder navegar por ellos.</span></li>
+          <li><span>Revisar los títulos de grupo del menú lateral, marcados a la vez como decorativos y como nombre del grupo.</span></li>
+          <li><span>Describir la acción completa en los botones de icono: «Exportar los trámites concluidos que se están viendo».</span></li>
+          <li><span>Dar nombre único a los dieciséis enlaces del semáforo del tablero: «3 por vencer en Querétaro Centro».</span></li>
+          <li><span>Añadir una leyenda del semáforo en el listado y en el detalle, donde hoy los colores aparecen sin explicación.</span></li>
+          <li><span>Respetar la preferencia de movimiento reducido en todas las animaciones, incluida la del asistente flotante.</span></li>
+        </ul>
+      </article>
+
+      <figure class="wire reveal" style="--cyc:8s; --freeze:-4.8s">
+        <div class="wire-head">
+          <span class="wire-tag">Simulación</span>
+          <span class="wire-title">Seis píxeles entre archivar y abrir</span>
+          <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+        </div>
+        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Dos acciones pegadas al final de la fila.</span><span class="an" style="animation-name:av-paso2">El dedo cae entre las dos.</span><span class="an" style="animation-name:av-paso3">Se archiva el trámite equivocado.</span></p>
+        <div class="wire-stage wire-stage--split" aria-hidden="true">
+          <div class="wire-panel is-bad">
+            <span class="wire-panel-label">Lo habitual</span>
+            <div class="wf"><div class="wf-tabla">
+                <div class="wf-fila"><span class="folio">TV-0412</span><span class="cli">Comercializadora Vértice</span><span class="sep wf-acc juntos"><span class="wf-mini">Archivar</span><span class="wf-mini">Ver expediente</span></span></div>
+              </div>
+              <p class="wf-msg an" style="animation-name:av-fallo" style2="">Se archivó el trámite equivocado.</p>
+              <span class="wf-ripple wf-ripple--dead an" style="animation-name:av-press; transform:translate(21.3rem,2.47rem)"></span>
+              <span class="wf-cursor an" style="animation-name:av-cursor-tap"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--a-surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span></div>
+          </div>
+          <div class="wire-panel is-good">
+            <span class="wire-panel-label">Lo recomendado</span>
+            <div class="wf"><div class="wf-tabla">
+                <div class="wf-fila"><span class="folio">TV-0412</span><span class="cli">Comercializadora Vértice</span><span class="sep wf-acc sueltos"><span class="wf-mini">Ver expediente</span><span class="wf-mini">Archivar</span></span></div>
+              </div>
+              <p class="wf-sub">Zonas de 24 píxeles, separadas, y lo destructivo al final.</p></div>
+          </div>
+        </div>
+        <figcaption>Archivar por error es de los fallos que más desconfianza generan en una herramienta interna.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="componente-filtros">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Componente</div>
+        <h2>La barra de filtros ya está construida.</h2>
+        <p class="section-note">Documentada en el <a href="/entregables/reglas-de-diseno#g-filtros">sistema de diseño</a>, §6.21.</p>
+      </div>
+    </div>
+<figure class="fsim" aria-hidden="true">
+      <div class="fsim-stage">
+        <div class="fsim-bar">
+          <span class="fsim-chip"><i class="w-md"></i><i class="w-lg"></i><span class="caret"></span></span>
+          <span class="fsim-chip fsim-chip--on an" style="animation-name:fs-chip-on"><i class="w-sm"></i><i class="w-md"></i><span class="caret"></span></span>
+          <span class="fsim-chip"><i class="w-md"></i><i class="w-sm"></i><span class="caret"></span></span>
+          <span class="fsim-chip fsim-chip--mas"><span class="mas"></span><i class="w-md"></i></span>
+        </div>
+
+        <div class="fsim-pop an" style="animation-name:fs-pop; left:6.6rem">
+          <div class="fsim-busc">
+            <span class="fsim-lupa"></span>
+            <span class="fsim-tecleo an" style="animation-name:fs-tecleo"></span>
+            <span class="fsim-caret an" style="animation-name:fs-caret"></span>
+          </div>
+          <div class="fsim-fila"><span class="fsim-box"><span class="ll an" style="animation-name:fs-marca"></span><b class="an" style="animation-name:fs-tic"></b></span><i style="width:5.2rem"></i><span class="n"></span></div>
+          <div class="fsim-fila"><span class="fsim-box"><span class="ll an" style="animation-name:fs-marca-2"></span><b class="an" style="animation-name:fs-tic-2"></b></span><i style="width:4.1rem"></i><span class="n"></span></div>
+          <div class="fsim-fila"><span class="fsim-box"></span><i style="width:6rem"></i><span class="n"></span></div>
+          <div class="fsim-fila"><span class="fsim-box"></span><i style="width:3.4rem"></i><span class="n"></span></div>
+        </div>
+
+        <div class="fsim-aplic">
+          <span class="fsim-pill an" style="animation-name:fs-pill"><i style="width:3.6rem"></i><span class="x"></span></span>
+          <span class="fsim-pill an" style="animation-name:fs-pill-2"><i style="width:2.6rem"></i><span class="x"></span></span>
+          <span class="fsim-quitar an" style="animation-name:fs-quitar"></span>
+        </div>
+
+        <div class="fsim-tabla">
+          <i class="an" style="animation-name:fs-tabla; width:100%"></i>
+          <i class="an" style="animation-name:fs-tabla; width:92%"></i>
+          <i class="an" style="animation-name:fs-tabla; width:96%"></i>
+          <i class="an" style="animation-name:fs-tabla; width:88%"></i>
+        </div>
+
+        <span class="fsim-ripple an" style="animation-name:fs-ripple, fs-ripple-pos"></span>
+        <span class="fsim-cursor an" style="animation-name:fs-cursor">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 1l5.2 13 2-5.4 5.4-2z"/></svg>
+        </span>
+      </div>
+    </figure>
+  </div>
+</section>
+
+</div><!-- /#p-diag -->
+
+<div class="panel" id="p-pant" role="tabpanel" aria-labelledby="t-pant" tabindex="-1" hidden>
+
+<section class="maquetas-mod" id="pantallas">
+  <div class="wrap">
+    <h2>Las pantallas, para abrirlas</h2>
+    <p class="maquetas-lede">Construidas con los tokens del sistema y con los hallazgos ya
+      aplicados. Cambian entre sus cuatro estados, tienen tema claro y oscuro, bajan a móvil y se
+      recorren con el teclado.</p>
+    <ul class="maquetas-lista">
+      <li><a href="/entregables/propuestas/administracion-vehicular-tablero">
+        <b>Tablero</b>
+        <span>El estado del módulo de un vistazo: los trámites con el reloj corriendo,
+          repartidos por plaza, y el desglose por estado detrás de una cascada.</span>
+        <span class="maquetas-cambio">Tenía alrededor de cincuenta cifras compitiendo entre sí.
+          La reducción sale de una partición: un trámite o tiene el reloj corriendo o no lo tiene.
+          «Observado» deja de ser una cuarta casilla —su reloj sigue corriendo— y pasa a marca. De
+          once cifras por plaza a entre dos y cuatro.</span></a></li>
+      <li><a href="/entregables/propuestas/administracion-vehicular-tramites">
+        <b>Trámites vehiculares</b>
+        <span>El listado completo, con la barra de filtros por plaza, trámite, responsable,
+          plazo y estatus.</span>
+        <span class="maquetas-cambio">Los filtros eran botones sin panel, con un valor por
+          dimensión. Ahora cada uno abre un desplegable con buscador y casillas, y lo seleccionado
+          baja a pastillas con un tope visible. El buscador pintaba además dos anillos de foco
+          concéntricos.</span></a></li>
+      <li><a href="/entregables/propuestas/administracion-vehicular-tramite-detalle">
+        <b>Detalle de trámite</b>
+        <span>El expediente abierto: reloj de plazo en días hábiles, bitácora, documentos y
+          contacto del cliente.</span>
+        <span class="maquetas-cambio">La tarjeta del reloj recibía lo que sobrara —doscientos
+          cincuenta píxeles para una cifra grande, un párrafo y tres fechas— y se veía apretada
+          porque lo estaba. Y el contacto del cliente vivía al final de la columna derecha, debajo
+          de los documentos.</span></a></li>
+      <li><a href="/entregables/propuestas/administracion-vehicular-concluidos">
+        <b>Trámites concluidos</b>
+        <span>El cierre con acuse y el archivado, que es a donde salen los trámites que ya no
+          están en curso.</span>
+        <span class="maquetas-cambio">No tenía barra de filtros: adopta la misma que Trámites
+          vehiculares. Que dos pantallas hermanas filtren distinto es una fuente de fricción
+          gratuita.</span></a></li>
+    </ul>
+    <p class="maquetas-pie">El sistema de diseño que comparten se puede leer en el entregable
+      <a href="/entregables/reglas-de-diseno">Sistema de diseño</a>, y las piezas de dato visual
+      que usa el tablero en su sección <a href="/entregables/reglas-de-diseno#dashboard">Capa de dashboard</a>. El
+      relato completo de la revisión —qué se encontró, qué se midió y qué regla dejó cada
+      hallazgo— está en <code>docs/cambios-ux-ui-administracion-vehicular.pdf</code>.</p>
+  </div>
+</section>
+
+</div><!-- /#p-pant -->
 
 <footer>
   <div class="wrap">
     <div class="footer-nav"><a href="/entregables">← Volver a Entregables</a></div>
     <div class="footer-meta">
-      <span>2894 Studio × DPROMA — entregable de área</span>
+      <span>2894 Studio × DPROMA · Entregable, septiembre 2026</span>
       <a href="/">Ver la síntesis completa →</a>
     </div>
   </div>
 </footer>
+
+<script>
+/* Pestañas. El panel oculto no dispara el IntersectionObserver de .reveal, así
+   que al abrirlo hay que revelar lo suyo o el contenido se queda invisible. */
+(function(){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  if(!tabs.length) return;
+  var paneles = tabs.map(function(t){ return document.getElementById(t.getAttribute('aria-controls')); });
+
+  function revela(panel){
+    panel.querySelectorAll('.reveal:not(.is-visible)').forEach(function(el){
+      el.classList.add('is-visible');
+    });
+  }
+  function activa(tab, mueveFoco){
+    tabs.forEach(function(t, i){
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      paneles[i].hidden = !on;
+      if(on) revela(paneles[i]);
+    });
+    if(mueveFoco) tab.focus();
+  }
+  tabs.forEach(function(tab, i){
+    tab.addEventListener('click', function(){ activa(tab, false); });
+    tab.addEventListener('keydown', function(e){
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if(d){ e.preventDefault(); activa(tabs[(i + d + tabs.length) % tabs.length], true); }
+      else if(e.key === 'Home'){ e.preventDefault(); activa(tabs[0], true); }
+      else if(e.key === 'End'){ e.preventDefault(); activa(tabs[tabs.length - 1], true); }
+    });
+  });
+
+  /* Un enlace a una sección abre antes la pestaña que la contiene: si no, el
+     navegador no encuentra a dónde desplazarse. */
+  function abrePara(hash){
+    if(!hash || hash === '#') return false;
+    var destino;
+    try { destino = document.querySelector(hash); } catch(err){ return false; }
+    if(!destino) return false;
+    var panel = destino.closest('.panel');
+    if(!panel) return false;
+    var i = paneles.indexOf(panel);
+    if(i < 0 || !panel.hidden) return false;
+    activa(tabs[i], false);
+    return true;
+  }
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(){
+      if(abrePara(a.getAttribute('href'))){
+        var destino = document.querySelector(a.getAttribute('href'));
+        requestAnimationFrame(function(){ destino.scrollIntoView({ block:'start' }); });
+      }
+    });
+  });
+
+  /* #pantallas abre la pestaña de las maquetas: sirve para enviar el enlace directo. */
+  function porHash(){
+    if(location.hash === '#pantallas'){ activa(tabs[1], false); return; }
+    abrePara(location.hash);
+  }
+  window.addEventListener('hashchange', porHash);
+  porHash();
+})();
+/* Reveal-on-scroll */
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var els = document.querySelectorAll('.reveal');
+  if(reduced || !('IntersectionObserver' in window)){
+    els.forEach(function(el){ el.classList.add('is-visible'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('is-visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
+  /* threshold 0: con 0.15 un bloque más alto que la ventana nunca llegaba a
+     mostrar el 15% exigido y se quedaba invisible para siempre. */
+  els.forEach(function(el){ io.observe(el); });
+})();
+
+/* Claim con scroll-linked word reveal */
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var scroller = document.getElementById('claimScroller');
+  var words = Array.prototype.slice.call(document.querySelectorAll('.claim-word'));
+  var hint = document.getElementById('claimScrollHint');
+  if(!scroller || !words.length) return;
+
+  if(reduced){
+    words.forEach(function(w){ w.classList.add('is-lit'); });
+    return;
+  }
+
+  var raf = null;
+  function update(){
+    var rect = scroller.getBoundingClientRect();
+    var total = scroller.offsetHeight - window.innerHeight;
+    var scrolled = -rect.top;
+    var progress = Math.max(0, Math.min(1, total > 0 ? scrolled / total : 1));
+    var lit = Math.round(progress * words.length);
+    words.forEach(function(w, i){ w.classList.toggle('is-lit', i < lit); });
+    if(hint) hint.style.opacity = progress > 0.05 ? '0' : '1';
+  }
+  window.addEventListener('scroll', function(){
+    if(raf) return;
+    raf = requestAnimationFrame(function(){ update(); raf = null; });
+  }, { passive: true });
+  update();
+})();
+</script>
+
+<script>
+/* Pausa de las simulaciones. WCAG 2.2.2: todo movimiento que arranca solo,
+   dura más de 5s y convive con texto necesita una forma de detenerlo. */
+(function(){
+  document.querySelectorAll('[data-wire-toggle]').forEach(function(btn){
+    var fig = btn.closest('.wire');
+    if(!fig) return;
+    btn.addEventListener('click', function(){
+      var paused = fig.classList.toggle('is-paused');
+      btn.setAttribute('aria-pressed', paused ? 'true' : 'false');
+      btn.textContent = paused ? 'Reproducir' : 'Pausar';
+    });
+  });
+})();
+</script>
 
 </body>
 </html>
