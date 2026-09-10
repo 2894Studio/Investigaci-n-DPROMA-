@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jerarquía del dashboard de proyección · Entregables DPROMA × 2894 Studio</title>
+<meta name="description" content="Evaluación de las 20 vistas del dashboard proyectado de SIO-DPROMA y propuesta de un ciclo de 12 pantallas construidas para leerse en diez segundos." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cloud-white: #F7F8FA;
+  --soft-gray: #E6E8EC;
+  --ink-black: #0B0B0D;
+  --deep-cobalt: #0A46FF;
+  --sky-blue: #7DB7FF;
+
+  --bg: var(--cloud-white);
+  --surface: #FFFFFF;
+  --surface-alt: var(--soft-gray);
+  --text: var(--ink-black);
+  --text-muted: #53565f;
+  --border: #d8dbe2;
+  --accent: var(--deep-cobalt);
+  --accent-fill: var(--deep-cobalt);
+  --accent-text: #0A3FD6;
+  --accent-soft: var(--sky-blue);
+  --on-accent: var(--cloud-white);
+  --on-dark: var(--cloud-white);
+  --dark-surface: var(--ink-black);
+  --dark-surface-text-muted: #b9bec9;
+  --shadow: 0 1px 2px rgba(11,11,13,0.04), 0 8px 24px rgba(11,11,13,0.06);
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: #0B0B0D;
+    --surface: #16171c;
+    --surface-alt: #1c1e24;
+    --text: #F7F8FA;
+    --text-muted: #b9bec9;
+    --border: #2a2d35;
+    --accent: #3D6BFF;
+    --accent-fill: #2E56DE;
+    --accent-text: #8FA8FF;
+    --accent-soft: #9CC7FF;
+    --on-accent: #F7F8FA;
+    --dark-surface: #000000;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg: #0B0B0D;
+  --surface: #16171c;
+  --surface-alt: #1c1e24;
+  --text: #F7F8FA;
+  --text-muted: #b9bec9;
+  --border: #2a2d35;
+  --accent: #3D6BFF;
+  --accent-fill: #2E56DE;
+  --accent-text: #8FA8FF;
+  --accent-soft: #9CC7FF;
+  --on-accent: #F7F8FA;
+  --dark-surface: #000000;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+}
+:root[data-theme="light"]{
+  --bg: var(--cloud-white);
+  --surface: #FFFFFF;
+  --surface-alt: var(--soft-gray);
+  --text: var(--ink-black);
+  --text-muted: #53565f;
+  --border: #d8dbe2;
+  --accent: var(--deep-cobalt);
+  --accent-fill: var(--deep-cobalt);
+  --accent-text: #0A3FD6;
+  --accent-soft: var(--sky-blue);
+  --on-accent: var(--cloud-white);
+  --dark-surface: var(--ink-black);
+  --shadow: 0 1px 2px rgba(11,11,13,0.04), 0 8px 24px rgba(11,11,13,0.06);
+}
+
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior: auto; }
+  *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+a{ color: var(--accent-text); }
+a:focus-visible, button:focus-visible, summary:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.wrap{ max-width: 1120px; margin: 0 auto; padding: 0 clamp(1.25rem, 4vw, 2.5rem); }
+
+h1,h2,h3{ font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; margin: 0; }
+
+.prose p{ max-width: 66ch; color: var(--text-muted); }
+.prose p + p{ margin-top: 1em; }
+
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+.eyebrow{
+  display:inline-flex; align-items:center; gap: 0.5em;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent-text);
+}
+.eyebrow::before{ content:""; width: 0.5em; height: 0.5em; border-radius: 999px; background: var(--accent); display:inline-block; }
+
+/* Masthead */
+header.masthead{ padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
+.masthead-inner{ display:flex; align-items:center; justify-content:space-between; gap: 1rem; flex-wrap: wrap; }
+.wordmark{ font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em; text-transform: uppercase; text-decoration:none; color: var(--text); }
+.wordmark span{ color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+.masthead nav{ display:flex; align-items:center; gap: 1.5rem; flex-wrap: wrap; }
+.masthead nav a{ font-size: 0.875rem; font-weight: 500; color: var(--text-muted); text-decoration: none;
+  display:inline-flex; align-items:center; min-height: 24px; }
+.masthead nav a:hover{ color: var(--accent-text); }
+.masthead nav a.nav-cta{
+  background: var(--accent-fill); color: var(--on-accent);
+  padding: 0.45em 1.1em; border-radius: 999px; font-weight: 700;
+}
+.masthead nav a.nav-cta:hover{ background: var(--accent-fill); opacity:.88; color: var(--on-accent); }
+
+/* Sections */
+section{ padding: clamp(2.5rem, 6vw, 4rem) 0; }
+section + section{ border-top: 1px solid var(--border); }
+.section-head{ display:flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.section-head h2{ font-size: clamp(1.5rem, 3vw, 2rem); margin-top: 0.5rem; }
+.section-head .section-note{ max-width: 56ch; color: var(--text-muted); font-size: 0.9375rem; margin-top: 0.25rem; }
+
+/* Reveal-on-scroll */
+.reveal{ opacity:0; transform: translateY(16px); transition: opacity .5s ease, transform .5s ease; }
+.reveal.is-visible{ opacity:1; transform:none; }
+@media (prefers-reduced-motion: reduce){
+  .reveal{ opacity:1 !important; transform:none !important; }
+}
+
+/* Claim hero con scroll-linked word reveal */
+.card{ border-radius: 18px; padding: 1.5rem; display:flex; flex-direction:column; gap: 0.75rem; box-shadow: var(--shadow); }
+.card-neutral{ background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+.card-brand{ background: var(--accent-fill); color: var(--on-accent); }
+.card-dark{ background: var(--dark-surface); color: var(--on-dark); }
+.card h3{ font-size: 1.0625rem; font-weight: 700; }
+.card p{ font-size: 0.9375rem; margin:0; opacity: 0.88; }
+.card-neutral p{ color: var(--text-muted); opacity: 1; }
+
+/* Diagnóstico */
+.evidence-stack{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+@media (max-width: 760px){ .evidence-stack{ grid-template-columns: 1fr; } }
+.evidence-card{ padding: 1.75rem 2rem; }
+
+/* Glosa: explica un término en español llano donde aparece */
+.spec-scroll{ overflow-x: auto; margin-top: 1.25rem; }
+.spec-table{ width:100%; border-collapse: collapse; font-size: 0.875rem; }
+.spec-table th{
+  text-align:left; font-weight:700; font-size:0.75rem; text-transform:uppercase;
+  letter-spacing:0.08em; color:var(--text-muted); padding:0.6rem 0.75rem;
+  border-bottom:1px solid var(--border); white-space:nowrap;
+}
+.spec-table td{ padding:0.7rem 0.75rem; border-bottom:1px solid var(--border); color:var(--text-muted); vertical-align:top; }
+.spec-table td:first-child{ color:var(--text); font-weight:500; }
+.spec-table code{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8125rem; color: var(--accent-text); }
+.tabs-wrap{padding:0 0 clamp(.5rem,2vw,1rem)}
+.tabs{display:inline-flex;gap:.3rem;background:var(--surface-alt);padding:.3rem;
+  border-radius:999px;border:1px solid var(--border);max-width:100%;flex-wrap:wrap}
+.tab{appearance:none;font-family:inherit;font-size:.875rem;font-weight:700;
+  padding:.62em 1.25em;border-radius:999px;border:1px solid transparent;
+  background:transparent;color:var(--text-muted);cursor:pointer;min-height:2.75rem;
+  transition:background-color 160ms ease,color 160ms ease,border-color 160ms ease}
+.tab:hover{color:var(--text)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--text);
+  border-color:var(--accent);box-shadow:var(--shadow)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.panel:focus{outline:none}
+.panel[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.tab{transition:none}}
+
+.maquetas-mod{padding:clamp(2rem,5vw,3rem) 0 clamp(3rem,7vw,5rem)}
+.maquetas-lede{max-width:62ch;margin:.75rem 0 1.75rem}
+.maquetas-lista{list-style:none;padding:0;margin:0;display:grid;gap:1rem;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.maquetas-lista a{display:flex;flex-direction:column;gap:.4rem;height:100%;
+  padding:1.15rem 1.25rem;border:1px solid var(--border,#e5e7eb);border-radius:12px;
+  text-decoration:none;color:inherit;transition:border-color .2s,transform .2s}
+.maquetas-lista a:hover{border-color:currentColor;transform:translateY(-2px)}
+.maquetas-lista b{font-size:1.0625rem}
+.maquetas-lista span{font-size:.9375rem;color:var(--text-muted);line-height:1.5}
+.maquetas-cambio{font-size:.875rem;opacity:1;color:var(--text-muted);
+  margin-top:.5rem;padding-top:.7rem;border-top:1px solid var(--border)}
+.maquetas-cambio code{font-size:.875em;padding:.1em .3em;border-radius:4px;
+  background:rgba(127,127,127,.14)}
+.maquetas-pie{margin-top:1.5rem;font-size:.9375rem;color:var(--text-muted);max-width:70ch}
+.maquetas-pie code{font-size:.875em;padding:.1em .35em;border-radius:4px;
+  background:rgba(127,127,127,.14)}
+@media (prefers-reduced-motion:reduce){.maquetas-lista a:hover{transform:none}}
+footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
+.footer-meta{ display:flex; justify-content: space-between; align-items:center; flex-wrap: wrap; gap: 1rem; font-size: 0.8125rem; color: var(--text-muted); }
+.footer-meta a{ color: var(--text-muted); display:inline-flex; align-items:center; min-height: 24px; }
+.footer-nav{ margin-bottom: 1.5rem; }
+.footer-nav a{ color: var(--accent-text); text-decoration:none; font-weight: 500; font-size: 0.9375rem;
+  display:inline-flex; align-items:center; min-height: 24px; }
+/* ═══ Piezas propias de este entregable ═════════════════════════════════════ */
+
+/* Marcador de cifra grande para el resumen de apertura. */
+.cifras{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1.25rem; margin-top:2rem; }
+.cifra{ padding:1.5rem 1.6rem; border:1px solid var(--border); border-radius:14px; background:var(--surface); }
+.cifra b{ display:block; font-size:clamp(2rem,5vw,2.75rem); font-weight:700; letter-spacing:-0.03em; line-height:1; color:var(--accent-text); font-variant-numeric:tabular-nums; }
+.cifra span{ display:block; margin-top:.5rem; font-size:.9375rem; color:var(--text-muted); line-height:1.45; }
+
+/* Diagnóstico vista por vista. Un <details> por pantalla: veinte tarjetas
+   abiertas serían otra pared de información, que es justo lo que se critica. */
+.vistas{ list-style:none; margin:1.5rem 0 0; padding:0; border-top:1px solid var(--border); }
+.vista-item{ border-bottom:1px solid var(--border); }
+.vista-item summary{
+  display:grid; grid-template-columns:minmax(2.75rem,auto) 1fr auto; align-items:center; gap:1rem;
+  padding:1.05rem 0; cursor:pointer; list-style:none; min-height:2.75rem;
+}
+.vista-item summary::-webkit-details-marker{ display:none; }
+.vista-item summary::marker{ content:""; }
+.vista-item .n{ white-space:nowrap; font-weight:700; color:var(--accent-text); font-size:.9375rem; font-variant-numeric:tabular-nums; }
+.vista-item summary h3{ font-size:1.0625rem; font-weight:700; }
+.vista-item details[open] summary{ background:var(--surface-alt); border-radius:8px; padding-left:.6rem; padding-right:.6rem; }
+.vista-item summary:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:6px; }
+.vista-cuerpo{ padding:0 0 1.5rem calc(2.75rem + 1rem); }
+@media (max-width:640px){
+  .vista-item summary{ grid-template-columns:2.25rem 1fr auto; }
+  .vista-item .veredicto{ grid-column:2; }
+  .vista-cuerpo{ padding-left:0; }
+}
+.vista-cuerpo ul{ margin:0; padding-left:1.15rem; }
+.vista-cuerpo li{ font-size:.9375rem; color:var(--text-muted); line-height:1.6; max-width:70ch; }
+.vista-cuerpo li + li{ margin-top:.45rem; }
+.vista-cuerpo li b{ color:var(--text); font-weight:600; }
+.vista-cuerpo .arreglo{
+  margin:1rem 0 0; padding:.9rem 1.1rem; border-radius:10px;
+  background:var(--surface-alt); font-size:.9375rem; color:var(--text); line-height:1.55; max-width:74ch;
+}
+.vista-cuerpo .arreglo b{ color:var(--accent-text); }
+
+/* Veredicto por vista. Tres estados y nada más: se va, se funde o se rehace. */
+.veredicto{
+  font-size:.75rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+  padding:.32em .75em; border-radius:999px; white-space:nowrap; border:1px solid transparent;
+}
+.v-fuera{ background:rgba(194,66,56,.12); color:#9C3229; border-color:rgba(194,66,56,.3); }
+.v-funde{ background:rgba(185,138,30,.14); color:#7E5B0E; border-color:rgba(185,138,30,.32); }
+.v-rehace{ background:rgba(10,70,255,.10); color:var(--accent-text); border-color:rgba(10,70,255,.26); }
+.v-queda{ background:rgba(47,143,111,.13); color:#22705A; border-color:rgba(47,143,111,.32); }
+@media (prefers-color-scheme:dark){
+  .v-fuera{ background:rgba(238,110,95,.14); color:#EE8377; border-color:rgba(238,110,95,.3); }
+  .v-funde{ background:rgba(232,194,76,.14); color:#E8C24C; border-color:rgba(232,194,76,.3); }
+  .v-queda{ background:rgba(79,191,152,.14); color:#4FBF98; border-color:rgba(79,191,152,.3); }
+}
+:root[data-theme="dark"] .v-fuera{ background:rgba(238,110,95,.14); color:#EE8377; border-color:rgba(238,110,95,.3); }
+:root[data-theme="dark"] .v-funde{ background:rgba(232,194,76,.14); color:#E8C24C; border-color:rgba(232,194,76,.3); }
+:root[data-theme="dark"] .v-queda{ background:rgba(79,191,152,.14); color:#4FBF98; border-color:rgba(79,191,152,.3); }
+
+/* Los tres niveles, como bandas de tiempo. */
+.niveles{ display:grid; gap:1rem; margin-top:1.75rem; }
+.nivel{
+  display:grid; grid-template-columns:8.5rem 1fr; gap:1.5rem; align-items:start;
+  padding:1.4rem 1.6rem; border:1px solid var(--border); border-radius:14px; background:var(--surface);
+}
+@media (max-width:640px){ .nivel{ grid-template-columns:1fr; gap:.6rem; } }
+.nivel-t{ font-weight:700; font-size:1.0625rem; color:var(--accent-text); }
+.nivel-t small{ display:block; font-weight:500; font-size:.8125rem; color:var(--text-muted); margin-top:.2rem; font-variant-numeric:tabular-nums; }
+.nivel p{ margin:0; font-size:.9375rem; color:var(--text-muted); line-height:1.6; max-width:68ch; }
+.nivel p b{ color:var(--text); font-weight:600; }
+
+/* Antes / después del ciclo. */
+.ciclos{ display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-top:1.75rem; }
+@media (max-width:700px){ .ciclos{ grid-template-columns:1fr; } }
+.ciclo{ padding:1.5rem 1.6rem; border:1px solid var(--border); border-radius:14px; background:var(--surface); }
+.ciclo.es-nuevo{ border-color:var(--accent); }
+.ciclo h4{ margin:0 0 .3rem; font-size:.8125rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); }
+.ciclo .dur{ font-size:clamp(1.75rem,4vw,2.25rem); font-weight:700; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; }
+.ciclo.es-nuevo .dur{ color:var(--accent-text); }
+.ciclo ol{ margin:1rem 0 0; padding-left:1.25rem; font-size:.875rem; color:var(--text-muted); line-height:1.55; }
+.ciclo li + li{ margin-top:.25rem; }
+.ciclo li.es-re{ color:var(--text); font-weight:600; }
+
+/* Aviso de dato: lo que no cuadra en el origen y hay que verificar. */
+.datos-lista{ list-style:none; margin:1.5rem 0 0; padding:0; display:grid; gap:.75rem; }
+.datos-lista li{
+  padding:1.1rem 1.3rem; border:1px solid var(--border); border-left:3px solid var(--accent);
+  border-radius:10px; background:var(--surface); font-size:.9375rem; color:var(--text-muted); line-height:1.6;
+}
+.datos-lista li b{ color:var(--text); font-weight:600; }
+.datos-lista li code{ font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.875em;
+  padding:.1em .35em; border-radius:4px; background:rgba(127,127,127,.14); color:var(--accent-text); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="wordmark" href="/">2894 <span>Studio × DPROMA</span></a>
+    <nav>
+      <a href="/">Informe general</a>
+      <a href="#resumen">Resumen</a>
+      <a href="#diagnostico">Las 20 vistas</a>
+      <a href="#propuesta">La propuesta</a>
+      <a href="#ciclo">El ciclo</a>
+      <a class="nav-cta" href="/entregables">Entregables</a>
+    </nav>
+  </div>
+</header>
+
+<section id="resumen" style="padding-bottom:clamp(1.5rem,4vw,2.5rem)">
+  <div class="wrap">
+    <div class="eyebrow">Entregable · Dashboard de proyección</div>
+    <h1 style="font-size:clamp(1.9rem,5vw,3rem);margin-top:.6rem;max-width:22ch">Jerarquía del dashboard proyectado.</h1>
+    <p class="section-note" style="max-width:64ch;margin-top:1rem;font-size:1.0625rem">
+      Las 20 vistas del ciclo actual, evaluadas con un solo criterio: qué se lleva una persona que
+      las mira diez segundos desde su escritorio. Y la secuencia que se propone en su lugar.</p>
+
+    <div class="cifras">
+      <div class="cifra"><b>3:20</b><span>dura una vuelta hoy: 20 pantallas de 10 segundos</span></div>
+      <div class="cifra"><b>6</b><span>de esas 20 no dicen nada: tres portadas, incidentes en cero y dos módulos con un solo registro</span></div>
+      <div class="cifra"><b>15</b><span>de 20 vistas tienen todos sus números al mismo tamaño y el mismo peso</span></div>
+      <div class="cifra"><b>2:00</b><span>dura la vuelta propuesta: 12 pantallas, un 40% menos de ciclo</span></div>
+    </div>
+
+    <div class="glosa" style="margin-top:2.5rem">
+      <p><b>El problema no es que falten datos: es que todos pesan lo mismo.</b> Cuando seis cifras
+      comparten tamaño, grosor y color, el ojo no sabe dónde empezar, y diez segundos no dan para
+      elegir. La propuesta no añade información — quita la que no se puede usar y jerarquiza la que sí.</p>
+      <p>El otro cambio es estructural: las tres portadas mudas desaparecen y su lugar lo ocupa el
+      mismo <b>resumen ejecutivo</b>, proyectado tres veces por vuelta, que además anuncia la sección
+      que entra a continuación. Treinta segundos de cada vuelta pasan de no decir nada a decir
+      dónde está la empresa.</p>
+    </div>
+  </div>
+</section>
+
+<div class="tabs-wrap">
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Contenido del entregable">
+      <button type="button" class="tab" id="t-diag" role="tab" aria-selected="true" aria-controls="p-diag">Las 20 vistas</button>
+      <button type="button" class="tab" id="t-prop" role="tab" aria-selected="false" aria-controls="p-prop" tabindex="-1">La propuesta</button>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="p-diag" role="tabpanel" aria-labelledby="t-diag" tabindex="-1">
+
+<section id="diagnostico">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Diagnóstico</div>
+        <h2>Vista por vista, y qué se hace con cada una.</h2>
+        <p class="section-note">Cuatro veredictos posibles: se va del ciclo, se funde con otra,
+          se rehace con jerarquía, o se conserva como está.</p>
+      </div>
+    </div>
+
+    <ul class="vistas">
+      <li class="vista-item"><details>
+        <summary><span class="n">01·10·14</span><h3>Las tres portadas — Instalaciones, Administración vehicular, Almacén</h3><span class="veredicto v-fuera">Se va</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li>Son <b>30 segundos de cada vuelta sin un solo dato</b>: diez por sección.</li>
+            <li>Su función —saber de qué área son los datos que vienen— se cumple sin gastar tiempo del ciclo.</li>
+          </ul>
+          <p class="arreglo"><b>Se sustituyen por el resumen ejecutivo</b>, que ocupa el mismo hueco,
+            dice dónde está la empresa y además anuncia la sección siguiente agrandando su tarjeta.
+            La identidad de área pasa a la esquina superior derecha de todas las pantallas, así que
+            quien entra a media vuelta sabe dónde está sin haber visto ninguna portada.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">02</span><h3>Instalaciones — indicadores y resumen por marca</h3><span class="veredicto v-rehace">Se rehace</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li><b>Seis cifras en fila con idéntico tratamiento visual.</b> No hay dato principal: el ojo no sabe dónde empezar.</li>
+            <li>Se prioriza lo que obliga a actuar —pendientes, con atraso, canceladas—. Total de registros, instaladas y con instalador asignado hablan de un acumulado, no del presente.</li>
+            <li><b>«Con instalador asignado: 150» mezcla dimensiones.</b> Los cuatro estatus —instaladas 594, pendientes 45, canceladas 104 y con atraso 10— suman exactamente 753. El quinto dato al lado, que es un corte transversal, hace dudar de la suma.</li>
+            <li>El gráfico de marca tiene <b>solo dos barras</b>. Con dos categorías, un dato cerrado se lee mejor que un gráfico.</li>
+          </ul>
+          <p class="arreglo">Titular: <b>45 pendientes</b>. Debajo, tres estatus con su semáforo. Y la
+            marca como dato cerrado —«Changan: 383 instaladas de 497, 77%»— en vez de dos barras. La
+            cifra transversal sale de la fila y se explica en la nota de método.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">03</span><h3>Próximas instalaciones (7 días)</h3><span class="veredicto v-rehace">Se rehace</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li>El orden por día, agendadas frente a asignadas, <b>es correcto y se conserva</b>.</li>
+            <li>Falla la jerarquía: el dato accionable —<b>cinco órdenes sin instalador</b>— está mezclado con las que ya están resueltas en vez de ser el titular.</li>
+            <li><b>Diez filas de texto pequeño no se leen a cuatro metros.</b> Con cinco basta, si son las cinco que hay que resolver.</li>
+            <li>Nueve de las diez filas no tienen ciudad, y las fechas van en formato <code>2026-09-08</code> en vez de «hoy» o «sábado 12».</li>
+          </ul>
+          <p class="arreglo">El titular pasa a ser <b>«5 de las 10 de esta semana no tienen instalador»</b>,
+            y la lista se queda solo con esas cinco, con la fecha en lenguaje natural. La ausencia de
+            ciudad deja de ser un hueco en blanco y pasa a decirse: sin ella no se decide a quién asignar.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">04</span><h3>Instalaciones por estado (mapa)</h3><span class="veredicto v-rehace">Se rehace</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li>Un mapa con 26 cifras y una tabla con otras 26 al lado. <b>Nadie lee 52 números en diez segundos.</b></li>
+            <li>En el centro del país las etiquetas se pisan: 71, 99 y 2 aparecen encimadas e ilegibles.</li>
+            <li><b>La escala de color casi no varía</b>: un estado con 125 y otro con 2 se ven de un tono parecido.</li>
+            <li>Es un acumulado histórico: tiene sentido como contexto, no en medio de las pantallas del día.</li>
+          </ul>
+          <p class="arreglo">Pasa a ser un ranking de los cuatro estados que concentran el 56%, con
+            barra proporcional y el resto agrupado. Lleva <b>marca de «contexto»</b> para que se lea
+            como acumulado y no como urgencia, y declara el hueco de datos que arrastra.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">05</span><h3>Top instaladores</h3><span class="veredicto v-queda">Se conserva</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li><b>Es una vista bien resuelta</b>: pocas filas, barras que comparan de verdad, letra legible.</li>
+            <li>Demuestra que el equipo ya sabe hacer una pantalla que se lee. Es el modelo del resto.</li>
+          </ul>
+          <p class="arreglo">Solo gana dos cosas: un <b>titular que dice la conclusión</b> —dos
+            instaladores hacen el 68% del trabajo— y el periodo declarado. Y la nota de que las barras
+            suman 139 nombres frente a los 150 «con instalador asignado».</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">06</span><h3>Incidentes (0 / 0 / 0)</h3><span class="veredicto v-fuera">Se va</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li><b>Diez segundos para decir que no hay nada.</b> Si no hay incidentes es una buena noticia, y cabe en una línea verde dentro de otra pantalla.</li>
+            <li>Si el módulo aún no captura incidentes, conviene decir «sin registro todavía» en lugar de mostrar ceros que parecen un dato real.</li>
+          </ul>
+          <p class="arreglo">Sale del ciclo. <b>Vuelve automáticamente en cuanto haya un incidente
+            abierto</b>, que es cuando merece los diez segundos.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">07</span><h3>Trámites CFE</h3><span class="veredicto v-fuera">Se va</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li><b>Un anillo completo para representar un solo registro.</b> Un gráfico circular al 100% no comunica nada.</li>
+            <li>Con un trámite en curso, esto es una línea de texto, no una pantalla.</li>
+          </ul>
+          <p class="arreglo">Sale del ciclo hasta que el volumen lo justifique. El criterio general
+            que se propone: <b>sin gráficos de menos de cuatro categorías</b>.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">08</span><h3>Administración vehicular — trámites por tipo y por estatus</h3><span class="veredicto v-funde">Se funde</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li><b>Una sola barra con valor 1 y un anillo de un solo color</b>: dos gráficos para un registro.</li>
+            <li>El eje vertical va de 0 a 1 con marcas en 0,2 / 0,4 / 0,6 / 0,8 — decimales para contar unidades.</li>
+          </ul>
+          <p class="arreglo">Se funde con la tendencia (09) en una sola pantalla de volumen, donde
+            el Top 5 —que es lo único que se leía bien— pasa a ser el contenido principal.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">09</span><h3>Administración vehicular — tendencia</h3><span class="veredicto v-funde">Se funde</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li><b>Siete de los doce meses están en cero</b> porque no hay histórico anterior a junio de 2026. La línea plana ocupa dos tercios del ancho y no dice nada.</li>
+            <li>El pico de julio aplasta la escala del resto.</li>
+            <li>El Top 5 de trámites de la parte inferior es lo único que se lee bien.</li>
+          </ul>
+          <p class="arreglo">Los meses sin registro <b>no se pintan</b>, y la pantalla declara desde
+            cuándo hay datos. El Top 5 sube a ser el cuerpo de la vista, con barras proporcionales y
+            porcentaje sobre el total.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">11</span><h3>Administración vehicular — cumplimiento de SLA</h3><span class="veredicto v-rehace">Se rehace</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li><b>El problema más importante del negocio llega en la posición once de veinte.</b></li>
+            <li>El título «% vencidos (de los que tienen fecha compromiso)» necesita un paréntesis para explicarse. <b>Si una métrica necesita explicación, la métrica está mal definida.</b></li>
+            <li>El «100» aparece sin símbolo de porcentaje, y su título de dos líneas desalinea la cifra respecto a las otras dos tarjetas.</li>
+            <li>Un 100% de vencidos casi siempre significa que <b>la fecha compromiso solo se está llenando en los casos que ya iban tarde</b>, o que se calcula mal.</li>
+            <li>La lista de detalle son nueve folios con exactamente «53 días de atraso» cada uno. <b>No permite priorizar nada.</b></li>
+          </ul>
+          <p class="arreglo">Sube a la posición siete del ciclo, justo después del resumen que la
+            anuncia. Titular <b>742 vencidos</b>, y el 100% deja de presentarse como un logro
+            invertido: la nota de método explica que <b>mide cuándo se llena el campo, no el
+            cumplimiento</b>. Los nueve folios idénticos se sustituyen por el reparto por plaza, que
+            sí prioriza.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">12</span><h3>Administración vehicular — vencidos por plaza</h3><span class="veredicto v-rehace">Se rehace</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li><b>Dieciséis tarjetas iguales, todas rojas, todas con la barra al 100%.</b> Cuando todo está en rojo, el rojo deja de significar algo.</li>
+            <li><b>Las barras no comparan</b>: son idénticas aunque una tarjeta tenga 187 y otra tenga 1.</li>
+            <li>Falta el total de trámites de cada plaza, que es lo que daría sentido a la proporción de vencidos.</li>
+            <li>Dos nombres se cortan —«GUADALAJ…», «AGUASCALIE…»— en una pantalla que sobra espacio.</li>
+            <li>El dato valioso está ahí pero hay que calcularlo mentalmente: <b>cuatro plazas concentran el 68% del atraso</b>.</li>
+          </ul>
+          <p class="arreglo">Ese 68% pasa a ser el titular. Cuatro plazas con <b>barra proporcional
+            de verdad</b> —CDMX al 100%, Guadalajara al 43%— y las otras doce agrupadas en una línea.
+            Y se declara lo que falta: sin el total por plaza sabemos dónde hay más atraso, no dónde
+            se falla más.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">13</span><h3>Administración vehicular — trámites legales</h3><span class="veredicto v-funde">Se funde</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li><b>Nueve trámites en total.</b> El volumen no justifica una pantalla propia dentro del ciclo.</li>
+            <li>Los folios largos sin nombre de caso no dicen nada a quien pasa por delante.</li>
+          </ul>
+          <p class="arreglo">Baja a una línea dentro de la pantalla de volumen. <b>Recupera pantalla
+            propia si supera los 30 en curso</b>, y el umbral queda escrito para que la vuelta sea
+            automática y no una discusión.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">15</span><h3>Almacén — cargadores e inventario</h3><span class="veredicto v-funde">Se funde</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li>Un KPI con «3» y un panel de «sin datos disponibles todavía» que ocupa el 80% de la pantalla.</li>
+            <li><b>Conviene conservar el aviso de «no hay datos disponibles aún»</b> cuando corresponda: es honesto y evita leer un cero como dato real.</li>
+          </ul>
+          <p class="arreglo">Se funde con la vista de cobertura (20). El aviso de dato ausente se
+            mantiene como componente, pero <b>no ocupa una pantalla del ciclo</b>.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">16</span><h3>Almacén — existencias</h3><span class="veredicto v-rehace">Se rehace</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li><b>Está ordenado por cantidad, que es justo el orden que no sirve</b>: arriba salen 894 abrazaderas y los materiales agotados no aparecen.</li>
+            <li>Tres filas idénticas de «CABLE THW-LS 8 AWG» con 402 piezas cada una <b>delatan un catálogo de materiales duplicado</b>.</li>
+            <li>Varios nombres se cortan con puntos suspensivos justo donde está el distintivo del material.</li>
+          </ul>
+          <p class="arreglo">El orden se invierte: <b>manda lo que falta, no lo que sobra</b>. Y la
+            unidad deja de ser la pieza para pasar a ser el servicio: cuántas instalaciones surte el
+            almacén. Eso exige la lista de materiales por instalación, que hoy no está en el sistema
+            y queda declarado como dependencia.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">17</span><h3>Almacén — flujo mensual</h3><span class="veredicto v-funde">Se funde</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li>Ocho de los doce meses están en cero por falta de registro, y <b>quien lo vea sin contexto entenderá que el almacén estuvo parado</b>.</li>
+            <li>El pico de julio aplasta la escala de los meses que sí tienen movimiento.</li>
+          </ul>
+          <p class="arreglo">Los meses sin registro <b>no se tienen en cuenta</b>, o se añade el aviso
+            de que no hay datos anteriores. Se funde en la pantalla de cobertura como una cifra:
+            cuatro meses con registro, desde junio de 2026.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">18·19</span><h3>Almacén — alertas de stock, y alertas de stock por almacén</h3><span class="veredicto v-funde">Se funde</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li><b>De las pantallas con más valor real del ciclo</b>: 50 materiales en crítico es información que sirve para actuar hoy.</li>
+            <li>La lista de detalle <b>se corta a media fila</b> en el borde inferior.</li>
+            <li>Repite el mismo material en tres plazas <b>como si fueran tres problemas distintos</b>. El problema son cinco materiales agotados.</li>
+            <li>En la vista por almacén, <b>el número grande de las tres tarjetas es 29 en las tres</b>, porque es el total de materiales vigilados. Un dato idéntico en todas no compara nada y ocupa el lugar del que sí compara: Monterrey 21, Tijuana 21, CDMX 8.</li>
+            <li>Tres tarjetas pequeñas ocupan un tercio de la pantalla y <b>dos tercios quedan en negro</b>.</li>
+          </ul>
+          <p class="arreglo">Las dos se fusionan en una sola pantalla, <b>«Alertas de stock»</b>. El
+            titular son los cinco materiales distintos que están a cero. Debajo, el reparto por plaza
+            con barra apilada, donde el número grande pasa a ser el crítico y no el total. Y la lista
+            de cinco, sin repetir material: cada fila dice en qué plazas está agotado.</p>
+        </div>
+      </details></li>
+
+      <li class="vista-item"><details>
+        <summary><span class="n">20</span><h3>Almacén — cargadores</h3><span class="veredicto v-rehace">Se rehace</span></summary>
+        <div class="vista-cuerpo">
+          <ul>
+            <li><b>Una barra de una sola categoría y un anillo de un solo segmento</b> para un registro.</li>
+            <li>El dato útil sería otro: <b>cuántos cargadores hay disponibles frente a las instalaciones agendadas</b>.</li>
+            <li>El sistema da tres cifras distintas del mismo objeto: 34 piezas en existencias, 3 en «piezas en inventario» y 1 en «cargadores por marca».</li>
+          </ul>
+          <p class="arreglo">Se convierte en la pregunta que importa: <b>34 cargadores para 45
+            instalaciones pendientes, déficit de 11</b>. Y las tres cifras contradictorias se
+            declaran en la pantalla en vez de elegir una en silencio.</p>
+        </div>
+      </details></li>
+    </ul>
+  </div>
+</section>
+
+<section id="conserva">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Lo que ya funciona</div>
+        <h2>Decisiones acertadas que la propuesta no toca.</h2>
+        <p class="section-note">Un rediseño que las descartara haría el dashboard peor.</p>
+      </div>
+    </div>
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral">
+        <span class="eyebrow">Identidad</span>
+        <h3>El fondo oscuro es la decisión correcta</h3>
+        <p>Identidad visual sólida y coherente: fondo oscuro, verde de marca, iconografía consistente
+          por área. En una pantalla de oficina proyectada durante horas, el fondo oscuro es lo que hay
+          que hacer, y por eso esta maqueta es la única del sistema que fija tema y no ofrece el claro.</p>
+      </article>
+      <article class="evidence-card card card-neutral">
+        <span class="eyebrow">Trazabilidad</span>
+        <h3>El sello de «última actualización» en todas las pantallas</h3>
+        <p>Es un acierto poco común: quien mira sabe si el dato es de hace un minuto o de ayer. Solo
+          hay que unificarlo — hoy conviven las 10:53 y las 11:14 en el mismo ciclo, lo que hace dudar
+          de qué vista está al día.</p>
+      </article>
+      <article class="evidence-card card card-neutral">
+        <span class="eyebrow">Consistencia</span>
+        <h3>Las cifras cuadran entre vistas</h3>
+        <p>Las alertas de stock por material y por almacén sí concuerdan: 87 materiales en ambas, 50
+          críticos repartidos en 21, 21 y 8. Y los vencidos por plaza suman exactamente los 742 de la
+          pantalla de SLA. El sistema es fiable donde se ha comprobado.</p>
+      </article>
+      <article class="evidence-card card card-neutral">
+        <span class="eyebrow">Orden</span>
+        <h3>La agenda ya está bien ordenada</h3>
+        <p>Por día, agendadas frente a asignadas. Es el orden correcto y se conserva tal cual: lo que
+          cambia no es el criterio, sino cuántas filas se muestran y cuál de ellas es el titular.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="datos">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Hallazgos de dato</div>
+        <h2>Cinco cosas que no cuadran en el origen.</h2>
+        <p class="section-note">Salen de sumar lo que muestran las propias pantallas. No son
+          problemas de diseño: ningún cambio visual los arregla, y conviene verificarlos en el dato.</p>
+      </div>
+    </div>
+    <ul class="datos-lista">
+      <li><b>El mapa no llega al total.</b> Los 25 estados con cifra visible suman <b>693</b>, no 753,
+        y <b>Veracruz aparece en el listado sin ninguna cifra</b>. Faltan unas 50 órdenes por asignar
+        estado, o hay un estado sin contabilizar.</li>
+      <li><b>Los instaladores nombrados no llegan a los asignados.</b> Las seis barras del ranking
+        suman <b>139</b> instalaciones, frente a las <b>150</b> que el indicador marca «con instalador
+        asignado». Hay 11 sin nombre.</li>
+      <li><b>Tres cifras distintas para los cargadores.</b> <code>34</code> piezas en existencias,
+        <code>3</code> en «piezas en inventario» y <code>1</code> en «cargadores por marca». Antes de
+        decidir si faltan cargadores hay que saber cuál de las tres es.</li>
+      <li><b>Un 100% de vencidos con fecha compromiso.</b> Lo más probable es que la fecha solo se
+        registre cuando el trámite ya va tarde. Mientras eso sea así, la métrica no mide cumplimiento
+        y no debería presentarse como si lo hiciera.</li>
+      <li><b>Catálogo de materiales duplicado.</b> Tres filas idénticas de «CABLE THW-LS/THHW-LS CE
+        ROHS 8 AWG» con 402 piezas cada una. O son tres claves del mismo material, o el inventario
+        real es un tercio de lo que muestra la pantalla.</li>
+    </ul>
+  </div>
+</section>
+
+</div><!-- /#p-diag -->
+
+<div class="panel" id="p-prop" role="tabpanel" aria-labelledby="t-prop" tabindex="-1" hidden>
+
+<section id="propuesta">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">El cambio estructural</div>
+        <h2>El resumen ejecutivo, como portada de sección.</h2>
+        <p class="section-note">En vez de tres portadas mudas, el mismo resumen se proyecta tres
+          veces por vuelta y cada vez destaca la sección que entra a continuación.</p>
+      </div>
+    </div>
+
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral">
+        <span class="eyebrow">La rejilla</span>
+        <h3>Cuatro tarjetas, siempre en el mismo orden</h3>
+        <p>Una por sección más una de acumulado, con el mismo semáforo y la misma posición en las
+          tres repeticiones. Lo único que cambia es cuál está agrandada. Que no se muevan es lo que
+          permite leerlas de memoria a partir de la segunda vuelta.</p>
+      </article>
+      <article class="evidence-card card card-neutral">
+        <span class="eyebrow">El anuncio</span>
+        <h3>El cambio de tamaño sustituye a la portada</h3>
+        <p>La tarjeta destacada ocupa el doble de ancho, sube el tamaño de su cifra, lleva el icono y
+          el nombre de la sección y una etiqueta «Siguiente». No hace falta una pantalla entera para
+          decir «ahora viene Almacén».</p>
+      </article>
+      <article class="evidence-card card card-neutral">
+        <span class="eyebrow">El adelanto</span>
+        <h3>La destacada gana una línea que las otras no tienen</h3>
+        <p>Y esa línea adelanta lo que van a desarrollar las pantallas siguientes: «5 de las 10
+          agendadas esta semana no tienen instalador». Quien solo vea el resumen ya se lleva lo
+          esencial de la sección.</p>
+      </article>
+      <article class="evidence-card card card-neutral">
+        <span class="eyebrow">La orientación</span>
+        <h3>El icono y el nombre viajan a todas las pantallas</h3>
+        <p>Con idéntico tratamiento, en la esquina superior derecha. Quien entra a media vuelta sabe
+          dónde está sin haber visto la portada — que es exactamente el problema que hoy resuelven
+          las portadas gastando diez segundos.</p>
+      </article>
+    </div>
+
+    <div class="glosa" style="margin-top:2rem">
+      <p><b>Una decisión de color que conviene tomar conscientemente.</b> Si el icono y la etiqueta de
+      cada sección van en el verde de marca, ese verde compite con el verde del semáforo y el equipo
+      termina sin saber si el verde significa «Almacén» o significa «está bien». En la maqueta la
+      identidad de sección va en neutro —icono y texto sobre un chip gris— y <b>el color queda
+      reservado por completo al semáforo</b>. La sección se reconoce por el icono y el nombre, no por
+      el color.</p>
+      <p><b>La leyenda del semáforo vive solo en el pie del resumen ejecutivo.</b> Como esa pantalla se
+      repite tres veces por vuelta, en dos días el equipo la ha interiorizado y no hace falta
+      repetirla en las pantallas de datos, donde ese espacio vale más.</p>
+    </div>
+  </div>
+</section>
+
+<section id="niveles">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">La regla</div>
+        <h2>Tres niveles, porque en diez segundos hay tres miradas.</h2>
+        <p class="section-note">Cada pantalla se construye exactamente para esos tres movimientos
+          de ojo, y nada más.</p>
+      </div>
+    </div>
+
+    <div class="niveles">
+      <div class="nivel">
+        <div class="nivel-t">Nivel 1<small>segundo 0 → 2</small></div>
+        <p><b>El titular.</b> Un solo número, muy grande, en peso 800, con su color de semáforo y una
+          frase corta que diga qué es. Si hay que elegir entre dos cifras, <b>gana la que obliga a
+          alguien a hacer algo hoy</b>.</p>
+      </div>
+      <div class="nivel">
+        <div class="nivel-t">Nivel 2<small>segundo 2 → 6</small></div>
+        <p><b>De qué se compone.</b> Entre dos y cuatro cifras que descomponen o comparan el titular,
+          cada una con su propio semáforo. <b>Nunca más de cuatro.</b></p>
+      </div>
+      <div class="nivel">
+        <div class="nivel-t">Nivel 3<small>segundo 6 → 10</small></div>
+        <p><b>El detalle accionable.</b> Máximo cinco filas, con nombre propio: una persona, una
+          plaza, un material, un folio. <b>Si nadie puede hacer nada con esa lista, no va en la
+          pantalla.</b></p>
+      </div>
+    </div>
+
+    <div class="spec-scroll">
+      <table class="spec-table">
+        <caption class="sr-only">Reglas que se derivan de los tres niveles</caption>
+        <thead><tr><th scope="col">Regla</th><th scope="col">Por qué</th></tr></thead>
+        <tbody>
+          <tr><td>Jerarquía con tres cosas a la vez: tamaño, peso y color</td>
+            <td>Con solo el tamaño la pantalla se lee plana; con solo el color se pierde quien no
+              distingue bien el rojo del verde. Tres pesos bastan: <code>800</code> el dato,
+              <code>600</code> las etiquetas, <code>400</code> el apoyo.</td></tr>
+          <tr><td>Aire entre niveles mayor que dentro de cada bloque</td>
+            <td>Si todo está a la misma distancia, los tres niveles se leen como uno solo.</td></tr>
+          <tr><td>Una pantalla, una pregunta. El título es la conclusión, no la categoría</td>
+            <td>«5 de las 10 de esta semana no tienen instalador» en vez de «Próximas instalaciones
+              (7 días)».</td></tr>
+          <tr><td>Semáforo en todo dato priorizado, sin excepción</td>
+            <td>En cuanto un verde decora, el equipo deja de fiarse de los demás. Verde correcto,
+              ámbar a mejorar, rojo problemático, gris sin umbral definido.</td></tr>
+          <tr><td>El semáforo necesita umbrales acordados, y mientras no los haya lo dice</td>
+            <td>Hoy no existen: por eso los tres almacenes salían en rojo aunque uno tuviera 8
+              críticos y otros 21. Definirlos es <b>decisión de negocio, no de diseño</b>.</td></tr>
+          <tr><td>Toda cifra lleva periodo y comparación</td>
+            <td>No hay número sin «de cuándo» y sin «frente a qué».</td></tr>
+          <tr><td>Sin gráficos de menos de cuatro categorías</td>
+            <td>Un anillo al 100% y una barra única no comunican; un dato cerrado en texto sí.</td></tr>
+          <tr><td>Máximo cinco filas por lista, cero pantallas vacías, un solo sello de actualización</td>
+            <td>Diez filas de texto pequeño no se leen a cuatro metros, y una lista cortada a media
+              fila hace dudar de si falta algo más.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="glosa" style="margin-top:2rem">
+      <p><b>El suelo tipográfico de proyección no es el del sistema.</b> Los 12px de
+      <a href="/entregables/reglas-de-diseno">§2.1 del sistema de diseño</a> están medidos a distancia
+      de escritorio. A cuatro metros no sirven: en esta maqueta <b>nada baja de 20px</b> —el cuerpo
+      arranca en 24— y toda la escala se declara en unidades de contenedor, así que el mismo HTML se
+      lee igual en un proyector de 1280 y en uno de 4K. Es la única regla en la que esta pantalla se
+      separa del sistema, y se separa a propósito.</p>
+    </div>
+  </div>
+</section>
+
+<section id="ciclo">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">El ciclo</div>
+        <h2>De 3:20 a 2:00, y ninguna pantalla vacía.</h2>
+        <p class="section-note">Doce pantallas en vez de veinte. Las que salen no se pierden:
+          vuelven solas cuando su umbral se cumple.</p>
+      </div>
+    </div>
+
+    <div class="ciclos">
+      <div class="ciclo">
+        <h4>Ciclo actual</h4>
+        <div class="dur">3:20</div>
+        <p style="margin:.4rem 0 0;font-size:.9375rem;color:var(--text-muted)">20 pantallas · 6 sin información · 30% del tiempo mudo</p>
+        <ol>
+          <li>Portada Instalaciones</li>
+          <li>Indicadores y marca</li>
+          <li>Próximas instalaciones</li>
+          <li>Mapa por estado</li>
+          <li>Top instaladores</li>
+          <li>Incidentes (0/0/0)</li>
+          <li>Trámites CFE (1 registro)</li>
+          <li>Portada Adm. vehicular</li>
+          <li>Trámites por tipo y estatus</li>
+          <li>Tendencia y Top 5</li>
+          <li>Cumplimiento de SLA</li>
+          <li>Vencidos por plaza</li>
+          <li>Trámites legales</li>
+          <li>Portada Almacén</li>
+          <li>Cargadores e inventario</li>
+          <li>Existencias</li>
+          <li>Flujo mensual</li>
+          <li>Alertas de stock</li>
+          <li>Alertas por almacén</li>
+          <li>Cargadores</li>
+        </ol>
+      </div>
+      <div class="ciclo es-nuevo">
+        <h4>Ciclo propuesto</h4>
+        <div class="dur">2:00</div>
+        <p style="margin:.4rem 0 0;font-size:.9375rem;color:var(--text-muted)">12 pantallas · ninguna vacía · 40% menos de vuelta</p>
+        <ol>
+          <li class="es-re">Resumen ejecutivo → Instalaciones</li>
+          <li>Instalaciones — el día</li>
+          <li>Instalaciones — la semana</li>
+          <li>Instalaciones — quién instala</li>
+          <li>Instalaciones — territorio <em>(contexto)</em></li>
+          <li class="es-re">Resumen ejecutivo → Adm. vehicular</li>
+          <li>Adm. vehicular — el plazo</li>
+          <li>Adm. vehicular — dónde está el atraso</li>
+          <li>Adm. vehicular — qué se tramita</li>
+          <li class="es-re">Resumen ejecutivo → Almacén</li>
+          <li>Almacén — alertas de stock</li>
+          <li>Almacén — cuántas instalaciones surte</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="glosa" style="margin-top:2rem">
+      <p><b>Lo que sale del ciclo tiene condición de vuelta escrita.</b> Incidentes vuelve en cuanto
+      haya uno abierto. Trámites legales recupera pantalla propia si supera los 30 en curso. Trámites
+      CFE, cuando pase de cuatro categorías. Así la decisión de quitarlos no hay que rediscutirla cada
+      vez que alguien pregunte por su área: <b>el umbral responde por el diseño</b>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="maquetas-mod" id="maqueta">
+  <div class="wrap">
+    <h2>El ciclo, para verlo correr</h2>
+    <p class="maquetas-lede">Construido con los tokens del sistema y con la regla de los tres niveles
+      aplicada en las doce pantallas. Avanza solo cada diez segundos, se pausa con la barra
+      espaciadora y se recorre con las flechas. Se proyecta a pantalla completa en cualquier
+      resolución 16:9.</p>
+    <ul class="maquetas-lista">
+      <li><a href="/entregables/propuestas/proyeccion-dashboard">
+        <b>Dashboard de proyección — 12 pantallas</b>
+        <span>El ciclo completo, con el resumen ejecutivo repetido tres veces como portada de
+          sección y las nueve pantallas de datos reconstruidas.</span>
+        <span class="maquetas-cambio">Todas las cifras salen de las capturas de la versión 1. Donde
+          el dato de origen no cuadra —el mapa que no llega al total, los tres valores de cargadores,
+          el 100% de vencidos— la pantalla lo dice en su nota de método en vez de elegir uno en
+          silencio.</span></a></li>
+    </ul>
+    <p class="maquetas-pie">El sistema de diseño que usa se puede leer en el entregable
+      <a href="/entregables/reglas-de-diseno">Sistema de diseño</a>, y las piezas de dato visual en su
+      sección <a href="/entregables/reglas-de-diseno#dashboard">Capa de dashboard</a>. El módulo cuyas
+      pantallas alimentan la sección de Administración vehicular está en
+      <a href="/entregables/administracion-vehicular">Administración Vehicular</a>.</p>
+  </div>
+</section>
+
+</div><!-- /#p-prop -->
+
+<footer>
+  <div class="wrap">
+    <div class="footer-nav"><a href="/entregables">← Volver a Entregables</a></div>
+    <div class="footer-meta">
+      <span>2894 Studio × DPROMA · Entregable, septiembre 2026</span>
+      <a href="/">Ver la síntesis completa →</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* Pestañas. Mismo patrón que el resto de entregables. */
+(function(){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  if(!tabs.length) return;
+  var paneles = tabs.map(function(t){ return document.getElementById(t.getAttribute('aria-controls')); });
+
+  function activa(tab, mueveFoco){
+    tabs.forEach(function(t, i){
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      paneles[i].hidden = !on;
+    });
+    if(mueveFoco) tab.focus();
+  }
+  tabs.forEach(function(t){ t.addEventListener('click', function(){ activa(t, false); }); });
+  tabs.forEach(function(t, i){
+    t.addEventListener('keydown', function(e){
+      var n = null;
+      if(e.key === 'ArrowRight') n = tabs[(i+1) % tabs.length];
+      else if(e.key === 'ArrowLeft') n = tabs[(i-1+tabs.length) % tabs.length];
+      else if(e.key === 'Home') n = tabs[0];
+      else if(e.key === 'End') n = tabs[tabs.length-1];
+      if(n){ e.preventDefault(); activa(n, true); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
