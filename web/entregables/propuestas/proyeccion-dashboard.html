@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Dashboard de proyección · SIO-DPROMA</title>
-<meta name="description" content="Ciclo de proyección propuesto para SIO-DPROMA: doce pantallas de diez segundos construidas con la regla de los tres niveles." />
+<meta name="description" content="Ciclo de proyección propuesto para SIO-DPROMA: catorce pantallas de diez segundos construidas con la regla de los tres niveles." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -151,6 +151,16 @@ body{
 .v-pie{ margin-top:auto; flex:none; }
 .n3{ flex:0 1 auto; }
 
+/* Las tarjetas de ciudad, cuando son el cuerpo de la pantalla, crecen con ella
+   y su barra engorda: a cuatro metros una barra de 1,5cqw se lee como una línea,
+   no como un reparto entre cuatro estados. */
+.vista--aire .plazas{ align-items:stretch; }
+.vista--aire .plaza{ display:flex; flex-direction:column; justify-content:center; padding:1.8cqw 1.6cqw; }
+.vista--aire .plaza .barra{ height:3.2cqw; }
+.vista--aire .plaza-nombre{ font-size:2.2cqw; }
+.vista--aire .plaza-total{ font-size:1.7cqw; }
+.vista--aire .plaza-cab{ margin-bottom:1cqw; }
+
 /* Vistas que no llenan el lienzo. Con el pie anclado abajo, todo el sobrante se
    acumulaba en una franja vacía bajo el último bloque —hasta un tercio de la
    pantalla—, que es el defecto que la v1 tenía en «alertas por almacén». Dos
@@ -239,6 +249,44 @@ body{
 .rank-resto{ opacity:.85; }
 .rank-carril--sin{ background:repeating-linear-gradient(115deg,var(--surface-2) 0 6px,transparent 6px 12px); }
 .rank-valor small{ display:block; font-size:.68em; font-weight:500; color:var(--text-3); }
+
+/* Barra de total con su parte cumplida dentro (§12.4 .progreso): el carril es
+   el total y el relleno lo ya hecho, así que las dos cifras se comparan sin
+   saltar de una barra a otra. El ancho del carril es proporcional al mayor
+   total de la lista, de modo que la barra también dice el volumen relativo. */
+.totales{ display:flex; flex-direction:column; gap:2.4cqw; flex:1; justify-content:center; }
+.total-fila{ display:grid; grid-template-columns:minmax(0,16cqw) 1fr; gap:1.6cqw; align-items:start; }
+.total-nombre{ font-size:2.6cqw; font-weight:700; color:var(--text); line-height:4.2cqw; }
+.total-cuerpo{ min-width:0; }
+.total-carril{
+  height:4.2cqw; border-radius:var(--r-ctrl); background:var(--surface-2);
+  border:1px solid var(--border); overflow:hidden; position:relative;
+}
+.total-relleno{ display:block; height:100%; background:var(--serie-1); }
+.total-cifras{
+  display:flex; align-items:baseline; gap:1.2cqw; margin-top:.7cqw;
+  font-size:1.7cqw; font-weight:500; color:var(--text-2);
+}
+.total-cifras b{ color:var(--text); font-weight:700; font-variant-numeric:tabular-nums; }
+.total-cifras .pct{ margin-left:auto; font-size:1.4em; font-weight:800; color:var(--text); font-variant-numeric:tabular-nums; }
+
+/* Leyenda de color al pie de una pantalla de gráfico: dice qué significa cada
+   tramo. No es la leyenda del semáforo —esa se acordó fuera de pantalla—, sino
+   el rótulo de los segmentos de este gráfico concreto. */
+.leyenda-pie{
+  display:flex; flex-wrap:wrap; gap:1.2cqw 2.6cqw; align-items:center;
+  font-size:1.5cqw; font-weight:500; color:var(--text-2);
+}
+.leyenda-pie span{ display:inline-flex; align-items:center; gap:.55em; }
+.leyenda-pie i{ width:1.1em; height:1.1em; border-radius:3px; flex:none; }
+.leyenda-pie b{ color:var(--text); font-weight:600; }
+
+/* Fila de listado sin columna de cifra: dos columnas, dato y dónde. El nombre
+   del material no va en negrita — si toda la fila pesa, ninguna palabra manda. */
+.n3-fila--dos{ grid-template-columns:1fr auto; }
+.n3-fila--dos .quien{ font-weight:400; color:var(--text); white-space:normal; }
+.n3-fila--dos .quien .clave{ color:var(--text-3); font-weight:400; }
+.n3-fila--dos .cuanto{ font-weight:600; }
 
 /* Barra apilada de estado (§12.4). Los segmentos contiguos se separan con
    superficie, no con hueco: un hueco transparente parecería un cuarto valor. */
@@ -372,7 +420,7 @@ body{
      semáforo—, no una frase que explique cómo leerla.
      ═══════════════════════════════════════════════════════════════════════════ -->
 
-<!-- ═══ 1 · RESUMEN EJECUTIVO → INSTALACIONES ══════════════════════════════ -->
+<!-- ═══ 1 · RESUMEN EJECUTIVO → INSTALACIONES ═══════════════════════════════ -->
 <section class="vista es-activa vista--re" data-vista aria-label="Resumen. A continuación, Instalaciones.">
   <div class="re-rejilla foco-1">
     <article class="re-card b-warn es-foco">
@@ -404,7 +452,7 @@ body{
 </section>
 
 <!-- ═══ 2 · INSTALACIONES ══════════════════════════════════════════════════ -->
-<section class="vista" data-vista aria-label="Instalaciones.">
+<section class="vista vista--aire" data-vista aria-label="Instalaciones.">
   <header class="v-cab">
     <h1 class="v-titulo">Instalaciones</h1>
     <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-inst"/></svg>Instalaciones</span>
@@ -430,17 +478,51 @@ body{
       <span class="n2-apoyo">14% del total</span>
     </div>
   </div>
-  <div class="n3">
-    <p class="n3-lista-rotulo">Por marca</p>
-    <div class="n3-fila"><span class="cuando">Changan</span><span class="quien">383 instaladas de <b>497 órdenes</b></span><span class="cuanto c-ok">77%</span></div>
-    <div class="n3-fila"><span class="cuando">OCN</span><span class="quien">211 instaladas de <b>256 órdenes</b></span><span class="cuanto c-ok">82%</span></div>
-  </div>
   <footer class="v-pie">
     <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
   </footer>
 </section>
 
-<!-- ═══ 3 · PRÓXIMAS INSTALACIONES ═════════════════════════════════════════ -->
+<!-- ═══ 3 · INSTALACIONES POR MARCA ═══════════════════════════════════════
+     El carril de cada marca es su total de órdenes, a escala entre marcas, y el
+     relleno son las instaladas. Total y cumplido en la misma barra: no hay que
+     saltar de un gráfico a otro para compararlos. -->
+<section class="vista" data-vista aria-label="Instalaciones por marca.">
+  <header class="v-cab">
+    <h1 class="v-titulo">Instalaciones <em>por marca</em></h1>
+    <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-inst"/></svg>Instalaciones</span>
+  </header>
+  <div class="totales">
+    <div class="total-fila">
+      <span class="total-nombre">Changan</span>
+      <div class="total-cuerpo">
+        <div class="total-carril" style="width:100%" role="img" aria-label="Changan: 383 instaladas de 497 órdenes, el 77%.">
+          <span class="total-relleno" style="width:77.1%"></span>
+        </div>
+        <p class="total-cifras"><b>383</b> instaladas de <b>497</b> órdenes<span class="pct">77%</span></p>
+      </div>
+    </div>
+    <div class="total-fila">
+      <span class="total-nombre">OCN</span>
+      <div class="total-cuerpo">
+        <div class="total-carril" style="width:51.5%" role="img" aria-label="OCN: 211 instaladas de 256 órdenes, el 82%.">
+          <span class="total-relleno" style="width:82.4%"></span>
+        </div>
+        <p class="total-cifras"><b>211</b> instaladas de <b>256</b> órdenes<span class="pct">82%</span></p>
+      </div>
+    </div>
+  </div>
+  <footer class="v-pie">
+    <div class="leyenda-pie">
+      <span><i style="background:var(--serie-1)"></i><b>Instaladas</b></span>
+      <span><i style="background:var(--surface-2);border:1px solid var(--border-2)"></i><b>Resto de órdenes</b></span>
+      <span>El ancho de cada barra es su total de órdenes</span>
+    </div>
+    <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 4 · PRÓXIMAS INSTALACIONES ══════════════════════════════════════════ -->
 <section class="vista vista--aire" data-vista aria-label="Próximas instalaciones, siete días.">
   <header class="v-cab">
     <h1 class="v-titulo">Próximas instalaciones <em>· 7 días</em></h1>
@@ -462,7 +544,7 @@ body{
   </footer>
 </section>
 
-<!-- ═══ 4 · INSTALACIONES POR INSTALADOR ═══════════════════════════════════ -->
+<!-- ═══ 5 · INSTALACIONES POR INSTALADOR ════════════════════════════════════ -->
 <section class="vista" data-vista aria-label="Instalaciones completadas por instalador.">
   <header class="v-cab">
     <h1 class="v-titulo">Instalaciones completadas <em>por instalador</em></h1>
@@ -482,7 +564,7 @@ body{
   </footer>
 </section>
 
-<!-- ═══ 5 · ÓRDENES POR ESTADO ═════════════════════════════════════════════ -->
+<!-- ═══ 6 · ÓRDENES POR ESTADO ══════════════════════════════════════════════ -->
 <section class="vista" data-vista aria-label="Órdenes de instalación por estado.">
   <header class="v-cab">
     <h1 class="v-titulo">Órdenes de instalación <em>por estado</em></h1>
@@ -502,7 +584,7 @@ body{
   </footer>
 </section>
 
-<!-- ═══ 6 · RESUMEN EJECUTIVO → ADMINISTRACIÓN VEHICULAR ════════════════════ -->
+<!-- ═══ 7 · RESUMEN EJECUTIVO → ADMINISTRACIÓN VEHICULAR ════════════════════ -->
 <section class="vista vista--re" data-vista aria-label="Resumen. A continuación, Administración vehicular.">
   <div class="re-rejilla foco-2">
     <article class="re-card b-warn">
@@ -533,7 +615,7 @@ body{
   </footer>
 </section>
 
-<!-- ═══ 7 · CUMPLIMIENTO DE SLA ════════════════════════════════════════════ -->
+<!-- ═══ 8 · CUMPLIMIENTO DE SLA ═════════════════════════════════════════════ -->
 <section class="vista vista--aire" data-vista aria-label="Cumplimiento de SLA.">
   <header class="v-cab">
     <h1 class="v-titulo">Cumplimiento de SLA</h1>
@@ -565,7 +647,7 @@ body{
   </footer>
 </section>
 
-<!-- ═══ 8 · TRÁMITES VENCIDOS POR PLAZA ════════════════════════════════════ -->
+<!-- ═══ 9 · TRÁMITES VENCIDOS POR PLAZA ═════════════════════════════════════ -->
 <section class="vista" data-vista aria-label="Trámites vencidos por plaza.">
   <header class="v-cab">
     <h1 class="v-titulo">Trámites vencidos <em>por plaza</em></h1>
@@ -585,7 +667,7 @@ body{
   </footer>
 </section>
 
-<!-- ═══ 9 · TRÁMITES POR TIPO ══════════════════════════════════════════════ -->
+<!-- ═══ 10 · TRÁMITES POR TIPO ══════════════════════════════════════════════ -->
 <section class="vista" data-vista aria-label="Trámites por tipo.">
   <header class="v-cab">
     <h1 class="v-titulo">Trámites <em>por tipo</em></h1>
@@ -604,7 +686,7 @@ body{
   </footer>
 </section>
 
-<!-- ═══ 10 · RESUMEN EJECUTIVO → ALMACÉN ═══════════════════════════════════ -->
+<!-- ═══ 11 · RESUMEN EJECUTIVO → ALMACÉN ════════════════════════════════════ -->
 <section class="vista vista--re" data-vista aria-label="Resumen. A continuación, Almacén.">
   <div class="re-rejilla foco-3">
     <article class="re-card b-warn">
@@ -635,50 +717,74 @@ body{
   </footer>
 </section>
 
-<!-- ═══ 11 · ALERTAS DE STOCK ══════════════════════════════════════════════ -->
-<section class="vista" data-vista aria-label="Alertas de stock.">
+<!-- ═══ 12 · ALERTAS DE STOCK POR CIUDAD ════════════════════════════════════ -->
+<section class="vista vista--aire" data-vista aria-label="Alertas de stock por ciudad.">
   <header class="v-cab">
-    <h1 class="v-titulo">Alertas de stock</h1>
+    <h1 class="v-titulo">Alertas de stock <em>por ciudad</em></h1>
     <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-alm"/></svg>Almacén</span>
   </header>
   <div class="n1">
-    <span class="n1-cifra c-err">5</span>
-    <span class="n1-glosa">materiales agotados<br>de <b>50 alertas críticas</b></span>
+    <span class="n1-cifra c-err">50</span>
+    <span class="n1-glosa">materiales en crítico<br>de <b>87 vigilados</b></span>
   </div>
   <div class="plazas">
     <article class="plaza">
-      <div class="plaza-cab"><span class="plaza-nombre">Monterrey</span><span class="plaza-total"><b>21</b> crít. · 2 bajos</span></div>
+      <div class="plaza-cab"><span class="plaza-nombre">Monterrey</span><span class="plaza-total"><b>21</b> de 29</span></div>
       <div class="barra" role="img" aria-label="Monterrey: 21 críticos, 2 bajos, 6 sin umbral, ninguno suficiente, de 29 materiales.">
         <span class="s-err" style="width:72.4%"></span><span class="s-warn" style="width:6.9%"></span><span class="s-pause" style="width:20.7%"></span>
       </div>
     </article>
     <article class="plaza">
-      <div class="plaza-cab"><span class="plaza-nombre">Tijuana</span><span class="plaza-total"><b>21</b> crít. · 2 bajos</span></div>
+      <div class="plaza-cab"><span class="plaza-nombre">Tijuana</span><span class="plaza-total"><b>21</b> de 29</span></div>
       <div class="barra" role="img" aria-label="Tijuana: 21 críticos, 2 bajos, 6 sin umbral, ninguno suficiente, de 29 materiales.">
         <span class="s-err" style="width:72.4%"></span><span class="s-warn" style="width:6.9%"></span><span class="s-pause" style="width:20.7%"></span>
       </div>
     </article>
     <article class="plaza">
-      <div class="plaza-cab"><span class="plaza-nombre">CDMX</span><span class="plaza-total"><b>8</b> crít. · 13 bajos</span></div>
+      <div class="plaza-cab"><span class="plaza-nombre">CDMX</span><span class="plaza-total"><b>8</b> de 29</span></div>
       <div class="barra" role="img" aria-label="CDMX: 8 críticos, 13 bajos, 2 suficientes, 6 sin umbral, de 29 materiales.">
         <span class="s-err" style="width:27.6%"></span><span class="s-warn" style="width:44.8%"></span><span class="s-ok" style="width:6.9%"></span><span class="s-pause" style="width:20.7%"></span>
       </div>
     </article>
   </div>
+  <footer class="v-pie">
+    <div class="leyenda-pie">
+      <span><i style="background:var(--err)"></i><b>Crítico</b></span>
+      <span><i style="background:var(--warn)"></i><b>Bajo</b></span>
+      <span><i style="background:var(--ok)"></i><b>Suficiente</b></span>
+      <span><i style="background:var(--pause)"></i><b>Sin umbral definido</b></span>
+      <span>Cada barra son los 29 materiales vigilados en esa ciudad</span>
+    </div>
+    <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 13 · MATERIALES AGOTADOS ═══════════════════════════════════════
+     Sin columna de piezas: agotado ya significa cero, y repetirlo cinco veces
+     gasta una columna sin decir nada. El nombre del material no va en negrita:
+     si toda la fila pesa, ninguna palabra manda. -->
+<section class="vista vista--aire" data-vista aria-label="Materiales agotados.">
+  <header class="v-cab">
+    <h1 class="v-titulo">Materiales <em>agotados</em></h1>
+    <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-alm"/></svg>Almacén</span>
+  </header>
+  <div class="n1">
+    <span class="n1-cifra c-err">5</span>
+    <span class="n1-glosa">materiales distintos<br>sin una sola pieza</span>
+  </div>
   <div class="n3">
-    <p class="n3-lista-rotulo">Materiales agotados</p>
-    <div class="n3-fila"><span class="cuando">0 pzas</span><span class="quien"><b>Cople conduit PVC pesado 19mm</b> · COPP019</span><span class="cuanto marca-falta">CDMX · Tijuana · Monterrey</span></div>
-    <div class="n3-fila"><span class="cuando">0 pzas</span><span class="quien"><b>Cople conduit PVC ligero 19mm</b> · COPL019</span><span class="cuanto marca-falta">Tijuana · Monterrey</span></div>
-    <div class="n3-fila"><span class="cuando">0 pzas</span><span class="quien"><b>Pegamento PVC baja presión 475ml</b> · Tangit</span><span class="cuanto marca-falta">Monterrey · Tijuana</span></div>
-    <div class="n3-fila"><span class="cuando">0 pzas</span><span class="quien"><b>Codo conduit PVC pesado 19mm</b> · CPP0199</span><span class="cuanto marca-falta">CDMX</span></div>
-    <div class="n3-fila"><span class="cuando">0 pzas</span><span class="quien"><b>Zapata ponchable cal. 8 1/4</b> · clave 33461</span><span class="cuanto marca-falta">CDMX</span></div>
+    <div class="n3-fila n3-fila--dos"><span class="quien">Cople conduit PVC pesado 19mm <span class="clave">· COPP019</span></span><span class="cuanto marca-falta">CDMX · Tijuana · Monterrey</span></div>
+    <div class="n3-fila n3-fila--dos"><span class="quien">Cople conduit PVC ligero 19mm <span class="clave">· COPL019</span></span><span class="cuanto marca-falta">Tijuana · Monterrey</span></div>
+    <div class="n3-fila n3-fila--dos"><span class="quien">Pegamento PVC baja presión 475ml <span class="clave">· Tangit</span></span><span class="cuanto marca-falta">Monterrey · Tijuana</span></div>
+    <div class="n3-fila n3-fila--dos"><span class="quien">Codo conduit PVC pesado 19mm <span class="clave">· CPP0199</span></span><span class="cuanto marca-falta">CDMX</span></div>
+    <div class="n3-fila n3-fila--dos"><span class="quien">Zapata ponchable cal. 8 1/4 <span class="clave">· clave 33461</span></span><span class="cuanto marca-falta">CDMX</span></div>
   </div>
   <footer class="v-pie">
     <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
   </footer>
 </section>
 
-<!-- ═══ 12 · CARGADORES E INSTALACIONES PENDIENTES ═════════════════════════ -->
+<!-- ═══ 14 · CARGADORES E INSTALACIONES PENDIENTES ══════════════════════════ -->
 <section class="vista vista--aire" data-vista aria-label="Cargadores e instalaciones pendientes.">
   <header class="v-cab">
     <h1 class="v-titulo">Cargadores <em>e instalaciones pendientes</em></h1>
@@ -718,14 +824,14 @@ body{
   <button type="button" id="btnAnterior" aria-label="Pantalla anterior">‹</button>
   <button type="button" id="btnPausa" aria-pressed="false">Pausar</button>
   <button type="button" id="btnSiguiente" aria-label="Pantalla siguiente">›</button>
-  <span class="cuenta" id="cuenta">1 / 12</span>
+  <span class="cuenta" id="cuenta">1 / 14</span>
   <button type="button" id="btnTema" aria-label="Cambiar entre tema claro y oscuro">Tema</button>
 </div>
 
 <script>
 /* ════════════════════════════════════════════════════════════════════════════
-   El ciclo. Diez segundos por pantalla, doce pantallas: dos minutos por vuelta,
-   frente a los tres minutos y veinte del ciclo de veinte pantallas.
+   El ciclo. Diez segundos por pantalla, catorce pantallas: dos minutos y veinte
+   por vuelta, frente a los tres minutos y veinte del ciclo de veinte pantallas.
 
    Sin JavaScript la primera pantalla se ve igual y las demás quedan ocultas: el
    contenido está en el HTML, no lo genera el script. Y el mando existe porque
