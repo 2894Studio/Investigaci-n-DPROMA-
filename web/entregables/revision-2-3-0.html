@@ -98,6 +98,64 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:var(--fs-
    Se reproduce literal porque es justamente lo que esta columna tiene que enseñar. */
 .chrome-demo .fila{height:14px;border-radius:4px;background:#3D658B}
 .chrome-demo .fila.ok{background:var(--chrome-ink);opacity:.9;width:70%}
+/* ── La fila de cifras: lo que hay y lo que se propone ───────────────── */
+.demo{margin-top:var(--sp-5);border:1px solid var(--border);border-radius:var(--r-card);
+  background:var(--surface);overflow:hidden}
+.demo > h3{margin:0;padding:var(--sp-3) var(--sp-5);font-size:var(--fs-meta);
+  text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);font-weight:700;
+  border-bottom:1px solid var(--border);background:var(--surface-2)}
+.demo .lienzo{padding:var(--sp-5);background:var(--bg);overflow-x:auto}
+/* La fila rota se dibuja a su ancho real de QA —175px por tarjeta— para no inventar
+   saltos de línea que allí no ocurren. Si no cabe, se desplaza. */
+.demo .lienzo .kpis.roto{min-width:1300px}
+.demo > p{margin:0;padding:var(--sp-4) var(--sp-5);font-size:var(--fs-dense);color:var(--text-2);
+  border-top:1px solid var(--border)}
+.demo > p strong{color:var(--text)}
+.demo.queda{border-color:var(--accent);box-shadow:var(--sh-rest)}
+.demo.queda > h3{color:var(--accent);background:var(--accent-soft)}
+
+/* El componente propuesto para §12.4. Las tres ranuras son filas de la MISMA rejilla
+   para todas las tarjetas de la fila: por eso los rótulos caen a la misma altura. */
+.kpis{display:grid;gap:var(--sp-3);grid-template-rows:auto auto auto;align-items:start}
+.kpi{grid-row:span 3;display:grid;grid-template-rows:subgrid;gap:var(--sp-1);
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
+  padding:var(--sp-4) var(--sp-4) var(--sp-5)}
+.kpi .cifra{font-size:var(--fs-kpi);font-weight:700;line-height:1.1;letter-spacing:-.02em}
+.kpi .rotulo{font-size:var(--fs-base);font-weight:500;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .apoyo{font-size:var(--fs-meta);color:var(--text-3);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@supports not (grid-template-rows:subgrid){
+  .kpi{grid-row:auto;grid-template-rows:none}
+}
+.grupo{margin:0 0 var(--sp-5)}
+.grupo:last-child{margin-bottom:0}
+.grupo > h4{margin:0 0 var(--sp-3);font-size:var(--fs-sub);font-weight:600;display:flex;
+  align-items:baseline;gap:var(--sp-3);flex-wrap:wrap}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.nota-metodo{margin:var(--sp-3) 0 0;font-size:var(--fs-meta);color:var(--text-3);max-width:70ch}
+.vacio{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
+  padding:var(--sp-5);display:flex;flex-direction:column;gap:var(--sp-3);align-items:flex-start}
+.vacio p{margin:0;color:var(--text-2);font-size:var(--fs-dense)}
+.btn{display:inline-flex;align-items:center;min-height:32px;padding:0 var(--sp-4);
+  border:1px solid var(--border-2);border-radius:var(--r-ctrl);background:var(--surface);
+  color:var(--text);font:inherit;font-size:var(--fs-dense);font-weight:500;cursor:pointer}
+
+/* Reproducción del defecto, con las medidas tomadas de la captura: altura fija de 97px,
+   interior anclado abajo y la cifra a 20px en vez de los 30 del token. El rótulo flota
+   según cuántas líneas traiga el apoyo. Es el mecanismo, no una caricatura. */
+.kpis.roto{grid-template-rows:none;grid-template-columns:repeat(7,1fr);gap:12px}
+.kpis.roto .kpi{grid-row:auto;display:flex;flex-direction:column;justify-content:space-between;
+  height:97px;overflow:hidden;padding:14px var(--sp-4);background:var(--surface-2)}
+.kpis.roto .cifra{font-size:var(--fs-title);line-height:1}
+.kpis.roto .rotulo{font-weight:400;color:var(--text-2);line-height:1.15;
+  white-space:normal;overflow:visible}
+.kpis.roto .apoyo{line-height:1.35;white-space:normal;overflow:visible}
+figure.ev{margin:0}
+figure.ev img{display:block;width:100%;height:auto;border:1px solid var(--border);
+  border-radius:var(--r-ctrl)}
+figure.ev figcaption{margin-top:var(--sp-2);font-size:var(--fs-meta);color:var(--text-3)}
 footer{border-top:1px solid var(--border);padding:var(--sp-8) 0 var(--sp-12);
   color:var(--text-3);font-size:var(--fs-meta)}
 </style>
@@ -113,10 +171,9 @@ footer{border-top:1px solid var(--border);padding:var(--sp-8) 0 var(--sp-12);
 
 <header class="cab"><div class="wrap">
   <h1>Qué cambia en la versión 2.3.0</h1>
-  <p>Cinco cambios, uno por bloque. A la izquierda el problema en la pantalla real de QA; en medio
-    lo que el sistema decía hasta ahora; a la derecha lo que queda, renderizado con los tokens de
-    verdad. Tres de los cinco no son piezas nuevas sino movimientos de regla, y esos solo se ven
-    comparando.</p>
+  <p>Dos cambios. El ámbito de datos, que es un componente que no existía, y la fila de cifras del
+    tablero, que existía mal. Cada uno con el problema medido sobre la pantalla real de QA y la
+    propuesta renderizada al lado con los tokens de verdad.</p>
 </div></header>
 
 <main class="wrap">
@@ -158,128 +215,134 @@ exige 4,5 · sin token nuevo</div>
 
   <!-- B -->
   <section class="caso">
-    <h2>B · La regla del color sube de §12.5 a §1</h2>
-    <p class="donde">Movimiento · no se escribe regla nueva, se cambia de sitio</p>
+    <h2>B · La fila de cifras del tablero</h2>
+    <p class="donde">Componente <code>.kpi</code> · §12.4 · rehecho, no señalizado</p>
+
     <div class="tres">
       <div class="col">
-        <h3>El problema</h3>
-        <img src="/entregables/img/sio-qa/detalle-columnas.jpg" alt="Tabla del padrón donde la columna Tipo muestra «Empresa» con un punto violeta.">
-        <p>«Empresa» acabó con el violeta de <code>--block</code>, que significa
-          <strong>bloqueado por una condición externa</strong>. Empresa no es un estado: es lo que
-          el cliente es.</p>
+        <h3>El problema, medido</h3>
+        <figure class="ev">
+          <img src="/entregables/img/sio-qa/detalle-kpi-guias.png" alt="La fila de siete tarjetas de métrica con tres líneas rojas horizontales que marcan las tres alturas distintas a las que cae el rótulo.">
+          <figcaption>Las tres líneas son las tres alturas a las que cae el rótulo en una misma fila.</figcaption>
+        </figure>
+        <p>Las siete tarjetas miden lo mismo: <strong>175px de ancho y 97 de alto</strong>, todas.
+          No es un problema de tamaño.</p>
+        <div class="med">Dónde cae cada rótulo (px)
+Órdenes totales     459
+Instaladas          433
+Pendientes          425
+Canceladas          459
+Trámites totales    459
+En proceso          425
+Admitidos este mes  425</div>
+        <p>La cifra está clavada en 402 en las siete. El rótulo se reparte entre
+          <strong>tres alturas distintas, con 34px de horquilla</strong>.</p>
       </div>
+
       <div class="col">
-        <h3>Lo que había</h3>
-        <p>La regla existía entera, pero en <strong>§12.5, dentro del capítulo de dashboard y
-          redactada para gráficas</strong>. Una etiqueta de tabla no es una gráfica, así que nadie
-          fue a buscarla ahí.</p>
-        <div class="muestra-viva"><span class="p-type p-block">Empresa</span></div>
-        <p>El color del semáforo aplicado a una categoría.</p>
+        <h3>Por qué pasa</h3>
+        <p>El interior de la tarjeta va <strong>anclado abajo</strong>. La última línea siempre
+          termina en 468, así que el rótulo sube o baja según cuántas líneas traiga el texto de
+          apoyo: dos líneas lo empujan a 425, una a 433, ninguna lo deja caer a 459.</p>
+        <p>Cada tarjeta se alinea consigo misma. Ninguna se alinea con la de al lado, que es lo
+          que uno lee cuando mira una fila.</p>
+        <p>Y hay un segundo motivo, estructural: <strong>son dos familias en una sola fila</strong>.
+          Las cuatro primeras son órdenes de instalación, las tres últimas son trámites. Hay dos
+          «totales» contiguos —<em>Órdenes totales</em> y <em>Trámites totales</em>— sin nada que
+          diga que cuentan cosas distintas.</p>
       </div>
-      <div class="col queda">
-        <h3>Lo que queda</h3>
-        <p>La regla sube a <strong>§1</strong>, donde gobierna todo el color y no solo el de las
-          gráficas. En §12.5 queda la referencia.</p>
-        <div class="muestra-viva"><span class="p-type p-s1">Empresa</span></div>
-        <p>Si el dato tiene juicio, semáforo. Si solo distingue una cosa de otra, paleta
-          categórica. Si es un dato sobre el dato, tinta de texto.</p>
+
+      <div class="col">
+        <h3>Sí hay lógica de cajas</h3>
+        <p><code>.dash</code> es una rejilla de <strong>doce columnas</strong> y cada widget
+          declara cuántas ocupa. <code>.widget</code> es la superficie. <code>.kpi</code> es la
+          cifra.</p>
+        <p><strong>Siete no cabe en doce.</strong> Por eso esta fila se resolvió con siete
+          columnas iguales al margen de la rejilla. Pero nunca fueron siete: son
+          <strong>cuatro y tres</strong>, y eso sí cabe — cuatro de <code>.w-3</code> y tres de
+          <code>.w-4</code>.</p>
+        <p>Lo que al sistema le falta de verdad es más pequeño y más concreto:
+          <code>.kpi</code> define <strong>dos ranuras</strong>, cifra y delta. La pantalla usa
+          <strong>tres</strong>: cifra, rótulo y apoyo. La tercera nació sin reglas, y es la que
+          descuadra la fila.</p>
       </div>
     </div>
-  </section>
 
-  <!-- C -->
-  <section class="caso">
-    <h2>C · El arranque en frío entra en §6.4</h2>
-    <p class="donde">Caso nuevo dentro de una sección que ya existía</p>
-    <div class="tres">
-      <div class="col">
-        <h3>El problema</h3>
-        <img src="/entregables/img/sio-qa/detalle-esqueleto.jpg" alt="Barra lateral azul con doce rectángulos de esqueleto y el área de contenido en blanco.">
-        <p><strong>Doce barras de esqueleto sobre un menú de ocho filas</strong>, y el área de
-          contenido en blanco con una frase suelta en la esquina.</p>
-      </div>
-      <div class="col">
-        <h3>Lo que había</h3>
-        <p>§6.4 ya decía que el estado ocupa la zona de contenido y que la barra lateral se queda
-          «porque sigue siendo verdad». Lo que no decía es que <strong>la restauración de sesión
-          es uno de esos casos</strong>, ni qué pasa si tarda o falla.</p>
-        <div class="chrome-demo" aria-hidden="true">
-          <div class="fila"></div><div class="fila"></div><div class="fila"></div>
-          <div class="fila"></div><div class="fila"></div>
+    <div class="demo">
+      <h3>Lo que hay — reproducido con los tokens reales</h3>
+      <div class="lienzo">
+        <div class="kpis roto">
+          <div class="kpi"><span class="cifra">0</span><span class="rotulo">Órdenes totales</span></div>
+          <div class="kpi"><span class="cifra">0</span><span class="rotulo">Instaladas</span><span class="apoyo">sin órdenes todavía</span></div>
+          <div class="kpi"><span class="cifra">0</span><span class="rotulo">Pendientes</span><span class="apoyo">nueva, pendiente, programada o en visita</span></div>
+          <div class="kpi"><span class="cifra">0</span><span class="rotulo">Canceladas</span></div>
+          <div class="kpi"><span class="cifra">845</span><span class="rotulo">Trámites totales</span></div>
+          <div class="kpi"><span class="cifra">796</span><span class="rotulo">En proceso</span><span class="apoyo">sin concluir, entregar ni cancelar</span></div>
+          <div class="kpi"><span class="cifra">0</span><span class="rotulo">Admitidos este mes</span><span class="apoyo">−1 frente a los 1 del mes anterior</span></div>
         </div>
-        <p>El esqueleto quedaba a 1,42:1 sobre el cromo, casi lo mismo que el elemento
-          seleccionado del menú (1,37:1).</p>
       </div>
-      <div class="col queda">
-        <h3>Lo que queda</h3>
-        <p>El cromo se pinta de inmediato con sus etiquetas reales: <strong>no dependen de la
-          sesión</strong>, así que no hay esqueleto sobre el cromo. El esqueleto va en el contenido.</p>
-        <div class="chrome-demo" aria-hidden="true">
-          <div class="fila ok"></div><div class="fila ok"></div><div class="fila ok"></div>
-          <div class="fila ok"></div><div class="fila ok"></div>
+      <p>No es la captura: es el mecanismo, funcionando. Ancla abajo, siete columnas, el apoyo
+        partiéndose en las líneas que haga falta. Sale el mismo escalón.</p>
+    </div>
+
+    <div class="demo queda">
+      <h3>Lo que se propone</h3>
+      <div class="lienzo">
+        <div class="grupo">
+          <h4>Trámites <span class="ambito"><span class="msi" aria-hidden="true" translate="no">layers</span>de toda la organización</span></h4>
+          <div class="kpis c3">
+            <div class="kpi"><span class="cifra">845</span><span class="rotulo">Totales</span></div>
+            <div class="kpi"><span class="cifra">796</span><span class="rotulo">En proceso</span><span class="apoyo">94% del total</span></div>
+            <div class="kpi"><span class="cifra">0</span><span class="rotulo">Admitidos este mes</span><span class="apoyo">−1 vs. mes anterior</span></div>
+          </div>
+          <p class="nota-metodo">En proceso son los que no están concluidos, entregados ni
+            cancelados. Los admitidos se cuentan por fecha de admisión, contra un mes anterior
+            completo.</p>
         </div>
-        <p>Más dos reglas: <strong>el esqueleto anticipa lo que va a aparecer</strong> —ocho filas,
-          ocho barras— y hay salida por tiempo o fallo, con reintento y vuelta al acceso.</p>
-      </div>
-    </div>
-  </section>
 
-  <!-- D -->
-  <section class="caso">
-    <h2>D · Señalizar las dos reglas que ya existían</h2>
-    <p class="donde">Notas en §12.4 y §12.5 · ni una regla nueva</p>
-    <div class="tres">
-      <div class="col">
-        <h3>El problema</h3>
-        <img src="/entregables/img/sio-qa/detalle-ambito.jpg" alt="Fila de siete tarjetas de métrica del tablero, cinco de ellas marcando cero.">
-        <p>Siete tarjetas del mismo ancho con alturas de <strong>103 a 127px</strong>, y cinco de
-          las siete marcando cero con el mismo peso que una de 845.</p>
+        <div class="grupo">
+          <h4>Órdenes de instalación <span class="ambito"><span class="msi" aria-hidden="true" translate="no">layers</span>de toda la organización</span></h4>
+          <div class="vacio">
+            <p>Sin órdenes todavía.</p>
+            <button class="btn" type="button">Ver la lista</button>
+          </div>
+        </div>
       </div>
-      <div class="col">
-        <h3>Lo que había</h3>
-        <p>Las dos respuestas, escritas desde la versión 2.0.0. <code>.kpi</code> dentro de
-          <code>.widget</code> sobre la rejilla <code>.dash</code> en §12.4. Y en §12.5:
-          «<strong>un conteo medido en cero no se pinta</strong>».</p>
-        <p>El problema demostrado no es que falten reglas. Es que no se encuentran.</p>
+      <p>Tres cambios, y ninguno es cosmético.</p>
+    </div>
+
+    <div class="tres" style="margin-top:var(--sp-5)">
+      <div class="col queda">
+        <h3>1 · Las tres ranuras se alinean entre tarjetas</h3>
+        <p>Cifra, rótulo y apoyo dejan de ser tres cosas sueltas dentro de cada caja y pasan a ser
+          <strong>tres filas de la misma rejilla</strong>, compartidas por toda la fila
+          (<code>grid-template-rows:subgrid</code>).</p>
+        <p>El rótulo cae a la misma altura tenga o no tenga apoyo. Es lo que arregla el escalón, y
+          es una línea de CSS.</p>
       </div>
       <div class="col queda">
-        <h3>Lo que queda</h3>
-        <p>Una nota corta en cada sección que <strong>nombra el caso real que se saltó la
-          regla</strong>: la fila de siete columnas resuelta al margen de la rejilla, y el borde
-          inferior irregular que produjo.</p>
-        <p>Es señalización, no documentación nueva. Si la regla no se encuentra, da igual lo bien
-          escrita que esté.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- E -->
-  <section class="caso">
-    <h2>E · La deuda del <code>--text-3</code>, y la excepción que la tapaba</h2>
-    <p class="donde">Corrección · maqueta de acceso y nota de §1.1</p>
-    <div class="tres">
-      <div class="col">
-        <h3>El problema</h3>
-        <p>La maqueta de acceso seguía con <code>--text-3:#66717F</code>, el valor viejo que el
-          sistema había corregido a <code>#5C6675</code>.</p>
-        <div class="med">#66717F sobre --surface-2
-4,21:1   ·   exige 4,5</div>
-      </div>
-      <div class="col">
-        <h3>Lo que había</h3>
-        <p>Una exención documentada: «no es un defecto ahí: esa pantalla no usa
-          <code>--surface-2</code>».</p>
-        <p><strong>Era falsa.</strong> El archivo lo declara y lo usa en cinco sitios, así que
-          llevaba desde entonces fallando en ellos.</p>
+        <h3>2 · El apoyo es una línea, o no es apoyo</h3>
+        <p>«Nueva, pendiente, programada o en visita» no es apoyo de una cifra: es la
+          <strong>definición de la medida</strong>. Baja a la nota de método (<code>.nota-reloj</code>,
+          §12.6), que el tablero ya tiene debajo y ya usa para esto.</p>
+        <p>Lo que queda arriba cabe en una línea y se corta con elipsis si no cabe. El sistema ya
+          lo decía: «si la leyenda no cabe en el ancho que le toca, sobra leyenda o falta ancho».</p>
       </div>
       <div class="col queda">
-        <h3>Lo que queda</h3>
-        <p>Token corregido a <code>#5C6675</code>, que ahí da 4,93:1. Y la nota reescrita para
-          decir qué pasó.</p>
-        <p><strong>Una exención se apunta con la medición que la justifica</strong>, no con una
-          suposición sobre el archivo. Ésa sobrevivió porque nadie volvió a abrirlo.</p>
+        <h3>3 · Cuatro ceros no son cuatro tarjetas</h3>
+        <p>El grupo entero de órdenes marcaba 0, 0, 0 y 0. Cuatro cajas para decir que no hay nada.</p>
+        <p>Pasa al estado vacío del widget, que es <strong>lo que el propio tablero ya hace</strong>
+          doscientos píxeles más abajo con «Nada en tu alcance». La pantalla se contradecía a sí
+          misma.</p>
       </div>
     </div>
+
+    <div class="med" style="margin-top:var(--sp-5)">Lo que esto pide al sistema (§12.4)
+· .kpi pasa de dos ranuras (cifra + delta) a tres (cifra + rótulo + apoyo)
+· la fila las alinea con subgrid; no basta con igualar la altura de las cajas
+· el apoyo es de una línea; una definición de la medida va a la nota, no a la tarjeta
+· una fila de cifras es un grupo con un nombre; dos familias son dos grupos
+· un grupo entero en cero se pinta como vacío, no como tarjetas a cero</div>
   </section>
 
 </main>
