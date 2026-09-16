@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.2.5
-last_updated: 2026-09-04
+version: 2.3.0
+last_updated: 2026-09-16
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -37,6 +37,23 @@ en la hoja de estilos.
 Dos temas, claro y oscuro, seleccionados por `prefers-color-scheme` o forzados con
 `data-theme="dark"` / `data-theme="light"` en el `<html>`.
 
+**Antes de elegir un color, decide qué trabajo hace el dato.** De eso depende la paleta, y no de
+la pantalla donde caiga ni de lo que quede bien al lado.
+
+- **Si el dato tiene juicio** —va bien, falta algo, venció, está bloqueado, está en pausa— es el
+  semáforo de §1.3.
+- **Si solo distingue una cosa de otra** —tipo de cliente, origen, plaza, serie de una gráfica—
+  es la paleta categórica de §1.4.
+- **Si es un dato sobre el dato** —de qué conjunto habla una cifra— no lleva color propio: va en
+  tinta de texto (§6.22).
+
+**Un color de estado no se reutiliza para una categoría, ni al revés.**
+
+Esta regla vivía solo en §12.5, redactada para gráficas, y ahí se quedaba corta. La columna
+«Tipo» del padrón acabó pintada con el violeta de `--block` —«bloqueado por una condición
+externa»— porque nadie fue a buscar en el capítulo de dashboard una regla sobre una etiqueta de
+tabla. Gobierna todo el color, así que vive aquí.
+
 ### 1.1 Superficies y texto
 
 | Token | Claro | Oscuro | Uso |
@@ -67,9 +84,14 @@ del mínimo. `#5C6675` cumple en las tres:
 
 En oscuro `#8B96A6` ya cumplía en las tres (5,53 / 6,06 / 5,03) y no se toca.
 
-`acceso-sio-dproma.html` sigue con `#66717F`. No es un defecto ahí: esa pantalla no usa
-`--surface-2`, así que su texto auxiliar nunca cae sobre el fondo que fallaba. Queda pendiente
-igualarlo cuando esa pantalla se vuelva a tocar.
+`acceso-sio-dproma.html` ya está igualada. La nota anterior daba por hecho que esa pantalla no
+usaba `--surface-2` y que por eso su texto auxiliar nunca caía sobre el fondo que fallaba. Al ir a
+saldarlo resultó que sí lo declara y lo usa en cinco sitios, así que llevaba desde entonces a
+4,21:1 en ellos. Corregido a `#5C6675`, que allí da 4,93:1.
+
+**La excepción documentada era la del propio sistema, no la de la pantalla.** Una exención se
+apunta con la medición que la justifica, no con una suposición sobre el archivo: la de arriba
+sobrevivió porque nadie volvió a abrirlo.
 
 ### 1.2 Acción y marca
 
@@ -665,6 +687,19 @@ padrón llegaron así pese a que este apartado ya lo prescribía.
    borrador: justo en el momento de más incertidumbre, se retiraba la prueba de que el trabajo
    seguía ahí. Cuando hay trabajo del usuario en pantalla, el error va **encima**, como aviso,
    con los campos visibles y rellenos.
+
+5. **La restauración de sesión es una vista «cargando», no una pantalla aparte.** Al volver al
+   sistema, el cromo se pinta de inmediato con sus etiquetas reales —no dependen de la sesión— y
+   el esqueleto va en la zona de contenido, como en cualquier otra carga. Lo construido fue lo
+   contrario: doce barras de esqueleto sobre una barra lateral de ocho filas, y el área de
+   contenido en blanco con una frase suelta pegada a la esquina.
+
+   **El esqueleto anticipa lo que va a aparecer.** Si el menú tiene ocho filas, el esqueleto
+   tiene ocho. Uno que no coincide con su contenido no prepara al ojo: lo engaña.
+
+   **Y tiene salida.** Pasados unos segundos sin respuesta se pasa al estado de error, con su
+   reintento y su vuelta al acceso. Sin eso nadie distingue «tarda» de «se colgó», y la única
+   salida que queda es recargar.
 
 ### 6.5 Iconos (`.msi`)
 
@@ -1489,6 +1524,45 @@ de la barra, y la tabla de detrás sigue siendo legible mientras se decide. Por 
 
 ---
 
+### 6.22 Ámbito de datos (`.ambito`)
+
+Una cifra no siempre habla del mismo conjunto. «845 trámites» puede ser de toda la organización,
+de una plaza, o de lo que alcanza quien mira, y esa diferencia cambia la lectura entera. El
+producto ya tenía el vocabulario —«de toda la organización», «Vista de Administración principal»,
+«Nada en tu alcance»— pero no tenía forma, así que se pintó con el ámbar de `--warn`. En una sola
+pantalla del tablero salía cuatro veces: cuatro avisos de que falta algo, cuando no faltaba nada.
+Cuatro avisos falsos por pantalla desgastan el aviso de verdad.
+
+**El ámbito no es un estado.** Es un dato sobre el dato, así que pesa menos que todo lo demás de
+la pantalla: sin relleno, sin borde, icono y texto en tinta auxiliar.
+
+```css
+.ambito{display:inline-flex;align-items:center;gap:5px;
+  font-size:var(--fs-meta);font-weight:600;color:var(--text-3)}
+.ambito .msi{font-size:14px}
+```
+
+**No lleva token de color propio, y no hacía falta añadirlo.** `--text-3` pasa 4,5:1 sobre las
+tres superficies donde puede caer, en los dos temas: 5,65 sobre `--surface`, 5,31 sobre `--bg` y
+4,93 sobre `--surface-2` en claro; 5,53 / 6,06 / 5,03 en oscuro.
+
+Se descartó darle relleno de `--surface-2` al medirlo: queda a 1,08:1 del fondo de página y
+desaparece del todo cuando cae sobre una tarjeta de esa misma superficie, que es justo el caso
+del tablero.
+
+**Dos vacíos que no son el mismo.** Hoy «Nada en tu alcance» y un 0 conviven en la misma fila del
+tablero diciendo cosas distintas con la misma cara:
+
+| Caso | Qué pasa | Cómo se dice |
+|---|---|---|
+| Sin permiso | El dato existe, pero no es de quien mira | Vista vacía de §6.4, con el ámbito diciendo qué sí alcanza. **Nunca un 0**: un cero afirma que se midió |
+| Conjunto vacío | Quien mira alcanza el dato, y vale cero | La cifra con su cero. §12.5: un conteo medido en cero no se pinta como falta |
+
+Y el corolario de la primera fila: **no se ofrece «ver la lista» de una lista que no se puede
+ver.** El tablero lo hace hoy en sus dos tarjetas sin alcance.
+
+---
+
 ## 7. Layout
 
 ### 7.1 Entrada al sistema (`.split`)
@@ -1793,6 +1867,13 @@ conexión tiene que enseñar datos, no un rectángulo vacío.
 | Sparkline | `canvas` | Tendencia dentro de una tarjeta, sin ejes |
 | Barra de progreso | `.progreso` | Avance contra una meta declarada |
 
+**La fila de cifras del tablero sale de aquí.** `.kpi` dentro de `.widget` sobre la rejilla
+`.dash`, que es la que reparte el ancho. En el tablero construido se resolvió con siete columnas
+iguales al margen de esta capa, y el resultado fueron siete tarjetas del mismo ancho con alturas
+de 103 a 127px según lo larga que fuera cada leyenda: una fila con el borde inferior irregular.
+Si la leyenda no cabe en el ancho que le toca, sobra leyenda o falta ancho, no se parte en tres
+líneas.
+
 ### 12.5 Reglas de lectura
 
 - **Un solo eje.** Nunca dos escalas verticales en la misma gráfica; dos medidas de magnitud
@@ -1808,7 +1889,9 @@ conexión tiene que enseñar datos, no un rectángulo vacío.
   y 2px de superficie entre segmentos contiguos de una barra apilada.
 - **Color según el trabajo del dato.** Si el dato tiene juicio —va bien, vence pronto, ya
   venció— es el semáforo de §1.3. Si solo distingue una cosa de otra, es la paleta categórica de
-  §1.4. Un color de estado nunca se reutiliza como serie.
+  §1.4. Un color de estado nunca se reutiliza como serie. **La regla completa está en §1**, que
+  es donde gobierna todo el color: aquí queda solo su aplicación a las series. Mientras vivió
+  únicamente en este capítulo, nadie la aplicó fuera de las gráficas.
 
 ### 12.6 Composiciones de tablero
 
@@ -1855,3 +1938,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.2.3 | 2026-09-04 | Regenera `icon_names` de la página del sistema, que se había quedado sin `expand_more` al incorporar la barra de filtros: el chevron de cada desplegable salía como la letra «E». Es exactamente el fallo que §6.5 ya describe —se añade un icono al markup y se olvida en la lista del subconjunto, y el navegador pinta el nombre en letras—, así que no hay regla nueva que escribir: la regla estaba y no se cumplió. Comprobado con el fragmento de tres líneas que el propio apartado prescribe, que ahora devuelve vacío. Cambio acotado a esta página; no toca `docs/sistema-diseno-sio-dproma.md`. |
 | 2.2.4 | 2026-09-04 | Poda de texto en la página renderizada, aplicando el criterio que la propia §8 declara: en pantalla va qué hacer y qué no; el porqué y las alternativas descartadas viven en la documentación. Sale la entrada de la sección de dashboard, que contaba la historia del hueco en vez de dar una regla, y la justificación histórica de la sustitución de la paleta, que ya está en la fila 2.0.0 de este historial. Se recortan además las coletillas de racional en las reglas de gráfico y en la barra de filtros, dejando la regla y su consecuencia. No se retira ninguna regla ni se toca la fuente técnica, que es justamente donde ese razonamiento debe estar. |
 | 2.2.5 | 2026-09-04 | Reescribe el texto de la capa de dashboard y de la barra de filtros en la página renderizada dejando solo la instrucción. Fuera las coletillas, las aclaraciones entre rayas y las frases que explicaban la consecuencia de incumplir la regla. La sección de dashboard baja de 696 a 547 palabras y no queda ni una raya. Ninguna regla se retira: cambia cómo están escritas. |
+| 2.3.0 | 2026-09-16 | Cierra los huecos que destapó la revisión del SIO construido en QA, y resultaron ser menos de los que parecía: de cinco piezas que dábamos por pendientes, cuatro ya estaban escritas. La única nueva es el ámbito de datos (§6.22) —de qué conjunto habla una cifra—, que el producto ya usaba con vocabulario propio pero sin forma, así que se pintó con el ámbar de `--warn`: cuatro avisos de que falta algo en una sola pantalla del tablero, cuando no faltaba nada. No trae token nuevo, y no hacía falta: `--text-3` ya pasa 4,5:1 sobre las tres superficies donde puede caer en los dos temas, y el relleno de `--surface-2` se descartó al medirlo, porque queda a 1,08:1 del fondo y desaparece del todo sobre una tarjeta de esa misma superficie. La regla de qué paleta le toca a cada dato sube de §12.5 a §1, que es donde gobierna todo el color: mientras vivió en el capítulo de dashboard, redactada para gráficas, nadie fue a buscarla para una etiqueta de tabla y la columna «Tipo» del padrón acabó con el violeta de `--block`. §6.4 gana la restauración de sesión como caso de la vista «cargando», con el cromo pintado de inmediato porque no depende de la sesión, la salida por tiempo o fallo que no existía, y la regla de que el esqueleto anticipa lo que va a aparecer —se pintaron doce barras sobre un menú de ocho filas—. Y dos notas en §12.4 y §12.5 que nombran el caso real que se saltó cada regla, porque el problema demostrado no es que falten reglas: es que no se encuentran. |

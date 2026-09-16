@@ -30,6 +30,23 @@ en la hoja de estilos.
 Dos temas, claro y oscuro, seleccionados por `prefers-color-scheme` o forzados con
 `data-theme="dark"` / `data-theme="light"` en el `<html>`.
 
+**Antes de elegir un color, decide qué trabajo hace el dato.** De eso depende la paleta, y no de
+la pantalla donde caiga ni de lo que quede bien al lado.
+
+- **Si el dato tiene juicio** —va bien, falta algo, venció, está bloqueado, está en pausa— es el
+  semáforo de §1.3.
+- **Si solo distingue una cosa de otra** —tipo de cliente, origen, plaza, serie de una gráfica—
+  es la paleta categórica de §1.4.
+- **Si es un dato sobre el dato** —de qué conjunto habla una cifra— no lleva color propio: va en
+  tinta de texto (§6.22).
+
+**Un color de estado no se reutiliza para una categoría, ni al revés.**
+
+Esta regla vivía solo en §12.5, redactada para gráficas, y ahí se quedaba corta. La columna
+«Tipo» del padrón acabó pintada con el violeta de `--block` —«bloqueado por una condición
+externa»— porque nadie fue a buscar en el capítulo de dashboard una regla sobre una etiqueta de
+tabla. Gobierna todo el color, así que vive aquí.
+
 ### 1.1 Superficies y texto
 
 | Token | Claro | Oscuro | Uso |
@@ -60,9 +77,14 @@ del mínimo. `#5C6675` cumple en las tres:
 
 En oscuro `#8B96A6` ya cumplía en las tres (5,53 / 6,06 / 5,03) y no se toca.
 
-`acceso-sio-dproma.html` sigue con `#66717F`. No es un defecto ahí: esa pantalla no usa
-`--surface-2`, así que su texto auxiliar nunca cae sobre el fondo que fallaba. Queda pendiente
-igualarlo cuando esa pantalla se vuelva a tocar.
+`acceso-sio-dproma.html` ya está igualada. La nota anterior daba por hecho que esa pantalla no
+usaba `--surface-2` y que por eso su texto auxiliar nunca caía sobre el fondo que fallaba. Al ir a
+saldarlo resultó que sí lo declara y lo usa en cinco sitios, así que llevaba desde entonces a
+4,21:1 en ellos. Corregido a `#5C6675`, que allí da 4,93:1.
+
+**La excepción documentada era la del propio sistema, no la de la pantalla.** Una exención se
+apunta con la medición que la justifica, no con una suposición sobre el archivo: la de arriba
+sobrevivió porque nadie volvió a abrirlo.
 
 ### 1.2 Acción y marca
 
@@ -658,6 +680,19 @@ padrón llegaron así pese a que este apartado ya lo prescribía.
    borrador: justo en el momento de más incertidumbre, se retiraba la prueba de que el trabajo
    seguía ahí. Cuando hay trabajo del usuario en pantalla, el error va **encima**, como aviso,
    con los campos visibles y rellenos.
+
+5. **La restauración de sesión es una vista «cargando», no una pantalla aparte.** Al volver al
+   sistema, el cromo se pinta de inmediato con sus etiquetas reales —no dependen de la sesión— y
+   el esqueleto va en la zona de contenido, como en cualquier otra carga. Lo construido fue lo
+   contrario: doce barras de esqueleto sobre una barra lateral de ocho filas, y el área de
+   contenido en blanco con una frase suelta pegada a la esquina.
+
+   **El esqueleto anticipa lo que va a aparecer.** Si el menú tiene ocho filas, el esqueleto
+   tiene ocho. Uno que no coincide con su contenido no prepara al ojo: lo engaña.
+
+   **Y tiene salida.** Pasados unos segundos sin respuesta se pasa al estado de error, con su
+   reintento y su vuelta al acceso. Sin eso nadie distingue «tarda» de «se colgó», y la única
+   salida que queda es recargar.
 
 ### 6.5 Iconos (`.msi`)
 
@@ -1482,6 +1517,45 @@ de la barra, y la tabla de detrás sigue siendo legible mientras se decide. Por 
 
 ---
 
+### 6.22 Ámbito de datos (`.ambito`)
+
+Una cifra no siempre habla del mismo conjunto. «845 trámites» puede ser de toda la organización,
+de una plaza, o de lo que alcanza quien mira, y esa diferencia cambia la lectura entera. El
+producto ya tenía el vocabulario —«de toda la organización», «Vista de Administración principal»,
+«Nada en tu alcance»— pero no tenía forma, así que se pintó con el ámbar de `--warn`. En una sola
+pantalla del tablero salía cuatro veces: cuatro avisos de que falta algo, cuando no faltaba nada.
+Cuatro avisos falsos por pantalla desgastan el aviso de verdad.
+
+**El ámbito no es un estado.** Es un dato sobre el dato, así que pesa menos que todo lo demás de
+la pantalla: sin relleno, sin borde, icono y texto en tinta auxiliar.
+
+```css
+.ambito{display:inline-flex;align-items:center;gap:5px;
+  font-size:var(--fs-meta);font-weight:600;color:var(--text-3)}
+.ambito .msi{font-size:14px}
+```
+
+**No lleva token de color propio, y no hacía falta añadirlo.** `--text-3` pasa 4,5:1 sobre las
+tres superficies donde puede caer, en los dos temas: 5,65 sobre `--surface`, 5,31 sobre `--bg` y
+4,93 sobre `--surface-2` en claro; 5,53 / 6,06 / 5,03 en oscuro.
+
+Se descartó darle relleno de `--surface-2` al medirlo: queda a 1,08:1 del fondo de página y
+desaparece del todo cuando cae sobre una tarjeta de esa misma superficie, que es justo el caso
+del tablero.
+
+**Dos vacíos que no son el mismo.** Hoy «Nada en tu alcance» y un 0 conviven en la misma fila del
+tablero diciendo cosas distintas con la misma cara:
+
+| Caso | Qué pasa | Cómo se dice |
+|---|---|---|
+| Sin permiso | El dato existe, pero no es de quien mira | Vista vacía de §6.4, con el ámbito diciendo qué sí alcanza. **Nunca un 0**: un cero afirma que se midió |
+| Conjunto vacío | Quien mira alcanza el dato, y vale cero | La cifra con su cero. §12.5: un conteo medido en cero no se pinta como falta |
+
+Y el corolario de la primera fila: **no se ofrece «ver la lista» de una lista que no se puede
+ver.** El tablero lo hace hoy en sus dos tarjetas sin alcance.
+
+---
+
 ## 7. Layout
 
 ### 7.1 Entrada al sistema (`.split`)
@@ -1784,6 +1858,13 @@ conexión tiene que enseñar datos, no un rectángulo vacío.
 | Sparkline | `canvas` | Tendencia dentro de una tarjeta, sin ejes |
 | Barra de progreso | `.progreso` | Avance contra una meta declarada |
 
+**La fila de cifras del tablero sale de aquí.** `.kpi` dentro de `.widget` sobre la rejilla
+`.dash`, que es la que reparte el ancho. En el tablero construido se resolvió con siete columnas
+iguales al margen de esta capa, y el resultado fueron siete tarjetas del mismo ancho con alturas
+de 103 a 127px según lo larga que fuera cada leyenda: una fila con el borde inferior irregular.
+Si la leyenda no cabe en el ancho que le toca, sobra leyenda o falta ancho, no se parte en tres
+líneas.
+
 ### 12.5 Reglas de lectura
 
 - **Un solo eje.** Nunca dos escalas verticales en la misma gráfica; dos medidas de magnitud
@@ -1799,7 +1880,9 @@ conexión tiene que enseñar datos, no un rectángulo vacío.
   y 2px de superficie entre segmentos contiguos de una barra apilada.
 - **Color según el trabajo del dato.** Si el dato tiene juicio —va bien, vence pronto, ya
   venció— es el semáforo de §1.3. Si solo distingue una cosa de otra, es la paleta categórica de
-  §1.4. Un color de estado nunca se reutiliza como serie.
+  §1.4. Un color de estado nunca se reutiliza como serie. **La regla completa está en §1**, que
+  es donde gobierna todo el color: aquí queda solo su aplicación a las series. Mientras vivió
+  únicamente en este capítulo, nadie la aplicó fuera de las gráficas.
 
 ### 12.6 Composiciones de tablero
 
