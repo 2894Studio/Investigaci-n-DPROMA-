@@ -1797,7 +1797,7 @@ usados - declarados  →  tiene que ser vacío
 ## 12. Capa de dashboard
 
 El sistema tenía diecinueve componentes y ninguno de dato visual: ni una cifra destacada, ni una
-barra, ni una tendencia. Esta capa cubre ese hueco. Las nueve piezas están vivas, con su marcado, en la
+barra, ni una tendencia. Esta capa cubre ese hueco. Las diez piezas están vivas, con su marcado, en la
 sección «Capa de dashboard» de la página del sistema (`web/entregables/reglas-de-diseno.html#dashboard`).
 
 ### 12.1 Qué se dibuja con librería y qué no
@@ -1843,13 +1843,14 @@ conexión tiene que enseñar datos, no un rectángulo vacío.
 </figure>
 ```
 
-### 12.4 Las nueve piezas
+### 12.4 Las diez piezas
 
 | Pieza | Clase | Para qué |
 |---|---|---|
 | Rejilla | `.dash` | Doce columnas; cada widget declara cuántas ocupa (`.w-3`, `.w-4`, `.w-6`, `.w-8`) |
 | Tarjeta de widget | `.widget` | El contenedor común. Reusa la receta de superficie de §6.3; no se anidan tarjetas |
-| KPI con variación | `.kpi` | Cifra en `--fs-kpi` y su delta debajo, no al lado |
+| KPI con variación | `.kpi` | Cifra en `--fs-kpi` y su delta debajo, no al lado. Una por widget: el rótulo lo pone la cabecera del widget |
+| Fila de cifras | `.cifras` | Varias cifras compactas dentro de **un solo** widget, cuando ninguna merece widget propio. Aquí cada cifra sí lleva rótulo dentro (§12.4.1) |
 | Barra apilada de estado | `.barra` | Reparto de un total entre estados del semáforo |
 | Leyenda inline | `.leyenda` | Marca de color + rótulo en tinta de texto + cifra |
 | Dona | `canvas` | Proporción sobre un total, con hueco central |
@@ -1858,12 +1859,75 @@ conexión tiene que enseñar datos, no un rectángulo vacío.
 | Sparkline | `canvas` | Tendencia dentro de una tarjeta, sin ejes |
 | Barra de progreso | `.progreso` | Avance contra una meta declarada |
 
-**La fila de cifras del tablero sale de aquí.** `.kpi` dentro de `.widget` sobre la rejilla
-`.dash`, que es la que reparte el ancho. En el tablero construido se resolvió con siete columnas
-iguales al margen de esta capa, y el resultado fueron siete tarjetas del mismo ancho con alturas
-de 103 a 127px según lo larga que fuera cada leyenda: una fila con el borde inferior irregular.
-Si la leyenda no cabe en el ancho que le toca, sobra leyenda o falta ancho, no se parte en tres
-líneas.
+### 12.4.1 La fila de cifras (`.cifras`)
+
+`.kpi` está pensado para **una cifra por widget**: el rótulo lo pone la cabecera del widget y
+dentro solo van el número y su delta. Cuando siete cifras tienen que convivir en un bloque, esa
+receta no sirve, y el tablero de SIO la resolvió por su cuenta. Lo que salió, medido sobre la
+pantalla:
+
+- Las siete tarjetas miden **175px de ancho y 97 de alto, todas**. El problema no es el tamaño.
+- La cifra está clavada en la misma altura en las siete. **El rótulo cae a tres alturas
+  distintas** —con 34px de horquilla— porque el interior va anclado abajo: la última línea
+  siempre termina en el mismo sitio, así que el rótulo sube o baja según cuántas líneas traiga el
+  texto de apoyo.
+- La cifra tiene 14px de altura de mayúscula, o sea **unos 20px de cuerpo cuando el token dice
+  30**. El número acaba a 1,4 veces su rótulo en lugar de a 2,1, y no manda en su propia tarjeta.
+- Cada cifra va en una caja con relleno `--surface-2` **y borde**, dentro de un widget de
+  `--surface`. Eso es anidar tarjetas, que §6.3 prohíbe.
+
+Cada tarjeta se alinea consigo misma y ninguna con la de al lado, que es justo lo que se lee al
+mirar una fila.
+
+**Las tres ranuras.** Una cifra compacta tiene cifra, rótulo y apoyo. La tercera es la que nació
+sin reglas, y es la que descuadra la fila. Van como **filas de una misma rejilla compartida por
+toda la fila**, no como tres elementos sueltos dentro de cada caja:
+
+```css
+.cifras{ display:grid; gap:var(--sp-3); align-items:start;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  grid-template-rows:auto auto auto }
+.cifras > .kpi{ grid-row:span 3; display:grid; grid-template-rows:subgrid; gap:var(--sp-1);
+  background:var(--surface-2); border-radius:var(--r-card); padding:var(--sp-4) }
+.cifras .rotulo{ font-size:var(--fs-base); font-weight:500 }
+.cifras .apoyo{ font-size:var(--fs-meta); color:var(--text-3);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+@supports not (grid-template-rows:subgrid){
+  .cifras > .kpi{ grid-row:auto; grid-template-rows:none }
+}
+```
+
+`subgrid` es lo que hace el trabajo: el rótulo cae a la misma altura tenga o no tenga apoyo, y una
+cifra sin apoyo deja su tercera fila vacía sin necesidad de rellenarla con nada. **Igualar la
+altura de las cajas no basta** —en la pantalla medida ya eran todas de 97px y aun así el rótulo
+bailaba—; lo que hay que igualar es dónde empieza cada ranura.
+
+**Sin borde.** Dentro de un widget, una cifra compacta es un relleno, no una tarjeta. Sumar borde
+a `--surface-2` convierte siete subdivisiones en siete tarjetas peleando con la que las contiene.
+
+Medido, el relleno queda a **1,15:1 del widget en claro y 1,10:1 en oscuro**, muy por debajo del
+3:1 de §1.7. Es aceptable aquí, y conviene decir por qué: **ninguna información depende de ver ese
+borde**. Lo que agrupa cada cifra con su rótulo es la proximidad y el hueco de `--sp-3` entre
+cajas; el relleno solo lo refuerza. Si alguna vez el reparto en cajas pasara a significar algo por
+sí mismo, el relleno dejaría de bastar y habría que medirlo contra el 3:1.
+
+El texto sí se mide como texto, y pasa: el rótulo en `--text` da 13,27:1 en claro y 12,68:1 en
+oscuro sobre ese relleno, y el apoyo en `--text-3`, 4,93:1 y 5,03:1.
+
+**El apoyo es de una línea.** Si no cabe, no es apoyo: es la definición de la medida, y esa va a
+la nota de método (`.nota-reloj`, §12.6) debajo de la fila. «Nueva, pendiente, programada o en
+visita» explica qué se cuenta; no acompaña a un número.
+
+**Una fila de cifras es un grupo con nombre, y dos familias son dos grupos.** Las siete cifras del
+tablero eran cuatro de órdenes de instalación y tres de trámites, con dos «totales» contiguos y
+nada que dijera que cuentan cosas distintas. Siete columnas no caben en una rejilla de doce, y ese
+fue el motivo de salirse de `.dash`; cuatro de `.w-3` y tres de `.w-4` sí caben. Si un conjunto de
+cifras no se puede nombrar de una vez, son dos conjuntos.
+
+**Un grupo entero en cero se pinta como vacío.** Cuatro tarjetas marcando 0, 0, 0 y 0 son cuatro
+cajas para decir que no hay nada. Va el estado vacío del widget (§6.4), que es lo que ese mismo
+tablero ya hace doscientos píxeles más abajo con «Nada en tu alcance». Es la misma regla de §12.5
+—un conteo medido en cero no se pinta— aplicada al grupo y no al segmento.
 
 ### 12.5 Reglas de lectura
 

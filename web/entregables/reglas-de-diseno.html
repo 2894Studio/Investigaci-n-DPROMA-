@@ -288,6 +288,23 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 .kpi .var.plano{ color:var(--text-3) }
 .kpi .var .ctx{ font-weight:400; color:var(--text-3) }
 
+/* Fila de cifras. Varias cifras compactas en UN solo widget, cuando ninguna merece widget
+   propio. Aquí cada cifra lleva su rótulo dentro, porque no tiene cabecera que se lo ponga.
+   Las tres ranuras son filas de la MISMA rejilla para toda la fila: por eso el rótulo cae a
+   la misma altura tenga o no tenga apoyo. Igualar la altura de las cajas no basta.
+   Sin borde: dentro de un widget una cifra es un relleno, no una tarjeta anidada (§6.3). */
+.cifras{ display:grid; gap:var(--sp-3); align-items:start;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  grid-template-rows:auto auto auto }
+.cifras > .kpi{ grid-row:span 3; display:grid; grid-template-rows:subgrid; gap:var(--sp-1);
+  background:var(--surface-2); border-radius:var(--r-card); padding:var(--sp-4) }
+.cifras .rotulo{ font-size:var(--fs-base); font-weight:500; color:var(--text) }
+.cifras .apoyo{ font-size:var(--fs-meta); color:var(--text-3);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+@supports not (grid-template-rows:subgrid){
+  .cifras > .kpi{ grid-row:auto; grid-template-rows:none }
+}
+
 /* Barra apilada de estado. CSS, no librería: son tres rectángulos.
    Separador de 2px del color de la superficie entre segmentos. */
 .barra{ display:flex; height:10px; border-radius:var(--r-pill); overflow:hidden; background:var(--surface-2) }
@@ -471,7 +488,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
     <h1>El sistema de diseño real de SIO-DPROMA.</h1>
     <p class="lede">Es el sistema de <strong>producto</strong> de DPROMA, construido y verificado sobre las propuestas ya corregidas de <strong>acceso</strong> y <strong>padrón de clientes</strong>. Con cada token, componente y regla ya resueltos y documentados aquí, diseñar la siguiente pantalla de DPROMA es una decisión de contenido, no de estilo: sin reinventar color, tipografía o espaciado desde cero, ni esperar a que alguien lo defina. Cada token viene medido en el navegador, con su contraste comprobado en los dos temas.</p>
     <div class="hero-meta">
-      <span class="version-tag">Versión 2.3.0 · dashboard + acceso</span>
+      <span class="version-tag">Versión 2.4.0 · dashboard + acceso</span>
       <a class="download-btn" href="/entregables/design-rules.md" download><span class="msi" aria-hidden="true" translate="no">download</span> Descargar sistema completo (.md)</a>
     </div>
     <p class="source-note">Fuente completa: <code>docs/sistema-diseno-sio-dproma.md</code> · complementan <code>docs/sistema-diseno-acceso-sio-dproma.md</code>, <code>docs/decisiones-producto-padron.md</code>, <code>docs/patron-dialogo-sio-dproma.md</code> y <code>docs/criterios-de-animacion.md</code>.</p>
@@ -526,6 +543,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
           <tr><td>2.2.4</td><td>4 sep 2026</td><td>Poda de texto en esta página, aplicando el criterio que la propia sección de voz declara: en pantalla va qué hacer y qué no; el porqué y las alternativas descartadas viven en la documentación. Sale la entrada de la sección de dashboard y la justificación histórica de la paleta, que ya está en la fila 2.0.0. No se retira ninguna regla.</td></tr>
           <tr><td>2.2.5</td><td>4 sep 2026</td><td>Reescribe el texto de la capa de dashboard y de la barra de filtros dejando solo la instrucción. Fuera las coletillas, las aclaraciones entre rayas y las frases que explicaban la consecuencia de incumplir la regla. De 696 a 547 palabras, sin ninguna raya. Ninguna regla se retira.</td></tr>
           <tr><td>2.3.0</td><td>16 sep 2026</td><td>Incorpora el ámbito de datos (§6.22): de qué conjunto habla una cifra. El producto ya tenía el vocabulario pero no la forma, así que se pintaba con el ámbar de <code>--warn</code> — cuatro avisos de que falta algo en una sola pantalla del tablero, sin que faltara nada. No trae token: <code>--text-3</code> pasa 4,5:1 sobre las tres superficies donde puede caer, en ambos temas. La regla de qué paleta le toca a cada dato sube de §12.5 a §1, donde gobierna todo el color: mientras vivió en el capítulo de gráficas, la columna «Tipo» del padrón acabó con el violeta de <code>--block</code>. §6.4 gana la restauración de sesión como vista «cargando», con su salida por tiempo o fallo y la regla de que el esqueleto anticipa lo que va a aparecer.</td></tr>
+          <tr><td>2.4.0</td><td>16 sep 2026</td><td>Rehace la fila de cifras del tablero (§12.4.1). <code>.kpi</code> servía para <b>una</b> cifra por widget, con el rótulo en la cabecera; el tablero necesitaba siete en un bloque y lo resolvió por su cuenta. Las siete tarjetas miden lo mismo —175×97px—, así que no era tamaño: la cifra está clavada a la misma altura en las siete y el rótulo cae a tres alturas distintas, con 34px de horquilla, porque el interior va anclado abajo. Dos defectos más: la cifra ronda los 20px de cuerpo cuando <code>--fs-kpi</code> son 30, y cada caja lleva relleno y borde dentro de un widget, que es anidar tarjetas. Entra <code>.cifras</code>: cifra, rótulo y apoyo pasan a ser filas de una misma rejilla compartida por toda la fila con <code>subgrid</code>. Con ello, el apoyo de una línea, una fila de cifras como grupo con nombre —dos familias son dos grupos— y un grupo entero en cero pintado como vacío.</td></tr>
         </tbody>
       </table>
     </div>
@@ -857,13 +875,35 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 <div class="bloque-dash" id="d-piezas">
   <div class="rot">
     <div class="kicker">Piezas</div>
-    <h3>Nueve componentes</h3>
+    <h3>Diez componentes</h3>
     <p>Todo va dentro de una tarjeta de widget, la única receta de superficie. Se componen sobre una rejilla de doce columnas.</p>
   </div>
 
   <div class="dash">
 
-    <!-- 1 · KPI -->
+    <!-- 1 · Fila de cifras -->
+    <div class="widget">
+      <header><h3>Trámites</h3></header>
+      <div class="cifras">
+        <div class="kpi">
+          <span class="cifra tnum">845</span>
+          <span class="rotulo">Totales</span>
+        </div>
+        <div class="kpi">
+          <span class="cifra tnum">796</span>
+          <span class="rotulo">En proceso</span>
+          <span class="apoyo">94% del total</span>
+        </div>
+        <div class="kpi">
+          <span class="cifra tnum">0</span>
+          <span class="rotulo">Admitidos este mes</span>
+          <span class="apoyo">&minus;1 vs. mes anterior</span>
+        </div>
+      </div>
+      <p class="pie">En proceso son los que no están concluidos, entregados ni cancelados. Los admitidos se cuentan por fecha de admisión, contra un mes anterior completo.</p>
+    </div>
+
+    <!-- 2 · KPI -->
     <div class="widget w-3">
       <header><h3>Trámites con reloj</h3></header>
       <div class="kpi">
@@ -873,7 +913,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       <p class="pie">No incluye los 10 sin reloj.</p>
     </div>
 
-    <!-- 2 · KPI con sparkline -->
+    <!-- 3 · KPI con sparkline -->
     <div class="widget w-3">
       <header><h3>Cerrados este mes</h3></header>
       <div class="kpi">
@@ -898,7 +938,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       </figure>
     </div>
 
-    <!-- 3 · Barra apilada de estado -->
+    <!-- 4 · Barra apilada de estado -->
     <div class="widget w-6">
       <header><h3>Trámites con el reloj corriendo</h3></header>
       <div class="kpi"><div><span class="cifra tnum">26</span><span class="unidad">expedientes</span></div></div>
@@ -915,7 +955,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       <p class="pie">No incluye los <b>10</b> sin reloj: aún sin admitir o ya cerrados, no tienen plazo contra el que medirse.</p>
     </div>
 
-    <!-- 4 · Dona -->
+    <!-- 5 · Dona -->
     <div class="widget w-4">
       <header><h3>Reparto por tipo de trámite</h3></header>
       <figure class="viz">
@@ -936,7 +976,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       </figure>
     </div>
 
-    <!-- 5 · Ranking -->
+    <!-- 6 · Ranking -->
     <div class="widget w-8">
       <header><h3>Carga por plaza</h3></header>
       <figure class="viz">
@@ -957,7 +997,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       </figure>
     </div>
 
-    <!-- 6 · Tendencia -->
+    <!-- 7 · Tendencia -->
     <div class="widget w-8">
       <header><h3>Recibidos y concluidos por semana</h3></header>
       <figure class="viz">
@@ -978,7 +1018,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       </figure>
     </div>
 
-    <!-- 7 · Progreso -->
+    <!-- 8 · Progreso -->
     <div class="widget w-4">
       <header><h3>Meta del mes</h3></header>
       <div class="progreso">
