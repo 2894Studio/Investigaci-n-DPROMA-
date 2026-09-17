@@ -30,6 +30,23 @@ en la hoja de estilos.
 Dos temas, claro y oscuro, seleccionados por `prefers-color-scheme` o forzados con
 `data-theme="dark"` / `data-theme="light"` en el `<html>`.
 
+**Antes de elegir un color, decide qué trabajo hace el dato.** De eso depende la paleta, y no de
+la pantalla donde caiga ni de lo que quede bien al lado.
+
+- **Si el dato tiene juicio** —va bien, falta algo, venció, está bloqueado, está en pausa— es el
+  semáforo de §1.3.
+- **Si solo distingue una cosa de otra** —tipo de cliente, origen, plaza, serie de una gráfica—
+  es la paleta categórica de §1.4.
+- **Si es un dato sobre el dato** —de qué conjunto habla una cifra— no lleva color propio: va en
+  tinta de texto (§6.22).
+
+**Un color de estado no se reutiliza para una categoría, ni al revés.**
+
+Esta regla vivía solo en §12.5, redactada para gráficas, y ahí se quedaba corta. La columna
+«Tipo» del padrón acabó pintada con el violeta de `--block` —«bloqueado por una condición
+externa»— porque nadie fue a buscar en el capítulo de dashboard una regla sobre una etiqueta de
+tabla. Gobierna todo el color, así que vive aquí.
+
 ### 1.1 Superficies y texto
 
 | Token | Claro | Oscuro | Uso |
@@ -60,9 +77,14 @@ del mínimo. `#5C6675` cumple en las tres:
 
 En oscuro `#8B96A6` ya cumplía en las tres (5,53 / 6,06 / 5,03) y no se toca.
 
-`acceso-sio-dproma.html` sigue con `#66717F`. No es un defecto ahí: esa pantalla no usa
-`--surface-2`, así que su texto auxiliar nunca cae sobre el fondo que fallaba. Queda pendiente
-igualarlo cuando esa pantalla se vuelva a tocar.
+`acceso-sio-dproma.html` ya está igualada. La nota anterior daba por hecho que esa pantalla no
+usaba `--surface-2` y que por eso su texto auxiliar nunca caía sobre el fondo que fallaba. Al ir a
+saldarlo resultó que sí lo declara y lo usa en cinco sitios, así que llevaba desde entonces a
+4,21:1 en ellos. Corregido a `#5C6675`, que allí da 4,93:1.
+
+**La excepción documentada era la del propio sistema, no la de la pantalla.** Una exención se
+apunta con la medición que la justifica, no con una suposición sobre el archivo: la de arriba
+sobrevivió porque nadie volvió a abrirlo.
 
 ### 1.2 Acción y marca
 
@@ -658,6 +680,19 @@ padrón llegaron así pese a que este apartado ya lo prescribía.
    borrador: justo en el momento de más incertidumbre, se retiraba la prueba de que el trabajo
    seguía ahí. Cuando hay trabajo del usuario en pantalla, el error va **encima**, como aviso,
    con los campos visibles y rellenos.
+
+5. **La restauración de sesión es una vista «cargando», no una pantalla aparte.** Al volver al
+   sistema, el cromo se pinta de inmediato con sus etiquetas reales —no dependen de la sesión— y
+   el esqueleto va en la zona de contenido, como en cualquier otra carga. Lo construido fue lo
+   contrario: doce barras de esqueleto sobre una barra lateral de ocho filas, y el área de
+   contenido en blanco con una frase suelta pegada a la esquina.
+
+   **El esqueleto anticipa lo que va a aparecer.** Si el menú tiene ocho filas, el esqueleto
+   tiene ocho. Uno que no coincide con su contenido no prepara al ojo: lo engaña.
+
+   **Y tiene salida.** Pasados unos segundos sin respuesta se pasa al estado de error, con su
+   reintento y su vuelta al acceso. Sin eso nadie distingue «tarda» de «se colgó», y la única
+   salida que queda es recargar.
 
 ### 6.5 Iconos (`.msi`)
 
@@ -1482,6 +1517,45 @@ de la barra, y la tabla de detrás sigue siendo legible mientras se decide. Por 
 
 ---
 
+### 6.22 Ámbito de datos (`.ambito`)
+
+Una cifra no siempre habla del mismo conjunto. «845 trámites» puede ser de toda la organización,
+de una plaza, o de lo que alcanza quien mira, y esa diferencia cambia la lectura entera. El
+producto ya tenía el vocabulario —«de toda la organización», «Vista de Administración principal»,
+«Nada en tu alcance»— pero no tenía forma, así que se pintó con el ámbar de `--warn`. En una sola
+pantalla del tablero salía cuatro veces: cuatro avisos de que falta algo, cuando no faltaba nada.
+Cuatro avisos falsos por pantalla desgastan el aviso de verdad.
+
+**El ámbito no es un estado.** Es un dato sobre el dato, así que pesa menos que todo lo demás de
+la pantalla: sin relleno, sin borde, icono y texto en tinta auxiliar.
+
+```css
+.ambito{display:inline-flex;align-items:center;gap:5px;
+  font-size:var(--fs-meta);font-weight:600;color:var(--text-3)}
+.ambito .msi{font-size:14px}
+```
+
+**No lleva token de color propio, y no hacía falta añadirlo.** `--text-3` pasa 4,5:1 sobre las
+tres superficies donde puede caer, en los dos temas: 5,65 sobre `--surface`, 5,31 sobre `--bg` y
+4,93 sobre `--surface-2` en claro; 5,53 / 6,06 / 5,03 en oscuro.
+
+Se descartó darle relleno de `--surface-2` al medirlo: queda a 1,08:1 del fondo de página y
+desaparece del todo cuando cae sobre una tarjeta de esa misma superficie, que es justo el caso
+del tablero.
+
+**Dos vacíos que no son el mismo.** Hoy «Nada en tu alcance» y un 0 conviven en la misma fila del
+tablero diciendo cosas distintas con la misma cara:
+
+| Caso | Qué pasa | Cómo se dice |
+|---|---|---|
+| Sin permiso | El dato existe, pero no es de quien mira | Vista vacía de §6.4, con el ámbito diciendo qué sí alcanza. **Nunca un 0**: un cero afirma que se midió |
+| Conjunto vacío | Quien mira alcanza el dato, y vale cero | La cifra con su cero. §12.5: un conteo medido en cero no se pinta como falta |
+
+Y el corolario de la primera fila: **no se ofrece «ver la lista» de una lista que no se puede
+ver.** El tablero lo hace hoy en sus dos tarjetas sin alcance.
+
+---
+
 ## 7. Layout
 
 ### 7.1 Entrada al sistema (`.split`)
@@ -1603,10 +1677,11 @@ Todo lo que lleve `data-andamio` se retira en la versión real. Un solo selector
 
 ---
 
-## 10. Seis trampas comprobadas
+## 10. Nueve trampas comprobadas
 
-No son teoría: las seis aparecieron aplicando este documento al módulo de clientes, y las
-seis se ven solo si se comprueba en el navegador, no leyendo la hoja de estilos.
+No son teoría: las seis primeras aparecieron aplicando este documento al módulo de clientes, y
+las tres últimas revisando esta misma página. Todas se ven solo si se comprueba en el navegador,
+no leyendo la hoja de estilos.
 
 **El tamaño se mide en el navegador, no en el CSS.** La regla de los 12px se puede burlar sin
 querer con la forma abreviada `font:`, donde el tamaño no aparece como `font-size`. Los avatares
@@ -1645,6 +1720,24 @@ unidades **empezando en x=0**, mientras que la marca vive a partir de x=740. Res
 32,5px a la izquierda de su caja y se recorta casi entera. No da error, no avisa, y el atributo
 sobrante parece lo correcto. Se comprueba midiendo la caja del `<use>` contra la del `<svg>`:
 si el desplazamiento no es ~0, está mal.
+
+**Un valor por defecto del navegador que nadie repone se lleva 80px sin avisar.** `<figure>` trae
+`margin: 1em 40px`. La hoja del sistema solo lo reponía dentro de un componente, así que las
+**cuatro** figuras de gráfico salían 80px más estrechas que su widget y centradas dentro de él:
+medido, 134px de gráfica y de tabla en 214 de interior, desplazadas 57px del borde. Nada lo
+delataba —no hay desborde, no hay scroll, la página valida— y por eso sobrevivió a varias
+revisiones. El reset va sobre el elemento, no sobre la clase del componente, o la siguiente figura
+repite el fallo.
+
+**Una utilidad escrita como estilo de un componente deja de existir fuera de él.** `.sr`, la clase
+que aparta texto para que solo lo lea el lector de pantalla, estaba declarada como
+`.filtros-demo .sr`. Los cuatro `<caption class="sr">` de las gráficas, escritos precisamente para
+no verse, se pintaban centrados encima de su tabla repitiendo el título del widget. Si algo se usa
+en más de un componente, se declara suelto.
+
+**`display:block` sobre un `<summary>` le quita la flecha.** El marcador del desplegable viene de
+`display:list-item`; cualquier otro valor lo borra, y el control deja de anunciar que se abre. Si
+hace falta mostrar un `<summary>` que otra regla oculta, se repone con `list-item`.
 
 **Una regla copiada del acceso puede traerse un token que allí existe y aquí no.** El medallón de
 error del acceso usa `--err-soft`; su tarjeta usa `--glass-line`. Ninguno de los dos está declarado
@@ -1723,7 +1816,7 @@ usados - declarados  →  tiene que ser vacío
 ## 12. Capa de dashboard
 
 El sistema tenía diecinueve componentes y ninguno de dato visual: ni una cifra destacada, ni una
-barra, ni una tendencia. Esta capa cubre ese hueco. Las nueve piezas están vivas, con su marcado, en la
+barra, ni una tendencia. Esta capa cubre ese hueco. Las diez piezas están vivas, con su marcado, en la
 sección «Capa de dashboard» de la página del sistema (`web/entregables/reglas-de-diseno.html#dashboard`).
 
 ### 12.1 Qué se dibuja con librería y qué no
@@ -1758,6 +1851,23 @@ carga, el lienzo desaparece y la tabla se abre**. Estas maquetas se abrían desd
 internet; al introducir una dependencia externa eso deja de ser cierto, y un dashboard sin
 conexión tiene que enseñar datos, no un rectángulo vacío.
 
+**Con una excepción: el gráfico de apoyo no abre su tabla.** Un sparkline acompaña a una cifra, no
+la sustituye; el contenido del widget es el número. Si su tabla se abre sola, la tarjeta se
+dispara: medido en la propia página del sistema, «Cerrados este mes» pasaba de 171 a **671px de
+alto en una columna de 248**, junto a una vecina de 171, y dejaba la fila con el borde inferior
+roto. Se marca `.viz.apoyo` y ahí la tabla se queda plegada tras su resumen, que sigue siendo
+pulsable. No se esconde ningún dato: se deja de imponer un dato secundario por encima del
+principal. Con el cambio, esa tarjeta baja a 282px.
+
+La prueba para decidir es corta: **si al quitar el gráfico el widget sigue diciendo lo que tiene
+que decir, ese gráfico es de apoyo.** El ranking, la dona y la tendencia no lo son —quitarlos deja
+la tarjeta muda—, así que esos sí abren su tabla.
+
+**La tabla equivalente lleva su total en un `<tfoot>`**, con línea encima y peso. Sin esa
+separación el total se lee como un valor más de la serie, y es justo la fila que permite ver de un
+vistazo si la serie cuadra con la cifra del widget (§12.5). El `<caption>` va en `.sr`: nombra la
+tabla para quien la recorre con lector, y visualmente lo dice ya la cabecera del widget.
+
 ```html
 <figure class="viz">
   <div class="viz-lienzo"><canvas id="v-x" aria-label="…"></canvas></div>
@@ -1769,13 +1879,14 @@ conexión tiene que enseñar datos, no un rectángulo vacío.
 </figure>
 ```
 
-### 12.4 Las nueve piezas
+### 12.4 Las diez piezas
 
 | Pieza | Clase | Para qué |
 |---|---|---|
 | Rejilla | `.dash` | Doce columnas; cada widget declara cuántas ocupa (`.w-3`, `.w-4`, `.w-6`, `.w-8`) |
 | Tarjeta de widget | `.widget` | El contenedor común. Reusa la receta de superficie de §6.3; no se anidan tarjetas |
-| KPI con variación | `.kpi` | Cifra en `--fs-kpi` y su delta debajo, no al lado |
+| KPI con variación | `.kpi` | Cifra en `--fs-kpi` y su delta debajo, no al lado. Una por widget: el rótulo lo pone la cabecera del widget |
+| Fila de cifras | `.cifras` | Varias cifras compactas dentro de **un solo** widget, cuando ninguna merece widget propio. Aquí cada cifra sí lleva rótulo dentro (§12.4.1) |
 | Barra apilada de estado | `.barra` | Reparto de un total entre estados del semáforo |
 | Leyenda inline | `.leyenda` | Marca de color + rótulo en tinta de texto + cifra |
 | Dona | `canvas` | Proporción sobre un total, con hueco central |
@@ -1783,6 +1894,152 @@ conexión tiene que enseñar datos, no un rectángulo vacío.
 | Tendencia | `canvas` | Evolución en el tiempo, una o dos series |
 | Sparkline | `canvas` | Tendencia dentro de una tarjeta, sin ejes |
 | Barra de progreso | `.progreso` | Avance contra una meta declarada |
+
+### 12.4.1 La fila de cifras (`.cifras`)
+
+`.kpi` está pensado para **una cifra por widget**: el rótulo lo pone la cabecera del widget y
+dentro solo van el número y su delta. Cuando siete cifras tienen que convivir en un bloque, esa
+receta no sirve, y el tablero de SIO la resolvió por su cuenta. Lo que salió, medido sobre la
+pantalla:
+
+- Las siete tarjetas miden **175px de ancho y 97 de alto, todas**. El problema no es el tamaño.
+- La cifra está clavada en la misma altura en las siete. **El rótulo cae a tres alturas
+  distintas** —con 34px de horquilla— porque el interior va anclado abajo: la última línea
+  siempre termina en el mismo sitio, así que el rótulo sube o baja según cuántas líneas traiga el
+  texto de apoyo.
+- La cifra tiene 14px de altura de mayúscula, o sea **unos 20px de cuerpo cuando el token dice
+  30**. El número acaba a 1,4 veces su rótulo en lugar de a 2,1, y no manda en su propia tarjeta.
+- Cada cifra va en una caja con relleno `--surface-2` **y borde**, dentro de un widget de
+  `--surface`. Eso es anidar tarjetas, que §6.3 prohíbe.
+
+Cada tarjeta se alinea consigo misma y ninguna con la de al lado, que es justo lo que se lee al
+mirar una fila.
+
+**Dos ranuras, y el apoyo no es una de ellas.** Una cifra compacta tiene cifra, rótulo y apoyo,
+pero solo las dos primeras son filas de la rejilla: el apoyo va dentro del bloque `.etq`, pegado a
+su rótulo. Las dos ranuras se comparten con **toda la fila**, así que el rótulo cae a la misma
+altura en todas las tarjetas y todas miden lo mismo:
+
+```css
+.cifras{ display:grid; gap:var(--sp-3); align-items:start;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  grid-template-rows:auto auto }
+.cifras > .kpi{ grid-row:span 2; display:grid; grid-template-rows:subgrid; gap:var(--sp-1);
+  background:var(--surface-2); border:1px solid transparent; border-radius:var(--r-card);
+  padding:var(--sp-4) }
+/* En alto contraste del sistema todos los fondos pasan a Canvas, así que el relleno se
+   pierde y las cajas desaparecen dentro del widget: medido, tarjeta y widget del mismo
+   blanco y sin nada que las separe. El borde, que en condiciones normales sobraría porque
+   anidaría tarjetas, ahí es lo único que las distingue. Va transparente siempre para que
+   la geometría no cambie entre un modo y el otro. */
+@media (forced-colors: active){
+  .cifras > .kpi{ border-color:CanvasText }
+}
+.cifras .etq{ display:flex; flex-direction:column; overflow-wrap:anywhere }
+.cifras .rotulo{ font-size:var(--fs-base); font-weight:500; color:var(--text) }
+/* Sin gap, y con el interlineado del apoyo ceñido: son los dos renglones de una misma
+   etiqueta y tienen que leerse pegados. Medido de texto a texto, 10px pasan a 5. El
+   interlineado se toca en el apoyo y no en el rótulo, porque ceñir el rótulo también
+   acorta por arriba y el aire entre la cifra y el rótulo es el correcto. */
+.cifras .apoyo{ font-size:var(--fs-meta); line-height:1.4; color:var(--text-3) }
+@supports not (grid-template-rows:subgrid){
+  .cifras > .kpi{ grid-row:auto; grid-template-rows:none }
+}
+
+
+
+```
+
+```html
+<div class="cifras">
+  <div class="kpi">
+    <span class="cifra tnum">796</span>
+    <div class="etq"><span class="rotulo">En proceso</span><span class="apoyo">94% del total</span></div>
+  </div>
+  …
+</div>
+```
+
+`subgrid` es lo que hace el trabajo: el rótulo cae a la misma altura tenga o no tenga apoyo, y una
+cifra sin apoyo deja su tercera fila vacía sin necesidad de rellenarla con nada. **Igualar la
+altura de las cajas no basta** —en la pantalla medida ya eran todas de 97px y aun así el rótulo
+bailaba—; lo que hay que igualar es dónde empieza cada ranura.
+
+**Sin borde.** Dentro de un widget, una cifra compacta es un relleno, no una tarjeta. Sumar borde
+a `--surface-2` convierte siete subdivisiones en siete tarjetas peleando con la que las contiene.
+
+Con una excepción que el QA destapó: **en alto contraste del sistema el relleno no existe**.
+`forced-colors` lleva todos los fondos a Canvas, así que tarjeta y widget quedan del mismo blanco
+y sin nada que las separe. Ahí el borde sí hace falta, y es lo único que las distingue. Se declara
+`border:1px solid transparent` siempre, para que la geometría no cambie entre un modo y otro, y
+`border-color:CanvasText` dentro de `@media (forced-colors: active)`.
+
+Medido, el relleno queda a **1,15:1 del widget en claro y 1,10:1 en oscuro**, muy por debajo del
+3:1 de §1.7. Es aceptable aquí, y conviene decir por qué: **ninguna información depende de ver ese
+borde**. Lo que agrupa cada cifra con su rótulo es la proximidad y el hueco de `--sp-3` entre
+cajas; el relleno solo lo refuerza. Si alguna vez el reparto en cajas pasara a significar algo por
+sí mismo, el relleno dejaría de bastar y habría que medirlo contra el 3:1.
+
+El texto sí se mide como texto, y pasa: el rótulo en `--text` da 13,27:1 en claro y 12,68:1 en
+oscuro sobre ese relleno, y el apoyo en `--text-3`, 4,93:1 y 5,03:1.
+
+**El apoyo es de una línea**, y es regla de redacción, no de CSS. Si no cabe, no es apoyo: es la
+definición de la medida, y esa va a la nota de método (`.nota-reloj`, §12.6) debajo de la fila.
+«Nueva, pendiente, programada o en visita» explica qué se cuenta; no acompaña a un número.
+
+El presupuesto está medido: a la tarjeta mínima de 150px le quedan **118px de texto**, que a 12px
+son **unos 18 caracteres**. «94% del total» ocupa 81. «−1 vs. mes anterior» ocupa 120 y ya no cabe.
+
+**El rótulo y su apoyo son dos renglones de una misma etiqueta.** Van sin `gap` y con el
+interlineado del apoyo ceñido a 1,4. Medido de texto a texto, la separación baja de **10px a 5**.
+El interlineado se toca en el apoyo y no en el rótulo: ceñir el rótulo acorta también por arriba,
+y el aire entre la cifra y el rótulo —4px— es el que debe quedarse.
+
+**Una referencia pegada no rompe la caja.** El rótulo lleva `overflow-wrap:anywhere`, porque
+puede llegar un identificador sin espacios ni guiones donde el navegador no tiene dónde partir.
+Medido sin esa línea: 283px de contenido en una tarjeta de 170. Los guiones sí son punto de corte,
+así que `EXPEDIENTE-VEHICULAR-2026-000481` se reparte solo; `EXPEDIENTEVEHICULAR2026000481`, no.
+
+**Y no se recorta con elipsis.** La primera versión de esta regla la imponía con
+`white-space:nowrap` y `text-overflow:ellipsis`, y el QA la tumbó: al ancho mínimo que el propio
+componente declara, el apoyo del ejemplo documentado se cortaba y **lo cortado no había forma de
+leerlo** —sin emergente, sin foco, sin nada—. Una cifra a la que le falta la mitad del contexto es
+peor que una fila un poco más alta. Sin recorte, el apoyo largo pasa a dos líneas, la rejilla
+crece para todas por igual y no se pierde ni un carácter. Es exactamente para lo que está
+`subgrid`.
+
+**Una fila de cifras es un grupo con nombre, y dos familias son dos grupos.** Las siete cifras del
+tablero eran cuatro de órdenes de instalación y tres de trámites, con dos «totales» contiguos y
+nada que dijera que cuentan cosas distintas. Siete columnas no caben en una rejilla de doce, y ese
+fue el motivo de salirse de `.dash`; cuatro de `.w-3` y tres de `.w-4` sí caben. Si un conjunto de
+cifras no se puede nombrar de una vez, son dos conjuntos.
+
+**El techo son cuatro cifras por grupo.** Lo dice ya §12.6 para la tarjeta de entidad —«en
+reposo no pasa de cuatro cifras»— y aquí vale igual, por dos motivos medidos.
+
+El primero, que la rejilla no tiene ancho para cinco ni para seis: `.dash` reparte doce columnas y
+las anchuras que ofrece son `.w-3`, cuatro por fila, y `.w-4`, tres por fila. Cinco y seis no
+caben en ninguna de las dos.
+
+El segundo sale del QA. `auto-fit` mete las que quepan y deja suelta la última: seis cifras se
+reparten 6 en una fila a 1440px, **5 y 1 a 1024** y 4 y 2 a 768. Una cifra sola al final de una
+fila, alineada a la izquierda y con hueco a su derecha, se lee como un error de maquetación o como
+una cifra destacada, y no es ninguna de las dos cosas.
+
+Si son seis, casi siempre es que no son un grupo de cifras. **Si reparten un mismo total** —en
+proceso, concluidos, en dependencia, por vencer, vencidos— eso es una barra apilada con su leyenda
+(§12.4), que además enseña la proporción, que es lo que en realidad se está preguntando. **Si son
+familias distintas**, son dos grupos, cada uno con su nombre.
+
+**Una sola cifra no es una fila.** `auto-fit` colapsa las columnas vacías, así que una cifra
+suelta dentro de `.cifras` se estira a todo el ancho del widget: medido, 1006px de caja para un
+número. Una cifra sola es `.kpi` en su propio widget, con el rótulo en la cabecera, que es para lo
+que `.kpi` existe.
+
+**Un grupo entero en cero se pinta como vacío.** Cuatro tarjetas marcando 0, 0, 0 y 0 son cuatro
+cajas para decir que no hay nada. Va el estado vacío del widget (§6.4), que es lo que ese mismo
+tablero ya hace doscientos píxeles más abajo con «Nada en tu alcance». Es la misma regla de §12.5
+—un conteo medido en cero no se pinta— aplicada al grupo y no al segmento.
 
 ### 12.5 Reglas de lectura
 
@@ -1797,9 +2054,22 @@ conexión tiene que enseñar datos, no un rectángulo vacío.
   cualquier superficie.
 - **Marcas finas y rejilla discreta.** Línea de 2px, punto de 8px o más, rejilla en `--grid`,
   y 2px de superficie entre segmentos contiguos de una barra apilada.
+- **El lienzo reserva la mitad de la marca más gruesa.** El área de dibujo llega hasta el borde,
+  así que una línea de 2px que toque el máximo se traza a caballo de ese borde y se ve cortada por
+  la mitad: es lo que le pasaba al sparkline por arriba. Va en la envoltura y no en cada gráfico,
+  `layout:{padding:4}`, que es la mitad de un punto de 8px y cubre de sobra la línea.
+- **La serie y la cifra del mismo widget miden lo mismo, y cuadran.** El rótulo declara un
+  periodo y la serie tiene que ser ese periodo: «Cerrados **este mes**» no puede traer ocho
+  semanas, porque un mes no tiene ocho. Y si la serie descompone la cifra, sus valores suman la
+  cifra. En el ejemplo de esta misma página, el sparkline de «Cerrados este mes: 20» traía ocho
+  semanas que sumaban 35: ni el periodo ni el total. Se comprueba sumando, que cuesta un
+  segundo, y se comprueba **también en la tabla equivalente**, que es la fuente de verdad (§12.3)
+  y donde la incoherencia queda escrita con todas las letras.
 - **Color según el trabajo del dato.** Si el dato tiene juicio —va bien, vence pronto, ya
   venció— es el semáforo de §1.3. Si solo distingue una cosa de otra, es la paleta categórica de
-  §1.4. Un color de estado nunca se reutiliza como serie.
+  §1.4. Un color de estado nunca se reutiliza como serie. **La regla completa está en §1**, que
+  es donde gobierna todo el color: aquí queda solo su aplicación a las series. Mientras vivió
+  únicamente en este capítulo, nadie la aplicó fuera de las gráficas.
 
 ### 12.6 Composiciones de tablero
 
