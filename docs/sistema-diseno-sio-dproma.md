@@ -1934,6 +1934,23 @@ nada que dijera que cuentan cosas distintas. Siete columnas no caben en una reji
 fue el motivo de salirse de `.dash`; cuatro de `.w-3` y tres de `.w-4` sí caben. Si un conjunto de
 cifras no se puede nombrar de una vez, son dos conjuntos.
 
+**El techo son cuatro cifras por grupo.** Lo dice ya §12.6 para la tarjeta de entidad —«en
+reposo no pasa de cuatro cifras»— y aquí vale igual, por dos motivos medidos.
+
+El primero, que la rejilla no tiene ancho para cinco ni para seis: `.dash` reparte doce columnas y
+las anchuras que ofrece son `.w-3`, cuatro por fila, y `.w-4`, tres por fila. Cinco y seis no
+caben en ninguna de las dos.
+
+El segundo sale del QA. `auto-fit` mete las que quepan y deja suelta la última: seis cifras se
+reparten 6 en una fila a 1440px, **5 y 1 a 1024** y 4 y 2 a 768. Una cifra sola al final de una
+fila, alineada a la izquierda y con hueco a su derecha, se lee como un error de maquetación o como
+una cifra destacada, y no es ninguna de las dos cosas.
+
+Si son seis, casi siempre es que no son un grupo de cifras. **Si reparten un mismo total** —en
+proceso, concluidos, en dependencia, por vencer, vencidos— eso es una barra apilada con su leyenda
+(§12.4), que además enseña la proporción, que es lo que en realidad se está preguntando. **Si son
+familias distintas**, son dos grupos, cada uno con su nombre.
+
 **Una sola cifra no es una fila.** `auto-fit` colapsa las columnas vacías, así que una cifra
 suelta dentro de `.cifras` se estira a todo el ancho del widget: medido, 1006px de caja para un
 número. Una cifra sola es `.kpi` en su propio widget, con el rótulo en la cabecera, que es para lo
