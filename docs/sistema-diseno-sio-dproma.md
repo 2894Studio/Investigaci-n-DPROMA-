@@ -2030,6 +2030,13 @@ tablero ya hace doscientos píxeles más abajo con «Nada en tu alcance». Es la
   cualquier superficie.
 - **Marcas finas y rejilla discreta.** Línea de 2px, punto de 8px o más, rejilla en `--grid`,
   y 2px de superficie entre segmentos contiguos de una barra apilada.
+- **La serie y la cifra del mismo widget miden lo mismo, y cuadran.** El rótulo declara un
+  periodo y la serie tiene que ser ese periodo: «Cerrados **este mes**» no puede traer ocho
+  semanas, porque un mes no tiene ocho. Y si la serie descompone la cifra, sus valores suman la
+  cifra. En el ejemplo de esta misma página, el sparkline de «Cerrados este mes: 20» traía ocho
+  semanas que sumaban 35: ni el periodo ni el total. Se comprueba sumando, que cuesta un
+  segundo, y se comprueba **también en la tabla equivalente**, que es la fuente de verdad (§12.3)
+  y donde la incoherencia queda escrita con todas las letras.
 - **Color según el trabajo del dato.** Si el dato tiene juicio —va bien, vence pronto, ya
   venció— es el semáforo de §1.3. Si solo distingue una cosa de otra, es la paleta categórica de
   §1.4. Un color de estado nunca se reutiliza como serie. **La regla completa está en §1**, que
