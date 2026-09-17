@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,autorenew,check_circle,close,content_copy,download,edit,error,expand_more,more_horiz,pause_circle,schedule,visibility" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,autorenew,check_circle,layers,close,content_copy,download,edit,error,expand_more,more_horiz,pause_circle,schedule,visibility" rel="stylesheet">
 <style>
 :root{
   /* §1.1 Superficies y texto */
@@ -149,7 +149,10 @@ section + section{ border-top:1px solid var(--border); }
 .tarjeta{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-card); box-shadow:var(--sh-rest); overflow:hidden; max-width:320px; }
 .idx-demo{ width:22px; height:22px; border-radius:50%; background:var(--accent); color:var(--accent-ink); display:grid; place-items:center; font-size:var(--fs-meta); font-weight:700; flex-shrink:0; }
 .tarjeta > header{ display:flex; align-items:center; gap:var(--sp-2); padding:var(--sp-3) var(--sp-4); background:var(--surface-2); border-bottom:1px solid var(--border); }
-.tarjeta > header h3{ font-size:var(--fs-base); font-weight:600; margin:0; }
+/* El título de una maqueta lleva .t y no un hN: es contenido de ejemplo, no una
+   sección del documento. Once de ellos aparecían en el esquema de la página como
+   si fueran capítulos del sistema. */
+.tarjeta > header .t{ font-size:var(--fs-base); font-weight:600; margin:0; }
 .tarjeta .interior{ padding:var(--sp-4); font-size:var(--fs-dense); color:var(--text-2); }
 
 /* .glass — tarjeta translúcida del acceso, único sitio del sistema donde la superficie no es opaca */
@@ -168,6 +171,8 @@ section + section{ border-top:1px solid var(--border); }
 
 .p-type{ display:inline-flex; align-items:center; gap:6px; border-radius:var(--r-ctrl); padding:3px 9px; font-size:var(--fs-meta); font-weight:600; color:var(--text-2); background:var(--surface-2); }
 .p-type::before{ content:""; width:7px; height:7px; border-radius:999px; flex-shrink:0; }
+.ambito{ display:inline-flex; align-items:center; gap:5px; font-size:var(--fs-meta); font-weight:600; color:var(--text-3); }
+.ambito .msi{ font-size:14px; }
 .p-s1{ background:color-mix(in srgb,var(--serie-1) 16%,var(--surface)); }
 .p-s1::before{ background:var(--serie-1); }
 .p-s2{ background:color-mix(in srgb,var(--serie-2) 16%,var(--surface)); }
@@ -270,8 +275,8 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
   box-shadow:var(--sh-rest); padding:var(--sp-4); display:flex; flex-direction:column; gap:var(--sp-3);
   min-width:0 }
 .widget > header{ display:flex; align-items:baseline; justify-content:space-between; gap:var(--sp-2) }
-.widget > header h3{ font:700 var(--fs-dense)/1.3 var(--font-ui); color:var(--text-2);
-  text-transform:uppercase; letter-spacing:.06em }
+.widget > header .t{ font:700 var(--fs-dense)/1.3 var(--font-ui); color:var(--text-2);
+  text-transform:uppercase; letter-spacing:.06em; margin:0 }
 .widget > header .acc{ font-size:var(--fs-meta) }
 .widget .pie{ font-size:var(--fs-meta); color:var(--text-3); line-height:1.5 }
 
@@ -285,6 +290,41 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 .kpi .var.baja{ color:var(--err-ink) }
 .kpi .var.plano{ color:var(--text-3) }
 .kpi .var .ctx{ font-weight:400; color:var(--text-3) }
+
+/* Fila de cifras. Varias cifras compactas en UN solo widget, cuando ninguna merece widget
+   propio. Aquí cada cifra lleva su rótulo dentro, porque no tiene cabecera que se lo ponga.
+   DOS ranuras, no tres: la cifra, y el bloque .etq con el rótulo y su apoyo. Son filas de la
+   MISMA rejilla para toda la fila, así que el rótulo cae a la misma altura en todas las
+   tarjetas y todas miden lo mismo. El apoyo NO es ranura propia: va pegado a su rótulo a
+   --sp-1 pase lo que pase, porque pertenece a ese rótulo y no al gris de al lado.
+   Sin borde: dentro de un widget una cifra es un relleno, no una tarjeta anidada (§6.3).
+   El apoyo tampoco se recorta con elipsis: un valor cortado no se puede recuperar.
+   overflow-wrap:anywhere porque un rótulo puede traer una referencia pegada sin
+   guiones, y sin él se sale de la tarjeta: medido, 283px de contenido en 170 de caja. */
+.cifras{ display:grid; gap:var(--sp-3); align-items:start;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  grid-template-rows:auto auto }
+.cifras > .kpi{ grid-row:span 2; display:grid; grid-template-rows:subgrid; gap:var(--sp-1);
+  background:var(--surface-2); border:1px solid transparent; border-radius:var(--r-card);
+  padding:var(--sp-4) }
+/* En alto contraste del sistema todos los fondos pasan a Canvas, así que el relleno se
+   pierde y las cajas desaparecen dentro del widget: medido, tarjeta y widget del mismo
+   blanco y sin nada que las separe. El borde, que en condiciones normales sobraría porque
+   anidaría tarjetas, ahí es lo único que las distingue. Va transparente siempre para que
+   la geometría no cambie entre un modo y el otro. */
+@media (forced-colors: active){
+  .cifras > .kpi{ border-color:CanvasText }
+}
+.cifras .etq{ display:flex; flex-direction:column; overflow-wrap:anywhere }
+.cifras .rotulo{ font-size:var(--fs-base); font-weight:500; color:var(--text) }
+/* Sin gap, y con el interlineado del apoyo ceñido: son los dos renglones de una misma
+   etiqueta y tienen que leerse pegados. Medido de texto a texto, 10px pasan a 5. El
+   interlineado se toca en el apoyo y no en el rótulo, porque ceñir el rótulo también
+   acorta por arriba y el aire entre la cifra y el rótulo es el correcto. */
+.cifras .apoyo{ font-size:var(--fs-meta); line-height:1.4; color:var(--text-3) }
+@supports not (grid-template-rows:subgrid){
+  .cifras > .kpi{ grid-row:auto; grid-template-rows:none }
+}
 
 /* Barra apilada de estado. CSS, no librería: son tres rectángulos.
    Separador de 2px del color de la superficie entre segmentos. */
@@ -312,6 +352,11 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 
 /* Figura de gráfico: lienzo + alternativa en tabla. La tabla es la fuente de
    verdad; el lienzo es la lectura rápida. */
+/* <figure> trae 40px de margen a izquierda y derecha por defecto del navegador.
+   Sin reponerlo, las cuatro gráficas salían 80px más estrechas que su widget y
+   centradas dentro de él: medido, 134px de gráfica en 214 de interior. El reset va
+   sobre el elemento, no sobre .viz, para que la siguiente figura no repita el fallo. */
+figure{ margin:0 }
 .viz{ display:flex; flex-direction:column; gap:var(--sp-2); min-width:0 }
 .viz-lienzo{ position:relative; width:100%; height:180px }
 .viz-lienzo.alto{ height:230px }
@@ -325,11 +370,21 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 .viz-tabla th{ color:var(--text-2); font-weight:700; text-transform:uppercase; letter-spacing:.04em }
 .viz-tabla td{ font-variant-numeric:tabular-nums }
 .viz-tabla tr:last-child td,.viz-tabla tr:last-child th{ border-bottom:none }
+/* El total no es una fila más de la serie: se separa con una línea arriba. */
+.viz-tabla tfoot th,.viz-tabla tfoot td{ border-top:1px solid var(--border-2); font-weight:700 }
 
 /* Si la librería no llega, el lienzo no se queda vacío: desaparece y la tabla
-   se abre. Un dashboard sin internet muestra datos, no un hueco. */
+   se abre. Un dashboard sin internet muestra datos, no un hueco.
+   Salvo cuando el gráfico es apoyo y no el contenido del widget: un sparkline
+   acompaña a una cifra, no la sustituye. Ahí la tabla se queda plegada tras su
+   resumen, porque abrirla multiplica por cuatro el alto de la tarjeta —medido,
+   671px en una columna de 248 junto a una vecina de 171— y el dato principal,
+   que es la cifra, sigue delante. Ningún dato se esconde: el resumen se pulsa. */
 .viz.sin-libreria .viz-lienzo{ display:none }
 .viz.sin-libreria .viz-tabla > summary{ display:none }
+/* list-item y no block: block le quita al <summary> su marcador, y el desplegable
+   se queda sin la flecha que dice que se puede abrir. */
+.viz.apoyo.sin-libreria .viz-tabla > summary{ display:list-item }
 .aviso-cdn{ display:none; font-size:var(--fs-meta); color:var(--warn-ink); background:var(--warn-bg);
   border:1px solid var(--warn-ink); border-radius:var(--r-ctrl); padding:6px var(--sp-2) }
 .viz.sin-libreria .aviso-cdn{ display:block }
@@ -436,7 +491,10 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 .fchip .pill{margin:0 2px}
 @media (max-width:560px){.pop{width:min(268px,calc(100vw - var(--sp-8)))}}
 .filtros-demo{ display:flex; flex-direction:column; gap:var(--sp-2) }
-.filtros-demo .sr{ position:absolute; width:1px; height:1px; margin:-1px; padding:0;
+/* .sr vivía acotado a .filtros-demo, así que los cuatro caption de las gráficas,
+   escritos para lector de pantalla, se pintaban centrados encima de su tabla. Es
+   una utilidad, no un estilo de un componente: va suelta. */
+.sr{ position:absolute; width:1px; height:1px; margin:-1px; padding:0;
   overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0 }
 .filtros-demo .aplicados[hidden]{ display:none }
 .filtros-demo .pill{ display:inline-flex; align-items:center; border-radius:var(--r-ctrl);
@@ -469,7 +527,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
     <h1>El sistema de diseño real de SIO-DPROMA.</h1>
     <p class="lede">Es el sistema de <strong>producto</strong> de DPROMA, construido y verificado sobre las propuestas ya corregidas de <strong>acceso</strong> y <strong>padrón de clientes</strong>. Con cada token, componente y regla ya resueltos y documentados aquí, diseñar la siguiente pantalla de DPROMA es una decisión de contenido, no de estilo: sin reinventar color, tipografía o espaciado desde cero, ni esperar a que alguien lo defina. Cada token viene medido en el navegador, con su contraste comprobado en los dos temas.</p>
     <div class="hero-meta">
-      <span class="version-tag">Versión 2.2.5 · dashboard + acceso</span>
+      <span class="version-tag">Versión 2.4.0 · dashboard + acceso</span>
       <a class="download-btn" href="/entregables/design-rules.md" download><span class="msi" aria-hidden="true" translate="no">download</span> Descargar sistema completo (.md)</a>
     </div>
     <p class="source-note">Fuente completa: <code>docs/sistema-diseno-sio-dproma.md</code> · complementan <code>docs/sistema-diseno-acceso-sio-dproma.md</code>, <code>docs/decisiones-producto-padron.md</code>, <code>docs/patron-dialogo-sio-dproma.md</code> y <code>docs/criterios-de-animacion.md</code>.</p>
@@ -517,12 +575,6 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
           <tr><td><code>--err</code></td><td>Falta lo que impide operar</td><td><span class="pill p-err"><span class="msi" aria-hidden="true" translate="no">error</span>Bloqueado</span></td></tr>
           <tr><td><code>--block</code></td><td>Bloqueado por condición externa</td><td><span class="pill p-block"><span class="msi" aria-hidden="true" translate="no">error</span>Retenido</span></td></tr>
           <tr><td><code>--pause</code></td><td>Inactivo — no es un fallo</td><td><span class="pill p-pause"><span class="msi" aria-hidden="true" translate="no">pause_circle</span>Inactivo</span></td></tr>
-          <tr><td>2.2.0</td><td>4 sep 2026</td><td>Completa la barra de filtros: cada dimensión abre un desplegable con buscador y casillas de selección múltiple, con el conteo de cada opción y un «Limpiar» propio. Tres visibles y el resto tras un «+ Añadir filtro». Lo seleccionado baja a una fila de pastillas con tope de cuatro visibles, un «+N más» y «Quitar todos los filtros». Con el teclado resuelto: <code>aria-expanded</code>, foco al buscador al abrir, <code>Escape</code> que devuelve el foco al botón, y cada «×» diciendo qué quita.</td></tr>
-          <tr><td>2.2.1</td><td>4 sep 2026</td><td>Corolario de §3.1: <code>:last-child</code> no distingue lo oculto —la fila de filtros aplicados nace con <code>hidden</code>, no ocupa espacio pero sí es el último hijo, y se llevaba el relleno—, así que pasa al contenedor. La pastilla de estado viaja al filtro: estatus y plazo la llevan en el panel, en el botón y en la pastilla aplicada, para relacionar filtro y fila por color. Y «Observado» pasa de <code>--err</code> a <code>--block</code> en tabla y detalle.</td></tr>
-          <tr><td>2.2.2</td><td>4 sep 2026</td><td>La capa de dashboard y la barra de filtros dejan de vivir en una página aparte y pasan a ser secciones de esta, con sus piezas vivas: los nueve componentes de dato con sus gráficos y sus tablas equivalentes, y la barra de filtros funcionando. Son componentes transversales, no de un módulo: tenerlos fuera invitaba a reimplementarlos en cada pantalla. No cambia ninguna regla ni ningún token.</td></tr>
-          <tr><td>2.2.3</td><td>4 sep 2026</td><td>Regenera <code>icon_names</code> de esta página, que se había quedado sin <code>expand_more</code> al incorporar la barra de filtros: el chevron de cada desplegable salía como la letra «E». Es el fallo que §6.5 ya describe, así que no hay regla nueva —la regla estaba y no se cumplió—. Comprobado con el fragmento que ese mismo apartado prescribe.</td></tr>
-          <tr><td>2.2.4</td><td>4 sep 2026</td><td>Poda de texto en esta página, aplicando el criterio que la propia sección de voz declara: en pantalla va qué hacer y qué no; el porqué y las alternativas descartadas viven en la documentación. Sale la entrada de la sección de dashboard y la justificación histórica de la paleta, que ya está en la fila 2.0.0. No se retira ninguna regla.</td></tr>
-          <tr><td>2.2.5</td><td>4 sep 2026</td><td>Reescribe el texto de la capa de dashboard y de la barra de filtros dejando solo la instrucción. Fuera las coletillas, las aclaraciones entre rayas y las frases que explicaban la consecuencia de incumplir la regla. De 696 a 547 palabras, sin ninguna raya. Ninguna regla se retira.</td></tr>
         </tbody>
       </table>
     </div>
@@ -630,17 +682,19 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
         <button class="btn p">Acción primaria</button>
         <button class="btn mini">Mini</button>
       </div>
-      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>El icono es opcional, el texto no.</strong> Un botón puede llevar icono + texto (refuerza el reconocimiento en un flujo denso) o solo texto (cuando la acción no tiene un icono universal claro, o añadirlo sería ruido). Lo que no se admite es icono solo <em>a secas</em>: sin texto visible hace falta etiqueta emergente y <code>aria-label</code>, y entonces es otra variante — <code>.iconbtn</code>, aquí debajo.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>El icono es opcional, el texto no.</strong> Icono con texto, o solo texto. Icono a secas no: sin texto visible hacen falta etiqueta emergente y <code>aria-label</code>, y eso ya es otra variante — <code>.iconbtn</code>, aquí debajo.</p>
+    </div>
 
-      <h5 class="variante">Solo icono — <code>.iconbtn</code></h5>
-      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 .9rem;">Para acciones que se repiten en una fila o viven en el cromo, donde una etiqueta escrita ocuparía más que la propia acción. <strong>Tres medidas, según dónde esté.</strong></p>
+    <div class="comp-block">
+      <h4>Solo icono — <code>.iconbtn</code></h4>
+      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 .9rem;">Para acciones que se repiten en una fila o viven en el cromo. <strong>Tres medidas, según dónde esté.</strong></p>
       <div class="medidas">
         <figure><button class="iconbtn" type="button" title="Exportar" aria-label="Exportar la ficha"><span class="msi" aria-hidden="true" translate="no">download</span></button><figcaption>36px — suelto</figcaption></figure>
         <figure><span class="acciones-demo"><button class="iconbtn" type="button" title="Editar" aria-label="Editar el correo de ejemplo"><span class="msi" aria-hidden="true" translate="no">edit</span></button></span><figcaption>28px — en fila densa</figcaption></figure>
         <figure><span class="iconbtn-dedo"><button class="iconbtn" type="button" title="Editar" aria-label="Editar, en modo táctil"><span class="msi" aria-hidden="true" translate="no">edit</span></button></span><figcaption>46px — táctil</figcaption></figure>
       </div>
 
-      <p style="font-size:.85rem; color:var(--text-2); margin:1.25rem 0 .5rem;"><strong>En un grupo, primero lo frecuente y reversible; último lo destructivo.</strong> Quien va deprisa pulsa el primero. Pruébalo: el de copiar funciona.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1.25rem 0 .5rem;"><strong>En un grupo, primero lo frecuente y reversible; último lo destructivo.</strong> Quien va deprisa pulsa el primero. El de copiar funciona.</p>
       <div class="fila-demo">
         <span class="valor" translate="no">r.mendieta@verticebajio.example</span>
         <span class="acciones-demo">
@@ -650,17 +704,21 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
         </span>
       </div>
       <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Nunca viaja solo.</strong> El <code>aria-label</code> nombra <strong>el dato concreto</strong>, no la acción a secas: en una lista de cuatro correos, cuatro botones «Copiar» son indistinguibles al tabular.</p>
-      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>La variante que confirma en el sitio cambia tres cosas, no una:</strong> el icono (para quien mira), el <code>aria-label</code> (para quien navega por botones) y un anuncio por <code>aria-live</code> (para quien no tiene ninguna de las dos). Un icono que cambia no lo percibe quien usa lector de pantalla. Y si falla se dice: en silencio, la persona cree que ya lo tiene.</p>
-      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>La variante de tamaño puede matar la regla táctil sin avisar.</strong> <code>[data-tacto="dedo"] .iconbtn</code> suma (0,2,0) y lo empata <code>.acciones .iconbtn{width:28px}</code>, que al ir declarada después gana: medido, los botones de fila seguían a 28px con el modo dedo activado. Con <code>:root</code> delante sube a (0,3,0) y gana. Toda regla táctil lleva <code>:root</code>, y se comprueba midiendo, no leyendo.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Confirmar en el sitio cambia tres cosas, no una:</strong> el icono, el <code>aria-label</code> y un anuncio por <code>aria-live</code>. Las tres. Y si falla, se dice: en silencio, la persona cree que ya lo tiene.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Toda regla táctil lleva <code>:root</code> delante</strong>, o una variante de tamaño declarada después la anula sin avisar. Se comprueba midiendo con el modo dedo puesto, no leyendo la hoja.</p>
+    </div>
 
-      <h5 class="variante">Primario del acceso — <code>.gbtn</code></h5>
+    <div class="comp-block">
+      <h4>Primario del acceso — <code>.gbtn</code></h4>
       <div class="comp-row">
         <button class="gbtn"><span class="msi" aria-hidden="true" translate="no">visibility</span>Continuar con Google</button>
         <button class="gbtn" aria-busy="true"><span class="spin" aria-hidden="true"></span>Comprobando…</button>
       </div>
-      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><code>.gbtn</code> — el botón primario del acceso: 48px de alto, se bloquea en el <strong>manejador de JS</strong>, no solo con CSS. <code>pointer-events:none</code> detiene el ratón pero no el teclado — en la maqueta original, cuatro <kbd>Intro</kbd> sobre el botón «ocupado» disparaban cuatro envíos.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><code>.gbtn</code>, primario del acceso: 48px de alto y se bloquea en el <strong>manejador de JS</strong>, no solo con CSS. <code>pointer-events:none</code> detiene el ratón, no el teclado.</p>
+    </div>
 
-      <h5 class="variante">El icono hereda el color del botón</h5>
+    <div class="comp-block">
+      <h4>El icono hereda el color del botón</h4>
       <div class="comp-row" style="gap:1.5rem;">
         <div>
           <div class="icon-bad" style="margin-bottom:.35rem;"><button class="btn p"><span class="msi" aria-hidden="true" translate="no">autorenew</span>Reintentar</button></div>
@@ -674,8 +732,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Regla:</strong> un icono dentro de un botón hereda el color del botón (<code>color:inherit</code>). No se le da color propio — si el icono necesita un color distinto, es señal de que el botón lo necesita.</p>
     </div>
 
-
-        <div class="comp-block">
+    <div class="comp-block">
       <h4>Botón con motion — estado ocupado (.gbtn[aria-busy])</h4>
       <p style="font-size:.85rem; color:var(--text-2); margin:0 0 1rem;">Pulsa el botón: se bloquea de verdad en el <strong>manejador de JS</strong>, no solo con CSS — <code>pointer-events:none</code> detiene el ratón pero no el teclado. Un giro (<code>--dur-micro</code> aparte) marca el estado "ocupado" mientras dura la comprobación.</p>
       <div class="comp-row">
@@ -691,7 +748,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
     <div class="comp-block">
       <h4>Tarjeta (.tarjeta)</h4>
       <div class="tarjeta">
-        <header><h3>Ficha de cliente</h3></header>
+        <header><p class="t">Ficha de cliente</p></header>
         <div class="interior">Una sola receta de superficie: fondo, borde, radio y sombra de reposo. No se reimplementa por pantalla.</div>
       </div>
     </div>
@@ -701,7 +758,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       <div class="glass-demo-bg">
         <div class="glass-demo">
           <div class="eyebrow" style="margin-bottom:.6rem;">Acceso</div>
-          <h3 style="font-size:1.1rem; margin-bottom:.5rem;">Entra a SIO-DPROMA</h3>
+          <p class="t" style="font-size:1.1rem; font-weight:700; margin:0 0 .5rem;">Entra a SIO-DPROMA</p>
           <p style="font-size:var(--fs-dense); color:var(--text-2); margin:0 0 1rem;">La única tarjeta con <code>backdrop-filter:blur(16px)</code> del sistema — aquí se ve casi sólida porque el fondo de detrás es del mismo tono; el efecto real se nota sobre la escena oscura de marca.</p>
           <button class="gbtn" id="gbtnDemo" type="button" aria-busy="false">
             <span class="msi" aria-hidden="true" translate="no">visibility</span>
@@ -730,7 +787,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       </div>
 
       <div class="tarjeta" style="max-width:340px; margin-top:1.25rem;">
-        <header><span class="idx-demo">2</span><h3>Datos fiscales</h3></header>
+        <header><span class="idx-demo">2</span><p class="t">Datos fiscales</p></header>
         <div class="interior">Cabecera con índice numerado en vez de icono — el modificador <code>.seccion</code> ordena pasos de un formulario, no clasifica contenido.</div>
       </div>
     </div>
@@ -747,6 +804,16 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
         <span class="p-type p-s1">Empresa</span>
         <span class="p-type p-s2">Agencia</span>
       </div>
+    </div>
+
+    <div class="comp-block">
+      <h4>Ámbito de datos (.ambito)</h4>
+      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 .75rem;">De qué conjunto habla una cifra. No es un estado: es un dato sobre el dato, así que pesa menos que todo lo demás — sin relleno, sin borde, tinta auxiliar.</p>
+      <div class="comp-row">
+        <span class="ambito"><span class="msi" aria-hidden="true" translate="no">layers</span>de toda la organización</span>
+        <span class="ambito"><span class="msi" aria-hidden="true" translate="no">layers</span>Vista de Administración principal</span>
+      </div>
+      <p style="font-size:.85rem; color:var(--text-2); margin:.75rem 0 0;">Se pintaba con el ámbar de <code>--warn</code>, que significa que falta algo: cuatro veces en una sola pantalla del tablero, cuatro avisos falsos. No lleva token propio — <code>--text-3</code> ya pasa 4,5:1 sobre las tres superficies donde puede caer, en los dos temas.</p>
     </div>
 
     <div class="comp-block">
@@ -817,7 +884,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
   <div class="wrap">
     <div class="section-head">
       <div class="eyebrow">Capa de dashboard</div>
-      <h2>Nueve piezas de dato visual, vivas.</h2>
+      <h2>Diez piezas de dato visual, vivas.</h2>
     </div>
 <div class="bloque-dash" id="d-paleta">
   <div class="rot">
@@ -844,15 +911,35 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 <div class="bloque-dash" id="d-piezas">
   <div class="rot">
     <div class="kicker">Piezas</div>
-    <h3>Nueve componentes</h3>
+    <h3>Diez componentes</h3>
     <p>Todo va dentro de una tarjeta de widget, la única receta de superficie. Se componen sobre una rejilla de doce columnas.</p>
   </div>
 
   <div class="dash">
 
-    <!-- 1 · KPI -->
+    <!-- 1 · Fila de cifras -->
+    <div class="widget">
+      <header><p class="t">Trámites</p></header>
+      <div class="cifras">
+        <div class="kpi">
+          <span class="cifra tnum">845</span>
+          <div class="etq"><span class="rotulo">Totales</span></div>
+        </div>
+        <div class="kpi">
+          <span class="cifra tnum">796</span>
+          <div class="etq"><span class="rotulo">En proceso</span><span class="apoyo">94% del total</span></div>
+        </div>
+        <div class="kpi">
+          <span class="cifra tnum">0</span>
+          <div class="etq"><span class="rotulo">Admitidos este mes</span><span class="apoyo">&minus;1 vs. mes anterior</span></div>
+        </div>
+      </div>
+      <p class="pie">En proceso son los que no están concluidos, entregados ni cancelados. Los admitidos se cuentan por fecha de admisión, contra un mes anterior completo.</p>
+    </div>
+
+    <!-- 2 · KPI -->
     <div class="widget w-3">
-      <header><h3>Trámites con reloj</h3></header>
+      <header><p class="t">Trámites con reloj</p></header>
       <div class="kpi">
         <div><span class="cifra tnum">26</span><span class="unidad">expedientes</span></div>
         <div class="var sube">+4 <span class="ctx">vs. semana pasada</span></div>
@@ -860,34 +947,33 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       <p class="pie">No incluye los 10 sin reloj.</p>
     </div>
 
-    <!-- 2 · KPI con sparkline -->
+    <!-- 3 · KPI con sparkline -->
     <div class="widget w-3">
-      <header><h3>Cerrados este mes</h3></header>
+      <header><p class="t">Cerrados este mes</p></header>
       <div class="kpi">
         <div><span class="cifra tnum">20</span><span class="unidad">acuses</span></div>
         <div class="var sube">+18% <span class="ctx">vs. mes anterior</span></div>
       </div>
-      <figure class="viz">
-        <div class="viz-lienzo chico"><canvas id="v-spark" aria-label="Acuses cerrados por semana en las últimas ocho semanas"></canvas></div>
-        <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
+      <figure class="viz apoyo">
+        <div class="viz-lienzo chico"><canvas id="v-spark" aria-label="Acuses cerrados por semana del mes en curso: 4, 6, 5 y 5"></canvas></div>
+        <p class="aviso-cdn">Sin conexión con la librería de gráficos.</p>
         <details class="viz-tabla">
           <summary>Ver los datos en tabla</summary>
-          <table><caption class="sr">Acuses cerrados por semana</caption>
+          <table><caption class="sr">Acuses cerrados por semana del mes en curso</caption>
             <thead><tr><th scope="col">Semana</th><th scope="col">Acuses</th></tr></thead>
             <tbody>
-              <tr><th scope="row">S1</th><td>2</td></tr><tr><th scope="row">S2</th><td>3</td></tr>
-              <tr><th scope="row">S3</th><td>3</td></tr><tr><th scope="row">S4</th><td>5</td></tr>
-              <tr><th scope="row">S5</th><td>4</td></tr><tr><th scope="row">S6</th><td>6</td></tr>
-              <tr><th scope="row">S7</th><td>5</td></tr><tr><th scope="row">S8</th><td>7</td></tr>
+              <tr><th scope="row">Sem. 1</th><td>4</td></tr><tr><th scope="row">Sem. 2</th><td>6</td></tr>
+              <tr><th scope="row">Sem. 3</th><td>5</td></tr><tr><th scope="row">Sem. 4</th><td>5</td></tr>
             </tbody>
+            <tfoot><tr><th scope="row">Total</th><td>20</td></tr></tfoot>
           </table>
         </details>
       </figure>
     </div>
 
-    <!-- 3 · Barra apilada de estado -->
+    <!-- 4 · Barra apilada de estado -->
     <div class="widget w-6">
-      <header><h3>Trámites con el reloj corriendo</h3></header>
+      <header><p class="t">Trámites con el reloj corriendo</p></header>
       <div class="kpi"><div><span class="cifra tnum">26</span><span class="unidad">expedientes</span></div></div>
       <div class="barra" role="img" aria-label="18 en plazo, 5 por vencer, 3 vencidos, de 26 con el reloj corriendo">
         <span class="s-ok"   style="width:69.2%"></span>
@@ -902,9 +988,9 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       <p class="pie">No incluye los <b>10</b> sin reloj: aún sin admitir o ya cerrados, no tienen plazo contra el que medirse.</p>
     </div>
 
-    <!-- 4 · Dona -->
+    <!-- 5 · Dona -->
     <div class="widget w-4">
-      <header><h3>Reparto por tipo de trámite</h3></header>
+      <header><p class="t">Reparto por tipo de trámite</p></header>
       <figure class="viz">
         <div class="viz-lienzo"><canvas id="v-dona" aria-label="Reparto de trámites por tipo"></canvas></div>
         <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
@@ -918,14 +1004,15 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
               <tr><th scope="row">Baja de placas</th><td>4</td></tr>
               <tr><th scope="row">Reemplacamiento</th><td>2</td></tr>
             </tbody>
+            <tfoot><tr><th scope="row">Total</th><td>26</td></tr></tfoot>
           </table>
         </details>
       </figure>
     </div>
 
-    <!-- 5 · Ranking -->
+    <!-- 6 · Ranking -->
     <div class="widget w-8">
-      <header><h3>Carga por plaza</h3></header>
+      <header><p class="t">Carga por plaza</p></header>
       <figure class="viz">
         <div class="viz-lienzo alto"><canvas id="v-rank" aria-label="Trámites con reloj corriendo por plaza"></canvas></div>
         <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
@@ -939,14 +1026,15 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
               <tr><th scope="row">Celaya</th><td>4</td></tr>
               <tr><th scope="row">Naucalpan</th><td>3</td></tr>
             </tbody>
+            <tfoot><tr><th scope="row">Total</th><td>26</td></tr></tfoot>
           </table>
         </details>
       </figure>
     </div>
 
-    <!-- 6 · Tendencia -->
+    <!-- 7 · Tendencia -->
     <div class="widget w-8">
-      <header><h3>Recibidos y concluidos por semana</h3></header>
+      <header><p class="t">Recibidos y concluidos por semana</p></header>
       <figure class="viz">
         <div class="viz-lienzo alto"><canvas id="v-tend" aria-label="Trámites recibidos y concluidos por semana"></canvas></div>
         <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
@@ -960,14 +1048,15 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
               <tr><th scope="row">S5</th><td>7</td><td>4</td></tr><tr><th scope="row">S6</th><td>10</td><td>6</td></tr>
               <tr><th scope="row">S7</th><td>8</td><td>5</td></tr><tr><th scope="row">S8</th><td>9</td><td>7</td></tr>
             </tbody>
+            <tfoot><tr><th scope="row">Total</th><td>62</td><td>35</td></tr></tfoot>
           </table>
         </details>
       </figure>
     </div>
 
-    <!-- 7 · Progreso -->
+    <!-- 8 · Progreso -->
     <div class="widget w-4">
-      <header><h3>Meta del mes</h3></header>
+      <header><p class="t">Meta del mes</p></header>
       <div class="progreso">
         <div class="via"><i style="width:67%"></i></div>
         <div class="cifras"><span><b>20</b> de <b>30</b> acuses</span><span><b>67%</b></span></div>
@@ -991,6 +1080,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
     <li><strong>Sin animación bajo <code>prefers-reduced-motion</code>.</strong> Chart.js anima por defecto. Hay que apagarlo.</li>
     <li><strong>Un solo eje.</strong> Dos medidas de magnitud distinta son dos gráficos.</li>
     <li><strong>Marcas finas.</strong> Línea de 2px, punto de 8px o más, rejilla en <code>--grid</code>.</li>
+        <li><strong>La serie y la cifra cuadran.</strong> El rótulo declara un periodo y la serie es ese periodo: «este mes» no trae ocho semanas. Si la serie descompone la cifra, suma la cifra.</li>
   </ul>
 
   <pre><code>&lt;!-- El patrón de toda figura de gráfico --&gt;
@@ -1054,6 +1144,14 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
           <tr><td>2.0.0</td><td>3 sep 2026</td><td>Abre la capa de dashboard: nueve piezas de dato visual con la envoltura que obliga a Chart.js a obedecer los tokens, y la regla de que el <code>&lt;canvas&gt;</code> no es accesible —cada gráfico lleva su tabla equivalente, que es la fuente de verdad y la que aparece si el CDN no carga. <b>Cambio que rompe:</b> <code>--serie-1</code> y <code>--serie-2</code> cambian de valor; medidos uno contra otro daban ΔE 1,1 en protanopia, así que se sustituyen por cuatro slots validados en los dos temas. Añade <code>--on-state</code>, la tinta sobre relleno sólido, y la regla de acotar a hijo directo un selector que tiñe iconos por contexto.</td></tr>
           <tr><td>2.0.1</td><td>3 sep 2026</td><td>El relleno de un contenedor no vive en un hijo opcional: la cabecera <code>.p4</code> cerraba gracias al <code>padding-bottom</code> de la fila de chips, y al retirarlos el título quedó pegado a su borde. Pasa al contenedor vía <code>:last-child</code>.</td></tr>
           <tr><td>2.1.0</td><td>4 sep 2026</td><td>Resuelve una contradicción viva: §6.4 seguía prescribiendo el medallón de estado en <code>--accent-soft</code> mientras §1.4.1 nombraba ese mismo medallón como caso de la tinta sobre relleno sólido. §6.4 pasa a ser aplicación de §1.4.1, no una alternativa. Tres reglas nuevas de las pantallas de Administración Vehicular: un control compuesto lleva un solo anillo de foco y lo lleva el envoltorio; el resumen de estatus no convive con un filtro de estatus equivalente; y en la ficha de detalle el indicador de urgencia declara su ancho en rejilla y el contacto del cliente va bajo la identidad del expediente. Documenta las composiciones de tablero y las dos reglas de la rejilla <code>.dash</code>.</td></tr>
+                  <tr><td>2.2.0</td><td>4 sep 2026</td><td>Completa la barra de filtros: cada dimensión abre un desplegable con buscador y casillas de selección múltiple, con el conteo de cada opción y un «Limpiar» propio. Tres visibles y el resto tras un «+ Añadir filtro». Lo seleccionado baja a una fila de pastillas con tope de cuatro visibles, un «+N más» y «Quitar todos los filtros». Con el teclado resuelto: <code>aria-expanded</code>, foco al buscador al abrir, <code>Escape</code> que devuelve el foco al botón, y cada «×» diciendo qué quita.</td></tr>
+          <tr><td>2.2.1</td><td>4 sep 2026</td><td>Corolario de §3.1: <code>:last-child</code> no distingue lo oculto —la fila de filtros aplicados nace con <code>hidden</code>, no ocupa espacio pero sí es el último hijo, y se llevaba el relleno—, así que pasa al contenedor. La pastilla de estado viaja al filtro: estatus y plazo la llevan en el panel, en el botón y en la pastilla aplicada, para relacionar filtro y fila por color. Y «Observado» pasa de <code>--err</code> a <code>--block</code> en tabla y detalle.</td></tr>
+          <tr><td>2.2.2</td><td>4 sep 2026</td><td>La capa de dashboard y la barra de filtros dejan de vivir en una página aparte y pasan a ser secciones de esta, con sus piezas vivas: los nueve componentes de dato con sus gráficos y sus tablas equivalentes, y la barra de filtros funcionando. Son componentes transversales, no de un módulo: tenerlos fuera invitaba a reimplementarlos en cada pantalla. No cambia ninguna regla ni ningún token.</td></tr>
+          <tr><td>2.2.3</td><td>4 sep 2026</td><td>Regenera <code>icon_names</code> de esta página, que se había quedado sin <code>expand_more</code> al incorporar la barra de filtros: el chevron de cada desplegable salía como la letra «E». Es el fallo que §6.5 ya describe, así que no hay regla nueva —la regla estaba y no se cumplió—. Comprobado con el fragmento que ese mismo apartado prescribe.</td></tr>
+          <tr><td>2.2.4</td><td>4 sep 2026</td><td>Poda de texto en esta página, aplicando el criterio que la propia sección de voz declara: en pantalla va qué hacer y qué no; el porqué y las alternativas descartadas viven en la documentación. Sale la entrada de la sección de dashboard y la justificación histórica de la paleta, que ya está en la fila 2.0.0. No se retira ninguna regla.</td></tr>
+          <tr><td>2.2.5</td><td>4 sep 2026</td><td>Reescribe el texto de la capa de dashboard y de la barra de filtros dejando solo la instrucción. Fuera las coletillas, las aclaraciones entre rayas y las frases que explicaban la consecuencia de incumplir la regla. De 696 a 547 palabras, sin ninguna raya. Ninguna regla se retira.</td></tr>
+          <tr><td>2.3.0</td><td>16 sep 2026</td><td>Incorpora el ámbito de datos (§6.22): de qué conjunto habla una cifra. El producto ya tenía el vocabulario pero no la forma, así que se pintaba con el ámbar de <code>--warn</code> — cuatro avisos de que falta algo en una sola pantalla del tablero, sin que faltara nada. No trae token: <code>--text-3</code> pasa 4,5:1 sobre las tres superficies donde puede caer, en ambos temas. La regla de qué paleta le toca a cada dato sube de §12.5 a §1, donde gobierna todo el color: mientras vivió en el capítulo de gráficas, la columna «Tipo» del padrón acabó con el violeta de <code>--block</code>. §6.4 gana la restauración de sesión como vista «cargando», con su salida por tiempo o fallo y la regla de que el esqueleto anticipa lo que va a aparecer.</td></tr>
+          <tr><td>2.4.0</td><td>17 sep 2026</td><td>Rehace la fila de cifras del tablero (§12.4.1). <code>.kpi</code> servía para <b>una</b> cifra por widget, con el rótulo en la cabecera; el tablero necesitaba siete en un bloque y lo resolvió por su cuenta. Las siete tarjetas miden lo mismo —175×97px—, así que no era tamaño: la cifra está clavada a la misma altura en las siete y el rótulo cae a tres alturas distintas, con 34px de horquilla, porque el interior va anclado abajo. Dos defectos más: la cifra ronda los 20px de cuerpo cuando <code>--fs-kpi</code> son 30, y cada caja lleva relleno y borde dentro de un widget, que es anidar tarjetas. Entra <code>.cifras</code>: cifra, rótulo y apoyo pasan a ser filas de una misma rejilla compartida por toda la fila con <code>subgrid</code>. Con ello, el apoyo de una línea, una fila de cifras como grupo con nombre —dos familias son dos grupos— y un grupo entero en cero pintado como vacío. El QA previo al merge retiró el <code>text-overflow:ellipsis</code> del apoyo: al ancho mínimo que el componente declara cortaba el ejemplo documentado sin forma de leerlo, así que ser de una línea pasa a ser regla de redacción con su presupuesto medido. Y queda escrito el techo de cuatro cifras por grupo, que §12.6 ya imponía a la tarjeta de entidad: <code>auto-fit</code> deja suelta la última cuando son cinco o seis —5+1 a 1024px—, cinco y seis no tienen ancho en la rejilla de doce, y seis conteos de un mismo total son una barra apilada con leyenda. Se corrigen además tres defectos de esta página: el margen por defecto de <code>&lt;figure&gt;</code> dejaba las cuatro gráficas 80px más estrechas y centradas, <code>.sr</code> estaba acotada a un componente y sus cuatro <code>caption</code> se veían, y el sparkline del ejemplo decía «este mes» con ocho semanas que no sumaban la cifra. Las tres primeras quedan escritas como trampas en §10, que pasa de seis a nueve. Y el lienzo reserva la mitad de la marca más gruesa, porque la línea de 2px se trazaba a caballo del borde y se veía cortada. El apoyo deja de ser ranura propia y pasa al bloque <code>.etq</code>, pegado a su rótulo: con tres ranuras, un rótulo que partía en dos renglones dejaba el gris de las demás tarjetas a 30px del suyo en vez de a 8. Y <code>overflow-wrap:anywhere</code>, porque una referencia sin espacios ni guiones se salía de la caja. Rótulo y apoyo se cierran a 5px de texto a texto, la mitad de los 10 que había, sin tocar el aire entre la cifra y el rótulo. Y borde transparente que se pinta en alto contraste del sistema: sin él, <code>forced-colors</code> igualaba tarjeta y widget y las cajas desaparecían.</td></tr>
         </tbody>
       </table>
     </div>
@@ -1156,6 +1254,8 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
   if(!hayLibreria){
     document.querySelectorAll('.viz').forEach(function(v){
       v.classList.add('sin-libreria');
+      /* El gráfico de apoyo no abre su tabla: la cifra ya está delante. */
+      if(v.classList.contains('apoyo')) return;
       var d = v.querySelector('.viz-tabla'); if(d) d.open = true;
     });
   } else {
@@ -1172,14 +1272,19 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
   function base(extra){
     return Object.assign({
       responsive:true, maintainAspectRatio:false,
+      /* El lienzo no reserva nada para la marca: una línea de 2px que toca el borde
+         se dibuja a caballo de él y se ve cortada por la mitad. El relleno es la mitad
+         de la marca más gruesa que el sistema admite —un punto de 8px—, así que 4
+         cubre también la línea. Sin esto, el sparkline salía cortado por arriba. */
+      layout:{ padding:4 },
       animation: quieto ? false : { duration:200 }
     }, extra||{});
   }
 
   registra('v-spark', function(c){
     return { type:'line',
-      data:{ labels:['S1','S2','S3','S4','S5','S6','S7','S8'],
-        datasets:[{ data:[2,3,3,5,4,6,5,7], borderColor:c.s1, borderWidth:2,
+      data:{ labels:['Sem. 1','Sem. 2','Sem. 3','Sem. 4'],
+        datasets:[{ data:[4,6,5,5], borderColor:c.s1, borderWidth:2,
           pointRadius:0, tension:.35, fill:false }] },
       options: base({ plugins:{ legend:{display:false}, tooltip:{enabled:false} },
         scales:{ x:{display:false}, y:{display:false} } }) };
