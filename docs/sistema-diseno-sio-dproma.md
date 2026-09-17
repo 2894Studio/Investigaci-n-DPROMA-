@@ -1889,7 +1889,16 @@ altura en todas las tarjetas y todas miden lo mismo:
   grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
   grid-template-rows:auto auto }
 .cifras > .kpi{ grid-row:span 2; display:grid; grid-template-rows:subgrid; gap:var(--sp-1);
-  background:var(--surface-2); border-radius:var(--r-card); padding:var(--sp-4) }
+  background:var(--surface-2); border:1px solid transparent; border-radius:var(--r-card);
+  padding:var(--sp-4) }
+/* En alto contraste del sistema todos los fondos pasan a Canvas, así que el relleno se
+   pierde y las cajas desaparecen dentro del widget: medido, tarjeta y widget del mismo
+   blanco y sin nada que las separe. El borde, que en condiciones normales sobraría porque
+   anidaría tarjetas, ahí es lo único que las distingue. Va transparente siempre para que
+   la geometría no cambie entre un modo y el otro. */
+@media (forced-colors: active){
+  .cifras > .kpi{ border-color:CanvasText }
+}
 .cifras .etq{ display:flex; flex-direction:column; overflow-wrap:anywhere }
 .cifras .rotulo{ font-size:var(--fs-base); font-weight:500; color:var(--text) }
 /* Sin gap, y con el interlineado del apoyo ceñido: son los dos renglones de una misma
@@ -1900,6 +1909,7 @@ altura en todas las tarjetas y todas miden lo mismo:
 @supports not (grid-template-rows:subgrid){
   .cifras > .kpi{ grid-row:auto; grid-template-rows:none }
 }
+
 
 
 ```
@@ -1921,6 +1931,12 @@ bailaba—; lo que hay que igualar es dónde empieza cada ranura.
 
 **Sin borde.** Dentro de un widget, una cifra compacta es un relleno, no una tarjeta. Sumar borde
 a `--surface-2` convierte siete subdivisiones en siete tarjetas peleando con la que las contiene.
+
+Con una excepción que el QA destapó: **en alto contraste del sistema el relleno no existe**.
+`forced-colors` lleva todos los fondos a Canvas, así que tarjeta y widget quedan del mismo blanco
+y sin nada que las separe. Ahí el borde sí hace falta, y es lo único que las distingue. Se declara
+`border:1px solid transparent` siempre, para que la geometría no cambie entre un modo y otro, y
+`border-color:CanvasText` dentro de `@media (forced-colors: active)`.
 
 Medido, el relleno queda a **1,15:1 del widget en claro y 1,10:1 en oscuro**, muy por debajo del
 3:1 de §1.7. Es aceptable aquí, y conviene decir por qué: **ninguna información depende de ver ese
