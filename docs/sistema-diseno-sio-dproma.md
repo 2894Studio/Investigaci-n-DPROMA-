@@ -1832,6 +1832,18 @@ carga, el lienzo desaparece y la tabla se abre**. Estas maquetas se abrían desd
 internet; al introducir una dependencia externa eso deja de ser cierto, y un dashboard sin
 conexión tiene que enseñar datos, no un rectángulo vacío.
 
+**Con una excepción: el gráfico de apoyo no abre su tabla.** Un sparkline acompaña a una cifra, no
+la sustituye; el contenido del widget es el número. Si su tabla se abre sola, la tarjeta se
+dispara: medido en la propia página del sistema, «Cerrados este mes» pasaba de 171 a **671px de
+alto en una columna de 248**, junto a una vecina de 171, y dejaba la fila con el borde inferior
+roto. Se marca `.viz.apoyo` y ahí la tabla se queda plegada tras su resumen, que sigue siendo
+pulsable. No se esconde ningún dato: se deja de imponer un dato secundario por encima del
+principal. Con el cambio, esa tarjeta baja a 282px.
+
+La prueba para decidir es corta: **si al quitar el gráfico el widget sigue diciendo lo que tiene
+que decir, ese gráfico es de apoyo.** El ranking, la dona y la tendencia no lo son —quitarlos deja
+la tarjeta muda—, así que esos sí abren su tabla.
+
 ```html
 <figure class="viz">
   <div class="viz-lienzo"><canvas id="v-x" aria-label="…"></canvas></div>

@@ -149,7 +149,10 @@ section + section{ border-top:1px solid var(--border); }
 .tarjeta{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-card); box-shadow:var(--sh-rest); overflow:hidden; max-width:320px; }
 .idx-demo{ width:22px; height:22px; border-radius:50%; background:var(--accent); color:var(--accent-ink); display:grid; place-items:center; font-size:var(--fs-meta); font-weight:700; flex-shrink:0; }
 .tarjeta > header{ display:flex; align-items:center; gap:var(--sp-2); padding:var(--sp-3) var(--sp-4); background:var(--surface-2); border-bottom:1px solid var(--border); }
-.tarjeta > header h3{ font-size:var(--fs-base); font-weight:600; margin:0; }
+/* El título de una maqueta lleva .t y no un hN: es contenido de ejemplo, no una
+   sección del documento. Once de ellos aparecían en el esquema de la página como
+   si fueran capítulos del sistema. */
+.tarjeta > header .t{ font-size:var(--fs-base); font-weight:600; margin:0; }
 .tarjeta .interior{ padding:var(--sp-4); font-size:var(--fs-dense); color:var(--text-2); }
 
 /* .glass — tarjeta translúcida del acceso, único sitio del sistema donde la superficie no es opaca */
@@ -272,8 +275,8 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
   box-shadow:var(--sh-rest); padding:var(--sp-4); display:flex; flex-direction:column; gap:var(--sp-3);
   min-width:0 }
 .widget > header{ display:flex; align-items:baseline; justify-content:space-between; gap:var(--sp-2) }
-.widget > header h3{ font:700 var(--fs-dense)/1.3 var(--font-ui); color:var(--text-2);
-  text-transform:uppercase; letter-spacing:.06em }
+.widget > header .t{ font:700 var(--fs-dense)/1.3 var(--font-ui); color:var(--text-2);
+  text-transform:uppercase; letter-spacing:.06em; margin:0 }
 .widget > header .acc{ font-size:var(--fs-meta) }
 .widget .pie{ font-size:var(--fs-meta); color:var(--text-3); line-height:1.5 }
 
@@ -364,9 +367,15 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 .viz-tabla tr:last-child td,.viz-tabla tr:last-child th{ border-bottom:none }
 
 /* Si la librería no llega, el lienzo no se queda vacío: desaparece y la tabla
-   se abre. Un dashboard sin internet muestra datos, no un hueco. */
+   se abre. Un dashboard sin internet muestra datos, no un hueco.
+   Salvo cuando el gráfico es apoyo y no el contenido del widget: un sparkline
+   acompaña a una cifra, no la sustituye. Ahí la tabla se queda plegada tras su
+   resumen, porque abrirla multiplica por cuatro el alto de la tarjeta —medido,
+   671px en una columna de 248 junto a una vecina de 171— y el dato principal,
+   que es la cifra, sigue delante. Ningún dato se esconde: el resumen se pulsa. */
 .viz.sin-libreria .viz-lienzo{ display:none }
 .viz.sin-libreria .viz-tabla > summary{ display:none }
+.viz.apoyo.sin-libreria .viz-tabla > summary{ display:block }
 .aviso-cdn{ display:none; font-size:var(--fs-meta); color:var(--warn-ink); background:var(--warn-bg);
   border:1px solid var(--warn-ink); border-radius:var(--r-ctrl); padding:6px var(--sp-2) }
 .viz.sin-libreria .aviso-cdn{ display:block }
@@ -722,7 +731,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
     <div class="comp-block">
       <h4>Tarjeta (.tarjeta)</h4>
       <div class="tarjeta">
-        <header><h3>Ficha de cliente</h3></header>
+        <header><p class="t">Ficha de cliente</p></header>
         <div class="interior">Una sola receta de superficie: fondo, borde, radio y sombra de reposo. No se reimplementa por pantalla.</div>
       </div>
     </div>
@@ -732,7 +741,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       <div class="glass-demo-bg">
         <div class="glass-demo">
           <div class="eyebrow" style="margin-bottom:.6rem;">Acceso</div>
-          <h3 style="font-size:1.1rem; margin-bottom:.5rem;">Entra a SIO-DPROMA</h3>
+          <p class="t" style="font-size:1.1rem; font-weight:700; margin:0 0 .5rem;">Entra a SIO-DPROMA</p>
           <p style="font-size:var(--fs-dense); color:var(--text-2); margin:0 0 1rem;">La única tarjeta con <code>backdrop-filter:blur(16px)</code> del sistema — aquí se ve casi sólida porque el fondo de detrás es del mismo tono; el efecto real se nota sobre la escena oscura de marca.</p>
           <button class="gbtn" id="gbtnDemo" type="button" aria-busy="false">
             <span class="msi" aria-hidden="true" translate="no">visibility</span>
@@ -761,7 +770,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
       </div>
 
       <div class="tarjeta" style="max-width:340px; margin-top:1.25rem;">
-        <header><span class="idx-demo">2</span><h3>Datos fiscales</h3></header>
+        <header><span class="idx-demo">2</span><p class="t">Datos fiscales</p></header>
         <div class="interior">Cabecera con índice numerado en vez de icono — el modificador <code>.seccion</code> ordena pasos de un formulario, no clasifica contenido.</div>
       </div>
     </div>
@@ -893,7 +902,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 
     <!-- 1 · Fila de cifras -->
     <div class="widget">
-      <header><h3>Trámites</h3></header>
+      <header><p class="t">Trámites</p></header>
       <div class="cifras">
         <div class="kpi">
           <span class="cifra tnum">845</span>
@@ -913,7 +922,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 
     <!-- 2 · KPI -->
     <div class="widget w-3">
-      <header><h3>Trámites con reloj</h3></header>
+      <header><p class="t">Trámites con reloj</p></header>
       <div class="kpi">
         <div><span class="cifra tnum">26</span><span class="unidad">expedientes</span></div>
         <div class="var sube">+4 <span class="ctx">vs. semana pasada</span></div>
@@ -923,14 +932,14 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 
     <!-- 3 · KPI con sparkline -->
     <div class="widget w-3">
-      <header><h3>Cerrados este mes</h3></header>
+      <header><p class="t">Cerrados este mes</p></header>
       <div class="kpi">
         <div><span class="cifra tnum">20</span><span class="unidad">acuses</span></div>
         <div class="var sube">+18% <span class="ctx">vs. mes anterior</span></div>
       </div>
-      <figure class="viz">
+      <figure class="viz apoyo">
         <div class="viz-lienzo chico"><canvas id="v-spark" aria-label="Acuses cerrados por semana en las últimas ocho semanas"></canvas></div>
-        <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
+        <p class="aviso-cdn">Sin conexión con la librería de gráficos.</p>
         <details class="viz-tabla">
           <summary>Ver los datos en tabla</summary>
           <table><caption class="sr">Acuses cerrados por semana</caption>
@@ -948,7 +957,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 
     <!-- 4 · Barra apilada de estado -->
     <div class="widget w-6">
-      <header><h3>Trámites con el reloj corriendo</h3></header>
+      <header><p class="t">Trámites con el reloj corriendo</p></header>
       <div class="kpi"><div><span class="cifra tnum">26</span><span class="unidad">expedientes</span></div></div>
       <div class="barra" role="img" aria-label="18 en plazo, 5 por vencer, 3 vencidos, de 26 con el reloj corriendo">
         <span class="s-ok"   style="width:69.2%"></span>
@@ -965,7 +974,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 
     <!-- 5 · Dona -->
     <div class="widget w-4">
-      <header><h3>Reparto por tipo de trámite</h3></header>
+      <header><p class="t">Reparto por tipo de trámite</p></header>
       <figure class="viz">
         <div class="viz-lienzo"><canvas id="v-dona" aria-label="Reparto de trámites por tipo"></canvas></div>
         <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
@@ -986,7 +995,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 
     <!-- 6 · Ranking -->
     <div class="widget w-8">
-      <header><h3>Carga por plaza</h3></header>
+      <header><p class="t">Carga por plaza</p></header>
       <figure class="viz">
         <div class="viz-lienzo alto"><canvas id="v-rank" aria-label="Trámites con reloj corriendo por plaza"></canvas></div>
         <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
@@ -1007,7 +1016,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 
     <!-- 7 · Tendencia -->
     <div class="widget w-8">
-      <header><h3>Recibidos y concluidos por semana</h3></header>
+      <header><p class="t">Recibidos y concluidos por semana</p></header>
       <figure class="viz">
         <div class="viz-lienzo alto"><canvas id="v-tend" aria-label="Trámites recibidos y concluidos por semana"></canvas></div>
         <p class="aviso-cdn">Sin conexión con la librería de gráficos. Los datos siguen abajo.</p>
@@ -1028,7 +1037,7 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 
     <!-- 8 · Progreso -->
     <div class="widget w-4">
-      <header><h3>Meta del mes</h3></header>
+      <header><p class="t">Meta del mes</p></header>
       <div class="progreso">
         <div class="via"><i style="width:67%"></i></div>
         <div class="cifras"><span><b>20</b> de <b>30</b> acuses</span><span><b>67%</b></span></div>
@@ -1225,6 +1234,8 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
   if(!hayLibreria){
     document.querySelectorAll('.viz').forEach(function(v){
       v.classList.add('sin-libreria');
+      /* El gráfico de apoyo no abre su tabla: la cifra ya está delante. */
+      if(v.classList.contains('apoyo')) return;
       var d = v.querySelector('.viz-tabla'); if(d) d.open = true;
     });
   } else {
