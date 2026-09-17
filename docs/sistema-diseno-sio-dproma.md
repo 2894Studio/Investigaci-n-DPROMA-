@@ -1677,10 +1677,11 @@ Todo lo que lleve `data-andamio` se retira en la versión real. Un solo selector
 
 ---
 
-## 10. Seis trampas comprobadas
+## 10. Nueve trampas comprobadas
 
-No son teoría: las seis aparecieron aplicando este documento al módulo de clientes, y las
-seis se ven solo si se comprueba en el navegador, no leyendo la hoja de estilos.
+No son teoría: las seis primeras aparecieron aplicando este documento al módulo de clientes, y
+las tres últimas revisando esta misma página. Todas se ven solo si se comprueba en el navegador,
+no leyendo la hoja de estilos.
 
 **El tamaño se mide en el navegador, no en el CSS.** La regla de los 12px se puede burlar sin
 querer con la forma abreviada `font:`, donde el tamaño no aparece como `font-size`. Los avatares
@@ -1719,6 +1720,24 @@ unidades **empezando en x=0**, mientras que la marca vive a partir de x=740. Res
 32,5px a la izquierda de su caja y se recorta casi entera. No da error, no avisa, y el atributo
 sobrante parece lo correcto. Se comprueba midiendo la caja del `<use>` contra la del `<svg>`:
 si el desplazamiento no es ~0, está mal.
+
+**Un valor por defecto del navegador que nadie repone se lleva 80px sin avisar.** `<figure>` trae
+`margin: 1em 40px`. La hoja del sistema solo lo reponía dentro de un componente, así que las
+**cuatro** figuras de gráfico salían 80px más estrechas que su widget y centradas dentro de él:
+medido, 134px de gráfica y de tabla en 214 de interior, desplazadas 57px del borde. Nada lo
+delataba —no hay desborde, no hay scroll, la página valida— y por eso sobrevivió a varias
+revisiones. El reset va sobre el elemento, no sobre la clase del componente, o la siguiente figura
+repite el fallo.
+
+**Una utilidad escrita como estilo de un componente deja de existir fuera de él.** `.sr`, la clase
+que aparta texto para que solo lo lea el lector de pantalla, estaba declarada como
+`.filtros-demo .sr`. Los cuatro `<caption class="sr">` de las gráficas, escritos precisamente para
+no verse, se pintaban centrados encima de su tabla repitiendo el título del widget. Si algo se usa
+en más de un componente, se declara suelto.
+
+**`display:block` sobre un `<summary>` le quita la flecha.** El marcador del desplegable viene de
+`display:list-item`; cualquier otro valor lo borra, y el control deja de anunciar que se abre. Si
+hace falta mostrar un `<summary>` que otra regla oculta, se repone con `list-item`.
 
 **Una regla copiada del acceso puede traerse un token que allí existe y aquí no.** El medallón de
 error del acceso usa `--err-soft`; su tarjeta usa `--glass-line`. Ninguno de los dos está declarado
@@ -1843,6 +1862,11 @@ principal. Con el cambio, esa tarjeta baja a 282px.
 La prueba para decidir es corta: **si al quitar el gráfico el widget sigue diciendo lo que tiene
 que decir, ese gráfico es de apoyo.** El ranking, la dona y la tendencia no lo son —quitarlos deja
 la tarjeta muda—, así que esos sí abren su tabla.
+
+**La tabla equivalente lleva su total en un `<tfoot>`**, con línea encima y peso. Sin esa
+separación el total se lee como un valor más de la serie, y es justo la fila que permite ver de un
+vistazo si la serie cuadra con la cifra del widget (§12.5). El `<caption>` va en `.sr`: nombra la
+tabla para quien la recorre con lector, y visualmente lo dice ya la cabecera del widget.
 
 ```html
 <figure class="viz">
