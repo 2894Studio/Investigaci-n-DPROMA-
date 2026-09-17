@@ -2054,6 +2054,10 @@ tablero ya hace doscientos píxeles más abajo con «Nada en tu alcance». Es la
   cualquier superficie.
 - **Marcas finas y rejilla discreta.** Línea de 2px, punto de 8px o más, rejilla en `--grid`,
   y 2px de superficie entre segmentos contiguos de una barra apilada.
+- **El lienzo reserva la mitad de la marca más gruesa.** El área de dibujo llega hasta el borde,
+  así que una línea de 2px que toque el máximo se traza a caballo de ese borde y se ve cortada por
+  la mitad: es lo que le pasaba al sparkline por arriba. Va en la envoltura y no en cada gráfico,
+  `layout:{padding:4}`, que es la mitad de un punto de 8px y cubre de sobra la línea.
 - **La serie y la cifra del mismo widget miden lo mismo, y cuadran.** El rótulo declara un
   periodo y la serie tiene que ser ese periodo: «Cerrados **este mes**» no puede traer ocho
   semanas, porque un mes no tiene ocho. Y si la serie descompone la cifra, sus valores suman la
