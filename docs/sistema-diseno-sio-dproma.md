@@ -1890,13 +1890,17 @@ altura en todas las tarjetas y todas miden lo mismo:
   grid-template-rows:auto auto }
 .cifras > .kpi{ grid-row:span 2; display:grid; grid-template-rows:subgrid; gap:var(--sp-1);
   background:var(--surface-2); border-radius:var(--r-card); padding:var(--sp-4) }
-.cifras .etq{ display:flex; flex-direction:column; gap:var(--sp-1);
-  overflow-wrap:anywhere }
+.cifras .etq{ display:flex; flex-direction:column; overflow-wrap:anywhere }
 .cifras .rotulo{ font-size:var(--fs-base); font-weight:500; color:var(--text) }
-.cifras .apoyo{ font-size:var(--fs-meta); color:var(--text-3) }
+/* Sin gap, y con el interlineado del apoyo ceñido: son los dos renglones de una misma
+   etiqueta y tienen que leerse pegados. Medido de texto a texto, 10px pasan a 5. El
+   interlineado se toca en el apoyo y no en el rótulo, porque ceñir el rótulo también
+   acorta por arriba y el aire entre la cifra y el rótulo es el correcto. */
+.cifras .apoyo{ font-size:var(--fs-meta); line-height:1.4; color:var(--text-3) }
 @supports not (grid-template-rows:subgrid){
   .cifras > .kpi{ grid-row:auto; grid-template-rows:none }
 }
+
 
 ```
 
@@ -1933,6 +1937,11 @@ definición de la medida, y esa va a la nota de método (`.nota-reloj`, §12.6) 
 
 El presupuesto está medido: a la tarjeta mínima de 150px le quedan **118px de texto**, que a 12px
 son **unos 18 caracteres**. «94% del total» ocupa 81. «−1 vs. mes anterior» ocupa 120 y ya no cabe.
+
+**El rótulo y su apoyo son dos renglones de una misma etiqueta.** Van sin `gap` y con el
+interlineado del apoyo ceñido a 1,4. Medido de texto a texto, la separación baja de **10px a 5**.
+El interlineado se toca en el apoyo y no en el rótulo: ceñir el rótulo acorta también por arriba,
+y el aire entre la cifra y el rótulo —4px— es el que debe quedarse.
 
 **Una referencia pegada no rompe la caja.** El rótulo lleva `overflow-wrap:anywhere`, porque
 puede llegar un identificador sin espacios ni guiones donde el navegador no tiene dónde partir.
