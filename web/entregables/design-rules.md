@@ -1899,8 +1899,7 @@ toda la fila**, no como tres elementos sueltos dentro de cada caja:
 .cifras > .kpi{ grid-row:span 3; display:grid; grid-template-rows:subgrid; gap:var(--sp-1);
   background:var(--surface-2); border-radius:var(--r-card); padding:var(--sp-4) }
 .cifras .rotulo{ font-size:var(--fs-base); font-weight:500 }
-.cifras .apoyo{ font-size:var(--fs-meta); color:var(--text-3);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.cifras .apoyo{ font-size:var(--fs-meta); color:var(--text-3) }
 @supports not (grid-template-rows:subgrid){
   .cifras > .kpi{ grid-row:auto; grid-template-rows:none }
 }
@@ -1923,15 +1922,31 @@ sí mismo, el relleno dejaría de bastar y habría que medirlo contra el 3:1.
 El texto sí se mide como texto, y pasa: el rótulo en `--text` da 13,27:1 en claro y 12,68:1 en
 oscuro sobre ese relleno, y el apoyo en `--text-3`, 4,93:1 y 5,03:1.
 
-**El apoyo es de una línea.** Si no cabe, no es apoyo: es la definición de la medida, y esa va a
-la nota de método (`.nota-reloj`, §12.6) debajo de la fila. «Nueva, pendiente, programada o en
-visita» explica qué se cuenta; no acompaña a un número.
+**El apoyo es de una línea**, y es regla de redacción, no de CSS. Si no cabe, no es apoyo: es la
+definición de la medida, y esa va a la nota de método (`.nota-reloj`, §12.6) debajo de la fila.
+«Nueva, pendiente, programada o en visita» explica qué se cuenta; no acompaña a un número.
+
+El presupuesto está medido: a la tarjeta mínima de 150px le quedan **118px de texto**, que a 12px
+son **unos 18 caracteres**. «94% del total» ocupa 81. «−1 vs. mes anterior» ocupa 120 y ya no cabe.
+
+**Y no se recorta con elipsis.** La primera versión de esta regla la imponía con
+`white-space:nowrap` y `text-overflow:ellipsis`, y el QA la tumbó: al ancho mínimo que el propio
+componente declara, el apoyo del ejemplo documentado se cortaba y **lo cortado no había forma de
+leerlo** —sin emergente, sin foco, sin nada—. Una cifra a la que le falta la mitad del contexto es
+peor que una fila un poco más alta. Sin recorte, el apoyo largo pasa a dos líneas, la rejilla
+crece para todas por igual y no se pierde ni un carácter. Es exactamente para lo que está
+`subgrid`.
 
 **Una fila de cifras es un grupo con nombre, y dos familias son dos grupos.** Las siete cifras del
 tablero eran cuatro de órdenes de instalación y tres de trámites, con dos «totales» contiguos y
 nada que dijera que cuentan cosas distintas. Siete columnas no caben en una rejilla de doce, y ese
 fue el motivo de salirse de `.dash`; cuatro de `.w-3` y tres de `.w-4` sí caben. Si un conjunto de
 cifras no se puede nombrar de una vez, son dos conjuntos.
+
+**Una sola cifra no es una fila.** `auto-fit` colapsa las columnas vacías, así que una cifra
+suelta dentro de `.cifras` se estira a todo el ancho del widget: medido, 1006px de caja para un
+número. Una cifra sola es `.kpi` en su propio widget, con el rótulo en la cabecera, que es para lo
+que `.kpi` existe.
 
 **Un grupo entero en cero se pinta como vacío.** Cuatro tarjetas marcando 0, 0, 0 y 0 son cuatro
 cajas para decir que no hay nada. Va el estado vacío del widget (§6.4), que es lo que ese mismo
@@ -2003,4 +2018,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.2.4 | 2026-09-04 | Poda de texto en la página renderizada, aplicando el criterio que la propia §8 declara: en pantalla va qué hacer y qué no; el porqué y las alternativas descartadas viven en la documentación. Sale la entrada de la sección de dashboard, que contaba la historia del hueco en vez de dar una regla, y la justificación histórica de la sustitución de la paleta, que ya está en la fila 2.0.0 de este historial. Se recortan además las coletillas de racional en las reglas de gráfico y en la barra de filtros, dejando la regla y su consecuencia. No se retira ninguna regla ni se toca la fuente técnica, que es justamente donde ese razonamiento debe estar. |
 | 2.2.5 | 2026-09-04 | Reescribe el texto de la capa de dashboard y de la barra de filtros en la página renderizada dejando solo la instrucción. Fuera las coletillas, las aclaraciones entre rayas y las frases que explicaban la consecuencia de incumplir la regla. La sección de dashboard baja de 696 a 547 palabras y no queda ni una raya. Ninguna regla se retira: cambia cómo están escritas. |
 | 2.3.0 | 2026-09-16 | Cierra los huecos que destapó la revisión del SIO construido en QA, y resultaron ser menos de los que parecía: de cinco piezas que dábamos por pendientes, cuatro ya estaban escritas. La única nueva es el ámbito de datos (§6.22) —de qué conjunto habla una cifra—, que el producto ya usaba con vocabulario propio pero sin forma, así que se pintó con el ámbar de `--warn`: cuatro avisos de que falta algo en una sola pantalla del tablero, cuando no faltaba nada. No trae token nuevo, y no hacía falta: `--text-3` ya pasa 4,5:1 sobre las tres superficies donde puede caer en los dos temas, y el relleno de `--surface-2` se descartó al medirlo, porque queda a 1,08:1 del fondo y desaparece del todo sobre una tarjeta de esa misma superficie. La regla de qué paleta le toca a cada dato sube de §12.5 a §1, que es donde gobierna todo el color: mientras vivió en el capítulo de dashboard, redactada para gráficas, nadie fue a buscarla para una etiqueta de tabla y la columna «Tipo» del padrón acabó con el violeta de `--block`. §6.4 gana la restauración de sesión como caso de la vista «cargando», con el cromo pintado de inmediato porque no depende de la sesión, la salida por tiempo o fallo que no existía, y la regla de que el esqueleto anticipa lo que va a aparecer —se pintaron doce barras sobre un menú de ocho filas—. Y dos notas en §12.4 y §12.5 que nombran el caso real que se saltó cada regla, porque el problema demostrado no es que falten reglas: es que no se encuentran. |
-| 2.4.0 | 2026-09-16 | Rehace la fila de cifras del tablero, que la revisión de QA había despachado con una nota al pie y resultó ser un componente que faltaba (§12.4.1). `.kpi` estaba pensado para **una** cifra por widget, con el rótulo en la cabecera del widget; el tablero necesitaba siete conviviendo en un bloque y lo resolvió por su cuenta. Medido sobre la pantalla: las siete tarjetas miden lo mismo —175×97px— así que no era un problema de tamaño; la cifra está clavada a la misma altura en las siete y el rótulo cae a tres alturas distintas, con 34px de horquilla, porque el interior va anclado abajo y el rótulo sube o baja según cuántas líneas traiga el apoyo. Aparecen otros dos defectos al reproducirlo: la cifra tiene 14px de altura de mayúscula, unos 20 de cuerpo cuando `--fs-kpi` son 30, así que el número va a 1,4 veces su rótulo en vez de a 2,1 y no manda en su tarjeta; y cada cifra va en una caja con relleno y borde dentro de un widget, que es anidar tarjetas, prohibido desde §6.3. Entra `.cifras`: las tres ranuras —cifra, rótulo y apoyo— pasan a ser filas de una misma rejilla compartida por toda la fila con `subgrid`, que es lo que alinea el rótulo tenga o no tenga apoyo; igualar la altura de las cajas no bastaba, porque ya eran todas de 97px. Con ello, tres reglas de composición: el apoyo es de una línea y una definición de la medida baja a la nota de método; una fila de cifras es un grupo con nombre, y las siete del tablero eran cuatro de órdenes y tres de trámites con dos «totales» contiguos —siete columnas no caben en una rejilla de doce, y ése fue el motivo de salirse de `.dash`, pero cuatro de `.w-3` y tres de `.w-4` sí caben—; y un grupo entero en cero se pinta como vacío, que es lo que ese mismo tablero ya hace más abajo con «Nada en tu alcance». |
+| 2.4.0 | 2026-09-16 | Rehace la fila de cifras del tablero, que la revisión de QA había despachado con una nota al pie y resultó ser un componente que faltaba (§12.4.1). `.kpi` estaba pensado para **una** cifra por widget, con el rótulo en la cabecera del widget; el tablero necesitaba siete conviviendo en un bloque y lo resolvió por su cuenta. Medido sobre la pantalla: las siete tarjetas miden lo mismo —175×97px— así que no era un problema de tamaño; la cifra está clavada a la misma altura en las siete y el rótulo cae a tres alturas distintas, con 34px de horquilla, porque el interior va anclado abajo y el rótulo sube o baja según cuántas líneas traiga el apoyo. Aparecen otros dos defectos al reproducirlo: la cifra tiene 14px de altura de mayúscula, unos 20 de cuerpo cuando `--fs-kpi` son 30, así que el número va a 1,4 veces su rótulo en vez de a 2,1 y no manda en su tarjeta; y cada cifra va en una caja con relleno y borde dentro de un widget, que es anidar tarjetas, prohibido desde §6.3. Entra `.cifras`: las tres ranuras —cifra, rótulo y apoyo— pasan a ser filas de una misma rejilla compartida por toda la fila con `subgrid`, que es lo que alinea el rótulo tenga o no tenga apoyo; igualar la altura de las cajas no bastaba, porque ya eran todas de 97px. Con ello, tres reglas de composición: el apoyo es de una línea y una definición de la medida baja a la nota de método; una fila de cifras es un grupo con nombre, y las siete del tablero eran cuatro de órdenes y tres de trámites con dos «totales» contiguos —siete columnas no caben en una rejilla de doce, y ése fue el motivo de salirse de `.dash`, pero cuatro de `.w-3` y tres de `.w-4` sí caben—; y un grupo entero en cero se pinta como vacío, que es lo que ese mismo tablero ya hace más abajo con «Nada en tu alcance». El QA previo al merge tumbó una de las reglas tal como estaba escrita: el apoyo se imponía con `text-overflow:ellipsis`, y al ancho mínimo que el propio componente declara el apoyo del ejemplo documentado se cortaba sin forma de leerlo. Se retira el recorte: ser de una línea pasa a ser regla de redacción, con el presupuesto medido —118px, unos 18 caracteres—, y el día que no se cumpla la rejilla absorbe la segunda línea para todas por igual. Queda anotado también que una cifra sola no es una fila: `auto-fit` la estira a todo el widget. |

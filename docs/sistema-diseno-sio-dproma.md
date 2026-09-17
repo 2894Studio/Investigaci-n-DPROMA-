@@ -1890,8 +1890,7 @@ toda la fila**, no como tres elementos sueltos dentro de cada caja:
 .cifras > .kpi{ grid-row:span 3; display:grid; grid-template-rows:subgrid; gap:var(--sp-1);
   background:var(--surface-2); border-radius:var(--r-card); padding:var(--sp-4) }
 .cifras .rotulo{ font-size:var(--fs-base); font-weight:500 }
-.cifras .apoyo{ font-size:var(--fs-meta); color:var(--text-3);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.cifras .apoyo{ font-size:var(--fs-meta); color:var(--text-3) }
 @supports not (grid-template-rows:subgrid){
   .cifras > .kpi{ grid-row:auto; grid-template-rows:none }
 }
@@ -1914,15 +1913,31 @@ sí mismo, el relleno dejaría de bastar y habría que medirlo contra el 3:1.
 El texto sí se mide como texto, y pasa: el rótulo en `--text` da 13,27:1 en claro y 12,68:1 en
 oscuro sobre ese relleno, y el apoyo en `--text-3`, 4,93:1 y 5,03:1.
 
-**El apoyo es de una línea.** Si no cabe, no es apoyo: es la definición de la medida, y esa va a
-la nota de método (`.nota-reloj`, §12.6) debajo de la fila. «Nueva, pendiente, programada o en
-visita» explica qué se cuenta; no acompaña a un número.
+**El apoyo es de una línea**, y es regla de redacción, no de CSS. Si no cabe, no es apoyo: es la
+definición de la medida, y esa va a la nota de método (`.nota-reloj`, §12.6) debajo de la fila.
+«Nueva, pendiente, programada o en visita» explica qué se cuenta; no acompaña a un número.
+
+El presupuesto está medido: a la tarjeta mínima de 150px le quedan **118px de texto**, que a 12px
+son **unos 18 caracteres**. «94% del total» ocupa 81. «−1 vs. mes anterior» ocupa 120 y ya no cabe.
+
+**Y no se recorta con elipsis.** La primera versión de esta regla la imponía con
+`white-space:nowrap` y `text-overflow:ellipsis`, y el QA la tumbó: al ancho mínimo que el propio
+componente declara, el apoyo del ejemplo documentado se cortaba y **lo cortado no había forma de
+leerlo** —sin emergente, sin foco, sin nada—. Una cifra a la que le falta la mitad del contexto es
+peor que una fila un poco más alta. Sin recorte, el apoyo largo pasa a dos líneas, la rejilla
+crece para todas por igual y no se pierde ni un carácter. Es exactamente para lo que está
+`subgrid`.
 
 **Una fila de cifras es un grupo con nombre, y dos familias son dos grupos.** Las siete cifras del
 tablero eran cuatro de órdenes de instalación y tres de trámites, con dos «totales» contiguos y
 nada que dijera que cuentan cosas distintas. Siete columnas no caben en una rejilla de doce, y ese
 fue el motivo de salirse de `.dash`; cuatro de `.w-3` y tres de `.w-4` sí caben. Si un conjunto de
 cifras no se puede nombrar de una vez, son dos conjuntos.
+
+**Una sola cifra no es una fila.** `auto-fit` colapsa las columnas vacías, así que una cifra
+suelta dentro de `.cifras` se estira a todo el ancho del widget: medido, 1006px de caja para un
+número. Una cifra sola es `.kpi` en su propio widget, con el rótulo en la cabecera, que es para lo
+que `.kpi` existe.
 
 **Un grupo entero en cero se pinta como vacío.** Cuatro tarjetas marcando 0, 0, 0 y 0 son cuatro
 cajas para decir que no hay nada. Va el estado vacío del widget (§6.4), que es lo que ese mismo
