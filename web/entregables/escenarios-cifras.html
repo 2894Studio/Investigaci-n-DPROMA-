@@ -293,16 +293,21 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 
 /* Fila de cifras. Varias cifras compactas en UN solo widget, cuando ninguna merece widget
    propio. Aquí cada cifra lleva su rótulo dentro, porque no tiene cabecera que se lo ponga.
-   Las tres ranuras son filas de la MISMA rejilla para toda la fila: por eso el rótulo cae a
-   la misma altura tenga o no tenga apoyo. Igualar la altura de las cajas no basta.
+   DOS ranuras, no tres: la cifra, y el bloque .etq con el rótulo y su apoyo. Son filas de la
+   MISMA rejilla para toda la fila, así que el rótulo cae a la misma altura en todas las
+   tarjetas y todas miden lo mismo. El apoyo NO es ranura propia: va pegado a su rótulo a
+   --sp-1 pase lo que pase, porque pertenece a ese rótulo y no al gris de al lado.
    Sin borde: dentro de un widget una cifra es un relleno, no una tarjeta anidada (§6.3).
-   El apoyo NO se recorta con elipsis: un valor cortado no se puede recuperar. Que sea
-   de una línea es regla de redacción, y la rejilla absorbe el día que no lo sea. */
+   El apoyo tampoco se recorta con elipsis: un valor cortado no se puede recuperar.
+   overflow-wrap:anywhere porque un rótulo puede traer una referencia pegada sin
+   guiones, y sin él se sale de la tarjeta: medido, 283px de contenido en 170 de caja. */
 .cifras{ display:grid; gap:var(--sp-3); align-items:start;
   grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  grid-template-rows:auto auto auto }
-.cifras > .kpi{ grid-row:span 3; display:grid; grid-template-rows:subgrid; gap:var(--sp-1);
+  grid-template-rows:auto auto }
+.cifras > .kpi{ grid-row:span 2; display:grid; grid-template-rows:subgrid; gap:var(--sp-1);
   background:var(--surface-2); border-radius:var(--r-card); padding:var(--sp-4) }
+.cifras .etq{ display:flex; flex-direction:column; gap:var(--sp-1);
+  overflow-wrap:anywhere }
 .cifras .rotulo{ font-size:var(--fs-base); font-weight:500; color:var(--text) }
 .cifras .apoyo{ font-size:var(--fs-meta); color:var(--text-3) }
 @supports not (grid-template-rows:subgrid){
@@ -473,7 +478,6 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 .filtros-demo .f .pill{ margin-left:2px }
 .filtros-demo .fchip .pill{ margin:0 2px }
 
-
 /* ── Sólo andamiaje de esta galería, de aquí abajo ─────────────────────────── */
 .aviso-and{background:#3A2A00;color:#FFE9B0;padding:var(--sp-4) 0;font-size:var(--fs-dense)}
 .aviso-and b{color:#FFF}
@@ -482,15 +486,25 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 .cab-g p{margin:0;color:var(--text-2);max-width:70ch}
 .caso{border-top:1px solid var(--border);padding:var(--sp-8) 0}
 .cab-caso{display:flex;align-items:baseline;gap:var(--sp-3);flex-wrap:wrap;margin-bottom:var(--sp-2)}
-.cab-caso .num{font:700 var(--fs-meta)/1 var(--font-ui);color:var(--text-3);
-  font-variant-numeric:tabular-nums}
+.cab-caso .num{font:700 var(--fs-meta)/1 var(--font-ui);color:var(--text-3);font-variant-numeric:tabular-nums}
 .cab-caso h2{font-size:var(--fs-title);margin:0}
 .v{font-size:var(--fs-meta);font-weight:700;padding:3px 9px;border-radius:var(--r-ctrl)}
 .v.bien{background:var(--ok-bg);color:var(--ok-ink)}
 .v.mal{background:var(--err-bg);color:var(--err-ink)}
+.v.ojo{background:var(--warn-bg);color:var(--warn-ink)}
 .v.ref{background:var(--pause-bg);color:var(--pause-ink)}
 .caso .nota{margin:0 0 var(--sp-4);color:var(--text-2);font-size:var(--fs-dense);max-width:80ch}
+.caso .nota strong{color:var(--text)}
 .lienzo{display:flex;flex-direction:column;gap:var(--sp-4)}
+.lienzo.estrecho{max-width:950px}
+/* Los casos de ancho forzado se desplazan dentro de su caja en vez de empujar la página:
+   la galería tiene que poder revisarse en un teléfono aunque el caso no quepa. */
+.lienzo.estrecho,.lienzo.estrecho520,.lienzo.estrecho160{overflow-x:auto}
+.lienzo.estrecho520{max-width:600px}
+.lienzo.estrecho160{max-width:740px}
+/* Anchos fijos sólo para forzar el caso: en producción los reparte auto-fit. */
+.cifras.c4x160{grid-template-columns:repeat(4,160px)}
+.cifras.c3x170{grid-template-columns:repeat(3,170px)}
 .vacio-demo{display:flex;flex-direction:column;gap:var(--sp-3);align-items:flex-start}
 .vacio-demo p{margin:0;color:var(--text-2);font-size:var(--fs-dense)}
 .btn{display:inline-flex;align-items:center;min-height:36px;padding:0 var(--sp-4);
@@ -500,13 +514,11 @@ footer{ padding:clamp(2rem,5vw,3rem) 0 2.5rem; }
 .cifras.roto{grid-template-rows:none;grid-template-columns:repeat(7,1fr);gap:12px;min-width:1240px}
 .cifras.roto > .kpi{grid-row:auto;display:flex;flex-direction:column;justify-content:space-between;
   height:97px;overflow:hidden;padding:14px var(--sp-4)}
+.cifras.roto .etq{display:contents}
 .cifras.roto .cifra{font-size:var(--fs-title);line-height:1}
 .cifras.roto .rotulo{font-weight:400;color:var(--text-2);line-height:1.15}
 .cifras.roto .apoyo{line-height:1.35}
-/* Las siete de QA piden 1240px. En vez de recortarlas, se reducen: lo que importa
-   de este caso son las alturas relativas del rótulo, y la reducción no las cambia. */
 .caso:has(.cifras.roto) .lienzo{zoom:.79;overflow-x:auto}
-.lienzo.estrecho{max-width:950px}
 footer.g{border-top:1px solid var(--border);padding:var(--sp-8) 0 var(--sp-12);
   color:var(--text-3);font-size:var(--fs-meta)}
 </style>
@@ -516,73 +528,84 @@ footer.g{border-top:1px solid var(--border);padding:var(--sp-8) 0 var(--sp-12);
   <b>Andamiaje de revisión.</b> Galería de escenarios de <code>.cifras</code> (§12.4.1). No entra al merge.
 </div></div>
 <header class="cab-g"><div class="wrap">
-  <h1>.cifras en once escenarios</h1>
+  <h1>.cifras en trece escenarios</h1>
   <p>Todos montados con la hoja del sistema copiada literal, sin una regla propia para el
-    componente. Cambia el tema del sistema operativo y la página cambia con él.</p>
+    componente. Del 05 al 08 son los casos de texto largo. Cambia el tema del sistema operativo y
+    la página cambia con él.</p>
 </div></header>
 <main class="wrap">
 <section class="caso">
   <div class="cab-caso"><span class="num">01</span><h2>El caso del tablero, con los datos de hoy</h2><span class="v bien">Así se usa</span></div>
   <p class="nota">Siete cifras en la pantalla real. Cuatro marcaban cero y eran todas del mismo grupo, así que ese grupo pasa a su estado vacío. Quedan tres.</p>
-  <div class="lienzo"><div class="widget"><header><h3>Trámites</h3></header><div class="cifras"><div class="kpi"><span class="cifra">845</span><span class="rotulo">Totales</span></div><div class="kpi"><span class="cifra">796</span><span class="rotulo">En proceso</span><span class="apoyo">94% del total</span></div><div class="kpi"><span class="cifra">0</span><span class="rotulo">Admitidos este mes</span><span class="apoyo">−1 vs. mes anterior</span></div></div><p class="pie">En proceso son los que no están concluidos, entregados ni cancelados.</p></div><div class="widget"><header><h3>Órdenes de instalación</h3></header><div class="vacio-demo"><p>Sin órdenes todavía.</p><button class="btn" type="button">Ver la lista</button></div></div></div>
+  <div class="lienzo "><div class="widget"><header><h3>Trámites</h3></header><div class="cifras "><div class="kpi"><span class="cifra">845</span><div class="etq"><span class="rotulo">Totales</span></div></div><div class="kpi"><span class="cifra">796</span><div class="etq"><span class="rotulo">En proceso</span><span class="apoyo">94% del total</span></div></div><div class="kpi"><span class="cifra">0</span><div class="etq"><span class="rotulo">Admitidos este mes</span><span class="apoyo">−1 vs. mes anterior</span></div></div></div><p class="pie">En proceso son los que no están concluidos, entregados ni cancelados.</p></div><div class="widget"><header><h3>Órdenes de instalación</h3></header><div class="vacio-demo"><p>Sin órdenes todavía.</p><button class="btn" type="button">Ver la lista</button></div></div></div>
 </section>
 <section class="caso">
   <div class="cab-caso"><span class="num">02</span><h2>El mismo caso el día que las órdenes tengan datos</h2><span class="v bien">Así se usa</span></div>
   <p class="nota">Cuatro y tres, cada grupo con su nombre y su total al frente. Las dos filas reparten su ancho por separado.</p>
-  <div class="lienzo"><div class="widget"><header><h3>Trámites</h3></header><div class="cifras"><div class="kpi"><span class="cifra">845</span><span class="rotulo">Totales</span></div><div class="kpi"><span class="cifra">796</span><span class="rotulo">En proceso</span><span class="apoyo">94% del total</span></div><div class="kpi"><span class="cifra">12</span><span class="rotulo">Admitidos este mes</span><span class="apoyo">+3 vs. mes anterior</span></div></div></div><div class="widget"><header><h3>Órdenes de instalación</h3></header><div class="cifras"><div class="kpi"><span class="cifra">312</span><span class="rotulo">Totales</span></div><div class="kpi"><span class="cifra">168</span><span class="rotulo">Instaladas</span><span class="apoyo">54% del total</span></div><div class="kpi"><span class="cifra">121</span><span class="rotulo">Pendientes</span><span class="apoyo">39% del total</span></div><div class="kpi"><span class="cifra">23</span><span class="rotulo">Canceladas</span><span class="apoyo">7% del total</span></div></div><p class="pie">Pendiente reúne nueva, pendiente, programada y en visita.</p></div></div>
+  <div class="lienzo "><div class="widget"><header><h3>Trámites</h3></header><div class="cifras "><div class="kpi"><span class="cifra">845</span><div class="etq"><span class="rotulo">Totales</span></div></div><div class="kpi"><span class="cifra">796</span><div class="etq"><span class="rotulo">En proceso</span><span class="apoyo">94% del total</span></div></div><div class="kpi"><span class="cifra">12</span><div class="etq"><span class="rotulo">Admitidos este mes</span><span class="apoyo">+3 vs. mes anterior</span></div></div></div></div><div class="widget"><header><h3>Órdenes de instalación</h3></header><div class="cifras "><div class="kpi"><span class="cifra">312</span><div class="etq"><span class="rotulo">Totales</span></div></div><div class="kpi"><span class="cifra">168</span><div class="etq"><span class="rotulo">Instaladas</span><span class="apoyo">54% del total</span></div></div><div class="kpi"><span class="cifra">121</span><div class="etq"><span class="rotulo">Pendientes</span><span class="apoyo">39% del total</span></div></div><div class="kpi"><span class="cifra">23</span><div class="etq"><span class="rotulo">Canceladas</span><span class="apoyo">7% del total</span></div></div></div><p class="pie">Pendiente reúne nueva, pendiente, programada y en visita.</p></div></div>
 </section>
 <section class="caso">
   <div class="cab-caso"><span class="num">03</span><h2>Cuatro cifras, que es el techo</h2><span class="v bien">Así se usa</span></div>
   <p class="nota">Cuatro es el máximo por grupo. Encima de eso, o son dos grupos o no son cifras sueltas.</p>
-  <div class="lienzo"><div class="widget"><header><h3>Órdenes de instalación</h3></header><div class="cifras"><div class="kpi"><span class="cifra">312</span><span class="rotulo">Totales</span></div><div class="kpi"><span class="cifra">168</span><span class="rotulo">Instaladas</span><span class="apoyo">54% del total</span></div><div class="kpi"><span class="cifra">121</span><span class="rotulo">Pendientes</span><span class="apoyo">39% del total</span></div><div class="kpi"><span class="cifra">23</span><span class="rotulo">Canceladas</span><span class="apoyo">7% del total</span></div></div></div></div>
+  <div class="lienzo "><div class="widget"><header><h3>Órdenes de instalación</h3></header><div class="cifras "><div class="kpi"><span class="cifra">312</span><div class="etq"><span class="rotulo">Totales</span></div></div><div class="kpi"><span class="cifra">168</span><div class="etq"><span class="rotulo">Instaladas</span><span class="apoyo">54% del total</span></div></div><div class="kpi"><span class="cifra">121</span><div class="etq"><span class="rotulo">Pendientes</span><span class="apoyo">39% del total</span></div></div><div class="kpi"><span class="cifra">23</span><div class="etq"><span class="rotulo">Canceladas</span><span class="apoyo">7% del total</span></div></div></div></div></div>
 </section>
 <section class="caso">
   <div class="cab-caso"><span class="num">04</span><h2>Dos cifras</h2><span class="v bien">Así se usa</span></div>
   <p class="nota">El componente no pide un mínimo de tres. Con dos se reparten el ancho igual.</p>
-  <div class="lienzo"><div class="widget"><header><h3>Gestoría</h3></header><div class="cifras"><div class="kpi"><span class="cifra">49</span><span class="rotulo">En trámite</span><span class="apoyo">de 62 del mes</span></div><div class="kpi"><span class="cifra">13</span><span class="rotulo">Entregadas</span><span class="apoyo">21% del mes</span></div></div></div></div>
+  <div class="lienzo "><div class="widget"><header><h3>Gestoría</h3></header><div class="cifras "><div class="kpi"><span class="cifra">49</span><div class="etq"><span class="rotulo">En trámite</span><span class="apoyo">de 62 del mes</span></div></div><div class="kpi"><span class="cifra">13</span><div class="etq"><span class="rotulo">Entregadas</span><span class="apoyo">21% del mes</span></div></div></div></div></div>
 </section>
 <section class="caso">
-  <div class="cab-caso"><span class="num">05</span><h2>Apoyo que no cabe en una línea</h2><span class="v bien">Así se usa</span></div>
-  <p class="nota">Ser de una línea es regla de redacción, no de CSS. Cuando alguien escribe de más, la segunda línea la absorbe la rejilla para todas por igual y no se pierde ni un carácter. Es para lo que está subgrid.</p>
-  <div class="lienzo"><div class="widget"><header><h3>Trámites</h3></header><div class="cifras"><div class="kpi"><span class="cifra">845</span><span class="rotulo">Totales</span></div><div class="kpi"><span class="cifra">796</span><span class="rotulo">En proceso</span><span class="apoyo">sin concluir, entregar ni cancelar, contando solo los que tienen reloj</span></div><div class="kpi"><span class="cifra">12</span><span class="rotulo">Admitidos este mes</span><span class="apoyo">+3 vs. mes anterior</span></div></div></div></div>
+  <div class="cab-caso"><span class="num">05</span><h2>Un rótulo parte en dos y los demás no</h2><span class="v bien">Así se usa</span></div>
+  <p class="nota">Éste es el caso que obligó a rehacer la estructura. Antes, cuando un rótulo partía, el gris de las otras tarjetas se quedaba <strong>a 30px de su rótulo</strong> en vez de a los 8 de diseño, y la fila se veía desordenada. Ahora el gris va pegado a su rótulo pase lo que pase, y el hueco se va al fondo de la tarjeta, donde no molesta.</p>
+  <div class="lienzo estrecho160"><div class="widget"><header><h3>Trámites</h3></header><div class="cifras c4x160"><div class="kpi"><span class="cifra">845</span><div class="etq"><span class="rotulo">Totales</span><span class="apoyo">del ejercicio</span></div></div><div class="kpi"><span class="cifra">796</span><div class="etq"><span class="rotulo">En proceso</span><span class="apoyo">94% del total</span></div></div><div class="kpi"><span class="cifra">121</span><div class="etq"><span class="rotulo">Admitidos este mes</span><span class="apoyo">−1 vs. anterior</span></div></div><div class="kpi"><span class="cifra">23</span><div class="etq"><span class="rotulo">Vencidos</span><span class="apoyo">3% del total</span></div></div></div></div></div>
 </section>
 <section class="caso">
-  <div class="cab-caso"><span class="num">06</span><h2>Rótulo largo junto a rótulos cortos</h2><span class="v bien">Así se usa</span></div>
-  <p class="nota">El rótulo que parte en dos líneas hace crecer esa ranura para toda la fila, así que el apoyo de las tres sigue arrancando a la misma altura.</p>
-  <div class="lienzo"><div class="widget"><header><h3>Trámites</h3></header><div class="cifras"><div class="kpi"><span class="cifra">845</span><span class="rotulo">Totales</span><span class="apoyo">del ejercicio</span></div><div class="kpi"><span class="cifra">121</span><span class="rotulo">Reprogramaciones por dependencia</span><span class="apoyo">14% del total</span></div><div class="kpi"><span class="cifra">23</span><span class="rotulo">Vencidos</span><span class="apoyo">3% del total</span></div></div></div></div>
+  <div class="cab-caso"><span class="num">06</span><h2>Apoyo de dos y tres líneas</h2><span class="v bien">Así se usa</span></div>
+  <p class="nota">Ser de una línea es regla de redacción, no de CSS: no se recorta, porque un valor cortado no se puede recuperar. Las tarjetas se igualan en alto y cada gris sigue pegado a su rótulo.</p>
+  <div class="lienzo "><div class="widget"><header><h3>Trámites</h3></header><div class="cifras "><div class="kpi"><span class="cifra">845</span><div class="etq"><span class="rotulo">Totales</span><span class="apoyo">del ejercicio en curso</span></div></div><div class="kpi"><span class="cifra">796</span><div class="etq"><span class="rotulo">En proceso</span><span class="apoyo">sin concluir, entregar ni cancelar, y contando solo los que tienen reloj corriendo</span></div></div><div class="kpi"><span class="cifra">12</span><div class="etq"><span class="rotulo">Admitidos</span><span class="apoyo">+3 vs. anterior</span></div></div></div></div></div>
 </section>
 <section class="caso">
-  <div class="cab-caso"><span class="num">07</span><h2>Números de siete dígitos</h2><span class="v bien">Así se usa</span></div>
+  <div class="cab-caso"><span class="num">07</span><h2>Rótulo y apoyo largos a la vez</h2><span class="v bien">Así se usa</span></div>
+  <p class="nota">El peor caso razonable: el rótulo ocupa dos renglones y el apoyo otros dos. La cifra sigue clavada arriba en las tres y el orden de lectura no cambia.</p>
+  <div class="lienzo estrecho520"><div class="widget"><header><h3>Trámites</h3></header><div class="cifras c3x170"><div class="kpi"><span class="cifra">845</span><div class="etq"><span class="rotulo">Totales</span><span class="apoyo">del ejercicio</span></div></div><div class="kpi"><span class="cifra">121</span><div class="etq"><span class="rotulo">Reprogramaciones por dependencia</span><span class="apoyo">14% del total, medido sobre los que tienen reloj</span></div></div><div class="kpi"><span class="cifra">23</span><div class="etq"><span class="rotulo">Vencidos</span><span class="apoyo">3%</span></div></div></div></div></div>
+</section>
+<section class="caso">
+  <div class="cab-caso"><span class="num">08</span><h2>Una palabra sin espacios más ancha que la caja</h2><span class="v ojo">Ojo</span></div>
+  <p class="nota">Una referencia sin espacios ni guiones no tiene dónde partirse. Sin <code>overflow-wrap:anywhere</code> se sale de la tarjeta: medido, <strong>283px de contenido en 170 de caja</strong>. Con él, se parte donde haga falta. Ojo igualmente: un identificador no es un rótulo, y si aparece uno aquí probablemente el dato esté en el sitio equivocado.</p>
+  <div class="lienzo estrecho520"><div class="widget"><header><h3>Referencias</h3></header><div class="cifras c3x170"><div class="kpi"><span class="cifra">845</span><div class="etq"><span class="rotulo">Totales</span><span class="apoyo">del ejercicio</span></div></div><div class="kpi"><span class="cifra">1</span><div class="etq"><span class="rotulo">EXPEDIENTEVEHICULAR2026000481A</span><span class="apoyo">referencia interna</span></div></div><div class="kpi"><span class="cifra">23</span><div class="etq"><span class="rotulo">Vencidos</span><span class="apoyo">3%</span></div></div></div></div></div>
+</section>
+<section class="caso">
+  <div class="cab-caso"><span class="num">09</span><h2>Números de siete dígitos</h2><span class="v bien">Así se usa</span></div>
   <p class="nota">La cifra va con <code>tabular-nums</code>: todos los dígitos ocupan lo mismo, así que un valor que se actualiza no hace bailar el ancho del número ni empuja al rótulo.</p>
-  <div class="lienzo"><div class="widget"><header><h3>Histórico</h3></header><div class="cifras"><div class="kpi"><span class="cifra">1 284 663</span><span class="rotulo">Registros</span><span class="apoyo">+12% vs. 2025</span></div><div class="kpi"><span class="cifra">  938 401</span><span class="rotulo">Con expediente</span><span class="apoyo">73% del total</span></div><div class="kpi"><span class="cifra">  346 262</span><span class="rotulo">Sin expediente</span><span class="apoyo">27% del total</span></div></div></div></div>
+  <div class="lienzo "><div class="widget"><header><h3>Histórico</h3></header><div class="cifras "><div class="kpi"><span class="cifra">1 284 663</span><div class="etq"><span class="rotulo">Registros</span><span class="apoyo">+12% vs. 2025</span></div></div><div class="kpi"><span class="cifra">938 401</span><div class="etq"><span class="rotulo">Con expediente</span><span class="apoyo">73% del total</span></div></div><div class="kpi"><span class="cifra">346 262</span><div class="etq"><span class="rotulo">Sin expediente</span><span class="apoyo">27% del total</span></div></div></div></div></div>
 </section>
 <section class="caso">
-  <div class="cab-caso"><span class="num">08</span><h2>Seis cifras: la última se queda sola</h2><span class="v mal">Así no</span></div>
+  <div class="cab-caso"><span class="num">10</span><h2>Seis cifras: la última se queda sola</h2><span class="v mal">Así no</span></div>
   <p class="nota">Dibujado a 950px, que es donde falla. A 1440 caben las seis en una fila; por debajo de 1100 se reparten cinco y una, y esa que queda suelta a la izquierda se lee como un error. Éste es el motivo medido del techo de cuatro.</p>
-  <div class="lienzo estrecho"><div class="widget"><header><h3>Trámites</h3></header><div class="cifras"><div class="kpi"><span class="cifra">845</span><span class="rotulo">Totales</span></div><div class="kpi"><span class="cifra">796</span><span class="rotulo">En proceso</span><span class="apoyo">94% del total</span></div><div class="kpi"><span class="cifra">312</span><span class="rotulo">Concluidos</span><span class="apoyo">37%</span></div><div class="kpi"><span class="cifra">121</span><span class="rotulo">En dependencia</span><span class="apoyo">14%</span></div><div class="kpi"><span class="cifra">49</span><span class="rotulo">Por vencer</span><span class="apoyo">6%</span></div><div class="kpi"><span class="cifra">23</span><span class="rotulo">Vencidos</span><span class="apoyo">3%</span></div></div></div></div>
+  <div class="lienzo estrecho"><div class="widget"><header><h3>Trámites</h3></header><div class="cifras "><div class="kpi"><span class="cifra">845</span><div class="etq"><span class="rotulo">Totales</span></div></div><div class="kpi"><span class="cifra">796</span><div class="etq"><span class="rotulo">En proceso</span><span class="apoyo">94% del total</span></div></div><div class="kpi"><span class="cifra">312</span><div class="etq"><span class="rotulo">Concluidos</span><span class="apoyo">37%</span></div></div><div class="kpi"><span class="cifra">121</span><div class="etq"><span class="rotulo">En dependencia</span><span class="apoyo">14%</span></div></div><div class="kpi"><span class="cifra">49</span><div class="etq"><span class="rotulo">Por vencer</span><span class="apoyo">6%</span></div></div><div class="kpi"><span class="cifra">23</span><div class="etq"><span class="rotulo">Vencidos</span><span class="apoyo">3%</span></div></div></div></div></div>
 </section>
 <section class="caso">
-  <div class="cab-caso"><span class="num">09</span><h2>Las mismas seis, resueltas como se debe</h2><span class="v bien">Así se usa</span></div>
+  <div class="cab-caso"><span class="num">11</span><h2>Las mismas seis, resueltas como se debe</h2><span class="v bien">Así se usa</span></div>
   <p class="nota">Si reparten un mismo total, no son seis cajas: son una barra apilada con su leyenda, que además enseña la proporción, que es lo que se está preguntando.</p>
-  <div class="lienzo"><div class="widget"><header><h3>Trámites</h3></header><div class="cifras"><div class="kpi"><span class="cifra">845</span><span class="rotulo">Totales</span></div><div class="kpi"><span class="cifra">49</span><span class="rotulo">Por vencer</span><span class="apoyo">6% del total</span></div><div class="kpi"><span class="cifra">23</span><span class="rotulo">Vencidos</span><span class="apoyo">3% del total</span></div></div><div class="barra" role="img" aria-label="312 concluidos, 121 en dependencia, 49 por vencer, 23 vencidos, de 845">
-   <span style="width:36.9%;background:var(--ok)"></span><span style="width:14.3%;background:var(--serie-1)"></span>
-   <span style="width:5.8%;background:var(--warn)"></span><span style="width:2.7%;background:var(--err)"></span>
-   <span style="width:40.3%;background:var(--pause)"></span></div>
-   <div class="leyenda"><span><i class="mu" style="background:var(--ok)"></i>Concluidos <b>312</b></span>
-   <span><i class="mu" style="background:var(--serie-1)"></i>En dependencia <b>121</b></span>
-   <span><i class="mu" style="background:var(--warn)"></i>Por vencer <b>49</b></span>
-   <span><i class="mu" style="background:var(--err)"></i>Vencidos <b>23</b></span>
-   <span><i class="mu" style="background:var(--pause)"></i>Resto <b>340</b></span></div></div></div>
+  <div class="lienzo "><div class="widget"><header><h3>Trámites</h3></header><div class="cifras "><div class="kpi"><span class="cifra">845</span><div class="etq"><span class="rotulo">Totales</span></div></div><div class="kpi"><span class="cifra">49</span><div class="etq"><span class="rotulo">Por vencer</span><span class="apoyo">6% del total</span></div></div><div class="kpi"><span class="cifra">23</span><div class="etq"><span class="rotulo">Vencidos</span><span class="apoyo">3% del total</span></div></div></div><div class="barra" role="img" aria-label="312 concluidos, 121 en dependencia, 49 por vencer, 23 vencidos, de 845">
+  <span style="width:36.9%;background:var(--ok)"></span><span style="width:14.3%;background:var(--serie-1)"></span>
+  <span style="width:5.8%;background:var(--warn)"></span><span style="width:2.7%;background:var(--err)"></span>
+  <span style="width:40.3%;background:var(--pause)"></span></div>
+  <div class="leyenda"><span><i class="mu" style="background:var(--ok)"></i>Concluidos <b>312</b></span>
+  <span><i class="mu" style="background:var(--serie-1)"></i>En dependencia <b>121</b></span>
+  <span><i class="mu" style="background:var(--warn)"></i>Por vencer <b>49</b></span>
+  <span><i class="mu" style="background:var(--err)"></i>Vencidos <b>23</b></span>
+  <span><i class="mu" style="background:var(--pause)"></i>Resto <b>340</b></span></div></div></div>
 </section>
 <section class="caso">
-  <div class="cab-caso"><span class="num">10</span><h2>Una sola cifra</h2><span class="v mal">Así no</span></div>
-  <p class="nota">auto-fit colapsa las columnas vacías, así que una cifra suelta se estira a todo el widget. Medido, 1006px de caja para un número. Una cifra sola es .kpi con el rótulo en la cabecera.</p>
-  <div class="lienzo"><div class="widget"><header><h3>Trámites totales</h3></header><div class="cifras"><div class="kpi"><span class="cifra">845</span><span class="rotulo">Totales</span><span class="apoyo">del ejercicio en curso</span></div></div></div></div>
+  <div class="cab-caso"><span class="num">12</span><h2>Una sola cifra</h2><span class="v mal">Así no</span></div>
+  <p class="nota"><code>auto-fit</code> colapsa las columnas vacías, así que una cifra suelta se estira a todo el widget. Medido, 1006px de caja para un número. Una cifra sola es <code>.kpi</code> con el rótulo en la cabecera.</p>
+  <div class="lienzo "><div class="widget"><header><h3>Trámites totales</h3></header><div class="cifras "><div class="kpi"><span class="cifra">845</span><div class="etq"><span class="rotulo">Totales</span><span class="apoyo">del ejercicio en curso</span></div></div></div></div></div>
 </section>
 <section class="caso">
-  <div class="cab-caso"><span class="num">11</span><h2>Lo que había en QA, reproducido</h2><span class="v ref">Referencia</span></div>
+  <div class="cab-caso"><span class="num">13</span><h2>Lo que había en QA, reproducido</h2><span class="v ref">Referencia</span></div>
   <p class="nota">Reducido al 79% para que quepan las siete; las alturas relativas no cambian. Altura fija de 97px, interior anclado abajo y la cifra a 20px en vez de a los 30 del token. El rótulo cae a tres alturas distintas. Es el defecto que originó todo esto.</p>
-  <div class="lienzo"><div class="widget"><header><h3>De un vistazo</h3></header><div class="cifras roto"><div class="kpi"><span class="cifra">0</span><span class="rotulo">Órdenes totales</span></div><div class="kpi"><span class="cifra">0</span><span class="rotulo">Instaladas</span><span class="apoyo">sin órdenes todavía</span></div><div class="kpi"><span class="cifra">0</span><span class="rotulo">Pendientes</span><span class="apoyo">nueva, pendiente, programada o en visita</span></div><div class="kpi"><span class="cifra">0</span><span class="rotulo">Canceladas</span></div><div class="kpi"><span class="cifra">845</span><span class="rotulo">Trámites totales</span></div><div class="kpi"><span class="cifra">796</span><span class="rotulo">En proceso</span><span class="apoyo">sin concluir, entregar ni cancelar</span></div><div class="kpi"><span class="cifra">0</span><span class="rotulo">Admitidos este mes</span><span class="apoyo">−1 frente a los 1 del mes anterior</span></div></div></div></div>
+  <div class="lienzo "><div class="widget"><header><h3>De un vistazo</h3></header><div class="cifras roto"><div class="kpi"><span class="cifra">0</span><div class="etq"><span class="rotulo">Órdenes totales</span></div></div><div class="kpi"><span class="cifra">0</span><div class="etq"><span class="rotulo">Instaladas</span><span class="apoyo">sin órdenes todavía</span></div></div><div class="kpi"><span class="cifra">0</span><div class="etq"><span class="rotulo">Pendientes</span><span class="apoyo">nueva, pendiente, programada o en visita</span></div></div><div class="kpi"><span class="cifra">0</span><div class="etq"><span class="rotulo">Canceladas</span></div></div><div class="kpi"><span class="cifra">845</span><div class="etq"><span class="rotulo">Trámites totales</span></div></div><div class="kpi"><span class="cifra">796</span><div class="etq"><span class="rotulo">En proceso</span><span class="apoyo">sin concluir, entregar ni cancelar</span></div></div><div class="kpi"><span class="cifra">0</span><div class="etq"><span class="rotulo">Admitidos este mes</span><span class="apoyo">−1 frente a los 1 del mes anterior</span></div></div></div></div></div>
 </section>
 </main>
 <footer class="g"><div class="wrap">Andamiaje · SIO-DPROMA 2.4.0 · se retira antes del merge</div></footer>

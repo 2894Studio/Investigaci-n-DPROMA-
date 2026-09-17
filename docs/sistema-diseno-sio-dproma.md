@@ -1879,21 +1879,35 @@ pantalla:
 Cada tarjeta se alinea consigo misma y ninguna con la de al lado, que es justo lo que se lee al
 mirar una fila.
 
-**Las tres ranuras.** Una cifra compacta tiene cifra, rótulo y apoyo. La tercera es la que nació
-sin reglas, y es la que descuadra la fila. Van como **filas de una misma rejilla compartida por
-toda la fila**, no como tres elementos sueltos dentro de cada caja:
+**Dos ranuras, y el apoyo no es una de ellas.** Una cifra compacta tiene cifra, rótulo y apoyo,
+pero solo las dos primeras son filas de la rejilla: el apoyo va dentro del bloque `.etq`, pegado a
+su rótulo. Las dos ranuras se comparten con **toda la fila**, así que el rótulo cae a la misma
+altura en todas las tarjetas y todas miden lo mismo:
 
 ```css
 .cifras{ display:grid; gap:var(--sp-3); align-items:start;
   grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  grid-template-rows:auto auto auto }
-.cifras > .kpi{ grid-row:span 3; display:grid; grid-template-rows:subgrid; gap:var(--sp-1);
+  grid-template-rows:auto auto }
+.cifras > .kpi{ grid-row:span 2; display:grid; grid-template-rows:subgrid; gap:var(--sp-1);
   background:var(--surface-2); border-radius:var(--r-card); padding:var(--sp-4) }
-.cifras .rotulo{ font-size:var(--fs-base); font-weight:500 }
+.cifras .etq{ display:flex; flex-direction:column; gap:var(--sp-1);
+  overflow-wrap:anywhere }
+.cifras .rotulo{ font-size:var(--fs-base); font-weight:500; color:var(--text) }
 .cifras .apoyo{ font-size:var(--fs-meta); color:var(--text-3) }
 @supports not (grid-template-rows:subgrid){
   .cifras > .kpi{ grid-row:auto; grid-template-rows:none }
 }
+
+```
+
+```html
+<div class="cifras">
+  <div class="kpi">
+    <span class="cifra tnum">796</span>
+    <div class="etq"><span class="rotulo">En proceso</span><span class="apoyo">94% del total</span></div>
+  </div>
+  …
+</div>
 ```
 
 `subgrid` es lo que hace el trabajo: el rótulo cae a la misma altura tenga o no tenga apoyo, y una
@@ -1919,6 +1933,11 @@ definición de la medida, y esa va a la nota de método (`.nota-reloj`, §12.6) 
 
 El presupuesto está medido: a la tarjeta mínima de 150px le quedan **118px de texto**, que a 12px
 son **unos 18 caracteres**. «94% del total» ocupa 81. «−1 vs. mes anterior» ocupa 120 y ya no cabe.
+
+**Una referencia pegada no rompe la caja.** El rótulo lleva `overflow-wrap:anywhere`, porque
+puede llegar un identificador sin espacios ni guiones donde el navegador no tiene dónde partir.
+Medido sin esa línea: 283px de contenido en una tarjeta de 170. Los guiones sí son punto de corte,
+así que `EXPEDIENTE-VEHICULAR-2026-000481` se reparte solo; `EXPEDIENTEVEHICULAR2026000481`, no.
 
 **Y no se recorta con elipsis.** La primera versión de esta regla la imponía con
 `white-space:nowrap` y `text-overflow:ellipsis`, y el QA la tumbó: al ancho mínimo que el propio
