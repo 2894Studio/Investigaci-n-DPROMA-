@@ -7,8 +7,8 @@ traduce en una web narrativa de resultados.
 **Estado actual:** 10 entrevistas procesadas y anonimizadas, verificadas contra sus transcripciones
 originales · 95 puntos de fricción documentados · 76 oportunidades priorizadas. Ver la web de
 hallazgos: se publica como Artifact al pedirlo en esta
-sesión de Claude Code, o directamente abriendo `web/index.html` en el navegador (no requiere
-servidor ni build).
+sesión de Claude Code, o directamente abriendo `web/investigacion-dproma.html` en el navegador
+(no requiere servidor ni build).
 
 ## Por qué "biblia de datos"
 
@@ -22,30 +22,45 @@ research de DPROMA, en vez de un conjunto de notas de reunión dispersas.
 ```
 .
 ├── README.md                          ← este archivo
+├── CLAUDE.md                          ← reglas del proyecto: sistemas de diseño, innegociables, routing
 ├── 01-ESPECIFICACION-TECNICA.md       ← arquitectura completa del sistema, léela primero
 ├── .claude/
-│   ├── agents/                        ← 6 subagentes especializados (1 lente de análisis c/u)
+│   ├── agents/                        ← 7 subagentes especializados (1 lente de análisis c/u)
 │   │   ├── flow-extractor.md          ← reconstruye flujos "tal como son hoy"
 │   │   ├── pain-point-detector.md     ← clasifica fricciones en las 6 categorías del brief
 │   │   ├── tool-inventory-analyst.md  ← cataloga herramientas (manual/digital/IA)
 │   │   ├── ai-adoption-analyst.md     ← uso, barreras y actitud frente a IA
 │   │   ├── opportunity-mapper.md      ← oportunidades ancladas a dolor + objetivo de negocio
-│   │   └── narrative-synthesizer.md   ← viñetas humanas + verificación de anonimización
+│   │   ├── narrative-synthesizer.md   ← viñetas humanas + verificación de anonimización
+│   │   └── ux-researcher.md           ← investigación de usuario de propósito general
 │   ├── skills/
-│   │   ├── dproma-interview-analyzer/SKILL.md   ← orquesta el pipeline de análisis completo
-│   │   └── dproma-web-narrative/SKILL.md        ← reconstruye la web a partir del dataset
+│   │   ├── dproma-interview-analyzer/ ← orquesta el pipeline de análisis completo
+│   │   ├── dproma-web-narrative/      ← reconstruye la web a partir del dataset
+│   │   ├── sio-dproma-design-sync/    ← sincroniza las tres piezas del sistema de diseño
+│   │   ├── dproma-design-review/      ← ciclo de calidad de una entrega visual (3 fases)
+│   │   └── dproma-texto-humano/       ← humanización de textos con la rúbrica del proyecto
 │   └── commands/
-│       └── analizar-entrevista.md     ← /analizar-entrevista <archivo>
+│       ├── analizar-entrevista.md     ← /analizar-entrevista <archivo>
+│       └── estado-skills.md           ← /estado-skills — qué hay disponible en esta sesión
 ├── schema/
 │   ├── interview-insight.schema.json  ← contrato de datos único (JSON Schema 2020-12)
 │   └── example-output.json            ← referencia de "output correcto" para calibrar agentes
+├── docs/
+│   ├── sistema-diseno-sio-dproma.md   ← sistema de diseño del producto (fuente técnica)
+│   ├── criterios-de-animacion.md      ← contrato de movimiento y accesibilidad
+│   ├── skills-externas-routing.md     ← las 7 skills externas: routing, vetos y fallbacks
+│   └── brand/az-branding-guide.md     ← guía de marca AZ / 2894 (entregables narrativos)
 ├── data/
 │   ├── brief-context.md               ← fuente única de las 6 categorías y 6 objetivos del brief
 │   ├── raw/                           ← transcripciones nuevas por procesar (vacío por defecto)
 │   ├── insights/                      ← un JSON por entrevista ya procesada (10 hoy)
 │   └── aggregate.json                 ← dataset acumulado — la biblia de datos completa
 └── web/
-    └── index.html                     ← web narrativa, standalone, dataset embebido
+    ├── investigacion-dproma.html      ← web narrativa de hallazgos, standalone
+    ├── plan-transformacion.html       ← plan de transformación
+    ├── roadmap.html                   ← roadmap interactivo (Supabase opcional)
+    ├── entregables.html               ← índice de entregables y propuestas
+    └── areas/                         ← una página por área de la operación
 ```
 
 ## Cómo se ve esto por fuera (compartir por link)
@@ -55,9 +70,10 @@ research de DPROMA, en vez de un conjunto de notas de reunión dispersas.
   compartir desde el menú de share del artifact.
 - **Vía GitHub Pages (permanente, con el dominio del repo):** en GitHub, ve a
   *Settings → Pages → Deploy from a branch*, elige la rama de este proyecto y la carpeta `/web` (o
-  `/root` sirviendo `web/index.html` como `index.html`). Una vez activado, GitHub publica la web en
+  `/root` sirviendo la web desde ahí). Una vez activado, GitHub publica el sitio en
   `https://2894studio.github.io/Investigaci-n-DPROMA-/`.
-- **Local:** abre `web/index.html` directamente en cualquier navegador — no necesita servidor.
+- **Local:** abre `web/investigacion-dproma.html` directamente en cualquier navegador — no
+  necesita servidor.
 
 ## Cómo se usa (flujo de trabajo)
 
@@ -69,6 +85,20 @@ research de DPROMA, en vez de un conjunto de notas de reunión dispersas.
    actualiza `data/aggregate.json`.
 4. Cuando quieras reflejar las entrevistas nuevas en la web: pide "reconstruye la web de hallazgos
    DPROMA" — se activa la skill `dproma-web-narrative`.
+
+## Sistema de skills
+
+Además de las skills propias, el proyecto usa siete skills externas para lo que no cubre el aparato
+interno: explorar patrones antes de diseñar, auditar una entrega con mirada de fuera, humanizar
+textos, dibujar esquemas, montar presentaciones y analizar el propio repositorio.
+
+Están instaladas globalmente, no vendorizadas aquí. `/estado-skills` dice cuáles hay disponibles en
+la sesión actual; una sesión web normalmente no tiene ninguna, y el sistema está diseñado para
+seguir funcionando en ese caso.
+
+Ninguna es autoridad sobre lo que ya está decidido y medido en el sistema de diseño: se les propone
+un papel por fase y tienen vetos explícitos. El routing completo, los comandos de instalación y los
+fallbacks están en `docs/skills-externas-routing.md`; el resumen operativo, en `CLAUDE.md`.
 
 ## Principios que se respetan siempre
 

@@ -1,6 +1,6 @@
 ---
 name: dproma-web-narrative
-description: Reconstruye la web interactiva de resultados de investigación (web/index.html) a partir de data/aggregate.json. Sabe el sistema de diseño narrativo y las reglas de anonimización de contenido publicable. Úsalo cuando el usuario pida "reconstruir la web", "actualizar el sitio de hallazgos", o después de procesar nuevas entrevistas si el usuario quiere verlas reflejadas.
+description: Reconstruye la web interactiva de resultados de investigación (web/investigacion-dproma.html) a partir de data/aggregate.json. Sabe el sistema de diseño narrativo y las reglas de anonimización de contenido publicable. Úsalo cuando el usuario pida "reconstruir la web", "actualizar el sitio de hallazgos", o después de procesar nuevas entrevistas si el usuario quiere verlas reflejadas.
 ---
 
 # Web narrativa de hallazgos DPROMA
@@ -42,6 +42,6 @@ Esta no es una skill de "generar un dashboard". Es una skill de **traducir evide
 - El copy debe sonar como alguien explicándoselo a un colega, no como un informe de consultoría — frases cortas, sin "leverage", sin "sinergia".
 
 ## Entregable técnico
-- Archivo único `web/index.html` (CSS y JS inline, sin build step) para que sea trivial de compartir o subir a cualquier hosting estático.
+- Archivo único `web/investigacion-dproma.html` (CSS y JS inline, sin build step) para que sea trivial de compartir o subir a cualquier hosting estático.
 - Todo el dataset anonimizado se embebe como un objeto JS al final del `<body>` (`const DATA = {...}`) para que la página funcione standalone sin fetch a un backend.
 - Debe verse bien en mobile (el brief no lo pide explícitamente pero un stakeholder lo va a abrir desde el celular en algún momento).

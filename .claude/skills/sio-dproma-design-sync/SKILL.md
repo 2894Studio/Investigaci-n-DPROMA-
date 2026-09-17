@@ -62,3 +62,19 @@ documentación de componentes viven embebidos en `design-rules.md` / `reglas-de-
   `web/entregables/design-rules.md` y `web/entregables/reglas-de-diseno.html` — sin divergencias.
 - El resumen final al usuario dice qué se tocó en cada uno de los tres archivos, y explícitamente
   si alguno se dejó sin cambios y por qué.
+
+## Propiedad exclusiva de las tres piezas
+
+`docs/sistema-diseno-sio-dproma.md`, `web/entregables/design-rules.md` y
+`web/entregables/reglas-de-diseno.html` solo se modifican desde aquí. Ninguna otra skill —y en
+particular ninguna de las externas documentadas en `docs/skills-externas-routing.md`— escribe en
+ellas.
+
+Esto vale también para una recomendación acertada. Si una auditoría externa señala algo real —un
+contraste que no cumple, un token que se usa sin estar declarado, una regla que se contradice con
+otra—, **entra por aquí**: con su fila de historial, su subida de versión y las tres piezas
+sincronizadas a la vez. No se aplica en caliente sobre el archivo donde se detectó.
+
+El motivo es que la desincronización de estos tres documentos no da ningún síntoma visible. Una
+corrección aplicada solo en la copia descargable se descubre semanas después, cuando alguien
+construye una pantalla leyendo la fuente técnica y obtiene otro valor.

@@ -47,10 +47,10 @@ Principio rector: *la evidencia manda, la narrativa comunica*. Ningún hallazgo 
                          data/aggregate.json                  (dataset acumulado, todas las entrevistas)
                                           │
                                           ▼
-                         ┌─────────────────────────────┐
-                         │  skill: dproma-web-narrative  │  (se invoca manualmente o al acumular N entrevistas)
-                         │  reconstruye web/index.html   │
-                         └─────────────────────────────┘
+                         ┌────────────────────────────────┐
+                         │  skill: dproma-web-narrative   │  (se invoca manualmente o al acumular N entrevistas)
+                         │  reconstruye la web narrativa  │
+                         └────────────────────────────────┘
 ```
 
 ### Por qué subagentes y no un solo prompt largo
@@ -88,7 +88,7 @@ Ver `.claude/agents/`:
 Dos skills, con responsabilidades distintas a los agentes: los agentes **analizan una entrevista**; las skills **orquestan el proceso repetible** y **saben las reglas de negocio/estilo** que no cambian entrevista a entrevista.
 
 - `dproma-interview-analyzer/SKILL.md` — orquesta el pipeline completo (lanzar los 6 subagentes en el orden correcto, validar contra el JSON Schema, escribir a `data/`). Se activa con: "analiza esta entrevista de Dproma", "procesa este guion", o al detectar un archivo de entrevista nuevo en `data/raw/`.
-- `dproma-web-narrative/SKILL.md` — sabe el sistema de diseño (tono, tipografía, principios narrativos) y las reglas de anonimización para reconstruir `web/index.html` a partir de `data/aggregate.json`.
+- `dproma-web-narrative/SKILL.md` — sabe el sistema de diseño (tono, tipografía, principios narrativos) y las reglas de anonimización para reconstruir `web/investigacion-dproma.html` a partir de `data/aggregate.json`.
 
 ### 3.3 Slash command (`.claude/commands/analizar-entrevista.md`)
 
@@ -112,7 +112,7 @@ Contrato único que los 6 subagentes deben respetar. Ver sección 5.
    e. Lanza `opportunity-mapper` con: `pain_points` ya extraídos + los 6 objetivos específicos del brief.
    f. Lanza `narrative-synthesizer` con los 5 JSON completos; su output incluye las viñetas humanas y el veredicto de anonimización.
    g. Escribe `data/insights/<entrevista_id>.json` (registro completo) y actualiza `data/aggregate.json` (append).
-4. **Usuario, en otro momento:** "reconstruye la web con las últimas entrevistas" → se activa `dproma-web-narrative`, que lee `data/aggregate.json` y regenera `web/index.html`.
+4. **Usuario, en otro momento:** "reconstruye la web con las últimas entrevistas" → se activa `dproma-web-narrative`, que lee `data/aggregate.json` y regenera `web/investigacion-dproma.html`.
 
 ### Puntos de control humano (no es un pipeline 100% automático)
 
