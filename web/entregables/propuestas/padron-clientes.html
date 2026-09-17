@@ -287,9 +287,12 @@ main[id="contenido"]::after{content:"";display:block;flex-shrink:0;height:var(--
   box-shadow:var(--sh-float),0 0 0 1px var(--marca-halo);z-index:20}
 .fab .ring{position:absolute;inset:-4px;border-radius:50%;border:1.5px dashed var(--marca-halo-suave);
   opacity:0;transition:opacity var(--dur-base) var(--ease-out)}
-.fab:hover .ring,.fab:focus-visible .ring{opacity:1;animation:spin 4.5s linear infinite}
-/* 4,5s, por debajo de los 5s de WCAG 2.2.2: el anillo no necesita control de pausa.
-   Solo corre mientras el puntero o el foco están encima, y es decorativo. */
+/* WCAG 2.2.2 pide poder parar el movimiento que ARRANCA SOLO y dura más de cinco
+   segundos. Este no arranca solo: existe únicamente mientras el puntero o el foco
+   están encima, y se detiene al salir, así que el criterio no aplica y no necesita
+   control de pausa. El periodo largo es deliberado: §5 pide ciclos lentos antes que
+   rápidos y llamativos. */
+.fab:hover .ring,.fab:focus-visible .ring{opacity:1;animation:spin 14s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.fab:hover .ring,.fab:focus-visible .ring{animation:none}}
 
@@ -381,7 +384,7 @@ thead th{text-align:left;color:var(--text-2);font-size:var(--fs-meta);font-weigh
 tbody th,td{padding:var(--sp-2) var(--sp-4);height:var(--row-comfy);border-bottom:1px solid var(--border);
   vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 tbody th{text-align:left;font-weight:400}
-td:has(> input[type="checkbox"]:only-child),td.control{overflow:visible;text-overflow:clip}
+td:has(> input[type="checkbox"]:only-child),td:has(.menu-cont),td.control{overflow:visible;text-overflow:clip}
 thead th button{display:inline-flex;align-items:center;gap:5px;min-height:24px;border:0;background:transparent;color:inherit;
   font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;padding:3px 5px;margin:-3px -5px;
   border-radius:var(--r-ctrl);white-space:nowrap}
@@ -528,7 +531,7 @@ tbody th:first-child::after,thead th:first-child::after{content:"";position:abso
 /* ARQ-FILTROS ─ El resumen y los filtros llegaron en la misma fila y con la
    misma forma de pastilla: no se distinguía qué era lectura y qué control.
    Son dos zonas (doc §6.12). */
-.resumen{display:flex;gap:var(--sp-6);padding:var(--sp-3) var(--sp-6) var(--sp-2);
+section.resumen{display:flex;gap:var(--sp-6);padding:var(--sp-3) var(--sp-6) var(--sp-2);
   align-items:flex-end;flex-wrap:wrap}
 .grupo-est{display:flex;flex-direction:column;gap:5px}
 .grupo-est .et-est{font-size:var(--fs-meta);font-weight:700;letter-spacing:.06em;
@@ -1233,7 +1236,11 @@ document.getElementById('desactivar').addEventListener('click',function(e){
   var n=nombresSeleccionados(); if(n.length)pideConfirmacion(n,e.currentTarget);
 });
 document.querySelectorAll('[data-desactivar]').forEach(function(b){
-  b.addEventListener('click',function(){cierra(false);pideConfirmacion([b.dataset.desactivar],b);});
+  b.addEventListener('click',function(){
+    var origen=abierta&&abierta.bt;
+    cierra(false);
+    pideConfirmacion([b.dataset.desactivar],origen||b);
+  });
 });
 document.getElementById('dlg-no').addEventListener('click',function(){dlg.close();});
 document.getElementById('dlg-si').addEventListener('click',function(){
@@ -1311,10 +1318,22 @@ function menu(abierto){
   mb.setAttribute('aria-expanded',String(abierto));
   mb.setAttribute('aria-label',abierto?'Cerrar el menú':'Abrir el menú');
   if(velo)velo.tabIndex=abierto?0:-1;
+  sincronizaInerte(abierto);
 }
+var lateral=document.querySelector('.side'),estrecho=window.matchMedia('(max-width:860px)');
+function sincronizaInerte(abierto){
+  if(!lateral)return;
+  if(estrecho.matches&&!abierto)lateral.setAttribute('inert','');
+  else lateral.removeAttribute('inert');
+}
+sincronizaInerte(raiz.getAttribute('data-menu')==='abierto');
+estrecho.addEventListener('change',function(){sincronizaInerte(raiz.getAttribute('data-menu')==='abierto');});
 if(mb)mb.addEventListener('click',function(){menu(raiz.getAttribute('data-menu')!=='abierto');});
-if(velo)velo.addEventListener('click',function(){menu(false);});
-document.addEventListener('keydown',function(e){if(e.key==='Escape')menu(false);});
+if(velo)velo.addEventListener('click',function(){menu(false);if(mb)mb.focus();});
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Escape'||raiz.getAttribute('data-menu')!=='abierto')return;
+  menu(false);if(mb)mb.focus();
+});
 })();
 </script>
 </body>
