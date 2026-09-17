@@ -107,33 +107,47 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:var(--fs-
 .demo .lienzo{padding:var(--sp-5);background:var(--bg);overflow-x:auto}
 /* La fila rota se dibuja a su ancho real de QA —175px por tarjeta— para no inventar
    saltos de línea que allí no ocurren. Si no cabe, se desplaza. */
-.demo .lienzo .kpis.roto{min-width:1300px}
+.demo .lienzo .cifras.roto{min-width:1300px}
 .demo > p{margin:0;padding:var(--sp-4) var(--sp-5);font-size:var(--fs-dense);color:var(--text-2);
   border-top:1px solid var(--border)}
 .demo > p strong{color:var(--text)}
 .demo.queda{border-color:var(--accent);box-shadow:var(--sh-rest)}
 .demo.queda > h3{color:var(--accent);background:var(--accent-soft)}
 
-/* El componente propuesto para §12.4. Las tres ranuras son filas de la MISMA rejilla
-   para todas las tarjetas de la fila: por eso los rótulos caen a la misma altura. */
-.kpis{display:grid;gap:var(--sp-3);grid-template-rows:auto auto auto;align-items:start}
-.kpi{grid-row:span 3;display:grid;grid-template-rows:subgrid;gap:var(--sp-1);
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
-  padding:var(--sp-4) var(--sp-4) var(--sp-5)}
-.kpi .cifra{font-size:var(--fs-kpi);font-weight:700;line-height:1.1;letter-spacing:-.02em}
-.kpi .rotulo{font-size:var(--fs-base);font-weight:500;color:var(--text);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kpi .apoyo{font-size:var(--fs-meta);color:var(--text-3);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* El componente, copiado literal de la página del sistema. No se reescribe: §10 lo
+   avisa —una regla del sistema rehecha a mano es una regla distinta con el mismo nombre. */
+/* KPI. La cifra es el dato; la variación es contexto y va debajo, no al lado. */
+.kpi{ display:flex; flex-direction:column; gap:var(--sp-1) }
+.kpi .cifra{ font:800 var(--fs-kpi)/1 var(--font-ui); font-variant-numeric:tabular-nums; letter-spacing:-.02em }
+.kpi .unidad{ font-size:var(--fs-dense); font-weight:600; color:var(--text-2); margin-left:6px }
+.kpi .var{ display:inline-flex; align-items:center; gap:4px; font-size:var(--fs-meta); font-weight:700;
+  font-variant-numeric:tabular-nums }
+.kpi .var.sube{ color:var(--ok-ink) }
+.kpi .var.baja{ color:var(--err-ink) }
+.kpi .var.plano{ color:var(--text-3) }
+.kpi .var .ctx{ font-weight:400; color:var(--text-3) }
+
+/* Fila de cifras. Varias cifras compactas en UN solo widget, cuando ninguna merece widget
+   propio. Aquí cada cifra lleva su rótulo dentro, porque no tiene cabecera que se lo ponga.
+   Las tres ranuras son filas de la MISMA rejilla para toda la fila: por eso el rótulo cae a
+   la misma altura tenga o no tenga apoyo. Igualar la altura de las cajas no basta.
+   Sin borde: dentro de un widget una cifra es un relleno, no una tarjeta anidada (§6.3). */
+.cifras{ display:grid; gap:var(--sp-3); align-items:start;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  grid-template-rows:auto auto auto }
+.cifras > .kpi{ grid-row:span 3; display:grid; grid-template-rows:subgrid; gap:var(--sp-1);
+  background:var(--surface-2); border-radius:var(--r-card); padding:var(--sp-4) }
+.cifras .rotulo{ font-size:var(--fs-base); font-weight:500; color:var(--text) }
+.cifras .apoyo{ font-size:var(--fs-meta); color:var(--text-3);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
 @supports not (grid-template-rows:subgrid){
-  .kpi{grid-row:auto;grid-template-rows:none}
+  .cifras > .kpi{ grid-row:auto; grid-template-rows:none }
 }
+
 .grupo{margin:0 0 var(--sp-5)}
 .grupo:last-child{margin-bottom:0}
 .grupo > h4{margin:0 0 var(--sp-3);font-size:var(--fs-sub);font-weight:600;display:flex;
   align-items:baseline;gap:var(--sp-3);flex-wrap:wrap}
-.c3{grid-template-columns:repeat(3,1fr)}
-.c4{grid-template-columns:repeat(4,1fr)}
 .nota-metodo{margin:var(--sp-3) 0 0;font-size:var(--fs-meta);color:var(--text-3);max-width:70ch}
 .vacio{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
   padding:var(--sp-5);display:flex;flex-direction:column;gap:var(--sp-3);align-items:flex-start}
@@ -145,13 +159,13 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:var(--fs-
 /* Reproducción del defecto, con las medidas tomadas de la captura: altura fija de 97px,
    interior anclado abajo y la cifra a 20px en vez de los 30 del token. El rótulo flota
    según cuántas líneas traiga el apoyo. Es el mecanismo, no una caricatura. */
-.kpis.roto{grid-template-rows:none;grid-template-columns:repeat(7,1fr);gap:12px}
-.kpis.roto .kpi{grid-row:auto;display:flex;flex-direction:column;justify-content:space-between;
+.cifras.roto{grid-template-rows:none;grid-template-columns:repeat(7,1fr);gap:12px}
+.cifras.roto .kpi{grid-row:auto;display:flex;flex-direction:column;justify-content:space-between;
   height:97px;overflow:hidden;padding:14px var(--sp-4);background:var(--surface-2)}
-.kpis.roto .cifra{font-size:var(--fs-title);line-height:1}
-.kpis.roto .rotulo{font-weight:400;color:var(--text-2);line-height:1.15;
+.cifras.roto .cifra{font-size:var(--fs-title);line-height:1}
+.cifras.roto .rotulo{font-weight:400;color:var(--text-2);line-height:1.15;
   white-space:normal;overflow:visible}
-.kpis.roto .apoyo{line-height:1.35;white-space:normal;overflow:visible}
+.cifras.roto .apoyo{line-height:1.35;white-space:normal;overflow:visible}
 figure.ev{margin:0}
 figure.ev img{display:block;width:100%;height:auto;border:1px solid var(--border);
   border-radius:var(--r-ctrl)}
@@ -271,7 +285,7 @@ Admitidos este mes  425</div>
     <div class="demo">
       <h3>Lo que hay — reproducido con los tokens reales</h3>
       <div class="lienzo">
-        <div class="kpis roto">
+        <div class="cifras roto">
           <div class="kpi"><span class="cifra">0</span><span class="rotulo">Órdenes totales</span></div>
           <div class="kpi"><span class="cifra">0</span><span class="rotulo">Instaladas</span><span class="apoyo">sin órdenes todavía</span></div>
           <div class="kpi"><span class="cifra">0</span><span class="rotulo">Pendientes</span><span class="apoyo">nueva, pendiente, programada o en visita</span></div>
@@ -290,7 +304,7 @@ Admitidos este mes  425</div>
       <div class="lienzo">
         <div class="grupo">
           <h4>Trámites <span class="ambito"><span class="msi" aria-hidden="true" translate="no">layers</span>de toda la organización</span></h4>
-          <div class="kpis c3">
+          <div class="cifras">
             <div class="kpi"><span class="cifra">845</span><span class="rotulo">Totales</span></div>
             <div class="kpi"><span class="cifra">796</span><span class="rotulo">En proceso</span><span class="apoyo">94% del total</span></div>
             <div class="kpi"><span class="cifra">0</span><span class="rotulo">Admitidos este mes</span><span class="apoyo">−1 vs. mes anterior</span></div>
@@ -309,6 +323,72 @@ Admitidos este mes  425</div>
         </div>
       </div>
       <p>Tres cambios, y ninguno es cosmético.</p>
+    </div>
+
+    <div class="demo">
+      <h3>El caso de referencia, entero</h3>
+      <div class="lienzo">
+        <figure class="ev">
+          <img src="/entregables/img/sio-qa/detalle-vistazo-banda.jpg" alt="La banda «De un vistazo» del tablero de QA completa: la pastilla ámbar de ámbito, las siete tarjetas de métrica y la nota de método debajo.">
+          <figcaption>La banda «De un vistazo» tal como está hoy en QA.</figcaption>
+        </figure>
+      </div>
+      <p>Siete cifras en fila. <strong>Cinco marcan cero</strong>, y las cuatro primeras son de una
+        familia distinta que las tres últimas.</p>
+    </div>
+
+    <div class="demo queda">
+      <h3>Rehecho, con los datos que hay hoy</h3>
+      <div class="lienzo">
+        <div class="grupo">
+          <h4>Trámites <span class="ambito"><span class="msi" aria-hidden="true" translate="no">layers</span>de toda la organización</span></h4>
+          <div class="cifras">
+            <div class="kpi"><span class="cifra">845</span><span class="rotulo">Totales</span></div>
+            <div class="kpi"><span class="cifra">796</span><span class="rotulo">En proceso</span><span class="apoyo">94% del total</span></div>
+            <div class="kpi"><span class="cifra">0</span><span class="rotulo">Admitidos este mes</span><span class="apoyo">−1 vs. mes anterior</span></div>
+          </div>
+          <p class="nota-metodo">En proceso son los que no están concluidos, entregados ni
+            cancelados. Los admitidos se cuentan por fecha de admisión, contra un mes anterior
+            completo.</p>
+        </div>
+        <div class="grupo">
+          <h4>Órdenes de instalación <span class="ambito"><span class="msi" aria-hidden="true" translate="no">layers</span>de toda la organización</span></h4>
+          <div class="vacio">
+            <p>Sin órdenes todavía.</p>
+            <button class="btn" type="button">Ver la lista</button>
+          </div>
+        </div>
+      </div>
+      <p>De siete cuadros quedan tres, porque hoy <strong>solo hay datos de una familia</strong>.
+        Los otros cuatro decían cero cuatro veces.</p>
+    </div>
+
+    <div class="demo queda">
+      <h3>El mismo bloque el día que las órdenes tengan datos</h3>
+      <div class="lienzo">
+        <div class="grupo">
+          <h4>Trámites <span class="ambito"><span class="msi" aria-hidden="true" translate="no">layers</span>de toda la organización</span></h4>
+          <div class="cifras">
+            <div class="kpi"><span class="cifra">845</span><span class="rotulo">Totales</span></div>
+            <div class="kpi"><span class="cifra">796</span><span class="rotulo">En proceso</span><span class="apoyo">94% del total</span></div>
+            <div class="kpi"><span class="cifra">12</span><span class="rotulo">Admitidos este mes</span><span class="apoyo">+3 vs. mes anterior</span></div>
+          </div>
+        </div>
+        <div class="grupo">
+          <h4>Órdenes de instalación <span class="ambito"><span class="msi" aria-hidden="true" translate="no">layers</span>de toda la organización</span></h4>
+          <div class="cifras">
+            <div class="kpi"><span class="cifra">312</span><span class="rotulo">Totales</span></div>
+            <div class="kpi"><span class="cifra">168</span><span class="rotulo">Instaladas</span><span class="apoyo">54% del total</span></div>
+            <div class="kpi"><span class="cifra">121</span><span class="rotulo">Pendientes</span><span class="apoyo">39% del total</span></div>
+            <div class="kpi"><span class="cifra">23</span><span class="rotulo">Canceladas</span><span class="apoyo">7% del total</span></div>
+          </div>
+          <p class="nota-metodo">Pendiente reúne nueva, pendiente, programada y en visita.</p>
+        </div>
+      </div>
+      <p>Aquí sí son siete cuadros, y ahora se leen: <strong>cuatro y tres, cada grupo con su
+        nombre y su propio total al frente</strong>. Los rótulos caen a la misma altura dentro de
+        cada grupo, y los porcentajes, en la suya. Ninguna fila tiene que compartir ancho con la
+        otra, así que cada una reparte el suyo entre las cifras que de verdad tiene.</p>
     </div>
 
     <div class="tres" style="margin-top:var(--sp-5)">
