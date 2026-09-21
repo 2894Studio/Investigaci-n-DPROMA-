@@ -2160,6 +2160,14 @@ tablero ya hace doscientos píxeles más abajo con «Nada en tu alcance». Es la
   §1.4. Un color de estado nunca se reutiliza como serie. **La regla completa está en §1**, que
   es donde gobierna todo el color: aquí queda solo su aplicación a las series. Mientras vivió
   únicamente en este capítulo, nadie la aplicó fuera de las gráficas.
+- **La regla de color por estado no depende de que la forma sea `.barra`.** Un reparto de un
+  total entre estados del semáforo sigue siendo eso mismo aunque se dibuje como una lista de
+  barras horizontales en vez de una sola barra segmentada — un valor por fila con su propio
+  `<rect>`, en vez de tramos dentro de la misma pieza. Medido en el Tablero real: el componente
+  `.grafica-barra` (una fila «Por estado» con Concluido/En dependencia/Documentos recibidos/
+  Recibido·sin admitir) pinta las cuatro filas con `fill:var(--accent)`, el mismo verde para las
+  cuatro — sin la regla de arriba, el color deja de decir nada y hay que leer la leyenda para
+  distinguir un estado de otro. La forma cambia; qué dato lleva juicio, no.
 
 ### 12.6 Composiciones de tablero
 
