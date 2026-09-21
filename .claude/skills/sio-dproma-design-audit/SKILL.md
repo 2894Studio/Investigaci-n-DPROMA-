@@ -13,7 +13,7 @@ Dos preguntas distintas, en un solo informe:
 
 El material auditado **no vive en este repo** — son archivos subidos por el usuario (export de una app externa, p. ej. `sio-qa.dproma.com`). No se toca el repo ni el build real; el único artefacto que se produce es el informe.
 
-**Pendiente de esta skill, a fecha de su creación:** no existe todavía un catálogo canónico de "qué pantallas debería tener SIO-DPROMA" integrado aquí (vive en documentos externos del equipo DPROMA, ej. los citados como "doc 14"/"doc 43" en comentarios de CSP del propio HTML de producción). Sin ese catálogo, esta skill audita **la(s) pantalla(s) que el usuario suba**, no puede decir qué pantallas *faltan por subir*. Si en algún momento el usuario aporta ese catálogo, añadir una sección "Cobertura de pantallas" al informe cruzando pantallas auditadas hasta la fecha contra el catálogo — mientras tanto, omitir esa sección sin inventarla.
+**Fuera de alcance, confirmado con el usuario:** no existe un catálogo canónico de "qué pantallas debería tener SIO-DPROMA" (se le preguntó explícitamente si había un documento así — el HTML de producción cita "doc 14"/"doc 43" en comentarios de CSP, pero no son ese catálogo, y el usuario confirmó que no existe tal cosa). Por tanto esta skill **audita únicamente la(s) pantalla(s) que el usuario suba en cada ocasión** y nunca reporta qué pantallas faltan por subir — esa sección no se incluye en el informe. Si en el futuro surge un documento así, retomar la idea entonces; no asumir que aparecerá.
 
 ## Fuentes de verdad a leer siempre
 
