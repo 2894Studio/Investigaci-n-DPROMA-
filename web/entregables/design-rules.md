@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.5.2
+version: 2.5.3
 last_updated: 2026-09-21
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -2169,6 +2169,14 @@ tablero ya hace doscientos píxeles más abajo con «Nada en tu alcance». Es la
   §1.4. Un color de estado nunca se reutiliza como serie. **La regla completa está en §1**, que
   es donde gobierna todo el color: aquí queda solo su aplicación a las series. Mientras vivió
   únicamente en este capítulo, nadie la aplicó fuera de las gráficas.
+- **La regla de color por estado no depende de que la forma sea `.barra`.** Un reparto de un
+  total entre estados del semáforo sigue siendo eso mismo aunque se dibuje como una lista de
+  barras horizontales en vez de una sola barra segmentada — un valor por fila con su propio
+  `<rect>`, en vez de tramos dentro de la misma pieza. Medido en el Tablero real: el componente
+  `.grafica-barra` (una fila «Por estado» con Concluido/En dependencia/Documentos recibidos/
+  Recibido·sin admitir) pinta las cuatro filas con `fill:var(--accent)`, el mismo verde para las
+  cuatro — sin la regla de arriba, el color deja de decir nada y hay que leer la leyenda para
+  distinguir un estado de otro. La forma cambia; qué dato lleva juicio, no.
 
 ### 12.6 Composiciones de tablero
 
@@ -2221,3 +2229,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.5.0 | 2026-09-21 | Incorpora las siete piezas que Jonathan Viveros (DPROMA) midió sobre la v2.4.1 construyendo administración vehicular y viáticos. Añade `--border-ctrl` (§1.1), el borde a 3:1 para el control cuyo relleno no lo identifica —medido en 1,68:1 el actual, 3,06:1 el propuesto—, y el criterio ejecutable para distinguir borde informativo de decorativo: se retira y se comprueba si el dato deja de verse. Añade `--surface-hover` (§1.5) para el sobrevuelo fuera del cromo, hoy por debajo del matiz del menú —1,146/1,099 los botones frente a 1,235 el menú—, marcado como propuesto y pendiente de auditoría visual, porque DPROMA no llegó a medir un valor final. Añade `--chrome-alerta`/`--chrome-alerta-ink` (§1.5): sin el token, un contador de avisos sobre `--chrome` daba 1,00:1 en oscuro, invisible. Documenta la familia `--marca-1`…`--marca-7` del isotipo (§1.2) y corrige dónde vive: declarada una sola vez fuera de los bloques de tema, no duplicada dentro de cada uno, donde podía divergir entre claro y oscuro. Sustituye en §2 el `<link>` a Google Fonts por `@font-face` autoalojado para Inter y Michroma —contradicción activa, no hueco: el CDN ya falló una vez en producción, 4 días sin detectarse—. Y en §1.4, extiende la certificación de contraste a pares de serie no adyacentes que aparecen juntos en pantalla, no solo a los consecutivos: medido, serie 1–4 en 12,6 y serie 1–3 en oscuro en 1,6, los dos por debajo del suelo de 15. La página del sistema gana la sección «Piezas DPROMA» (§ nueva, antes de «Color»), con las siete muestras vivas para auditar cada una antes de fijarla. |
 | 2.5.1 | 2026-09-21 | Verifica dos reglas ya documentadas contra el Tablero real, reconstruyendo la pantalla con su CSS de producción: ninguna de las dos es un hallazgo de DPROMA, las encontró esta verificación. §6.22 dice que el alcance nunca usa los colores de estado; el pill `.alcance` («de toda la organización») lo pinta hoy con `--warn-bg`/`--ok-bg`, ámbar y verde. §6.2 fija el suelo del botón en 36px; el botón real medía 33px, sin `min-height` declarado. Las dos son la misma trampa de siempre —la regla estaba escrita y no se cumplió—, así que no hay regla nueva que redactar. |
 | 2.5.2 | 2026-09-21 | Disuelve la sección «Piezas DPROMA» de `reglas-de-diseno.html` que había creado la 2.5.0: cada muestra viva pasa a la sección de su propio tema —bordes, sobrevuelo, alerta de cromo, marca y series a Color; tipografía autoalojada a Tipografía— en vez de vivir aparte del resto del sistema. Las reglas y los valores no cambian, solo dónde se leen; una sección extra para "lo nuevo de DPROMA" habría dejado al sistema leyéndose como el sistema más un parche pegado encima. |
+| 2.5.3 | 2026-09-21 | Aclara §12.5: la regla de "color según el trabajo del dato" —semáforo si el dato tiene juicio, paleta categórica si no— no depende de que la pieza sea `.barra`; aplica igual a una lista de barras horizontales, una por fila. Medido en el Tablero real: `.grafica-barra` pinta sus cuatro filas de "Por estado" (Concluido/En dependencia/Documentos recibidos/Recibido·sin admitir) con `fill:var(--accent)`, el mismo verde en las cuatro, así que hay que leer la leyenda para distinguir un estado de otro. No es una regla nueva —la de §12.5 ya cubría el caso, solo con otra forma en mente—, así que no hay token ni valor que cambiar aquí; la corrección es en el CSS real de producción, no en este sistema. |
