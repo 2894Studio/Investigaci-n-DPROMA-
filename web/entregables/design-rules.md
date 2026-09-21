@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.4.1
-last_updated: 2026-09-17
+version: 2.5.0
+last_updated: 2026-09-21
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -61,8 +61,11 @@ tabla. Gobierna todo el color, así que vive aquí.
 | `--bg` | `#F2F5F7` | `#10161F` | Fondo de página |
 | `--surface` | `#FAFCFD` | `#171F2C` | Superficie sólida (tarjetas, tablas, botones) |
 | `--surface-2` | `#E7EDF3` | `#1D2735` | Superficie secundaria (cabeceras, filas al pasar el cursor, filas inactivas, esqueleto) |
-| `--border` | `rgba(27,36,48,.14)` | `rgba(231,236,242,.12)` | Borde sutil |
-| `--border-2` | `rgba(27,36,48,.26)` | `rgba(231,236,242,.24)` | Borde de control interactivo |
+| `--border` | `rgba(27,36,48,.14)` | `rgba(231,236,242,.12)` | Borde sutil, decorativo |
+| `--border-2` | `rgba(27,36,48,.26)` | `rgba(231,236,242,.24)` | Borde de control interactivo (con relleno que ya lo identifica) |
+| `--border-fuerte` | `rgba(27,36,48,.52)` | `rgba(231,236,242,.4)` | Borde que carga información — ver criterio abajo |
+| `--border-ctrl` | `rgba(27,36,48,.5)` | `rgba(231,236,242,.37)` | Borde de control cuya única frontera es el borde (sin relleno propio) |
+| `--surface-hover` | *pendiente* | *pendiente* | Sobrevuelo de controles fuera del cromo — ver nota de auditoría abajo |
 | `--text` | `#1B2430` | `#E7ECF2` | Texto principal |
 | `--text-2` | `#4C5A6B` | `#A8B3C2` | Texto secundario |
 | `--text-3` | `#5C6675` | `#8B96A6` | Texto auxiliar |
@@ -93,6 +96,35 @@ saldarlo resultó que sí lo declara y lo usa en cinco sitios, así que llevaba 
 apunta con la medición que la justifica, no con una suposición sobre el archivo: la de arriba
 sobrevivió porque nadie volvió a abrirlo.
 
+**`--border`/`--border-2` nunca se habían medido contra el suelo de 3:1 de un elemento gráfico
+(§1.7).** El hallazgo es de DPROMA, midiendo administración vehicular y viáticos contra esta
+versión: el borde de control daba 1,68:1. No se sube el borde base — eso ensuciaría todas las
+divisiones decorativas que hoy funcionan bien — se añaden dos tokens nuevos para los dos casos
+reales que `--border`/`--border-2` mezclaban sin distinguir:
+
+- **`--border-ctrl`** (3,06:1 medido) — para el control cuya única frontera visible es el borde:
+  un input vacío, una tarjeta sin relleno propio. Ahí el borde *es* el dato de "esto es un
+  control", y tiene que cumplir como elemento gráfico.
+- **`--border-fuerte`** — para el borde que **carga información** en vez de solo decorar: el que
+  separa filas de una tabla densa (§6.11) o delimita una tarjeta de estado (§6.4). El criterio
+  para saber si un borde entra aquí es ejecutable, no de ojo: **se retira y se comprueba si el
+  dato deja de distinguirse.** Si sí, es informativo y necesita `--border-fuerte`; si no, se
+  queda en `--border`/`--border-2` sin tocar.
+
+El borde decorativo normal —el que separa una sección de otra sin que nada dependa de él— sigue
+en `--border`/`--border-2` exactamente como estaba; esto no es una subida general de contraste,
+es separar dos usos que compartían un token demasiado débil para uno de los dos.
+
+**Falta el tono de sobrevuelo fuera del cromo.** El botón y el ítem de menú fuera de la barra
+lateral reutilizan `--surface-2` para su estado `:hover`, que es el token de *fila inactiva*, no
+de *interacción* — por eso el cambio al pasar el cursor es casi imperceptible (1,146 y 1,099
+medidos en botones reales, contra 1,235 que sí logra `--chrome-hover` dentro del cromo, que tiene
+su propio tono dedicado desde §1.5). Hace falta un `--surface-hover` con el mismo criterio que ya
+usa el cromo — un tono perceptiblemente distinto de reposo, no un préstamo de un token que
+significa otra cosa — pero **su valor final queda pendiente**: a diferencia de las demás piezas
+de esta ronda, esta no llegó con un valor ya medido por DPROMA. La página de reglas de diseño
+lleva una muestra viva para que se audite visualmente antes de fijar el hex definitivo.
+
 ### 1.2 Acción y marca
 
 | Token | Claro | Oscuro | Uso |
@@ -109,6 +141,31 @@ de estado invita a pulsarla.
 
 Un tercer color vive fuera de estos tokens porque es de marca, no de interfaz: `#C7D97B`
 (verde lima), en el wordmark y el anillo de foco sobre fondo oscuro. No se usa en controles.
+
+**El isotipo completo es esa misma familia, ampliada, y tiene que vivir fuera de los dos igual.**
+El gradiente de marca son siete paradas, más los tonos de la escena de fondo del acceso:
+
+| Token | Valor | Uso |
+|---|---|---|
+| `--marca-1` | `#0c361e` | Gradiente del isotipo, parada 1 (más oscura) |
+| `--marca-2` | `#12572b` | Gradiente del isotipo, parada 2 |
+| `--marca-3` | `#2e823d` | Gradiente del isotipo, parada 3 |
+| `--marca-4` | `#60a84b` | Gradiente del isotipo, parada 4 |
+| `--marca-5` | `#76b552` | Gradiente del isotipo, parada 5 |
+| `--marca-6` | `#a5c86a` | Gradiente del isotipo, parada 6 |
+| `--marca-7` | `#c7d97b` | Gradiente del isotipo, parada 7 — mismo valor que el verde lima de arriba |
+| `--marca-azul` | `#1E4E79` | Acento de la escena de fondo del acceso |
+| `--marca-halo` | `rgba(199,217,123,.35)` | Halo del isotipo en la escena de fondo |
+| `--marca-halo-suave` | `rgba(199,217,123,.5)` | Variante más tenue del halo |
+| `--marca-lienzo` | `#071120` | Fondo de la escena de marca del acceso |
+| `--marca-lienzo-ink` | `#f2f5f7` | Texto sobre `--marca-lienzo` |
+
+**Corrección de esta ronda, no token nuevo de criterio:** esta familia había quedado declarada
+dentro de los bloques de tema (`:root[data-theme="dark"]`, etc.), heredando sin querer la regla
+de "cada tema tiene su paleta" que sí aplica a `--bg`/`--surface`/`--accent`. Un logotipo no debe
+cambiar de color al cambiar de tema — es la misma regla que ya protegía al verde lima suelto de
+arriba, aplicada de forma incompleta. Se declara **una sola vez, fuera de cualquier bloque de
+tema**, y así queda verificado en los dos temas por DPROMA.
 
 ### 1.3 Semáforo — cinco estados, tres variantes cada uno
 
@@ -186,6 +243,17 @@ contra `--surface` oscuro y validados ahí.
 Para reproducir cualquiera de estas cifras se usa el validador del método de visualización,
 no la estimación a ojo.
 
+**Las cinco comprobaciones de más arriba solo se corrieron sobre el peor par adyacente.** DPROMA
+midió combinaciones no consecutivas en el orden de asignación y encontró dos por debajo del suelo
+de ΔE 15: serie 1–4 en **12,6** y serie 1–3 en oscuro en **1,6** — este último, prácticamente
+indistinguible. La regla de validación se amplía: **cuando una gráfica o leyenda muestra más de
+dos series a la vez en pantalla, se mide cada combinación que realmente aparece junta**, no solo
+las consecutivas en el orden fijo de la regla 1. Un par que no llegue al suelo no se corrige
+subiendo el ΔE global —eso puede romper pares que hoy sí funcionan— se resuelve caso por caso:
+o se documenta que esa combinación no se muestra junta en ninguna pantalla, o se le añade
+distinción por forma/patrón además de color (línea sólida vs. discontinua, por ejemplo) para esa
+gráfica en concreto.
+
 ### 1.4.1 Tinta sobre relleno sólido de color
 
 | Token | Claro | Oscuro |
@@ -218,9 +286,19 @@ temas. Van aparte para que un cambio en las superficies del contenido no las arr
 | `--chrome-line` | `rgba(242,245,247,.14)` | `rgba(231,236,242,.10)` | Separadores dentro del cromo |
 | `--chrome-focus` | `#9FE0AE` | igual | Anillo de foco sobre fondo oscuro |
 | `--chrome-hover` / `--chrome-activo` | `rgba(255,255,255,.08)` / `.12` | igual | Estados del ítem de menú |
+| `--chrome-alerta` | `#C24238` | igual | Badge/contador de avisos sobre `--chrome` |
+| `--chrome-alerta-ink` | `#FAFCFD` | igual | Texto/icono sobre `--chrome-alerta` |
 
 El anillo de foco cambia de color dentro del cromo. `--accent` sobre `#1E4E79` no llega a 3:1;
 `--chrome-focus` sí. Es la única excepción a «el foco es idéntico en los dos temas».
+
+**Faltaba un color de alerta que funcionara sobre el cromo mismo.** Un contador de avisos que use
+el rojo de estado normal (`--err`) está pensado para caer sobre `--surface`/`--surface-2`, no
+sobre `--chrome` — DPROMA midió **1,00:1** en tema oscuro al reutilizarlo ahí, es decir,
+invisible. `--chrome-alerta` es un valor único que no cambia por tema, igual que `--chrome`
+mismo, porque su fondo (el cromo) tampoco cambia de familia entre temas — solo de tono dentro de
+la misma familia azul oscura. Se usa exclusivamente para badges/contadores que viven sobre
+`--chrome`; un aviso sobre `--surface` sigue usando el semáforo normal (§1.3).
 
 ### 1.6 Velos
 
@@ -261,15 +339,27 @@ dibujando foco, ningún descendiente suyo dibuja foco además.
 - **Marca:** `Michroma` / `Ethnocentric Rg` (`--font-brand`), solo para el wordmark
   «SIO-DPROMA» y el nombre «DPROMA». Nunca en texto de interfaz.
 
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
+**Las fuentes se autoalojan — `D116`.** Hasta esta ronda, esta sección prescribía un `<link>` a
+Google Fonts. Se retira: un CDN que no responde falla **en silencio** — la pantalla cae a
+`system-ui` sin ningún error visible, y el sistema de tipografía existe solo sobre el papel. Es
+exactamente lo que ya pasó una vez con Ethnocentric Rg desde su propio CDN, y DPROMA registró una
+incidencia real de **4 días sin detección** por el mismo motivo con Google Fonts. Con un archivo
+autoalojado la misma falla es un 404 visible en la pestaña de red, no una interfaz que se ve
+«rara» sin que nadie sepa por qué.
+
+```css
+@font-face{font-family:Inter;font-style:normal;font-weight:400 700;font-display:swap;
+  src:url(/fuentes/inter-variable.woff2) format("woff2")}
+@font-face{font-family:Michroma;font-style:normal;font-weight:400;font-display:swap;
+  src:url(/fuentes/michroma.woff2) format("woff2")}
 ```
 
-**Ese `<link>` no es opcional.** Las tres maquetas del padrón declaraban `--font-ui:'Inter'` y no
-cargaban ninguna fuente, así que se renderizaban en `system-ui` — el sistema de tipografía
-existía solo sobre el papel.
+**Ese `@font-face` no es opcional.** Las tres maquetas del padrón declaraban `--font-ui:'Inter'` y
+no cargaban ninguna fuente, así que se renderizaban en `system-ui` — el sistema de tipografía
+existía solo sobre el papel. La causa cambió (antes era un `<link>` ausente, ahora sería un
+`@font-face` ausente o una ruta rota) pero la comprobación es la misma: la fuente tiene que
+aparecer cargada de verdad en las herramientas de red del navegador, no asumirse por la
+declaración de `--font-ui` en el CSS.
 
 | Token | Tamaño | Uso |
 |---|---|---|
@@ -2128,3 +2218,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.3.0 | 2026-09-16 | Añade la etiqueta de alcance (§6.22), la que dice de qué conjunto de datos habla una cifra: «de toda la organización», «nada en tu alcance». El producto ya usaba ese vocabulario, pero el sistema no tenía la pieza, así que se pintaba con el ámbar de aviso: cuatro avisos de que falta algo en una sola pantalla del tablero, cuando no faltaba nada. Ahora es neutra, y el alcance nunca usa los colores de estado. Distingue además dos casos que se veían igual: no tener permiso y tener permiso sobre un conjunto vacío. La regla de cuándo toca el semáforo y cuándo la paleta de categorías sube de §12.5 a §1, porque vivía en el capítulo de gráficas y nadie iba a buscarla para una etiqueta de tabla. Y §6.4 gana la restauración de sesión, con la salida por tiempo o por fallo que no existía. |
 | 2.4.0 | 2026-09-17 | Convierte en componente la fila de cifras del tablero (§12.4.1): esa fila de cajas con un número grande y su texto. El tablero ya la tenía, pero la había montado por su cuenta, y los textos caían a tres alturas distintas —hasta 34px— aunque las siete cajas midieran exactamente lo mismo. Ahora todas comparten la misma retícula, así que el número, el rótulo y la aclaración quedan a la misma altura lleve cada caja el mismo texto o no. Con cuatro reglas de uso: cuatro cajas por fila como máximo, cada fila es un grupo con nombre, la aclaración cabe en una línea, y un grupo entero a cero se dice en vez de pintarse. Las pruebas previas a publicarlo tumbaron dos decisiones propias: recortar la aclaración con puntos suspensivos dejaba el ejemplo documentado sin forma de leerse, y quitar el borde hacía desaparecer las cajas en el alto contraste del sistema. Corrige además tres fallos de esta misma página —las cuatro gráficas salían 80px más estrechas, los títulos escritos para lector de pantalla se estaban viendo y un desplegable se quedó sin flecha—, que quedan escritos como trampas en §10, que pasa de seis a nueve. Y §12.5 gana dos reglas de lectura: la serie y la cifra del mismo recuadro miden lo mismo y cuadran, y el dibujo reserva sitio para el grosor de su línea. |
 | 2.4.1 | 2026-09-17 | Reescribe en lenguaje llano las entradas de la 2.3.0 y la 2.4.0. Habían crecido hasta ser ilegibles —la de 2.4.0 ocupaba 5.569 caracteres frente a los 443 de la mediana— y repetían lo que ya dicen §12.4.1, §10 y §12.5, que es donde se busca el detalle; no se pierde nada, el porqué y las medidas siguen en esas secciones. La página gana además el apartado «Qué cambió», al principio y no al final, porque el historial vive abajo del todo y nadie baja hasta ahí para saber qué hay de nuevo. Sin cambios de valor ni de comportamiento. |
+| 2.5.0 | 2026-09-21 | Incorpora las siete piezas que Jonathan Viveros (DPROMA) midió sobre la v2.4.1 construyendo administración vehicular y viáticos. Añade `--border-ctrl` (§1.1), el borde a 3:1 para el control cuyo relleno no lo identifica —medido en 1,68:1 el actual, 3,06:1 el propuesto—, y el criterio ejecutable para distinguir borde informativo de decorativo: se retira y se comprueba si el dato deja de verse. Añade `--surface-hover` (§1.5) para el sobrevuelo fuera del cromo, hoy por debajo del matiz del menú —1,146/1,099 los botones frente a 1,235 el menú—, marcado como propuesto y pendiente de auditoría visual, porque DPROMA no llegó a medir un valor final. Añade `--chrome-alerta`/`--chrome-alerta-ink` (§1.5): sin el token, un contador de avisos sobre `--chrome` daba 1,00:1 en oscuro, invisible. Documenta la familia `--marca-1`…`--marca-7` del isotipo (§1.2) y corrige dónde vive: declarada una sola vez fuera de los bloques de tema, no duplicada dentro de cada uno, donde podía divergir entre claro y oscuro. Sustituye en §2 el `<link>` a Google Fonts por `@font-face` autoalojado para Inter y Michroma —contradicción activa, no hueco: el CDN ya falló una vez en producción, 4 días sin detectarse—. Y en §1.4, extiende la certificación de contraste a pares de serie no adyacentes que aparecen juntos en pantalla, no solo a los consecutivos: medido, serie 1–4 en 12,6 y serie 1–3 en oscuro en 1,6, los dos por debajo del suelo de 15. La página del sistema gana la sección «Piezas DPROMA» (§ nueva, antes de «Color»), con las siete muestras vivas para auditar cada una antes de fijarla. |
