@@ -38,16 +38,33 @@ documentación de componentes viven embebidos en `design-rules.md` / `reglas-de-
    Si el cambio es puramente de redacción o racional sin ningún impacto visual (p. ej. "por qué"
    se eligió un valor, sin cambiar el valor), **no toques el HTML** — pero dilo explícitamente en
    el resumen final al usuario, no lo omitas en silencio.
-4. **Añade una fila a "Historial de cambios"** en `web/entregables/design-rules.md` (tabla al
-   final del archivo, columnas `Versión | Fecha | Cambios`):
+4. **Añade o actualiza una fila en "Historial de cambios"** en `web/entregables/design-rules.md`
+   (tabla al final del archivo, columnas `Versión | Fecha | Cambios`) y en la tabla equivalente de
+   `reglas-de-diseno.html` (`#historial`):
+   - **Este historial lo lee el cliente.** Es el cambio neto, no la bitácora de cómo se llegó ahí.
+     Nunca narres el proceso de esta sesión: nada de "esta verificación encontró", "no es hallazgo
+     de DPROMA", "se disuelve la sección que había creado la X.X.0", referencias a un revert, ni
+     ningún relato del ir-y-venir de una tarea. Si algo se creó y se corrigió o se quitó el mismo
+     día, el cliente no necesita saberlo — se escribe directamente el estado final, como si
+     siempre hubiera sido así.
+   - **Un solo renglón por fecha de calendario, consolidado.** Si el trabajo de un mismo día
+     produjo varios cambios (o varias versiones intermedias), no se listan por separado: se funden
+     en una sola fila con la versión final alcanzada ese día y una descripción que cubre el neto
+     acumulado. No expongas números de versión intermedios que ya no importan (p. ej. si el día
+     pasó de 2.5.0 a 2.5.3 en varios pasos, la fila que queda es solo "2.5.3").
+   - Cambios de herramientas o skills internas (cómo auditamos, qué agentes usamos) **no van en
+     este historial** — es el historial del sistema de diseño en sí, no de nuestro proceso de
+     trabajo.
    - Sube versión con semver: **patch** (x.x.N) para aclaraciones o correcciones menores sin
      cambiar comportamiento; **minor** (x.N.0) para una regla o componente nuevo documentado;
      **major** (N.0.0) para un cambio que rompe un token o valor que ya se usaba en pantallas
      existentes.
    - Fecha: la fecha real de hoy.
-   - Descripción: concreta, referencia la sección (§) afectada, explica el **motivo** del cambio
-     (qué hallazgo o revisión lo dispara), no solo repite "qué" cambió — sigue el estilo de las
-     entradas ya existentes (1.0.0 → 1.5.0) como referencia de tono y nivel de detalle.
+   - Descripción: concreta, referencia la sección (§) afectada cuando aplique, y dice **qué es
+     cierto ahora** — no el motivo interno ni el camino recorrido. Sigue el estilo de las entradas
+     ya existentes (1.0.0 → 1.5.0) como referencia de tono, pero más corta: una o dos frases basta
+     para un cliente que no necesita el razonamiento completo, que sigue viviendo en
+     `docs/sistema-diseno-sio-dproma.md`.
 5. **Actualiza el front matter de `design-rules.md`** (`version:` y `last_updated:`) para que
    coincidan exactamente con la versión y fecha que acabas de añadir al historial.
 
