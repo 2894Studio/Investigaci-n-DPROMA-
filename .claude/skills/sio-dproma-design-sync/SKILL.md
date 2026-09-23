@@ -5,6 +5,14 @@ description: Sincroniza una regla o componente nuevo del sistema de diseño SIO-
 
 # Sincronización del sistema de diseño SIO-DPROMA
 
+## Qué NO entra en esta skill ni en el historial
+
+Un cambio de maquetación/navegación de `reglas-de-diseno.html` que no toca ninguna regla, token o
+componente del sistema (mover una sección de sitio, reordenar el menú, quitar un bloque
+redundante con el historial) **no sube versión ni gana fila en el historial**. El historial es
+del sistema de diseño, no de la página que lo aloja — si el cambio no altera qué se documenta,
+solo dónde vive en la página, es mantenimiento silencioso, igual que ya no comitea al `main`.
+
 ## Principio rector
 El sistema de diseño de SIO-DPROMA no vive en un solo archivo. Un cambio que solo toca uno de
 los tres deja a las otras dos desincronizadas — un token que cambió en el `.md` pero sigue
