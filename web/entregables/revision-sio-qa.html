@@ -1,0 +1,1239 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Revisión de SIO-DPROMA · Entregables DPROMA × 2894 Studio</title>
+<meta name="description" content="Revisión del SIO-DPROMA construido: acceso, restauración de sesión, tablero y padrón. Qué está bien resuelto, qué falta pulir, y los colores medidos contra los tokens del sistema de diseño." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cloud-white: #F7F8FA;
+  --soft-gray: #E6E8EC;
+  --ink-black: #0B0B0D;
+  --deep-cobalt: #0A46FF;
+  --sky-blue: #7DB7FF;
+
+  --bg: var(--cloud-white);
+  --surface: #FFFFFF;
+  --surface-alt: var(--soft-gray);
+  --text: var(--ink-black);
+  --text-muted: #53565f;
+  --border: #d8dbe2;
+  --accent: var(--deep-cobalt);
+  --accent-text: #0A3FD6;
+  --on-accent: var(--cloud-white);
+  --shadow: 0 1px 2px rgba(11,11,13,0.04), 0 8px 24px rgba(11,11,13,0.06);
+
+  /* Veredictos de la auditoría. El más justo es el ámbar, a 5,51:1. */
+  --ok-ink: #1B6B4F;   --ok-bg: #E2F2EA;
+  --mal-ink: #A3342A;  --mal-bg: #FBE4E1;
+  --duda-ink: #7A5A12; --duda-bg: #F8EED4;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg: #0B0B0D; --surface: #16171c; --surface-alt: #1c1e24;
+    --text: #F7F8FA; --text-muted: #b9bec9; --border: #2a2d35;
+    --accent: #3D6BFF; --accent-text: #8FA8FF; --on-accent: #F7F8FA;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    --ok-ink: #6FD3A5;   --ok-bg: #12291F;
+    --mal-ink: #FF8F80;  --mal-bg: #2E1512;
+    --duda-ink: #E8C24C; --duda-bg: #2B2410;
+  }
+}
+:root[data-theme="dark"]{
+  --bg: #0B0B0D; --surface: #16171c; --surface-alt: #1c1e24;
+  --text: #F7F8FA; --text-muted: #b9bec9; --border: #2a2d35;
+  --accent: #3D6BFF; --accent-text: #8FA8FF; --on-accent: #F7F8FA;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  --ok-ink: #6FD3A5;   --ok-bg: #12291F;
+  --mal-ink: #FF8F80;  --mal-bg: #2E1512;
+  --duda-ink: #E8C24C; --duda-bg: #2B2410;
+}
+
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior: auto; }
+  *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+body{
+  margin:0; background: var(--bg); color: var(--text);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  line-height: 1.55; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased;
+}
+a{ color: var(--accent-text); }
+a:focus-visible, button:focus-visible{ outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+.wrap{ max-width: 1120px; margin: 0 auto; padding: 0 clamp(1.25rem, 4vw, 2.5rem); }
+h1,h2,h3{ font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; margin: 0; }
+.sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+
+header.masthead{ padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
+.masthead-inner{ display:flex; align-items:center; justify-content:space-between; gap: 1rem; flex-wrap: wrap; }
+.wordmark{ font-weight: 700; font-size: 1.05rem; text-transform: uppercase; text-decoration:none; color: var(--text); }
+.wordmark span{ color: var(--text-muted); font-weight: 400; text-transform: none; }
+.masthead nav{ display:flex; align-items:center; gap: 1.25rem; flex-wrap: wrap; }
+.masthead nav a{ font-size: 0.875rem; font-weight: 500; color: var(--text-muted); text-decoration: none;
+  display:inline-flex; align-items:center; min-height: 24px; }
+.masthead nav a:hover{ color: var(--accent-text); }
+.masthead nav a.nav-cta{ background: var(--accent); color: var(--on-accent);
+  padding: 0.45em 1.1em; border-radius: 999px; font-weight: 700; }
+
+section{ padding: clamp(2.5rem, 6vw, 4rem) 0; }
+section + section{ border-top: 1px solid var(--border); }
+.section-head{ margin-bottom: 2rem; }
+.section-head h2{ font-size: clamp(1.45rem, 3vw, 1.95rem); }
+.section-note{ max-width: 64ch; color: var(--text-muted); font-size: 0.9375rem; margin: 0.75rem 0 0; }
+
+.hero{ padding: clamp(3rem, 8vw, 5rem) 0 clamp(2rem, 5vw, 3rem); }
+.hero h1{ font-size: clamp(1.9rem, 5vw, 3rem); line-height: 1.14; max-width: 19ch; }
+.hero p{ max-width: 60ch; color: var(--text-muted); font-size: clamp(1rem, 1.6vw, 1.0625rem); margin: 1.25rem 0 0; }
+.meta-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap: 1px;
+  background: var(--border); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-top: 2.5rem; }
+.meta-grid div{ background: var(--bg); padding: 1rem 1.25rem; }
+.meta-grid dt{ font-size: 0.75rem; color: var(--text-muted); }
+.meta-grid dd{ margin: 0.3rem 0 0; font-weight: 700; font-size: 0.9375rem; }
+
+.stack{ display:flex; flex-direction:column; gap: 1.5rem; }
+.card{ border-radius: 16px; padding: 1.5rem 1.75rem; background: var(--surface);
+  border: 1px solid var(--border); box-shadow: var(--shadow); }
+
+.h-cab{ display:flex; align-items:baseline; gap: 0.85rem; }
+.h-num{ flex:none; font-weight:700; font-size:0.9375rem; color: var(--accent-text); }
+.h-cab h3{ font-size: 1.0625rem; line-height:1.3; }
+.donde{ font-size: 0.8125rem; color: var(--text-muted); margin: 0.3rem 0 0.9rem 1.9rem; }
+.card > p{ margin:0; max-width: 76ch; color: var(--text-muted); font-size: 0.9375rem; }
+.card > p + p{ margin-top: 0.7rem; }
+.card p strong{ color: var(--text); }
+.et{ font-size: 0.8125rem; font-weight:700; color: var(--text); margin: 1.1rem 0 0.5rem; }
+.hacer{ margin:0; padding:0; list-style:none; }
+.hacer li{ position:relative; padding-left: 1.4rem; margin-bottom: 0.45rem;
+  color: var(--text-muted); font-size: 0.9375rem; max-width: 74ch; }
+.hacer li::before{ content:"—"; position:absolute; left:0; color: var(--text-muted); }
+.hacer li strong{ color: var(--text); }
+
+figure.shot{ margin: 1.1rem 0 0; border:1px solid var(--border); border-radius: 10px; overflow:hidden; background: var(--surface-alt); }
+figure.shot img{ display:block; width:100%; height:auto; }
+figure.shot figcaption{ padding: 0.65rem 0.9rem; font-size: 0.8125rem; color: var(--text-muted);
+  border-top:1px solid var(--border); background: var(--surface); }
+/* Los recortes de detalle son pequeños. Estirarlos a todo el ancho los
+   emborrona, así que cada uno se queda en su tamaño natural. */
+figure.shot.nat{ max-width: 480px; }
+figure.shot.nat img{ width:auto; max-width:100%; margin-inline:auto; }
+.shot-pair{ display:grid; grid-template-columns: repeat(auto-fit, minmax(290px,1fr)); gap: 1.1rem; margin-top:1.1rem; }
+.shot-pair figure.shot{ margin-top:0; }
+.fila{ display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1.15fr); gap: 1.25rem; align-items:start; margin-top:1.1rem; }
+.fila figure.shot{ margin-top:0; }
+@media (max-width: 720px){ .fila{ grid-template-columns: minmax(0,1fr); } }
+
+.medida{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8125rem;
+  background: var(--surface-alt); border-radius: 8px; padding: 0.8rem 0.95rem; margin-top: 1rem;
+  color: var(--text); white-space: pre-wrap; overflow-x:auto; }
+
+.tabla-bloque{ margin:0; border:1px solid var(--border); border-radius: 12px; overflow:hidden; background: var(--surface); }
+.tabla-titulo{ padding: 0.85rem 1rem; color: var(--text-muted); font-size:0.875rem; border-bottom:1px solid var(--border); }
+.tabla-titulo strong{ color: var(--text); }
+.tabla-scroll{ overflow-x: auto; }
+table{ border-collapse: collapse; width:100%; font-size: 0.875rem; min-width: 620px; }
+th, td{ text-align:left; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+th{ font-size:0.75rem; font-weight:700; color: var(--text-muted); }
+tbody tr:last-child td{ border-bottom:0; }
+td code{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8125rem; }
+td.n{ font-weight:700; color: var(--accent-text); width:2.5rem; }
+
+.v{ display:inline-flex; align-items:center; gap:0.35em; font-size:0.75rem; font-weight:700;
+  border-radius:999px; padding:0.2em 0.6em; white-space:nowrap; }
+.v-ok{ color: var(--ok-ink); background: var(--ok-bg); }
+.v-mal{ color: var(--mal-ink); background: var(--mal-bg); }
+.v-duda{ color: var(--duda-ink); background: var(--duda-bg); }
+.v-ok::before{ content:"✓"; } .v-mal::before{ content:"✕"; } .v-duda::before{ content:"!"; }
+.swatch{ display:inline-block; width:0.85em; height:0.85em; border-radius:3px; border:1px solid var(--border);
+  vertical-align:-0.08em; margin-right:0.35em; }
+
+.nota{ border-left: 3px solid var(--accent); background: var(--surface-alt);
+  padding: 1rem 1.25rem; border-radius: 0 10px 10px 0; font-size: 0.9375rem; color: var(--text-muted); max-width: 76ch; }
+.nota strong{ color: var(--text); }
+
+footer{ border-top:1px solid var(--border); padding: 2.5rem 0 3.5rem; }
+.footer-nav a{ font-weight:700; text-decoration:none; }
+.footer-meta{ display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+  margin-top:1.25rem; font-size:0.875rem; color: var(--text-muted); }
+
+.reveal{ opacity:0; transform: translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+.reveal.is-visible{ opacity:1; transform:none; }
+@media (prefers-reduced-motion: reduce){ .reveal{ opacity:1 !important; transform:none !important; } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="wordmark" href="/">2894 <span>Studio × DPROMA</span></a>
+    <nav>
+      <a href="#funciona">Lo que funciona</a>
+      <a href="#sesion">Sesión</a>
+      <a href="#login">Acceso</a>
+      <a href="#tablero">Tablero</a>
+      <a href="#padron">Padrón</a>
+      <a href="#sistema">Sistema de diseño</a>
+      <a href="#prioridades">Prioridades</a>
+      <a class="nav-cta" href="/entregables">Entregables</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>Revisión del SIO que ya está construido</h1>
+    <p>Recorrido por el acceso, la restauración de sesión, el tablero y el padrón del entorno de QA,
+      en tema claro y oscuro. Empieza por lo que está bien resuelto, que es bastante, y sigue con lo
+      que falta pulir. Todo lo que se dice sobre color está medido contra los tokens del sistema,
+      no estimado a ojo.</p>
+    <dl class="meta-grid">
+      <div><dt>Entorno</dt><dd>sio-qa.dproma.com</dd></div>
+      <div><dt>Perfil</dt><dd>Administración principal</dd></div>
+      <div><dt>Temas</dt><dd>Claro y oscuro</dd></div>
+      <div><dt>Medido contra</dt><dd>SIO-DPROMA v2.2.5</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ══════════ LO QUE FUNCIONA ══════════ -->
+<section id="funciona">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Lo que está bien resuelto</h2>
+      <p class="section-note">Va primero porque marca el listón del resto. Hay decisiones aquí que
+        la mayoría de las herramientas internas no llega a tomar nunca, y conviene tenerlas
+        identificadas antes de leer la lista de lo que falta.</p>
+    </div>
+
+    <div class="stack">
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">B1</span><h3>El acceso explica el modelo de seguridad antes de pedir nada</h3></div>
+        <p class="donde">Pantalla de acceso</p>
+        <p>«No hay contraseña que escribir aquí», tres pasos numerados de lo que va a pasar, y un
+          aviso de que SIO-DPROMA no guarda ni puede ver la contraseña. Al usuario se le cuenta cómo
+          funciona la autenticación en su idioma, antes de que tenga que hacer nada.</p>
+        <p>Responde directamente a lo que pedía el entregable de login. El único enlace que compite
+          con el botón es el de recuperar contraseña de Google, y ahí hay un matiz que se recoge en
+          el hallazgo L4.</p>
+        <figure class="shot nat">
+          <img src="/entregables/img/sio-qa/detalle-bien-pasos.jpg" width="390" height="385" loading="lazy"
+               alt="Tarjeta de acceso con los tres pasos numerados: elegir correo, confirmar en el teléfono y entrar.">
+          <figcaption>Los tres pasos, antes de pulsar nada.</figcaption>
+        </figure>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">B2</span><h3>El modal de edición explica por qué un campo está bloqueado</h3></div>
+        <p class="donde">Padrón · modal de edición</p>
+        <p>El RFC sale bloqueado con la razón escrita al lado: «es la identidad fiscal del cliente y
+          su clave única. Corregirlo es decir que era otro cliente, y eso necesita su propio trámite
+          con su rastro». El campo declara su límite, «entre 3 y 240 caracteres», y el botón Guardar
+          está desactivado con la explicación de por qué: «no has cambiado nada todavía».</p>
+        <p>Tres decisiones correctas seguidas en un espacio de 300 píxeles. Lo habitual es que un
+          campo bloqueado se limite a estar gris.</p>
+        <figure class="shot">
+          <img src="/entregables/img/sio-qa/modal-editar.jpg" width="1600" height="921" loading="lazy"
+               alt="Modal «Editar cliente» con el campo Razón social activo, el RFC bloqueado y explicado, y el botón Guardar desactivado bajo el texto «No has cambiado nada todavía».">
+          <figcaption>El modal de edición del padrón.</figcaption>
+        </figure>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">B3</span><h3>El padrón dice qué está viendo el usuario y en qué orden</h3></div>
+        <p class="donde">Padrón</p>
+        <p>«Mostrando 15 · orden: más recientes primero · Por página 25». Los filtros llevan su valor
+          en la propia pastilla, «Estado: Activos», en lugar de un icono de embudo que hay que
+          adivinar. Y al pie está la regla de negocio que gobierna la pantalla.</p>
+        <figure class="shot">
+          <img src="/entregables/img/sio-qa/detalle-bien-pie.jpg" width="1241" height="95" loading="lazy"
+               alt="Pie del padrón: «Mostrando 15, orden más recientes primero, por página 25» y la regla del sistema sobre datos fiscales incompletos.">
+          <figcaption>Qué se muestra, en qué orden, y la regla que condiciona la operación.</figcaption>
+        </figure>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">B4</span><h3>El tablero admite que sus datos envejecen y explica su aritmética</h3></div>
+        <p class="donde">Tablero</p>
+        <p>«Actualizado hace un momento», junto a un botón para actualizar. Y una nota que explica
+          cómo se cuentan los admitidos del mes: por fecha de admisión, comparando contra un mes
+          anterior completo porque el actual todavía no ha terminado.</p>
+        <p>Un tablero que explica de dónde salen sus números es raro de ver, y evita la
+          desconfianza que hunde a la mayoría de los cuadros de mando internos.</p>
+        <figure class="shot nat">
+          <img src="/entregables/img/sio-qa/detalle-bien-frescura.jpg" width="310" height="50" loading="lazy"
+               alt="Esquina del tablero con el texto «Actualizado hace un momento» y un botón «Actualizar».">
+          <figcaption>La frescura del dato, dicha sin que haya que preguntarla.</figcaption>
+        </figure>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">B5</span><h3>Los estados llevan color, icono y palabra</h3></div>
+        <p class="donde">Padrón · transversal</p>
+        <p>«Completos» e «Incompletos» no se distinguen solo por el verde y el ámbar: llevan icono y
+          texto. Es lo que pide el sistema de diseño y lo primero que se suele incumplir, porque el
+          color solo es más rápido de programar y deja fuera a quien no lo distingue.</p>
+        <figure class="shot nat">
+          <img src="/entregables/img/sio-qa/detalle-bien-estados.jpg" width="195" height="110" loading="lazy"
+               alt="Pastillas «Incompletos» en ámbar y «Completos» en verde, cada una con su icono y su palabra.">
+          <figcaption>Color, icono y palabra en cada estado.</figcaption>
+        </figure>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">B6</span><h3>El sistema de diseño se está usando de verdad</h3></div>
+        <p class="donde">Transversal</p>
+        <p>De quince mediciones de estructura, las quince dieron correcto y seis salieron exactas al
+          bit. Superficies, texto, el azul del chrome y hasta el de la gráfica salen del token que
+          les toca, en los dos temas. La regla de que ningún componente lleve un hex literal se está
+          cumpliendo.</p>
+        <p>Las mediciones completas están en el <a href="#sistema">apartado de auditoría</a>.</p>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">B7</span><h3>Hay vocabulario propio para hablar de permisos</h3></div>
+        <p class="donde">Transversal</p>
+        <p>«Lo que puedes abrir», «Vista de Administración principal», «de toda la organización»,
+          «Nada en tu alcance». El producto ha construido una forma consistente de decirle al usuario
+          qué alcanza y qué no, y eso es una decisión de producto sólida.</p>
+        <p>La calibración de ese modelo es otra cosa, y se trata en el hallazgo R1.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ ALCANCE ══════════ -->
+<section id="alcance">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Cómo se hizo esta revisión, y qué no cubre</h2>
+    </div>
+    <div class="stack">
+      <div class="nota reveal">
+        Las capturas llevaban perfil de color embebido. Se convirtieron a sRGB antes de muestrearlas
+        contra los tokens de la versión 2.2.5, y los neutros salieron con una desviación máxima de 1
+        sobre 255. Esa calibración es la que permite afirmar que las desviaciones señaladas más
+        abajo son reales y no ruido de la captura.
+      </div>
+      <article class="card reveal">
+        <h3>Lo que queda fuera</h3>
+        <ul class="hacer" style="margin-top:0.8rem">
+          <li>El recorrido se hizo con un solo perfil, <strong>Administración principal</strong>. Lo
+            que se dice sobre roles es lo que ese perfil deja ver del modelo, no una comparación.</li>
+          <li>No hay capturas de errores de formulario, de la barra de selección del padrón ni del
+            alta de cliente. Están en el sistema de diseño, pero no se han podido contrastar contra
+            lo construido.</li>
+          <li>No se ha revisado la navegación por teclado ni el comportamiento a ancho de teléfono.
+            Las dos cosas piden el sistema en vivo.</li>
+          <li>Los datos de QA están casi vacíos. En cada hallazgo se distingue lo que es falta de
+            datos de prueba de lo que es diseño, y varios del tablero son de diseño precisamente
+            porque el sistema no sabe comportarse cuando no hay datos.</li>
+        </ul>
+      </article>
+      <div class="nota reveal">
+        <strong>Las razones sociales, los RFC y los VIN van difuminados.</strong> Este documento es
+        público y las capturas traían quince clientes reales identificables. Lo difuminado es solo
+        el contenido de esas celdas: los anchos de columna, los cortes de texto y la posición de
+        cada elemento están intactos, que es lo que aquí se mide.
+      </div>
+      <div class="nota reveal">
+        <strong>Para entrar hubo que abrir una ventana de incógnito.</strong> No es una anécdota de
+        la sesión de pruebas: si una sesión previa impide autenticarse otra vez, hay estado
+        persistido que no se está invalidando. Es el mismo territorio que la pantalla de
+        «Restaurando tu sesión», y merece mirarse como un solo problema.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SESIÓN ══════════ -->
+<section id="sesion">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Restauración de sesión</h2>
+      <p class="section-note">Es lo primero que ve quien vuelve al sistema, y es la pantalla más
+        floja del recorrido.</p>
+    </div>
+
+    <figure class="shot reveal" style="margin-bottom:1.5rem">
+      <img src="/entregables/img/sio-qa/sesion-restaurando.jpg" width="1600" height="1036" loading="lazy"
+           alt="Pantalla de carga: barra lateral azul con once rectángulos de esqueleto y el área principal vacía salvo el texto «Restaurando tu sesión...» en la esquina superior izquierda.">
+      <figcaption>La barra lateral carga con esqueletos. El 85 % restante de la pantalla está en blanco.</figcaption>
+    </figure>
+
+    <div class="stack">
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">S1</span><h3>El esqueleto no se distingue del fondo azul</h3></div>
+        <p class="donde">Prioridad alta · afecta al sistema de diseño</p>
+        <p>Los once rectángulos quedan a 1,42:1 sobre el azul de la barra lateral. El mínimo para un
+          elemento gráfico es 3:1, así que están a menos de la mitad. Es el único fallo de contraste
+          de todo el recorrido.</p>
+        <div class="fila">
+          <figure class="shot nat">
+            <img src="/entregables/img/sio-qa/detalle-esqueleto.jpg" width="420" height="585" loading="lazy"
+                 alt="Detalle de la barra lateral azul con los rectángulos de esqueleto, que apenas se separan del fondo.">
+            <figcaption>El único sitio donde pasa algo es el más difícil de ver.</figcaption>
+          </figure>
+          <div>
+            <div class="medida" style="margin-top:0">esqueleto  #3D658B
+chrome     #1E4E79
+
+medido     1,42:1
+mínimo     3,00:1</div>
+            <p style="margin-top:0.9rem">El sistema define <code>.skel</code> sobre
+              <code>--surface-2</code>, que es una superficie clara. La variante sobre el chrome azul
+              no la definió nadie, así que aquí se resolvió a ojo.</p>
+          </div>
+        </div>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Documentar la variante de esqueleto sobre chrome, con un valor comprobado a 3:1 en los
+            dos temas.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">S2</span><h3>Se carga con esqueleto lo accesorio y se deja en blanco lo principal</h3></div>
+        <p class="donde">Prioridad alta</p>
+        <p>La barra lateral, que siempre enseña los mismos cinco enlaces, recibe once esqueletos. El
+          área de contenido, que es donde el usuario mira y lo único que de verdad está por resolver,
+          se queda vacía. La atención va justo al revés de donde importa.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Dar la vuelta al reparto. La barra lateral puede pintarse ya con sus etiquetas reales,
+            porque no dependen de la sesión.</li>
+          <li>El esqueleto va en el contenido, con la silueta de lo que va a aparecer.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">S3</span><h3>El mensaje es texto suelto, sin contenedor ni margen</h3></div>
+        <p class="donde">Interfaz</p>
+        <p>«Restaurando tu sesión» cae pegado al borde superior izquierdo, sin padding, sin caja y
+          sin relación con la retícula del resto. El propio sistema avisa de esto: un contenedor
+          declara su padding y no lo delega en un hijo opcional.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Que el área de contenido lleve su padding con independencia de lo que haya dentro.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">S4</span><h3>No hay estado de carga, hay una frase</h3></div>
+        <p class="donde">Afecta al sistema de diseño</p>
+        <p>El sistema documenta cuatro vistas de estado, con datos, cargando, vacío y error, y aquí
+          no se usa ninguna. Sin indicador de progreso, sin tiempo estimado, y sin nada que diga qué
+          pasa si la restauración falla o se eterniza. El usuario no puede distinguir «tarda» de
+          «se colgó».</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Usar la vista «cargando» que ya existe.</li>
+          <li>Definir la salida: a los <em>n</em> segundos, un mensaje con acción, reintentar o
+            volver al acceso.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">S5</span><h3>El cambio de estado no se anuncia</h3></div>
+        <p class="donde">Accesibilidad</p>
+        <p>Un texto que aparece y desaparece no llega a un lector de pantalla. El sistema pide
+          <code>aria-live</code> y movimiento de foco en todo cambio de estado.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Región <code>aria-live="polite"</code> para el mensaje.</li>
+          <li>Llevar el foco al encabezado de la pantalla cuando termine la restauración.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">S6</span><h3>El botón flotante aparece cuando no puede hacer nada</h3></div>
+        <p class="donde">Experiencia</p>
+        <p>El círculo verde de la esquina está presente durante la carga, antes de que exista sesión
+          o contenido sobre el que actuar. Tampoco lleva etiqueta visible ni se aprecia nombre
+          accesible: es un círculo con un logotipo que no dice qué hace.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Ocultarlo hasta que la aplicación esté lista.</li>
+          <li>Darle un nombre.</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ ACCESO ══════════ -->
+<section id="login">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Acceso</h2>
+      <p class="section-note">La pantalla mejor resuelta del conjunto. Lo que queda son ajustes de
+        afinado, no de estructura.</p>
+    </div>
+
+    <div class="shot-pair reveal" style="margin-bottom:1.5rem">
+      <figure class="shot">
+        <img src="/entregables/img/sio-qa/login-claro.jpg" width="1600" height="922" loading="lazy"
+             alt="Pantalla de acceso en tema claro: panel izquierdo oscuro con una ilustración de cargador eléctrico y panel derecho claro con la tarjeta de entrada.">
+        <figcaption>Tema claro</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="/entregables/img/sio-qa/login-oscuro.jpg" width="1600" height="920" loading="lazy"
+             alt="La misma pantalla en tema oscuro: el panel izquierdo es idéntico y el derecho pasa a fondo oscuro.">
+        <figcaption>Tema oscuro. El panel izquierdo no cambia.</figcaption>
+      </figure>
+    </div>
+
+    <div class="stack">
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">L1</span><h3>El verde lima de marca se usa como texto de interfaz</h3></div>
+        <p class="donde">Afecta al sistema de diseño</p>
+        <p>El antetítulo «DPROMA-SIO» del panel izquierdo está en <code>#C8DA7C</code>, que es el
+          lima de marca. El sistema dice que ese lima vive fuera de los tokens y se reserva al
+          logotipo y al anillo de foco sobre oscuro, nunca a controles ni a texto de interfaz.</p>
+        <p>El contraste es correcto, 12,48:1, así que no hay problema de accesibilidad. Lo que hay
+          es una fuga de la regla que mantiene el lima como señal de marca.</p>
+        <div class="medida">antetítulo  #C8DA7C   ≈   lima de marca #C7D97B
+contraste   12,48:1  (pasa de sobra)</div>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Decidirlo de forma consciente. O el antetítulo pasa a un token de texto, o se amplía la
+            regla para admitir el lima en antetítulos sobre superficie de marca.</li>
+          <li>Lo que no puede quedarse es la regla diciendo una cosa y la pantalla haciendo otra.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">L2</span><h3>El panel izquierdo ignora el tema</h3></div>
+        <p class="donde">Interfaz · producto</p>
+        <p>La mitad izquierda es idéntica en claro y en oscuro. En oscuro el resultado es excelente y
+          la pantalla se lee como una pieza. En claro produce un corte duro entre una mitad casi
+          negra y otra casi blanca, y el conjunto parece dos pantallas pegadas.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Es una decisión legítima, muchos productos fijan el panel de marca, pero hay que
+            tomarla en vez de heredarla.</li>
+          <li>Si se mantiene fijo, suavizar la transición en claro. Si no, el panel necesita su
+            variante clara.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">L3</span><h3>Cuatro formas de escribir la marca en una pantalla</h3></div>
+        <p class="donde">Contenido</p>
+        <p>«DPROMA» en el logotipo superior. «DPROMA-SIO» en el cartel de la ilustración y en el
+          antetítulo. «SIO-DPROMA» en el aviso de seguridad y en la barra lateral de la aplicación.
+          Y «DPROMA-SIO» otra vez en el título de la pestaña del navegador. El sistema de diseño
+          nombra el producto <strong>SIO-DPROMA</strong>.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Fijar una forma y aplicarla en todas partes, incluido el <code>&lt;title&gt;</code>.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">L4</span><h3>Los dos enlaces del pie compiten con el mismo peso</h3></div>
+        <p class="donde">Experiencia</p>
+        <p>«¿Olvidaste tu contraseña de Google?» y «¿Problemas para entrar? Levanta un ticket» llevan
+          idéntico tratamiento. En un sistema interno el segundo resuelve muchos más casos, y el
+          primero además lleva fuera del producto.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Jerarquizar. El ticket es la salida real cuando alguien no consigue entrar.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">L5</span><h3>El conmutador de tema se ve distinto en cada tema</h3></div>
+        <p class="donde">Interfaz · sin verificar</p>
+        <p>En claro aparece con un borde verde y en oscuro sin él. Si ese borde es el anillo de foco,
+          el foco quedó capturado en un caso y no en el otro, y no hay hallazgo. Si es un estilo de
+          reposo, el mismo control tiene dos aspectos.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Verificar cuál de las dos cosas es.</li>
+          <li>En cualquier caso el control no tiene etiqueta visible y necesita nombre accesible.</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ TABLERO ══════════ -->
+<section id="tablero">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Tablero</h2>
+      <p class="section-note">Aquí se concentra la mayor parte del trabajo pendiente, y casi todo es
+        de contenido más que de estilo.</p>
+    </div>
+
+    <div class="shot-pair reveal" style="margin-bottom:1.5rem">
+      <figure class="shot">
+        <img src="/entregables/img/sio-qa/tablero-claro.jpg" width="1600" height="922" loading="lazy"
+             alt="Tablero en tema claro con siete tarjetas de métrica, cinco de ellas a cero, y tres bloques debajo.">
+        <figcaption>Tema claro</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="/entregables/img/sio-qa/tablero-oscuro.jpg" width="1600" height="923" loading="lazy"
+             alt="El mismo tablero en tema oscuro, con idéntica disposición.">
+        <figcaption>Tema oscuro</figcaption>
+      </figure>
+    </div>
+
+    <div class="stack">
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">T1</span><h3>«De un vistazo» da ceros, no un vistazo</h3></div>
+        <p class="donde">Prioridad alta</p>
+        <p>Siete tarjetas, cinco marcan cero. La primera pantalla del sistema, para el perfil con más
+          permisos, comunica sobre todo ausencia. Parte es que QA tiene pocos datos, pero no todo:
+          hay 845 trámites y 796 en proceso cargados. Lo que pasa es que la mitad superior está
+          dedicada a un dominio vacío, las órdenes de instalación, y el dominio que sí tiene volumen
+          aparece en tercer lugar.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Ordenar la fila por lo que de verdad tiene actividad.</li>
+          <li>Que una métrica sin datos no ocupe el mismo espacio que una con 845. Un cero puede ser
+            una línea de texto en vez de una tarjeta.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">T2</span><h3>La gráfica no se puede leer</h3></div>
+        <p class="donde">Prioridad alta</p>
+        <div class="fila">
+          <figure class="shot nat">
+            <img src="/entregables/img/sio-qa/detalle-grafica.jpg" width="460" height="331" loading="lazy"
+                 alt="Gráfica de barras sin eje ni valores: cuatro barras azules del mismo color, una reducida a un hilo.">
+            <figcaption>Cuatro barras, un color, sin eje ni valores.</figcaption>
+          </figure>
+          <div>
+            <p>Cuatro barras del mismo azul, sin eje, sin escala y sin valores encima. Los números
+              son 49, 5, 99 y 692. Con escala lineal, «En dependencia» se queda en un hilo de tres
+              píxeles y la de 692 se come todo el ancho.</p>
+            <p>Como las cuatro categorías comparten color, el color tampoco separa nada. Al final no
+              se puede comparar nada que no esté ya en la tabla de debajo.</p>
+            <p>El azul es el correcto, sale de <code>--serie-1</code>. Lo que falla es cómo se
+              codifican los datos.</p>
+          </div>
+        </div>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>O se etiquetan las barras con su valor y su categoría, o <strong>se quita la gráfica y
+            se deja la tabla</strong>, que ya está y funciona.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">T3</span><h3>El ámbar de aviso marca el ámbito de los datos</h3></div>
+        <p class="donde">Prioridad alta · afecta al sistema de diseño</p>
+        <p>«De toda la organización» sale cuatro veces en la misma pantalla, en ámbar. En el sistema
+          el ámbar es <code>--warn</code> y significa que falta algo o que algo vence pronto. Aquí no
+          falta nada: solo se dice a qué conjunto de datos se refiere cada tarjeta.</p>
+        <p><strong>Cuatro avisos falsos por pantalla desgastan el aviso de verdad.</strong> Cuando
+          algo venza y haya que mirarlo, la pastilla ámbar ya no llamará la atención de nadie.</p>
+        <figure class="shot">
+          <img src="/entregables/img/sio-qa/detalle-ambito.jpg" width="1360" height="175" loading="lazy"
+               alt="Bloque «De un vistazo» con la pastilla ámbar «de toda la organización» y siete tarjetas de métrica.">
+          <figcaption>El ámbar de aviso usado para marcar un ámbito. Se repite en cada tarjeta.</figcaption>
+        </figure>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Tratamiento neutro para el ámbito. Es un dato sobre el dato, no un estado.</li>
+          <li>Documentar «ámbito» como pieza propia del sistema.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">T4</span><h3>«Lo que puedes abrir» repite la barra lateral</h3></div>
+        <p class="donde">Experiencia</p>
+        <p>Los cinco enlaces de esa fila son exactamente los cinco de la navegación lateral, que está
+          siempre visible a dos centímetros. Ocupa la posición más valiosa de la pantalla, lo primero
+          bajo el encabezado, para no añadir nada.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Quitarla, o convertirla en lo que su título promete. No «lo que puedes abrir» sino
+            <strong>lo que te toca hacer hoy</strong>, que sí sería un buen primer bloque.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">T5</span><h3>Dos vacíos distintos, redactados de dos maneras</h3></div>
+        <p class="donde">Contenido</p>
+        <p>«Órdenes de instalación» dice «Nada en tu alcance». «Incidencias abiertas» muestra un 0.
+          Son dos formas de decir lo mismo y además significan cosas distintas: una habla de permisos
+          y la otra de cantidad. Las dos ofrecen un botón «Ver la lista» que lleva a una lista vacía.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Unificar la redacción y separar los dos casos. No tener acceso no es lo mismo que estar
+            a cero.</li>
+          <li>No ofrecer «Ver la lista» cuando no hay lista.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">T6</span><h3>«−1 frente a los 1 del mes anterior»</h3></div>
+        <p class="donde">Contenido</p>
+        <p>La frase está rota gramaticalmente y presenta una resta como si fuera un dato de contexto.
+          Con cifras de un dígito se nota. Con cifras mayores pasará desapercibido y seguirá mal.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Plantilla que funcione con singular y plural, y que diga el signo en palabras: «1 menos
+            que el mes anterior (1)».</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">T7</span><h3>Cuatro líneas de encabezado antes del primer dato</h3></div>
+        <p class="donde">Experiencia</p>
+        <p>«Tablero», «Buen día, Administración», «Vista de Administración principal» y la fecha
+          completa, uno debajo de otro. El saludo además se dirige a un rol y no a una persona, lo
+          que suena raro justamente porque intenta sonar cercano. El nombre real del usuario ya está
+          arriba a la derecha.</p>
+        <figure class="shot nat">
+          <img src="/entregables/img/sio-qa/detalle-encabezado.jpg" width="660" height="130" loading="lazy"
+               alt="Encabezado del tablero con cuatro líneas: título, saludo, vista de perfil y fecha completa.">
+          <figcaption>Cuatro líneas antes de llegar al primer número.</figcaption>
+        </figure>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Comprimir a dos líneas. El rol y la fecha caben junto al título.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">T8</span><h3>La nota que explica una tarjeta está lejos de esa tarjeta</h3></div>
+        <p class="donde">Interfaz</p>
+        <p>El párrafo que explica cómo se cuentan los admitidos, que es una idea buena y está
+          recogida en B4, se ha colocado al pie de toda la fila, a siete tarjetas de distancia de
+          «Admitidos este mes», que es la única a la que se refiere.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Anclarla a su tarjeta, como nota desplegable o al pie de esa tarjeta concreta.</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PADRÓN ══════════ -->
+<section id="padron">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Padrón de clientes</h2>
+      <p class="section-note">La pantalla más trabajada del sistema y la que más se acerca a lo que
+        recomendaba su entregable. Aun así reaparece una trampa que ya habíamos documentado.</p>
+    </div>
+
+    <div class="shot-pair reveal" style="margin-bottom:1.5rem">
+      <figure class="shot">
+        <img src="/entregables/img/sio-qa/padron-claro.jpg" width="1600" height="924" loading="lazy"
+             alt="Padrón de clientes en tema claro: buscador, siete pastillas en una fila y tabla de quince clientes con dos columnas vacías.">
+        <figcaption>Tema claro</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="/entregables/img/sio-qa/padron-oscuro.jpg" width="1600" height="924" loading="lazy"
+             alt="El mismo padrón en tema oscuro, con idéntica estructura.">
+        <figcaption>Tema oscuro. Los mismos problemas.</figcaption>
+      </figure>
+    </div>
+
+    <div class="stack">
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">P1</span><h3>Los conteos y los filtros tienen la misma forma</h3></div>
+        <p class="donde">Prioridad alta · ya señalado en administración vehicular</p>
+        <p>Siete pastillas en la misma fila y con el mismo aspecto. Tres son conteos («15 activos»,
+          «5 registro incompleto», «0 inactivos») y cuatro son filtros («Estado: Activos», «Tipo:
+          Todos»…). Es el problema que documentamos en vehicular: si algo filtra al pulsarlo tiene
+          que parecer un control, y si no filtra no debe parecerlo.</p>
+        <figure class="shot">
+          <img src="/entregables/img/sio-qa/detalle-pastillas.jpg" width="1370" height="150" loading="lazy"
+               alt="Fila del padrón con siete pastillas de aspecto casi idéntico: tres conteos y cuatro filtros.">
+          <figcaption>Tres conteos y cuatro filtros, con la misma forma y en la misma fila.</figcaption>
+        </figure>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Separarlos en sitio y en forma. Los conteos resumen cómo está el padrón. Los filtros
+            son controles.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">P2</span><h3>Los conteos no cuadran con el total</h3></div>
+        <p class="donde">Prioridad alta · datos</p>
+        <p>Arriba dice 15 razones sociales. Las pastillas dicen 15 activos, 5 con registro incompleto
+          y 0 inactivos, que suman 20 sobre un universo de 15. Pasa porque «registro incompleto» no
+          es una alternativa a «activo» sino algo que se superpone, pero eso no hay manera de
+          deducirlo mirando la pantalla.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Tratar la fase y la condición como dos ejes distintos, igual que se hizo en trámites.
+            Activo o inactivo por un lado, completo o incompleto por otro.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">P3</span><h3>Dos columnas vacías, y la razón social cortada</h3></div>
+        <p class="donde">Prioridad alta</p>
+        <p>«Contacto principal» y «Último movimiento» tienen un guion en las quince filas. Mientras
+          tanto la razón social, que es por donde se busca a un cliente, sale truncada con puntos
+          suspensivos. Sobra sitio donde no hay nada y falta donde está el dato que se lee.</p>
+        <p>Medido sobre la captura: la razón social se queda en <strong>300px, un 17,6% del ancho de
+          la tabla</strong>, cuando el sistema le asigna el 26%. Y las columnas anchas resultan ser
+          las de rótulo largo —«Documentos fiscales», «Último movimiento»—, o sea que
+          <strong>el ancho lo está fijando la cabecera y no el dato</strong>.</p>
+        <figure class="shot">
+          <img src="/entregables/img/sio-qa/detalle-columnas.jpg" width="1376" height="225" loading="lazy"
+               alt="Tabla del padrón con razones sociales cortadas y las columnas Contacto principal y Último movimiento llenas de guiones.">
+          <figcaption>Razones sociales cortadas a la izquierda, dos columnas de guiones a la derecha.</figcaption>
+        </figure>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Fuera de la vista por defecto cualquier columna vacía en todos los registros. El
+            control «Columnas» ya está hecho, o sea que esto es decidir, no programar.</li>
+          <li>Devolver ese ancho a la razón social.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">P4</span><h3>El nombre del cliente no es un enlace</h3></div>
+        <p class="donde">Prioridad alta</p>
+        <p>Para abrir una ficha hay que acertar con un icono de ojo de unos 20 píxeles al final de la
+          fila, entre otros dos sin etiqueta. Pulsar el nombre, que es lo que haría cualquiera, no
+          hace nada. En vehicular señalamos lo contrario: allí el folio sí era enlace y sobraba el
+          botón «Abrir». Aquí falta el enlace y solo queda el icono.</p>
+        <div class="fila">
+          <figure class="shot nat">
+            <img src="/entregables/img/sio-qa/detalle-acciones.jpg" width="120" height="225" loading="lazy"
+                 alt="Columna de acciones con tres iconos sin etiqueta: un ojo, un lápiz y un documento, repetidos en cada fila.">
+            <figcaption>Ojo, lápiz y documento, sin texto.</figcaption>
+          </figure>
+          <div>
+            <div class="et" style="margin-top:0">Qué hacer</div>
+            <ul class="hacer">
+              <li><strong>La razón social enlaza a la ficha.</strong></li>
+              <li>Nombre accesible para los tres iconos de acción.</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">P5</span><h3>Dos verdes con dos significados en la misma fila</h3></div>
+        <p class="donde">Interfaz</p>
+        <p>«Completos», de documentos fiscales, y «Activo», de comercial, usan la misma pastilla verde
+          con el mismo icono. Son dos ejes distintos: uno habla de si el expediente está lleno y el
+          otro de si el cliente opera. En una fila leída rápido se funden en una sola idea de «todo
+          bien».</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Diferenciar el tratamiento, o quitar la columna Comercial de la vista por defecto si
+            «Activo» ya se deduce del filtro de estado aplicado.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">P6</span><h3>El violeta de «bloqueado» marca la categoría Empresa</h3></div>
+        <p class="donde">Prioridad alta · afecta al sistema de diseño</p>
+        <p>El violeta del punto y el texto de la columna Tipo viene de la familia <code>--block</code>,
+          que en el sistema quiere decir «bloqueado por una condición externa». Empresa no es un
+          estado ni un bloqueo. Es una categoría.</p>
+        <p>De fondo es lo mismo que T3: <strong>la paleta semántica se está usando para pintar cosas
+          que no tienen semántica.</strong> Van dos casos en tres pantallas.</p>
+        <div class="medida">punto y texto «Empresa»     medido   #6E4FA3
+--block-ink (estado)        esperado #5B4680   delta 35</div>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Las categorías salen de las series (<code>--serie-*</code>) o de un tratamiento neutro.</li>
+          <li>Escribir la regla en el sistema: una categoría no toma su color del semáforo.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">P7</span><h3>La ficha del cliente no ofrece ninguna acción</h3></div>
+        <p class="donde">Alcance pendiente, no defecto</p>
+        <p>«Sin contacto principal designado». «Sin contactos». Debajo, una tabla de más de quince
+          unidades donde Placas y Descripción dicen «sin placas» y «sin datos» en todas las filas. No
+          hay dónde editar, ni añadir un contacto, ni completar nada. Se puede leer lo que falta y
+          volver atrás.</p>
+        <p>Hay algo más raro: en el listado este cliente aparece marcado con <strong>documentos
+          fiscales incompletos</strong>, y ese dato, que es el que dispara la alerta, no está en su
+          ficha por ningún lado.</p>
+        <figure class="shot">
+          <img src="/entregables/img/sio-qa/detalle-ficha-vacios.jpg" width="1376" height="330" loading="lazy"
+               alt="Ficha de cliente con los bloques «Contacto principal» y «Sucursales y contactos» vacíos y sin botones.">
+          <figcaption>Cada bloque dice lo que falta. Ninguno ofrece cómo arreglarlo.</figcaption>
+        </figure>
+        <div class="shot-pair">
+          <figure class="shot">
+            <img src="/entregables/img/sio-qa/ficha-claro.jpg" width="1600" height="923" loading="lazy"
+                 alt="Ficha de cliente completa en tema claro, con la tabla de unidades sin datos.">
+            <figcaption>La ficha entera, tema claro</figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="/entregables/img/sio-qa/ficha-oscuro.jpg" width="1600" height="1036" loading="lazy"
+                 alt="La misma ficha en tema oscuro, con los mismos bloques vacíos.">
+            <figcaption>Tema oscuro</figcaption>
+          </figure>
+        </div>
+        <div class="nota" style="margin:1rem 0 0">
+          <strong>Esto sale de la lista de ajustes.</strong> La ficha no está construida todavía:
+          lo que se ve es el esqueleto de una pantalla por hacer, no una pantalla mal hecha. Queda
+          aquí como alcance pendiente y con la evidencia, para que cuando se construya no se
+          repitan las dos cosas de abajo.
+        </div>
+        <div class="et">Cuando se construya</div>
+        <ul class="hacer">
+          <li>Cada hueco con su acción al lado: designar contacto principal, añadir contactos,
+            completar datos fiscales.</li>
+          <li>Que los datos fiscales se vean en la ficha y no solo en el listado.</li>
+          <li>Es lo mismo que aplicamos en trámites: <strong>si el aviso dice que falta la ficha
+            técnica, el botón de subirla va pegado al aviso.</strong></li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">P8</span><h3>El modal se llama «Editar cliente» y edita un campo</h3></div>
+        <p class="donde">Contenido</p>
+        <p>Solo permite cambiar la razón social. Está bien resuelto, como se dice en B2, pero mal
+          nombrado: quien entra buscando corregir un dato fiscal o un contacto sale sin encontrarlo y
+          sin saber dónde está.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Llamarlo «Editar razón social», y decir dónde se editan las demás cosas.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">P9</span><h3>Hay casillas de selección pero no se ve qué hacen</h3></div>
+        <p class="donde">Sin verificar</p>
+        <p>La tabla tiene casilla por fila y casilla de «seleccionar todo» en la cabecera. El sistema
+          documenta una barra de selección con las acciones aplicables, pero no hay captura que
+          confirme si aparece ni qué ofrece.</p>
+        <p>Y hay algo que sí se puede medir sin esa captura: la casilla ocupa
+          <strong>24×24px</strong> y el icono de abrir un cliente, que es la acción principal de la
+          fila, <strong>20</strong>. Los tamaños están invertidos respecto al uso.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Verificar. Si la barra no existe, las casillas prometen algo que no se cumple.</li>
+          <li>Si existe, comprobar que dice a cuántos registros va a afectar la acción.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">P10</span><h3>El botón flotante tapa la paginación</h3></div>
+        <p class="donde">Interfaz</p>
+        <p>En el padrón el círculo verde de la esquina se solapa con el control «Siguientes». En la
+          captura de tema claro se ve además una segunda superficie asomando bajo él.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Reservar el espacio inferior derecho, o desplazar el botón cuando haya controles ahí.</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PERFILES ══════════ -->
+<section id="perfiles">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Flujo por perfil</h2>
+    </div>
+    <div class="stack">
+      <div class="nota reveal">
+        Todo el recorrido se hizo como <strong>Administración principal</strong>. Comparar perfiles
+        exige capturas de al menos uno operativo y uno de dirección. Lo que sigue es lo que este
+        perfil deja ver del modelo.
+      </div>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">R1</span><h3>El tablero del administrador principal sale casi vacío</h3></div>
+        <p class="donde">Prioridad alta · producto</p>
+        <p>El vocabulario de permisos está bien construido, como se recoge en B7. Lo que no está bien
+          es la calibración. <strong>El perfil con más permisos de la organización entra y se
+          encuentra cinco métricas a cero y un «Nada en tu alcance».</strong> O el alcance del admin
+          está mal definido, o la redacción alarma sin motivo.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Revisar qué significa «alcance» para administración principal.</li>
+          <li>Distinguir en el texto no tener permiso de tener permiso sobre algo vacío.</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">R2</span><h3>Un grupo y un elemento con el mismo nombre en la barra lateral</h3></div>
+        <p class="donde">Experiencia</p>
+        <p>El grupo «Trámites vehiculares» contiene un elemento llamado «Trámites vehiculares», junto
+          a «Trámites concluidos» y «Gestoría». Un rótulo de grupo que se repite como hoja del árbol
+          hace dudar de si se ha pulsado lo correcto.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Renombrar uno de los dos. Si el grupo es el dominio, el elemento puede ser «En curso»,
+            que además empareja bien con «Concluidos».</li>
+        </ul>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">R3</span><h3>Qué falta capturar para cerrar este apartado</h3></div>
+        <p class="donde">Pendiente</p>
+        <p>Con el tablero, el padrón y la barra lateral desplegada de un perfil operativo (almacén o
+          comercial) y uno de dirección, este apartado pasa de lectura a comparación: qué ve cada
+          rol, qué se le oculta, y si lo que le queda le sirve para su trabajo.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SISTEMA DE DISEÑO ══════════ -->
+<section id="sistema">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Uso del sistema de diseño</h2>
+      <p class="section-note">Medición directa sobre las capturas, convertidas a sRGB, contra los
+        tokens de SIO-DPROMA v2.2.5. La primera tabla es la calibración: si los neutros salen
+        clavados, lo que se desvíe después es una desviación real.</p>
+    </div>
+
+    <div class="stack">
+      <figure class="tabla-bloque reveal">
+        <figcaption class="tabla-titulo" id="cap-1"><strong>Calibración y estructura.</strong>
+          Superficies, texto, chrome y series de gráfica. Delta = diferencia máxima por canal, sobre 255.</figcaption>
+        <div class="tabla-scroll">
+          <table aria-labelledby="cap-1">
+            <thead><tr><th>Elemento medido</th><th>Token</th><th>Esperado</th><th>Medido</th><th>Delta</th><th>Veredicto</th></tr></thead>
+            <tbody>
+              <tr><td>Fondo de página, claro</td><td><code>--bg</code></td><td><code><span class="swatch" style="background:#F2F5F7"></span>#F2F5F7</code></td><td><code>#F3F5F7</code></td><td>1</td><td><span class="v v-ok">Correcto</span></td></tr>
+              <tr><td>Superficie, claro</td><td><code>--surface</code></td><td><code><span class="swatch" style="background:#FAFCFD"></span>#FAFCFD</code></td><td><code>#FBFCFD</code></td><td>1</td><td><span class="v v-ok">Correcto</span></td></tr>
+              <tr><td>Superficie secundaria, claro</td><td><code>--surface-2</code></td><td><code><span class="swatch" style="background:#E7EDF3"></span>#E7EDF3</code></td><td><code>#E7EDF4</code></td><td>1</td><td><span class="v v-ok">Correcto</span></td></tr>
+              <tr><td>Fondo de página, oscuro</td><td><code>--bg</code></td><td><code><span class="swatch" style="background:#10161F"></span>#10161F</code></td><td><code>#10161F</code></td><td>0</td><td><span class="v v-ok">Exacto</span></td></tr>
+              <tr><td>Superficie, oscuro</td><td><code>--surface</code></td><td><code><span class="swatch" style="background:#171F2C"></span>#171F2C</code></td><td><code>#171F2C</code></td><td>0</td><td><span class="v v-ok">Exacto</span></td></tr>
+              <tr><td>Superficie secundaria, oscuro</td><td><code>--surface-2</code></td><td><code><span class="swatch" style="background:#1D2735"></span>#1D2735</code></td><td><code>#1D2735</code></td><td>0</td><td><span class="v v-ok">Exacto</span></td></tr>
+              <tr><td>Barra lateral, claro</td><td><code>--chrome</code></td><td><code><span class="swatch" style="background:#1E4E79"></span>#1E4E79</code></td><td><code>#1E4E79</code></td><td>0</td><td><span class="v v-ok">Exacto</span></td></tr>
+              <tr><td>Barra lateral, oscuro</td><td><code>--chrome</code></td><td><code><span class="swatch" style="background:#122740"></span>#122740</code></td><td><code>#122840</code></td><td>1</td><td><span class="v v-ok">Correcto</span></td></tr>
+              <tr><td>Barras de la gráfica, claro</td><td><code>--serie-1</code></td><td><code><span class="swatch" style="background:#2a78d6"></span>#2A78D6</code></td><td><code>#2A79D7</code></td><td>1</td><td><span class="v v-ok">Correcto</span></td></tr>
+              <tr><td>Barras de la gráfica, oscuro</td><td><code>--serie-1</code></td><td><code><span class="swatch" style="background:#3987e5"></span>#3987E5</code></td><td><code>#3987E5</code></td><td>0</td><td><span class="v v-ok">Exacto</span></td></tr>
+              <tr><td>Texto principal, claro</td><td><code>--text</code></td><td><code><span class="swatch" style="background:#1B2430"></span>#1B2430</code></td><td><code>#1B2430</code></td><td>0</td><td><span class="v v-ok">Exacto</span></td></tr>
+              <tr><td>Texto secundario, claro</td><td><code>--text-2</code></td><td><code><span class="swatch" style="background:#4C5A6B"></span>#4C5A6B</code></td><td><code>#4C5A6C</code></td><td>1</td><td><span class="v v-ok">Correcto</span></td></tr>
+              <tr><td>Texto auxiliar, claro</td><td><code>--text-3</code></td><td><code><span class="swatch" style="background:#5C6675"></span>#5C6675</code></td><td><code>#5C6675</code></td><td>0</td><td><span class="v v-ok">Exacto</span></td></tr>
+              <tr><td>Texto secundario, oscuro</td><td><code>--text-2</code></td><td><code><span class="swatch" style="background:#A8B3C2"></span>#A8B3C2</code></td><td><code>#A8B3C2</code></td><td>0</td><td><span class="v v-ok">Exacto</span></td></tr>
+              <tr><td>Texto principal, oscuro</td><td><code>--text</code></td><td><code><span class="swatch" style="background:#E7ECF2"></span>#E7ECF2</code></td><td><code>#E7ECF3</code></td><td>1</td><td><span class="v v-ok">Correcto</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </figure>
+
+      <div class="nota reveal">
+        Quince mediciones de estructura, quince aciertos, seis exactos al bit. Las superficies, el
+        texto, el chrome y hasta el azul de la serie de gráfica salen del token correcto en los dos
+        temas. Esto no es lo habitual. Lo que sigue es la excepción, y está concentrada en un solo
+        sitio.
+      </div>
+
+      <figure class="tabla-bloque reveal">
+        <figcaption class="tabla-titulo" id="cap-2"><strong>Donde el sistema se está reinventando.</strong>
+          Las pastillas de estado, con las mismas capturas y el mismo método. Aquí los deltas se disparan.</figcaption>
+        <div class="tabla-scroll">
+          <table aria-labelledby="cap-2">
+            <thead><tr><th>Elemento medido</th><th>Token</th><th>Esperado</th><th>Medido</th><th>Delta</th><th>Veredicto</th></tr></thead>
+            <tbody>
+              <tr><td>«Completos», fondo</td><td><code>--ok-bg</code></td><td><code><span class="swatch" style="background:#DCF0E7"></span>#DCF0E7</code></td><td><code>#E3EFEC</code></td><td>7</td><td><span class="v v-duda">Deriva</span></td></tr>
+              <tr><td>«Completos», tinta</td><td><code>--ok-ink</code></td><td><code><span class="swatch" style="background:#1D5A46"></span>#1D5A46</code></td><td><code>#22715A</code></td><td>23</td><td><span class="v v-mal">Fuera de token</span></td></tr>
+              <tr><td>«Incompletos», fondo</td><td><code>--warn-bg</code></td><td><code><span class="swatch" style="background:#F5E7C6"></span>#F5E7C6</code></td><td><code>#F1ECDF</code></td><td>25</td><td><span class="v v-mal">Fuera de token</span></td></tr>
+              <tr><td>«Incompletos», tinta</td><td><code>--warn-ink</code></td><td><code><span class="swatch" style="background:#6E5210"></span>#6E5210</code></td><td><code>#7E5C0E</code></td><td>16</td><td><span class="v v-mal">Fuera de token</span></td></tr>
+              <tr><td>Punto y texto «Empresa»</td><td><code>--block-ink</code></td><td><code><span class="swatch" style="background:#5B4680"></span>#5B4680</code></td><td><code>#6E4FA3</code></td><td>35</td><td><span class="v v-mal">Fuera de token</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </figure>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">D1</span><h3>Las pastillas de estado no salen de los tokens</h3></div>
+        <p class="donde">Prioridad alta</p>
+        <p>Los cinco valores de estado medidos están fuera de sus tokens, con desviaciones de hasta
+          35 sobre 255, en las mismas capturas donde los neutros salieron exactos. Estas pastillas se
+          pintaron con valores propios en lugar de con las variables del sistema.</p>
+        <p>Hoy el contraste aguanta, 4,98:1 los verdes y 5,20:1 los ámbares, los dos por encima de
+          4,5:1. El problema es lo que viene después: los valores del sistema están comprobados sobre
+          todos los fondos donde pueden caer y estas aproximaciones no lo están.</p>
+        <div class="et">Qué hacer</div>
+        <ul class="hacer">
+          <li>Cambiar los literales por <code>--ok-bg</code>, <code>--ok-ink</code>,
+            <code>--warn-bg</code> y <code>--warn-ink</code>.</li>
+          <li>Hacerlo antes de construir los módulos que faltan, para que lo que se copie sea la
+            versión buena.</li>
+        </ul>
+      </article>
+
+      <figure class="tabla-bloque reveal">
+        <figcaption class="tabla-titulo" id="cap-3"><strong>Contraste medido.</strong>
+          Cada elemento contra el fondo que le toca, en la captura correspondiente.</figcaption>
+        <div class="tabla-scroll">
+          <table aria-labelledby="cap-3">
+            <thead><tr><th>Elemento</th><th>Sobre</th><th>Medido</th><th>Exige</th><th>Veredicto</th></tr></thead>
+            <tbody>
+              <tr><td>Razón social del cliente</td><td>superficie</td><td>14,32:1</td><td>4,5:1</td><td><span class="v v-ok">Pasa</span></td></tr>
+              <tr><td>RFC, cabeceras y pie del padrón</td><td>superficie</td><td>5,32:1</td><td>4,5:1</td><td><span class="v v-ok">Pasa</span></td></tr>
+              <tr><td>Texto secundario de tarjetas</td><td>superficie</td><td>6,73:1</td><td>4,5:1</td><td><span class="v v-ok">Pasa</span></td></tr>
+              <tr><td>Nota explicativa, tema oscuro</td><td>superficie</td><td>7,80:1</td><td>4,5:1</td><td><span class="v v-ok">Pasa</span></td></tr>
+              <tr><td>Pastilla «Completos»</td><td>su fondo</td><td>4,98:1</td><td>4,5:1</td><td><span class="v v-ok">Pasa</span></td></tr>
+              <tr><td>Pastilla «Incompletos»</td><td>su fondo</td><td>5,20:1</td><td>4,5:1</td><td><span class="v v-ok">Pasa</span></td></tr>
+              <tr><td>Texto «Empresa»</td><td>superficie</td><td>5,80:1</td><td>4,5:1</td><td><span class="v v-ok">Pasa</span></td></tr>
+              <tr><td>Antetítulo del acceso</td><td>panel de marca</td><td>12,48:1</td><td>4,5:1</td><td><span class="v v-ok">Pasa</span></td></tr>
+              <tr><td>Párrafo del panel de acceso</td><td>panel de marca</td><td>11,30:1</td><td>4,5:1</td><td><span class="v v-ok">Pasa</span></td></tr>
+              <tr><td><strong>Esqueleto de carga</strong></td><td><strong>chrome</strong></td><td><strong>1,42:1</strong></td><td><strong>3:1</strong></td><td><span class="v v-mal">No pasa</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </figure>
+
+      <div class="nota reveal">
+        <strong>Un solo fallo de contraste en todo el recorrido</strong>, y es el esqueleto sobre el
+        chrome, justo el único componente para el que el sistema no había definido su variante. La
+        correlación no es casual: donde hay regla, la implementación acierta. Donde no la hay,
+        alguien improvisa y a veces sale mal.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ LO QUE FALTA DOCUMENTAR ══════════ -->
+<section id="falta">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Lo que el sistema de diseño ganó con esto</h2>
+      <p class="section-note">La primera versión de este apartado proponía cuatro piezas nuevas. Al
+        ir a escribirlas apareció que tres ya estaban.</p>
+    </div>
+
+    <div class="stack">
+      <div class="nota reveal">
+        <strong>De los cuatro, solo el ámbito de datos lo era.</strong> El esqueleto sobre el
+        cromo dejó de hacer falta al confirmar que la navegación es igual para todos los perfiles:
+        la barra lateral se pinta de inmediato con sus etiquetas y el esqueleto va solo en el
+        contenido. El arranque en frío ya estaba cubierto por §6.4. La regla de que una categoría no
+        usa el semáforo estaba escrita entera en §12.5, pero dentro del capítulo de gráficas, así que
+        nadie fue a buscarla para una etiqueta de tabla. Lo que fallaba no era que faltaran reglas:
+        era que no se encontraban.
+      </div>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">2.3.0</span><h3>Ámbito de datos, y tres reglas que se mudan de sitio</h3></div>
+        <p class="donde">§6.22 · §1 · §6.4</p>
+        <p>Entra el <strong>ámbito de datos</strong> (§6.22), la única pieza que de verdad no
+          existía: de qué conjunto habla una cifra. Sin token nuevo, porque <code>--text-3</code> ya
+          pasa 4,5:1 sobre las tres superficies donde puede caer en los dos temas.</p>
+        <p>La regla de qué paleta le toca a cada dato <strong>sube de §12.5 a §1</strong>, que es
+          donde gobierna todo el color. §6.4 gana la restauración de sesión como caso de la vista
+          «cargando», con la salida por tiempo o por fallo que no existía y la regla de que el
+          esqueleto anticipa lo que va a aparecer. Y se cierra la deuda del <code>--text-3</code> en
+          la maqueta de acceso.</p>
+      </article>
+
+      <article class="card reveal">
+        <div class="h-cab"><span class="h-num">2.4.0</span><h3>La fila de cifras pasa a ser un componente</h3></div>
+        <p class="donde">§12.4.1 · <code>.cifras</code></p>
+        <p>T1 no se resolvía con una nota al pie. <code>.kpi</code> servía para <strong>una</strong>
+          cifra por widget, con el rótulo en la cabecera; el tablero necesitaba siete en un bloque y
+          lo resolvió por su cuenta. Las siete tarjetas miden lo mismo, 175 por 97, así que no era un
+          problema de tamaño: la cifra está clavada a la misma altura en las siete y el rótulo cae a
+          tres alturas distintas, con 34px de horquilla, porque el interior va anclado abajo.</p>
+        <p>Entra <code>.cifras</code>, con la cifra y el bloque de rótulo compartiendo rejilla entre
+          todas las tarjetas de la fila. Con ello, cuatro reglas de composición: el apoyo es de una
+          línea y una definición de la medida baja a la nota de método; una fila de cifras es un
+          grupo con nombre, y dos familias son dos grupos; un grupo entero en cero se pinta como
+          vacío; y el techo son cuatro cifras por grupo.</p>
+        <p>El QA previo al merge tumbó dos decisiones propias. El apoyo se recortaba con elipsis y al
+          ancho mínimo que el componente declara cortaba su propio ejemplo sin forma de leerlo. Y la
+          decisión de no llevar borde dejaba las cajas invisibles en el alto contraste del sistema,
+          donde todos los fondos se igualan.</p>
+      </article>
+
+      <div class="nota reveal">
+        Las dos versiones están escritas en los tres archivos que el sistema mantiene
+        sincronizados —la fuente técnica, la copia descargable y la página renderizada— y anotadas en
+        su historial. <a href="/entregables/reglas-de-diseno#dashboard">El componente está vivo en la
+        página del sistema</a>.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PRIORIDADES ══════════ -->
+<section id="prioridades">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Por dónde empezar</h2>
+      <p class="section-note">Siete ajustes, ordenados por lo que cuesta arreglarlos frente a lo que
+        estorban. Están también en un
+        <a href="/entregables/SIO-DPROMA-ajustes-prioritarios.pdf">PDF para el equipo de
+        desarrollo</a>, con la evidencia recortada y la acción separada del diagnóstico.</p>
+    </div>
+
+    <figure class="tabla-bloque reveal">
+      <figcaption class="tabla-titulo" id="cap-4"><strong>Los siete ajustes.</strong>
+        Cada uno enlaza con el apartado donde se explica, y cita la sección del sistema que ya lo
+        resuelve por escrito.</figcaption>
+      <div class="tabla-scroll">
+        <table aria-labelledby="cap-4">
+          <thead><tr><th>#</th><th>Qué</th><th>Dónde</th><th>Lo resuelve</th></tr></thead>
+          <tbody>
+            <tr><td class="n">01</td><td>Las pastillas a su token, y seis familias reducidas a las del sistema</td><td><a href="#sistema">D1</a></td><td>§6.10</td></tr>
+            <tr><td class="n">02</td><td>Esqueleto de carga en la zona de contenido, no una frase</td><td><a href="#sesion">S1, S2, S4</a></td><td>§6.4</td></tr>
+            <tr><td class="n">03</td><td>La fila de cifras del tablero, con su componente</td><td><a href="#tablero">T1</a></td><td>§12.4.1</td></tr>
+            <tr><td class="n">04</td><td>Quitar el violeta de «bloqueado» a la categoría Empresa</td><td><a href="#padron">P6</a></td><td>§1</td></tr>
+            <tr><td class="n">05</td><td>La tabla: casilla y acción a su tamaño, anchos por el dato</td><td><a href="#padron">P3, P9</a></td><td>§6.11, §7.3</td></tr>
+            <tr><td class="n">06</td><td>Separar los conteos de los filtros</td><td><a href="#padron">P1, P2</a></td><td>§6.12</td></tr>
+            <tr><td class="n">07</td><td>Etiquetar la gráfica, o quitarla</td><td><a href="#tablero">T2</a></td><td>§12.3, §12.5</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </figure>
+
+    <div class="stack" style="margin-top:1.5rem">
+      <div class="nota reveal">
+        <strong>Seis de los siete ya tenían respuesta escrita en el sistema.</strong> Solo el tercero
+        pedía una pieza nueva. Eso cambia qué hay que arreglar: no es que el sistema estuviera
+        incompleto, es que sus reglas no se estaban encontrando.
+      </div>
+      <div class="nota reveal">
+        Fuera de la lista quedan dos cosas que sí están en este documento. La ficha de cliente (P7)
+        no es un defecto sino una pantalla por construir. Y el alcance del perfil de administración
+        (R1) no se puede afirmar con un solo perfil capturado.
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-nav"><a href="/entregables">← Volver a Entregables</a></div>
+    <div class="footer-meta">
+      <span>2894 Studio × DPROMA · Revisión de SIO-DPROMA en QA, septiembre 2026</span>
+      <a href="/entregables/reglas-de-diseno">Ver el sistema de diseño →</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* Revelado al hacer scroll. Sin soporte, todo queda visible. */
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){
+    els.forEach(function(el){ el.classList.add('is-visible'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('is-visible'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -10% 0px' });
+  els.forEach(function(el){ io.observe(el); });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard de proyección · SIO-DPROMA</title>
+<meta name="description" content="Ciclo de proyección propuesto para SIO-DPROMA: catorce pantallas de diez segundos construidas con la regla de los tres niveles." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════════════════════
+   DASHBOARD DE PROYECCIÓN — SIO-DPROMA
+   Tokens de §1 del sistema de diseño. Tema oscuro fijo: esta pantalla vive
+   proyectada en una oficina, no en un escritorio, y ahí el fondo oscuro es la
+   decisión correcta. Por eso no declara paleta clara — es el único documento
+   del sistema que puede permitírselo, y lo dice aquí para que no se copie.
+
+   ESCALA DE PROYECCIÓN. El suelo de 12px de §2.1 está medido a distancia de
+   escritorio. A cuatro metros no sirve: el suelo aquí son 20px y el cuerpo
+   arranca en 24. Toda la escala va en cqw sobre el contenedor de la pantalla,
+   así que el mismo HTML se lee igual en un proyector de 1280 y en uno de 4K.
+   ════════════════════════════════════════════════════════════════════════════ */
+:root{
+  /* ── Tema claro, valores de §1 del sistema ──────────────────────────────
+     Es el tema por omisión, igual que en el resto del sistema. La proyección
+     en oficina usa el oscuro, pero la maqueta se revisa también en pantalla
+     de escritorio, y una maqueta que solo existe en un tema no permite
+     comprobar que los tokens de estado cumplen en los dos. */
+  color-scheme: light;
+  --bg:#F2F5F7; --surface:#FAFCFD; --surface-2:#E7EDF3;
+  --border:rgba(27,36,48,.14); --border-2:rgba(27,36,48,.26);
+  --text:#1B2430; --text-2:#4C5A6B; --text-3:#5C6675;
+
+  --accent:#3E7A4C; --accent-ink:#F7FAF9; --accent-soft:rgba(62,122,76,.10);
+  --on-state:#F7FAF9; --grid-viz:rgba(27,36,48,.10);
+
+  --ok:#2F8F6F;    --warn:#B98A1E;  --err:#C24238;
+  --block:#9678CC; --pause:#4A5560;
+
+  /* La variante -ink es la oscurecida hasta cumplir AA sobre su -bg. En claro
+     no coincide con la base; en oscuro sí, porque allí el color ya cumple. */
+  --ok-ink:#22705A; --warn-ink:#7E5B0E; --err-ink:#B03A31;
+  --block-ink:#6D4FA3; --pause-ink:#4A5560;
+  --ok-bg:#E2EFEC; --warn-bg:#F1ECDE; --err-bg:#F4E8E7;
+  --block-bg:#EDEBF7; --pause-bg:#E7EAEC;
+
+  /* Series de §1.4, valores v2.0.0 validados en daltonismo. */
+  --serie-1:#2a78d6; --serie-2:#eb6834; --serie-3:#4a3aa7; --serie-4:#e87ba4;
+  --sh-rest:0 1px 2px rgba(11,11,13,.08);
+
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px;
+  --sp-8:32px; --sp-12:48px;
+  --r-ctrl:6px; --r-card:10px; --r-pill:999px;
+}
+
+/* Tema oscuro: el de la proyección. Se toma por preferencia del sistema salvo
+   que se haya forzado el claro, y también con data-theme="dark". */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+  color-scheme: dark;
+  --bg:#10161F; --surface:#171F2C; --surface-2:#1D2735;
+  --border:rgba(231,236,242,.12); --border-2:rgba(231,236,242,.24);
+  --text:#E7ECF2; --text-2:#A8B3C2; --text-3:#8B96A6;
+
+  --accent:#4A8F5A; --accent-ink:#08120D; --accent-soft:rgba(74,143,90,.16);
+  --on-state:#08120D; --grid-viz:rgba(231,236,242,.10);
+
+  --ok:#4FBF98;    --warn:#E8C24C;  --err:#EE6E5F;
+  --block:#C0A9F0; --pause:#6B7684;
+
+  --ok-ink:#4FBF98; --warn-ink:#E8C24C; --err-ink:#EE6E5F;
+  --block-ink:#C0A9F0; --pause-ink:#98A4B4;
+  --ok-bg:#1F353B; --warn-bg:#343630; --err-bg:#352A33;
+  --block-bg:#2F3247; --pause-bg:#28303E;
+
+  --serie-1:#3987e5; --serie-2:#d95926; --serie-3:#9085e9; --serie-4:#d55181;
+  --sh-rest:0 1px 2px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#10161F; --surface:#171F2C; --surface-2:#1D2735;
+  --border:rgba(231,236,242,.12); --border-2:rgba(231,236,242,.24);
+  --text:#E7ECF2; --text-2:#A8B3C2; --text-3:#8B96A6;
+
+  --accent:#4A8F5A; --accent-ink:#08120D; --accent-soft:rgba(74,143,90,.16);
+  --on-state:#08120D; --grid-viz:rgba(231,236,242,.10);
+
+  --ok:#4FBF98;    --warn:#E8C24C;  --err:#EE6E5F;
+  --block:#C0A9F0; --pause:#6B7684;
+
+  --ok-ink:#4FBF98; --warn-ink:#E8C24C; --err-ink:#EE6E5F;
+  --block-ink:#C0A9F0; --pause-ink:#98A4B4;
+  --ok-bg:#1F353B; --warn-bg:#343630; --err-bg:#352A33;
+  --block-bg:#2F3247; --pause-bg:#28303E;
+
+  --serie-1:#3987e5; --serie-2:#d95926; --serie-3:#9085e9; --serie-4:#d55181;
+  --sh-rest:0 1px 2px rgba(0,0,0,.35);
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size:16px; -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+.sr{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+  clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+
+/* ── El escenario ──────────────────────────────────────────────────────────
+   16:9 encajado en la ventana. container-type:size deja que toda la tipografía
+   se declare en cqw y escale con el proyector en vez de con el navegador. */
+.escenario{
+  position:fixed; inset:0; display:grid; place-items:center; padding:0;
+}
+.pantalla{
+  position:relative; width:100%; height:100%;
+  aspect-ratio:16/9; max-width:calc(100vh * 16 / 9); max-height:calc(100vw * 9 / 16);
+  container-type:size; container-name:proj;
+  background:var(--bg); overflow:hidden;
+}
+
+/* ── Escala tipográfica de proyección ──────────────────────────────────────
+   Nivel 1 el titular, nivel 2 las cifras que lo componen, nivel 3 el detalle.
+   Los tres pesos de §5: 800 el dato, 600 las etiquetas, 400 el apoyo. */
+@container proj (min-width: 0px){
+  .vista{ padding: 2.8cqw 4cqw 1.9cqw; }
+  .v-titulo{ font-size:2.45cqw; }
+  .n1-cifra{ font-size:7.6cqw; }
+  .n1-glosa{ font-size:2.05cqw; }
+  .n2-cifra{ font-size:4.4cqw; }
+  .n2-rotulo{ font-size:1.5cqw; }
+  .n3-fila{ font-size:1.7cqw; }
+  .pie{ font-size:1.35cqw; }
+  .seccion-chip{ font-size:1.6cqw; }
+  .re-cifra{ font-size:5.6cqw; }
+  .re-cifra.es-foco{ font-size:8.4cqw; }
+}
+
+.vista{
+  position:absolute; inset:0; display:none;
+  flex-direction:column; gap:1.45cqw;
+}
+.vista.es-activa{ display:flex; }
+/* El pie se ancla abajo y el resto se apila desde arriba. Con grid de filas
+   fijas, las vistas de cuatro bloques —las que llevan lista de detalle—
+   estiraban el nivel 1 y empujaban el detalle fuera del borde inferior. */
+.v-pie{ margin-top:auto; flex:none; }
+.n3{ flex:0 1 auto; }
+
+/* Las tarjetas de ciudad, cuando son el cuerpo de la pantalla, crecen con ella
+   y su barra engorda: a cuatro metros una barra de 1,5cqw se lee como una línea,
+   no como un reparto entre cuatro estados. */
+.vista--aire .plazas{ align-items:stretch; }
+.vista--aire .plaza{ display:flex; flex-direction:column; justify-content:center; padding:1.8cqw 1.6cqw; }
+.vista--aire .plaza .barra{ height:3.2cqw; }
+.vista--aire .plaza-nombre{ font-size:2.2cqw; }
+.vista--aire .plaza-total{ font-size:1.7cqw; }
+.vista--aire .plaza-cab{ margin-bottom:1cqw; }
+
+/* Vistas que no llenan el lienzo. Con el pie anclado abajo, todo el sobrante se
+   acumulaba en una franja vacía bajo el último bloque —hasta un tercio de la
+   pantalla—, que es el defecto que la v1 tenía en «alertas por almacén». Dos
+   márgenes automáticos reparten ese aire por igual arriba y abajo, y el grupo
+   de contenido queda centrado en la zona libre. */
+.vista--aire > .n1{ margin-top:auto; }
+
+/* Vistas de resumen: no llevan cabecera, así que la rejilla arranca arriba y
+   ocupa el alto hasta el sello. */
+.vista--re{ padding-top:3.4cqw; }
+
+/* Un ranking que es el cuerpo entero de la vista reparte sus filas en el alto
+   disponible, en vez de amontonarse arriba y dejar el resto vacío. */
+.rank--suelto{ flex:1; justify-content:space-evenly; min-height:0; }
+
+/* ── Cabecera: título como conclusión + identidad de sección ───────────────
+   §4 del análisis: la identidad de sección va en NEUTRO. Si el icono y el
+   nombre fueran del verde de marca, ese verde competiría con el verde del
+   semáforo y nadie sabría si «verde» significa Almacén o significa bien. */
+.v-cab{ display:flex; align-items:flex-start; justify-content:space-between; gap:3cqw; flex:none; }
+.v-titulo{ font-weight:700; letter-spacing:-0.015em; line-height:1.12; margin:0; max-width:62ch; }
+.v-titulo em{ font-style:normal; color:var(--text-2); font-weight:600; }
+.seccion-chip{
+  display:inline-flex; align-items:center; gap:.6em; flex:none;
+  padding:.42em .9em; border-radius:var(--r-pill);
+  background:var(--surface-2); border:1px solid var(--border);
+  color:var(--text); font-weight:600; white-space:nowrap;
+}
+.seccion-chip svg{ width:1.5em; height:1.5em; flex:none; }
+
+/* ── Nivel 1 — el titular ──────────────────────────────────────────────────
+   Un solo número, peso 800, con su color de semáforo. */
+.n1{ display:flex; align-items:center; gap:1.6cqw; flex-wrap:wrap; }
+.n1-cifra{ font-weight:800; line-height:.86; letter-spacing:-0.04em; font-variant-numeric:tabular-nums; }
+.n1-glosa{ font-weight:600; color:var(--text-2); line-height:1.25; max-width:26ch; }
+.n1-glosa b{ color:var(--text); font-weight:700; }
+.c-ok{ color:var(--ok-ink); } .c-warn{ color:var(--warn-ink); }
+.c-err{ color:var(--err-ink); } .c-block{ color:var(--block-ink); }
+.c-pause{ color:var(--pause-ink); } .c-text{ color:var(--text); }
+.n1-sufijo{ font-size:.42em; font-weight:700; letter-spacing:0; margin-left:.12em; }
+.n1-sufijo.palabra{ margin-left:.3em; }
+
+
+/* ── Nivel 2 — de qué se compone. Nunca más de cuatro. ─────────────────────
+   Aire: la separación entre niveles es mayor que la interna de cada bloque. */
+.n2{ display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:1.5cqw; align-items:stretch; }
+.n2.de-4{ grid-template-columns:repeat(4,1fr); grid-auto-flow:row; }
+.n2-item{ justify-content:flex-start; }
+.n2-item{
+  padding:1.3cqw 1.5cqw; background:var(--surface); border:1px solid var(--border);
+  border-left:.5cqw solid var(--pause); border-radius:var(--r-card); box-shadow:var(--sh-rest);
+  display:flex; flex-direction:column; gap:.5cqw; min-width:0;
+}
+.n2-item.b-ok{ border-left-color:var(--ok); } .n2-item.b-warn{ border-left-color:var(--warn); }
+.n2-item.b-err{ border-left-color:var(--err); } .n2-item.b-block{ border-left-color:var(--block); }
+.n2-item.b-pause{ border-left-color:var(--pause); }
+.n2-item.b-s1{ border-left-color:var(--serie-1); } .n2-item.b-s2{ border-left-color:var(--serie-2); }
+.n2-rotulo{ font-weight:600; color:var(--text-2); line-height:1.3; min-height:2.6em; }
+.n2-cifra{ font-weight:800; line-height:1; letter-spacing:-0.03em; font-variant-numeric:tabular-nums; }
+.n2-apoyo{ margin-top:auto; padding-top:.3cqw; font-size:1.3cqw; font-weight:400; color:var(--text-3); line-height:1.35; }
+
+/* ── Nivel 3 — el detalle accionable. Máximo cinco filas, con nombre propio. */
+.n3{ display:flex; flex-direction:column; gap:.65cqw; min-height:0; }
+.n3-fila{
+  display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:1.4cqw;
+  padding:.6cqw 1.3cqw; background:var(--surface-2); border-radius:var(--r-ctrl);
+  font-weight:500; line-height:1.25;
+}
+.n3-fila .cuando{ font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; white-space:nowrap; }
+.n3-fila .quien{ color:var(--text-2); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.n3-fila .quien b{ color:var(--text); font-weight:700; }
+.n3-fila .cuanto{ font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.n3-fila .marca-falta{ color:var(--err-ink); font-weight:700; }
+.n3-lista-rotulo{ font-size:1.35cqw; font-weight:600; color:var(--text-2); margin-bottom:.15cqw; }
+
+/* Ranking con barras que de verdad comparan: el ancho es proporcional al valor
+   frente al mayor de la lista, no un 100% para todos. */
+.rank{ display:flex; flex-direction:column; gap:.6cqw; }
+.rank-fila{ display:grid; grid-template-columns:minmax(0,20cqw) 1fr auto; align-items:center; gap:1.4cqw; font-size:1.6cqw; }
+.rank-nombre{ font-weight:600; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rank-carril{ height:1.5cqw; border-radius:var(--r-pill); background:var(--surface-2); overflow:hidden; }
+.rank-barra{ display:block; height:100%; border-radius:var(--r-pill); background:var(--serie-1); }
+.rank-barra.f-err{ background:var(--err); } .rank-barra.f-warn{ background:var(--warn); }
+.rank-barra.f-ok{ background:var(--ok); }
+.rank-valor{ font-weight:700; font-variant-numeric:tabular-nums; color:var(--text); min-width:5.5cqw; text-align:right; }
+.rank-resto{ opacity:.85; }
+.rank-carril--sin{ background:repeating-linear-gradient(115deg,var(--surface-2) 0 6px,transparent 6px 12px); }
+.rank-valor small{ display:block; font-size:.68em; font-weight:500; color:var(--text-3); }
+
+/* Barra de total con su parte cumplida dentro (§12.4 .progreso): el carril es
+   el total y el relleno lo ya hecho, así que las dos cifras se comparan sin
+   saltar de una barra a otra. El ancho del carril es proporcional al mayor
+   total de la lista, de modo que la barra también dice el volumen relativo. */
+.totales{ display:flex; flex-direction:column; gap:2.4cqw; flex:1; justify-content:center; }
+.total-fila{ display:grid; grid-template-columns:minmax(0,16cqw) 1fr; gap:1.6cqw; align-items:start; }
+.total-nombre{ font-size:2.6cqw; font-weight:700; color:var(--text); line-height:4.2cqw; }
+.total-cuerpo{ min-width:0; }
+.total-carril{
+  height:4.2cqw; border-radius:var(--r-ctrl); background:var(--surface-2);
+  border:1px solid var(--border); overflow:hidden; position:relative;
+}
+.total-relleno{ display:block; height:100%; background:var(--serie-1); }
+.total-cifras{
+  display:flex; align-items:baseline; gap:1.2cqw; margin-top:.7cqw;
+  font-size:1.7cqw; font-weight:500; color:var(--text-2);
+}
+.total-cifras b{ color:var(--text); font-weight:700; font-variant-numeric:tabular-nums; }
+.total-cifras .pct{ margin-left:auto; font-size:1.4em; font-weight:800; color:var(--text); font-variant-numeric:tabular-nums; }
+
+/* Leyenda de color al pie de una pantalla de gráfico: dice qué significa cada
+   tramo. No es la leyenda del semáforo —esa se acordó fuera de pantalla—, sino
+   el rótulo de los segmentos de este gráfico concreto. */
+.leyenda-pie{
+  display:flex; flex-wrap:wrap; gap:1.2cqw 2.6cqw; align-items:center;
+  font-size:1.5cqw; font-weight:500; color:var(--text-2);
+}
+.leyenda-pie span{ display:inline-flex; align-items:center; gap:.55em; }
+.leyenda-pie i{ width:1.1em; height:1.1em; border-radius:3px; flex:none; }
+.leyenda-pie b{ color:var(--text); font-weight:600; }
+
+/* Fila de listado sin columna de cifra: dos columnas, dato y dónde. El nombre
+   del material no va en negrita — si toda la fila pesa, ninguna palabra manda. */
+.n3-fila--dos{ grid-template-columns:1fr auto; }
+.n3-fila--dos .quien{ font-weight:400; color:var(--text); white-space:normal; }
+.n3-fila--dos .quien .clave{ color:var(--text-3); font-weight:400; }
+.n3-fila--dos .cuanto{ font-weight:600; }
+
+/* Barra apilada de estado (§12.4). Los segmentos contiguos se separan con
+   superficie, no con hueco: un hueco transparente parecería un cuarto valor. */
+.barra{ display:flex; height:1.5cqw; border-radius:var(--r-pill); overflow:hidden; background:var(--surface-2); }
+.barra span + span{ border-left:2px solid var(--surface); }
+.barra .s-ok{ background:var(--ok); } .barra .s-warn{ background:var(--warn); }
+.barra .s-err{ background:var(--err); } .barra .s-pause{ background:var(--pause); }
+
+/* Tarjeta de entidad (§12.6). El total va al lado del nombre y el reparto en la
+   barra; debajo solo los conteos sobre los que se puede actuar. */
+.plazas{ display:grid; grid-template-columns:repeat(3,1fr); gap:1.5cqw; }
+.plaza{
+  padding:1cqw 1.2cqw; background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--r-card); box-shadow:var(--sh-rest); min-width:0;
+}
+.plaza-cab{ display:flex; align-items:baseline; justify-content:space-between; gap:1cqw; margin-bottom:.6cqw; }
+.plaza-nombre{ font-size:1.7cqw; font-weight:700; color:var(--text); }
+.plaza-total{ white-space:nowrap; font-size:1.3cqw; font-weight:500; color:var(--text-3); font-variant-numeric:tabular-nums; }
+.plaza-total b{ font-size:1.5em; font-weight:800; color:var(--text); }
+
+
+/* ── Pie: un solo sello de actualización, mismo sitio en las doce vistas ── */
+.v-pie{ display:flex; align-items:flex-end; justify-content:space-between; gap:2cqw; }
+.pie{ color:var(--text-3); font-weight:400; white-space:nowrap; }
+.pie b{ color:var(--text-2); font-weight:600; font-variant-numeric:tabular-nums; }
+
+/* ── Resumen ejecutivo (§4) ────────────────────────────────────────────────
+   Cuatro tarjetas, siempre el mismo orden y la misma posición. Lo único que
+   cambia entre las tres repeticiones es cuál está agrandada. El cambio de
+   tamaño ES el anuncio de la sección que entra. */
+.re-rejilla{ display:grid; gap:1.6cqw; align-items:stretch; flex:1; min-height:0; }
+.re-rejilla.foco-1{ grid-template-columns:2fr 1fr 1fr 1fr; }
+.re-rejilla.foco-2{ grid-template-columns:1fr 2fr 1fr 1fr; }
+.re-rejilla.foco-3{ grid-template-columns:1fr 1fr 2fr 1fr; }
+.re-card{
+  display:flex; flex-direction:column; gap:.7cqw; min-width:0;
+  padding:1.8cqw 1.9cqw; border-radius:var(--r-card);
+  background:var(--surface); border:1px solid var(--border);
+  border-top:.5cqw solid var(--pause); box-shadow:var(--sh-rest);
+}
+.re-card.b-ok{ border-top-color:var(--ok); } .re-card.b-warn{ border-top-color:var(--warn); }
+.re-card.b-err{ border-top-color:var(--err); } .re-card.b-pause{ border-top-color:var(--pause); }
+.re-card.es-foco{ background:var(--surface-2); border-color:var(--border-2); }
+.re-cab{ display:flex; align-items:center; gap:.6em; font-size:1.55cqw; font-weight:600;
+  color:var(--text-2); white-space:nowrap; min-height:2.1cqw; }
+.re-cab svg{ width:1.4em; height:1.4em; flex:none; color:var(--text-2); }
+.es-foco .re-cab{ font-size:2cqw; color:var(--text); }
+.es-foco .re-cab svg{ color:var(--text); }
+.re-cifra{ font-weight:800; line-height:.95; letter-spacing:-0.035em; font-variant-numeric:tabular-nums; }
+.re-glosa{ font-size:1.45cqw; font-weight:500; color:var(--text-2); line-height:1.35; }
+.es-foco .re-glosa{ font-size:1.8cqw; color:var(--text); }
+.re-siguiente{
+  align-self:flex-start; margin-top:auto; padding:.35em .85em; border-radius:var(--r-pill);
+  background:var(--surface); border:1px solid var(--border-2);
+  font-size:1.35cqw; font-weight:700; color:var(--text); letter-spacing:.02em;
+}
+/* La tarjeta destacada gana una línea de detalle que las otras no tienen, y
+   esa línea adelanta lo que van a desarrollar las pantallas siguientes. */
+.re-detalle{
+  margin-top:.4cqw; padding-top:1cqw; border-top:1px solid var(--border);
+  font-size:1.6cqw; font-weight:500; color:var(--text-2); line-height:1.4;
+}
+.re-detalle b{ color:var(--text); font-weight:700; }
+
+/* La leyenda del semáforo vive SOLO aquí. Como esta pantalla se repite tres
+   veces por vuelta, en dos días el equipo la ha interiorizado; repetirla en
+   las pantallas de datos gastaría un espacio que ahí vale más. */
+
+/* ── Mando: barra de progreso del ciclo + controles ────────────────────────
+   Se atenúa sola. En una proyección no debe verse; en una demo sí. */
+.progreso-ciclo{
+  position:absolute; left:0; right:0; bottom:0; height:.35cqw;
+  background:rgba(231,236,242,.08);
+}
+.progreso-ciclo i{ display:block; height:100%; background:var(--accent); width:0; }
+.mando{
+  position:fixed; right:1rem; bottom:1rem; z-index:9;
+  display:flex; align-items:center; gap:.4rem; padding:.4rem;
+  background:var(--surface-2); border:1px solid var(--border); border-radius:var(--r-pill);
+  box-shadow:0 6px 18px rgba(0,0,0,.4);
+  opacity:0; transition:opacity .25s ease;
+}
+.mando:hover, .mando:focus-within, body.mando-visible .mando{ opacity:1; }
+.mando button{
+  appearance:none; font-family:inherit; font-size:.8125rem; font-weight:600;
+  min-height:2.75rem; min-width:2.75rem; padding:0 .9em;
+  border-radius:var(--r-pill); border:1px solid transparent;
+  background:transparent; color:var(--text-2); cursor:pointer;
+}
+.mando button:hover{ background:var(--surface); color:var(--text); }
+.mando button:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+.mando .cuenta{ font-size:.8125rem; font-weight:600; color:var(--text-3); padding:0 .6em; font-variant-numeric:tabular-nums; }
+
+@media (prefers-reduced-motion:reduce){
+  .progreso-ciclo i{ transition:none; }
+  .mando{ transition:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Iconos de sección. Inline y no tipografía de iconos: §6.5 documenta que un
+     glifo que se añade al markup y se olvida en el subconjunto se pinta como la
+     letra de su nombre. Un <svg> no puede fallar así. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="ic-inst" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="9" y="8.5" width="10" height="9" rx="2.5"/><circle cx="14" cy="13" r="1.6"/>
+    <path d="M11.5 8.5V4.5M16.5 8.5V4.5"/><path d="M9 11.5c-2.2 0-3.4 1.6-3.4 3.6 0 1.5.7 2.6 1.6 3.4"/>
+  </symbol>
+  <symbol id="ic-veh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3.2 15.2 5.6 8.4A2 2 0 0 1 7.5 7h7.2a2 2 0 0 1 1.5.7l3.4 4a2 2 0 0 1 .5 1.3v2.2"/>
+    <path d="M3.2 15.2h17"/><circle cx="7.5" cy="16.6" r="1.9"/><circle cx="16.2" cy="16.6" r="1.9"/>
+  </symbol>
+  <symbol id="ic-alm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3.6 10.4 12 4l8.4 6.4"/><path d="M5.4 10.6V19h13.2v-8.4"/><path d="M10.3 19v-4.6h3.4V19"/>
+  </symbol>
+  <symbol id="ic-total" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 19V9.5M9.3 19V5M14.7 19v-6.5M20 19v-9"/>
+  </symbol>
+</svg>
+
+<main class="escenario">
+<div class="pantalla" id="pantalla">
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     Las doce vistas del ciclo.
+
+     Las pantallas muestran el dato y nada más: el título nombra lo que se ve,
+     no lo interpreta, y no llevan umbrales escritos, leyenda de color ni notas
+     de método. La jerarquía la hace la composición —tamaño, peso y color del
+     semáforo—, no una frase que explique cómo leerla.
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<!-- ═══ 1 · RESUMEN EJECUTIVO → INSTALACIONES ═══════════════════════════════ -->
+<section class="vista es-activa vista--re" data-vista aria-label="Resumen. A continuación, Instalaciones.">
+  <div class="re-rejilla foco-1">
+    <article class="re-card b-warn es-foco">
+      <div class="re-cab"><svg aria-hidden="true"><use href="#ic-inst"/></svg>Instalaciones</div>
+      <div class="re-cifra es-foco c-warn">45</div>
+      <div class="re-glosa">instalaciones pendientes de 753 registradas</div>
+      <div class="re-detalle"><b>5 de las 10</b> agendadas esta semana no tienen instalador</div>
+      <span class="re-siguiente">Siguiente</span>
+    </article>
+    <article class="re-card b-err">
+      <div class="re-cab"><svg aria-hidden="true"><use href="#ic-veh"/></svg>Vehicular</div>
+      <div class="re-cifra c-err">742</div>
+      <div class="re-glosa">trámites pasados de fecha compromiso</div>
+    </article>
+    <article class="re-card b-err">
+      <div class="re-cab"><svg aria-hidden="true"><use href="#ic-alm"/></svg>Almacén</div>
+      <div class="re-cifra c-err">50</div>
+      <div class="re-glosa">materiales en stock crítico de 87 vigilados</div>
+    </article>
+    <article class="re-card b-ok">
+      <div class="re-cab"><svg aria-hidden="true"><use href="#ic-total"/></svg>Acumulado</div>
+      <div class="re-cifra c-ok">79<span class="n1-sufijo">%</span></div>
+      <div class="re-glosa">594 de 753 órdenes ya instaladas</div>
+    </article>
+  </div>
+  <footer class="v-pie">
+    <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 2 · INSTALACIONES ══════════════════════════════════════════════════ -->
+<section class="vista vista--aire" data-vista aria-label="Instalaciones.">
+  <header class="v-cab">
+    <h1 class="v-titulo">Instalaciones</h1>
+    <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-inst"/></svg>Instalaciones</span>
+  </header>
+  <div class="n1">
+    <span class="n1-cifra c-warn">45</span>
+    <span class="n1-glosa">instalaciones pendientes<br>de <b>753 órdenes</b> registradas</span>
+  </div>
+  <div class="n2">
+    <div class="n2-item b-err">
+      <span class="n2-rotulo">Con atraso</span>
+      <span class="n2-cifra c-err">10</span>
+      <span class="n2-apoyo">pasaron su fecha agendada</span>
+    </div>
+    <div class="n2-item b-ok">
+      <span class="n2-rotulo">Instaladas</span>
+      <span class="n2-cifra c-ok">594</span>
+      <span class="n2-apoyo">79% del total</span>
+    </div>
+    <div class="n2-item b-pause">
+      <span class="n2-rotulo">Canceladas</span>
+      <span class="n2-cifra c-pause">104</span>
+      <span class="n2-apoyo">14% del total</span>
+    </div>
+  </div>
+  <footer class="v-pie">
+    <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 3 · INSTALACIONES POR MARCA ═══════════════════════════════════════
+     El carril de cada marca es su total de órdenes, a escala entre marcas, y el
+     relleno son las instaladas. Total y cumplido en la misma barra: no hay que
+     saltar de un gráfico a otro para compararlos. -->
+<section class="vista" data-vista aria-label="Instalaciones por marca.">
+  <header class="v-cab">
+    <h1 class="v-titulo">Instalaciones <em>por marca</em></h1>
+    <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-inst"/></svg>Instalaciones</span>
+  </header>
+  <div class="totales">
+    <div class="total-fila">
+      <span class="total-nombre">Changan</span>
+      <div class="total-cuerpo">
+        <div class="total-carril" style="width:100%" role="img" aria-label="Changan: 383 instaladas de 497 órdenes, el 77%.">
+          <span class="total-relleno" style="width:77.1%"></span>
+        </div>
+        <p class="total-cifras"><b>383</b> instaladas de <b>497</b> órdenes<span class="pct">77%</span></p>
+      </div>
+    </div>
+    <div class="total-fila">
+      <span class="total-nombre">OCN</span>
+      <div class="total-cuerpo">
+        <div class="total-carril" style="width:51.5%" role="img" aria-label="OCN: 211 instaladas de 256 órdenes, el 82%.">
+          <span class="total-relleno" style="width:82.4%"></span>
+        </div>
+        <p class="total-cifras"><b>211</b> instaladas de <b>256</b> órdenes<span class="pct">82%</span></p>
+      </div>
+    </div>
+  </div>
+  <footer class="v-pie">
+    <div class="leyenda-pie">
+      <span><i style="background:var(--serie-1)"></i><b>Instaladas</b></span>
+      <span><i style="background:var(--surface-2);border:1px solid var(--border-2)"></i><b>Resto de órdenes</b></span>
+      <span>El ancho de cada barra es su total de órdenes</span>
+    </div>
+    <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 4 · PRÓXIMAS INSTALACIONES ══════════════════════════════════════════ -->
+<section class="vista vista--aire" data-vista aria-label="Próximas instalaciones, siete días.">
+  <header class="v-cab">
+    <h1 class="v-titulo">Próximas instalaciones <em>· 7 días</em></h1>
+    <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-inst"/></svg>Instalaciones</span>
+  </header>
+  <div class="n1">
+    <span class="n1-cifra c-err">5</span>
+    <span class="n1-glosa">órdenes sin instalador<br>de <b>10 agendadas</b></span>
+  </div>
+  <div class="n3">
+    <div class="n3-fila"><span class="cuando">Hoy · mar 8</span><span class="quien"><b>Orden 0000670</b> · sin ciudad</span><span class="cuanto marca-falta">Sin instalador</span></div>
+    <div class="n3-fila"><span class="cuando">Sáb 12</span><span class="quien"><b>Orden 0000622</b> · sin ciudad</span><span class="cuanto marca-falta">Sin instalador</span></div>
+    <div class="n3-fila"><span class="cuando">Sáb 12</span><span class="quien"><b>Orden 0000641</b> · sin ciudad</span><span class="cuanto marca-falta">Sin instalador</span></div>
+    <div class="n3-fila"><span class="cuando">Sáb 12</span><span class="quien"><b>Orden 0000664</b> · sin ciudad</span><span class="cuanto marca-falta">Sin instalador</span></div>
+    <div class="n3-fila"><span class="cuando">Sáb 12</span><span class="quien"><b>Orden 0000674</b> · sin ciudad</span><span class="cuanto marca-falta">Sin instalador</span></div>
+  </div>
+  <footer class="v-pie">
+    <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 5 · INSTALACIONES POR INSTALADOR ════════════════════════════════════ -->
+<section class="vista" data-vista aria-label="Instalaciones completadas por instalador.">
+  <header class="v-cab">
+    <h1 class="v-titulo">Instalaciones completadas <em>por instalador</em></h1>
+    <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-inst"/></svg>Instalaciones</span>
+  </header>
+  <div class="rank rank--suelto">
+    <div class="rank-fila"><span class="rank-nombre">Michel Álvarez</span><span class="rank-carril"><span class="rank-barra" style="width:100%"></span></span><span class="rank-valor">48</span></div>
+    <div class="rank-fila"><span class="rank-nombre">Jesús Fuentes</span><span class="rank-carril"><span class="rank-barra" style="width:95.8%"></span></span><span class="rank-valor">46</span></div>
+    <div class="rank-fila"><span class="rank-nombre">Paul Ramos</span><span class="rank-carril"><span class="rank-barra" style="width:54.2%"></span></span><span class="rank-valor">26</span></div>
+    <div class="rank-fila"><span class="rank-nombre">José L. Martínez</span><span class="rank-carril"><span class="rank-barra" style="width:25%"></span></span><span class="rank-valor">12</span></div>
+    <div class="rank-fila"><span class="rank-nombre">Brandon Espinoza</span><span class="rank-carril"><span class="rank-barra" style="width:10.4%"></span></span><span class="rank-valor">5</span></div>
+    <div class="rank-fila"><span class="rank-nombre">Martín Horacio</span><span class="rank-carril"><span class="rank-barra" style="width:4.2%"></span></span><span class="rank-valor">2</span></div>
+    <div class="rank-fila rank-resto"><span class="rank-nombre">Total</span><span class="rank-carril rank-carril--sin"></span><span class="rank-valor">139</span></div>
+  </div>
+  <footer class="v-pie">
+    <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 6 · ÓRDENES POR ESTADO ══════════════════════════════════════════════ -->
+<section class="vista" data-vista aria-label="Órdenes de instalación por estado.">
+  <header class="v-cab">
+    <h1 class="v-titulo">Órdenes de instalación <em>por estado</em></h1>
+    <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-inst"/></svg>Instalaciones</span>
+  </header>
+  <div class="rank rank--suelto">
+    <div class="rank-fila"><span class="rank-nombre">Nuevo León</span><span class="rank-carril"><span class="rank-barra" style="width:100%"></span></span><span class="rank-valor">125<small>18,0%</small></span></div>
+    <div class="rank-fila"><span class="rank-nombre">Ciudad de México</span><span class="rank-carril"><span class="rank-barra" style="width:79.2%"></span></span><span class="rank-valor">99<small>14,3%</small></span></div>
+    <div class="rank-fila"><span class="rank-nombre">Sinaloa</span><span class="rank-carril"><span class="rank-barra" style="width:74.4%"></span></span><span class="rank-valor">93<small>13,4%</small></span></div>
+    <div class="rank-fila"><span class="rank-nombre">México</span><span class="rank-carril"><span class="rank-barra" style="width:56.8%"></span></span><span class="rank-valor">71<small>10,2%</small></span></div>
+    <div class="rank-fila"><span class="rank-nombre">Guanajuato</span><span class="rank-carril"><span class="rank-barra" style="width:31.2%"></span></span><span class="rank-valor">39<small>5,6%</small></span></div>
+    <div class="rank-fila"><span class="rank-nombre">Puebla</span><span class="rank-carril"><span class="rank-barra" style="width:27.2%"></span></span><span class="rank-valor">34<small>4,9%</small></span></div>
+    <div class="rank-fila rank-resto"><span class="rank-nombre">Otros 19 estados</span><span class="rank-carril rank-carril--sin"></span><span class="rank-valor">232<small>33,5%</small></span></div>
+  </div>
+  <footer class="v-pie">
+    <p class="pie">693 órdenes con estado registrado · Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 7 · RESUMEN EJECUTIVO → ADMINISTRACIÓN VEHICULAR ════════════════════ -->
+<section class="vista vista--re" data-vista aria-label="Resumen. A continuación, Administración vehicular.">
+  <div class="re-rejilla foco-2">
+    <article class="re-card b-warn">
+      <div class="re-cab"><svg aria-hidden="true"><use href="#ic-inst"/></svg>Instalaciones</div>
+      <div class="re-cifra c-warn">45</div>
+      <div class="re-glosa">instalaciones pendientes de 753 registradas</div>
+    </article>
+    <article class="re-card b-err es-foco">
+      <div class="re-cab"><svg aria-hidden="true"><use href="#ic-veh"/></svg>Vehicular</div>
+      <div class="re-cifra es-foco c-err">742</div>
+      <div class="re-glosa">trámites pasados de fecha compromiso</div>
+      <div class="re-detalle">CDMX, Edomex, Tijuana y Guadalajara suman <b>508 de los 742</b></div>
+      <span class="re-siguiente">Siguiente</span>
+    </article>
+    <article class="re-card b-err">
+      <div class="re-cab"><svg aria-hidden="true"><use href="#ic-alm"/></svg>Almacén</div>
+      <div class="re-cifra c-err">50</div>
+      <div class="re-glosa">materiales en stock crítico de 87 vigilados</div>
+    </article>
+    <article class="re-card b-ok">
+      <div class="re-cab"><svg aria-hidden="true"><use href="#ic-total"/></svg>Acumulado</div>
+      <div class="re-cifra c-ok">79<span class="n1-sufijo">%</span></div>
+      <div class="re-glosa">594 de 753 órdenes ya instaladas</div>
+    </article>
+  </div>
+  <footer class="v-pie">
+    <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 8 · CUMPLIMIENTO DE SLA ═════════════════════════════════════════════ -->
+<section class="vista vista--aire" data-vista aria-label="Cumplimiento de SLA.">
+  <header class="v-cab">
+    <h1 class="v-titulo">Cumplimiento de SLA</h1>
+    <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-veh"/></svg>Vehicular</span>
+  </header>
+  <div class="n1">
+    <span class="n1-cifra c-err">742</span>
+    <span class="n1-glosa">trámites vencidos<br>en <b>16 plazas</b></span>
+  </div>
+  <div class="n2">
+    <div class="n2-item b-err">
+      <span class="n2-rotulo">Atraso medio</span>
+      <span class="n2-cifra c-err">47<span class="n1-sufijo palabra">días</span></span>
+      <span class="n2-apoyo">sobre los 742 vencidos</span>
+    </div>
+    <div class="n2-item b-err">
+      <span class="n2-rotulo">Vencidos con fecha compromiso</span>
+      <span class="n2-cifra c-err">100<span class="n1-sufijo">%</span></span>
+      <span class="n2-apoyo">742 de 742</span>
+    </div>
+    <div class="n2-item b-pause">
+      <span class="n2-rotulo">Plazas afectadas</span>
+      <span class="n2-cifra c-pause">16</span>
+      <span class="n2-apoyo">de 16</span>
+    </div>
+  </div>
+  <footer class="v-pie">
+    <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 9 · TRÁMITES VENCIDOS POR PLAZA ═════════════════════════════════════ -->
+<section class="vista" data-vista aria-label="Trámites vencidos por plaza.">
+  <header class="v-cab">
+    <h1 class="v-titulo">Trámites vencidos <em>por plaza</em></h1>
+    <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-veh"/></svg>Vehicular</span>
+  </header>
+  <div class="rank rank--suelto">
+    <div class="rank-fila"><span class="rank-nombre">CDMX</span><span class="rank-carril"><span class="rank-barra f-err" style="width:100%"></span></span><span class="rank-valor">187<small>25%</small></span></div>
+    <div class="rank-fila"><span class="rank-nombre">Edomex</span><span class="rank-carril"><span class="rank-barra f-err" style="width:69.5%"></span></span><span class="rank-valor">130<small>18%</small></span></div>
+    <div class="rank-fila"><span class="rank-nombre">Tijuana</span><span class="rank-carril"><span class="rank-barra f-err" style="width:58.8%"></span></span><span class="rank-valor">110<small>15%</small></span></div>
+    <div class="rank-fila"><span class="rank-nombre">Guadalajara</span><span class="rank-carril"><span class="rank-barra f-warn" style="width:43.3%"></span></span><span class="rank-valor">81<small>11%</small></span></div>
+    <div class="rank-fila"><span class="rank-nombre">Monterrey</span><span class="rank-carril"><span class="rank-barra f-warn" style="width:34.2%"></span></span><span class="rank-valor">64<small>9%</small></span></div>
+    <div class="rank-fila"><span class="rank-nombre">Querétaro</span><span class="rank-carril"><span class="rank-barra f-warn" style="width:29.4%"></span></span><span class="rank-valor">55<small>7%</small></span></div>
+    <div class="rank-fila rank-resto"><span class="rank-nombre">Otras 10 plazas</span><span class="rank-carril rank-carril--sin"></span><span class="rank-valor">115<small>15%</small></span></div>
+  </div>
+  <footer class="v-pie">
+    <p class="pie">742 trámites vencidos · Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 10 · TRÁMITES POR TIPO ══════════════════════════════════════════════ -->
+<section class="vista" data-vista aria-label="Trámites por tipo.">
+  <header class="v-cab">
+    <h1 class="v-titulo">Trámites <em>por tipo</em></h1>
+    <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-veh"/></svg>Vehicular</span>
+  </header>
+  <div class="rank rank--suelto">
+    <div class="rank-fila"><span class="rank-nombre">Baja de placas</span><span class="rank-carril"><span class="rank-barra" style="width:100%"></span></span><span class="rank-valor">295<small>41%</small></span></div>
+    <div class="rank-fila"><span class="rank-nombre">Pago de tenencia</span><span class="rank-carril"><span class="rank-barra" style="width:63.7%"></span></span><span class="rank-valor">188<small>26%</small></span></div>
+    <div class="rank-fila"><span class="rank-nombre">Alta de placas</span><span class="rank-carril"><span class="rank-barra" style="width:30.8%"></span></span><span class="rank-valor">91<small>13%</small></span></div>
+    <div class="rank-fila"><span class="rank-nombre">Corrección de datos</span><span class="rank-carril"><span class="rank-barra" style="width:28.1%"></span></span><span class="rank-valor">83<small>11%</small></span></div>
+    <div class="rank-fila"><span class="rank-nombre">Reposición de tarjeta</span><span class="rank-carril"><span class="rank-barra" style="width:22.4%"></span></span><span class="rank-valor">66<small>9%</small></span></div>
+    <div class="rank-fila rank-resto"><span class="rank-nombre">Trámites legales</span><span class="rank-carril rank-carril--sin"></span><span class="rank-valor">9<small>6 en proceso</small></span></div>
+  </div>
+  <footer class="v-pie">
+    <p class="pie">723 trámites · Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 11 · RESUMEN EJECUTIVO → ALMACÉN ════════════════════════════════════ -->
+<section class="vista vista--re" data-vista aria-label="Resumen. A continuación, Almacén.">
+  <div class="re-rejilla foco-3">
+    <article class="re-card b-warn">
+      <div class="re-cab"><svg aria-hidden="true"><use href="#ic-inst"/></svg>Instalaciones</div>
+      <div class="re-cifra c-warn">45</div>
+      <div class="re-glosa">instalaciones pendientes de 753 registradas</div>
+    </article>
+    <article class="re-card b-err">
+      <div class="re-cab"><svg aria-hidden="true"><use href="#ic-veh"/></svg>Vehicular</div>
+      <div class="re-cifra c-err">742</div>
+      <div class="re-glosa">trámites pasados de fecha compromiso</div>
+    </article>
+    <article class="re-card b-err es-foco">
+      <div class="re-cab"><svg aria-hidden="true"><use href="#ic-alm"/></svg>Almacén</div>
+      <div class="re-cifra es-foco c-err">50</div>
+      <div class="re-glosa">materiales en stock crítico de 87 vigilados</div>
+      <div class="re-detalle">Monterrey y Tijuana suman <b>42 de los 50</b>; cinco materiales a cero</div>
+      <span class="re-siguiente">Siguiente</span>
+    </article>
+    <article class="re-card b-ok">
+      <div class="re-cab"><svg aria-hidden="true"><use href="#ic-total"/></svg>Acumulado</div>
+      <div class="re-cifra c-ok">79<span class="n1-sufijo">%</span></div>
+      <div class="re-glosa">594 de 753 órdenes ya instaladas</div>
+    </article>
+  </div>
+  <footer class="v-pie">
+    <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 12 · ALERTAS DE STOCK POR CIUDAD ════════════════════════════════════ -->
+<section class="vista vista--aire" data-vista aria-label="Alertas de stock por ciudad.">
+  <header class="v-cab">
+    <h1 class="v-titulo">Alertas de stock <em>por ciudad</em></h1>
+    <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-alm"/></svg>Almacén</span>
+  </header>
+  <div class="n1">
+    <span class="n1-cifra c-err">50</span>
+    <span class="n1-glosa">materiales en crítico<br>de <b>87 vigilados</b></span>
+  </div>
+  <div class="plazas">
+    <article class="plaza">
+      <div class="plaza-cab"><span class="plaza-nombre">Monterrey</span><span class="plaza-total"><b>21</b> de 29</span></div>
+      <div class="barra" role="img" aria-label="Monterrey: 21 críticos, 2 bajos, 6 sin umbral, ninguno suficiente, de 29 materiales.">
+        <span class="s-err" style="width:72.4%"></span><span class="s-warn" style="width:6.9%"></span><span class="s-pause" style="width:20.7%"></span>
+      </div>
+    </article>
+    <article class="plaza">
+      <div class="plaza-cab"><span class="plaza-nombre">Tijuana</span><span class="plaza-total"><b>21</b> de 29</span></div>
+      <div class="barra" role="img" aria-label="Tijuana: 21 críticos, 2 bajos, 6 sin umbral, ninguno suficiente, de 29 materiales.">
+        <span class="s-err" style="width:72.4%"></span><span class="s-warn" style="width:6.9%"></span><span class="s-pause" style="width:20.7%"></span>
+      </div>
+    </article>
+    <article class="plaza">
+      <div class="plaza-cab"><span class="plaza-nombre">CDMX</span><span class="plaza-total"><b>8</b> de 29</span></div>
+      <div class="barra" role="img" aria-label="CDMX: 8 críticos, 13 bajos, 2 suficientes, 6 sin umbral, de 29 materiales.">
+        <span class="s-err" style="width:27.6%"></span><span class="s-warn" style="width:44.8%"></span><span class="s-ok" style="width:6.9%"></span><span class="s-pause" style="width:20.7%"></span>
+      </div>
+    </article>
+  </div>
+  <footer class="v-pie">
+    <div class="leyenda-pie">
+      <span><i style="background:var(--err)"></i><b>Crítico</b></span>
+      <span><i style="background:var(--warn)"></i><b>Bajo</b></span>
+      <span><i style="background:var(--ok)"></i><b>Suficiente</b></span>
+      <span><i style="background:var(--pause)"></i><b>Sin umbral definido</b></span>
+      <span>Cada barra son los 29 materiales vigilados en esa ciudad</span>
+    </div>
+    <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 13 · MATERIALES AGOTADOS ═══════════════════════════════════════
+     Sin columna de piezas: agotado ya significa cero, y repetirlo cinco veces
+     gasta una columna sin decir nada. El nombre del material no va en negrita:
+     si toda la fila pesa, ninguna palabra manda. -->
+<section class="vista vista--aire" data-vista aria-label="Materiales agotados.">
+  <header class="v-cab">
+    <h1 class="v-titulo">Materiales <em>agotados</em></h1>
+    <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-alm"/></svg>Almacén</span>
+  </header>
+  <div class="n1">
+    <span class="n1-cifra c-err">5</span>
+    <span class="n1-glosa">materiales distintos<br>sin una sola pieza</span>
+  </div>
+  <div class="n3">
+    <div class="n3-fila n3-fila--dos"><span class="quien">Cople conduit PVC pesado 19mm <span class="clave">· COPP019</span></span><span class="cuanto marca-falta">CDMX · Tijuana · Monterrey</span></div>
+    <div class="n3-fila n3-fila--dos"><span class="quien">Cople conduit PVC ligero 19mm <span class="clave">· COPL019</span></span><span class="cuanto marca-falta">Tijuana · Monterrey</span></div>
+    <div class="n3-fila n3-fila--dos"><span class="quien">Pegamento PVC baja presión 475ml <span class="clave">· Tangit</span></span><span class="cuanto marca-falta">Monterrey · Tijuana</span></div>
+    <div class="n3-fila n3-fila--dos"><span class="quien">Codo conduit PVC pesado 19mm <span class="clave">· CPP0199</span></span><span class="cuanto marca-falta">CDMX</span></div>
+    <div class="n3-fila n3-fila--dos"><span class="quien">Zapata ponchable cal. 8 1/4 <span class="clave">· clave 33461</span></span><span class="cuanto marca-falta">CDMX</span></div>
+  </div>
+  <footer class="v-pie">
+    <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<!-- ═══ 14 · CARGADORES E INSTALACIONES PENDIENTES ══════════════════════════ -->
+<section class="vista vista--aire" data-vista aria-label="Cargadores e instalaciones pendientes.">
+  <header class="v-cab">
+    <h1 class="v-titulo">Cargadores <em>e instalaciones pendientes</em></h1>
+    <span class="seccion-chip"><svg aria-hidden="true"><use href="#ic-alm"/></svg>Almacén</span>
+  </header>
+  <div class="n1">
+    <span class="n1-cifra c-warn">34</span>
+    <span class="n1-glosa">cargadores en existencia<br>frente a <b>45 instalaciones</b> pendientes</span>
+  </div>
+  <div class="n2">
+    <div class="n2-item b-err">
+      <span class="n2-rotulo">Instalaciones pendientes</span>
+      <span class="n2-cifra c-err">45</span>
+      <span class="n2-apoyo">agendadas sin instalar</span>
+    </div>
+    <div class="n2-item b-warn">
+      <span class="n2-rotulo">Diferencia</span>
+      <span class="n2-cifra c-warn">−11</span>
+      <span class="n2-apoyo">cargadores</span>
+    </div>
+    <div class="n2-item b-pause">
+      <span class="n2-rotulo">Meses con registro</span>
+      <span class="n2-cifra c-pause">4</span>
+      <span class="n2-apoyo">de jun a sep 2026</span>
+    </div>
+  </div>
+  <footer class="v-pie">
+    <p class="pie">Actualizado <b>08/09/26 11:14</b></p>
+  </footer>
+</section>
+
+<div class="progreso-ciclo" aria-hidden="true"><i id="barraCiclo"></i></div>
+</div>
+</main>
+
+<div class="mando" role="group" aria-label="Control del ciclo de proyección">
+  <button type="button" id="btnAnterior" aria-label="Pantalla anterior">‹</button>
+  <button type="button" id="btnPausa" aria-pressed="false">Pausar</button>
+  <button type="button" id="btnSiguiente" aria-label="Pantalla siguiente">›</button>
+  <span class="cuenta" id="cuenta">1 / 14</span>
+  <button type="button" id="btnTema" aria-label="Cambiar entre tema claro y oscuro">Tema</button>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════════════
+   El ciclo. Diez segundos por pantalla, catorce pantallas: dos minutos y veinte
+   por vuelta, frente a los tres minutos y veinte del ciclo de veinte pantallas.
+
+   Sin JavaScript la primera pantalla se ve igual y las demás quedan ocultas: el
+   contenido está en el HTML, no lo genera el script. Y el mando existe porque
+   una proyección se revisa en reunión, donde hace falta parar en una vista.
+   ════════════════════════════════════════════════════════════════════════════ */
+(function(){
+  var DURACION = 10000;
+  var vistas = Array.prototype.slice.call(document.querySelectorAll('[data-vista]'));
+  if(!vistas.length) return;
+
+  var barra = document.getElementById('barraCiclo');
+  var cuenta = document.getElementById('cuenta');
+  var btnPausa = document.getElementById('btnPausa');
+  var indice = 0, pausado = false, t0 = 0, raf = null, temporizador = null;
+
+  var sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function pinta(){
+    vistas.forEach(function(v,i){ v.classList.toggle('es-activa', i === indice); });
+    cuenta.textContent = (indice+1) + ' / ' + vistas.length;
+  }
+  function avanzaBarra(){
+    if(pausado) return;
+    var t = (Date.now() - t0) / DURACION;
+    barra.style.width = Math.min(t,1) * 100 + '%';
+    raf = requestAnimationFrame(avanzaBarra);
+  }
+  function arranca(){
+    clearTimeout(temporizador); cancelAnimationFrame(raf);
+    t0 = Date.now(); barra.style.width = '0%';
+    if(pausado) return;
+    if(!sinMovimiento.matches) raf = requestAnimationFrame(avanzaBarra);
+    temporizador = setTimeout(function(){ ve(indice + 1); }, DURACION);
+  }
+  function ve(n){
+    indice = ((n % vistas.length) + vistas.length) % vistas.length;
+    pinta(); arranca();
+  }
+  function alternaPausa(){
+    pausado = !pausado;
+    btnPausa.textContent = pausado ? 'Reanudar' : 'Pausar';
+    btnPausa.setAttribute('aria-pressed', pausado ? 'true' : 'false');
+    if(pausado){ clearTimeout(temporizador); cancelAnimationFrame(raf); }
+    else arranca();
+  }
+
+  document.getElementById('btnSiguiente').addEventListener('click', function(){ ve(indice+1); });
+  document.getElementById('btnAnterior').addEventListener('click', function(){ ve(indice-1); });
+  btnPausa.addEventListener('click', alternaPausa);
+
+  /* Conmutador de tema. Sin pulsar nada, la maqueta sigue la preferencia del
+     sistema; el botón la fuerza para poder revisar los dos temas en una misma
+     pantalla, que es lo que exige comprobar los tokens de estado. */
+  document.getElementById('btnTema').addEventListener('click', function(){
+    var raiz = document.documentElement;
+    var actual = raiz.getAttribute('data-theme');
+    if(!actual){
+      actual = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    raiz.setAttribute('data-theme', actual === 'dark' ? 'light' : 'dark');
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight'){ e.preventDefault(); ve(indice+1); }
+    else if(e.key === 'ArrowLeft'){ e.preventDefault(); ve(indice-1); }
+    else if(e.key === ' '){
+      var t = e.target;
+      if(t && (t.tagName === 'BUTTON' || t.tagName === 'INPUT' || t.isContentEditable)) return;
+      e.preventDefault(); alternaPausa();
+    }
+  });
+
+  /* El mando aparece al mover el ratón y se retira solo. En la pared no se ve. */
+  var ocultaMando = null;
+  document.addEventListener('mousemove', function(){
+    document.body.classList.add('mando-visible');
+    clearTimeout(ocultaMando);
+    ocultaMando = setTimeout(function(){ document.body.classList.remove('mando-visible'); }, 2500);
+  });
+
+  /* Una pestaña de fondo no debe seguir consumiendo el ciclo. */
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){ clearTimeout(temporizador); cancelAnimationFrame(raf); }
+    else if(!pausado){ arranca(); }
+  });
+
+  pinta(); arranca();
+})();
+</script>
+</body>
+</html>
