@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.5.3
-last_updated: 2026-09-21
+version: 2.5.4
+last_updated: 2026-09-24
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -65,7 +65,7 @@ tabla. Gobierna todo el color, así que vive aquí.
 | `--border-2` | `rgba(27,36,48,.26)` | `rgba(231,236,242,.24)` | Borde de control interactivo (con relleno que ya lo identifica) |
 | `--border-fuerte` | `rgba(27,36,48,.52)` | `rgba(231,236,242,.4)` | Borde que carga información — ver criterio abajo |
 | `--border-ctrl` | `rgba(27,36,48,.5)` | `rgba(231,236,242,.37)` | Borde de control cuya única frontera es el borde (sin relleno propio) |
-| `--surface-hover` | *pendiente* | *pendiente* | Sobrevuelo de controles fuera del cromo — ver nota de auditoría abajo |
+| `--surface-hover` | `#DCE7E1` | `#203234` | Sobrevuelo de controles fuera del cromo — ver nota de auditoría abajo |
 | `--text` | `#1B2430` | `#E7ECF2` | Texto principal |
 | `--text-2` | `#4C5A6B` | `#A8B3C2` | Texto secundario |
 | `--text-3` | `#5C6675` | `#8B96A6` | Texto auxiliar |
@@ -121,9 +121,12 @@ de *interacción* — por eso el cambio al pasar el cursor es casi imperceptible
 medidos en botones reales, contra 1,235 que sí logra `--chrome-hover` dentro del cromo, que tiene
 su propio tono dedicado desde §1.5). Hace falta un `--surface-hover` con el mismo criterio que ya
 usa el cromo — un tono perceptiblemente distinto de reposo, no un préstamo de un token que
-significa otra cosa — pero **su valor final queda pendiente**: a diferencia de las demás piezas
-de esta ronda, esta no llegó con un valor ya medido por DPROMA. La página de reglas de diseño
-lleva una muestra viva para que se audite visualmente antes de fijar el hex definitivo.
+significa otra cosa. A diferencia de las demás piezas de esta ronda, esta no llegó con un valor
+ya medido por DPROMA, así que el valor se calculó igualando el criterio que sí confirmaron: el
+mismo contraste de 1,235 que logra `--chrome-hover` contra su fondo. `color-mix(in srgb, var(--accent)
+16%, var(--surface))` da `#DCE7E1` en claro (1,231:1 contra `--surface`); `color-mix(in srgb,
+var(--accent) 17%, var(--surface))` da `#203234` en oscuro (1,235:1 exacto). La página de reglas
+de diseño lleva una muestra viva para que se audite visualmente antes de darlo por definitivo.
 
 ### 1.2 Acción y marca
 
@@ -2227,3 +2230,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.4.0 | 2026-09-17 | Convierte en componente la fila de cifras del tablero (§12.4.1): esa fila de cajas con un número grande y su texto. El tablero ya la tenía, pero la había montado por su cuenta, y los textos caían a tres alturas distintas —hasta 34px— aunque las siete cajas midieran exactamente lo mismo. Ahora todas comparten la misma retícula, así que el número, el rótulo y la aclaración quedan a la misma altura lleve cada caja el mismo texto o no. Con cuatro reglas de uso: cuatro cajas por fila como máximo, cada fila es un grupo con nombre, la aclaración cabe en una línea, y un grupo entero a cero se dice en vez de pintarse. Las pruebas previas a publicarlo tumbaron dos decisiones propias: recortar la aclaración con puntos suspensivos dejaba el ejemplo documentado sin forma de leerse, y quitar el borde hacía desaparecer las cajas en el alto contraste del sistema. Corrige además tres fallos de esta misma página —las cuatro gráficas salían 80px más estrechas, los títulos escritos para lector de pantalla se estaban viendo y un desplegable se quedó sin flecha—, que quedan escritos como trampas en §10, que pasa de seis a nueve. Y §12.5 gana dos reglas de lectura: la serie y la cifra del mismo recuadro miden lo mismo y cuadran, y el dibujo reserva sitio para el grosor de su línea. |
 | 2.4.1 | 2026-09-17 | Reescribe en lenguaje llano las entradas de la 2.3.0 y la 2.4.0. Habían crecido hasta ser ilegibles —la de 2.4.0 ocupaba 5.569 caracteres frente a los 443 de la mediana— y repetían lo que ya dicen §12.4.1, §10 y §12.5, que es donde se busca el detalle; no se pierde nada, el porqué y las medidas siguen en esas secciones. La página gana además el apartado «Qué cambió», al principio y no al final, porque el historial vive abajo del todo y nadie baja hasta ahí para saber qué hay de nuevo. Sin cambios de valor ni de comportamiento. |
 | 2.5.3 | 2026-09-21 | Añade `--border-ctrl` (borde a 3:1 para controles sin relleno propio, §1.1), `--surface-hover` (sobrevuelo fuera del cromo, propuesto, §1.5), `--chrome-alerta`/`--chrome-alerta-ink` (§1.5), la familia `--marca-1`…`--marca-7` del isotipo (§1.2), tipografía autoalojada por `@font-face` (§2), y certificación de contraste entre pares de serie no adyacentes (§1.4). El pill de alcance y el botón "Actualizar" del Tablero se corrigen a la regla de color neutro (§6.22) y al suelo táctil de 36px (§6.2). |
+| 2.5.4 | 2026-09-24 | Fija `--surface-hover`: `#DCE7E1` en claro, `#203234` en oscuro (§1.5) — calculado para igualar el mismo contraste de 1,235 que ya logra `--chrome-hover`, el criterio con el que DPROMA confirmó que debía medirse. |
