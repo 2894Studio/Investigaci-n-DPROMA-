@@ -58,7 +58,7 @@ tabla. Gobierna todo el color, así que vive aquí.
 | `--border-2` | `rgba(27,36,48,.26)` | `rgba(231,236,242,.24)` | Borde de control interactivo (con relleno que ya lo identifica) |
 | `--border-fuerte` | `rgba(27,36,48,.52)` | `rgba(231,236,242,.4)` | Borde que carga información — ver criterio abajo |
 | `--border-ctrl` | `rgba(27,36,48,.5)` | `rgba(231,236,242,.37)` | Borde de control cuya única frontera es el borde (sin relleno propio) |
-| `--surface-hover` | *pendiente* | *pendiente* | Sobrevuelo de controles fuera del cromo — ver nota de auditoría abajo |
+| `--surface-hover` | `#DCE7E1` | `#203234` | Sobrevuelo de controles fuera del cromo — ver nota de auditoría abajo |
 | `--text` | `#1B2430` | `#E7ECF2` | Texto principal |
 | `--text-2` | `#4C5A6B` | `#A8B3C2` | Texto secundario |
 | `--text-3` | `#5C6675` | `#8B96A6` | Texto auxiliar |
@@ -114,9 +114,12 @@ de *interacción* — por eso el cambio al pasar el cursor es casi imperceptible
 medidos en botones reales, contra 1,235 que sí logra `--chrome-hover` dentro del cromo, que tiene
 su propio tono dedicado desde §1.5). Hace falta un `--surface-hover` con el mismo criterio que ya
 usa el cromo — un tono perceptiblemente distinto de reposo, no un préstamo de un token que
-significa otra cosa — pero **su valor final queda pendiente**: a diferencia de las demás piezas
-de esta ronda, esta no llegó con un valor ya medido por DPROMA. La página de reglas de diseño
-lleva una muestra viva para que se audite visualmente antes de fijar el hex definitivo.
+significa otra cosa. A diferencia de las demás piezas de esta ronda, esta no llegó con un valor
+ya medido por DPROMA, así que el valor se calculó igualando el criterio que sí confirmaron: el
+mismo contraste de 1,235 que logra `--chrome-hover` contra su fondo. `color-mix(in srgb, var(--accent)
+16%, var(--surface))` da `#DCE7E1` en claro (1,231:1 contra `--surface`); `color-mix(in srgb,
+var(--accent) 17%, var(--surface))` da `#203234` en oscuro (1,235:1 exacto). La página de reglas
+de diseño lleva una muestra viva para que se audite visualmente antes de darlo por definitivo.
 
 ### 1.2 Acción y marca
 
