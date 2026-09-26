@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.5.5
+version: 2.6.0
 last_updated: 2026-09-26
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -252,10 +252,24 @@ de ΔE 15: serie 1–4 en **12,6** y serie 1–3 en oscuro en **1,6** — este �
 indistinguible. La regla de validación se amplía: **cuando una gráfica o leyenda muestra más de
 dos series a la vez en pantalla, se mide cada combinación que realmente aparece junta**, no solo
 las consecutivas en el orden fijo de la regla 1. Un par que no llegue al suelo no se corrige
-subiendo el ΔE global —eso puede romper pares que hoy sí funcionan— se resuelve caso por caso:
-o se documenta que esa combinación no se muestra junta en ninguna pantalla, o se le añade
-distinción por forma/patrón además de color (línea sólida vs. discontinua, por ejemplo) para esa
-gráfica en concreto.
+subiendo el ΔE global —eso puede romper pares que hoy sí funcionan.
+
+**Resolución para serie 1–4 y serie 1–3 (oscuro).** No existe un catálogo de pantallas que
+garantice que estas dos combinaciones nunca coexisten en una misma gráfica, así que no se
+documentan como «no se muestran juntas» sin verificarlo pantalla por pantalla — sería una cifra
+inventada. En su lugar, la distinción se refuerza con un segundo canal, no solo color, cada vez
+que aparecen juntas:
+
+- **Línea:** una de las dos series lleva trazo discontinuo, la otra sólido.
+- **Barra o dona:** una de las dos series lleva una textura de rayas diagonales sobre su color de
+  relleno, la otra queda lisa.
+- **Leyenda:** repite el mismo patrón junto al nombre de la serie, no solo el color — si la barra
+  tiene rayas, el cuadro de la leyenda también las tiene.
+
+Ningún hex cambia — los cuatro slots de color de §1.4 se quedan igual. Es una regla de aplicación
+adicional, solo para estos dos pares concretos, la primera vez que compartan gráfica. Cualquier
+otro par que en el futuro se mida por debajo del suelo de ΔE 15 sigue el mismo criterio: se
+verifica si de verdad coexiste en alguna pantalla antes de decidir la corrección.
 
 ### 1.4.1 Tinta sobre relleno sólido de color
 
@@ -2233,3 +2247,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.5.3 | 2026-09-21 | Añade `--border-ctrl` (borde a 3:1 para controles sin relleno propio, §1.1), `--surface-hover` (sobrevuelo fuera del cromo, propuesto, §1.5), `--chrome-alerta`/`--chrome-alerta-ink` (§1.5), la familia `--marca-1`…`--marca-7` del isotipo (§1.2), tipografía autoalojada por `@font-face` (§2), y certificación de contraste entre pares de serie no adyacentes (§1.4). El pill de alcance y el botón "Actualizar" del Tablero se corrigen a la regla de color neutro (§6.22) y al suelo táctil de 36px (§6.2). |
 | 2.5.4 | 2026-09-24 | Fija `--surface-hover`: `#DCE7E1` en claro, `#203234` en oscuro (§1.5) — calculado para igualar el mismo contraste de 1,235 que ya logra `--chrome-hover`, el criterio con el que DPROMA confirmó que debía medirse. |
 | 2.5.5 | 2026-09-26 | Reescribe cinco pasajes (§3, §6.4, §6.19, §6.21, §6.22) que usaban la construcción "no es X, es Y". Sin cambios de regla ni de valor. |
+| 2.6.0 | 2026-09-26 | Resuelve los dos pares de serie que quedaban por debajo del suelo de ΔE 15 (§1.4): serie 1–4 y serie 1–3 en oscuro. Ningún hex cambia — en vez de forzar un nuevo ΔE global, que rompería pares que hoy sí funcionan, o de documentar sin verificarlo que esas combinaciones nunca coexisten, se añade un segundo canal de distinción (trazo discontinuo en línea, textura de rayas en barra/dona, repetida en la leyenda) para esos dos pares cuando comparten gráfica. |

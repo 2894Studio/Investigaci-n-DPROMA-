@@ -245,10 +245,24 @@ de ΔE 15: serie 1–4 en **12,6** y serie 1–3 en oscuro en **1,6** — este �
 indistinguible. La regla de validación se amplía: **cuando una gráfica o leyenda muestra más de
 dos series a la vez en pantalla, se mide cada combinación que realmente aparece junta**, no solo
 las consecutivas en el orden fijo de la regla 1. Un par que no llegue al suelo no se corrige
-subiendo el ΔE global —eso puede romper pares que hoy sí funcionan— se resuelve caso por caso:
-o se documenta que esa combinación no se muestra junta en ninguna pantalla, o se le añade
-distinción por forma/patrón además de color (línea sólida vs. discontinua, por ejemplo) para esa
-gráfica en concreto.
+subiendo el ΔE global —eso puede romper pares que hoy sí funcionan.
+
+**Resolución para serie 1–4 y serie 1–3 (oscuro).** No existe un catálogo de pantallas que
+garantice que estas dos combinaciones nunca coexisten en una misma gráfica, así que no se
+documentan como «no se muestran juntas» sin verificarlo pantalla por pantalla — sería una cifra
+inventada. En su lugar, la distinción se refuerza con un segundo canal, no solo color, cada vez
+que aparecen juntas:
+
+- **Línea:** una de las dos series lleva trazo discontinuo, la otra sólido.
+- **Barra o dona:** una de las dos series lleva una textura de rayas diagonales sobre su color de
+  relleno, la otra queda lisa.
+- **Leyenda:** repite el mismo patrón junto al nombre de la serie, no solo el color — si la barra
+  tiene rayas, el cuadro de la leyenda también las tiene.
+
+Ningún hex cambia — los cuatro slots de color de §1.4 se quedan igual. Es una regla de aplicación
+adicional, solo para estos dos pares concretos, la primera vez que compartan gráfica. Cualquier
+otro par que en el futuro se mida por debajo del suelo de ΔE 15 sigue el mismo criterio: se
+verifica si de verdad coexiste en alguna pantalla antes de decidir la corrección.
 
 ### 1.4.1 Tinta sobre relleno sólido de color
 
