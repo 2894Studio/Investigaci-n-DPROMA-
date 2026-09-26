@@ -398,8 +398,8 @@ o cinco palabras que se leen una vez para orientarse, no datos.
 
 ## 3. Espaciado y radios
 
-Escala base de 4px. El nombre del token **no es el multiplicador** — es un identificador, no una
-fórmula a extrapolar sin mirar la tabla.
+Escala base de 4px. El nombre del token es un identificador, no el multiplicador — no hay
+fórmula que extrapolar sin mirar la tabla.
 
 ```css
 --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px;
@@ -744,7 +744,7 @@ idéntico y además se respeta el §4 —el translúcido es de la pantalla de en
 El medallón se tiñe con `--err-fill`, no con el `--err-soft` del acceso, que fuera de esa pantalla
 no existe.
 
-**El medallón no es decoración: es lo que da peso al icono.** Sin él, el icono de estado acaba
+**El medallón carga el peso visual del icono.** Sin él, el icono de estado acaba
 siendo texto en `--text-3`, el gris más apagado del sistema, a 30px. Las cuatro maquetas del
 padrón llegaron así pese a que este apartado ya lo prescribía.
 
@@ -1611,8 +1611,8 @@ página; un clic fuera cierra. El contenedor de pastillas abre con un texto solo
 —«Filtros aplicados: N»— y cada «×» dice qué quita, no solo «quitar»: en una fila de seis, seis
 botones «×» idénticos son indistinguibles al tabular (§6.19).
 
-**Un panel no es un modal.** No atrapa el foco ni oscurece la pantalla: es un menú de un control
-de la barra, y la tabla de detrás sigue siendo legible mientras se decide. Por eso lleva
+**Un panel es un menú de un control de la barra, no un modal** — no atrapa el foco ni oscurece
+la pantalla, y la tabla de detrás sigue siendo legible mientras se decide. Por eso lleva
 `role="group"` con su etiqueta y no `role="dialog"`.
 
 ---
@@ -1626,8 +1626,9 @@ producto ya tenía el vocabulario —«de toda la organización», «Vista de Ad
 pantalla del tablero salía cuatro veces: cuatro avisos de que falta algo, cuando no faltaba nada.
 Cuatro avisos falsos por pantalla desgastan el aviso de verdad.
 
-**El ámbito no es un estado.** Es un dato sobre el dato, así que pesa menos que todo lo demás de
-la pantalla: sin relleno, sin borde, icono y texto en tinta auxiliar.
+**El ámbito es un dato sobre el dato** —de qué conjunto habla una cifra, nunca un juicio sobre
+ella—, así que pesa menos que todo lo demás de la pantalla: sin relleno, sin borde, icono y
+texto en tinta auxiliar.
 
 ```css
 .ambito{display:inline-flex;align-items:center;gap:5px;
@@ -1702,7 +1703,7 @@ principal de la pantalla o el uso es en campo o tableta.
 :root[data-tacto="dedo"] .btn{min-height:46px}
 ```
 
-**El `:root` no es adorno: es lo que hace que la regla gane.** Con `:root` delante, el selector
+**El `:root` es lo que hace ganar la regla.** Con `:root` delante, el selector
 suma (0,3,0); sin él se queda en (0,2,0) y lo empata cualquier variante de tamaño del propio
 componente —`.acciones .iconbtn{width:28px}`—, que al ir declarada después gana. La ficha de
 cliente lo escribió sin `:root` y, medido con el modo dedo activado, sus botones de fila seguían
