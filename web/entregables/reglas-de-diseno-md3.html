@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sistema de diseño SIO-DPROMA — vista M3</title>
+<meta name="description" content="Vista experimental del sistema de diseño SIO-DPROMA con la presentación de Material Design 3: barra lateral, tarjetas de superficie, roles de color. No sustituye a reglas-de-diseno.html — es una exploración de visualización." />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=check_circle,close,dark_mode,error,expand_more,light_mode,menu,pause_circle,schedule,tune" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F5F7; --surface:#FAFCFD; --surface-2:#E7EDF3;
+  --border:rgba(27,36,48,.14); --border-2:rgba(27,36,48,.26);
+  --border-fuerte:rgba(27,36,48,.52); --border-ctrl:rgba(27,36,48,.5);
+  --surface-hover:color-mix(in srgb, var(--accent) 16%, var(--surface));
+  --text:#1B2430; --text-2:#4C5A6B; --text-3:#5C6675;
+  --accent:#3E7A4C; --accent-ink:#F7FAF9; --accent-soft:rgba(62,122,76,.10); --link:#2F6B3C;
+  --marca-1:#0c361e; --marca-2:#12572b; --marca-3:#2e823d; --marca-4:#60a84b;
+  --marca-5:#76b552; --marca-6:#a5c86a; --marca-7:#c7d97b;
+  --ok:#2F8F6F; --ok-ink:#1D5A46; --ok-bg:#DCF0E7;
+  --warn:#B98A1E; --warn-ink:#6E5210; --warn-bg:#F5E7C6;
+  --err:#C24238; --err-ink:#7A2A23; --err-bg:#F6DAD7;
+  --block:#9678CC; --block-ink:#5B4680; --block-bg:#EAE1F7;
+  --pause:#4A5560; --pause-ink:#333B44; --pause-bg:#E2E6E9;
+  --serie-1:#2a78d6; --serie-2:#eb6834; --serie-3:#4a3aa7; --serie-4:#e87ba4;
+  --chrome:#1E4E79; --chrome-ink:#F2F5F7;
+  --chrome-alerta:#C24238; --chrome-alerta-ink:#FAFCFD;
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-12:48px;
+  --r-ctrl:6px; --r-card:10px; --r-modal:16px; --r-pill:999px;
+  --sh-rest:0 1px 2px rgba(19,29,43,.07); --sh-float:0 6px 18px rgba(19,29,43,.10);
+  --font-ui:'Inter',system-ui,sans-serif; --font-brand:'Michroma',sans-serif;
+  --fs-meta:12px; --fs-dense:13px; --fs-base:14px; --fs-sub:16px; --fs-title:20px; --fs-kpi:30px;
+  /* --- roles añadidos solo para esta vista M3: no son parte del sistema, son chrome de la maqueta --- */
+  --m3-rail-w:280px; --m3-radius-lg:28px; --m3-radius-xl:20px;
+}
+:root[data-theme="dark"]{
+  --bg:#10161F; --surface:#171F2C; --surface-2:#1D2735;
+  --border:rgba(231,236,242,.12); --border-2:rgba(231,236,242,.24);
+  --border-fuerte:rgba(231,236,242,.4); --border-ctrl:rgba(231,236,242,.37);
+  --surface-hover:color-mix(in srgb, var(--accent) 17%, var(--surface));
+  --text:#E7ECF2; --text-2:#A8B3C2; --text-3:#8B96A6;
+  --accent:#4A8F5A; --accent-ink:#08120D; --accent-soft:rgba(74,143,90,.16); --link:#7FC08F;
+  --ok:#4FBF98; --ok-ink:#4FBF98; --ok-bg:#173028;
+  --warn:#E8C24C; --warn-ink:#E8C24C; --warn-bg:#332A11;
+  --err:#EE6E5F; --err-ink:#EE6E5F; --err-bg:#391D18;
+  --block:#C0A9F0; --block-ink:#C0A9F0; --block-bg:#2A2140;
+  --pause:#6B7684; --pause-ink:#6B7684; --pause-bg:#232C36;
+  --serie-1:#3987e5; --serie-2:#d95926; --serie-3:#9085e9; --serie-4:#d55181;
+  --chrome:#122740; --chrome-ink:#E7ECF2;
+  --sh-rest:0 1px 2px rgba(0,0,0,.3); --sh-float:0 6px 18px rgba(0,0,0,.35);
+}
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+@media (prefers-reduced-motion:reduce){ *{ animation-duration:.001ms !important; transition-duration:.001ms !important; } }
+body{ margin:0; background:var(--bg); color:var(--text); font:400 var(--fs-base) var(--font-ui); line-height:1.55; -webkit-font-smoothing:antialiased; }
+a{ color:var(--link); }
+.msi{ font-family:'Material Symbols Rounded'; font-size:20px; font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24; vertical-align:-4px; }
+
+/* --- notice banner --- */
+.m3-notice{ background:var(--warn-bg); color:var(--warn-ink); font-size:var(--fs-dense); padding:var(--sp-2) var(--sp-4); text-align:center; border-bottom:1px solid var(--border); }
+.m3-notice b{ font-weight:700; }
+
+/* --- shell: rail + content --- */
+.m3-shell{ display:flex; min-height:100vh; }
+.m3-rail{ width:var(--m3-rail-w); flex-shrink:0; background:var(--surface); border-right:1px solid var(--border); padding:var(--sp-6) var(--sp-4); position:sticky; top:0; height:100vh; overflow-y:auto; }
+.m3-brand{ display:flex; align-items:center; gap:var(--sp-3); padding:0 var(--sp-3) var(--sp-6); }
+.m3-brand .mark{ width:36px; height:36px; border-radius:var(--r-ctrl); background:linear-gradient(135deg, var(--marca-7), var(--marca-2)); flex-shrink:0; }
+.m3-brand .name{ font-family:var(--font-brand); font-size:.85rem; letter-spacing:.04em; }
+.m3-brand .sub{ font-size:var(--fs-meta); color:var(--text-3); }
+.m3-nav-group{ margin-bottom:var(--sp-6); }
+.m3-nav-group h4{ font-size:var(--fs-meta); text-transform:uppercase; letter-spacing:.08em; color:var(--text-3); font-weight:700; margin:0 0 var(--sp-2) var(--sp-3); }
+.m3-nav-group a{ display:flex; align-items:center; gap:var(--sp-3); padding:var(--sp-3); border-radius:var(--r-pill); color:var(--text-2); text-decoration:none; font-size:.925rem; font-weight:500; margin-bottom:2px; transition:background-color .15s ease; }
+.m3-nav-group a:hover{ background:var(--surface-hover); }
+.m3-nav-group a.active{ background:var(--accent-soft); color:var(--accent); font-weight:700; }
+.m3-nav-group a .msi{ font-size:18px; opacity:.85; }
+
+.m3-main{ flex:1; min-width:0; }
+.m3-topbar{ position:sticky; top:0; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:var(--sp-4) var(--sp-8); background:color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter:blur(8px); border-bottom:1px solid var(--border); }
+.m3-crumb{ font-size:var(--fs-dense); color:var(--text-3); }
+.m3-crumb b{ color:var(--text); font-weight:600; }
+.m3-theme-toggle{ display:inline-flex; align-items:center; gap:6px; padding:.5em 1em; border-radius:var(--r-pill); border:1px solid var(--border); background:var(--surface); cursor:pointer; font:inherit; color:var(--text); }
+
+.m3-content{ max-width:1040px; margin:0 auto; padding:var(--sp-12) var(--sp-8) 120px; }
+.m3-hero{ margin-bottom:var(--sp-12); }
+.m3-hero .eyebrow{ color:var(--accent); font-weight:700; font-size:var(--fs-dense); text-transform:uppercase; letter-spacing:.08em; }
+.m3-hero h1{ font-size:2.75rem; line-height:1.1; margin:.4em 0 .5em; letter-spacing:-.01em; }
+.m3-hero p{ font-size:1.05rem; color:var(--text-2); max-width:640px; }
+
+.m3-section{ margin-bottom:var(--sp-12); scroll-margin-top:90px; }
+.m3-section h2{ font-size:1.5rem; margin:0 0 var(--sp-2); }
+.m3-section .lede{ color:var(--text-2); margin:0 0 var(--sp-6); max-width:680px; }
+
+/* --- surface card, M3-style: large radius, soft elevation --- */
+.m3-card{ background:var(--surface); border-radius:var(--m3-radius-xl); padding:var(--sp-6); box-shadow:var(--sh-rest); border:1px solid var(--border); }
+.m3-card + .m3-card{ margin-top:var(--sp-4); }
+
+/* --- color role tiles, M3-style --- */
+.m3-role-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:var(--sp-4); }
+.m3-role{ border-radius:var(--m3-radius-xl); overflow:hidden; border:1px solid var(--border); box-shadow:var(--sh-rest); }
+.m3-role .swatch{ height:96px; display:flex; align-items:flex-end; padding:var(--sp-3); }
+.m3-role .swatch .hex{ font:600 var(--fs-dense) monospace; padding:.2em .6em; border-radius:var(--r-pill); background:rgba(255,255,255,.35); backdrop-filter:blur(2px); }
+.m3-role .meta{ background:var(--surface); padding:var(--sp-4); }
+.m3-role .meta .role-name{ font-weight:700; font-size:.95rem; margin-bottom:.2em; }
+.m3-role .meta .role-desc{ font-size:var(--fs-dense); color:var(--text-2); }
+
+/* --- semaphore chips row --- */
+.m3-chip-row{ display:flex; flex-wrap:wrap; gap:var(--sp-3); }
+.m3-chip{ display:inline-flex; align-items:center; gap:6px; padding:.5em 1em; border-radius:var(--r-pill); font-size:.875rem; font-weight:600; }
+.m3-chip .msi{ font-size:16px; vertical-align:-3px; }
+
+/* --- type scale --- */
+.m3-type-row{ display:flex; align-items:baseline; gap:var(--sp-6); padding:var(--sp-4) 0; border-bottom:1px solid var(--border); }
+.m3-type-row:last-child{ border-bottom:0; }
+.m3-type-row .sample{ flex:1; }
+.m3-type-row .meta{ font:500 var(--fs-dense) monospace; color:var(--text-3); white-space:nowrap; }
+
+/* --- component preview --- */
+.m3-comp-demo{ display:flex; flex-wrap:wrap; align-items:center; gap:var(--sp-4); padding:var(--sp-6); background:var(--surface-2); border-radius:var(--r-card); margin-bottom:var(--sp-3); }
+.m3-btn{ display:inline-flex; align-items:center; gap:6px; padding:.7em 1.4em; border-radius:var(--r-pill); font:600 var(--fs-base) var(--font-ui); border:1px solid transparent; cursor:pointer; }
+.m3-btn.filled{ background:var(--accent); color:var(--accent-ink); }
+.m3-btn.tonal{ background:var(--accent-soft); color:var(--accent); }
+.m3-btn.outlined{ background:transparent; color:var(--accent); border-color:var(--border-ctrl); }
+.m3-code{ font:400 .8rem/1.5 'SFMono-Regular', Menlo, monospace; background:var(--bg); border:1px solid var(--border); border-radius:var(--r-ctrl); padding:var(--sp-3) var(--sp-4); overflow-x:auto; color:var(--text-2); }
+.m3-code b{ color:var(--accent); font-weight:600; }
+
+@media (max-width:900px){
+  .m3-rail{ display:none; }
+  .m3-content{ padding:var(--sp-8) var(--sp-4) 80px; }
+  .m3-hero h1{ font-size:2rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="m3-notice"><span class="msi" aria-hidden="true" translate="no">tune</span> Vista experimental — exploración de visualización con el estilo de Material Design 3. <b>No sustituye</b> a <code>reglas-de-diseno.html</code>; mismos tokens y reglas, otra presentación.</div>
+
+<div class="m3-shell">
+  <aside class="m3-rail">
+    <div class="m3-brand">
+      <div class="mark"></div>
+      <div>
+        <div class="name">SIO-DPROMA</div>
+        <div class="sub">Sistema de diseño</div>
+      </div>
+    </div>
+
+    <div class="m3-nav-group">
+      <h4>Fundamentos</h4>
+      <a href="#color" class="active"><span class="msi" aria-hidden="true" translate="no">light_mode</span>Color</a>
+      <a href="#tipografia"><span class="msi" aria-hidden="true" translate="no">check_circle</span>Tipografía</a>
+    </div>
+    <div class="m3-nav-group">
+      <h4>Componentes</h4>
+      <a href="#botones"><span class="msi" aria-hidden="true" translate="no">expand_more</span>Botones</a>
+      <a href="#estados"><span class="msi" aria-hidden="true" translate="no">schedule</span>Estados</a>
+    </div>
+    <div class="m3-nav-group">
+      <h4>Otros</h4>
+      <a href="/entregables/reglas-de-diseno.html"><span class="msi" aria-hidden="true" translate="no">menu</span>Ver versión oficial →</a>
+    </div>
+  </aside>
+
+  <main class="m3-main">
+    <div class="m3-topbar">
+      <div class="m3-crumb">Sistema de diseño / <b>Color</b></div>
+      <button class="m3-theme-toggle" id="theme-toggle" type="button">
+        <span class="msi" aria-hidden="true" translate="no">dark_mode</span> Tema
+      </button>
+    </div>
+
+    <div class="m3-content">
+      <div class="m3-hero">
+        <div class="eyebrow">Exploración visual · M3</div>
+        <h1>Un sistema, otra forma de leerlo.</h1>
+        <p>Mismos tokens, mismos valores, mismas reglas de <code>docs/sistema-diseno-sio-dproma.md</code> — presentados con la retícula de tarjetas y roles de color de Material Design 3, para comparar qué tan bien viajaría nuestro sistema en esa presentación.</p>
+      </div>
+
+      <section class="m3-section" id="color">
+        <h2>Color</h2>
+        <p class="lede">Los mismos roles que documenta §1: superficie, acción, semáforo de cinco estados y marca. Aquí como tarjetas de rol, al estilo de las páginas de esquema de color de M3.</p>
+
+        <div class="m3-role-grid">
+          <div class="m3-role">
+            <div class="swatch" style="background:var(--bg);"><span class="hex">--bg</span></div>
+            <div class="meta"><div class="role-name">Fondo</div><div class="role-desc">#F2F5F7 · fondo de página</div></div>
+          </div>
+          <div class="m3-role">
+            <div class="swatch" style="background:var(--surface); color:var(--text);"><span class="hex">--surface</span></div>
+            <div class="meta"><div class="role-name">Superficie</div><div class="role-desc">#FAFCFD · tarjetas, tablas, botones</div></div>
+          </div>
+          <div class="m3-role">
+            <div class="swatch" style="background:var(--surface-2); color:var(--text);"><span class="hex">--surface-2</span></div>
+            <div class="meta"><div class="role-name">Superficie secundaria</div><div class="role-desc">#E7EDF3 · cabeceras, hover de fila</div></div>
+          </div>
+          <div class="m3-role">
+            <div class="swatch" style="background:var(--accent); color:var(--accent-ink);"><span class="hex">--accent</span></div>
+            <div class="meta"><div class="role-name">Acento</div><div class="role-desc">#3E7A4C · acción principal</div></div>
+          </div>
+          <div class="m3-role">
+            <div class="swatch" style="background:var(--chrome); color:var(--chrome-ink);"><span class="hex">--chrome</span></div>
+            <div class="meta"><div class="role-name">Cromo</div><div class="role-desc">#1E4E79 · barra lateral y superior</div></div>
+          </div>
+          <div class="m3-role">
+            <div class="swatch" style="background:var(--text); color:var(--surface);"><span class="hex">--text</span></div>
+            <div class="meta"><div class="role-name">Texto</div><div class="role-desc">#1B2430 · texto principal</div></div>
+          </div>
+        </div>
+
+        <h2 style="margin-top:var(--sp-8);">Semáforo — cinco estados</h2>
+        <p class="lede">Un color de estado nunca se reutiliza como serie de gráfica (§1.4) — la regla completa vive en §1.</p>
+        <div class="m3-card">
+          <div class="m3-chip-row">
+            <span class="m3-chip" style="background:var(--ok-bg); color:var(--ok-ink);"><span class="msi" aria-hidden="true" translate="no">check_circle</span>Vigente</span>
+            <span class="m3-chip" style="background:var(--warn-bg); color:var(--warn-ink);"><span class="msi" aria-hidden="true" translate="no">schedule</span>Incompleto</span>
+            <span class="m3-chip" style="background:var(--err-bg); color:var(--err-ink);"><span class="msi" aria-hidden="true" translate="no">error</span>Bloqueado</span>
+            <span class="m3-chip" style="background:var(--block-bg); color:var(--block-ink);"><span class="msi" aria-hidden="true" translate="no">error</span>Retenido</span>
+            <span class="m3-chip" style="background:var(--pause-bg); color:var(--pause-ink);"><span class="msi" aria-hidden="true" translate="no">pause_circle</span>Inactivo</span>
+          </div>
+        </div>
+
+        <h2 style="margin-top:var(--sp-8);">Marca — fuera del tema</h2>
+        <p class="lede">El gradiente del isotipo no cambia entre temas, a propósito (§1.2).</p>
+        <div class="m3-card" style="padding:0; overflow:hidden;">
+          <div style="height:64px; background:linear-gradient(90deg, var(--marca-1), var(--marca-2), var(--marca-3), var(--marca-4), var(--marca-5), var(--marca-6), var(--marca-7));"></div>
+        </div>
+      </section>
+
+      <section class="m3-section" id="tipografia">
+        <h2>Tipografía</h2>
+        <p class="lede">Inter para interfaz, Michroma solo para marca (§2). El suelo del sistema son 12px.</p>
+        <div class="m3-card">
+          <div class="m3-type-row"><span class="sample" style="font-family:var(--font-brand); font-size:1.1rem;">SIO-DPROMA</span><span class="meta">--font-brand</span></div>
+          <div class="m3-type-row"><span class="sample" style="font-size:var(--fs-title); font-weight:700;">Padrón de clientes</span><span class="meta">--fs-title · 20px</span></div>
+          <div class="m3-type-row"><span class="sample" style="font-size:var(--fs-sub); font-weight:600;">Subtítulo destacado</span><span class="meta">--fs-sub · 16px</span></div>
+          <div class="m3-type-row"><span class="sample" style="font-size:var(--fs-base);">Cuerpo por defecto de la interfaz.</span><span class="meta">--fs-base · 14px</span></div>
+          <div class="m3-type-row"><span class="sample" style="font-size:var(--fs-dense);">Grupo Automotriz Vértice — tabla densa</span><span class="meta">--fs-dense · 13px</span></div>
+          <div class="m3-type-row"><span class="sample" style="font-size:var(--fs-meta); color:var(--text-3);">RFC · GAV-870512-K21</span><span class="meta">--fs-meta · 12px</span></div>
+        </div>
+      </section>
+
+      <section class="m3-section" id="botones">
+        <h2>Botones</h2>
+        <p class="lede">Tres énfasis, mismo token de acento — como M3 distingue filled/tonal/outlined.</p>
+        <div class="m3-comp-demo">
+          <button class="m3-btn filled">Guardar cambios</button>
+          <button class="m3-btn tonal">Ver detalle</button>
+          <button class="m3-btn outlined">Cancelar</button>
+        </div>
+        <div class="m3-code">.btn.filled { background: <b>var(--accent)</b>; color: <b>var(--accent-ink)</b>; }</div>
+      </section>
+
+      <section class="m3-section" id="estados">
+        <h2>Estados</h2>
+        <p class="lede">El pill de estado, con su receta real (§6): sin borde, radio de píldora, semáforo aplicado a fondo+texto.</p>
+        <div class="m3-comp-demo">
+          <span class="m3-chip" style="background:var(--ok-bg); color:var(--ok-ink);">Vigente</span>
+          <span class="m3-chip" style="background:var(--warn-bg); color:var(--warn-ink);">Por vencer</span>
+          <span class="m3-chip" style="background:var(--err-bg); color:var(--err-ink);">Vencido</span>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+  var btn = document.getElementById('theme-toggle');
+  var root = document.documentElement;
+  btn.addEventListener('click', function(){
+    var isDark = root.getAttribute('data-theme') === 'dark';
+    root.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  });
+})();
+</script>
+</body>
+</html>
