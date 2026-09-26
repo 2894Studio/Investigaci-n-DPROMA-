@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.5.4
-last_updated: 2026-09-24
+version: 2.5.5
+last_updated: 2026-09-26
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -398,8 +398,8 @@ o cinco palabras que se leen una vez para orientarse, no datos.
 
 ## 3. Espaciado y radios
 
-Escala base de 4px. El nombre del token **no es el multiplicador** — es un identificador, no una
-fórmula a extrapolar sin mirar la tabla.
+Escala base de 4px. El nombre del token es un identificador, no el multiplicador — no hay
+fórmula que extrapolar sin mirar la tabla.
 
 ```css
 --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px;
@@ -744,7 +744,7 @@ idéntico y además se respeta el §4 —el translúcido es de la pantalla de en
 El medallón se tiñe con `--err-fill`, no con el `--err-soft` del acceso, que fuera de esa pantalla
 no existe.
 
-**El medallón no es decoración: es lo que da peso al icono.** Sin él, el icono de estado acaba
+**El medallón carga el peso visual del icono.** Sin él, el icono de estado acaba
 siendo texto en `--text-3`, el gris más apagado del sistema, a 30px. Las cuatro maquetas del
 padrón llegaron así pese a que este apartado ya lo prescribía.
 
@@ -1611,8 +1611,8 @@ página; un clic fuera cierra. El contenedor de pastillas abre con un texto solo
 —«Filtros aplicados: N»— y cada «×» dice qué quita, no solo «quitar»: en una fila de seis, seis
 botones «×» idénticos son indistinguibles al tabular (§6.19).
 
-**Un panel no es un modal.** No atrapa el foco ni oscurece la pantalla: es un menú de un control
-de la barra, y la tabla de detrás sigue siendo legible mientras se decide. Por eso lleva
+**Un panel es un menú de un control de la barra, no un modal** — no atrapa el foco ni oscurece
+la pantalla, y la tabla de detrás sigue siendo legible mientras se decide. Por eso lleva
 `role="group"` con su etiqueta y no `role="dialog"`.
 
 ---
@@ -1626,8 +1626,9 @@ producto ya tenía el vocabulario —«de toda la organización», «Vista de Ad
 pantalla del tablero salía cuatro veces: cuatro avisos de que falta algo, cuando no faltaba nada.
 Cuatro avisos falsos por pantalla desgastan el aviso de verdad.
 
-**El ámbito no es un estado.** Es un dato sobre el dato, así que pesa menos que todo lo demás de
-la pantalla: sin relleno, sin borde, icono y texto en tinta auxiliar.
+**El ámbito es un dato sobre el dato** —de qué conjunto habla una cifra, nunca un juicio sobre
+ella—, así que pesa menos que todo lo demás de la pantalla: sin relleno, sin borde, icono y
+texto en tinta auxiliar.
 
 ```css
 .ambito{display:inline-flex;align-items:center;gap:5px;
@@ -1702,7 +1703,7 @@ principal de la pantalla o el uso es en campo o tableta.
 :root[data-tacto="dedo"] .btn{min-height:46px}
 ```
 
-**El `:root` no es adorno: es lo que hace que la regla gane.** Con `:root` delante, el selector
+**El `:root` es lo que hace ganar la regla.** Con `:root` delante, el selector
 suma (0,3,0); sin él se queda en (0,2,0) y lo empata cualquier variante de tamaño del propio
 componente —`.acciones .iconbtn{width:28px}`—, que al ir declarada después gana. La ficha de
 cliente lo escribió sin `:root` y, medido con el modo dedo activado, sus botones de fila seguían
@@ -2231,3 +2232,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.4.1 | 2026-09-17 | Reescribe en lenguaje llano las entradas de la 2.3.0 y la 2.4.0. Habían crecido hasta ser ilegibles —la de 2.4.0 ocupaba 5.569 caracteres frente a los 443 de la mediana— y repetían lo que ya dicen §12.4.1, §10 y §12.5, que es donde se busca el detalle; no se pierde nada, el porqué y las medidas siguen en esas secciones. La página gana además el apartado «Qué cambió», al principio y no al final, porque el historial vive abajo del todo y nadie baja hasta ahí para saber qué hay de nuevo. Sin cambios de valor ni de comportamiento. |
 | 2.5.3 | 2026-09-21 | Añade `--border-ctrl` (borde a 3:1 para controles sin relleno propio, §1.1), `--surface-hover` (sobrevuelo fuera del cromo, propuesto, §1.5), `--chrome-alerta`/`--chrome-alerta-ink` (§1.5), la familia `--marca-1`…`--marca-7` del isotipo (§1.2), tipografía autoalojada por `@font-face` (§2), y certificación de contraste entre pares de serie no adyacentes (§1.4). El pill de alcance y el botón "Actualizar" del Tablero se corrigen a la regla de color neutro (§6.22) y al suelo táctil de 36px (§6.2). |
 | 2.5.4 | 2026-09-24 | Fija `--surface-hover`: `#DCE7E1` en claro, `#203234` en oscuro (§1.5) — calculado para igualar el mismo contraste de 1,235 que ya logra `--chrome-hover`, el criterio con el que DPROMA confirmó que debía medirse. |
+| 2.5.5 | 2026-09-26 | Reescribe cinco pasajes (§3, §6.4, §6.19, §6.21, §6.22) que usaban la construcción "no es X, es Y". Sin cambios de regla ni de valor. |
