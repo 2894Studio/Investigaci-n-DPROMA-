@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.6.0
-last_updated: 2026-09-26
+version: 2.6.1
+last_updated: 2026-09-28
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -1463,11 +1463,17 @@ Un botón cuadrado sin texto, para acciones que se repiten en una fila o que viv
 donde una etiqueta escrita ocuparía más que la propia acción.
 
 ```css
-.iconbtn{width:36px;height:36px;border:1px solid var(--border);border-radius:var(--r-ctrl);
+.iconbtn{width:36px;height:36px;padding:0;border:1px solid var(--border);border-radius:var(--r-ctrl);
   display:grid;place-items:center;cursor:pointer;background:transparent;
   color:var(--text-2);flex-shrink:0}
 .iconbtn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
 ```
+
+**El `padding:0` no es cosmético — sin él, el icono queda descentrado en la variante de 28px.**
+Un `<button>` trae de fábrica el relleno del navegador (Chromium: `1px 6px`). A 36px sobra espacio
+y no se nota; a 28px ese relleno reduce la caja de contenido a menos que el icono (20px), y el
+motor de grid la centra sobre esa caja reducida, no sobre el botón completo. Medido en producción:
+7px de margen a la izquierda del icono contra 1px a la derecha, en vez de 4px y 4px.
 
 **Tres medidas, según dónde esté:**
 
@@ -2248,3 +2254,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.5.4 | 2026-09-24 | Fija `--surface-hover`: `#DCE7E1` en claro, `#203234` en oscuro (§1.5) — calculado para igualar el mismo contraste de 1,235 que ya logra `--chrome-hover`, el criterio con el que DPROMA confirmó que debía medirse. |
 | 2.5.5 | 2026-09-26 | Reescribe cinco pasajes (§3, §6.4, §6.19, §6.21, §6.22) que usaban la construcción "no es X, es Y". Sin cambios de regla ni de valor. |
 | 2.6.0 | 2026-09-26 | Resuelve los dos pares de serie que quedaban por debajo del suelo de ΔE 15 (§1.4): serie 1–4 y serie 1–3 en oscuro. Ningún hex cambia — en vez de forzar un nuevo ΔE global, que rompería pares que hoy sí funcionan, o de documentar sin verificarlo que esas combinaciones nunca coexisten, se añade un segundo canal de distinción (trazo discontinuo en línea, textura de rayas en barra/dona, repetida en la leyenda) para esos dos pares cuando comparten gráfica. |
+| 2.6.1 | 2026-09-28 | Corrige `.iconbtn` (§6.19): faltaba `padding:0`. Sin él, el relleno nativo del `<button>` reduce la caja de contenido por debajo del icono en la variante de 28px, y el icono queda descentrado (medido: 7px de margen a un lado, 1px al otro, en vez de 4px y 4px). Hallado auditando pantallas reales de Viáticos. |

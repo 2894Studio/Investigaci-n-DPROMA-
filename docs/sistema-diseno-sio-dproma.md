@@ -1456,11 +1456,19 @@ Un botón cuadrado sin texto, para acciones que se repiten en una fila o que viv
 donde una etiqueta escrita ocuparía más que la propia acción.
 
 ```css
-.iconbtn{width:36px;height:36px;border:1px solid var(--border);border-radius:var(--r-ctrl);
+.iconbtn{width:36px;height:36px;padding:0;border:1px solid var(--border);border-radius:var(--r-ctrl);
   display:grid;place-items:center;cursor:pointer;background:transparent;
   color:var(--text-2);flex-shrink:0}
 .iconbtn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
 ```
+
+**El `padding:0` no es cosmético — sin él, el icono queda descentrado en la variante de 28px.**
+Un `<button>` trae de fábrica el relleno del navegador (Chromium: `1px 6px`). A 36px sobra espacio
+y no se nota; a 28px ese relleno reduce la caja de contenido a menos que el icono (20px), y el
+motor de grid la centra sobre esa caja reducida, no sobre el botón completo — el icono queda
+corrido hacia un lado en vez de centrado. Medido en producción: 7px de margen a la izquierda del
+icono contra 1px a la derecha, en vez de 4px y 4px. `padding:0` fija el tamaño real del botón
+como la única caja que cuenta.
 
 **Tres medidas, según dónde esté:**
 
