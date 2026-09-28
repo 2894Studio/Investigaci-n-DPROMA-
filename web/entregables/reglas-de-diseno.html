@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,autorenew,check_circle,layers,close,content_copy,download,edit,error,expand_more,more_horiz,notifications,pause_circle,schedule,visibility" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,autorenew,check_circle,layers,close,content_copy,download,edit,error,expand_more,info,more_horiz,notifications,pause_circle,schedule,visibility" rel="stylesheet">
 <style>
 :root{
   /* §1.1 Superficies y texto */
@@ -241,18 +241,36 @@ tbody tr:hover td{ background:var(--surface-2); }
 .grupo-comp .cuantos{ font-size:.8125rem; font-weight:400; color:var(--text-3); }
 /* Barra de secciones. Se queda pegada arriba al desplazar, así que las
    secciones necesitan scroll-margin-top o el anclaje cae debajo de ella. */
-.nav-secciones{ position:sticky; top:0; z-index:20; background:var(--bg);
-  border-bottom:1px solid var(--border); padding:.6rem 0; }
-.nav-secciones ul{ display:flex; gap:.5rem; flex-wrap:wrap; margin:0; padding:0; list-style:none; }
-.nav-secciones a{ display:inline-flex; align-items:center; min-height:36px; padding:.4em 1em;
-  border:1px solid var(--border); border-radius:var(--r-pill); background:var(--surface);
-  font-size:.8125rem; font-weight:600; color:var(--text-2); text-decoration:none; }
-.nav-secciones a:hover{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+.nav-secciones{ position:fixed; left:0; top:0; bottom:0; width:236px; z-index:30;
+  background:var(--chrome); color:var(--chrome-ink); overflow-y:auto;
+  padding:1.25rem .9rem 1.5rem; box-shadow:var(--sh-float); }
+.nav-secciones .nav-marca{ display:block; font-family:var(--font-brand,var(--font-ui)); font-size:.85rem;
+  letter-spacing:.03em; color:var(--chrome-ink); text-decoration:none; padding:.4rem .5rem 1rem;
+  border-bottom:1px solid var(--chrome-line); margin-bottom:.75rem; }
+.nav-secciones .nav-marca span{ display:block; font-family:var(--font-ui); font-weight:400; font-size:.7rem; color:var(--chrome-dim); margin-top:2px; }
+.nav-secciones ul{ display:flex; flex-direction:column; gap:2px; margin:0; padding:0; list-style:none; }
+.nav-secciones a{ display:flex; align-items:center; min-height:38px; padding:.5rem .7rem;
+  border-radius:8px; border-left:3px solid transparent;
+  font-size:.8125rem; font-weight:600; color:var(--chrome-dim); text-decoration:none; }
+.nav-secciones a:hover{ background:var(--chrome-hover); color:var(--chrome-ink); }
+.nav-secciones a.activa{ background:var(--chrome-activo); color:var(--chrome-ink); border-left-color:var(--ok); }
+.nav-secciones a.nueva::after{ content:"nuevo"; margin-left:auto; font-size:.625rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.03em; color:var(--chrome-focus,var(--ok)); }
+header.masthead, section[id], section.hero{ margin-left:236px; }
+section[id]{ scroll-margin-top:1.5rem; }
+@media (max-width:900px){
+  .nav-secciones{ position:static; width:auto; height:auto; box-shadow:none;
+    border-bottom:1px solid var(--border); padding:.6rem 0; }
+  .nav-secciones .nav-marca{ display:none; }
+  .nav-secciones ul{ flex-direction:row; flex-wrap:wrap; gap:.5rem; padding:0 clamp(1.25rem,4vw,2.5rem); }
+  .nav-secciones a{ border:1px solid var(--border); background:var(--surface); color:var(--text-2); }
+  .nav-secciones a:hover, .nav-secciones a.activa{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+  header.masthead, section[id], section.hero{ margin-left:0; }
+}
 section[id]{ scroll-margin-top:4.75rem; }
 .grupo-comp{ scroll-margin-top:5.25rem; }
 /* En pantalla estrecha la barra envuelve a tres líneas: pegada se comería
    media pantalla, así que ahí se queda quieta. */
-@media (max-width:640px){ .nav-secciones{ position:static; } }
 /* Subtítulo de variante dentro de una card */
 .variante{ font-size:.875rem; margin:1.75rem 0 .6rem; padding-top:1rem;
   border-top:1px solid var(--border); color:var(--text); }
@@ -265,6 +283,71 @@ section[id]{ scroll-margin-top:4.75rem; }
 .acciones-demo .iconbtn{ width:28px; height:28px; }
 .iconbtn-dedo .iconbtn{ width:46px; height:46px; }
 .iconbtn.copiar.hecho{ color:var(--ok-ink); border-color:var(--ok); background:var(--ok-bg); }
+
+/* Toggletip — §6.23 */
+.infob{ width:24px; height:24px; padding:0; border:0; border-radius:50%; background:transparent; color:var(--text-3); display:grid; place-items:center; cursor:pointer; flex-shrink:0; }
+.infob:hover, .infob[aria-expanded="true"]{ background:var(--surface-2); color:var(--text-2); }
+.infob .msi{ font-size:15px; }
+.tip{ position:absolute; left:0; top:calc(100% + 8px); z-index:5; width:240px; max-width:70vw; background:var(--text); color:var(--surface); font:500 .8rem/1.5 var(--font-ui,inherit); text-align:left; font-variant-numeric:normal; border-radius:var(--r-ctrl); padding:.5rem .75rem; box-shadow:var(--sh-float); }
+.tip::before{ content:""; position:absolute; left:10px; bottom:100%; border:5px solid transparent; border-bottom-color:var(--text); }
+
+/* Composición y grid — §13, borrador */
+.comp-borrador{ border:1px dashed var(--border-2); background:var(--surface-2); }
+.borrador-tag{ display:inline-block; font-size:.6875rem; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--warn-ink); background:var(--warn-bg); padding:.2em .6em; border-radius:999px; margin-right:.5em; vertical-align:middle; }
+.s13-regla{ padding-top:1.25rem; margin-top:1.25rem; border-top:1px dashed var(--border-2); }
+.s13-regla:first-of-type{ padding-top:0; margin-top:0; border-top:0; }
+.s13-titulo{ font-weight:700; font-size:.95rem; margin:0 0 .5rem; }
+.s13-antes-despues{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+@media (max-width:640px){ .s13-antes-despues{ grid-template-columns:1fr; } }
+.s13-antes-despues figure{ margin:0; }
+.s13-antes-despues figcaption{ font-size:.75rem; color:var(--text-3); margin-top:.5rem; }
+.s13-fig-desborde{ margin-bottom:1.5rem; }
+.s13-barra-mock{ background:var(--bg); border:1px solid var(--border); border-radius:var(--r-card); padding:.6rem; display:flex; flex-direction:column; gap:.5rem; min-height:100px; justify-content:center; }
+.s13-mock-fila{ display:flex; gap:.4rem; flex-wrap:wrap; }
+.s13-mock-search{ display:inline-flex; align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-pill); padding:.35rem .8rem; font-size:.72rem; color:var(--text-3); }
+.s13-mock-chip{ display:inline-flex; align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-pill); padding:.35rem .7rem; font-size:.72rem; color:var(--text-2); font-weight:600; white-space:nowrap; }
+.s13-cols-demo{ margin-bottom:1rem; }
+.s13-cols-demo:last-child{ margin-bottom:0; }
+.s13-col-caja{ display:flex; gap:8px; height:56px; margin-bottom:.5rem; }
+.s13-col-px{ width:240px; flex-shrink:0; }
+.s13-col{ background:var(--accent-soft); border:1px dashed var(--accent); border-radius:var(--r-ctrl); display:grid; place-items:center; font-weight:700; color:var(--accent); font-size:.8rem; min-width:0; }
+.s13-col-minmax{ flex:1; min-width:300px; max-width:360px; }
+.s13-col-et{ font-size:.8rem; color:var(--text-2); margin:0; }
+.s13-tarjeta-mal, .s13-tarjeta-bien{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-card); padding:1rem; box-shadow:var(--sh-rest); }
+.s13-chip-mal{ max-width:180px; background:var(--bg); border:1px solid var(--border); border-radius:var(--r-ctrl); padding:.6rem .8rem; }
+.s13-chip-bien{ display:flex; align-items:center; gap:.75rem; background:var(--bg); border:1px solid var(--border); border-radius:var(--r-ctrl); padding:.6rem .8rem; }
+.s13-chip-bien > div, .s13-chip-mal > div{ flex:1; }
+.s13-chip-mal b, .s13-chip-bien b{ font-variant-numeric:tabular-nums; white-space:nowrap; }
+.s13-barra-mini{ height:8px; border-radius:4px; margin-top:.4rem; background:linear-gradient(to right, var(--accent) 0 60%, var(--border-2) 60% 100%); }
+.s13-fila-cards{ display:flex; gap:.6rem; }
+.s13-mini-card{ flex:1; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-ctrl); padding:.6rem .7rem; font-size:.78rem; color:var(--text-2); box-shadow:var(--sh-rest); }
+.s13-filas-demo{ margin-bottom:1rem; }
+.s13-filas-demo:last-child{ margin-bottom:0; }
+.s13-fila-caja{ display:flex; flex-direction:column; gap:8px; height:160px; margin-bottom:.5rem; }
+.s13-fila{ background:var(--accent-soft); border:1px dashed var(--accent); border-radius:var(--r-ctrl); display:grid; place-items:center; font-weight:700; color:var(--accent); font-size:.78rem; min-height:0; }
+.s13-fila-px{ height:40px; flex-shrink:0; }
+.s13-fila-minmax{ flex:0 0 auto; min-height:64px; max-height:96px; }
+.s13-split-mal, .s13-split-bien{ display:flex; gap:8px; height:170px; background:var(--bg); border:1px solid var(--border); border-radius:var(--r-card); padding:8px; }
+.s13-split-col-a{ flex:1; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-ctrl); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.3rem; font-size:.78rem; color:var(--text-2); font-weight:600; text-align:center; }
+.s13-split-col-a span, .s13-split-col-b-mal span, .s13-split-col-b-bien span{ font-weight:400; color:var(--text-3); font-family:ui-monospace,monospace; font-size:.7rem; }
+.s13-split-col-b-mal{ flex:1; height:auto; align-self:flex-start; background:var(--warn-bg); border:1px dashed var(--warn); border-radius:var(--r-ctrl); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.3rem; padding:1rem 0; font-size:.78rem; color:var(--warn-ink); font-weight:600; text-align:center; }
+.s13-split-col-b-bien{ flex:1; height:100%; background:var(--accent-soft); border:1px dashed var(--accent); border-radius:var(--r-ctrl); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.3rem; font-size:.78rem; color:var(--accent); font-weight:600; text-align:center; }
+.s13-scroll-marco{ height:150px; border:1px dashed var(--border-2); border-radius:var(--r-card); padding:0; overflow:visible; }
+.s13-scroll-caja{ height:100%; border:1px solid var(--border); border-radius:var(--r-card); background:var(--surface); display:flex; flex-direction:column; box-shadow:var(--sh-rest); }
+.s13-scroll-caja-mal{ outline:2px solid var(--warn); }
+.s13-scroll-caja-bien{ overflow:hidden; }
+.s13-scroll-cab{ flex-shrink:0; background:var(--surface-2); padding:.4rem .6rem; font-size:.75rem; font-weight:700; border-bottom:1px solid var(--border); }
+.s13-scroll-cont-mal{ flex:1; padding:.4rem .6rem; display:flex; flex-direction:column; gap:.3rem; }
+.s13-scroll-cont-bien{ flex:1; min-height:0; overflow-y:auto; padding:.4rem .6rem; display:flex; flex-direction:column; gap:.3rem; }
+.s13-scroll-item{ background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:.3rem .5rem; font-size:.72rem; color:var(--text-2); flex-shrink:0; }
+
+/* Paginación del historial — mismo componente .pag/.tfoot de §6.11 */
+.tfoot{ display:flex; align-items:center; gap:1rem; flex-wrap:wrap; padding:.75rem 1rem; border:1px solid var(--border); border-top:0; border-radius:0 0 var(--r-card) var(--r-card); background:var(--surface); }
+.hist-cuenta{ font-size:.8125rem; color:var(--text-3); }
+.pag{ margin-left:auto; display:flex; gap:5px; }
+.pag button{ background:var(--surface); border:1px solid var(--border); color:var(--text-2); border-radius:var(--r-ctrl); min-width:32px; height:32px; padding:0 8px; cursor:pointer; font:600 .8125rem var(--font-ui); }
+.pag button:hover{ background:var(--surface-2); color:var(--text); }
+.pag button[aria-current="page"]{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
 .fila-demo{ display:flex; align-items:center; gap:var(--sp-4); padding:var(--sp-2) 0; }
 .fila-demo .valor{ font-size:var(--fs-dense); color:var(--text); }
 .medidas{ display:flex; gap:1.5rem; align-items:flex-end; flex-wrap:wrap; }
@@ -569,7 +652,7 @@ figure{ margin:0 }
     <h1>Sistema de Diseño SIO-DPROMA</h1>
     <p class="lede">Es el sistema de <strong>producto</strong> de DPROMA, construido y verificado sobre las propuestas ya corregidas de <strong>acceso</strong> y <strong>padrón de clientes</strong>. Con cada token, componente y regla ya resueltos y documentados aquí, diseñar la siguiente pantalla de DPROMA es una decisión de contenido, no de estilo: sin reinventar color, tipografía o espaciado desde cero, ni esperar a que alguien lo defina. Cada token viene medido en el navegador, con su contraste comprobado en los dos temas.</p>
     <div class="hero-meta">
-      <span class="version-tag">Versión 2.5.5 · dashboard + acceso</span>
+      <span class="version-tag">Versión 2.8.0 · toggletip + composición (§13 en revisión)</span>
       <a class="download-btn" href="/entregables/design-rules.md" download><span class="msi" aria-hidden="true" translate="no">download</span> Descargar sistema completo (.md)</a>
     </div>
     <p class="source-note">Fuente completa: <code>docs/sistema-diseno-sio-dproma.md</code> · complementan <code>docs/sistema-diseno-acceso-sio-dproma.md</code>, <code>docs/decisiones-producto-padron.md</code>, <code>docs/patron-dialogo-sio-dproma.md</code> y <code>docs/criterios-de-animacion.md</code>.</p>
@@ -577,18 +660,18 @@ figure{ margin:0 }
 </section>
 
 <nav class="nav-secciones" aria-label="Secciones del sistema de diseño">
-  <div class="wrap">
-    <ul>
-      <li><a href="#color">Color</a></li>
-      <li><a href="#tipografia">Tipografía</a></li>
-      <li><a href="#espaciado">Espaciado</a></li>
-      <li><a href="#iconos">Iconos</a></li>
-      <li><a href="#componentes">Componentes</a></li>
-      <li><a href="#dashboard">Capa de dashboard</a></li>
-      <li><a href="#principios">Voz de producto</a></li>
-      <li><a href="#historial">Historial</a></li>
-    </ul>
-  </div>
+  <a class="nav-marca" href="#color">SIO-DPROMA<span>Sistema de diseño</span></a>
+  <ul>
+    <li><a href="#color">Color</a></li>
+    <li><a href="#tipografia">Tipografía</a></li>
+    <li><a href="#espaciado">Espaciado</a></li>
+    <li><a href="#iconos">Iconos</a></li>
+    <li><a href="#componentes">Componentes</a></li>
+    <li><a href="#composicion" class="nueva">Composición y grid</a></li>
+    <li><a href="#dashboard">Capa de dashboard</a></li>
+    <li><a href="#principios">Voz de producto</a></li>
+    <li><a href="#historial">Historial</a></li>
+  </ul>
 </nav>
 
 <section id="color">
@@ -920,6 +1003,22 @@ figure{ margin:0 }
       </div>
     </div>
 
+    <h3 class="grupo-comp" id="g-toggletip">Ayuda contextual <span class="cuantos">toggletip de información — nuevo, §6.23</span></h3>
+
+    <div class="comp-block">
+      <h4>Toggletip de información (.infob + .tip)</h4>
+      <div class="comp-row" style="gap:2.5rem">
+        <div style="display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums;font-weight:700;font-size:1.05rem;position:relative">
+          $436,070
+          <button class="infob" type="button" aria-expanded="false" aria-controls="tip-demo" aria-describedby="tip-demo" aria-label="Más información sobre cerrado y sin facturar">
+            <span class="msi" aria-hidden="true" translate="no">info</span>
+          </button>
+          <span class="tip" id="tip-demo" role="tooltip" hidden>No suma al $2,644,180 de por cobrar — son 9 órdenes sin facturar todavía.</span>
+        </div>
+      </div>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Clic o <kbd>Tab</kbd>+<kbd>Enter</kbd>.</strong> No sustituye al texto siempre visible de un dato protagonista (§8).</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>24×24px</strong> (46px en modo dedo, §7.3), <code>aria-describedby</code> permanente. Contraste: 15,2:1/13,9:1 el globo, 4,8:1/5,5:1 el icono.</p>
+    </div>
 
     <h3 class="grupo-comp" id="g-filtros">Filtros <span class="cuantos">desplegable con buscador, selección múltiple y pastillas de lo aplicado</span></h3>
 
@@ -971,6 +1070,181 @@ figure{ margin:0 }
         <span class="skel" style="width:100%; height:48px;"></span>
       </div>
       <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Sin texto real dentro de las barras.</strong> El texto que imitan («razón social y RFC», por ejemplo) queda invisible por <code>color:transparent</code>, pero sigue en el árbol de accesibilidad y un lector de pantalla lo anuncia igual. Un <code>role="status"</code> con <code>aria-label</code> en el contenedor basta.</p>
+    </div>
+  </div>
+</section>
+
+<section id="composicion">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Composición y grid</div>
+      <h2>Cómo se ordena una pantalla, no solo cómo se ve cada pieza.</h2>
+      <p class="section-note">Dos reglas aprobadas de esta sesión (§6.12 y §6.3), y el borrador de §13 — sin aprobar, marcado aparte.</p>
+    </div>
+
+    <div class="comp-block">
+      <h4>Resumen, buscador y filtros (§6.12, reglas 7–8)</h4>
+      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 1rem;"><strong>Regla 7.</strong> Resumen → buscador + filtros en una sola fila → tabla. El buscador nunca va suelto encima del resumen.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Regla 8.</strong> Un control con <code>aria-pressed</code>/<code>data-activo</code> filtra de verdad, o se presenta como cifra de lectura.</p>
+    </div>
+
+    <div class="comp-block">
+      <h4>Ancho de contenido en tarjeta (§6.3)</h4>
+      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 .75rem;">Si la tarjeta crece, su contenido crece con ella — <code>flex:1</code> en el hijo, nunca un <code>max-width</code> heredado.</p>
+    </div>
+
+    <div class="comp-block comp-borrador">
+      <h4><span class="borrador-tag">Borrador — sin aprobar</span> §13 Composición y grid</h4>
+
+      <div class="s13-regla">
+        <p class="s13-titulo">13.1 — Lectura → control → objeto</p>
+        <div class="s13-antes-despues">
+          <figure>
+            <div class="s13-barra-mock">
+              <div class="s13-mock-fila"><span class="s13-mock-search">🔍 Buscar…</span></div>
+              <div class="s13-mock-fila"><span class="s13-mock-chip">Plaza ▾</span><span class="s13-mock-chip">Estatus ▾</span><span class="s13-mock-chip">Responsable ▾</span></div>
+            </div>
+            <figcaption>✗ Antes — dos filas para un mismo trabajo</figcaption>
+          </figure>
+          <figure>
+            <div class="s13-barra-mock">
+              <div class="s13-mock-fila"><span class="s13-mock-search" style="flex:1">🔍 Buscar…</span><span class="s13-mock-chip">Plaza ▾</span><span class="s13-mock-chip">Estatus ▾</span><span class="s13-mock-chip">Responsable ▾</span></div>
+            </div>
+            <figcaption>✓ Después — una fila, misma altura ganada</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="s13-regla">
+        <p class="s13-titulo">13.2 — Proporción de columna: tres casos, no dos</p>
+        <div class="s13-cols-demo">
+          <div class="s13-col-caja">
+            <div class="s13-col s13-col-px">A</div><div class="s13-col s13-col-fr">B</div>
+          </div>
+          <p class="s13-col-et"><code>240px 1fr</code> — <strong>px fijo.</strong> A nunca cambia.</p>
+        </div>
+        <div class="s13-cols-demo">
+          <div class="s13-col-caja">
+            <div class="s13-col s13-col-fr" style="flex:1.6">A</div><div class="s13-col s13-col-fr" style="flex:1">B</div>
+          </div>
+          <p class="s13-col-et"><code>1.6fr 1fr</code> — <strong>fr puro.</strong> Reparto proporcional fijo.</p>
+        </div>
+        <div class="s13-cols-demo">
+          <div class="s13-col-caja">
+            <div class="s13-col s13-col-fr" style="flex:1.6">A</div><div class="s13-col s13-col-minmax">B</div>
+          </div>
+          <p class="s13-col-et"><code>minmax(0,1.6fr) minmax(300px,360px)</code> — <strong>fr acotado.</strong> B fluye entre un piso y un techo.</p>
+        </div>
+      </div>
+
+      <div class="s13-regla">
+        <p class="s13-titulo">13.3 — Un contenedor no cede el ancho a un descendiente</p>
+        <div class="s13-antes-despues">
+          <figure>
+            <div class="s13-tarjeta-mal">
+              <div class="s13-chip-mal"><b>$2,644,180</b><div class="s13-barra-mini"></div></div>
+            </div>
+            <figcaption>✗ <code>max-width</code> capado — la tarjeta creció, el contenido no</figcaption>
+          </figure>
+          <figure>
+            <div class="s13-tarjeta-bien">
+              <div class="s13-chip-bien"><b>$2,644,180</b><div class="s13-barra-mini"></div></div>
+            </div>
+            <figcaption>✓ <code>flex:1</code> — llena el ancho real</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="s13-regla">
+        <p class="s13-titulo">13.4 — Comparar exige igualar</p>
+        <div class="s13-antes-despues">
+          <figure>
+            <div class="s13-fila-cards" style="align-items:stretch">
+              <div class="s13-mini-card">Corto</div>
+              <div class="s13-mini-card">Este texto es bastante más largo y ocupa varias líneas</div>
+              <div class="s13-mini-card">Corto</div>
+            </div>
+            <figcaption>✗ <code>align-items:stretch</code> por omisión — las cortas se estiran sin necesidad</figcaption>
+          </figure>
+          <figure>
+            <div class="s13-fila-cards" style="align-items:start">
+              <div class="s13-mini-card">Corto</div>
+              <div class="s13-mini-card">Este texto es bastante más largo y ocupa varias líneas</div>
+              <div class="s13-mini-card">Corto</div>
+            </div>
+            <figcaption>✓ <code>align-items:start</code> por omisión — cada una su alto real</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="s13-regla">
+        <p class="s13-titulo">13.5 — El mismo criterio de la 13.2, en fila</p>
+        <div class="s13-filas-demo">
+          <div class="s13-fila-caja">
+            <div class="s13-fila s13-fila-px">Cabecera — 40px</div>
+            <div class="s13-fila s13-fila-fr">Contenido — 1fr</div>
+          </div>
+          <p class="s13-col-et"><code>40px 1fr</code> — <strong>px fijo + fr.</strong> La cabecera nunca cambia de alto.</p>
+        </div>
+        <div class="s13-filas-demo">
+          <div class="s13-fila-caja">
+            <div class="s13-fila s13-fila-fr" style="flex:1.6">Panel — 1.6fr</div>
+            <div class="s13-fila s13-fila-fr" style="flex:1">Detalle — 1fr</div>
+          </div>
+          <p class="s13-col-et"><code>1.6fr 1fr</code> — <strong>fr puro,</strong> apilado en vez de en columnas.</p>
+        </div>
+        <div class="s13-filas-demo">
+          <div class="s13-fila-caja">
+            <div class="s13-fila s13-fila-fr" style="flex:1">Lista — fluye</div>
+            <div class="s13-fila s13-fila-minmax">Resumen — 64–96px</div>
+          </div>
+          <p class="s13-col-et"><code>1fr minmax(64px,96px)</code> — <strong>fr acotado.</strong> Ni se aplasta ni se come la lista.</p>
+        </div>
+      </div>
+
+      <div class="s13-regla">
+        <p class="s13-titulo">13.6 — Un contenedor tampoco cede el alto a un descendiente</p>
+        <div class="s13-antes-despues">
+          <figure>
+            <div class="s13-split-mal">
+              <div class="s13-split-col-a">Columna A<br><span>contenido real</span></div>
+              <div class="s13-split-col-b-mal">Columna B<br><span>height:auto</span></div>
+            </div>
+            <figcaption>✗ <code>height:auto</code> — B se queda corta</figcaption>
+          </figure>
+          <figure>
+            <div class="s13-split-bien">
+              <div class="s13-split-col-a">Columna A<br><span>contenido real</span></div>
+              <div class="s13-split-col-b-bien">Columna B<br><span>height:100%</span></div>
+            </div>
+            <figcaption>✓ <code>height:100%</code> — B llena la columna</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="s13-regla">
+        <p class="s13-titulo">13.7 — La cadena de <code>min-height:0</code></p>
+        <div class="s13-antes-despues s13-fig-desborde">
+          <figure>
+            <div class="s13-scroll-marco">
+              <div class="s13-scroll-caja s13-scroll-caja-mal">
+                <div class="s13-scroll-cab">Cabecera fija</div>
+                <div class="s13-scroll-cont-mal"><div class="s13-scroll-item">Fila 1</div><div class="s13-scroll-item">Fila 2</div><div class="s13-scroll-item">Fila 3</div></div>
+              </div>
+            </div>
+            <figcaption>✗ Sin <code>min-height:0</code> — crece fuera del marco</figcaption>
+          </figure>
+          <figure>
+            <div class="s13-scroll-marco">
+              <div class="s13-scroll-caja s13-scroll-caja-bien">
+                <div class="s13-scroll-cab">Cabecera fija</div>
+                <div class="s13-scroll-cont-bien"><div class="s13-scroll-item">Fila 1</div><div class="s13-scroll-item">Fila 2</div><div class="s13-scroll-item">Fila 3</div><div class="s13-scroll-item">Fila 4</div><div class="s13-scroll-item">Fila 5</div><div class="s13-scroll-item">Fila 6</div></div>
+              </div>
+            </div>
+            <figcaption>✓ Con <code>min-height:0</code> — solo el contenido hace scroll</figcaption>
+          </figure>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -1240,36 +1514,51 @@ figure{ margin:0 }
     <div class="section-head">
       <div class="eyebrow">Control de cambios</div>
       <h2>Historial de versiones.</h2>
-      <p class="section-note">Misma tabla que <a href="/entregables/design-rules.md" download>design-rules.md</a>.</p>
+      <p class="section-note">Lo más nuevo primero. Misma tabla que <code>design-rules.md</code>.</p>
+      <a class="download-btn" href="/entregables/design-rules.md" download><span class="msi" aria-hidden="true" translate="no">download</span> Descargar historial completo (.md)</a>
     </div>
     <div class="table-scroll">
       <table>
         <thead><tr><th>Versión</th><th>Fecha</th><th>Cambios</th></tr></thead>
         <tbody>
-          <tr><td>1.0.0</td><td>28 ago 2026</td><td>Documenta el sistema de diseño del acceso a SIO-DPROMA.</td></tr>
-          <tr><td>1.1.0</td><td>31 ago 2026</td><td>Se abre al dashboard: tabla densa, semáforo de 5 estados, ficha de cliente. Corrige <code>--text-3</code>. Migra a Material Symbols. Documenta 5 trampas comprobadas.</td></tr>
-          <tr><td>1.2.0</td><td>31 ago 2026</td><td>Documenta cuándo usar cada tarjeta (<code>.tarjeta</code>, <code>.seccion</code>, <code>.glass</code>) a partir del uso real en acceso, padrón y ficha de cliente.</td></tr>
-          <tr><td>1.3.0</td><td>31 ago 2026</td><td>Reescribe el racional de tarjetas a dos principios generales, alineados con buenas prácticas de UI: contener un flujo pequeño autocontenido, o agrupar información para que no quede suelta. Añade la regla de no anidar tarjetas.</td></tr>
-          <tr><td>1.4.0</td><td>1 sep 2026</td><td>El estado de vacío y error va en tarjeta con medallón, no suelto sobre el fondo. El suelo de botón —36px, 28px en <code>.mini</code>— hay que declararlo con <code>min-height</code>, no confiarlo al relleno. El esqueleto necesita el mismo alto y el mismo punto de ruptura que el contenido que sustituye, y aplanar el fondo en movimiento reducido. Sexta trampa comprobada: copiar una regla de otra pantalla puede traerse un token que allí existe y aquí no.</td></tr>
-          <tr><td>1.5.0</td><td>1 sep 2026</td><td>Documenta el botón-icono (<code>.iconbtn</code>), que se usaba en tres secciones sin estar definido: sus tres medidas, que el <code>aria-label</code> nombra el dato y no la acción, y que en un grupo va primero lo frecuente y último lo destructivo. Añade la variante que confirma en el sitio —copiar—, que cambia icono, etiqueta y anuncio por <code>aria-live</code>, las tres. Y el caso medido del <code>:root</code>: sin él, la regla táctil la anula cualquier variante de tamaño declarada después.</td></tr>
-          <tr><td>1.5.1</td><td>2 sep 2026</td><td>Corrige el hover de esta barra de navegación de secciones: gris sobre gris con poco cambio de estado. Pasa a <code>background:var(--accent); color:var(--accent-ink)</code>, el mismo par ya usado en <code>.btn.p</code>. Cambio acotado a esta página, no toca el sistema fuente.</td></tr>
-          <tr><td>2.0.0</td><td>3 sep 2026</td><td>Abre la capa de dashboard: nueve piezas de dato visual con la envoltura que obliga a Chart.js a obedecer los tokens, y la regla de que el <code>&lt;canvas&gt;</code> no es accesible —cada gráfico lleva su tabla equivalente, que es la fuente de verdad y la que aparece si el CDN no carga. <b>Cambio que rompe:</b> <code>--serie-1</code> y <code>--serie-2</code> cambian de valor; medidos uno contra otro daban ΔE 1,1 en protanopia, así que se sustituyen por cuatro slots validados en los dos temas. Añade <code>--on-state</code>, la tinta sobre relleno sólido, y la regla de acotar a hijo directo un selector que tiñe iconos por contexto.</td></tr>
-          <tr><td>2.0.1</td><td>3 sep 2026</td><td>El relleno de un contenedor no vive en un hijo opcional: la cabecera <code>.p4</code> cerraba gracias al <code>padding-bottom</code> de la fila de chips, y al retirarlos el título quedó pegado a su borde. Pasa al contenedor vía <code>:last-child</code>.</td></tr>
-          <tr><td>2.1.0</td><td>4 sep 2026</td><td>Resuelve una contradicción viva: §6.4 seguía prescribiendo el medallón de estado en <code>--accent-soft</code> mientras §1.4.1 nombraba ese mismo medallón como caso de la tinta sobre relleno sólido. §6.4 pasa a ser aplicación de §1.4.1, no una alternativa. Tres reglas nuevas de las pantallas de Administración Vehicular: un control compuesto lleva un solo anillo de foco y lo lleva el envoltorio; el resumen de estatus no convive con un filtro de estatus equivalente; y en la ficha de detalle el indicador de urgencia declara su ancho en rejilla y el contacto del cliente va bajo la identidad del expediente. Documenta las composiciones de tablero y las dos reglas de la rejilla <code>.dash</code>.</td></tr>
-                  <tr><td>2.2.0</td><td>4 sep 2026</td><td>Completa la barra de filtros: cada dimensión abre un desplegable con buscador y casillas de selección múltiple, con el conteo de cada opción y un «Limpiar» propio. Tres visibles y el resto tras un «+ Añadir filtro». Lo seleccionado baja a una fila de pastillas con tope de cuatro visibles, un «+N más» y «Quitar todos los filtros». Con el teclado resuelto: <code>aria-expanded</code>, foco al buscador al abrir, <code>Escape</code> que devuelve el foco al botón, y cada «×» diciendo qué quita.</td></tr>
-          <tr><td>2.2.1</td><td>4 sep 2026</td><td>Corolario de §3.1: <code>:last-child</code> no distingue lo oculto —la fila de filtros aplicados nace con <code>hidden</code>, no ocupa espacio pero sí es el último hijo, y se llevaba el relleno—, así que pasa al contenedor. La pastilla de estado viaja al filtro: estatus y plazo la llevan en el panel, en el botón y en la pastilla aplicada, para relacionar filtro y fila por color. Y «Observado» pasa de <code>--err</code> a <code>--block</code> en tabla y detalle.</td></tr>
-          <tr><td>2.2.2</td><td>4 sep 2026</td><td>La capa de dashboard y la barra de filtros dejan de vivir en una página aparte y pasan a ser secciones de esta, con sus piezas vivas: los nueve componentes de dato con sus gráficos y sus tablas equivalentes, y la barra de filtros funcionando. Son componentes transversales, no de un módulo: tenerlos fuera invitaba a reimplementarlos en cada pantalla. No cambia ninguna regla ni ningún token.</td></tr>
-          <tr><td>2.2.3</td><td>4 sep 2026</td><td>Regenera <code>icon_names</code> de esta página, que se había quedado sin <code>expand_more</code> al incorporar la barra de filtros: el chevron de cada desplegable salía como la letra «E». Es el fallo que §6.5 ya describe, así que no hay regla nueva —la regla estaba y no se cumplió—. Comprobado con el fragmento que ese mismo apartado prescribe.</td></tr>
-          <tr><td>2.2.4</td><td>4 sep 2026</td><td>Poda de texto en esta página, aplicando el criterio que la propia sección de voz declara: en pantalla va qué hacer y qué no; el porqué y las alternativas descartadas viven en la documentación. Sale la entrada de la sección de dashboard y la justificación histórica de la paleta, que ya está en la fila 2.0.0. No se retira ninguna regla.</td></tr>
-          <tr><td>2.2.5</td><td>4 sep 2026</td><td>Reescribe el texto de la capa de dashboard y de la barra de filtros dejando solo la instrucción. Fuera las coletillas, las aclaraciones entre rayas y las frases que explicaban la consecuencia de incumplir la regla. De 696 a 547 palabras, sin ninguna raya. Ninguna regla se retira.</td></tr>
-          <tr><td>2.3.0</td><td>16 sep 2026</td><td>Añade la etiqueta de alcance (§6.22), la que dice de qué conjunto de datos habla una cifra: «de toda la organización», «nada en tu alcance». El producto ya usaba ese vocabulario, pero el sistema no tenía la pieza, así que se pintaba con el ámbar de aviso: cuatro avisos de que falta algo en una sola pantalla del tablero, cuando no faltaba nada. Ahora es neutra, y el alcance nunca usa los colores de estado. Distingue además dos casos que se veían igual: no tener permiso y tener permiso sobre un conjunto vacío. La regla de cuándo toca el semáforo y cuándo la paleta de categorías sube de §12.5 a §1, porque vivía en el capítulo de gráficas y nadie iba a buscarla para una etiqueta de tabla. Y §6.4 gana la restauración de sesión, con la salida por tiempo o por fallo que no existía.</td></tr>
-          <tr><td>2.4.0</td><td>17 sep 2026</td><td>Convierte en componente la fila de cifras del tablero (§12.4.1): esa fila de cajas con un número grande y su texto. El tablero ya la tenía, pero la había montado por su cuenta, y los textos caían a tres alturas distintas —hasta 34px— aunque las siete cajas midieran exactamente lo mismo. Ahora todas comparten la misma retícula, así que el número, el rótulo y la aclaración quedan a la misma altura lleve cada caja el mismo texto o no. Con cuatro reglas de uso: cuatro cajas por fila como máximo, cada fila es un grupo con nombre, la aclaración cabe en una línea, y un grupo entero a cero se dice en vez de pintarse. Las pruebas previas a publicarlo tumbaron dos decisiones propias: recortar la aclaración con puntos suspensivos dejaba el ejemplo documentado sin forma de leerse, y quitar el borde hacía desaparecer las cajas en el alto contraste del sistema. Corrige además tres fallos de esta misma página —las cuatro gráficas salían 80px más estrechas, los títulos escritos para lector de pantalla se estaban viendo y un desplegable se quedó sin flecha—, que quedan escritos como trampas en §10, que pasa de seis a nueve. Y §12.5 gana dos reglas de lectura: la serie y la cifra del mismo recuadro miden lo mismo y cuadran, y el dibujo reserva sitio para el grosor de su línea.</td></tr>
-          <tr><td>2.4.1</td><td>17 sep 2026</td><td>Reescribe en lenguaje llano las entradas de la 2.3.0 y la 2.4.0. Habían crecido hasta ser ilegibles —la de 2.4.0 ocupaba 5.569 caracteres frente a los 443 de la mediana— y repetían lo que ya dicen §12.4.1, §10 y §12.5, que es donde se busca el detalle; no se pierde nada, el porqué y las medidas siguen en esas secciones. La página gana además el apartado «Qué cambió», al principio y no al final, porque el historial vive abajo del todo y nadie baja hasta ahí para saber qué hay de nuevo. Sin cambios de valor ni de comportamiento.</td></tr>
-          <tr><td>2.5.3</td><td>21 sep 2026</td><td>Añade <code>--border-ctrl</code> (borde a 3:1 para controles sin relleno propio), <code>--surface-hover</code> (sobrevuelo fuera del cromo, propuesto), <code>--chrome-alerta</code>/<code>--chrome-alerta-ink</code>, la familia <code>--marca-1</code>…<code>--marca-7</code> del isotipo, tipografía autoalojada por <code>@font-face</code>, y certificación de contraste entre pares de serie no adyacentes. El pill de alcance y el botón "Actualizar" del Tablero se corrigen a la regla de color neutro (§6.22) y al suelo táctil de 36px (§6.2).</td></tr>
-          <tr><td>2.5.4</td><td>24 sep 2026</td><td>Fija <code>--surface-hover</code>: <code>#DCE7E1</code> en claro, <code>#203234</code> en oscuro — calculado para igualar el mismo contraste de 1,235 que ya logra <code>--chrome-hover</code>.</td></tr>
-          <tr><td>2.5.5</td><td>26 sep 2026</td><td>Reescribe cinco pasajes (§3, §6.4, §6.19, §6.21, §6.22) que usaban la construcción "no es X, es Y". Sin cambios de regla ni de valor.</td></tr>
+          <tr data-pagina="1"><td>2.8.0</td><td>28 sep 2026</td><td>Documenta el toggletip de información (<code>.infob</code> + <code>.tip</code>, §6.23): botón de icono que revela una aclaración en un globo, para filas de ficha donde el texto no cabe siempre visible. Botón de 24×24px, <code>aria-describedby</code> permanente, contraste verificado por cálculo.</td></tr>
+          <tr data-pagina="1"><td>2.7.0</td><td>28 sep 2026</td><td>§6.12 gana la regla 7 —resumen arriba, buscador y filtros en una sola fila, nunca el buscador suelto— y la regla 8 —un control con <code>aria-pressed</code>/<code>data-activo</code> filtra de verdad o se presenta como lectura—. §6.3 gana: si la tarjeta crece, su contenido crece con ella, nunca un <code>max-width</code> heredado.</td></tr>
+          <tr data-pagina="1"><td>2.6.2</td><td>28 sep 2026</td><td>Añade un caso real a §1.4: una barra de antigüedad de cartera pintada con <code>--ok</code>/<code>--warn</code>/<code>--block</code>/<code>--err</code> por tramo de tiempo en vez de <code>--serie-1</code>…<code>--serie-4</code>, con el antes/después completo.</td></tr>
+          <tr data-pagina="1"><td>2.6.1</td><td>28 sep 2026</td><td>Corrige <code>.iconbtn</code> (§6.19): faltaba <code>padding:0</code>. Sin él, el relleno nativo del <code>&lt;button&gt;</code> descentra el icono en la variante de 28px (medido: 7px de margen a un lado, 1px al otro). Hallado auditando pantallas reales de Viáticos.</td></tr>
+          <tr data-pagina="1"><td>2.6.0</td><td>26 sep 2026</td><td>Resuelve los dos pares de serie que quedaban por debajo del suelo de ΔE 15 (§1.4): serie 1–4 y serie 1–3 en oscuro. Ningún hex cambia — se añade un segundo canal de distinción (trazo discontinuo en línea, textura de rayas en barra/dona) para esos dos pares cuando comparten gráfica.</td></tr>
+          <tr data-pagina="1"><td>2.5.5</td><td>26 sep 2026</td><td>Reescribe cinco pasajes (§3, §6.4, §6.19, §6.21, §6.22) que usaban la construcción "no es X, es Y". Sin cambios de regla ni de valor.</td></tr>
+          <tr data-pagina="1"><td>2.5.4</td><td>24 sep 2026</td><td>Fija <code>--surface-hover</code>: <code>#DCE7E1</code> en claro, <code>#203234</code> en oscuro — calculado para igualar el mismo contraste de 1,235 que ya logra <code>--chrome-hover</code>.</td></tr>
+          <tr data-pagina="2" hidden><td>2.5.3</td><td>21 sep 2026</td><td>Añade <code>--border-ctrl</code> (borde a 3:1 para controles sin relleno propio), <code>--surface-hover</code> (sobrevuelo fuera del cromo, propuesto), <code>--chrome-alerta</code>/<code>--chrome-alerta-ink</code>, la familia <code>--marca-1</code>…<code>--marca-7</code> del isotipo, tipografía autoalojada por <code>@font-face</code>, y certificación de contraste entre pares de serie no adyacentes. El pill de alcance y el botón "Actualizar" del Tablero se corrigen a la regla de color neutro (§6.22) y al suelo táctil de 36px (§6.2).</td></tr>
+          <tr data-pagina="2" hidden><td>2.4.1</td><td>17 sep 2026</td><td>Reescribe en lenguaje llano las entradas de la 2.3.0 y la 2.4.0. Habían crecido hasta ser ilegibles —la de 2.4.0 ocupaba 5.569 caracteres frente a los 443 de la mediana— y repetían lo que ya dicen §12.4.1, §10 y §12.5, que es donde se busca el detalle; no se pierde nada, el porqué y las medidas siguen en esas secciones. La página gana además el apartado «Qué cambió», al principio y no al final, porque el historial vive abajo del todo y nadie baja hasta ahí para saber qué hay de nuevo. Sin cambios de valor ni de comportamiento.</td></tr>
+          <tr data-pagina="2" hidden><td>2.4.0</td><td>17 sep 2026</td><td>Convierte en componente la fila de cifras del tablero (§12.4.1): esa fila de cajas con un número grande y su texto. El tablero ya la tenía, pero la había montado por su cuenta, y los textos caían a tres alturas distintas —hasta 34px— aunque las siete cajas midieran exactamente lo mismo. Ahora todas comparten la misma retícula, así que el número, el rótulo y la aclaración quedan a la misma altura lleve cada caja el mismo texto o no. Con cuatro reglas de uso: cuatro cajas por fila como máximo, cada fila es un grupo con nombre, la aclaración cabe en una línea, y un grupo entero a cero se dice en vez de pintarse. Las pruebas previas a publicarlo tumbaron dos decisiones propias: recortar la aclaración con puntos suspensivos dejaba el ejemplo documentado sin forma de leerse, y quitar el borde hacía desaparecer las cajas en el alto contraste del sistema. Corrige además tres fallos de esta misma página —las cuatro gráficas salían 80px más estrechas, los títulos escritos para lector de pantalla se estaban viendo y un desplegable se quedó sin flecha—, que quedan escritos como trampas en §10, que pasa de seis a nueve. Y §12.5 gana dos reglas de lectura: la serie y la cifra del mismo recuadro miden lo mismo y cuadran, y el dibujo reserva sitio para el grosor de su línea.</td></tr>
+          <tr data-pagina="2" hidden><td>2.3.0</td><td>16 sep 2026</td><td>Añade la etiqueta de alcance (§6.22), la que dice de qué conjunto de datos habla una cifra: «de toda la organización», «nada en tu alcance». El producto ya usaba ese vocabulario, pero el sistema no tenía la pieza, así que se pintaba con el ámbar de aviso: cuatro avisos de que falta algo en una sola pantalla del tablero, cuando no faltaba nada. Ahora es neutra, y el alcance nunca usa los colores de estado. Distingue además dos casos que se veían igual: no tener permiso y tener permiso sobre un conjunto vacío. La regla de cuándo toca el semáforo y cuándo la paleta de categorías sube de §12.5 a §1, porque vivía en el capítulo de gráficas y nadie iba a buscarla para una etiqueta de tabla. Y §6.4 gana la restauración de sesión, con la salida por tiempo o por fallo que no existía.</td></tr>
+          <tr data-pagina="2" hidden><td>2.2.5</td><td>4 sep 2026</td><td>Reescribe el texto de la capa de dashboard y de la barra de filtros dejando solo la instrucción. Fuera las coletillas, las aclaraciones entre rayas y las frases que explicaban la consecuencia de incumplir la regla. De 696 a 547 palabras, sin ninguna raya. Ninguna regla se retira.</td></tr>
+          <tr data-pagina="2" hidden><td>2.2.4</td><td>4 sep 2026</td><td>Poda de texto en esta página, aplicando el criterio que la propia sección de voz declara: en pantalla va qué hacer y qué no; el porqué y las alternativas descartadas viven en la documentación. Sale la entrada de la sección de dashboard y la justificación histórica de la paleta, que ya está en la fila 2.0.0. No se retira ninguna regla.</td></tr>
+          <tr data-pagina="2" hidden><td>2.2.3</td><td>4 sep 2026</td><td>Regenera <code>icon_names</code> de esta página, que se había quedado sin <code>expand_more</code> al incorporar la barra de filtros: el chevron de cada desplegable salía como la letra «E». Es el fallo que §6.5 ya describe, así que no hay regla nueva —la regla estaba y no se cumplió—. Comprobado con el fragmento que ese mismo apartado prescribe.</td></tr>
+          <tr data-pagina="3" hidden><td>2.2.2</td><td>4 sep 2026</td><td>La capa de dashboard y la barra de filtros dejan de vivir en una página aparte y pasan a ser secciones de esta, con sus piezas vivas: los nueve componentes de dato con sus gráficos y sus tablas equivalentes, y la barra de filtros funcionando. Son componentes transversales, no de un módulo: tenerlos fuera invitaba a reimplementarlos en cada pantalla. No cambia ninguna regla ni ningún token.</td></tr>
+          <tr data-pagina="3" hidden><td>2.2.1</td><td>4 sep 2026</td><td>Corolario de §3.1: <code>:last-child</code> no distingue lo oculto —la fila de filtros aplicados nace con <code>hidden</code>, no ocupa espacio pero sí es el último hijo, y se llevaba el relleno—, así que pasa al contenedor. La pastilla de estado viaja al filtro: estatus y plazo la llevan en el panel, en el botón y en la pastilla aplicada, para relacionar filtro y fila por color. Y «Observado» pasa de <code>--err</code> a <code>--block</code> en tabla y detalle.</td></tr>
+                  <tr data-pagina="3" hidden><td>2.2.0</td><td>4 sep 2026</td><td>Completa la barra de filtros: cada dimensión abre un desplegable con buscador y casillas de selección múltiple, con el conteo de cada opción y un «Limpiar» propio. Tres visibles y el resto tras un «+ Añadir filtro». Lo seleccionado baja a una fila de pastillas con tope de cuatro visibles, un «+N más» y «Quitar todos los filtros». Con el teclado resuelto: <code>aria-expanded</code>, foco al buscador al abrir, <code>Escape</code> que devuelve el foco al botón, y cada «×» diciendo qué quita.</td></tr>
+          <tr data-pagina="3" hidden><td>2.1.0</td><td>4 sep 2026</td><td>Resuelve una contradicción viva: §6.4 seguía prescribiendo el medallón de estado en <code>--accent-soft</code> mientras §1.4.1 nombraba ese mismo medallón como caso de la tinta sobre relleno sólido. §6.4 pasa a ser aplicación de §1.4.1, no una alternativa. Tres reglas nuevas de las pantallas de Administración Vehicular: un control compuesto lleva un solo anillo de foco y lo lleva el envoltorio; el resumen de estatus no convive con un filtro de estatus equivalente; y en la ficha de detalle el indicador de urgencia declara su ancho en rejilla y el contacto del cliente va bajo la identidad del expediente. Documenta las composiciones de tablero y las dos reglas de la rejilla <code>.dash</code>.</td></tr>
+          <tr data-pagina="3" hidden><td>2.0.1</td><td>3 sep 2026</td><td>El relleno de un contenedor no vive en un hijo opcional: la cabecera <code>.p4</code> cerraba gracias al <code>padding-bottom</code> de la fila de chips, y al retirarlos el título quedó pegado a su borde. Pasa al contenedor vía <code>:last-child</code>.</td></tr>
+          <tr data-pagina="3" hidden><td>2.0.0</td><td>3 sep 2026</td><td>Abre la capa de dashboard: nueve piezas de dato visual con la envoltura que obliga a Chart.js a obedecer los tokens, y la regla de que el <code>&lt;canvas&gt;</code> no es accesible —cada gráfico lleva su tabla equivalente, que es la fuente de verdad y la que aparece si el CDN no carga. <b>Cambio que rompe:</b> <code>--serie-1</code> y <code>--serie-2</code> cambian de valor; medidos uno contra otro daban ΔE 1,1 en protanopia, así que se sustituyen por cuatro slots validados en los dos temas. Añade <code>--on-state</code>, la tinta sobre relleno sólido, y la regla de acotar a hijo directo un selector que tiñe iconos por contexto.</td></tr>
+          <tr data-pagina="3" hidden><td>1.5.1</td><td>2 sep 2026</td><td>Corrige el hover de esta barra de navegación de secciones: gris sobre gris con poco cambio de estado. Pasa a <code>background:var(--accent); color:var(--accent-ink)</code>, el mismo par ya usado en <code>.btn.p</code>. Cambio acotado a esta página, no toca el sistema fuente.</td></tr>
+          <tr data-pagina="4" hidden><td>1.5.0</td><td>1 sep 2026</td><td>Documenta el botón-icono (<code>.iconbtn</code>), que se usaba en tres secciones sin estar definido: sus tres medidas, que el <code>aria-label</code> nombra el dato y no la acción, y que en un grupo va primero lo frecuente y último lo destructivo. Añade la variante que confirma en el sitio —copiar—, que cambia icono, etiqueta y anuncio por <code>aria-live</code>, las tres. Y el caso medido del <code>:root</code>: sin él, la regla táctil la anula cualquier variante de tamaño declarada después.</td></tr>
+          <tr data-pagina="4" hidden><td>1.4.0</td><td>1 sep 2026</td><td>El estado de vacío y error va en tarjeta con medallón, no suelto sobre el fondo. El suelo de botón —36px, 28px en <code>.mini</code>— hay que declararlo con <code>min-height</code>, no confiarlo al relleno. El esqueleto necesita el mismo alto y el mismo punto de ruptura que el contenido que sustituye, y aplanar el fondo en movimiento reducido. Sexta trampa comprobada: copiar una regla de otra pantalla puede traerse un token que allí existe y aquí no.</td></tr>
+          <tr data-pagina="4" hidden><td>1.3.0</td><td>31 ago 2026</td><td>Reescribe el racional de tarjetas a dos principios generales, alineados con buenas prácticas de UI: contener un flujo pequeño autocontenido, o agrupar información para que no quede suelta. Añade la regla de no anidar tarjetas.</td></tr>
+          <tr data-pagina="4" hidden><td>1.2.0</td><td>31 ago 2026</td><td>Documenta cuándo usar cada tarjeta (<code>.tarjeta</code>, <code>.seccion</code>, <code>.glass</code>) a partir del uso real en acceso, padrón y ficha de cliente.</td></tr>
+          <tr data-pagina="4" hidden><td>1.1.0</td><td>31 ago 2026</td><td>Se abre al dashboard: tabla densa, semáforo de 5 estados, ficha de cliente. Corrige <code>--text-3</code>. Migra a Material Symbols. Documenta 5 trampas comprobadas.</td></tr>
+          <tr data-pagina="4" hidden><td>1.0.0</td><td>28 ago 2026</td><td>Documenta el sistema de diseño del acceso a SIO-DPROMA.</td></tr>
         </tbody>
       </table>
+    </div>
+    <div class="tfoot">
+      <span class="hist-cuenta">Página <span id="hist-pag-actual">1</span> de 4 · 27 versiones</span>
+      <nav class="pag" id="hist-pag" aria-label="Páginas del historial">
+        <button type="button" data-pagina="1" aria-current="page">1</button>
+        <button type="button" data-pagina="2">2</button>
+        <button type="button" data-pagina="3">3</button>
+        <button type="button" data-pagina="4">4</button>
+      </nav>
     </div>
   </div>
 </section>
@@ -1286,6 +1575,69 @@ figure{ margin:0 }
   </div>
 </footer>
 
+<script>
+(function(){
+  document.querySelectorAll('.infob').forEach(function(b){
+    var tip = document.getElementById(b.getAttribute('aria-controls'));
+    if (!tip) return;
+    function cerrar(){ b.setAttribute('aria-expanded','false'); tip.hidden = true; }
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      var abierto = b.getAttribute('aria-expanded') === 'true';
+      document.querySelectorAll('.infob[aria-expanded="true"]').forEach(function(o){
+        if (o !== b) { o.setAttribute('aria-expanded','false'); document.getElementById(o.getAttribute('aria-controls')).hidden = true; }
+      });
+      if (abierto) cerrar(); else { b.setAttribute('aria-expanded','true'); tip.hidden = false; }
+    });
+    b.addEventListener('focusout', function(e){
+      if (e.relatedTarget === b) return;
+      setTimeout(function(){ if (document.activeElement !== b) cerrar(); }, 0);
+    });
+  });
+  document.addEventListener('click', function(){
+    document.querySelectorAll('.infob[aria-expanded="true"]').forEach(function(o){
+      o.setAttribute('aria-expanded','false'); document.getElementById(o.getAttribute('aria-controls')).hidden = true;
+    });
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.infob[aria-expanded="true"]').forEach(function(o){
+        o.setAttribute('aria-expanded','false'); document.getElementById(o.getAttribute('aria-controls')).hidden = true; o.focus();
+      });
+    }
+  });
+})();
+(function(){
+  var nav = document.getElementById('hist-pag');
+  if (!nav) return;
+  var filas = document.querySelectorAll('#historial tbody tr');
+  var contador = document.getElementById('hist-pag-actual');
+  nav.querySelectorAll('button').forEach(function(b){
+    b.addEventListener('click', function(){
+      var pagina = b.getAttribute('data-pagina');
+      nav.querySelectorAll('button').forEach(function(o){ o.removeAttribute('aria-current'); });
+      b.setAttribute('aria-current','page');
+      filas.forEach(function(f){ f.hidden = f.getAttribute('data-pagina') !== pagina; });
+      contador.textContent = pagina;
+    });
+  });
+})();
+(function(){
+  var enlaces = Array.prototype.slice.call(document.querySelectorAll('.nav-secciones a[href^="#"]'));
+  var secciones = enlaces.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+  if (!secciones.length || !window.IntersectionObserver) return;
+  var activo = null;
+  function marcar(id){
+    if (id === activo) return;
+    activo = id;
+    enlaces.forEach(function(a){ a.classList.toggle('activa', a.getAttribute('href') === '#' + id); });
+  }
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if (e.isIntersecting) marcar(e.target.id); });
+  }, { rootMargin: '-10% 0px -70% 0px' });
+  secciones.forEach(function(s){ obs.observe(s); });
+})();
+</script>
 <script>
 (function(){
   var boton = document.getElementById('gbtnMotion');
