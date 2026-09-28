@@ -213,6 +213,33 @@ Contraste medido de cada `-ink` sobre su `-bg`, que es la combinación real de u
 verde, se leería como «agencias correctas». Estos colores existen justo para eso: para
 clasificar sin opinar. Se usan también en las etiquetas de tipo de cliente (§6.10).
 
+**Caso real, para que la regla no se vuelva a pasar por alto.** Una barra de antigüedad de
+cartera con cuatro tramos (0–30 / 31–60 / 61–90 / +90 días) se construyó así:
+
+```html
+<!-- ✗ Mal — antigüedad de cartera pintada con el semáforo de estado -->
+<i style="width:57%;background:var(--ok)"></i>
+<i style="width:23%;background:var(--warn)"></i>
+<i style="width:12%;background:var(--block)"></i>
+<i style="width:8%;background:var(--err)"></i>
+```
+
+Cuatro tramos de tiempo, ninguno es un estado — y aun así 0–30 días quedó en `--ok` («correcto»)
+y +90 en `--err` («error»). Es el ejemplo exacto que el párrafo de arriba usa para explicar por
+qué existe la regla, solo que con antigüedad de cartera en vez de «Agencias». La corrección no
+cambia el layout ni los porcentajes, solo la fuente del color:
+
+```html
+<!-- ✓ Bien — mismo componente, tramos de tiempo en --serie-1…4 -->
+<i style="width:57%;background:var(--serie-1)"></i>
+<i style="width:23%;background:var(--serie-2)"></i>
+<i style="width:12%;background:var(--serie-3)"></i>
+<i style="width:8%;background:var(--serie-4)"></i>
+```
+
+Con la leyenda repitiendo el mismo color junto al rango de días, nunca junto a la palabra
+«correcto» o «error».
+
 **Los dos colores anteriores no se distinguían entre sí.** `#2C6CA8` y `#7A5FA8` estaban
 medidos contra el fondo —5,35 y 5,06 en claro— pero nunca uno contra otro, que es la
 comparación que de verdad importa en una gráfica. Medidos entre sí dan **ΔE 1,1 en protanopia

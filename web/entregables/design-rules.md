@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.6.1
+version: 2.6.2
 last_updated: 2026-09-28
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -219,6 +219,33 @@ Contraste medido de cada `-ink` sobre su `-bg`, que es la combinación real de u
 **Una serie de gráfica nunca reutiliza un color de estado.** Si la barra de «Agencias» fuera
 verde, se leería como «agencias correctas». Estos colores existen justo para eso: para
 clasificar sin opinar. Se usan también en las etiquetas de tipo de cliente (§6.10).
+
+**Caso real, para que la regla no se vuelva a pasar por alto.** Una barra de antigüedad de
+cartera con cuatro tramos (0–30 / 31–60 / 61–90 / +90 días) se construyó así:
+
+```html
+<!-- ✗ Mal — antigüedad de cartera pintada con el semáforo de estado -->
+<i style="width:57%;background:var(--ok)"></i>
+<i style="width:23%;background:var(--warn)"></i>
+<i style="width:12%;background:var(--block)"></i>
+<i style="width:8%;background:var(--err)"></i>
+```
+
+Cuatro tramos de tiempo, ninguno es un estado — y aun así 0–30 días quedó en `--ok` («correcto»)
+y +90 en `--err` («error»). Es el ejemplo exacto que el párrafo de arriba usa para explicar por
+qué existe la regla, solo que con antigüedad de cartera en vez de «Agencias». La corrección no
+cambia el layout ni los porcentajes, solo la fuente del color:
+
+```html
+<!-- ✓ Bien — mismo componente, tramos de tiempo en --serie-1…4 -->
+<i style="width:57%;background:var(--serie-1)"></i>
+<i style="width:23%;background:var(--serie-2)"></i>
+<i style="width:12%;background:var(--serie-3)"></i>
+<i style="width:8%;background:var(--serie-4)"></i>
+```
+
+Con la leyenda repitiendo el mismo color junto al rango de días, nunca junto a la palabra
+«correcto» o «error».
 
 **Los dos colores anteriores no se distinguían entre sí.** `#2C6CA8` y `#7A5FA8` estaban
 medidos contra el fondo —5,35 y 5,06 en claro— pero nunca uno contra otro, que es la
@@ -2255,3 +2282,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.5.5 | 2026-09-26 | Reescribe cinco pasajes (§3, §6.4, §6.19, §6.21, §6.22) que usaban la construcción "no es X, es Y". Sin cambios de regla ni de valor. |
 | 2.6.0 | 2026-09-26 | Resuelve los dos pares de serie que quedaban por debajo del suelo de ΔE 15 (§1.4): serie 1–4 y serie 1–3 en oscuro. Ningún hex cambia — en vez de forzar un nuevo ΔE global, que rompería pares que hoy sí funcionan, o de documentar sin verificarlo que esas combinaciones nunca coexisten, se añade un segundo canal de distinción (trazo discontinuo en línea, textura de rayas en barra/dona, repetida en la leyenda) para esos dos pares cuando comparten gráfica. |
 | 2.6.1 | 2026-09-28 | Corrige `.iconbtn` (§6.19): faltaba `padding:0`. Sin él, el relleno nativo del `<button>` reduce la caja de contenido por debajo del icono en la variante de 28px, y el icono queda descentrado (medido: 7px de margen a un lado, 1px al otro, en vez de 4px y 4px). Hallado auditando pantallas reales de Viáticos. |
+| 2.6.2 | 2026-09-28 | Añade un caso real a §1.4 (series de gráfica): una barra de antigüedad de cartera pintada con `--ok`/`--warn`/`--block`/`--err` por tramo de tiempo en vez de `--serie-1`…`--serie-4`, con el antes/después completo. La regla de "una serie nunca reutiliza color de estado" ya existía; el hueco era no tener un ejemplo real citable, y por eso se pasó por alto al construir Cuentas por cobrar. Sin cambios de valor ni de regla. |
