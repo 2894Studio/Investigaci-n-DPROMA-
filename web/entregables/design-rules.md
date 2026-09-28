@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.6.2
+version: 2.7.0
 last_updated: 2026-09-28
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -694,6 +694,15 @@ jerarquía — la tarjeta dice «esto es un grupo aparte», y la tabla no lo es.
 tarjetas dentro de tarjetas: si un grupo necesita subgrupos, es una señal de que la pantalla
 tiene más de un objeto y conviene dividirla, no apilar tarjetas.
 
+**Si la tarjeta crece, su contenido crece con ella — nunca un `max-width` en el hijo.** Cuentas
+por cobrar hizo ancha la tarjeta de resumen (`.card.hero`) para ocupar el layout, pero el bloque
+interno con el número y el desglose por antigüedad conservó un `max-width` fijo pensado para el
+layout angosto anterior. Resultado: la tarjeta creció, el contenido de adentro no, y quedó una
+franja vacía a la derecha — la caja se alargó, no el gráfico. Un hijo que debe ocupar el ancho
+disponible de su tarjeta se declara con `flex:1` (o `width:100%` en grid), nunca con un
+`max-width` que sobrevivió a un rediseño de layout. Se comprueba midiendo el `getBoundingClientRect()`
+del hijo contra el de la tarjeta: si el hijo no llega al borde interior, algo lo está capando.
+
 ### 6.4 Vistas de estado de una pantalla
 
 Toda pantalla que pida datos tiene cuatro formas de presentarse: **con datos, cargando, vacía y
@@ -1231,6 +1240,25 @@ No se veía qué era resumen y qué era control.
    píxeles uno del otro. El resumen se queda solo cuando responde a un criterio que **ningún**
    filtro de la barra cubre, y entonces se agrupa según la regla 3. Los conteos que aporta un
    resumen retirado no se pierden: viven en el tablero, que es la pantalla de lectura.
+7. **El orden fijo es resumen → buscador + filtros en una sola fila → tabla.** El buscador de
+   la pantalla (`.search`, «Buscar marca, grupo o agencia…») no es un tercer bloque suelto encima
+   del resumen ni de los filtros: es un control de la misma fila que los filtros, porque hace lo
+   mismo que ellos — acota qué filas de la tabla se ven — solo que por texto libre en vez de por
+   valor exacto. Puesto arriba, aislado, antes del resumen, parecía flotar sin relación con nada;
+   pegado a los filtros, la relación «esto controla la tabla de abajo» se lee sin leer una palabra,
+   por pura cercanía. El resumen, en cambio, no es un control — es lectura — y por eso encabeza la
+   pantalla: lo primero que se muestra es qué hay, luego con qué se acota, luego el detalle.
+   `.search` en esa fila usa `flex:1;min-width:200px` para no competir en rigidez con las
+   pastillas de filtro, y la fila entera lleva relleno vertical completo (`var(--sp-4)` arriba y
+   abajo, no solo arriba) — sin él, la fila se ve pegada al resumen y a la tabla a la vez, como si
+   no fuera su propia zona.
+8. **Un control con pinta de interactivo tiene que interactuar.** Un `.schip` o `.f` con
+   `aria-pressed`/`data-activo` promete que al pulsarlo pasa algo. Si en la maqueta no hay ni
+   siquiera un evento de clic que cambie el estado o filtre la tabla, el control miente por forma:
+   se ve pulsable y no lo es. En una maqueta de demostración sin lógica de filtrado real, un dato
+   así se presenta como lo que es — una cifra de lectura, sin `aria-pressed` ni cursor de puntero
+   — nunca como un botón vacío. Se promueve a control real solo cuando existe el filtrado que lo
+   respalda.
 
 ```css
 .resumen{display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center;
@@ -2283,3 +2311,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.6.0 | 2026-09-26 | Resuelve los dos pares de serie que quedaban por debajo del suelo de ΔE 15 (§1.4): serie 1–4 y serie 1–3 en oscuro. Ningún hex cambia — en vez de forzar un nuevo ΔE global, que rompería pares que hoy sí funcionan, o de documentar sin verificarlo que esas combinaciones nunca coexisten, se añade un segundo canal de distinción (trazo discontinuo en línea, textura de rayas en barra/dona, repetida en la leyenda) para esos dos pares cuando comparten gráfica. |
 | 2.6.1 | 2026-09-28 | Corrige `.iconbtn` (§6.19): faltaba `padding:0`. Sin él, el relleno nativo del `<button>` reduce la caja de contenido por debajo del icono en la variante de 28px, y el icono queda descentrado (medido: 7px de margen a un lado, 1px al otro, en vez de 4px y 4px). Hallado auditando pantallas reales de Viáticos. |
 | 2.6.2 | 2026-09-28 | Añade un caso real a §1.4 (series de gráfica): una barra de antigüedad de cartera pintada con `--ok`/`--warn`/`--block`/`--err` por tramo de tiempo en vez de `--serie-1`…`--serie-4`, con el antes/después completo. La regla de "una serie nunca reutiliza color de estado" ya existía; el hueco era no tener un ejemplo real citable, y por eso se pasó por alto al construir Cuentas por cobrar. Sin cambios de valor ni de regla. |
+| 2.7.0 | 2026-09-28 | Dos reglas nuevas salidas de rediseñar Cuentas por cobrar en maqueta. §6.12 gana la regla 7 —resumen arriba, buscador y filtros en una sola fila justo encima de la tabla, nunca el buscador suelto por su cuenta— y la regla 8 —un control con `aria-pressed`/`data-activo` tiene que interactuar de verdad o presentarse como cifra de lectura, no fingir ser un filtro sin filtrado detrás; era el caso de los cuatro `.schip` originales de la pantalla, que no tenían ni un solo listener detrás. §6.3 gana una cuarta advertencia: si la tarjeta crece, su contenido crece con ella —`flex:1`, nunca un `max-width` heredado del layout anterior—, a partir del caso medido donde la tarjeta de resumen se hizo ancha y el bloque interno del gráfico se quedó angosto, dejando una franja vacía. Sin cambios de token ni de componente visual, así que `reglas-de-diseno.html` no se toca. |

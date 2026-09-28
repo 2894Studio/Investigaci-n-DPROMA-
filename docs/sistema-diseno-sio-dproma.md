@@ -687,6 +687,15 @@ jerarquía — la tarjeta dice «esto es un grupo aparte», y la tabla no lo es.
 tarjetas dentro de tarjetas: si un grupo necesita subgrupos, es una señal de que la pantalla
 tiene más de un objeto y conviene dividirla, no apilar tarjetas.
 
+**Si la tarjeta crece, su contenido crece con ella — nunca un `max-width` en el hijo.** Cuentas
+por cobrar hizo ancha la tarjeta de resumen (`.card.hero`) para ocupar el layout, pero el bloque
+interno con el número y el desglose por antigüedad conservó un `max-width` fijo pensado para el
+layout angosto anterior. Resultado: la tarjeta creció, el contenido de adentro no, y quedó una
+franja vacía a la derecha — la caja se alargó, no el gráfico. Un hijo que debe ocupar el ancho
+disponible de su tarjeta se declara con `flex:1` (o `width:100%` en grid), nunca con un
+`max-width` que sobrevivió a un rediseño de layout. Se comprueba midiendo el `getBoundingClientRect()`
+del hijo contra el de la tarjeta: si el hijo no llega al borde interior, algo lo está capando.
+
 ### 6.4 Vistas de estado de una pantalla
 
 Toda pantalla que pida datos tiene cuatro formas de presentarse: **con datos, cargando, vacía y
@@ -1224,6 +1233,25 @@ No se veía qué era resumen y qué era control.
    píxeles uno del otro. El resumen se queda solo cuando responde a un criterio que **ningún**
    filtro de la barra cubre, y entonces se agrupa según la regla 3. Los conteos que aporta un
    resumen retirado no se pierden: viven en el tablero, que es la pantalla de lectura.
+7. **El orden fijo es resumen → buscador + filtros en una sola fila → tabla.** El buscador de
+   la pantalla (`.search`, «Buscar marca, grupo o agencia…») no es un tercer bloque suelto encima
+   del resumen ni de los filtros: es un control de la misma fila que los filtros, porque hace lo
+   mismo que ellos — acota qué filas de la tabla se ven — solo que por texto libre en vez de por
+   valor exacto. Puesto arriba, aislado, antes del resumen, parecía flotar sin relación con nada;
+   pegado a los filtros, la relación «esto controla la tabla de abajo» se lee sin leer una palabra,
+   por pura cercanía. El resumen, en cambio, no es un control — es lectura — y por eso encabeza la
+   pantalla: lo primero que se muestra es qué hay, luego con qué se acota, luego el detalle.
+   `.search` en esa fila usa `flex:1;min-width:200px` para no competir en rigidez con las
+   pastillas de filtro, y la fila entera lleva relleno vertical completo (`var(--sp-4)` arriba y
+   abajo, no solo arriba) — sin él, la fila se ve pegada al resumen y a la tabla a la vez, como si
+   no fuera su propia zona.
+8. **Un control con pinta de interactivo tiene que interactuar.** Un `.schip` o `.f` con
+   `aria-pressed`/`data-activo` promete que al pulsarlo pasa algo. Si en la maqueta no hay ni
+   siquiera un evento de clic que cambie el estado o filtre la tabla, el control miente por forma:
+   se ve pulsable y no lo es. En una maqueta de demostración sin lógica de filtrado real, un dato
+   así se presenta como lo que es — una cifra de lectura, sin `aria-pressed` ni cursor de puntero
+   — nunca como un botón vacío. Se promueve a control real solo cuando existe el filtrado que lo
+   respalda.
 
 ```css
 .resumen{display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center;
