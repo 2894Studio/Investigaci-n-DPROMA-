@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.7.0
+version: 2.8.0
 last_updated: 2026-09-28
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -1732,6 +1732,66 @@ ver.** El tablero lo hace hoy en sus dos tarjetas sin alcance.
 
 ---
 
+### 6.23 Toggletip de información (`.infob` + `.tip`)
+
+Una cifra a veces necesita una aclaración corta que no cabe como texto siempre visible sin
+desordenar la fila — el caso de la ficha de detalle (§6.20), donde cada dato vive en una sola
+línea `dt`/`dd`. El toggletip resuelve eso: un botón de información al final del número que, al
+activarse, revela la aclaración en un globo. No es un tooltip nativo (que aparece con el simple
+paso del ratón y no es operable por teclado ni táctil de forma fiable) — es un **toggletip**: se
+abre con clic o `Enter`/`Espacio`, se queda abierto hasta que se cierra a propósito, y por eso
+puede convivir con dedos y lectores de pantalla igual de bien que con el ratón.
+
+```html
+<dd class="tnum">$436,070
+  <button class="infob" type="button" aria-expanded="false"
+          aria-controls="tip-cerrado" aria-describedby="tip-cerrado"
+          aria-label="Más información sobre cerrado y sin facturar">
+    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-info"/></svg>
+  </button>
+  <span class="tip" id="tip-cerrado" role="tooltip" hidden>
+    No suma al $2,644,180 de por cobrar — son 9 órdenes sin facturar todavía.
+  </span>
+</dd>
+```
+
+```css
+.infob{width:24px;height:24px;padding:0;border:0;border-radius:50%;background:transparent;
+  color:var(--text-3);display:grid;place-items:center;cursor:pointer;flex-shrink:0}
+.infob:hover,.infob[aria-expanded="true"]{background:var(--surface-2);color:var(--text-2)}
+[data-tacto="dedo"] .infob{width:46px;height:46px}
+.tip{position:absolute;right:0;top:calc(100% + 6px);z-index:30;width:220px;max-width:60vw;
+  background:var(--text);color:var(--surface);font:500 11.5px/1.5 var(--font-ui);
+  border-radius:var(--r-ctrl);padding:var(--sp-2) var(--sp-3);box-shadow:var(--sh-float)}
+```
+
+**Seis reglas.**
+
+1. **`aria-describedby` va siempre puesto, no solo mientras está abierto.** Es lo que hace que un
+   lector de pantalla, al llegar al botón por tabulación, tenga acceso al texto de la aclaración
+   en cuanto se activa — sin `aria-describedby`, `aria-controls` por sí solo no garantiza que
+   ningún lector anuncie el contenido señalado, porque solo declara una relación, no la lee.
+2. **El destino táctil mide 24×24px como mínimo (§7.3), 46px en modo dedo.** Un botón de icono
+   más pequeño que eso es el error más fácil de cometer con un control de este tamaño visual —
+   el icono puede medir 14px, el botón nunca.
+3. **Se cierra con `Escape`, con clic fuera y al tabular hacia el siguiente control.** Las tres
+   salidas devuelven el foco de forma predecible; sin la tercera, tabular más allá del botón deja
+   un globo abierto flotando sobre contenido que ya no tiene foco, huérfano en pantalla.
+4. **Contraste verificado, no asumido:** el texto del globo (`--surface` sobre `--text`) da
+   15,2:1 en claro y 13,9:1 en oscuro; el icono en reposo (`--text-3` sobre `--surface`) da
+   4,8:1 en claro y 5,5:1 en oscuro — ambos muy por encima de los suelos de 4,5:1 (texto) y 3:1
+   (icono funcional, WCAG 1.4.11).
+5. **Un solo toggletip abierto a la vez en toda la pantalla.** Abrir uno cierra cualquier otro
+   que ya estuviera abierto — de lo contrario una fila de datos con varios `.infob` termina con
+   media pantalla cubierta de globos.
+6. **No sustituye al texto siempre visible cuando el dato es el protagonista de la pantalla.**
+   La cifra principal de un resumen (§6.12, el `.hero`) lleva su aclaración como texto corriente
+   debajo, no oculta detrás de un icono — el criterio de §8 sigue mandando: si la frase explica
+   una consecuencia para quien mira, va en pantalla; el toggletip es para cuando ese texto no
+   cabe sin romper una fila de ficha, no una forma de esconder texto que sí cabría.
+
+---
+
 ## 7. Layout
 
 ### 7.1 Entrada al sistema (`.split`)
@@ -2312,3 +2372,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.6.1 | 2026-09-28 | Corrige `.iconbtn` (§6.19): faltaba `padding:0`. Sin él, el relleno nativo del `<button>` reduce la caja de contenido por debajo del icono en la variante de 28px, y el icono queda descentrado (medido: 7px de margen a un lado, 1px al otro, en vez de 4px y 4px). Hallado auditando pantallas reales de Viáticos. |
 | 2.6.2 | 2026-09-28 | Añade un caso real a §1.4 (series de gráfica): una barra de antigüedad de cartera pintada con `--ok`/`--warn`/`--block`/`--err` por tramo de tiempo en vez de `--serie-1`…`--serie-4`, con el antes/después completo. La regla de "una serie nunca reutiliza color de estado" ya existía; el hueco era no tener un ejemplo real citable, y por eso se pasó por alto al construir Cuentas por cobrar. Sin cambios de valor ni de regla. |
 | 2.7.0 | 2026-09-28 | Dos reglas nuevas salidas de rediseñar Cuentas por cobrar en maqueta. §6.12 gana la regla 7 —resumen arriba, buscador y filtros en una sola fila justo encima de la tabla, nunca el buscador suelto por su cuenta— y la regla 8 —un control con `aria-pressed`/`data-activo` tiene que interactuar de verdad o presentarse como cifra de lectura, no fingir ser un filtro sin filtrado detrás; era el caso de los cuatro `.schip` originales de la pantalla, que no tenían ni un solo listener detrás. §6.3 gana una cuarta advertencia: si la tarjeta crece, su contenido crece con ella —`flex:1`, nunca un `max-width` heredado del layout anterior—, a partir del caso medido donde la tarjeta de resumen se hizo ancha y el bloque interno del gráfico se quedó angosto, dejando una franja vacía. Sin cambios de token ni de componente visual, así que `reglas-de-diseno.html` no se toca. |
+| 2.8.0 | 2026-09-28 | Documenta el toggletip de información (`.infob` + `.tip`, §6.23): un botón de icono que revela una aclaración corta en un globo, para las filas de ficha (§6.20) donde el texto no cabe siempre visible. Seis reglas, con dos correcciones que salieron de auditar la maqueta contra el propio sistema antes de aprobarla: el botón medía 20×20px y bajaba del suelo táctil de 24px que ya exige §7.3, y el `aria-controls` sin `aria-describedby` no garantiza que un lector de pantalla anuncie el texto señalado. Contraste verificado por cálculo, no a ojo: 15,2:1 / 13,9:1 el texto del globo, 4,8:1 / 5,5:1 el icono en reposo, en claro y oscuro. La regla 6 fija el límite: no sustituye al texto siempre visible de un dato protagonista (§8 sigue mandando ahí). Pendiente: `reglas-de-diseno.html` no tiene todavía la demo viva del componente — solo la fuente y la copia descargable lo documentan por ahora. |

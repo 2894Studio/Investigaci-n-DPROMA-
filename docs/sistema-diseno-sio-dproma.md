@@ -1727,6 +1727,66 @@ ver.** El tablero lo hace hoy en sus dos tarjetas sin alcance.
 
 ---
 
+### 6.23 Toggletip de información (`.infob` + `.tip`)
+
+Una cifra a veces necesita una aclaración corta que no cabe como texto siempre visible sin
+desordenar la fila — el caso de la ficha de detalle (§6.20), donde cada dato vive en una sola
+línea `dt`/`dd`. El toggletip resuelve eso: un botón de información al final del número que, al
+activarse, revela la aclaración en un globo. No es un tooltip nativo (que aparece con el simple
+paso del ratón y no es operable por teclado ni táctil de forma fiable) — es un **toggletip**: se
+abre con clic o `Enter`/`Espacio`, se queda abierto hasta que se cierra a propósito, y por eso
+puede convivir con dedos y lectores de pantalla igual de bien que con el ratón.
+
+```html
+<dd class="tnum">$436,070
+  <button class="infob" type="button" aria-expanded="false"
+          aria-controls="tip-cerrado" aria-describedby="tip-cerrado"
+          aria-label="Más información sobre cerrado y sin facturar">
+    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-info"/></svg>
+  </button>
+  <span class="tip" id="tip-cerrado" role="tooltip" hidden>
+    No suma al $2,644,180 de por cobrar — son 9 órdenes sin facturar todavía.
+  </span>
+</dd>
+```
+
+```css
+.infob{width:24px;height:24px;padding:0;border:0;border-radius:50%;background:transparent;
+  color:var(--text-3);display:grid;place-items:center;cursor:pointer;flex-shrink:0}
+.infob:hover,.infob[aria-expanded="true"]{background:var(--surface-2);color:var(--text-2)}
+[data-tacto="dedo"] .infob{width:46px;height:46px}
+.tip{position:absolute;right:0;top:calc(100% + 6px);z-index:30;width:220px;max-width:60vw;
+  background:var(--text);color:var(--surface);font:500 11.5px/1.5 var(--font-ui);
+  border-radius:var(--r-ctrl);padding:var(--sp-2) var(--sp-3);box-shadow:var(--sh-float)}
+```
+
+**Seis reglas.**
+
+1. **`aria-describedby` va siempre puesto, no solo mientras está abierto.** Es lo que hace que un
+   lector de pantalla, al llegar al botón por tabulación, tenga acceso al texto de la aclaración
+   en cuanto se activa — sin `aria-describedby`, `aria-controls` por sí solo no garantiza que
+   ningún lector anuncie el contenido señalado, porque solo declara una relación, no la lee.
+2. **El destino táctil mide 24×24px como mínimo (§7.3), 46px en modo dedo.** Un botón de icono
+   más pequeño que eso es el error más fácil de cometer con un control de este tamaño visual —
+   el icono puede medir 14px, el botón nunca.
+3. **Se cierra con `Escape`, con clic fuera y al tabular hacia el siguiente control.** Las tres
+   salidas devuelven el foco de forma predecible; sin la tercera, tabular más allá del botón deja
+   un globo abierto flotando sobre contenido que ya no tiene foco, huérfano en pantalla.
+4. **Contraste verificado, no asumido:** el texto del globo (`--surface` sobre `--text`) da
+   15,2:1 en claro y 13,9:1 en oscuro; el icono en reposo (`--text-3` sobre `--surface`) da
+   4,8:1 en claro y 5,5:1 en oscuro — ambos muy por encima de los suelos de 4,5:1 (texto) y 3:1
+   (icono funcional, WCAG 1.4.11).
+5. **Un solo toggletip abierto a la vez en toda la pantalla.** Abrir uno cierra cualquier otro
+   que ya estuviera abierto — de lo contrario una fila de datos con varios `.infob` termina con
+   media pantalla cubierta de globos.
+6. **No sustituye al texto siempre visible cuando el dato es el protagonista de la pantalla.**
+   La cifra principal de un resumen (§6.12, el `.hero`) lleva su aclaración como texto corriente
+   debajo, no oculta detrás de un icono — el criterio de §8 sigue mandando: si la frase explica
+   una consecuencia para quien mira, va en pantalla; el toggletip es para cuando ese texto no
+   cabe sin romper una fila de ficha, no una forma de esconder texto que sí cabría.
+
+---
+
 ## 7. Layout
 
 ### 7.1 Entrada al sistema (`.split`)
