@@ -196,20 +196,36 @@ tbody tr:hover td{ background:var(--surface-2); }
 .grupo-comp:first-of-type{ margin-top:1rem; }
 .grupo-comp h3{ font-size:1.125rem; display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap; }
 .grupo-comp .cuantos{ font-size:.8125rem; font-weight:400; color:var(--text-3); }
-/* Barra de secciones. Se queda pegada arriba al desplazar, así que las
-   secciones necesitan scroll-margin-top o el anclaje cae debajo de ella. */
-.nav-secciones{ position:sticky; top:0; z-index:20; background:var(--bg);
-  border-bottom:1px solid var(--border); padding:.6rem 0; }
-.nav-secciones ul{ display:flex; gap:.5rem; flex-wrap:wrap; margin:0; padding:0; list-style:none; }
-.nav-secciones a{ display:inline-flex; align-items:center; min-height:36px; padding:.4em 1em;
-  border:1px solid var(--border); border-radius:var(--r-pill); background:var(--surface);
-  font-size:.8125rem; font-weight:600; color:var(--text-2); text-decoration:none; }
-.nav-secciones a:hover{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
-section[id]{ scroll-margin-top:4.75rem; }
-.grupo-comp{ scroll-margin-top:5.25rem; }
-/* En pantalla estrecha la barra envuelve a tres líneas: pegada se comería
-   media pantalla, así que ahí se queda quieta. */
-@media (max-width:640px){ .nav-secciones{ position:static; } }
+/* Barra lateral de navegación — estilo cromo de aplicación (§7.2), como en
+   D.P Energy: columna fija, oscura, con estado activo por borde izquierdo. */
+.nav-secciones{ position:fixed; left:0; top:0; bottom:0; width:236px; z-index:30;
+  background:var(--chrome); color:var(--chrome-ink); overflow-y:auto;
+  padding:1.25rem .9rem 1.5rem; box-shadow:var(--sh-float); }
+.nav-secciones .nav-marca{ display:block; font-family:var(--font-brand,var(--font-ui)); font-size:.85rem;
+  letter-spacing:.03em; color:var(--chrome-ink); text-decoration:none; padding:.4rem .5rem 1rem;
+  border-bottom:1px solid var(--chrome-line); margin-bottom:.75rem; }
+.nav-secciones .nav-marca span{ display:block; font-family:var(--font-ui); font-weight:400; font-size:.7rem; color:var(--chrome-dim); margin-top:2px; }
+.nav-secciones ul{ display:flex; flex-direction:column; gap:2px; margin:0; padding:0; list-style:none; }
+.nav-secciones a{ display:flex; align-items:center; min-height:38px; padding:.5rem .7rem;
+  border-radius:8px; border-left:3px solid transparent;
+  font-size:.8125rem; font-weight:600; color:var(--chrome-dim); text-decoration:none; }
+.nav-secciones a:hover{ background:var(--chrome-hover); color:var(--chrome-ink); }
+.nav-secciones a.activa{ background:var(--chrome-activo); color:var(--chrome-ink); border-left-color:var(--ok); }
+.nav-secciones a.nueva::after{ content:"nuevo"; margin-left:auto; font-size:.625rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.03em; color:var(--chrome-focus); }
+header.masthead, section[id], section.hero{ margin-left:236px; }
+section[id]{ scroll-margin-top:1.5rem; }
+.grupo-comp{ scroll-margin-top:2rem; }
+/* En pantalla estrecha la columna se convierte otra vez en barra horizontal arriba. */
+@media (max-width:900px){
+  .nav-secciones{ position:static; width:auto; height:auto; box-shadow:none;
+    border-bottom:1px solid var(--border); padding:.6rem 0; }
+  .nav-secciones .nav-marca{ display:none; }
+  .nav-secciones ul{ flex-direction:row; flex-wrap:wrap; gap:.5rem; padding:0 clamp(1.25rem,4vw,2.5rem); }
+  .nav-secciones a{ border:1px solid var(--border); border-left:1px solid var(--border); background:var(--surface); color:var(--text-2); }
+  .nav-secciones a:hover, .nav-secciones a.activa{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+  header.masthead, section[id], section.hero{ margin-left:0; }
+}
 /* Subtítulo de variante dentro de una card */
 .variante{ font-size:.875rem; margin:1.75rem 0 .6rem; padding-top:1rem;
   border-top:1px solid var(--border); color:var(--text); }
@@ -256,6 +272,31 @@ section[id]{ scroll-margin-top:4.75rem; }
 .s13-barra-mini{ height:8px; border-radius:4px; margin-top:.4rem; background:linear-gradient(to right, var(--accent) 0 60%, var(--border-2) 60% 100%); }
 .s13-fila-cards{ display:flex; gap:.6rem; }
 .s13-mini-card{ flex:1; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-ctrl); padding:.6rem .7rem; font-size:.78rem; color:var(--text-2); box-shadow:var(--sh-rest); }
+
+/* 13.5 — filas: alto fijo / fr / minmax */
+.s13-filas-demo{ margin-bottom:1rem; }
+.s13-filas-demo:last-child{ margin-bottom:0; }
+.s13-fila-caja{ display:flex; flex-direction:column; gap:8px; height:160px; margin-bottom:.5rem; }
+.s13-fila{ background:var(--accent-soft); border:1px dashed var(--accent); border-radius:var(--r-ctrl); display:grid; place-items:center; font-weight:700; color:var(--accent); font-size:.78rem; min-height:0; }
+.s13-fila-px{ height:40px; flex-shrink:0; }
+.s13-fila-minmax{ flex:0 0 auto; min-height:64px; max-height:96px; }
+
+/* 13.6 — split vertical: cede o no cede el alto */
+.s13-split-mal, .s13-split-bien{ display:flex; gap:8px; height:170px; background:var(--bg); border:1px solid var(--border); border-radius:var(--r-card); padding:8px; }
+.s13-split-col-a{ flex:1; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-ctrl); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.3rem; font-size:.78rem; color:var(--text-2); font-weight:600; text-align:center; }
+.s13-split-col-a span, .s13-split-col-b-mal span, .s13-split-col-b-bien span{ font-weight:400; color:var(--text-3); font-family:ui-monospace,monospace; font-size:.7rem; }
+.s13-split-col-b-mal{ flex:1; height:auto; align-self:flex-start; background:var(--warn-bg); border:1px dashed var(--warn); border-radius:var(--r-ctrl); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.3rem; padding:1rem 0; font-size:.78rem; color:var(--warn-ink); font-weight:600; text-align:center; }
+.s13-split-col-b-bien{ flex:1; height:100%; background:var(--accent-soft); border:1px dashed var(--accent); border-radius:var(--r-ctrl); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.3rem; font-size:.78rem; color:var(--accent); font-weight:600; text-align:center; }
+
+/* 13.7 — cadena de min-height:0 */
+.s13-scroll-marco{ height:150px; border:1px dashed var(--border-2); border-radius:var(--r-card); padding:0; overflow:visible; }
+.s13-scroll-caja{ height:100%; border:1px solid var(--border); border-radius:var(--r-card); background:var(--surface); display:flex; flex-direction:column; box-shadow:var(--sh-rest); }
+.s13-scroll-caja-mal{ outline:2px solid var(--warn); }
+.s13-scroll-caja-bien{ overflow:hidden; }
+.s13-scroll-cab{ flex-shrink:0; background:var(--surface-2); padding:.4rem .6rem; font-size:.75rem; font-weight:700; border-bottom:1px solid var(--border); }
+.s13-scroll-cont-mal{ flex:1; padding:.4rem .6rem; display:flex; flex-direction:column; gap:.3rem; }
+.s13-scroll-cont-bien{ flex:1; min-height:0; overflow-y:auto; padding:.4rem .6rem; display:flex; flex-direction:column; gap:.3rem; }
+.s13-scroll-item{ background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:.3rem .5rem; font-size:.72rem; color:var(--text-2); flex-shrink:0; }
 .fila-demo{ display:flex; align-items:center; gap:var(--sp-4); padding:var(--sp-2) 0; }
 .fila-demo .valor{ font-size:var(--fs-dense); color:var(--text); }
 .medidas{ display:flex; gap:1.5rem; align-items:flex-end; flex-wrap:wrap; }
@@ -568,19 +609,19 @@ figure{ margin:0 }
 </section>
 
 <nav class="nav-secciones" aria-label="Secciones del sistema de diseño">
-  <div class="wrap">
-    <ul>
-      <li><a href="#novedades">Qué cambió</a></li>
-      <li><a href="#color">Color</a></li>
-      <li><a href="#tipografia">Tipografía</a></li>
-      <li><a href="#espaciado">Espaciado</a></li>
-      <li><a href="#iconos">Iconos</a></li>
-      <li><a href="#componentes">Componentes</a></li>
-      <li><a href="#dashboard">Capa de dashboard</a></li>
-      <li><a href="#principios">Voz de producto</a></li>
-      <li><a href="#historial">Historial</a></li>
-    </ul>
-  </div>
+  <a class="nav-marca" href="#novedades">SIO-DPROMA<span>Sistema de diseño</span></a>
+  <ul>
+    <li><a href="#novedades">Qué cambió</a></li>
+    <li><a href="#color">Color</a></li>
+    <li><a href="#tipografia">Tipografía</a></li>
+    <li><a href="#espaciado">Espaciado</a></li>
+    <li><a href="#iconos">Iconos</a></li>
+    <li><a href="#componentes">Componentes</a></li>
+    <li><a href="#composicion" class="nueva">Composición y grid</a></li>
+    <li><a href="#dashboard">Capa de dashboard</a></li>
+    <li><a href="#principios">Voz de producto</a></li>
+    <li><a href="#historial">Historial</a></li>
+  </ul>
 </nav>
 
 <section id="novedades">
@@ -904,6 +945,53 @@ figure{ margin:0 }
       <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Un panel no es un modal.</strong> No atrapa el foco ni oscurece la pantalla. Lleva <code>role="group"</code> con su etiqueta, no <code>role="dialog"</code>. <kbd>Esc</kbd> cierra y devuelve el foco al botón.</p>
     </div>
 
+
+    <h3 class="grupo-comp" id="g-datos">Datos y listas <span class="cuantos">la tabla y lo que la acompaña mientras carga</span></h3>
+
+    <div class="comp-block">
+      <h4>Tabla densa (arquetipo del padrón)</h4>
+      <div class="tabla-caja">
+        <table>
+          <thead><tr><th>Razón social / RFC</th><th>Tipo</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Grupo Automotriz Vértice</th><td><span class="p-type p-s1">Empresa</span></td><td><span class="pill p-ok"><span class="msi" aria-hidden="true" translate="no">check_circle</span>Vigente</span></td></tr>
+            <tr><th scope="row">Flotillas GNP</th><td><span class="p-type p-s2">Agencia</span></td><td><span class="pill p-warn"><span class="msi" aria-hidden="true" translate="no">schedule</span>Incompleto</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="comp-block">
+      <h4>Chip</h4>
+      <div class="comp-row">
+        <button class="chip"><span class="msi" aria-hidden="true" translate="no">visibility</span>Tema</button>
+        <button class="chip"><span class="msi" aria-hidden="true" translate="no">more_horiz</span>Más</button>
+      </div>
+    </div>
+
+    <div class="comp-block">
+      <h4>Esqueleto de carga (.skel)</h4>
+      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 1rem;">Imita la forma de lo que va a llegar — mismas columnas y anchos que el contenido real, para que no salte al aparecer.</p>
+      <div class="skels" role="status" aria-label="Cargando el padrón de clientes">
+        <span class="skel" style="width:52px; height:52px; border-radius:50%; align-self:center;"></span>
+        <span class="skel" style="width:70%; height:22px; align-self:center;"></span>
+        <span class="skel" style="width:100%; height:14px;"></span>
+        <span class="skel" style="width:88%; height:14px;"></span>
+        <span class="skel" style="width:100%; height:48px;"></span>
+      </div>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Sin texto real dentro de las barras.</strong> El texto que imitan («razón social y RFC», por ejemplo) queda invisible por <code>color:transparent</code>, pero sigue en el árbol de accesibilidad y un lector de pantalla lo anuncia igual. Un <code>role="status"</code> con <code>aria-label</code> en el contenedor basta.</p>
+    </div>
+  </div>
+</section>
+
+<section id="composicion">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Composición y grid</div>
+      <h2>Cómo se ordena una pantalla, no solo cómo se ve cada pieza.</h2>
+      <p class="section-note">Lo nuevo de esta sesión: un componente aprobado (el toggletip), dos reglas aprobadas (§6.12 y §6.3), y el borrador de §13 — todavía sin aprobar, marcado aparte.</p>
+    </div>
+
     <h3 class="grupo-comp" id="g-composicion">Composición <span class="cuantos">toggletip, orden de resumen/filtros y grid — lo nuevo de esta sesión, §13 sin aprobar todavía</span></h3>
 
     <div class="comp-block">
@@ -943,8 +1031,8 @@ figure{ margin:0 }
         <p class="s13-titulo">13.1 — Lectura → control → objeto</p>
         <p style="font-size:.85rem; color:var(--text-2); margin:0 0 .75rem;">Resumen (lectura) arriba, buscador + filtros en una sola fila (control), tabla debajo. Generaliza la regla 7 de §6.12. Captura real de <code>administracion-vehicular-tramites.html</code> — el propio ejemplo de referencia de §6.21 tenía este bug.</p>
         <div class="s13-antes-despues">
-          <figure><img src="assets/composicion/13-1-antes.png" alt="Antes: el buscador vive solo en su fila, los filtros Plaza/Estatus/Responsable en otra fila debajo"><figcaption>✗ Antes — dos filas para un mismo trabajo</figcaption></figure>
-          <figure><img src="assets/composicion/13-1-despues.png" alt="Después: buscador y filtros comparten una sola fila"><figcaption>✓ Después — una fila, misma altura ganada</figcaption></figure>
+          <figure><img src="assets/composicion/13-1-antes.png" width="1440" height="260" alt="Antes: el buscador vive solo en su fila, los filtros Plaza/Estatus/Responsable en otra fila debajo"><figcaption>✗ Antes — dos filas para un mismo trabajo</figcaption></figure>
+          <figure><img src="assets/composicion/13-1-despues.png" width="1440" height="200" alt="Después: buscador y filtros comparten una sola fila"><figcaption>✓ Después — una fila, misma altura ganada</figcaption></figure>
         </div>
       </div>
 
@@ -1012,43 +1100,80 @@ figure{ margin:0 }
           </figure>
         </div>
       </div>
-    </div>
 
-    <h3 class="grupo-comp" id="g-datos">Datos y listas <span class="cuantos">la tabla y lo que la acompaña mientras carga</span></h3>
+      <div class="s13-regla">
+        <p class="s13-titulo">13.5 — El mismo criterio de la 13.2, en fila: alto fijo / fr / minmax</p>
+        <p style="font-size:.85rem; color:var(--text-2); margin:0 0 .75rem;">Vivo. Ya en uso en cada pantalla del sistema — <code>body{display:grid;grid-template-rows:1fr auto}</code> es exactamente el caso «fr + px fijo» de abajo, solo que nunca se había explicado como regla de composición.</p>
+        <div class="s13-filas-demo">
+          <div class="s13-fila-caja">
+            <div class="s13-fila s13-fila-px">Cabecera — 40px</div>
+            <div class="s13-fila s13-fila-fr">Contenido — 1fr</div>
+          </div>
+          <p class="s13-col-et"><code>40px 1fr</code> — <strong>px fijo + fr.</strong> La cabecera nunca cambia de alto; el contenido absorbe el resto y es quien hace scroll interno.</p>
+        </div>
+        <div class="s13-filas-demo">
+          <div class="s13-fila-caja">
+            <div class="s13-fila s13-fila-fr" style="flex:1.6">Panel — 1.6fr</div>
+            <div class="s13-fila s13-fila-fr" style="flex:1">Detalle — 1fr</div>
+          </div>
+          <p class="s13-col-et"><code>1.6fr 1fr</code> — <strong>fr puro,</strong> apilado en vez de en columnas: dos bloques que reparten el alto disponible en proporción fija.</p>
+        </div>
+        <div class="s13-filas-demo">
+          <div class="s13-fila-caja">
+            <div class="s13-fila s13-fila-fr" style="flex:1">Lista — fluye</div>
+            <div class="s13-fila s13-fila-minmax">Resumen — 64–96px</div>
+          </div>
+          <p class="s13-col-et"><code>1fr minmax(64px,96px)</code> — <strong>fr acotado.</strong> El pie de resumen fluye con su contenido, pero nunca baja de 64px ni sube de 96 — ni se aplasta ni se come la lista de arriba.</p>
+        </div>
+      </div>
 
-    <div class="comp-block">
-      <h4>Tabla densa (arquetipo del padrón)</h4>
-      <div class="tabla-caja">
-        <table>
-          <thead><tr><th>Razón social / RFC</th><th>Tipo</th><th>Estado</th></tr></thead>
-          <tbody>
-            <tr><th scope="row">Grupo Automotriz Vértice</th><td><span class="p-type p-s1">Empresa</span></td><td><span class="pill p-ok"><span class="msi" aria-hidden="true" translate="no">check_circle</span>Vigente</span></td></tr>
-            <tr><th scope="row">Flotillas GNP</th><td><span class="p-type p-s2">Agencia</span></td><td><span class="pill p-warn"><span class="msi" aria-hidden="true" translate="no">schedule</span>Incompleto</span></td></tr>
-          </tbody>
-        </table>
+      <div class="s13-regla">
+        <p class="s13-titulo">13.6 — Un contenedor tampoco cede el alto a un descendiente</p>
+        <p style="font-size:.85rem; color:var(--text-2); margin:0 0 .75rem;">Vivo — versión vertical de la 13.3. Dos columnas de la misma altura real; una de las dos deja su contenido a <code>height:auto</code> en vez de llenar la columna.</p>
+        <div class="s13-antes-despues">
+          <figure>
+            <div class="s13-split-mal">
+              <div class="s13-split-col-a">Columna A<br><span>contenido real</span></div>
+              <div class="s13-split-col-b-mal">Columna B<br><span>height:auto</span></div>
+            </div>
+            <figcaption>✗ Mal — B se queda corta, el hueco de abajo parece un error de maquetación</figcaption>
+          </figure>
+          <figure>
+            <div class="s13-split-bien">
+              <div class="s13-split-col-a">Columna A<br><span>contenido real</span></div>
+              <div class="s13-split-col-b-bien">Columna B<br><span>height:100%</span></div>
+            </div>
+            <figcaption>✓ Bien — B llena la altura real de su columna</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="s13-regla">
+        <p class="s13-titulo">13.7 — La cadena de <code>min-height:0</code>, o el scroll interno se rompe</p>
+        <p style="font-size:.85rem; color:var(--text-2); margin:0 0 .75rem;">Vivo. Ya está en cada pantalla del sistema (<code>.hoja</code> → <code>.app</code> → <code>.area</code> → <code>.main</code>, todas con <code>min-height:0</code>) pero nunca se había explicado por qué hace falta. Un solo eslabón de la cadena sin <code>min-height:0</code> —el valor por omisión de un hijo flex es <code>min-height:auto</code>, que se calcula por su contenido— y ese hijo empuja a su contenedor en vez de dejarlo hacer scroll.</p>
+        <div class="s13-antes-despues">
+          <figure>
+            <div class="s13-scroll-marco">
+              <div class="s13-scroll-caja s13-scroll-caja-mal">
+                <div class="s13-scroll-cab">Cabecera fija</div>
+                <div class="s13-scroll-cont-mal"><div class="s13-scroll-item">Fila 1</div><div class="s13-scroll-item">Fila 2</div><div class="s13-scroll-item">Fila 3</div><div class="s13-scroll-item">Fila 4</div><div class="s13-scroll-item">Fila 5</div><div class="s13-scroll-item">Fila 6</div></div>
+              </div>
+            </div>
+            <figcaption>✗ Mal — sin <code>min-height:0</code>, la caja crece más allá del espacio disponible (el marco punteado)</figcaption>
+          </figure>
+          <figure>
+            <div class="s13-scroll-marco">
+              <div class="s13-scroll-caja s13-scroll-caja-bien">
+                <div class="s13-scroll-cab">Cabecera fija</div>
+                <div class="s13-scroll-cont-bien"><div class="s13-scroll-item">Fila 1</div><div class="s13-scroll-item">Fila 2</div><div class="s13-scroll-item">Fila 3</div><div class="s13-scroll-item">Fila 4</div><div class="s13-scroll-item">Fila 5</div><div class="s13-scroll-item">Fila 6</div></div>
+              </div>
+            </div>
+            <figcaption>✓ Bien — con <code>min-height:0</code>, la caja respeta el espacio y solo el contenido hace scroll</figcaption>
+          </figure>
+        </div>
       </div>
     </div>
 
-    <div class="comp-block">
-      <h4>Chip</h4>
-      <div class="comp-row">
-        <button class="chip"><span class="msi" aria-hidden="true" translate="no">visibility</span>Tema</button>
-        <button class="chip"><span class="msi" aria-hidden="true" translate="no">more_horiz</span>Más</button>
-      </div>
-    </div>
-
-    <div class="comp-block">
-      <h4>Esqueleto de carga (.skel)</h4>
-      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 1rem;">Imita la forma de lo que va a llegar — mismas columnas y anchos que el contenido real, para que no salte al aparecer.</p>
-      <div class="skels" role="status" aria-label="Cargando el padrón de clientes">
-        <span class="skel" style="width:52px; height:52px; border-radius:50%; align-self:center;"></span>
-        <span class="skel" style="width:70%; height:22px; align-self:center;"></span>
-        <span class="skel" style="width:100%; height:14px;"></span>
-        <span class="skel" style="width:88%; height:14px;"></span>
-        <span class="skel" style="width:100%; height:48px;"></span>
-      </div>
-      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Sin texto real dentro de las barras.</strong> El texto que imitan («razón social y RFC», por ejemplo) queda invisible por <code>color:transparent</code>, pero sigue en el árbol de accesibilidad y un lector de pantalla lo anuncia igual. Un <code>role="status"</code> con <code>aria-label</code> en el contenedor basta.</p>
-    </div>
   </div>
 </section>
 
@@ -1376,6 +1501,23 @@ figure{ margin:0 }
       });
     }
   });
+})();
+</script>
+<script>
+(function(){
+  var enlaces = Array.prototype.slice.call(document.querySelectorAll('.nav-secciones a[href^="#"]'));
+  var secciones = enlaces.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+  if (!secciones.length || !window.IntersectionObserver) return;
+  var activo = null;
+  function marcar(id){
+    if (id === activo) return;
+    activo = id;
+    enlaces.forEach(function(a){ a.classList.toggle('activa', a.getAttribute('href') === '#' + id); });
+  }
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if (e.isIntersecting) marcar(e.target.id); });
+  }, { rootMargin: '-10% 0px -70% 0px' });
+  secciones.forEach(function(s){ obs.observe(s); });
 })();
 </script>
 <script>
