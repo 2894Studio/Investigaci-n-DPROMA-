@@ -222,6 +222,17 @@ section[id]{ scroll-margin-top:4.75rem; }
 .acciones-demo .iconbtn{ width:28px; height:28px; }
 .iconbtn-dedo .iconbtn{ width:46px; height:46px; }
 .iconbtn.copiar.hecho{ color:var(--ok-ink); border-color:var(--ok); background:var(--ok-bg); }
+
+/* Toggletip — §6.23 */
+.infob{ width:24px; height:24px; padding:0; border:0; border-radius:50%; background:transparent; color:var(--text-3); display:grid; place-items:center; cursor:pointer; flex-shrink:0; }
+.infob:hover, .infob[aria-expanded="true"]{ background:var(--surface-2); color:var(--text-2); }
+.infob .msi{ font-size:15px; }
+.tip{ position:absolute; left:0; top:calc(100% + 8px); z-index:5; width:240px; max-width:70vw; background:var(--text); color:var(--surface); font:500 .8rem/1.5 var(--font-ui,inherit); text-align:left; font-variant-numeric:normal; border-radius:var(--r-ctrl); padding:.5rem .75rem; box-shadow:var(--sh-float); }
+.tip::before{ content:""; position:absolute; left:10px; bottom:100%; border:5px solid transparent; border-bottom-color:var(--text); }
+
+/* Recuadro de borrador — §13, sin aprobar */
+.comp-borrador{ border:1px dashed var(--border-2); background:var(--surface-2); }
+.borrador-tag{ display:inline-block; font-size:.6875rem; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--warn-ink,#7E5B0E); background:var(--warn-bg,#F1ECDE); padding:.2em .6em; border-radius:999px; margin-right:.5em; vertical-align:middle; }
 .fila-demo{ display:flex; align-items:center; gap:var(--sp-4); padding:var(--sp-2) 0; }
 .fila-demo .valor{ font-size:var(--fs-dense); color:var(--text); }
 .medidas{ display:flex; gap:1.5rem; align-items:flex-end; flex-wrap:wrap; }
@@ -526,7 +537,7 @@ figure{ margin:0 }
     <h1>Sistema de Diseño SIO-DPROMA</h1>
     <p class="lede">Es el sistema de <strong>producto</strong> de DPROMA, construido y verificado sobre las propuestas ya corregidas de <strong>acceso</strong> y <strong>padrón de clientes</strong>. Con cada token, componente y regla ya resueltos y documentados aquí, diseñar la siguiente pantalla de DPROMA es una decisión de contenido, no de estilo: sin reinventar color, tipografía o espaciado desde cero, ni esperar a que alguien lo defina. Cada token viene medido en el navegador, con su contraste comprobado en los dos temas.</p>
     <div class="hero-meta">
-      <span class="version-tag">Versión 2.4.1 · dashboard + acceso</span>
+      <span class="version-tag">Versión 2.8.0 · toggletip + composición (§13 en revisión)</span>
       <a class="download-btn" href="/entregables/design-rules.md" download><span class="msi" aria-hidden="true" translate="no">download</span> Descargar sistema completo (.md)</a>
     </div>
     <p class="source-note">Fuente completa: <code>docs/sistema-diseno-sio-dproma.md</code> · complementan <code>docs/sistema-diseno-acceso-sio-dproma.md</code>, <code>docs/decisiones-producto-padron.md</code>, <code>docs/patron-dialogo-sio-dproma.md</code> y <code>docs/criterios-de-animacion.md</code>.</p>
@@ -870,6 +881,46 @@ figure{ margin:0 }
       <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Un panel no es un modal.</strong> No atrapa el foco ni oscurece la pantalla. Lleva <code>role="group"</code> con su etiqueta, no <code>role="dialog"</code>. <kbd>Esc</kbd> cierra y devuelve el foco al botón.</p>
     </div>
 
+    <h3 class="grupo-comp" id="g-composicion">Composición <span class="cuantos">toggletip, orden de resumen/filtros y grid — lo nuevo de esta sesión, §13 sin aprobar todavía</span></h3>
+
+    <div class="comp-block">
+      <h4>Toggletip de información (.infob + .tip)</h4>
+      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 1rem;">Vivo. Actívalo con clic o con <kbd>Tab</kbd> + <kbd>Enter</kbd>.</p>
+      <div class="comp-row" style="gap:2.5rem">
+        <div style="display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums;font-weight:700;font-size:1.05rem;position:relative">
+          $436,070
+          <button class="infob" type="button" aria-expanded="false" aria-controls="tip-demo" aria-describedby="tip-demo" aria-label="Más información sobre cerrado y sin facturar">
+            <span class="msi" aria-hidden="true" translate="no">info</span>
+          </button>
+          <span class="tip" id="tip-demo" role="tooltip" hidden>No suma al $2,644,180 de por cobrar — son 9 órdenes sin facturar todavía.</span>
+        </div>
+      </div>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Para cuando el texto no cabe siempre visible</strong>, en una fila de ficha (§6.20) — no sustituye al texto corriente de un dato protagonista, ahí sigue mandando §8.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Destino táctil de 24×24px</strong> (46px en modo dedo, §7.3) y <code>aria-describedby</code> permanente, no solo <code>aria-controls</code> — es lo que asegura que un lector de pantalla llegue al texto. Contraste calculado: 15,2:1 / 13,9:1 el globo, 4,8:1 / 5,5:1 el icono, claro y oscuro.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Se cierra</strong> con <kbd>Esc</kbd>, clic fuera, o al tabular hacia el siguiente control. Un solo toggletip abierto a la vez.</p>
+    </div>
+
+    <div class="comp-block">
+      <h4>Resumen, buscador y filtros (§6.12, reglas 7–8)</h4>
+      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 .75rem;">Dos hallazgos reales de esta sesión, en tres pantallas distintas del sistema (incluida esta misma referencia de filtros, arriba).</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Regla 7 — el orden fijo es resumen → buscador + filtros en una sola fila → tabla.</strong> El buscador acota la tabla igual que un filtro; va con ellos, nunca suelto encima del resumen.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>Regla 8 — un control con pinta de interactivo tiene que interactuar.</strong> Un <code>aria-pressed</code>/<code>data-activo</code> sin ningún listener detrás miente por forma. Se presenta como cifra de lectura, o se le da filtrado real.</p>
+    </div>
+
+    <div class="comp-block">
+      <h4>Ancho de contenido en tarjeta (§6.3)</h4>
+      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 .75rem;">Si la tarjeta crece, su contenido crece con ella — <code>flex:1</code> en el hijo, nunca un <code>max-width</code> heredado de un layout anterior. Caso medido: la tarjeta de resumen de Cuentas por cobrar se hizo ancha y el bloque del gráfico se quedó angosto — la caja se alargó, no el gráfico.</p>
+    </div>
+
+    <div class="comp-block comp-borrador">
+      <h4><span class="borrador-tag">Borrador — sin aprobar</span> §13 Composición y grid</h4>
+      <p style="font-size:.85rem; color:var(--text-2); margin:0 0 .75rem;">Nada de esto está todavía en <code>docs/sistema-diseno-sio-dproma.md</code>. Probado contra tres pantallas reales del propio repo antes de proponerlo — incluida <code>administracion-vehicular-tramites.html</code>, el ejemplo de referencia de §6.21, que tenía el mismo bug de la regla 7.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>13.1 — Lectura → control → objeto</strong>, en toda pantalla de listado. Generaliza la regla 7 de §6.12. No aplica a pantallas de detalle, que siguen el orden de §6.20.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>13.2 — Proporción de columna, tres casos:</strong> <code>px</code> fijo (ancho realmente constante — un panel de navegación), <code>fr</code> (reparto proporcional — un resumen junto a su ficha), <code>fr</code> acotado con <code>minmax()</code> (fluye entre un piso y un techo útiles para su contenido — el bloque de identidad + reloj de una ficha de detalle).</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>13.3 — Un contenedor de layout no cede el ancho a un descendiente.</strong> Generaliza la regla de tarjetas de §6.3 a cualquier nivel de anidado.</p>
+      <p style="font-size:.85rem; color:var(--text-2); margin:1rem 0 0;"><strong>13.4 — Comparar exige igualar.</strong> Adopta como regla general lo que <code>.dash</code> ya hace solo para tableros: <code>align-items:start</code> por omisión, <code>stretch</code> solo cuando la fila se lee como un conjunto.</p>
+    </div>
+
     <h3 class="grupo-comp" id="g-datos">Datos y listas <span class="cuantos">la tabla y lo que la acompaña mientras carga</span></h3>
 
     <div class="comp-block">
@@ -1181,6 +1232,8 @@ figure{ margin:0 }
           <tr><td>2.3.0</td><td>16 sep 2026</td><td>Añade la etiqueta de alcance (§6.22), la que dice de qué conjunto de datos habla una cifra: «de toda la organización», «nada en tu alcance». El producto ya usaba ese vocabulario, pero el sistema no tenía la pieza, así que se pintaba con el ámbar de aviso: cuatro avisos de que falta algo en una sola pantalla del tablero, cuando no faltaba nada. Ahora es neutra, y el alcance nunca usa los colores de estado. Distingue además dos casos que se veían igual: no tener permiso y tener permiso sobre un conjunto vacío. La regla de cuándo toca el semáforo y cuándo la paleta de categorías sube de §12.5 a §1, porque vivía en el capítulo de gráficas y nadie iba a buscarla para una etiqueta de tabla. Y §6.4 gana la restauración de sesión, con la salida por tiempo o por fallo que no existía.</td></tr>
           <tr><td>2.4.0</td><td>17 sep 2026</td><td>Convierte en componente la fila de cifras del tablero (§12.4.1): esa fila de cajas con un número grande y su texto. El tablero ya la tenía, pero la había montado por su cuenta, y los textos caían a tres alturas distintas —hasta 34px— aunque las siete cajas midieran exactamente lo mismo. Ahora todas comparten la misma retícula, así que el número, el rótulo y la aclaración quedan a la misma altura lleve cada caja el mismo texto o no. Con cuatro reglas de uso: cuatro cajas por fila como máximo, cada fila es un grupo con nombre, la aclaración cabe en una línea, y un grupo entero a cero se dice en vez de pintarse. Las pruebas previas a publicarlo tumbaron dos decisiones propias: recortar la aclaración con puntos suspensivos dejaba el ejemplo documentado sin forma de leerse, y quitar el borde hacía desaparecer las cajas en el alto contraste del sistema. Corrige además tres fallos de esta misma página —las cuatro gráficas salían 80px más estrechas, los títulos escritos para lector de pantalla se estaban viendo y un desplegable se quedó sin flecha—, que quedan escritos como trampas en §10, que pasa de seis a nueve. Y §12.5 gana dos reglas de lectura: la serie y la cifra del mismo recuadro miden lo mismo y cuadran, y el dibujo reserva sitio para el grosor de su línea.</td></tr>
           <tr><td>2.4.1</td><td>17 sep 2026</td><td>Reescribe en lenguaje llano las entradas de la 2.3.0 y la 2.4.0. Habían crecido hasta ser ilegibles —la de 2.4.0 ocupaba 5.569 caracteres frente a los 443 de la mediana— y repetían lo que ya dicen §12.4.1, §10 y §12.5, que es donde se busca el detalle; no se pierde nada, el porqué y las medidas siguen en esas secciones. La página gana además el apartado «Qué cambió», al principio y no al final, porque el historial vive abajo del todo y nadie baja hasta ahí para saber qué hay de nuevo. Sin cambios de valor ni de comportamiento.</td></tr>
+          <tr><td>2.5.0–2.7.0</td><td>21–28 sep 2026</td><td>Estas versiones se documentaron en <code>docs/sistema-diseno-sio-dproma.md</code> y en <code>web/entregables/design-rules.md</code> pero no llegaron a esta página renderizada: tokens de contraste de control y hover general (§1.1/§1.5), tipografía autoalojada (§2), certificación de pares de serie (§1.4), corrección de <code>.iconbtn</code> sin <code>padding:0</code> (§6.19), y dos reglas nuevas de composición —resumen/filtros/buscador en una sola fila, y un control con <code>aria-pressed</code> tiene que interactuar de verdad (§6.12)—. El detalle completo, con las cifras medidas de cada cambio, está en <code>design-rules.md</code>.</td></tr>
+          <tr><td>2.8.0</td><td>28 sep 2026</td><td>Esta página gana el toggletip vivo (.infob + .tip, §6.23), con su botón de 24×24px y su <code>aria-describedby</code> permanente para lectores de pantalla, y las reglas de composición nuevas en texto. Incluye además el borrador de §13 (composición y grid) marcado explícitamente como <strong>sin aprobar</strong> — probado contra tres pantallas reales del repo, entre ellas el propio ejemplo de referencia de §6.21, que tenía el mismo bug que motivó la regla. No se retira ni se corrige nada de lo ya aprobado.</td></tr>
         </tbody>
       </table>
     </div>
@@ -1199,6 +1252,39 @@ figure{ margin:0 }
   </div>
 </footer>
 
+<script>
+(function(){
+  document.querySelectorAll('.infob').forEach(function(b){
+    var tip = document.getElementById(b.getAttribute('aria-controls'));
+    if (!tip) return;
+    function cerrar(){ b.setAttribute('aria-expanded','false'); tip.hidden = true; }
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      var abierto = b.getAttribute('aria-expanded') === 'true';
+      document.querySelectorAll('.infob[aria-expanded="true"]').forEach(function(o){
+        if (o !== b) { o.setAttribute('aria-expanded','false'); document.getElementById(o.getAttribute('aria-controls')).hidden = true; }
+      });
+      if (abierto) cerrar(); else { b.setAttribute('aria-expanded','true'); tip.hidden = false; }
+    });
+    b.addEventListener('focusout', function(e){
+      if (e.relatedTarget === b) return;
+      setTimeout(function(){ if (document.activeElement !== b) cerrar(); }, 0);
+    });
+  });
+  document.addEventListener('click', function(){
+    document.querySelectorAll('.infob[aria-expanded="true"]').forEach(function(o){
+      o.setAttribute('aria-expanded','false'); document.getElementById(o.getAttribute('aria-controls')).hidden = true;
+    });
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.infob[aria-expanded="true"]').forEach(function(o){
+        o.setAttribute('aria-expanded','false'); document.getElementById(o.getAttribute('aria-controls')).hidden = true; o.focus();
+      });
+    }
+  });
+})();
+</script>
 <script>
 (function(){
   var boton = document.getElementById('gbtnMotion');
