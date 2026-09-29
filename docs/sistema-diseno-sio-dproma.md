@@ -2375,7 +2375,7 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 Las doce secciones anteriores dicen cómo se ve cada pieza — un botón, una tabla, una pastilla.
 Esta dice cómo se ordenan varias piezas juntas en una pantalla: cuándo una columna cede su ancho,
 cuándo dos bloques deben cerrar a la misma altura y cuándo no, y qué pasa cuando el contenido de
-uno crece más que el del otro. Siete reglas, con su demo viva en la página del sistema
+uno crece más que el del otro. Ocho reglas, con su demo viva en la página del sistema
 (`web/entregables/reglas-de-diseno.html#composicion`).
 
 ### 13.1 Lectura → control → objeto
@@ -2417,21 +2417,13 @@ la tarjeta de resumen se hizo ancha y el bloque del gráfico se quedó angosto.
 ### 13.4 Comparar exige igualar
 
 El valor por omisión de una fila de tarjetas es `align-items:start`: cada una a su alto real, sin
-estirarse para igualar a la más alta. Esto es correcto casi siempre — dos bloques con contenido
-de naturaleza distinta (una columna principal y una barra lateral, por ejemplo) no necesitan
-terminar a la misma altura, y forzarlos a `stretch` por defecto obliga a las cortas a inventar
-relleno vacío. `align-items:stretch` se reserva para cuando las tarjetas sí se están comparando
-entre sí — mismo criterio, mismo campo, y su desigualdad de alto no debería depender de cuánto
-texto tenga cada una.
+estirarse para igualar a la más alta. `align-items:stretch` se reserva para un caso concreto:
+cuando las tarjetas se están comparando entre sí — mismo criterio, mismo campo, y su desigualdad
+de alto no debería depender de cuánto texto tenga cada una. Fuera de ese caso, `stretch` por
+omisión obliga a las tarjetas cortas a inventar relleno vacío que no significa nada.
 
-Hay un tercer caso, más estrecho: cuando dos columnas que **no** se comparan deben, aun así,
-cerrar exactamente en el mismo punto — porque un cierre casi-pero-no-igual por pura coincidencia
-de contenido se lee peor que uno claramente distinto o uno garantizado. Ahí se usa `stretch` en
-el contenedor y `flex:1` en el último bloque de la columna más corta, para que el cierre sea
-por construcción y no por longitud de contenido. Es el caso de Viático detalle: la columna
-principal y la barra lateral no se comparan entre sí, pero medían a ~3px de diferencia por
-casualidad; con `stretch` + `flex:1` en la última tarjeta, los dos `bottom` quedan en el mismo
-pixel, siempre.
+Esta regla no cubre el caso de dos bloques que no se comparan pero aun así deben cerrar a la
+misma altura — eso es 13.8, con un mecanismo distinto.
 
 ### 13.5 El mismo criterio de la 13.2, en fila
 
@@ -2458,3 +2450,19 @@ contenido», y basta que un solo eslabón lo incumpla para que todo el contenido
 hacia afuera en vez de hacer scroll dentro de él. Validado en Trámite detalle bajo un viewport
 restringido: con la cadena completa, `main` no se desborda (753px de contenido real dentro de
 415px de alto visible, con scroll interno); sin ella, el contenido rompe el marco.
+
+### 13.8 Cierre garantizado, no por casualidad
+
+Distinta de 13.4: no es que dos columnas se estén comparando — es que dos columnas que **no**
+se comparan (una columna principal y una barra lateral, por ejemplo, con contenido de naturaleza
+distinta) deben, aun así, terminar exactamente en el mismo punto, porque un cierre
+casi-pero-no-igual por pura coincidencia de longitud de contenido se lee peor que uno claramente
+distinto o uno garantizado — sugiere un error donde no lo hay. El mecanismo es otro: `stretch` en
+el contenedor y `flex:1` en el último bloque de la columna más corta, para que el cierre sea por
+construcción, no por cuánto texto tenga cada columna ese día.
+
+Caso real: en Viático detalle, la columna principal (Solicitud + Comprobantes) y la barra lateral
+(La cuenta + Bitácora) no se comparan entre sí — son contenido independiente — pero medían a ~3px
+de diferencia por casualidad. Con `stretch` en el contenedor y `flex:1` en la última tarjeta de la
+barra lateral, los dos `bottom` quedan en el mismo pixel, siempre, sin importar cuánto crezca o
+encoja el contenido de cada lado.

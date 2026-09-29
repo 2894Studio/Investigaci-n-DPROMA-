@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.11.0
+version: 2.11.1
 last_updated: 2026-09-29
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -2370,7 +2370,7 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 Las doce secciones anteriores dicen cómo se ve cada pieza — un botón, una tabla, una pastilla.
 Esta dice cómo se ordenan varias piezas juntas en una pantalla: cuándo una columna cede su ancho,
 cuándo dos bloques deben cerrar a la misma altura y cuándo no, y qué pasa cuando el contenido de
-uno crece más que el del otro. Siete reglas, con su demo viva en la página del sistema
+uno crece más que el del otro. Ocho reglas, con su demo viva en la página del sistema
 (`reglas-de-diseno.html#composicion`).
 
 ### 13.1 Lectura → control → objeto
@@ -2396,13 +2396,11 @@ heredado de otro contexto. Es la misma regla que §6.3.
 ### 13.4 Comparar exige igualar
 
 Por omisión, `align-items:start`: cada tarjeta a su alto real. `align-items:stretch` se reserva
-para cuando las tarjetas sí se comparan entre sí — mismo criterio, mismo campo.
+para un caso concreto: cuando las tarjetas sí se comparan entre sí — mismo criterio, mismo campo.
+Fuera de ese caso, obliga a las cortas a inventar relleno vacío.
 
-Hay un tercer caso: dos columnas que no se comparan pero deben cerrar exactamente en el mismo
-punto, porque un cierre casi-pero-no-igual por coincidencia de contenido se lee peor que uno
-claramente distinto o uno garantizado. Ahí se usa `stretch` en el contenedor y `flex:1` en el
-último bloque de la columna más corta, para que el cierre sea por construcción, no por longitud
-de contenido.
+No cubre el caso de dos bloques que no se comparan pero deben cerrar a la misma altura — eso es
+13.8, con un mecanismo distinto.
 
 ### 13.5 El mismo criterio de la 13.2, en fila
 
@@ -2421,6 +2419,16 @@ Un contenedor con scroll interno necesita `min-height:0` en cada eslabón de la 
 ancestros hasta llegar al contenedor con scroll. El valor por omisión de `min-height` en un ítem
 flex es `auto` — basta que un solo eslabón lo incumpla para que el contenido empuje el marco
 hacia afuera en vez de hacer scroll dentro de él.
+
+### 13.8 Cierre garantizado, no por casualidad
+
+Distinta de 13.4: no es que dos columnas se comparen — es que dos columnas que no se comparan
+deben, aun así, terminar exactamente en el mismo punto, porque un cierre casi-pero-no-igual por
+coincidencia de contenido se lee peor que uno claramente distinto o uno garantizado. El mecanismo
+es otro: `stretch` en el contenedor y `flex:1` en el último bloque de la columna más corta, para
+que el cierre sea por construcción, no por longitud de contenido. Caso real: Viático detalle —
+columna principal y barra lateral no se comparan, medían a ~3px por casualidad; con `stretch` +
+`flex:1` los dos `bottom` quedan en el mismo pixel, siempre.
 
 ---
 
@@ -2455,4 +2463,4 @@ hacia afuera en vez de hacer scroll dentro de él.
 | 2.6.2 | 2026-09-28 | Añade un caso real a §1.4 (series de gráfica): una barra de antigüedad de cartera pintada con `--ok`/`--warn`/`--block`/`--err` por tramo de tiempo en vez de `--serie-1`…`--serie-4`, con el antes/después completo. La regla de "una serie nunca reutiliza color de estado" ya existía; el hueco era no tener un ejemplo real citable, y por eso se pasó por alto al construir Cuentas por cobrar. Sin cambios de valor ni de regla. |
 | 2.7.0 | 2026-09-28 | Dos reglas nuevas salidas de rediseñar Cuentas por cobrar en maqueta. §6.12 gana la regla 7 —resumen arriba, buscador y filtros en una sola fila justo encima de la tabla, nunca el buscador suelto por su cuenta— y la regla 8 —un control con `aria-pressed`/`data-activo` tiene que interactuar de verdad o presentarse como cifra de lectura, no fingir ser un filtro sin filtrado detrás; era el caso de los cuatro `.schip` originales de la pantalla, que no tenían ni un solo listener detrás. §6.3 gana una cuarta advertencia: si la tarjeta crece, su contenido crece con ella —`flex:1`, nunca un `max-width` heredado del layout anterior—, a partir del caso medido donde la tarjeta de resumen se hizo ancha y el bloque interno del gráfico se quedó angosto, dejando una franja vacía. Sin cambios de token ni de componente visual, así que `reglas-de-diseno.html` no se toca. |
 | 2.8.0 | 2026-09-28 | Documenta el toggletip de información (`.infob` + `.tip`, §6.23): un botón de icono que revela una aclaración corta en un globo, para las filas de ficha (§6.20) donde el texto no cabe siempre visible. Seis reglas, con dos correcciones que salieron de auditar la maqueta contra el propio sistema antes de aprobarla: el botón medía 20×20px y bajaba del suelo táctil de 24px que ya exige §7.3, y el `aria-controls` sin `aria-describedby` no garantiza que un lector de pantalla anuncie el texto señalado. Contraste verificado por cálculo, no a ojo: 15,2:1 / 13,9:1 el texto del globo, 4,8:1 / 5,5:1 el icono en reposo, en claro y oscuro. La regla 6 fija el límite: no sustituye al texto siempre visible de un dato protagonista (§8 sigue mandando ahí). Pendiente: `reglas-de-diseno.html` no tiene todavía la demo viva del componente — solo la fuente y la copia descargable lo documentan por ahora. |
-| 2.11.0 | 2026-09-29 | Cuatro reglas salidas de revisar Viáticos, Viático detalle, Cuentas por cobrar, Padrón de clientes y Editar cliente contra el sistema. §6.11 (tabla densa) gana la regla 10: el identificador de fila (folio) no lleva color de enlace — va en `--text`, porque `--link` es para navegación fuera de tabla y la fila entera, no el texto verde, es la zona pulsable. §6.12 gana la regla 9: la razón de un estado no vive como texto libre en la celda — va al detalle del registro. §8 (voz de producto) endurece su criterio a tres niveles: lo que bloquea una acción ahora se queda visible en una frase, lo que aclara una consecuencia sin bloquear nada pasa a un toggletip (§6.23) sobre el control relacionado, y el racional de diseño o la educación sobre un caso que no aplica al registro visible no va en la interfaz. Y se aprueba §13 Composición y grid, con sus siete reglas —de la proporción de columna al orden lectura → control → objeto—, validadas contra pantallas reales; deja de estar marcada como borrador. |
+| 2.11.1 | 2026-09-29 | Cuatro reglas salidas de revisar Viáticos, Viático detalle, Cuentas por cobrar, Padrón de clientes y Editar cliente contra el sistema. §6.11 (tabla densa) gana la regla 10: el identificador de fila (folio) no lleva color de enlace — va en `--text`, porque `--link` es para navegación fuera de tabla y la fila entera, no el texto verde, es la zona pulsable. §6.12 gana la regla 9: la razón de un estado no vive como texto libre en la celda — va al detalle del registro. §8 (voz de producto) endurece su criterio a tres niveles: lo que bloquea una acción ahora se queda visible en una frase, lo que aclara una consecuencia sin bloquear nada pasa a un toggletip (§6.23) sobre el control relacionado, y el racional de diseño o la educación sobre un caso que no aplica al registro visible no va en la interfaz. Y se aprueba §13 Composición y grid, con sus ocho reglas —de la proporción de columna al orden lectura → control → objeto—, validadas contra pantallas reales; deja de estar marcada como borrador. 13.4 (comparar exige igualar) y 13.8 (cierre garantizado, no por casualidad) quedan como dos reglas separadas, con mecanismos distintos para dos preguntas distintas. |
