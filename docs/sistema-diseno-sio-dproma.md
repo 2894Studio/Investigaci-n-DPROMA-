@@ -2367,3 +2367,94 @@ las tarjetas cortas a inventar relleno.
 **Y una del componente de barra.** Los segmentos contiguos se separan con superficie, no con
 espacio: `.barra span + span{border-left:2px solid var(--surface)}`. Un hueco transparente
 dejaría ver el fondo del carril y parecería un cuarto valor.
+
+---
+
+## 13. Composición y grid
+
+Las doce secciones anteriores dicen cómo se ve cada pieza — un botón, una tabla, una pastilla.
+Esta dice cómo se ordenan varias piezas juntas en una pantalla: cuándo una columna cede su ancho,
+cuándo dos bloques deben cerrar a la misma altura y cuándo no, y qué pasa cuando el contenido de
+uno crece más que el del otro. Siete reglas, con su demo viva en la página del sistema
+(`web/entregables/reglas-de-diseno.html#composicion`).
+
+### 13.1 Lectura → control → objeto
+
+El orden de una pantalla es fijo: primero lo que se lee (el resumen), luego lo que controla qué
+se ve (buscador + filtros), luego el objeto sobre el que se actúa (la tabla). Un buscador puesto
+en su propia fila, separado de los filtros, rompe esto — parece un cuarto bloque flotando sin
+relación con nada, cuando hace exactamente el mismo trabajo que los filtros: acotar qué filas se
+ven, solo que por texto libre en vez de por valor exacto. Va en la misma fila que ellos (§6.12,
+regla 7). Aplicado de verdad al fusionar buscador y filtros en Trámites vehiculares, Trámites
+concluidos y Padrón de clientes.
+
+### 13.2 Proporción de columna: tres casos, no dos
+
+Un layout de columnas no es solo «columna fija + columna flexible». Hay tres patrones reales, y
+elegir el que no corresponde produce el defecto correcto para el caso equivocado:
+
+- **px fijo** (`240px 1fr`) — la columna A nunca cambia, sea cual sea el ancho de pantalla. Para
+  un panel lateral de navegación o un ícono de tamaño constante.
+- **fr puro** (`1.6fr 1fr`) — reparto proporcional fijo entre las dos. Para dos bloques que deben
+  crecer juntos manteniendo su proporción, como el panel de detalle y el de acciones.
+- **fr acotado** (`minmax(0,1.6fr) minmax(300px,360px)`) — la columna B fluye entre un piso y un
+  techo; no se aplasta por debajo de su contenido mínimo ni crece sin límite. Para una barra
+  lateral con contenido de ancho variable (una lista de eventos, una ficha).
+
+Los tres existen ya en pantallas reales: `minmax(88px,34%) 1fr` en el modo tarjeta de las tablas
+densas, `1.4fr 1fr` en `.kpis-d` de Cuentas por cobrar, y `minmax(320px,380px) 1fr` en `.split` de
+esa misma pantalla.
+
+### 13.3 Un contenedor no cede el ancho a un descendiente
+
+Si la tarjeta que envuelve un dato crece (porque el layout le da más espacio), el contenido debe
+crecer con ella. Un `max-width` heredado del layout anterior deja la tarjeta ancha con el número o
+la barra atrapados en su ancho viejo, con una franja vacía al lado — la tarjeta obedeció al grid,
+su contenido no. Se resuelve con `flex:1` en el hijo, nunca con un límite fijo copiado de otro
+contexto. Es la misma regla que §6.3; el caso medido que la originó fue Cuentas por cobrar, donde
+la tarjeta de resumen se hizo ancha y el bloque del gráfico se quedó angosto.
+
+### 13.4 Comparar exige igualar
+
+El valor por omisión de una fila de tarjetas es `align-items:start`: cada una a su alto real, sin
+estirarse para igualar a la más alta. Esto es correcto casi siempre — dos bloques con contenido
+de naturaleza distinta (una columna principal y una barra lateral, por ejemplo) no necesitan
+terminar a la misma altura, y forzarlos a `stretch` por defecto obliga a las cortas a inventar
+relleno vacío. `align-items:stretch` se reserva para cuando las tarjetas sí se están comparando
+entre sí — mismo criterio, mismo campo, y su desigualdad de alto no debería depender de cuánto
+texto tenga cada una.
+
+Hay un tercer caso, más estrecho: cuando dos columnas que **no** se comparan deben, aun así,
+cerrar exactamente en el mismo punto — porque un cierre casi-pero-no-igual por pura coincidencia
+de contenido se lee peor que uno claramente distinto o uno garantizado. Ahí se usa `stretch` en
+el contenedor y `flex:1` en el último bloque de la columna más corta, para que el cierre sea
+por construcción y no por longitud de contenido. Es el caso de Viático detalle: la columna
+principal y la barra lateral no se comparan entre sí, pero medían a ~3px de diferencia por
+casualidad; con `stretch` + `flex:1` en la última tarjeta, los dos `bottom` quedan en el mismo
+pixel, siempre.
+
+### 13.5 El mismo criterio de la 13.2, en fila
+
+Los tres patrones de proporción de columna (px fijo, fr puro, fr acotado) aplican igual cuando la
+composición es de filas apiladas en vez de columnas lado a lado: una cabecera de alto fijo sobre
+contenido que fluye (`40px 1fr`), dos paneles en proporción fija (`1.6fr 1fr`), o una lista que
+fluye junto a un resumen acotado entre un piso y un techo (`1fr minmax(64px,96px)`). El resumen
+de estatus de Padrón de clientes usa esta misma lógica en `repeat(3,minmax(200px,1fr))`, para que
+sus tres grupos repartan el ancho completo de la fila en vez de ocupar solo lo que su texto pide.
+
+### 13.6 Un contenedor tampoco cede el alto a un descendiente
+
+Mismo problema que 13.3, en el eje vertical: una columna con `height:auto` en vez de `height:100%`
+se queda con el alto de su propio contenido en vez de llenar el alto real que el layout le dio.
+Validado en Trámite detalle: con `height:100%` la columna B llena su carril; con `auto`, se corta
+antes de tiempo aunque haya espacio libre debajo.
+
+### 13.7 La cadena de `min-height:0`
+
+Un contenedor flex o grid con scroll interno necesita `min-height:0` en **cada** eslabón de la
+cadena de ancestros hasta llegar al contenedor con scroll — el valor por omisión de `min-height`
+en un ítem flex es `auto`, que en la práctica significa «no me encojas por debajo de mi
+contenido», y basta que un solo eslabón lo incumpla para que todo el contenido empuje el marco
+hacia afuera en vez de hacer scroll dentro de él. Validado en Trámite detalle bajo un viewport
+restringido: con la cadena completa, `main` no se desborda (753px de contenido real dentro de
+415px de alto visible, con scroll interno); sin ella, el contenido rompe el marco.
