@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.8.0
-last_updated: 2026-09-28
+version: 2.9.0
+last_updated: 2026-09-29
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -1185,6 +1185,11 @@ thead th:first-child{z-index:7}
 9. **Registros por página elegibles.** Un pie que fija seis registros sobre un padrón de 1.248
    obliga a pasar páginas para cualquier revisión. Selector de 10 / 25 / 50 / 100, recordado
    entre sesiones.
+10. **El identificador de fila no lleva color de enlace.** El folio —el `<th scope="row">` que
+    abre el detalle— no se pinta con `--link`: ese token es para navegación fuera de tabla
+    (migas, «Ver en Maps»). Dentro de una tabla la fila entera es la zona pulsable, y lo indica
+    el fondo al pasar el cursor, no el color del texto. El folio va en `--text`, igual que el
+    resto de la celda.
 
 **Modo tarjeta por debajo de 860px.** La tabla pasa a lista de tarjetas; cada celda muestra su
 rótulo desde `data-et`:
@@ -1216,7 +1221,7 @@ No se veía qué era resumen y qué era control.
 └────────────────────────────────────────────────────┘
 ```
 
-**Cinco reglas.**
+**Nueve reglas.**
 
 1. **Un filtro se resalta solo si su valor difiere del predeterminado.** «Tipo: Todos» aparecía
    con borde y fondo de filtro aplicado, y «Todos» no filtra nada. El resalte debe significar
@@ -1259,6 +1264,12 @@ No se veía qué era resumen y qué era control.
    así se presenta como lo que es — una cifra de lectura, sin `aria-pressed` ni cursor de puntero
    — nunca como un botón vacío. Se promueve a control real solo cuando existe el filtrado que lo
    respalda.
+9. **La razón de un estado va al detalle del registro, no a la celda.** La justificación de un
+   excedente o el motivo de un rechazo no viven como texto libre dentro de la celda de estado —
+   una fila con motivo quedaría visiblemente más alta que sus vecinas y la tabla dejaría de
+   leerse como una grilla estable (misma idea que §6.11, regla 7, aplicada a una celda de
+   estatus). La celda se queda con el estado (`.pill`); la razón completa se muestra al entrar al
+   detalle del registro desde su identificador de fila.
 
 ```css
 .resumen{display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center;
@@ -2373,3 +2384,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.6.2 | 2026-09-28 | Añade un caso real a §1.4 (series de gráfica): una barra de antigüedad de cartera pintada con `--ok`/`--warn`/`--block`/`--err` por tramo de tiempo en vez de `--serie-1`…`--serie-4`, con el antes/después completo. La regla de "una serie nunca reutiliza color de estado" ya existía; el hueco era no tener un ejemplo real citable, y por eso se pasó por alto al construir Cuentas por cobrar. Sin cambios de valor ni de regla. |
 | 2.7.0 | 2026-09-28 | Dos reglas nuevas salidas de rediseñar Cuentas por cobrar en maqueta. §6.12 gana la regla 7 —resumen arriba, buscador y filtros en una sola fila justo encima de la tabla, nunca el buscador suelto por su cuenta— y la regla 8 —un control con `aria-pressed`/`data-activo` tiene que interactuar de verdad o presentarse como cifra de lectura, no fingir ser un filtro sin filtrado detrás; era el caso de los cuatro `.schip` originales de la pantalla, que no tenían ni un solo listener detrás. §6.3 gana una cuarta advertencia: si la tarjeta crece, su contenido crece con ella —`flex:1`, nunca un `max-width` heredado del layout anterior—, a partir del caso medido donde la tarjeta de resumen se hizo ancha y el bloque interno del gráfico se quedó angosto, dejando una franja vacía. Sin cambios de token ni de componente visual, así que `reglas-de-diseno.html` no se toca. |
 | 2.8.0 | 2026-09-28 | Documenta el toggletip de información (`.infob` + `.tip`, §6.23): un botón de icono que revela una aclaración corta en un globo, para las filas de ficha (§6.20) donde el texto no cabe siempre visible. Seis reglas, con dos correcciones que salieron de auditar la maqueta contra el propio sistema antes de aprobarla: el botón medía 20×20px y bajaba del suelo táctil de 24px que ya exige §7.3, y el `aria-controls` sin `aria-describedby` no garantiza que un lector de pantalla anuncie el texto señalado. Contraste verificado por cálculo, no a ojo: 15,2:1 / 13,9:1 el texto del globo, 4,8:1 / 5,5:1 el icono en reposo, en claro y oscuro. La regla 6 fija el límite: no sustituye al texto siempre visible de un dato protagonista (§8 sigue mandando ahí). Pendiente: `reglas-de-diseno.html` no tiene todavía la demo viva del componente — solo la fuente y la copia descargable lo documentan por ahora. |
+| 2.9.0 | 2026-09-29 | Dos reglas nuevas salidas de revisar Viáticos y Cuentas por cobrar contra el sistema. §6.11 (tabla densa) gana la regla 10: el identificador de fila (folio) no lleva color de enlace — va en `--text`, porque `--link` es para navegación fuera de tabla y la fila entera, no el texto verde, es la zona pulsable. §6.12 gana la regla 9: la razón de un estado (justificación de un excedente, motivo de un rechazo) no vive como texto libre en la celda — rompe la altura uniforme de la fila —, va al detalle del registro. Sin cambios de token; `reglas-de-diseno.html` no se toca porque ninguna de las dos regla afecta una variable CSS ni un componente con demo propia en esta página. |

@@ -1178,6 +1178,13 @@ thead th:first-child{z-index:7}
 9. **Registros por página elegibles.** Un pie que fija seis registros sobre un padrón de 1.248
    obliga a pasar páginas para cualquier revisión. Selector de 10 / 25 / 50 / 100, recordado
    entre sesiones.
+10. **El identificador de fila no lleva color de enlace.** El folio —el `<th scope="row">` que
+    abre el detalle— no se pinta con `--link`: ese token es para navegación fuera de tabla
+    (migas, «Ver en Maps»). Dentro de una tabla la fila entera es la zona pulsable, y lo indica
+    el fondo al pasar el cursor (`tbody tr:hover td{background:var(--surface-2)}`), no el color
+    del texto — un identificador verde sugiere falsamente que es un enlace distinto al resto de
+    la fila, cuando toda la fila se comporta igual. El folio va en `--text`, igual que el resto
+    de la celda.
 
 **Modo tarjeta por debajo de 860px.** La tabla pasa a lista de tarjetas; cada celda muestra su
 rótulo desde `data-et`:
@@ -1209,7 +1216,7 @@ No se veía qué era resumen y qué era control.
 └────────────────────────────────────────────────────┘
 ```
 
-**Cinco reglas.**
+**Nueve reglas.**
 
 1. **Un filtro se resalta solo si su valor difiere del predeterminado.** «Tipo: Todos» aparecía
    con borde y fondo de filtro aplicado, y «Todos» no filtra nada. El resalte debe significar
@@ -1252,6 +1259,13 @@ No se veía qué era resumen y qué era control.
    así se presenta como lo que es — una cifra de lectura, sin `aria-pressed` ni cursor de puntero
    — nunca como un botón vacío. Se promueve a control real solo cuando existe el filtrado que lo
    respalda.
+9. **La razón de un estado va al detalle del registro, no a la celda.** En Viáticos, la
+   justificación de un excedente y el motivo de un rechazo vivían como texto libre dentro de la
+   celda de estado, con largo variable — una fila con motivo se volvía visiblemente más alta que
+   sus vecinas y la tabla dejaba de leerse como una grilla estable (mismo problema que §6.11,
+   regla 7, aplicado aquí a una celda de estatus en vez de a la celda principal). La celda se
+   queda con el estado (`.pill`); la razón completa se muestra al entrar al detalle del registro
+   desde su identificador de fila.
 
 ```css
 .resumen{display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center;
