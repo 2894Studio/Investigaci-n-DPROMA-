@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.9.0
+version: 2.10.0
 last_updated: 2026-09-29
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -1900,6 +1900,18 @@ lo primero que se encuentra quien viene a consultar un teléfono.
 La prueba: **si el texto explica una decisión, no va en pantalla.** Si explica una consecuencia
 para quien está mirando, sí — y en una frase.
 
+**Endurecimiento del criterio:** un texto se queda visible por defecto solo si condiciona la
+acción inmediata en esa pantalla. Lo que aclara una consecuencia sin bloquear nada ahora mismo
+pasa a un toggletip (§6.23) sobre el control relacionado, en vez de ocupar espacio permanente. Lo
+que es puro racional de diseño o educación sobre un caso que no aplica al registro visible, no va
+en la interfaz.
+
+| Nivel | Ejemplo | Dónde vive |
+|---|---|---|
+| Bloquea la acción ahora mismo | «Rubén Beltrán Ochoa no puede pedir un viático nuevo» | Visible siempre, en una frase |
+| Aclara una consecuencia, sin bloquear nada ahora | Qué pasa si un comprobante se rechaza | Toggletip sobre el control relacionado |
+| Racional de diseño o caso que no aplica aquí | Referencias a documentos internos | No va en la interfaz |
+
 ---
 
 ## 9. Andamiaje de maqueta
@@ -2384,4 +2396,4 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.6.2 | 2026-09-28 | Añade un caso real a §1.4 (series de gráfica): una barra de antigüedad de cartera pintada con `--ok`/`--warn`/`--block`/`--err` por tramo de tiempo en vez de `--serie-1`…`--serie-4`, con el antes/después completo. La regla de "una serie nunca reutiliza color de estado" ya existía; el hueco era no tener un ejemplo real citable, y por eso se pasó por alto al construir Cuentas por cobrar. Sin cambios de valor ni de regla. |
 | 2.7.0 | 2026-09-28 | Dos reglas nuevas salidas de rediseñar Cuentas por cobrar en maqueta. §6.12 gana la regla 7 —resumen arriba, buscador y filtros en una sola fila justo encima de la tabla, nunca el buscador suelto por su cuenta— y la regla 8 —un control con `aria-pressed`/`data-activo` tiene que interactuar de verdad o presentarse como cifra de lectura, no fingir ser un filtro sin filtrado detrás; era el caso de los cuatro `.schip` originales de la pantalla, que no tenían ni un solo listener detrás. §6.3 gana una cuarta advertencia: si la tarjeta crece, su contenido crece con ella —`flex:1`, nunca un `max-width` heredado del layout anterior—, a partir del caso medido donde la tarjeta de resumen se hizo ancha y el bloque interno del gráfico se quedó angosto, dejando una franja vacía. Sin cambios de token ni de componente visual, así que `reglas-de-diseno.html` no se toca. |
 | 2.8.0 | 2026-09-28 | Documenta el toggletip de información (`.infob` + `.tip`, §6.23): un botón de icono que revela una aclaración corta en un globo, para las filas de ficha (§6.20) donde el texto no cabe siempre visible. Seis reglas, con dos correcciones que salieron de auditar la maqueta contra el propio sistema antes de aprobarla: el botón medía 20×20px y bajaba del suelo táctil de 24px que ya exige §7.3, y el `aria-controls` sin `aria-describedby` no garantiza que un lector de pantalla anuncie el texto señalado. Contraste verificado por cálculo, no a ojo: 15,2:1 / 13,9:1 el texto del globo, 4,8:1 / 5,5:1 el icono en reposo, en claro y oscuro. La regla 6 fija el límite: no sustituye al texto siempre visible de un dato protagonista (§8 sigue mandando ahí). Pendiente: `reglas-de-diseno.html` no tiene todavía la demo viva del componente — solo la fuente y la copia descargable lo documentan por ahora. |
-| 2.9.0 | 2026-09-29 | Dos reglas nuevas salidas de revisar Viáticos y Cuentas por cobrar contra el sistema. §6.11 (tabla densa) gana la regla 10: el identificador de fila (folio) no lleva color de enlace — va en `--text`, porque `--link` es para navegación fuera de tabla y la fila entera, no el texto verde, es la zona pulsable. §6.12 gana la regla 9: la razón de un estado (justificación de un excedente, motivo de un rechazo) no vive como texto libre en la celda — rompe la altura uniforme de la fila —, va al detalle del registro. Sin cambios de token; `reglas-de-diseno.html` no se toca porque ninguna de las dos regla afecta una variable CSS ni un componente con demo propia en esta página. |
+| 2.10.0 | 2026-09-29 | Tres reglas salidas de revisar Viáticos, Viático detalle, Cuentas por cobrar, Padrón de clientes y Editar cliente contra el sistema. §6.11 (tabla densa) gana la regla 10: el identificador de fila (folio) no lleva color de enlace — va en `--text`, porque `--link` es para navegación fuera de tabla y la fila entera, no el texto verde, es la zona pulsable. §6.12 gana la regla 9: la razón de un estado no vive como texto libre en la celda — va al detalle del registro. §8 (voz de producto) endurece su criterio a tres niveles: lo que bloquea una acción ahora se queda visible en una frase, lo que aclara una consecuencia sin bloquear nada pasa a un toggletip (§6.23) sobre el control relacionado, y el racional de diseño o la educación sobre un caso que no aplica al registro visible no va en la interfaz. Sin cambios de token; `reglas-de-diseno.html` no se toca porque ninguna de las tres reglas afecta una variable CSS ni un componente con demo propia en esta página. |

@@ -1898,6 +1898,27 @@ lo primero que se encuentra quien viene a consultar un teléfono.
 La prueba: **si el texto explica una decisión, no va en pantalla.** Si explica una consecuencia
 para quien está mirando, sí — y en una frase.
 
+**Endurecimiento del criterio, tras auditar Viáticos, Viático detalle, Cuentas por cobrar,
+Padrón de clientes y Editar cliente:** un texto se queda visible por defecto solo si es una
+instrucción o restricción que condiciona la acción inmediata en esa pantalla — no basta con que
+sea cierto o correcto. Quedan fuera, aunque sean ciertos: el racional de por qué se diseñó algo
+así (con o sin referencia a un documento del proyecto — encontramos una nota que citaba
+`docs/patron-dialogo-sio-dproma.md` directamente en la interfaz), la mecánica general de cómo
+funciona una función («el desglose baja tres niveles: marca › grupo › agencia»), y la educación
+sobre un caso que no aplica al registro que se está viendo (un aviso de «un comprobante rechazado
+no se borra» en un registro sin ningún comprobante rechazado).
+
+Eso no significa que la información desaparezca cuando sigue siendo relevante para *algún*
+momento de esa pantalla, solo que deja de ocupar espacio permanente: pasa a un toggletip (§6.23)
+sobre el elemento al que se refiere — la cabecera de columna, el campo, el banner. La regla
+completa entonces tiene tres niveles, no dos:
+
+| Nivel | Ejemplo | Dónde vive |
+|---|---|---|
+| Bloquea la acción ahora mismo | «Rubén Beltrán Ochoa no puede pedir un viático nuevo» | Visible siempre, en una frase |
+| Aclara una consecuencia, pero no bloquea nada en este momento | Qué pasa si un comprobante se rechaza; qué falta si no hay los dos documentos | Toggletip sobre el control o columna relacionada |
+| Explica por qué se diseñó así, o educa sobre un caso que no aplica aquí | Referencias a documentos internos, mecánica general de un componente | No va en la interfaz |
+
 ---
 
 ## 9. Andamiaje de maqueta
