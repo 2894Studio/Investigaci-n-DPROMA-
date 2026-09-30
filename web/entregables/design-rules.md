@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.4.1
-last_updated: 2026-09-17
+version: 2.13.1
+last_updated: 2026-09-30
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -61,8 +61,11 @@ tabla. Gobierna todo el color, así que vive aquí.
 | `--bg` | `#F2F5F7` | `#10161F` | Fondo de página |
 | `--surface` | `#FAFCFD` | `#171F2C` | Superficie sólida (tarjetas, tablas, botones) |
 | `--surface-2` | `#E7EDF3` | `#1D2735` | Superficie secundaria (cabeceras, filas al pasar el cursor, filas inactivas, esqueleto) |
-| `--border` | `rgba(27,36,48,.14)` | `rgba(231,236,242,.12)` | Borde sutil |
-| `--border-2` | `rgba(27,36,48,.26)` | `rgba(231,236,242,.24)` | Borde de control interactivo |
+| `--border` | `rgba(27,36,48,.14)` | `rgba(231,236,242,.12)` | Borde sutil, decorativo |
+| `--border-2` | `rgba(27,36,48,.26)` | `rgba(231,236,242,.24)` | Borde de control interactivo (con relleno que ya lo identifica) |
+| `--border-fuerte` | `rgba(27,36,48,.52)` | `rgba(231,236,242,.4)` | Borde que carga información — ver criterio abajo |
+| `--border-ctrl` | `rgba(27,36,48,.5)` | `rgba(231,236,242,.37)` | Borde de control cuya única frontera es el borde (sin relleno propio) |
+| `--surface-hover` | `#DCE7E1` | `#203234` | Sobrevuelo de controles fuera del cromo — ver nota de auditoría abajo |
 | `--text` | `#1B2430` | `#E7ECF2` | Texto principal |
 | `--text-2` | `#4C5A6B` | `#A8B3C2` | Texto secundario |
 | `--text-3` | `#5C6675` | `#8B96A6` | Texto auxiliar |
@@ -93,6 +96,38 @@ saldarlo resultó que sí lo declara y lo usa en cinco sitios, así que llevaba 
 apunta con la medición que la justifica, no con una suposición sobre el archivo: la de arriba
 sobrevivió porque nadie volvió a abrirlo.
 
+**`--border`/`--border-2` nunca se habían medido contra el suelo de 3:1 de un elemento gráfico
+(§1.7).** El hallazgo es de DPROMA, midiendo administración vehicular y viáticos contra esta
+versión: el borde de control daba 1,68:1. No se sube el borde base — eso ensuciaría todas las
+divisiones decorativas que hoy funcionan bien — se añaden dos tokens nuevos para los dos casos
+reales que `--border`/`--border-2` mezclaban sin distinguir:
+
+- **`--border-ctrl`** (3,06:1 medido) — para el control cuya única frontera visible es el borde:
+  un input vacío, una tarjeta sin relleno propio. Ahí el borde *es* el dato de "esto es un
+  control", y tiene que cumplir como elemento gráfico.
+- **`--border-fuerte`** — para el borde que **carga información** en vez de solo decorar: el que
+  separa filas de una tabla densa (§6.11) o delimita una tarjeta de estado (§6.4). El criterio
+  para saber si un borde entra aquí es ejecutable, no de ojo: **se retira y se comprueba si el
+  dato deja de distinguirse.** Si sí, es informativo y necesita `--border-fuerte`; si no, se
+  queda en `--border`/`--border-2` sin tocar.
+
+El borde decorativo normal —el que separa una sección de otra sin que nada dependa de él— sigue
+en `--border`/`--border-2` exactamente como estaba; esto no es una subida general de contraste,
+es separar dos usos que compartían un token demasiado débil para uno de los dos.
+
+**Falta el tono de sobrevuelo fuera del cromo.** El botón y el ítem de menú fuera de la barra
+lateral reutilizan `--surface-2` para su estado `:hover`, que es el token de *fila inactiva*, no
+de *interacción* — por eso el cambio al pasar el cursor es casi imperceptible (1,146 y 1,099
+medidos en botones reales, contra 1,235 que sí logra `--chrome-hover` dentro del cromo, que tiene
+su propio tono dedicado desde §1.5). Hace falta un `--surface-hover` con el mismo criterio que ya
+usa el cromo — un tono perceptiblemente distinto de reposo, no un préstamo de un token que
+significa otra cosa. A diferencia de las demás piezas de esta ronda, esta no llegó con un valor
+ya medido por DPROMA, así que el valor se calculó igualando el criterio que sí confirmaron: el
+mismo contraste de 1,235 que logra `--chrome-hover` contra su fondo. `color-mix(in srgb, var(--accent)
+16%, var(--surface))` da `#DCE7E1` en claro (1,231:1 contra `--surface`); `color-mix(in srgb,
+var(--accent) 17%, var(--surface))` da `#203234` en oscuro (1,235:1 exacto). La página de reglas
+de diseño lleva una muestra viva para que se audite visualmente antes de darlo por definitivo.
+
 ### 1.2 Acción y marca
 
 | Token | Claro | Oscuro | Uso |
@@ -109,6 +144,31 @@ de estado invita a pulsarla.
 
 Un tercer color vive fuera de estos tokens porque es de marca, no de interfaz: `#C7D97B`
 (verde lima), en el wordmark y el anillo de foco sobre fondo oscuro. No se usa en controles.
+
+**El isotipo completo es esa misma familia, ampliada, y tiene que vivir fuera de los dos igual.**
+El gradiente de marca son siete paradas, más los tonos de la escena de fondo del acceso:
+
+| Token | Valor | Uso |
+|---|---|---|
+| `--marca-1` | `#0c361e` | Gradiente del isotipo, parada 1 (más oscura) |
+| `--marca-2` | `#12572b` | Gradiente del isotipo, parada 2 |
+| `--marca-3` | `#2e823d` | Gradiente del isotipo, parada 3 |
+| `--marca-4` | `#60a84b` | Gradiente del isotipo, parada 4 |
+| `--marca-5` | `#76b552` | Gradiente del isotipo, parada 5 |
+| `--marca-6` | `#a5c86a` | Gradiente del isotipo, parada 6 |
+| `--marca-7` | `#c7d97b` | Gradiente del isotipo, parada 7 — mismo valor que el verde lima de arriba |
+| `--marca-azul` | `#1E4E79` | Acento de la escena de fondo del acceso |
+| `--marca-halo` | `rgba(199,217,123,.35)` | Halo del isotipo en la escena de fondo |
+| `--marca-halo-suave` | `rgba(199,217,123,.5)` | Variante más tenue del halo |
+| `--marca-lienzo` | `#071120` | Fondo de la escena de marca del acceso |
+| `--marca-lienzo-ink` | `#f2f5f7` | Texto sobre `--marca-lienzo` |
+
+**Corrección de esta ronda, no token nuevo de criterio:** esta familia había quedado declarada
+dentro de los bloques de tema (`:root[data-theme="dark"]`, etc.), heredando sin querer la regla
+de "cada tema tiene su paleta" que sí aplica a `--bg`/`--surface`/`--accent`. Un logotipo no debe
+cambiar de color al cambiar de tema — es la misma regla que ya protegía al verde lima suelto de
+arriba, aplicada de forma incompleta. Se declara **una sola vez, fuera de cualquier bloque de
+tema**, y así queda verificado en los dos temas por DPROMA.
 
 ### 1.3 Semáforo — cinco estados, tres variantes cada uno
 
@@ -160,6 +220,33 @@ Contraste medido de cada `-ink` sobre su `-bg`, que es la combinación real de u
 verde, se leería como «agencias correctas». Estos colores existen justo para eso: para
 clasificar sin opinar. Se usan también en las etiquetas de tipo de cliente (§6.10).
 
+**Caso real, para que la regla no se vuelva a pasar por alto.** Una barra de antigüedad de
+cartera con cuatro tramos (0–30 / 31–60 / 61–90 / +90 días) se construyó así:
+
+```html
+<!-- ✗ Mal — antigüedad de cartera pintada con el semáforo de estado -->
+<i style="width:57%;background:var(--ok)"></i>
+<i style="width:23%;background:var(--warn)"></i>
+<i style="width:12%;background:var(--block)"></i>
+<i style="width:8%;background:var(--err)"></i>
+```
+
+Cuatro tramos de tiempo, ninguno es un estado — y aun así 0–30 días quedó en `--ok` («correcto»)
+y +90 en `--err` («error»). Es el ejemplo exacto que el párrafo de arriba usa para explicar por
+qué existe la regla, solo que con antigüedad de cartera en vez de «Agencias». La corrección no
+cambia el layout ni los porcentajes, solo la fuente del color:
+
+```html
+<!-- ✓ Bien — mismo componente, tramos de tiempo en --serie-1…4 -->
+<i style="width:57%;background:var(--serie-1)"></i>
+<i style="width:23%;background:var(--serie-2)"></i>
+<i style="width:12%;background:var(--serie-3)"></i>
+<i style="width:8%;background:var(--serie-4)"></i>
+```
+
+Con la leyenda repitiendo el mismo color junto al rango de días, nunca junto a la palabra
+«correcto» o «error».
+
 **Los dos colores anteriores no se distinguían entre sí.** `#2C6CA8` y `#7A5FA8` estaban
 medidos contra el fondo —5,35 y 5,06 en claro— pero nunca uno contra otro, que es la
 comparación que de verdad importa en una gráfica. Medidos entre sí dan **ΔE 1,1 en protanopia
@@ -185,6 +272,31 @@ contra `--surface` oscuro y validados ahí.
 
 Para reproducir cualquiera de estas cifras se usa el validador del método de visualización,
 no la estimación a ojo.
+
+**Las cinco comprobaciones de más arriba solo se corrieron sobre el peor par adyacente.** DPROMA
+midió combinaciones no consecutivas en el orden de asignación y encontró dos por debajo del suelo
+de ΔE 15: serie 1–4 en **12,6** y serie 1–3 en oscuro en **1,6** — este último, prácticamente
+indistinguible. La regla de validación se amplía: **cuando una gráfica o leyenda muestra más de
+dos series a la vez en pantalla, se mide cada combinación que realmente aparece junta**, no solo
+las consecutivas en el orden fijo de la regla 1. Un par que no llegue al suelo no se corrige
+subiendo el ΔE global —eso puede romper pares que hoy sí funcionan.
+
+**Resolución para serie 1–4 y serie 1–3 (oscuro).** No existe un catálogo de pantallas que
+garantice que estas dos combinaciones nunca coexisten en una misma gráfica, así que no se
+documentan como «no se muestran juntas» sin verificarlo pantalla por pantalla — sería una cifra
+inventada. En su lugar, la distinción se refuerza con un segundo canal, no solo color, cada vez
+que aparecen juntas:
+
+- **Línea:** una de las dos series lleva trazo discontinuo, la otra sólido.
+- **Barra o dona:** una de las dos series lleva una textura de rayas diagonales sobre su color de
+  relleno, la otra queda lisa.
+- **Leyenda:** repite el mismo patrón junto al nombre de la serie, no solo el color — si la barra
+  tiene rayas, el cuadro de la leyenda también las tiene.
+
+Ningún hex cambia — los cuatro slots de color de §1.4 se quedan igual. Es una regla de aplicación
+adicional, solo para estos dos pares concretos, la primera vez que compartan gráfica. Cualquier
+otro par que en el futuro se mida por debajo del suelo de ΔE 15 sigue el mismo criterio: se
+verifica si de verdad coexiste en alguna pantalla antes de decidir la corrección.
 
 ### 1.4.1 Tinta sobre relleno sólido de color
 
@@ -218,9 +330,19 @@ temas. Van aparte para que un cambio en las superficies del contenido no las arr
 | `--chrome-line` | `rgba(242,245,247,.14)` | `rgba(231,236,242,.10)` | Separadores dentro del cromo |
 | `--chrome-focus` | `#9FE0AE` | igual | Anillo de foco sobre fondo oscuro |
 | `--chrome-hover` / `--chrome-activo` | `rgba(255,255,255,.08)` / `.12` | igual | Estados del ítem de menú |
+| `--chrome-alerta` | `#C24238` | igual | Badge/contador de avisos sobre `--chrome` |
+| `--chrome-alerta-ink` | `#FAFCFD` | igual | Texto/icono sobre `--chrome-alerta` |
 
 El anillo de foco cambia de color dentro del cromo. `--accent` sobre `#1E4E79` no llega a 3:1;
 `--chrome-focus` sí. Es la única excepción a «el foco es idéntico en los dos temas».
+
+**Faltaba un color de alerta que funcionara sobre el cromo mismo.** Un contador de avisos que use
+el rojo de estado normal (`--err`) está pensado para caer sobre `--surface`/`--surface-2`, no
+sobre `--chrome` — DPROMA midió **1,00:1** en tema oscuro al reutilizarlo ahí, es decir,
+invisible. `--chrome-alerta` es un valor único que no cambia por tema, igual que `--chrome`
+mismo, porque su fondo (el cromo) tampoco cambia de familia entre temas — solo de tono dentro de
+la misma familia azul oscura. Se usa exclusivamente para badges/contadores que viven sobre
+`--chrome`; un aviso sobre `--surface` sigue usando el semáforo normal (§1.3).
 
 ### 1.6 Velos
 
@@ -261,15 +383,27 @@ dibujando foco, ningún descendiente suyo dibuja foco además.
 - **Marca:** `Michroma` / `Ethnocentric Rg` (`--font-brand`), solo para el wordmark
   «SIO-DPROMA» y el nombre «DPROMA». Nunca en texto de interfaz.
 
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
+**Las fuentes se autoalojan — `D116`.** Hasta esta ronda, esta sección prescribía un `<link>` a
+Google Fonts. Se retira: un CDN que no responde falla **en silencio** — la pantalla cae a
+`system-ui` sin ningún error visible, y el sistema de tipografía existe solo sobre el papel. Es
+exactamente lo que ya pasó una vez con Ethnocentric Rg desde su propio CDN, y DPROMA registró una
+incidencia real de **4 días sin detección** por el mismo motivo con Google Fonts. Con un archivo
+autoalojado la misma falla es un 404 visible en la pestaña de red, no una interfaz que se ve
+«rara» sin que nadie sepa por qué.
+
+```css
+@font-face{font-family:Inter;font-style:normal;font-weight:400 700;font-display:swap;
+  src:url(/fuentes/inter-variable.woff2) format("woff2")}
+@font-face{font-family:Michroma;font-style:normal;font-weight:400;font-display:swap;
+  src:url(/fuentes/michroma.woff2) format("woff2")}
 ```
 
-**Ese `<link>` no es opcional.** Las tres maquetas del padrón declaraban `--font-ui:'Inter'` y no
-cargaban ninguna fuente, así que se renderizaban en `system-ui` — el sistema de tipografía
-existía solo sobre el papel.
+**Ese `@font-face` no es opcional.** Las tres maquetas del padrón declaraban `--font-ui:'Inter'` y
+no cargaban ninguna fuente, así que se renderizaban en `system-ui` — el sistema de tipografía
+existía solo sobre el papel. La causa cambió (antes era un `<link>` ausente, ahora sería un
+`@font-face` ausente o una ruta rota) pero la comprobación es la misma: la fuente tiene que
+aparecer cargada de verdad en las herramientas de red del navegador, no asumirse por la
+declaración de `--font-ui` en el CSS.
 
 | Token | Tamaño | Uso |
 |---|---|---|
@@ -305,8 +439,8 @@ o cinco palabras que se leen una vez para orientarse, no datos.
 
 ## 3. Espaciado y radios
 
-Escala base de 4px. El nombre del token **no es el multiplicador** — es un identificador, no una
-fórmula a extrapolar sin mirar la tabla.
+Escala base de 4px. El nombre del token es un identificador, no el multiplicador — no hay
+fórmula que extrapolar sin mirar la tabla.
 
 ```css
 --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px;
@@ -560,6 +694,15 @@ jerarquía — la tarjeta dice «esto es un grupo aparte», y la tabla no lo es.
 tarjetas dentro de tarjetas: si un grupo necesita subgrupos, es una señal de que la pantalla
 tiene más de un objeto y conviene dividirla, no apilar tarjetas.
 
+**Si la tarjeta crece, su contenido crece con ella — nunca un `max-width` en el hijo.** Cuentas
+por cobrar hizo ancha la tarjeta de resumen (`.card.hero`) para ocupar el layout, pero el bloque
+interno con el número y el desglose por antigüedad conservó un `max-width` fijo pensado para el
+layout angosto anterior. Resultado: la tarjeta creció, el contenido de adentro no, y quedó una
+franja vacía a la derecha — la caja se alargó, no el gráfico. Un hijo que debe ocupar el ancho
+disponible de su tarjeta se declara con `flex:1` (o `width:100%` en grid), nunca con un
+`max-width` que sobrevivió a un rediseño de layout. Se comprueba midiendo el `getBoundingClientRect()`
+del hijo contra el de la tarjeta: si el hijo no llega al borde interior, algo lo está capando.
+
 ### 6.4 Vistas de estado de una pantalla
 
 Toda pantalla que pida datos tiene cuatro formas de presentarse: **con datos, cargando, vacía y
@@ -651,7 +794,7 @@ idéntico y además se respeta el §4 —el translúcido es de la pantalla de en
 El medallón se tiñe con `--err-fill`, no con el `--err-soft` del acceso, que fuera de esa pantalla
 no existe.
 
-**El medallón no es decoración: es lo que da peso al icono.** Sin él, el icono de estado acaba
+**El medallón carga el peso visual del icono.** Sin él, el icono de estado acaba
 siendo texto en `--text-3`, el gris más apagado del sistema, a 30px. Las cuatro maquetas del
 padrón llegaron así pese a que este apartado ya lo prescribía.
 
@@ -1042,6 +1185,11 @@ thead th:first-child{z-index:7}
 9. **Registros por página elegibles.** Un pie que fija seis registros sobre un padrón de 1.248
    obliga a pasar páginas para cualquier revisión. Selector de 10 / 25 / 50 / 100, recordado
    entre sesiones.
+10. **El identificador de fila no lleva color de enlace.** El folio —el `<th scope="row">` que
+    abre el detalle— no se pinta con `--link`: ese token es para navegación fuera de tabla
+    (migas, «Ver en Maps»). Dentro de una tabla la fila entera es la zona pulsable, y lo indica
+    el fondo al pasar el cursor, no el color del texto. El folio va en `--text`, igual que el
+    resto de la celda.
 
 **Modo tarjeta por debajo de 860px.** La tabla pasa a lista de tarjetas; cada celda muestra su
 rótulo desde `data-et`:
@@ -1073,7 +1221,7 @@ No se veía qué era resumen y qué era control.
 └────────────────────────────────────────────────────┘
 ```
 
-**Cinco reglas.**
+**Nueve reglas.**
 
 1. **Un filtro se resalta solo si su valor difiere del predeterminado.** «Tipo: Todos» aparecía
    con borde y fondo de filtro aplicado, y «Todos» no filtra nada. El resalte debe significar
@@ -1097,6 +1245,31 @@ No se veía qué era resumen y qué era control.
    píxeles uno del otro. El resumen se queda solo cuando responde a un criterio que **ningún**
    filtro de la barra cubre, y entonces se agrupa según la regla 3. Los conteos que aporta un
    resumen retirado no se pierden: viven en el tablero, que es la pantalla de lectura.
+7. **El orden fijo es resumen → buscador + filtros en una sola fila → tabla.** El buscador de
+   la pantalla (`.search`, «Buscar marca, grupo o agencia…») no es un tercer bloque suelto encima
+   del resumen ni de los filtros: es un control de la misma fila que los filtros, porque hace lo
+   mismo que ellos — acota qué filas de la tabla se ven — solo que por texto libre en vez de por
+   valor exacto. Puesto arriba, aislado, antes del resumen, parecía flotar sin relación con nada;
+   pegado a los filtros, la relación «esto controla la tabla de abajo» se lee sin leer una palabra,
+   por pura cercanía. El resumen, en cambio, no es un control — es lectura — y por eso encabeza la
+   pantalla: lo primero que se muestra es qué hay, luego con qué se acota, luego el detalle.
+   `.search` en esa fila usa `flex:1;min-width:200px` para no competir en rigidez con las
+   pastillas de filtro, y la fila entera lleva relleno vertical completo (`var(--sp-4)` arriba y
+   abajo, no solo arriba) — sin él, la fila se ve pegada al resumen y a la tabla a la vez, como si
+   no fuera su propia zona.
+8. **Un control con pinta de interactivo tiene que interactuar.** Un `.schip` o `.f` con
+   `aria-pressed`/`data-activo` promete que al pulsarlo pasa algo. Si en la maqueta no hay ni
+   siquiera un evento de clic que cambie el estado o filtre la tabla, el control miente por forma:
+   se ve pulsable y no lo es. En una maqueta de demostración sin lógica de filtrado real, un dato
+   así se presenta como lo que es — una cifra de lectura, sin `aria-pressed` ni cursor de puntero
+   — nunca como un botón vacío. Se promueve a control real solo cuando existe el filtrado que lo
+   respalda.
+9. **La razón de un estado va al detalle del registro, no a la celda.** La justificación de un
+   excedente o el motivo de un rechazo no viven como texto libre dentro de la celda de estado —
+   una fila con motivo quedaría visiblemente más alta que sus vecinas y la tabla dejaría de
+   leerse como una grilla estable (misma idea que §6.11, regla 7, aplicada a una celda de
+   estatus). La celda se queda con el estado (`.pill`); la razón completa se muestra al entrar al
+   detalle del registro desde su identificador de fila.
 
 ```css
 .resumen{display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center;
@@ -1356,11 +1529,17 @@ Un botón cuadrado sin texto, para acciones que se repiten en una fila o que viv
 donde una etiqueta escrita ocuparía más que la propia acción.
 
 ```css
-.iconbtn{width:36px;height:36px;border:1px solid var(--border);border-radius:var(--r-ctrl);
+.iconbtn{width:36px;height:36px;padding:0;border:1px solid var(--border);border-radius:var(--r-ctrl);
   display:grid;place-items:center;cursor:pointer;background:transparent;
   color:var(--text-2);flex-shrink:0}
 .iconbtn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
 ```
+
+**El `padding:0` no es cosmético — sin él, el icono queda descentrado en la variante de 28px.**
+Un `<button>` trae de fábrica el relleno del navegador (Chromium: `1px 6px`). A 36px sobra espacio
+y no se nota; a 28px ese relleno reduce la caja de contenido a menos que el icono (20px), y el
+motor de grid la centra sobre esa caja reducida, no sobre el botón completo. Medido en producción:
+7px de margen a la izquierda del icono contra 1px a la derecha, en vez de 4px y 4px.
 
 **Tres medidas, según dónde esté:**
 
@@ -1518,9 +1697,16 @@ página; un clic fuera cierra. El contenedor de pastillas abre con un texto solo
 —«Filtros aplicados: N»— y cada «×» dice qué quita, no solo «quitar»: en una fila de seis, seis
 botones «×» idénticos son indistinguibles al tabular (§6.19).
 
-**Un panel no es un modal.** No atrapa el foco ni oscurece la pantalla: es un menú de un control
-de la barra, y la tabla de detrás sigue siendo legible mientras se decide. Por eso lleva
+**Un panel es un menú de un control de la barra, no un modal** — no atrapa el foco ni oscurece
+la pantalla, y la tabla de detrás sigue siendo legible mientras se decide. Por eso lleva
 `role="group"` con su etiqueta y no `role="dialog"`.
+
+**Es el único componente para filtrar por un campo categórico con más de un valor posible.**
+La excepción legítima es filtrar sobre una condición booleana (sí/no): ahí el patrón correcto es
+un chip que se activa o no, no un desplegable de un solo valor booleano. Un patrón de un solo
+valor sin selección múltiple para un campo con varios valores posibles no es una excepción, es
+deuda pendiente de migrar a este componente — Padrón de clientes lo tuvo así (Tipo, Estado,
+Documentos, Actividad) hasta que migró a este componente, conservando los mismos cuatro campos.
 
 ---
 
@@ -1533,8 +1719,9 @@ producto ya tenía el vocabulario —«de toda la organización», «Vista de Ad
 pantalla del tablero salía cuatro veces: cuatro avisos de que falta algo, cuando no faltaba nada.
 Cuatro avisos falsos por pantalla desgastan el aviso de verdad.
 
-**El ámbito no es un estado.** Es un dato sobre el dato, así que pesa menos que todo lo demás de
-la pantalla: sin relleno, sin borde, icono y texto en tinta auxiliar.
+**El ámbito es un dato sobre el dato** —de qué conjunto habla una cifra, nunca un juicio sobre
+ella—, así que pesa menos que todo lo demás de la pantalla: sin relleno, sin borde, icono y
+texto en tinta auxiliar.
 
 ```css
 .ambito{display:inline-flex;align-items:center;gap:5px;
@@ -1560,6 +1747,66 @@ tablero diciendo cosas distintas con la misma cara:
 
 Y el corolario de la primera fila: **no se ofrece «ver la lista» de una lista que no se puede
 ver.** El tablero lo hace hoy en sus dos tarjetas sin alcance.
+
+---
+
+### 6.23 Toggletip de información (`.infob` + `.tip`)
+
+Una cifra a veces necesita una aclaración corta que no cabe como texto siempre visible sin
+desordenar la fila — el caso de la ficha de detalle (§6.20), donde cada dato vive en una sola
+línea `dt`/`dd`. El toggletip resuelve eso: un botón de información al final del número que, al
+activarse, revela la aclaración en un globo. No es un tooltip nativo (que aparece con el simple
+paso del ratón y no es operable por teclado ni táctil de forma fiable) — es un **toggletip**: se
+abre con clic o `Enter`/`Espacio`, se queda abierto hasta que se cierra a propósito, y por eso
+puede convivir con dedos y lectores de pantalla igual de bien que con el ratón.
+
+```html
+<dd class="tnum">$436,070
+  <button class="infob" type="button" aria-expanded="false"
+          aria-controls="tip-cerrado" aria-describedby="tip-cerrado"
+          aria-label="Más información sobre cerrado y sin facturar">
+    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-info"/></svg>
+  </button>
+  <span class="tip" id="tip-cerrado" role="tooltip" hidden>
+    No suma al $2,644,180 de por cobrar — son 9 órdenes sin facturar todavía.
+  </span>
+</dd>
+```
+
+```css
+.infob{width:24px;height:24px;padding:0;border:0;border-radius:50%;background:transparent;
+  color:var(--text-3);display:grid;place-items:center;cursor:pointer;flex-shrink:0}
+.infob:hover,.infob[aria-expanded="true"]{background:var(--surface-2);color:var(--text-2)}
+[data-tacto="dedo"] .infob{width:46px;height:46px}
+.tip{position:absolute;right:0;top:calc(100% + 6px);z-index:30;width:220px;max-width:60vw;
+  background:var(--text);color:var(--surface);font:500 11.5px/1.5 var(--font-ui);
+  border-radius:var(--r-ctrl);padding:var(--sp-2) var(--sp-3);box-shadow:var(--sh-float)}
+```
+
+**Seis reglas.**
+
+1. **`aria-describedby` va siempre puesto, no solo mientras está abierto.** Es lo que hace que un
+   lector de pantalla, al llegar al botón por tabulación, tenga acceso al texto de la aclaración
+   en cuanto se activa — sin `aria-describedby`, `aria-controls` por sí solo no garantiza que
+   ningún lector anuncie el contenido señalado, porque solo declara una relación, no la lee.
+2. **El destino táctil mide 24×24px como mínimo (§7.3), 46px en modo dedo.** Un botón de icono
+   más pequeño que eso es el error más fácil de cometer con un control de este tamaño visual —
+   el icono puede medir 14px, el botón nunca.
+3. **Se cierra con `Escape`, con clic fuera y al tabular hacia el siguiente control.** Las tres
+   salidas devuelven el foco de forma predecible; sin la tercera, tabular más allá del botón deja
+   un globo abierto flotando sobre contenido que ya no tiene foco, huérfano en pantalla.
+4. **Contraste verificado, no asumido:** el texto del globo (`--surface` sobre `--text`) da
+   15,2:1 en claro y 13,9:1 en oscuro; el icono en reposo (`--text-3` sobre `--surface`) da
+   4,8:1 en claro y 5,5:1 en oscuro — ambos muy por encima de los suelos de 4,5:1 (texto) y 3:1
+   (icono funcional, WCAG 1.4.11).
+5. **Un solo toggletip abierto a la vez en toda la pantalla.** Abrir uno cierra cualquier otro
+   que ya estuviera abierto — de lo contrario una fila de datos con varios `.infob` termina con
+   media pantalla cubierta de globos.
+6. **No sustituye al texto siempre visible cuando el dato es el protagonista de la pantalla.**
+   La cifra principal de un resumen (§6.12, el `.hero`) lleva su aclaración como texto corriente
+   debajo, no oculta detrás de un icono — el criterio de §8 sigue mandando: si la frase explica
+   una consecuencia para quien mira, va en pantalla; el toggletip es para cuando ese texto no
+   cabe sin romper una fila de ficha, no una forma de esconder texto que sí cabría.
 
 ---
 
@@ -1609,7 +1856,7 @@ principal de la pantalla o el uso es en campo o tableta.
 :root[data-tacto="dedo"] .btn{min-height:46px}
 ```
 
-**El `:root` no es adorno: es lo que hace que la regla gane.** Con `:root` delante, el selector
+**El `:root` es lo que hace ganar la regla.** Con `:root` delante, el selector
 suma (0,3,0); sin él se queda en (0,2,0) y lo empata cualquier variante de tamaño del propio
 componente —`.acciones .iconbtn{width:28px}`—, que al ir declarada después gana. La ficha de
 cliente lo escribió sin `:root` y, medido con el modo dedo activado, sus botones de fila seguían
@@ -1660,6 +1907,32 @@ lo primero que se encuentra quien viene a consultar un teléfono.
 La prueba: **si el texto explica una decisión, no va en pantalla.** Si explica una consecuencia
 para quien está mirando, sí — y en una frase.
 
+**Endurecimiento del criterio:** un texto se queda visible por defecto solo si condiciona la
+acción inmediata en esa pantalla. Lo que aclara una consecuencia sin bloquear nada ahora mismo
+pasa a un toggletip (§6.23) sobre el control relacionado, en vez de ocupar espacio permanente. Lo
+que es puro racional de diseño o educación sobre un caso que no aplica al registro visible, no va
+en la interfaz.
+
+| Nivel | Ejemplo | Dónde vive |
+|---|---|---|
+| Bloquea la acción ahora mismo | «Rubén Beltrán Ochoa no puede pedir un viático nuevo» | Visible siempre, en una frase |
+| Aclara una consecuencia, sin bloquear nada ahora | Qué pasa si un comprobante se rechaza | Toggletip sobre el control relacionado |
+| Racional de diseño o caso que no aplica aquí | Referencias a documentos internos | No va en la interfaz |
+
+**Corrección final, porque el criterio de arriba seguía dejando pasar texto.** Auditar cinco
+pantallas volvió a encontrar párrafos de más de 400 caracteres colgando de una `.banda` que ya
+tenía su instrucción en la primera frase. Cuatro reglas sin margen de interpretación:
+
+1. `.nota` y `.banda` llevan como máximo una frase. Una segunda oración que aclara, justifica o
+   da contexto se borra o pasa a un toggletip (§6.23) sobre el control al que se refiere.
+2. Ningún bloque de texto siempre visible pasa de ~140 caracteres — se mide con el contador de
+   caracteres, no a ojo.
+3. `.nota` no es un componente de explicación general: solo para el nivel 1 de la tabla de
+   arriba. Si el texto no bloquea nada ahora mismo, `.nota` es la clase equivocada aunque sea
+   cierto y breve.
+4. Se revisa al escribir el componente, no después: §11 gana el paso de releer cada
+   `.nota`/`.banda` nueva contra estas tres reglas antes de dar la pantalla por terminada.
+
 ---
 
 ## 9. Andamiaje de maqueta
@@ -1684,11 +1957,11 @@ Todo lo que lleve `data-andamio` se retira en la versión real. Un solo selector
 
 ---
 
-## 10. Nueve trampas comprobadas
+## 10. Diez trampas comprobadas
 
-No son teoría: las seis primeras aparecieron aplicando este documento al módulo de clientes, y
-las tres últimas revisando esta misma página. Todas se ven solo si se comprueba en el navegador,
-no leyendo la hoja de estilos.
+No son teoría: las seis primeras aparecieron aplicando este documento al módulo de clientes, las
+tres siguientes revisando esta misma página, y la décima auditando las pantallas de Viáticos y
+Padrón. Todas se ven solo si se comprueba en el navegador, no leyendo la hoja de estilos.
 
 **El tamaño se mide en el navegador, no en el CSS.** La regla de los 12px se puede burlar sin
 querer con la forma abreviada `font:`, donde el tamaño no aparece como `font-size`. Los avatares
@@ -1759,6 +2032,14 @@ declarados = {--x: en el <style>}
 usados - declarados  →  tiene que ser vacío
 ```
 
+**Un nombre de clase corto no se declara dos veces en el mismo archivo, ni se comparte entre dos
+componentes sin relación.** `.resumen` se usó a la vez para un `<span>` de encabezado y un
+`<section>` de chips de estado — un cambio pensado solo para el segundo rompió el primero en
+silencio. `.nota` y `.f` aparecieron duplicados en el mismo archivo sin haber roto nada visible
+todavía. Antes de escribir `.algo{...}` se busca si ya existe; si sí, la regla se añade a la
+declaración existente, o se usa un nombre más específico. Nombres de una sola palabra genérica
+(`.resumen`, `.nota`, `.f`, `.leg`, `.cg`) son los que más se repiten sin querer.
+
 ---
 
 ## 11. Checklist al añadir un componente nuevo
@@ -1800,6 +2081,8 @@ usados - declarados  →  tiene que ser vacío
 **Movimiento y voz**
 - ¿Toda animación que dure más de 5s se puede pausar pulsándola, sin botón aparte?
 - ¿El texto en pantalla dice qué se puede hacer, y no por qué se decidió así?
+- ¿Cada `.nota`/`.banda` nueva es una sola frase, bajo ~140 caracteres, y bloquea la acción
+  inmediata — no explica, no educa, no cita un documento? Si no, se borra o pasa a un toggletip.
 - ¿Lo que es andamiaje de maqueta lleva `data-andamio` y está rotulado?
 
 **Comprobado en el navegador, no solo leído** (§10)
@@ -2079,6 +2362,14 @@ tablero ya hace doscientos píxeles más abajo con «Nada en tu alcance». Es la
   §1.4. Un color de estado nunca se reutiliza como serie. **La regla completa está en §1**, que
   es donde gobierna todo el color: aquí queda solo su aplicación a las series. Mientras vivió
   únicamente en este capítulo, nadie la aplicó fuera de las gráficas.
+- **La regla de color por estado no depende de que la forma sea `.barra`.** Un reparto de un
+  total entre estados del semáforo sigue siendo eso mismo aunque se dibuje como una lista de
+  barras horizontales en vez de una sola barra segmentada — un valor por fila con su propio
+  `<rect>`, en vez de tramos dentro de la misma pieza. Medido en el Tablero real: el componente
+  `.grafica-barra` (una fila «Por estado» con Concluido/En dependencia/Documentos recibidos/
+  Recibido·sin admitir) pinta las cuatro filas con `fill:var(--accent)`, el mismo verde para las
+  cuatro — sin la regla de arriba, el color deja de decir nada y hay que leer la leyenda para
+  distinguir un estado de otro. La forma cambia; qué dato lleva juicio, no.
 
 ### 12.6 Composiciones de tablero
 
@@ -2105,6 +2396,73 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 
 ---
 
+## 13. Composición y grid
+
+Las doce secciones anteriores dicen cómo se ve cada pieza — un botón, una tabla, una pastilla.
+Esta dice cómo se ordenan varias piezas juntas en una pantalla: cuándo una columna cede su ancho,
+cuándo dos bloques deben cerrar a la misma altura y cuándo no, y qué pasa cuando el contenido de
+uno crece más que el del otro. Ocho reglas, con su demo viva en la página del sistema
+(`reglas-de-diseno.html#composicion`).
+
+### 13.1 Lectura → control → objeto
+
+El orden de una pantalla es fijo: primero lo que se lee (el resumen), luego lo que controla qué
+se ve (buscador + filtros), luego el objeto sobre el que se actúa (la tabla). El buscador va en
+la misma fila que los filtros, nunca en su propio bloque separado (§6.12, regla 7).
+
+### 13.2 Proporción de columna: tres casos, no dos
+
+- **px fijo** (`240px 1fr`) — la columna A nunca cambia. Para un panel lateral o un ícono de
+  tamaño constante.
+- **fr puro** (`1.6fr 1fr`) — reparto proporcional fijo. Para dos bloques que crecen juntos
+  manteniendo su proporción.
+- **fr acotado** (`minmax(0,1.6fr) minmax(300px,360px)`) — la columna B fluye entre un piso y un
+  techo. Para una barra lateral con contenido de ancho variable.
+
+### 13.3 Un contenedor no cede el ancho a un descendiente
+
+Si la tarjeta crece, su contenido crece con ella — `flex:1` en el hijo, nunca un `max-width`
+heredado de otro contexto. Es la misma regla que §6.3.
+
+### 13.4 Comparar exige igualar
+
+Por omisión, `align-items:start`: cada tarjeta a su alto real. `align-items:stretch` se reserva
+para un caso concreto: cuando las tarjetas sí se comparan entre sí — mismo criterio, mismo campo.
+Fuera de ese caso, obliga a las cortas a inventar relleno vacío.
+
+No cubre el caso de dos bloques que no se comparan pero deben cerrar a la misma altura — eso es
+13.8, con un mecanismo distinto.
+
+### 13.5 El mismo criterio de la 13.2, en fila
+
+Los mismos tres patrones (px fijo, fr puro, fr acotado) aplican en filas apiladas: una cabecera
+de alto fijo sobre contenido que fluye, dos paneles en proporción fija, o una lista que fluye
+junto a un resumen acotado.
+
+### 13.6 Un contenedor tampoco cede el alto a un descendiente
+
+Mismo problema que 13.3, en vertical: una columna con `height:auto` se queda con el alto de su
+propio contenido en vez de llenar el alto real que el layout le dio. Se usa `height:100%`.
+
+### 13.7 La cadena de `min-height:0`
+
+Un contenedor con scroll interno necesita `min-height:0` en cada eslabón de la cadena de
+ancestros hasta llegar al contenedor con scroll. El valor por omisión de `min-height` en un ítem
+flex es `auto` — basta que un solo eslabón lo incumpla para que el contenido empuje el marco
+hacia afuera en vez de hacer scroll dentro de él.
+
+### 13.8 Cierre garantizado, no por casualidad
+
+Distinta de 13.4: no es que dos columnas se comparen — es que dos columnas que no se comparan
+deben, aun así, terminar exactamente en el mismo punto, porque un cierre casi-pero-no-igual por
+coincidencia de contenido se lee peor que uno claramente distinto o uno garantizado. El mecanismo
+es otro: `stretch` en el contenedor y `flex:1` en el último bloque de la columna más corta, para
+que el cierre sea por construcción, no por longitud de contenido. Caso real: Viático detalle —
+columna principal y barra lateral no se comparan, medían a ~3px por casualidad; con `stretch` +
+`flex:1` los dos `bottom` quedan en el mismo pixel, siempre.
+
+---
+
 ## Historial de cambios
 
 | Versión | Fecha | Cambios |
@@ -2128,3 +2486,14 @@ dejaría ver el fondo del carril y parecería un cuarto valor.
 | 2.3.0 | 2026-09-16 | Añade la etiqueta de alcance (§6.22), la que dice de qué conjunto de datos habla una cifra: «de toda la organización», «nada en tu alcance». El producto ya usaba ese vocabulario, pero el sistema no tenía la pieza, así que se pintaba con el ámbar de aviso: cuatro avisos de que falta algo en una sola pantalla del tablero, cuando no faltaba nada. Ahora es neutra, y el alcance nunca usa los colores de estado. Distingue además dos casos que se veían igual: no tener permiso y tener permiso sobre un conjunto vacío. La regla de cuándo toca el semáforo y cuándo la paleta de categorías sube de §12.5 a §1, porque vivía en el capítulo de gráficas y nadie iba a buscarla para una etiqueta de tabla. Y §6.4 gana la restauración de sesión, con la salida por tiempo o por fallo que no existía. |
 | 2.4.0 | 2026-09-17 | Convierte en componente la fila de cifras del tablero (§12.4.1): esa fila de cajas con un número grande y su texto. El tablero ya la tenía, pero la había montado por su cuenta, y los textos caían a tres alturas distintas —hasta 34px— aunque las siete cajas midieran exactamente lo mismo. Ahora todas comparten la misma retícula, así que el número, el rótulo y la aclaración quedan a la misma altura lleve cada caja el mismo texto o no. Con cuatro reglas de uso: cuatro cajas por fila como máximo, cada fila es un grupo con nombre, la aclaración cabe en una línea, y un grupo entero a cero se dice en vez de pintarse. Las pruebas previas a publicarlo tumbaron dos decisiones propias: recortar la aclaración con puntos suspensivos dejaba el ejemplo documentado sin forma de leerse, y quitar el borde hacía desaparecer las cajas en el alto contraste del sistema. Corrige además tres fallos de esta misma página —las cuatro gráficas salían 80px más estrechas, los títulos escritos para lector de pantalla se estaban viendo y un desplegable se quedó sin flecha—, que quedan escritos como trampas en §10, que pasa de seis a nueve. Y §12.5 gana dos reglas de lectura: la serie y la cifra del mismo recuadro miden lo mismo y cuadran, y el dibujo reserva sitio para el grosor de su línea. |
 | 2.4.1 | 2026-09-17 | Reescribe en lenguaje llano las entradas de la 2.3.0 y la 2.4.0. Habían crecido hasta ser ilegibles —la de 2.4.0 ocupaba 5.569 caracteres frente a los 443 de la mediana— y repetían lo que ya dicen §12.4.1, §10 y §12.5, que es donde se busca el detalle; no se pierde nada, el porqué y las medidas siguen en esas secciones. La página gana además el apartado «Qué cambió», al principio y no al final, porque el historial vive abajo del todo y nadie baja hasta ahí para saber qué hay de nuevo. Sin cambios de valor ni de comportamiento. |
+| 2.5.3 | 2026-09-21 | Añade `--border-ctrl` (borde a 3:1 para controles sin relleno propio, §1.1), `--surface-hover` (sobrevuelo fuera del cromo, propuesto, §1.5), `--chrome-alerta`/`--chrome-alerta-ink` (§1.5), la familia `--marca-1`…`--marca-7` del isotipo (§1.2), tipografía autoalojada por `@font-face` (§2), y certificación de contraste entre pares de serie no adyacentes (§1.4). El pill de alcance y el botón "Actualizar" del Tablero se corrigen a la regla de color neutro (§6.22) y al suelo táctil de 36px (§6.2). |
+| 2.5.4 | 2026-09-24 | Fija `--surface-hover`: `#DCE7E1` en claro, `#203234` en oscuro (§1.5) — calculado para igualar el mismo contraste de 1,235 que ya logra `--chrome-hover`, el criterio con el que DPROMA confirmó que debía medirse. |
+| 2.5.5 | 2026-09-26 | Reescribe cinco pasajes (§3, §6.4, §6.19, §6.21, §6.22) que usaban la construcción "no es X, es Y". Sin cambios de regla ni de valor. |
+| 2.6.0 | 2026-09-26 | Resuelve los dos pares de serie que quedaban por debajo del suelo de ΔE 15 (§1.4): serie 1–4 y serie 1–3 en oscuro. Ningún hex cambia — en vez de forzar un nuevo ΔE global, que rompería pares que hoy sí funcionan, o de documentar sin verificarlo que esas combinaciones nunca coexisten, se añade un segundo canal de distinción (trazo discontinuo en línea, textura de rayas en barra/dona, repetida en la leyenda) para esos dos pares cuando comparten gráfica. |
+| 2.6.1 | 2026-09-28 | Corrige `.iconbtn` (§6.19): faltaba `padding:0`. Sin él, el relleno nativo del `<button>` reduce la caja de contenido por debajo del icono en la variante de 28px, y el icono queda descentrado (medido: 7px de margen a un lado, 1px al otro, en vez de 4px y 4px). Hallado auditando pantallas reales de Viáticos. |
+| 2.6.2 | 2026-09-28 | Añade un caso real a §1.4 (series de gráfica): una barra de antigüedad de cartera pintada con `--ok`/`--warn`/`--block`/`--err` por tramo de tiempo en vez de `--serie-1`…`--serie-4`, con el antes/después completo. La regla de "una serie nunca reutiliza color de estado" ya existía; el hueco era no tener un ejemplo real citable, y por eso se pasó por alto al construir Cuentas por cobrar. Sin cambios de valor ni de regla. |
+| 2.7.0 | 2026-09-28 | Dos reglas nuevas salidas de rediseñar Cuentas por cobrar en maqueta. §6.12 gana la regla 7 —resumen arriba, buscador y filtros en una sola fila justo encima de la tabla, nunca el buscador suelto por su cuenta— y la regla 8 —un control con `aria-pressed`/`data-activo` tiene que interactuar de verdad o presentarse como cifra de lectura, no fingir ser un filtro sin filtrado detrás; era el caso de los cuatro `.schip` originales de la pantalla, que no tenían ni un solo listener detrás. §6.3 gana una cuarta advertencia: si la tarjeta crece, su contenido crece con ella —`flex:1`, nunca un `max-width` heredado del layout anterior—, a partir del caso medido donde la tarjeta de resumen se hizo ancha y el bloque interno del gráfico se quedó angosto, dejando una franja vacía. Sin cambios de token ni de componente visual, así que `reglas-de-diseno.html` no se toca. |
+| 2.8.0 | 2026-09-28 | Documenta el toggletip de información (`.infob` + `.tip`, §6.23): un botón de icono que revela una aclaración corta en un globo, para las filas de ficha (§6.20) donde el texto no cabe siempre visible. Seis reglas, con dos correcciones que salieron de auditar la maqueta contra el propio sistema antes de aprobarla: el botón medía 20×20px y bajaba del suelo táctil de 24px que ya exige §7.3, y el `aria-controls` sin `aria-describedby` no garantiza que un lector de pantalla anuncie el texto señalado. Contraste verificado por cálculo, no a ojo: 15,2:1 / 13,9:1 el texto del globo, 4,8:1 / 5,5:1 el icono en reposo, en claro y oscuro. La regla 6 fija el límite: no sustituye al texto siempre visible de un dato protagonista (§8 sigue mandando ahí). Pendiente: `reglas-de-diseno.html` no tiene todavía la demo viva del componente — solo la fuente y la copia descargable lo documentan por ahora. |
+| 2.13.0 | 2026-09-30 | §8 (voz de producto) gana una corrección final: el criterio de tres niveles seguía dejando pasar texto porque era un juicio, no un límite. Ahora `.nota`/`.banda` llevan como máximo una frase, bajo ~140 caracteres, y solo cuando bloquean la acción inmediata — cualquier segunda oración, o cualquier texto que aclare/eduque/cite un documento, se borra o pasa a un toggletip (§6.23). `.nota` deja de ser un componente de explicación general. §11 gana el paso de releer cada `.nota`/`.banda` nueva contra estas reglas antes de dar la pantalla por terminada, en vez de encontrarlo en una auditoría posterior. §10 gana la décima trampa: un nombre de clase corto (`.resumen`, `.nota`, `.f`…) no se declara dos veces en el mismo archivo ni se comparte entre componentes sin relación — encontrado auditando Padrón, donde rompió en silencio el encabezado. §6.21 fija que es el único componente para filtrar por un campo categórico con más de un valor, salvo condiciones booleanas (chip, no desplegable); Padrón queda señalado como deuda pendiente de migrar. |
+| 2.13.1 | 2026-09-30 | Corrige la deuda que la 2.13.0 dejó señalada: Padrón de clientes migra sus cuatro botones de un solo valor (Tipo, Estado, Documentos, Actividad) al componente estándar de §6.21 — desplegable con buscador, casillas de selección múltiple y pastillas removibles con tope de cuatro, mismo motor que ya usan Trámites vehiculares y Viáticos. Mismos cuatro campos, sin cambio de alcance; ahora con filtrado real sobre las filas de la tabla. §6.21 y este historial actualizan la nota de deuda a migrado. |
+| 2.11.1 | 2026-09-29 | Cuatro reglas salidas de revisar Viáticos, Viático detalle, Cuentas por cobrar, Padrón de clientes y Editar cliente contra el sistema. §6.11 (tabla densa) gana la regla 10: el identificador de fila (folio) no lleva color de enlace — va en `--text`, porque `--link` es para navegación fuera de tabla y la fila entera, no el texto verde, es la zona pulsable. §6.12 gana la regla 9: la razón de un estado no vive como texto libre en la celda — va al detalle del registro. §8 (voz de producto) endurece su criterio a tres niveles: lo que bloquea una acción ahora se queda visible en una frase, lo que aclara una consecuencia sin bloquear nada pasa a un toggletip (§6.23) sobre el control relacionado, y el racional de diseño o la educación sobre un caso que no aplica al registro visible no va en la interfaz. Y se aprueba §13 Composición y grid, con sus ocho reglas —de la proporción de columna al orden lectura → control → objeto—, validadas contra pantallas reales; deja de estar marcada como borrador. 13.4 (comparar exige igualar) y 13.8 (cierre garantizado, no por casualidad) quedan como dos reglas separadas, con mecanismos distintos para dos preguntas distintas. |
