@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,arrow_downward,bolt,check_circle,close,confirmation_number,credit_card,dark_mode,dashboard,description,download,edit,error,expand_more,folder,group,inventory_2,light_mode,link,location_on,menu,more_horiz,pause_circle,receipt_long,refresh,schedule,search,shield,trending_up,view_column,visibility,warning&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,arrow_downward,bolt,check_circle,close,confirmation_number,credit_card,dark_mode,dashboard,description,download,edit,error,expand_more,folder,group,info,inventory_2,light_mode,link,location_on,menu,more_horiz,pause_circle,receipt_long,refresh,schedule,search,shield,trending_up,view_column,visibility,warning&display=block" rel="stylesheet">
 <style>
 :root{
 --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -365,11 +365,6 @@ main[id="contenido"]::after{content:"";display:block;flex-shrink:0;height:var(--
 .schip.c-pause{color:var(--pause-ink)} .schip.c-pause[aria-pressed="true"]{background:var(--pause-bg)}
 .schip.c-neutro{color:var(--text-2);border-style:dashed;border-color:var(--border-2)}
 .schip.c-neutro[aria-pressed="true"]{background:var(--surface-2);box-shadow:inset 0 0 0 1.5px var(--border-2),var(--sh-rest)}
-.f{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r-pill);padding:6px 12px;font-size:var(--fs-meta);color:var(--text-2);cursor:pointer}
-.f:hover{border-color:var(--border-2);color:var(--text)}
-.f b{color:var(--text)}
-.f[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
 .tabla-caja{min-width:0;overflow-x:auto;flex:none}
 table{width:100%;border-collapse:collapse;font-size:var(--fs-dense)}
 caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
@@ -389,7 +384,7 @@ thead th[aria-sort="ascending"] .sort,thead th[aria-sort="descending"] .sort{opa
 thead th[aria-sort="ascending"] .sort{transform:rotate(180deg)}
 tbody tr{transition:background-color var(--dur-micro) var(--ease-out)}
 tbody tr:hover td,tbody tr:hover th{background:var(--surface-2)}
-.folio{font-variant-numeric:tabular-nums;font-weight:600;color:var(--link);text-decoration:none;white-space:nowrap}
+.folio{font-variant-numeric:tabular-nums;font-weight:600;color:var(--text);text-decoration:none;white-space:nowrap}
 .folio:hover{text-decoration:underline}
 .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .dos{display:flex;flex-direction:column;gap:2px;line-height:1.35;white-space:normal;min-width:0}
@@ -526,32 +521,80 @@ tbody th:first-child::after,thead th:first-child::after{content:"";position:abso
 /* ARQ-FILTROS ─ El resumen y los filtros llegaron en la misma fila y con la
    misma forma de pastilla: no se distinguía qué era lectura y qué control.
    Son dos zonas (doc §6.12). */
-.resumen{display:flex;gap:var(--sp-6);padding:var(--sp-3) var(--sp-6) var(--sp-2);
-  align-items:flex-end;flex-wrap:wrap}
-.grupo-est{display:flex;flex-direction:column;gap:5px}
+section.resumen{display:grid;grid-template-columns:repeat(3,minmax(200px,1fr));gap:var(--sp-6);
+  padding:var(--sp-3) var(--sp-6) var(--sp-2);align-items:flex-end}
+@media (max-width:760px){section.resumen{grid-template-columns:1fr 1fr}}
+.grupo-est{display:flex;flex-direction:column;gap:5px;min-width:0}
 .grupo-est .et-est{font-size:10.5px;font-weight:700;letter-spacing:.09em;
   text-transform:uppercase;color:var(--text-3)}
 .grupo-est .chips{display:flex;gap:var(--sp-2);flex-wrap:wrap}
 .filtros{display:flex;gap:var(--sp-2);padding:var(--sp-2) var(--sp-6) var(--sp-3);
   align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--border)}
 .filtros .tools{margin-left:auto;display:flex;gap:var(--sp-2);align-items:center}
-.f{display:inline-flex;align-items:center;gap:6px;min-height:32px;background:var(--surface);
-  border:1px solid var(--border);border-radius:var(--r-pill);padding:6px 12px;
-  font-size:var(--fs-meta);color:var(--text-2);cursor:pointer}
+
+/* Barra de filtros con desplegable, buscador y selección múltiple (doc §6.21).
+   Migrado del patrón antiguo de 4 botones de un solo valor —deuda documentada
+   en §6.21 y §10— al motor estándar ya en uso en Viáticos y Trámites
+   vehiculares: mismo markup, mismo CSS, mismo JS, con los mismos cuatro
+   campos que ya se filtraban (Tipo, Estado, Documentos, Actividad). Los
+   nombres de clase se verificaron contra colisión (doc §10: la colisión
+   corta ya documentada) antes de introducirse. */
+.barra-filtros{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.fwrap{position:relative}
+.f{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-pill);padding:6px 10px 6px 12px;font-size:var(--fs-meta);color:var(--text-2);
+  cursor:pointer;min-height:32px}
 .f:hover{border-color:var(--border-2);color:var(--text)}
-.f b{color:var(--text)}
-/* Se resalta solo si filtra de verdad. «Tipo: Todos» venía resaltado como si
-   filtrara, y «Todos» no filtra nada: el resalte perdía su significado. */
+.f b{color:var(--text);font-weight:700}
+.f .cuantos{display:inline-grid;place-items:center;min-width:17px;height:17px;padding:0 4px;
+  border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:11px;line-height:1}
+.f .msi{color:var(--text-3);transition:transform .12s ease}
+@media (prefers-reduced-motion:reduce){.f .msi{transition:none}}
+.f[aria-expanded="true"] .msi{transform:rotate(180deg)}
+/* Se resalta solo si filtra de verdad: sin selección, sin resalte (§6.12, regla 1). */
 .f[data-activo="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
-.aplicados{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.aplicado{display:inline-flex;align-items:center;gap:4px;min-height:26px;padding:3px 4px 3px 10px;
-  border-radius:var(--r-pill);background:var(--accent-soft);color:var(--text);
-  font-size:var(--fs-meta);font-weight:600}
-.aplicado button{width:24px;height:24px;border:0;background:transparent;cursor:pointer;
-  color:var(--text-2);border-radius:50%;display:grid;place-items:center}
-.aplicado button:hover{background:var(--surface-2);color:var(--text)}
-.quitar-todos{background:transparent;border:0;color:var(--link);font:600 var(--fs-meta) var(--font-ui);
-  cursor:pointer;min-height:24px;padding:0 4px;border-radius:4px;text-decoration:underline}
+.f[data-activo="true"] .msi{color:var(--accent)}
+.f.fmas{border-style:dashed;color:var(--text-2)}
+.pop{position:absolute;z-index:60;top:calc(100% + 6px);left:0;width:268px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
+  box-shadow:var(--sh-modal);display:flex;flex-direction:column;overflow:hidden}
+.pop[hidden]{display:none}
+.pop-b{padding:var(--sp-2);border-bottom:1px solid var(--border)}
+.pop-b input{width:100%;border:1px solid var(--border);border-radius:var(--r-ctrl);background:var(--bg);
+  color:var(--text);font:500 var(--fs-dense) var(--font-ui);padding:7px 10px}
+.pop-b input::placeholder{color:var(--text-3)}
+.pop-l{list-style:none;margin:0;padding:var(--sp-1);max-height:232px;overflow-y:auto}
+.pop-l li label{display:flex;align-items:center;gap:var(--sp-2);padding:7px 8px;border-radius:var(--r-ctrl);
+  cursor:pointer;font-size:var(--fs-dense);color:var(--text);min-height:32px}
+.pop-l li label:hover{background:var(--surface-2)}
+.pop-l input[type="checkbox"]{width:16px;height:16px;accent-color:var(--accent);flex-shrink:0;margin:0}
+.pop-l .et{flex:1;min-width:0}
+.pop-l .n{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
+.pop-vacio{padding:var(--sp-4);text-align:center;color:var(--text-2);font-size:var(--fs-meta)}
+.pop-p{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);
+  padding:var(--sp-2) var(--sp-3);border-top:1px solid var(--border);background:var(--surface-2)}
+.pop-p .cuenta{font-size:var(--fs-meta);color:var(--text-2);font-variant-numeric:tabular-nums}
+.pop-menu li label{font-weight:600}
+.aplicados{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap;padding:0 var(--sp-6) var(--sp-3)}
+.aplicados[hidden]{display:none}
+@media (max-width:1280px){.aplicados{padding-left:var(--sp-4);padding-right:var(--sp-4)}}
+.fchip{display:inline-flex;align-items:center;gap:4px;background:var(--accent-soft);
+  border:1px solid var(--accent);border-radius:var(--r-pill);padding:4px 6px 4px 12px;
+  font-size:var(--fs-meta);color:var(--text)}
+.fchip .dim{color:var(--text-2)}
+.fx{appearance:none;-webkit-appearance:none;border:0;background:none;cursor:pointer;color:var(--text-2);
+  font-size:16px;line-height:1;border-radius:50%;width:24px;height:24px;min-width:24px;display:grid;place-items:center}
+.fx:hover{background:var(--surface);color:var(--text)}
+.fmaschips{appearance:none;-webkit-appearance:none;border:0;background:none;cursor:pointer;
+  color:var(--link);font-size:var(--fs-meta);font-weight:600;padding:4px;min-height:24px;border-radius:4px}
+.fmaschips:hover{text-decoration:underline}
+.fquitar{appearance:none;-webkit-appearance:none;border:0;background:none;cursor:pointer;
+  color:var(--link);font-size:var(--fs-meta);font-weight:600;padding:4px;min-height:24px;border-radius:4px}
+.fquitar:hover{text-decoration:underline}
+@media (pointer:coarse){[data-tacto="dedo"] .f,[data-tacto="dedo"] .fquitar,
+  [data-tacto="dedo"] .fmaschips,:root[data-tacto="dedo"] .pop-l li label{min-height:46px}
+  :root[data-tacto="dedo"] .fx{width:46px;height:46px}}
+@media (max-width:560px){.pop{width:min(268px,calc(100vw - var(--sp-8)))}}
 
 /* Menú de acciones de fila. Tres iconos sin etiqueta no se deducen (doc §6.14). */
 .menu-cont{position:relative;display:inline-flex}
@@ -777,6 +820,17 @@ main[data-state="loading"] .state-loading{display:flex}
   .pad .par .vs{order:-1}
   .pad .par .der{margin-left:0}
 }
+.tip-anchor{position:relative;display:inline-flex;align-items:center;gap:2px}
+.infob{width:24px;height:24px;padding:0;border:0;border-radius:50%;background:transparent;
+  color:var(--text-3);display:grid;place-items:center;cursor:pointer;flex-shrink:0}
+.infob:hover,.infob[aria-expanded="true"]{background:var(--surface-2);color:var(--text-2)}
+.infob .msi{font-size:14px}
+[data-tacto="dedo"] .infob{width:46px;height:46px}
+.tip{position:absolute;left:0;top:calc(100% + 6px);z-index:30;width:230px;max-width:70vw;
+  background:var(--text);color:var(--surface);font:500 11.5px/1.5 var(--font-ui);
+  font-variant-numeric:normal;text-align:left;white-space:normal;text-transform:none;letter-spacing:normal;
+  border-radius:var(--r-ctrl);padding:var(--sp-2) var(--sp-3);box-shadow:var(--sh-float)}
+.tip::before{content:"";position:absolute;left:8px;bottom:100%;border:5px solid transparent;border-bottom-color:var(--text)}
 </style>
 </head>
 <body>
@@ -797,7 +851,6 @@ main[data-state="loading"] .state-loading{display:flex}
 </header><div class="main">
 <div class="p4">
 <div class="p4-t"><h1>Padrón de clientes</h1><span class="resumen"><b>1,248</b> clientes · <b>214</b> razones sociales con dos o más sucursales</span><div class="acc"><button class="iconbtn" type="button" aria-label="Exportar"><span class="msi" aria-hidden="true" translate="no">download</span></button><span class="menu-cont"><button class="btn" type="button" id="bt-col" aria-haspopup="dialog" aria-expanded="false" aria-controls="panel-col"><span class="msi msi-sm" aria-hidden="true" translate="no">view_column</span>Columnas</button><div class="panel-col" id="panel-col" hidden><h3 id="h-col">Columnas de la tabla</h3><div role="group" aria-labelledby="h-col"><label><input type="checkbox" data-col="tipo" checked> Tipo</label><label><input type="checkbox" data-col="sucursales" checked> Sucursales</label><label><input type="checkbox" data-col="documentos" checked> Documentos fiscales</label><label><input type="checkbox" data-col="movimiento" checked> Último movimiento</label><label><input type="checkbox" data-col="comercial" checked> Comercial</label></div></div></span><button class="btn p" type="button"><span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Nuevo cliente</button></div></div>
-<div class="p4-b"><label class="search" for="buscar"><span class="msi msi-sm" aria-hidden="true" translate="no">search</span><input id="buscar" type="search" placeholder="Buscar por razón social o RFC…" aria-label="Buscar en el padrón de clientes"></label></div>
 <!-- Resumen: se lee. Los cuatro contadores respondían a preguntas distintas
      —expediente, actividad, estado— y se presentaban iguales, así que parecían
      cuatro valores del mismo campo (hallazgo 2.4). -->
@@ -819,16 +872,14 @@ main[data-state="loading"] .state-loading{display:flex}
      el filtro de aquí: el estado del filtro vive en un solo sitio (hallazgo 1.5). -->
 <section class="filtros" aria-labelledby="h-filtros">
 <h2 class="sr" id="h-filtros">Filtros</h2>
-<button class="f" type="button" data-filtro="tipo" data-def="Todos" data-activo="false" aria-haspopup="listbox">Tipo: <b>Todos</b><span class="msi msi-xs" aria-hidden="true" translate="no">expand_more</span></button>
-<button class="f" type="button" data-filtro="estado" data-def="Todos" data-activo="false" aria-haspopup="listbox">Estado: <b>Todos</b><span class="msi msi-xs" aria-hidden="true" translate="no">expand_more</span></button>
-<button class="f" type="button" data-filtro="documentos" data-def="Todos" data-activo="false" aria-haspopup="listbox">Documentos: <b>Todos</b><span class="msi msi-xs" aria-hidden="true" translate="no">expand_more</span></button>
-<button class="f" type="button" data-filtro="actividad" data-def="Toda" data-activo="false" aria-haspopup="listbox">Actividad: <b>Toda</b><span class="msi msi-xs" aria-hidden="true" translate="no">expand_more</span></button>
-<span class="aplicados" id="aplicados"></span>
-<button class="quitar-todos" type="button" id="quitar-filtros" hidden>Quitar todos los filtros</button>
+<label class="search" for="buscar" style="flex:1;min-width:200px;max-width:280px"><span class="msi msi-sm" aria-hidden="true" translate="no">search</span><input id="buscar" type="search" placeholder="Buscar por razón social o RFC…" aria-label="Buscar en el padrón de clientes"></label>
+<div class="barra-filtros" id="filtros" role="group" aria-label="Filtros"></div>
 <div class="tools">
 <span class="aviso-col" id="aviso-col" hidden><span class="msi msi-xs" aria-hidden="true" translate="no">view_column</span><span id="aviso-col-txt"></span></span>
 </div>
 </section>
+<div class="aplicados" id="aplicados" hidden></div>
+<p id="anuncio-filtros" role="status" aria-live="polite" class="sr"></p>
 </div><main id="contenido" data-state="ok" tabindex="-1">
 <div class="state-ok "><div class="pad">
 
@@ -866,12 +917,12 @@ main[data-state="loading"] .state-loading{display:flex}
 <th scope="col" aria-sort="none" class="col-razon"><span class="selcab"><label class="casilla"><input type="checkbox" id="selall" aria-label="Seleccionar todos los clientes de esta página"></label><button data-c="0" data-t="text">Razón social / RFC<span class="msi sort" aria-hidden="true" translate="no">arrow_downward</span></button></span></th>
 <th scope="col" class="col-tipo">Tipo</th>
 <th scope="col" class="col-sucursales">Sucursales</th>
-<th scope="col" class="col-documentos">Documentos fiscales</th>
+<th scope="col" class="col-documentos"><span class="tip-anchor">Documentos fiscales<button class="infob" type="button" aria-expanded="false" aria-controls="tip-docs" aria-describedby="tip-docs" aria-label="Más información sobre documentos fiscales"><span class="msi" aria-hidden="true" translate="no">info</span></button><span class="tip" id="tip-docs" role="tooltip" hidden>Sin los dos documentos, un cliente se da de alta y se consulta, pero no se le puede programar una instalación ni facturarle. «Sin calcular» no es «faltan»: es que el servidor no pudo resolverlo todavía.</span></span></th>
 <th scope="col" aria-sort="descending" class="col-movimiento"><button data-c="4" data-t="num">Último movimiento<span class="msi sort" aria-hidden="true" translate="no">arrow_downward</span></button></th>
 <th scope="col" class="col-comercial">Comercial</th>
 <th scope="col"><span class="sr">Acciones</span></th>
 </tr></thead>
-<tbody><tr data-selected="true">
+<tbody><tr data-selected="true" data-tipo="agencia" data-estado="activo" data-documentos="completos" data-actividad="activa">
 <th scope="row" data-et="Razón social / RFC"><span class="selfila"><label class="casilla"><input type="checkbox" class="rowsel" checked aria-label="Seleccionar Grupo Automotriz Vértice"></label><span class="rz"><b translate="no">Grupo Automotriz Vértice</b><small translate="no">GAV-940312-K71</small></span></span></th>
 <td class="col-tipo" data-et="Tipo"><span class="p-type p-s1">Agencia</span></td>
 <td class="col-sucursales" data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="false" aria-controls="suc-gav" aria-label="Ver las 4 sucursales de Grupo Automotriz Vértice"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>4<span class="msi msi-xs chev" aria-hidden="true" translate="no">expand_more</span></button></td>
@@ -890,7 +941,7 @@ main[data-state="loading"] .state-loading{display:flex}
 <span class="der"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Puede recibir órdenes</span><button class="btn mini" type="button">Ver órdenes</button></span></li>
 </ul>
 </div></td>
-</tr><tr data-selected="true">
+</tr><tr data-selected="true" data-tipo="empresa" data-estado="activo" data-documentos="falta1" data-actividad="activa">
 <th scope="row" data-et="Razón social / RFC"><span class="selfila"><label class="casilla"><input type="checkbox" class="rowsel" checked aria-label="Seleccionar Comercializadora Vértice del Bajío"></label><span class="rz"><b translate="no">Comercializadora Vértice del Bajío</b><small translate="no">CVB-880125-3B2</small></span></span></th>
 <td class="col-tipo" data-et="Tipo"><span class="p-type p-s2">Empresa</span></td>
 <td class="col-sucursales" data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="false" aria-controls="suc-cvb" aria-label="Ver las 2 sucursales de Comercializadora Vértice del Bajío"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>2<span class="msi msi-xs chev" aria-hidden="true" translate="no">expand_more</span></button></td>
@@ -906,7 +957,7 @@ main[data-state="loading"] .state-loading{display:flex}
 <li><span class="nom"><b translate="no">León · Guanajuato</b><span>Av. López Mateos 3020, 37530 León, Gto.</span></span><span class="der"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Puede recibir órdenes</span><button class="btn mini" type="button">Ver órdenes</button></span></li>
 </ul>
 </div></td>
-</tr><tr>
+</tr><tr data-tipo="empresa" data-estado="activo" data-documentos="porvencer" data-actividad="activa">
 <th scope="row" data-et="Razón social / RFC"><span class="selfila"><label class="casilla"><input type="checkbox" class="rowsel" aria-label="Seleccionar Autotransportes Cerro Azul"></label><span class="rz"><b translate="no">Autotransportes Cerro Azul</b><small translate="no">ACA-020618-QX0</small></span></span></th>
 <td class="col-tipo" data-et="Tipo"><span class="p-type p-s2">Empresa</span></td>
 <td class="col-sucursales" data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="false" aria-controls="suc-aca" aria-label="Ver la sucursal de Autotransportes Cerro Azul"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>1<span class="msi msi-xs chev" aria-hidden="true" translate="no">expand_more</span></button></td>
@@ -921,7 +972,7 @@ main[data-state="loading"] .state-loading{display:flex}
 <li><span class="nom"><b translate="no">Matriz · Poza Rica</b><span>Carr. Poza Rica–Tuxpan km 4, 93230 Poza Rica, Ver.</span></span><span class="der"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Puede recibir órdenes</span><button class="btn mini" type="button">Ver órdenes</button></span></li>
 </ul>
 </div></td>
-</tr><tr>
+</tr><tr data-tipo="persona" data-estado="activo" data-documentos="completos" data-actividad="activa">
 <th scope="row" data-et="Razón social / RFC"><span class="selfila"><label class="casilla"><input type="checkbox" class="rowsel" aria-label="Seleccionar Laura Núñez Peralta"></label><span class="rz"><b translate="no">Laura Núñez Peralta</b><small translate="no">NUPL-910403-MN4</small></span></span></th>
 <td class="col-tipo" data-et="Tipo"><span class="p-type p-s0">Persona física</span></td>
 <td class="col-sucursales" data-et="Sucursales"><span class="pill p-neutro">Sin sucursales</span></td>
@@ -929,7 +980,7 @@ main[data-state="loading"] .state-loading{display:flex}
 <td class="col-movimiento" data-et="Último movimiento" data-v="2026-07-20"><span class="mov"><b>20 jul 2026</b><small>Instalación cerrada</small></span></td>
 <td class="col-comercial" data-et="Comercial"><span class="pill p-ok"><span class="msi msi-xs" aria-hidden="true" translate="no">check_circle</span>Activo</span></td>
 <td data-et="Acciones"><div class="acciones"><button class="iconbtn" type="button" title="Ver ficha" aria-label="Ver ficha de Laura Núñez Peralta"><span class="msi msi-sm" aria-hidden="true" translate="no">visibility</span></button><span class="menu-cont"><button class="iconbtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="m-laura-nunez-peralta" title="Más acciones" aria-label="Más acciones para Laura Núñez Peralta"><span class="msi msi-sm" aria-hidden="true" translate="no">more_horiz</span></button><div class="menu" id="m-laura-nunez-peralta" role="menu" hidden><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">edit</span>Editar cliente</button><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">receipt_long</span>Ver órdenes</button><button type="button" role="menuitem"><span class="msi msi-sm" aria-hidden="true" translate="no">link</span>Reenviar liga de registro</button><hr><button type="button" role="menuitem" class="destructiva" data-desactivar="Laura Núñez Peralta"><span class="msi msi-sm" aria-hidden="true" translate="no">pause_circle</span>Cambiar a inactivo</button></div></span></div></td>
-</tr><tr>
+</tr><tr data-tipo="agencia" data-estado="activo" data-documentos="faltan2" data-actividad="inactiva90">
 <th scope="row" data-et="Razón social / RFC"><span class="selfila"><label class="casilla"><input type="checkbox" class="rowsel" aria-label="Seleccionar Refaccionaria del Altiplano"></label><span class="rz"><b translate="no">Refaccionaria del Altiplano</b><small translate="no">RDA-970214-8H1</small></span></span></th>
 <td class="col-tipo" data-et="Tipo"><span class="p-type p-s1">Agencia</span></td>
 <td class="col-sucursales" data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="false" aria-controls="suc-rda" aria-label="Ver las 3 sucursales de Refaccionaria del Altiplano"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>3<span class="msi msi-xs chev" aria-hidden="true" translate="no">expand_more</span></button></td>
@@ -946,7 +997,7 @@ main[data-state="loading"] .state-loading{display:flex}
 <li><span class="nom"><b translate="no">Aguascalientes</b><span>Av. Aguascalientes Sur 601, 20328 Aguascalientes, Ags.</span></span><span class="der"><span class="pill p-warn"><span class="msi msi-xs" aria-hidden="true" translate="no">schedule</span>Bloqueada: faltan documentos</span><button class="btn mini" type="button">Ver órdenes</button></span></li>
 </ul>
 </div></td>
-</tr><tr>
+</tr><tr data-tipo="empresa" data-estado="inactivo" data-documentos="sincalcular" data-actividad="inactiva90">
 <th scope="row" data-et="Razón social / RFC"><span class="selfila"><label class="casilla"><input type="checkbox" class="rowsel" aria-label="Seleccionar Distribuidora Peña y Asociados"></label><span class="rz"><b translate="no">Distribuidora Peña y Asociados</b><small translate="no">DPA-051108-P44</small></span></span></th>
 <td class="col-tipo" data-et="Tipo"><span class="p-type p-s2">Empresa</span></td>
 <td class="col-sucursales" data-et="Sucursales"><button class="suc-btn" type="button" aria-expanded="false" aria-controls="suc-dpa" aria-label="Ver la sucursal de Distribuidora Peña y Asociados"><span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>1<span class="msi msi-xs chev" aria-hidden="true" translate="no">expand_more</span></button></td>
@@ -965,12 +1016,6 @@ main[data-state="loading"] .state-loading{display:flex}
 </div>
 
 <div class="tfoot"><span>Mostrando <b class="tnum" id="rango">1–25</b> de <b class="tnum">1,248</b> · orden: movimiento más reciente primero</span><span class="por-pagina"><label for="porpag">Por página</label><select id="porpag"><option>10</option><option selected>25</option><option>50</option><option>100</option></select></span><div class="pag"><button type="button">‹ Anteriores</button><button type="button" aria-current="page">1</button><button type="button">2</button><button type="button">3</button><button type="button">Siguientes ›</button></div></div>
-
-<p class="nota"><span class="msi" aria-hidden="true" translate="no">shield</span><span>Sin los dos documentos, un cliente se da de alta y se consulta, pero <b>no se le puede programar una instalación ni facturarle</b>. Se miden de la razón social, no de la sucursal.</span></p>
-
-<p class="nota"><span class="msi" aria-hidden="true" translate="no">warning</span><span><b>«Sin calcular» no es «faltan».</b> Cuando el servidor no puede resolver si los documentos están, lo dice en vez de suponerlo.</span></p>
-
-<p class="nota"><span class="msi" aria-hidden="true" translate="no">view_column</span><span>Las columnas se encienden y apagan desde <b>«Columnas»</b>. Ocultar no es quitar: el dato sigue en la ficha del cliente.</span></p>
 
 </div></div>
 <div class="state-loading sk sk-tabla" role="status" aria-label="Cargando el padrón de clientes"><div class="sk-fila sk-cab" style="grid-template-columns:23.4fr 11fr 11.3fr 20.8fr 15.6fr 9.9fr 94px"><span class="skel" style="width:62%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:60%"></span><span class="skel" style="width:66%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:52%"></span><span class="skel" style="width:40%"></span></div><div class="sk-fila" style="grid-template-columns:23.4fr 11fr 11.3fr 20.8fr 15.6fr 9.9fr 94px"><span class="celda"><span class="skel" style="width:88%"></span><span class="skel" style="width:52%;height:9px"></span></span><span class="skel" style="width:62%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:70%"></span><span class="skel" style="width:82%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:70%"></span></div><div class="sk-fila" style="grid-template-columns:23.4fr 11fr 11.3fr 20.8fr 15.6fr 9.9fr 94px"><span class="celda"><span class="skel" style="width:72%"></span><span class="skel" style="width:48%;height:9px"></span></span><span class="skel" style="width:55%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:52%"></span><span class="skel" style="width:68%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:70%"></span></div><div class="sk-fila" style="grid-template-columns:23.4fr 11fr 11.3fr 20.8fr 15.6fr 9.9fr 94px"><span class="celda"><span class="skel" style="width:92%"></span><span class="skel" style="width:56%;height:9px"></span></span><span class="skel" style="width:62%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:64%"></span><span class="skel" style="width:76%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:70%"></span></div><div class="sk-fila" style="grid-template-columns:23.4fr 11fr 11.3fr 20.8fr 15.6fr 9.9fr 94px"><span class="celda"><span class="skel" style="width:66%"></span><span class="skel" style="width:44%;height:9px"></span></span><span class="skel" style="width:48%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:62%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:70%"></span></div><div class="sk-fila" style="grid-template-columns:23.4fr 11fr 11.3fr 20.8fr 15.6fr 9.9fr 94px"><span class="celda"><span class="skel" style="width:84%"></span><span class="skel" style="width:52%;height:9px"></span></span><span class="skel" style="width:55%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:74%"></span><span class="skel" style="width:88%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:70%"></span></div><div class="sk-fila" style="grid-template-columns:23.4fr 11fr 11.3fr 20.8fr 15.6fr 9.9fr 94px"><span class="celda"><span class="skel" style="width:78%"></span><span class="skel" style="width:50%;height:9px"></span></span><span class="skel" style="width:62%"></span><span class="skel" style="width:44%"></span><span class="skel" style="width:50%"></span><span class="skel" style="width:70%"></span><span class="skel" style="width:58%"></span><span class="skel" style="width:70%"></span></div></div>
@@ -1087,52 +1132,247 @@ document.addEventListener('click',function(e){
 });
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&abierta)cierra(true);});
 
-/* — Filtros. Un chip del resumen es un atajo del filtro de abajo: al pulsarlo
-     mueve el desplegable, para que el estado del filtro esté en un solo sitio
-     (hallazgo 1.5). Y un filtro se resalta solo si su valor difiere del
-     predeterminado (hallazgo 1.6). — */
-var aplicados=document.getElementById('aplicados');
-var quitarTodos=document.getElementById('quitar-filtros');
-function filtroDe(nombre){return document.querySelector('.f[data-filtro="'+nombre+'"]');}
-function ponFiltro(nombre,valor){
-  var f=filtroDe(nombre); if(!f)return;
-  f.querySelector('b').textContent=valor;
-  f.dataset.activo=String(valor!==f.dataset.def);
-  document.querySelectorAll('.schip[data-filtro="'+nombre+'"]').forEach(function(c){
-    c.setAttribute('aria-pressed',String(c.dataset.valor===valor));});
-  pintaAplicados();
-}
-function pintaAplicados(){
-  var activos=[].slice.call(document.querySelectorAll('.f[data-activo="true"]'));
-  aplicados.innerHTML='';
-  activos.forEach(function(f){
-    var et=document.createElement('span'); et.className='aplicado';
-    et.append(f.dataset.filtro+': '+f.querySelector('b').textContent);
-    var x=document.createElement('button');
-    x.type='button';
-    x.setAttribute('aria-label','Quitar el filtro de '+f.dataset.filtro);
-    x.innerHTML='<span class="msi msi-xs" aria-hidden="true" translate="no">close</span>';
-    x.addEventListener('click',function(){ponFiltro(f.dataset.filtro,f.dataset.def);anuncia();});
-    et.appendChild(x); aplicados.appendChild(et);
-  });
-  quitarTodos.hidden=activos.length===0;
-}
-function anuncia(){
-  var n=document.querySelectorAll('.f[data-activo="true"]').length;
-  live.textContent=n?n+(n===1?' filtro aplicado':' filtros aplicados'):'Sin filtros. Mostrando los 1.248 clientes.';
-}
-document.querySelectorAll('.schip[data-filtro]').forEach(function(c){
-  c.addEventListener('click',function(){
-    var f=filtroDe(c.dataset.filtro);
-    var puesto=c.getAttribute('aria-pressed')==='true';
-    ponFiltro(c.dataset.filtro,puesto?f.dataset.def:c.dataset.valor);
+/* — Filtros (doc §6.21): botón «+ Añadir filtro», panel con buscador y
+   selección múltiple, y pastillas removibles. Migrado del patrón antiguo de
+   4 botones de un solo valor —deuda documentada en §6.21 y §10— al mismo
+   motor que ya usan Viáticos y Trámites vehiculares, con los mismos cuatro
+   campos que ya se filtraban: Tipo, Estado, Documentos, Actividad. Un chip
+   del resumen sigue siendo un atajo de estos filtros: el estado vive en un
+   solo sitio (hallazgo 1.5). */
+var FILTROS=[
+  {id:'tipo',etiqueta:'Tipo',fija:true,opciones:[
+    {v:'agencia',t:'Agencia',n:2},{v:'empresa',t:'Empresa',n:3},{v:'persona',t:'Persona física',n:1}]},
+  {id:'estado',etiqueta:'Estado',fija:true,opciones:[
+    {v:'activo',t:'Activos',n:5,pill:'p-ok'},{v:'inactivo',t:'Inactivos',n:1,pill:'p-neutro'}]},
+  {id:'documentos',etiqueta:'Documentos',fija:true,opciones:[
+    {v:'completos',t:'Los dos',n:2,pill:'p-ok'},{v:'porvencer',t:'Por vencer',n:1,pill:'p-warn'},
+    {v:'falta1',t:'Falta 1',n:1,pill:'p-warn'},{v:'faltan2',t:'Faltan los 2',n:1,pill:'p-err'},
+    {v:'sincalcular',t:'Sin calcular',n:1,pill:'p-neutro'}]},
+  {id:'actividad',etiqueta:'Actividad',opciones:[
+    {v:'inactiva90',t:'Sin órdenes en 90 días',n:2}]}
+];
+(function(){
+  var barra=document.getElementById('filtros'), aplic=document.getElementById('aplicados');
+  if(!barra||!aplic) return;
+  var MAX_CHIPS=4;
+  var sel={}, visibles=[], todoChips=false, abierto=null;
+  FILTROS.forEach(function(d){ sel[d.id]=[]; if(d.fija) visibles.push(d.id); });
+
+  function dim(id){ for(var i=0;i<FILTROS.length;i++) if(FILTROS[i].id===id) return FILTROS[i]; }
+  function nombre(d,v){ for(var i=0;i<d.opciones.length;i++) if(d.opciones[i].v===v) return d.opciones[i].t; return v; }
+  function op(d,v){ for(var i=0;i<d.opciones.length;i++) if(d.opciones[i].v===v) return d.opciones[i]; return null; }
+
+  function cierraPop(){ if(!abierto) return; var b=abierto; abierto=null;
+    b.setAttribute('aria-expanded','false'); b.parentNode.querySelector('.pop').hidden=true; }
+
+  function panel(d){
+    var pop=document.createElement('div');
+    pop.className='pop'; pop.hidden=true; pop.id='pop-'+d.id;
+    pop.setAttribute('role','group'); pop.setAttribute('aria-label',d.etiqueta);
+    var b=document.createElement('div'); b.className='pop-b';
+    var busc=document.createElement('input');
+    busc.type='search'; busc.placeholder='Buscar en '+d.etiqueta.toLowerCase()+'…';
+    busc.setAttribute('aria-label','Buscar en '+d.etiqueta.toLowerCase());
+    b.appendChild(busc); pop.appendChild(b);
+    var ul=document.createElement('ul'); ul.className='pop-l'; pop.appendChild(ul);
+    var vacio=document.createElement('p'); vacio.className='pop-vacio'; vacio.hidden=true;
+    vacio.textContent='Ningún valor coincide.'; pop.appendChild(vacio);
+    var pie=document.createElement('div'); pie.className='pop-p';
+    var cuenta=document.createElement('span'); cuenta.className='cuenta';
+    var limpiar=document.createElement('button');
+    limpiar.type='button'; limpiar.className='fquitar'; limpiar.textContent='Limpiar';
+    pie.appendChild(cuenta); pie.appendChild(limpiar); pop.appendChild(pie);
+
+    d.opciones.forEach(function(o){
+      var li=document.createElement('li'), lab=document.createElement('label');
+      var cb=document.createElement('input'); cb.type='checkbox'; cb.value=o.v;
+      var et=document.createElement('span'); et.className='et';
+      if(o.pill){ var pl=document.createElement('span'); pl.className='pill '+o.pill; pl.textContent=o.t; et.appendChild(pl); }
+      else et.textContent=o.t;
+      lab.appendChild(cb); lab.appendChild(et);
+      if(o.n!=null){ var n=document.createElement('span'); n.className='n'; n.textContent=o.n; lab.appendChild(n); }
+      cb.addEventListener('change',function(){
+        var lista=sel[d.id], i=lista.indexOf(o.v);
+        if(cb.checked){ if(i<0) lista.push(o.v); } else if(i>=0) lista.splice(i,1);
+        pinta();
+      });
+      li.appendChild(lab); ul.appendChild(li); li._v=o.t.toLowerCase();
+    });
+    busc.addEventListener('input',function(){
+      var q=busc.value.trim().toLowerCase(), n=0;
+      Array.prototype.forEach.call(ul.children,function(li){
+        var ok=!q||li._v.indexOf(q)>=0; li.hidden=!ok; if(ok) n++;
+      });
+      vacio.hidden=n>0;
+    });
+    limpiar.addEventListener('click',function(){ sel[d.id]=[]; pinta(); busc.focus(); });
+    pop._busc=busc; pop._cuenta=cuenta; pop._limpiar=limpiar; pop._ul=ul;
+    return pop;
+  }
+
+  function control(d){
+    var w=document.createElement('div'); w.className='fwrap';
+    var btn=document.createElement('button');
+    btn.type='button'; btn.className='f';
+    btn.setAttribute('aria-expanded','false'); btn.setAttribute('aria-haspopup','true');
+    btn.setAttribute('aria-controls','pop-'+d.id);
+    var pop=panel(d);
+    btn.addEventListener('click',function(){
+      var abrir=abierto!==btn; cierraPop();
+      if(abrir){ abierto=btn; btn.setAttribute('aria-expanded','true'); pop.hidden=false; pop._busc.focus(); }
+    });
+    w.appendChild(btn); w.appendChild(pop);
+    w._d=d; w._btn=btn; w._pop=pop;
+    return w;
+  }
+
+  function botonMas(){
+    var restantes=FILTROS.filter(function(d){ return visibles.indexOf(d.id)<0; });
+    if(!restantes.length) return null;
+    var w=document.createElement('div'); w.className='fwrap';
+    var btn=document.createElement('button');
+    btn.type='button'; btn.className='f fmas';
+    btn.setAttribute('aria-expanded','false'); btn.setAttribute('aria-haspopup','true');
+    btn.setAttribute('aria-controls','pop-mas');
+    btn.innerHTML='<span class="msi msi-sm" aria-hidden="true" translate="no">add</span>Añadir filtro';
+    var pop=document.createElement('div');
+    pop.className='pop'; pop.id='pop-mas'; pop.hidden=true;
+    pop.setAttribute('role','group'); pop.setAttribute('aria-label','Añadir un filtro');
+    var ul=document.createElement('ul'); ul.className='pop-l pop-menu';
+    restantes.forEach(function(d){
+      var li=document.createElement('li'), b=document.createElement('label');
+      b.style.cursor='pointer';
+      var s=document.createElement('span'); s.className='et'; s.textContent=d.etiqueta;
+      b.appendChild(s);
+      b.addEventListener('click',function(){ visibles.push(d.id); cierraPop(); pinta(true,d.id); });
+      li.appendChild(b); ul.appendChild(li);
+    });
+    pop.appendChild(ul);
+    btn.addEventListener('click',function(){
+      var abrir=abierto!==btn; cierraPop();
+      if(abrir){ abierto=btn; btn.setAttribute('aria-expanded','true'); pop.hidden=false;
+        var p=pop.querySelector('label'); if(p) p.focus(); }
+    });
+    w.appendChild(btn); w.appendChild(pop);
+    return w;
+  }
+
+  /* Filtrado real de la tabla: AND entre dimensiones, OR entre valores de
+     una misma dimensión. Una fila de detalle de sucursales («hijas») sigue
+     a su fila dueña y se oculta con ella. */
+  function filtraFilas(){
+    var filas=document.querySelectorAll('.tabla-caja tbody > tr[data-tipo]');
+    var visibles=0;
+    filas.forEach(function(tr){
+      var pasa=true;
+      FILTROS.forEach(function(d){
+        if(!sel[d.id].length) return;
+        if(sel[d.id].indexOf(tr.dataset[d.id])<0) pasa=false;
+      });
+      tr.hidden=!pasa;
+      var hija=tr.nextElementSibling;
+      if(hija&&hija.classList.contains('hijas')) hija.hidden=!pasa||hija.dataset.forzado!=='1';
+      if(pasa) visibles++;
+    });
+    var main=document.getElementById('contenido');
+    if(main) main.setAttribute('data-state', visibles===0 ? 'empty' : 'ok');
+  }
+
+  function pinta(abrirNuevo,idNuevo){
+    var abiertoId=abierto?abierto.getAttribute('aria-controls'):null;
+    barra.textContent='';
+    visibles.forEach(function(id){
+      var d=dim(id), w=control(d), n=sel[id].length;
+      w._btn.setAttribute('data-activo',String(n>0));
+      w._btn.innerHTML=d.etiqueta+(n?'<b class="cuantos">'+n+'</b>':'')+'<span class="msi msi-xs" aria-hidden="true" translate="no">expand_more</span>';
+      w._btn.setAttribute('aria-label', n===0 ? 'Filtrar por '+d.etiqueta.toLowerCase()+', sin valores puestos'
+        : d.etiqueta+', '+n+(n===1?' valor puesto':' valores puestos'));
+      Array.prototype.forEach.call(w._pop._ul.querySelectorAll('input'),function(cb){
+        cb.checked=sel[id].indexOf(cb.value)>=0;
+      });
+      w._pop._cuenta.textContent = n===0 ? 'Sin selección' : n+(n===1?' seleccionado':' seleccionados');
+      w._pop._limpiar.disabled=n===0;
+      barra.appendChild(w);
+      if(w._pop.id===abiertoId||(abrirNuevo&&id===idNuevo)){
+        abierto=w._btn; w._btn.setAttribute('aria-expanded','true'); w._pop.hidden=false;
+        if(abrirNuevo&&id===idNuevo) w._pop._busc.focus();
+      }
+    });
+    var mas=botonMas(); if(mas) barra.appendChild(mas);
+
+    document.querySelectorAll('.schip[data-filtro]').forEach(function(c){
+      var d=dim(c.dataset.filtro); if(!d) return;
+      var mapa={'Sin los dos':'faltan2','Por vencer':'porvencer','Sin órdenes en 90 días':'inactiva90','Activos':'activo'};
+      var v=mapa[c.dataset.valor];
+      c.setAttribute('aria-pressed',String(!!v&&sel[d.id].indexOf(v)>=0));
+    });
+
+    aplic.textContent='';
+    var puestos=[];
+    FILTROS.forEach(function(d){ sel[d.id].forEach(function(v){ puestos.push({d:d,v:v}); }); });
+    aplic.hidden=puestos.length===0;
+    if(puestos.length){
+      var sr=document.createElement('span'); sr.className='sr';
+      sr.textContent='Filtros aplicados: '+puestos.length; aplic.appendChild(sr);
+      var muestra = todoChips ? puestos : puestos.slice(0,MAX_CHIPS);
+      muestra.forEach(function(p){
+        var c=document.createElement('span'); c.className='fchip';
+        var t=nombre(p.d,p.v), o=op(p.d,p.v);
+        c.innerHTML='<span class="dim">'+p.d.etiqueta+':</span> '+(o&&o.pill?'<span class="pill '+o.pill+'">'+t+'</span>':t);
+        var x=document.createElement('button');
+        x.type='button'; x.className='fx'; x.textContent='×';
+        x.setAttribute('aria-label','Quitar el filtro '+p.d.etiqueta+': '+t);
+        x.addEventListener('click',function(){
+          sel[p.d.id].splice(sel[p.d.id].indexOf(p.v),1); pinta();
+        });
+        c.appendChild(x); aplic.appendChild(c);
+      });
+      if(puestos.length>MAX_CHIPS){
+        var mb=document.createElement('button');
+        mb.type='button'; mb.className='fmaschips';
+        mb.textContent = todoChips ? 'Ver menos' : '+'+(puestos.length-MAX_CHIPS)+' más';
+        mb.setAttribute('aria-expanded',String(todoChips));
+        mb.addEventListener('click',function(){ todoChips=!todoChips; pinta(); });
+        aplic.appendChild(mb);
+      }
+      var q=document.createElement('button');
+      q.type='button'; q.className='fquitar'; q.textContent='Quitar todos los filtros';
+      q.addEventListener('click',function(){ FILTROS.forEach(function(d){ sel[d.id]=[]; }); todoChips=false; pinta(); });
+      aplic.appendChild(q);
+    }
+    filtraFilas();
     anuncia();
+  }
+
+  var anuncio=document.getElementById('anuncio-filtros');
+  function anuncia(){
+    if(!anuncio) return;
+    var n=0; for(var k in sel) n+=sel[k].length;
+    anuncio.textContent = n===0 ? 'Sin filtros. Se muestran todos los clientes de esta página.'
+      : n+(n===1?' filtro aplicado.':' filtros aplicados.')+' La lista se ha actualizado.';
+  }
+
+  document.addEventListener('click',function(e){
+    if(abierto && !e.target.closest('.fwrap')) cierraPop();
   });
-});
-quitarTodos.addEventListener('click',function(){
-  document.querySelectorAll('.f').forEach(function(f){ponFiltro(f.dataset.filtro,f.dataset.def);});
-  anuncia();
-});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'&&abierto){ var b=abierto; cierraPop(); b.focus(); }
+  });
+
+  document.querySelectorAll('.schip[data-filtro]').forEach(function(c){
+    c.addEventListener('click',function(){
+      var d=dim(c.dataset.filtro); if(!d) return;
+      var mapa={'Sin los dos':'faltan2','Por vencer':'porvencer','Sin órdenes en 90 días':'inactiva90','Activos':'activo'};
+      var v=mapa[c.dataset.valor]; if(!v) return;
+      if(visibles.indexOf(d.id)<0) visibles.push(d.id);
+      var i=sel[d.id].indexOf(v);
+      if(i>=0) sel[d.id].splice(i,1); else sel[d.id].push(v);
+      pinta();
+    });
+  });
+
+  pinta();
+})();
 
 
 /* — Columnas. Ninguna desaparece en silencio: si hay alguna apagada, se dice
@@ -1300,7 +1540,6 @@ if(porPag)porPag.addEventListener('change',function(){
 });
 
 refrescaSeleccion();
-pintaAplicados();
 
 var mb=document.getElementById('menu-btn');
 var velo=document.querySelector('.velo-menu');
@@ -1314,6 +1553,39 @@ if(mb)mb.addEventListener('click',function(){menu(raiz.getAttribute('data-menu')
 if(velo)velo.addEventListener('click',function(){menu(false);});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')menu(false);});
 })();
+document.querySelectorAll('.infob').forEach(function(b){
+  var tip=document.getElementById(b.getAttribute('aria-controls'));
+  b.addEventListener('focusout',function(e){
+    if(e.relatedTarget===b)return;
+    setTimeout(function(){
+      if(document.activeElement!==b){b.setAttribute('aria-expanded','false');tip.hidden=true;}
+    },0);
+  });
+  b.addEventListener('click',function(e){
+    e.stopPropagation();
+    var abierto=b.getAttribute('aria-expanded')==='true';
+    document.querySelectorAll('.infob[aria-expanded="true"]').forEach(function(o){
+      o.setAttribute('aria-expanded','false');
+      document.getElementById(o.getAttribute('aria-controls')).hidden=true;
+    });
+    if(!abierto){b.setAttribute('aria-expanded','true');tip.hidden=false;}
+  });
+});
+document.addEventListener('click',function(){
+  document.querySelectorAll('.infob[aria-expanded="true"]').forEach(function(o){
+    o.setAttribute('aria-expanded','false');
+    document.getElementById(o.getAttribute('aria-controls')).hidden=true;
+  });
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    document.querySelectorAll('.infob[aria-expanded="true"]').forEach(function(o){
+      o.setAttribute('aria-expanded','false');
+      document.getElementById(o.getAttribute('aria-controls')).hidden=true;
+      o.focus();
+    });
+  }
+});
 </script>
 </body>
 </html>
