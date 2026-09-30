@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.12.0
+version: 2.13.0
 last_updated: 2026-09-30
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -1701,6 +1701,12 @@ botones «×» idénticos son indistinguibles al tabular (§6.19).
 la pantalla, y la tabla de detrás sigue siendo legible mientras se decide. Por eso lleva
 `role="group"` con su etiqueta y no `role="dialog"`.
 
+**Es el único componente para filtrar por un campo categórico con más de un valor posible.**
+La excepción legítima es filtrar sobre una condición booleana (sí/no): ahí el patrón correcto es
+un chip que se activa o no, no un desplegable de un solo valor booleano. Un patrón de un solo
+valor sin selección múltiple para un campo con varios valores posibles no es una excepción, es
+deuda pendiente de migrar a este componente.
+
 ---
 
 ### 6.22 Ámbito de datos (`.ambito`)
@@ -1950,11 +1956,11 @@ Todo lo que lleve `data-andamio` se retira en la versión real. Un solo selector
 
 ---
 
-## 10. Nueve trampas comprobadas
+## 10. Diez trampas comprobadas
 
-No son teoría: las seis primeras aparecieron aplicando este documento al módulo de clientes, y
-las tres últimas revisando esta misma página. Todas se ven solo si se comprueba en el navegador,
-no leyendo la hoja de estilos.
+No son teoría: las seis primeras aparecieron aplicando este documento al módulo de clientes, las
+tres siguientes revisando esta misma página, y la décima auditando las pantallas de Viáticos y
+Padrón. Todas se ven solo si se comprueba en el navegador, no leyendo la hoja de estilos.
 
 **El tamaño se mide en el navegador, no en el CSS.** La regla de los 12px se puede burlar sin
 querer con la forma abreviada `font:`, donde el tamaño no aparece como `font-size`. Los avatares
@@ -2024,6 +2030,14 @@ usados    = {var(--x) en el <style> y en los style=""}
 declarados = {--x: en el <style>}
 usados - declarados  →  tiene que ser vacío
 ```
+
+**Un nombre de clase corto no se declara dos veces en el mismo archivo, ni se comparte entre dos
+componentes sin relación.** `.resumen` se usó a la vez para un `<span>` de encabezado y un
+`<section>` de chips de estado — un cambio pensado solo para el segundo rompió el primero en
+silencio. `.nota` y `.f` aparecieron duplicados en el mismo archivo sin haber roto nada visible
+todavía. Antes de escribir `.algo{...}` se busca si ya existe; si sí, la regla se añade a la
+declaración existente, o se usa un nombre más específico. Nombres de una sola palabra genérica
+(`.resumen`, `.nota`, `.f`, `.leg`, `.cg`) son los que más se repiten sin querer.
 
 ---
 
@@ -2479,5 +2493,5 @@ columna principal y barra lateral no se comparan, medían a ~3px por casualidad;
 | 2.6.2 | 2026-09-28 | Añade un caso real a §1.4 (series de gráfica): una barra de antigüedad de cartera pintada con `--ok`/`--warn`/`--block`/`--err` por tramo de tiempo en vez de `--serie-1`…`--serie-4`, con el antes/después completo. La regla de "una serie nunca reutiliza color de estado" ya existía; el hueco era no tener un ejemplo real citable, y por eso se pasó por alto al construir Cuentas por cobrar. Sin cambios de valor ni de regla. |
 | 2.7.0 | 2026-09-28 | Dos reglas nuevas salidas de rediseñar Cuentas por cobrar en maqueta. §6.12 gana la regla 7 —resumen arriba, buscador y filtros en una sola fila justo encima de la tabla, nunca el buscador suelto por su cuenta— y la regla 8 —un control con `aria-pressed`/`data-activo` tiene que interactuar de verdad o presentarse como cifra de lectura, no fingir ser un filtro sin filtrado detrás; era el caso de los cuatro `.schip` originales de la pantalla, que no tenían ni un solo listener detrás. §6.3 gana una cuarta advertencia: si la tarjeta crece, su contenido crece con ella —`flex:1`, nunca un `max-width` heredado del layout anterior—, a partir del caso medido donde la tarjeta de resumen se hizo ancha y el bloque interno del gráfico se quedó angosto, dejando una franja vacía. Sin cambios de token ni de componente visual, así que `reglas-de-diseno.html` no se toca. |
 | 2.8.0 | 2026-09-28 | Documenta el toggletip de información (`.infob` + `.tip`, §6.23): un botón de icono que revela una aclaración corta en un globo, para las filas de ficha (§6.20) donde el texto no cabe siempre visible. Seis reglas, con dos correcciones que salieron de auditar la maqueta contra el propio sistema antes de aprobarla: el botón medía 20×20px y bajaba del suelo táctil de 24px que ya exige §7.3, y el `aria-controls` sin `aria-describedby` no garantiza que un lector de pantalla anuncie el texto señalado. Contraste verificado por cálculo, no a ojo: 15,2:1 / 13,9:1 el texto del globo, 4,8:1 / 5,5:1 el icono en reposo, en claro y oscuro. La regla 6 fija el límite: no sustituye al texto siempre visible de un dato protagonista (§8 sigue mandando ahí). Pendiente: `reglas-de-diseno.html` no tiene todavía la demo viva del componente — solo la fuente y la copia descargable lo documentan por ahora. |
-| 2.12.0 | 2026-09-30 | §8 (voz de producto) gana una corrección final: el criterio de tres niveles seguía dejando pasar texto porque era un juicio, no un límite. Ahora `.nota`/`.banda` llevan como máximo una frase, bajo ~140 caracteres, y solo cuando bloquean la acción inmediata — cualquier segunda oración, o cualquier texto que aclare/eduque/cite un documento, se borra o pasa a un toggletip (§6.23). `.nota` deja de ser un componente de explicación general. §11 gana el paso de releer cada `.nota`/`.banda` nueva contra estas reglas antes de dar la pantalla por terminada, en vez de encontrarlo en una auditoría posterior. |
+| 2.13.0 | 2026-09-30 | §8 (voz de producto) gana una corrección final: el criterio de tres niveles seguía dejando pasar texto porque era un juicio, no un límite. Ahora `.nota`/`.banda` llevan como máximo una frase, bajo ~140 caracteres, y solo cuando bloquean la acción inmediata — cualquier segunda oración, o cualquier texto que aclare/eduque/cite un documento, se borra o pasa a un toggletip (§6.23). `.nota` deja de ser un componente de explicación general. §11 gana el paso de releer cada `.nota`/`.banda` nueva contra estas reglas antes de dar la pantalla por terminada, en vez de encontrarlo en una auditoría posterior. §10 gana la décima trampa: un nombre de clase corto (`.resumen`, `.nota`, `.f`…) no se declara dos veces en el mismo archivo ni se comparte entre componentes sin relación — encontrado auditando Padrón, donde rompió en silencio el encabezado. §6.21 fija que es el único componente para filtrar por un campo categórico con más de un valor, salvo condiciones booleanas (chip, no desplegable); Padrón queda señalado como deuda pendiente de migrar. |
 | 2.11.1 | 2026-09-29 | Cuatro reglas salidas de revisar Viáticos, Viático detalle, Cuentas por cobrar, Padrón de clientes y Editar cliente contra el sistema. §6.11 (tabla densa) gana la regla 10: el identificador de fila (folio) no lleva color de enlace — va en `--text`, porque `--link` es para navegación fuera de tabla y la fila entera, no el texto verde, es la zona pulsable. §6.12 gana la regla 9: la razón de un estado no vive como texto libre en la celda — va al detalle del registro. §8 (voz de producto) endurece su criterio a tres niveles: lo que bloquea una acción ahora se queda visible en una frase, lo que aclara una consecuencia sin bloquear nada pasa a un toggletip (§6.23) sobre el control relacionado, y el racional de diseño o la educación sobre un caso que no aplica al registro visible no va en la interfaz. Y se aprueba §13 Composición y grid, con sus ocho reglas —de la proporción de columna al orden lectura → control → objeto—, validadas contra pantallas reales; deja de estar marcada como borrador. 13.4 (comparar exige igualar) y 13.8 (cierre garantizado, no por casualidad) quedan como dos reglas separadas, con mecanismos distintos para dos preguntas distintas. |

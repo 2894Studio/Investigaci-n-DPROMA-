@@ -1699,6 +1699,19 @@ botones «×» idénticos son indistinguibles al tabular (§6.19).
 la pantalla, y la tabla de detrás sigue siendo legible mientras se decide. Por eso lleva
 `role="group"` con su etiqueta y no `role="dialog"`.
 
+**Es el único componente para filtrar por un campo categórico con más de un valor posible.**
+Ninguna pantalla nueva declara su propio patrón de filtro de un solo valor para ese caso —
+auditando Viáticos, Trámites vehiculares, Trámites concluidos, Padrón de clientes y Cuentas por
+cobrar encontramos tres patrones distintos resolviendo el mismo tipo de filtro: el motor
+completo de aquí (Viáticos, Trámites), botones de un solo valor sin selección múltiple ni
+overflow (Padrón, previo a que este componente existiera, nunca migrado), y chips booleanos
+(Cuentas por cobrar). Solo el último es una excepción legítima: filtra sobre dos condiciones
+sí/no, no sobre una categoría con varios valores posibles, y forzar un desplegable de un solo
+valor booleano añadiría un paso sin necesidad — ahí el chip-toggle es el patrón correcto. El
+patrón de Padrón no es una excepción, es deuda: filtra los mismos campos categóricos (Tipo,
+Estado, Documentos, Actividad) que Viáticos filtra con este componente, y debería migrar a él
+la próxima vez que se toque esa pantalla.
+
 ---
 
 ### 6.22 Ámbito de datos (`.ambito`)
@@ -1971,11 +1984,11 @@ Todo lo que lleve `data-andamio` se retira en la versión real. Un solo selector
 
 ---
 
-## 10. Nueve trampas comprobadas
+## 10. Diez trampas comprobadas
 
-No son teoría: las seis primeras aparecieron aplicando este documento al módulo de clientes, y
-las tres últimas revisando esta misma página. Todas se ven solo si se comprueba en el navegador,
-no leyendo la hoja de estilos.
+No son teoría: las seis primeras aparecieron aplicando este documento al módulo de clientes, las
+tres siguientes revisando esta misma página, y la décima auditando las pantallas de Viáticos y
+Padrón. Todas se ven solo si se comprueba en el navegador, no leyendo la hoja de estilos.
 
 **El tamaño se mide en el navegador, no en el CSS.** La regla de los 12px se puede burlar sin
 querer con la forma abreviada `font:`, donde el tamaño no aparece como `font-size`. Los avatares
@@ -2045,6 +2058,20 @@ usados    = {var(--x) en el <style> y en los style=""}
 declarados = {--x: en el <style>}
 usados - declarados  →  tiene que ser vacío
 ```
+
+**Un nombre de clase corto no se declara dos veces en el mismo archivo, y no se comparte entre
+dos componentes sin relación.** `.resumen` se usó a la vez para el `<span>` de una línea de
+resumen en un encabezado y para el `<section>` de chips de estado de otra pantalla — un cambio
+pensado solo para el segundo (convertirlo a grid de tres columnas) rompió el primero en
+silencio: cada palabra del texto plano se volvió una celda de grid, partiéndolo en varias líneas
+sueltas. `.nota` y `.f` aparecieron declarados dos veces en el mismo archivo con reglas
+distintas, sin romper nada visible todavía solo porque ningún elemento activo dependía de las
+propiedades que la segunda declaración pisaba — la misma falta de disciplina, sin haber causado
+daño aún. Antes de escribir `.algo{...}`, se busca con `grep -n '^\.algo{'` en el archivo: si ya
+existe, la regla se añade a la declaración existente en vez de redeclarar el selector completo, o
+se usa un nombre más específico si el elemento es conceptualmente distinto. Nombres de una sola
+palabra genérica (`.resumen`, `.nota`, `.f`, `.leg`, `.cg`) son los que más se repiten sin
+querer — con esos, doble cuidado.
 
 ---
 
