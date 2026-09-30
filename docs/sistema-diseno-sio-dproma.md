@@ -213,6 +213,33 @@ Contraste medido de cada `-ink` sobre su `-bg`, que es la combinación real de u
 verde, se leería como «agencias correctas». Estos colores existen justo para eso: para
 clasificar sin opinar. Se usan también en las etiquetas de tipo de cliente (§6.10).
 
+**Caso real, para que la regla no se vuelva a pasar por alto.** Una barra de antigüedad de
+cartera con cuatro tramos (0–30 / 31–60 / 61–90 / +90 días) se construyó así:
+
+```html
+<!-- ✗ Mal — antigüedad de cartera pintada con el semáforo de estado -->
+<i style="width:57%;background:var(--ok)"></i>
+<i style="width:23%;background:var(--warn)"></i>
+<i style="width:12%;background:var(--block)"></i>
+<i style="width:8%;background:var(--err)"></i>
+```
+
+Cuatro tramos de tiempo, ninguno es un estado — y aun así 0–30 días quedó en `--ok` («correcto»)
+y +90 en `--err` («error»). Es el ejemplo exacto que el párrafo de arriba usa para explicar por
+qué existe la regla, solo que con antigüedad de cartera en vez de «Agencias». La corrección no
+cambia el layout ni los porcentajes, solo la fuente del color:
+
+```html
+<!-- ✓ Bien — mismo componente, tramos de tiempo en --serie-1…4 -->
+<i style="width:57%;background:var(--serie-1)"></i>
+<i style="width:23%;background:var(--serie-2)"></i>
+<i style="width:12%;background:var(--serie-3)"></i>
+<i style="width:8%;background:var(--serie-4)"></i>
+```
+
+Con la leyenda repitiendo el mismo color junto al rango de días, nunca junto a la palabra
+«correcto» o «error».
+
 **Los dos colores anteriores no se distinguían entre sí.** `#2C6CA8` y `#7A5FA8` estaban
 medidos contra el fondo —5,35 y 5,06 en claro— pero nunca uno contra otro, que es la
 comparación que de verdad importa en una gráfica. Medidos entre sí dan **ΔE 1,1 en protanopia
@@ -245,10 +272,24 @@ de ΔE 15: serie 1–4 en **12,6** y serie 1–3 en oscuro en **1,6** — este �
 indistinguible. La regla de validación se amplía: **cuando una gráfica o leyenda muestra más de
 dos series a la vez en pantalla, se mide cada combinación que realmente aparece junta**, no solo
 las consecutivas en el orden fijo de la regla 1. Un par que no llegue al suelo no se corrige
-subiendo el ΔE global —eso puede romper pares que hoy sí funcionan— se resuelve caso por caso:
-o se documenta que esa combinación no se muestra junta en ninguna pantalla, o se le añade
-distinción por forma/patrón además de color (línea sólida vs. discontinua, por ejemplo) para esa
-gráfica en concreto.
+subiendo el ΔE global —eso puede romper pares que hoy sí funcionan.
+
+**Resolución para serie 1–4 y serie 1–3 (oscuro).** No existe un catálogo de pantallas que
+garantice que estas dos combinaciones nunca coexisten en una misma gráfica, así que no se
+documentan como «no se muestran juntas» sin verificarlo pantalla por pantalla — sería una cifra
+inventada. En su lugar, la distinción se refuerza con un segundo canal, no solo color, cada vez
+que aparecen juntas:
+
+- **Línea:** una de las dos series lleva trazo discontinuo, la otra sólido.
+- **Barra o dona:** una de las dos series lleva una textura de rayas diagonales sobre su color de
+  relleno, la otra queda lisa.
+- **Leyenda:** repite el mismo patrón junto al nombre de la serie, no solo el color — si la barra
+  tiene rayas, el cuadro de la leyenda también las tiene.
+
+Ningún hex cambia — los cuatro slots de color de §1.4 se quedan igual. Es una regla de aplicación
+adicional, solo para estos dos pares concretos, la primera vez que compartan gráfica. Cualquier
+otro par que en el futuro se mida por debajo del suelo de ΔE 15 sigue el mismo criterio: se
+verifica si de verdad coexiste en alguna pantalla antes de decidir la corrección.
 
 ### 1.4.1 Tinta sobre relleno sólido de color
 
@@ -646,6 +687,15 @@ jerarquía — la tarjeta dice «esto es un grupo aparte», y la tabla no lo es.
 tarjetas dentro de tarjetas: si un grupo necesita subgrupos, es una señal de que la pantalla
 tiene más de un objeto y conviene dividirla, no apilar tarjetas.
 
+**Si la tarjeta crece, su contenido crece con ella — nunca un `max-width` en el hijo.** Cuentas
+por cobrar hizo ancha la tarjeta de resumen (`.card.hero`) para ocupar el layout, pero el bloque
+interno con el número y el desglose por antigüedad conservó un `max-width` fijo pensado para el
+layout angosto anterior. Resultado: la tarjeta creció, el contenido de adentro no, y quedó una
+franja vacía a la derecha — la caja se alargó, no el gráfico. Un hijo que debe ocupar el ancho
+disponible de su tarjeta se declara con `flex:1` (o `width:100%` en grid), nunca con un
+`max-width` que sobrevivió a un rediseño de layout. Se comprueba midiendo el `getBoundingClientRect()`
+del hijo contra el de la tarjeta: si el hijo no llega al borde interior, algo lo está capando.
+
 ### 6.4 Vistas de estado de una pantalla
 
 Toda pantalla que pida datos tiene cuatro formas de presentarse: **con datos, cargando, vacía y
@@ -993,6 +1043,14 @@ alerta.
 **El icono tiene que coincidir con la variante.** El alta de cliente abría con un triángulo de
 advertencia sobre una banda neutra: señal mixta, el lector no sabe si preocuparse.
 
+**Antes de escribir una clase nueva para un aviso de ancho completo, se verifica si `.banda` +
+una de sus cuatro variantes ya lo cubre.** La maqueta de Autorización de compra declaró
+`.bloqueado` — mismo `display:flex`, mismo `gap`, mismo `padding`, mismo propósito que
+`.banda.b-info` — sin darse cuenta de que el componente ya existía en el mismo archivo. No rompió
+nada visible (los valores coincidían caso por caso), pero duplicó CSS y deja dos nombres para la
+misma cosa, que es la trampa 10 en otra forma: no solo se repiten nombres de clase por accidente,
+también se reinventan componentes enteros por no buscar primero si ya existen.
+
 **Un aviso que cambia cómo se interpreta lo de abajo va antes del título de esa sección**, no
 después ni al pie. En la ficha, la advertencia de que las listas están recortadas por alcance
 —que cambia el significado de todos los ceros que vienen después— se presentaba como una nota
@@ -1128,6 +1186,13 @@ thead th:first-child{z-index:7}
 9. **Registros por página elegibles.** Un pie que fija seis registros sobre un padrón de 1.248
    obliga a pasar páginas para cualquier revisión. Selector de 10 / 25 / 50 / 100, recordado
    entre sesiones.
+10. **El identificador de fila no lleva color de enlace.** El folio —el `<th scope="row">` que
+    abre el detalle— no se pinta con `--link`: ese token es para navegación fuera de tabla
+    (migas, «Ver en Maps»). Dentro de una tabla la fila entera es la zona pulsable, y lo indica
+    el fondo al pasar el cursor (`tbody tr:hover td{background:var(--surface-2)}`), no el color
+    del texto — un identificador verde sugiere falsamente que es un enlace distinto al resto de
+    la fila, cuando toda la fila se comporta igual. El folio va en `--text`, igual que el resto
+    de la celda.
 
 **Modo tarjeta por debajo de 860px.** La tabla pasa a lista de tarjetas; cada celda muestra su
 rótulo desde `data-et`:
@@ -1159,7 +1224,7 @@ No se veía qué era resumen y qué era control.
 └────────────────────────────────────────────────────┘
 ```
 
-**Cinco reglas.**
+**Nueve reglas.**
 
 1. **Un filtro se resalta solo si su valor difiere del predeterminado.** «Tipo: Todos» aparecía
    con borde y fondo de filtro aplicado, y «Todos» no filtra nada. El resalte debe significar
@@ -1183,6 +1248,32 @@ No se veía qué era resumen y qué era control.
    píxeles uno del otro. El resumen se queda solo cuando responde a un criterio que **ningún**
    filtro de la barra cubre, y entonces se agrupa según la regla 3. Los conteos que aporta un
    resumen retirado no se pierden: viven en el tablero, que es la pantalla de lectura.
+7. **El orden fijo es resumen → buscador + filtros en una sola fila → tabla.** El buscador de
+   la pantalla (`.search`, «Buscar marca, grupo o agencia…») no es un tercer bloque suelto encima
+   del resumen ni de los filtros: es un control de la misma fila que los filtros, porque hace lo
+   mismo que ellos — acota qué filas de la tabla se ven — solo que por texto libre en vez de por
+   valor exacto. Puesto arriba, aislado, antes del resumen, parecía flotar sin relación con nada;
+   pegado a los filtros, la relación «esto controla la tabla de abajo» se lee sin leer una palabra,
+   por pura cercanía. El resumen, en cambio, no es un control — es lectura — y por eso encabeza la
+   pantalla: lo primero que se muestra es qué hay, luego con qué se acota, luego el detalle.
+   `.search` en esa fila usa `flex:1;min-width:200px` para no competir en rigidez con las
+   pastillas de filtro, y la fila entera lleva relleno vertical completo (`var(--sp-4)` arriba y
+   abajo, no solo arriba) — sin él, la fila se ve pegada al resumen y a la tabla a la vez, como si
+   no fuera su propia zona.
+8. **Un control con pinta de interactivo tiene que interactuar.** Un `.schip` o `.f` con
+   `aria-pressed`/`data-activo` promete que al pulsarlo pasa algo. Si en la maqueta no hay ni
+   siquiera un evento de clic que cambie el estado o filtre la tabla, el control miente por forma:
+   se ve pulsable y no lo es. En una maqueta de demostración sin lógica de filtrado real, un dato
+   así se presenta como lo que es — una cifra de lectura, sin `aria-pressed` ni cursor de puntero
+   — nunca como un botón vacío. Se promueve a control real solo cuando existe el filtrado que lo
+   respalda.
+9. **La razón de un estado va al detalle del registro, no a la celda.** En Viáticos, la
+   justificación de un excedente y el motivo de un rechazo vivían como texto libre dentro de la
+   celda de estado, con largo variable — una fila con motivo se volvía visiblemente más alta que
+   sus vecinas y la tabla dejaba de leerse como una grilla estable (mismo problema que §6.11,
+   regla 7, aplicado aquí a una celda de estatus en vez de a la celda principal). La celda se
+   queda con el estado (`.pill`); la razón completa se muestra al entrar al detalle del registro
+   desde su identificador de fila.
 
 ```css
 .resumen{display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center;
@@ -1442,11 +1533,19 @@ Un botón cuadrado sin texto, para acciones que se repiten en una fila o que viv
 donde una etiqueta escrita ocuparía más que la propia acción.
 
 ```css
-.iconbtn{width:36px;height:36px;border:1px solid var(--border);border-radius:var(--r-ctrl);
+.iconbtn{width:36px;height:36px;padding:0;border:1px solid var(--border);border-radius:var(--r-ctrl);
   display:grid;place-items:center;cursor:pointer;background:transparent;
   color:var(--text-2);flex-shrink:0}
 .iconbtn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
 ```
+
+**El `padding:0` no es cosmético — sin él, el icono queda descentrado en la variante de 28px.**
+Un `<button>` trae de fábrica el relleno del navegador (Chromium: `1px 6px`). A 36px sobra espacio
+y no se nota; a 28px ese relleno reduce la caja de contenido a menos que el icono (20px), y el
+motor de grid la centra sobre esa caja reducida, no sobre el botón completo — el icono queda
+corrido hacia un lado en vez de centrado. Medido en producción: 7px de margen a la izquierda del
+icono contra 1px a la derecha, en vez de 4px y 4px. `padding:0` fija el tamaño real del botón
+como la única caja que cuenta.
 
 **Tres medidas, según dónde esté:**
 
@@ -1608,6 +1707,19 @@ botones «×» idénticos son indistinguibles al tabular (§6.19).
 la pantalla, y la tabla de detrás sigue siendo legible mientras se decide. Por eso lleva
 `role="group"` con su etiqueta y no `role="dialog"`.
 
+**Es el único componente para filtrar por un campo categórico con más de un valor posible.**
+Ninguna pantalla nueva declara su propio patrón de filtro de un solo valor para ese caso —
+auditando Viáticos, Trámites vehiculares, Trámites concluidos, Padrón de clientes y Cuentas por
+cobrar encontramos tres patrones distintos resolviendo el mismo tipo de filtro: el motor
+completo de aquí (Viáticos, Trámites, y ahora también Padrón), botones de un solo valor sin
+selección múltiple ni overflow (el patrón que tenía Padrón antes de migrar, ver nota abajo), y
+chips booleanos (Cuentas por cobrar). Solo el último es una excepción legítima: filtra sobre dos
+condiciones sí/no, no sobre una categoría con varios valores posibles, y forzar un desplegable de
+un solo valor booleano añadiría un paso sin necesidad — ahí el chip-toggle es el patrón correcto.
+Padrón filtraba los mismos campos categóricos (Tipo, Estado, Documentos, Actividad) con botones
+de un solo valor, sin ser una excepción legítima; ya migró a este componente, conservando los
+mismos cuatro campos y su filtrado real sobre la tabla.
+
 ---
 
 ### 6.22 Ámbito de datos (`.ambito`)
@@ -1647,6 +1759,66 @@ tablero diciendo cosas distintas con la misma cara:
 
 Y el corolario de la primera fila: **no se ofrece «ver la lista» de una lista que no se puede
 ver.** El tablero lo hace hoy en sus dos tarjetas sin alcance.
+
+---
+
+### 6.23 Toggletip de información (`.infob` + `.tip`)
+
+Una cifra a veces necesita una aclaración corta que no cabe como texto siempre visible sin
+desordenar la fila — el caso de la ficha de detalle (§6.20), donde cada dato vive en una sola
+línea `dt`/`dd`. El toggletip resuelve eso: un botón de información al final del número que, al
+activarse, revela la aclaración en un globo. No es un tooltip nativo (que aparece con el simple
+paso del ratón y no es operable por teclado ni táctil de forma fiable) — es un **toggletip**: se
+abre con clic o `Enter`/`Espacio`, se queda abierto hasta que se cierra a propósito, y por eso
+puede convivir con dedos y lectores de pantalla igual de bien que con el ratón.
+
+```html
+<dd class="tnum">$436,070
+  <button class="infob" type="button" aria-expanded="false"
+          aria-controls="tip-cerrado" aria-describedby="tip-cerrado"
+          aria-label="Más información sobre cerrado y sin facturar">
+    <svg class="ico ico-xs" aria-hidden="true"><use href="#i-info"/></svg>
+  </button>
+  <span class="tip" id="tip-cerrado" role="tooltip" hidden>
+    No suma al $2,644,180 de por cobrar — son 9 órdenes sin facturar todavía.
+  </span>
+</dd>
+```
+
+```css
+.infob{width:24px;height:24px;padding:0;border:0;border-radius:50%;background:transparent;
+  color:var(--text-3);display:grid;place-items:center;cursor:pointer;flex-shrink:0}
+.infob:hover,.infob[aria-expanded="true"]{background:var(--surface-2);color:var(--text-2)}
+[data-tacto="dedo"] .infob{width:46px;height:46px}
+.tip{position:absolute;right:0;top:calc(100% + 6px);z-index:30;width:220px;max-width:60vw;
+  background:var(--text);color:var(--surface);font:500 11.5px/1.5 var(--font-ui);
+  border-radius:var(--r-ctrl);padding:var(--sp-2) var(--sp-3);box-shadow:var(--sh-float)}
+```
+
+**Seis reglas.**
+
+1. **`aria-describedby` va siempre puesto, no solo mientras está abierto.** Es lo que hace que un
+   lector de pantalla, al llegar al botón por tabulación, tenga acceso al texto de la aclaración
+   en cuanto se activa — sin `aria-describedby`, `aria-controls` por sí solo no garantiza que
+   ningún lector anuncie el contenido señalado, porque solo declara una relación, no la lee.
+2. **El destino táctil mide 24×24px como mínimo (§7.3), 46px en modo dedo.** Un botón de icono
+   más pequeño que eso es el error más fácil de cometer con un control de este tamaño visual —
+   el icono puede medir 14px, el botón nunca.
+3. **Se cierra con `Escape`, con clic fuera y al tabular hacia el siguiente control.** Las tres
+   salidas devuelven el foco de forma predecible; sin la tercera, tabular más allá del botón deja
+   un globo abierto flotando sobre contenido que ya no tiene foco, huérfano en pantalla.
+4. **Contraste verificado, no asumido:** el texto del globo (`--surface` sobre `--text`) da
+   15,2:1 en claro y 13,9:1 en oscuro; el icono en reposo (`--text-3` sobre `--surface`) da
+   4,8:1 en claro y 5,5:1 en oscuro — ambos muy por encima de los suelos de 4,5:1 (texto) y 3:1
+   (icono funcional, WCAG 1.4.11).
+5. **Un solo toggletip abierto a la vez en toda la pantalla.** Abrir uno cierra cualquier otro
+   que ya estuviera abierto — de lo contrario una fila de datos con varios `.infob` termina con
+   media pantalla cubierta de globos.
+6. **No sustituye al texto siempre visible cuando el dato es el protagonista de la pantalla.**
+   La cifra principal de un resumen (§6.12, el `.hero`) lleva su aclaración como texto corriente
+   debajo, no oculta detrás de un icono — el criterio de §8 sigue mandando: si la frase explica
+   una consecuencia para quien mira, va en pantalla; el toggletip es para cuando ese texto no
+   cabe sin romper una fila de ficha, no una forma de esconder texto que sí cabría.
 
 ---
 
@@ -1747,6 +1919,55 @@ lo primero que se encuentra quien viene a consultar un teléfono.
 La prueba: **si el texto explica una decisión, no va en pantalla.** Si explica una consecuencia
 para quien está mirando, sí — y en una frase.
 
+**Endurecimiento del criterio, tras auditar Viáticos, Viático detalle, Cuentas por cobrar,
+Padrón de clientes y Editar cliente:** un texto se queda visible por defecto solo si es una
+instrucción o restricción que condiciona la acción inmediata en esa pantalla — no basta con que
+sea cierto o correcto. Quedan fuera, aunque sean ciertos: el racional de por qué se diseñó algo
+así (con o sin referencia a un documento del proyecto — encontramos una nota que citaba
+`docs/patron-dialogo-sio-dproma.md` directamente en la interfaz), la mecánica general de cómo
+funciona una función («el desglose baja tres niveles: marca › grupo › agencia»), y la educación
+sobre un caso que no aplica al registro que se está viendo (un aviso de «un comprobante rechazado
+no se borra» en un registro sin ningún comprobante rechazado).
+
+Eso no significa que la información desaparezca cuando sigue siendo relevante para *algún*
+momento de esa pantalla, solo que deja de ocupar espacio permanente: pasa a un toggletip (§6.23)
+sobre el elemento al que se refiere — la cabecera de columna, el campo, el banner. La regla
+completa entonces tiene tres niveles, no dos:
+
+| Nivel | Ejemplo | Dónde vive |
+|---|---|---|
+| Bloquea la acción ahora mismo | «Rubén Beltrán Ochoa no puede pedir un viático nuevo» | Visible siempre, en una frase |
+| Aclara una consecuencia, pero no bloquea nada en este momento | Qué pasa si un comprobante se rechaza; qué falta si no hay los dos documentos | Toggletip sobre el control o columna relacionada |
+| Explica por qué se diseñó así, o educa sobre un caso que no aplica aquí | Referencias a documentos internos, mecánica general de un componente | No va en la interfaz |
+
+**Corrección final, porque el criterio de arriba seguía dejando pasar texto.** Los tres niveles
+son correctos, pero son un juicio — "¿esto condiciona la acción inmediata?" es una pregunta que
+se puede responder que sí con demasiada facilidad cuando quien escribe el texto es quien también
+lo redactó, convencido de que hace falta. Auditar cinco pantallas volvió a encontrar párrafos de
+más de 400 caracteres colgando de una `.banda` que ya tenía su instrucción en la primera frase —
+la regla existía y no impidió que se escribieran. Hace falta un límite que no dependa de
+interpretación:
+
+1. **`.nota` y `.banda` llevan como máximo una frase, sin punto y coma ni raya explicativa
+   después del primer punto.** Si al escribir el texto aparece una segunda oración que aclara,
+   justifica o da contexto a la primera, esa segunda oración no se queda ahí — se borra o se
+   convierte en el contenido de un toggletip (§6.23) sobre el control al que se refiere. No hay
+   excepción por importancia del contenido: la excepción de "esto sí hace falta que se vea
+   completo" es exactamente el razonamiento que ya falló cinco veces.
+2. **Ningún bloque de texto siempre visible pasa de ~140 caracteres.** Es una regla de regla, no
+   de estilo: un texto que no cabe en 140 caracteres está, casi siempre, tratando de explicar algo
+   además de instruir. Se mide con el contador de caracteres, no a ojo.
+3. **`.nota` no es un componente de explicación general.** Se usa solo para el nivel 1 de la
+   tabla de arriba —una restricción o instrucción que bloquea la acción inmediata—, nunca para
+   racional, mecánica de un componente, o contexto de negocio. Si el texto que se está por
+   escribir no bloquea nada ahora mismo, `.nota` es la clase equivocada aunque el texto sea
+   cierto y breve.
+4. **Se revisa al momento de escribir el componente, no después.** §11 (checklist al añadir un
+   componente nuevo) gana el paso: antes de dar por terminada una pantalla, cada `.nota`/`.banda`
+   nueva se relee contra las reglas 1–3 de este apartado. Encontrar el exceso en una auditoría
+   posterior significa que ya se construyó mal una vez; el checklist existe para que no haga
+   falta esa segunda pasada.
+
 ---
 
 ## 9. Andamiaje de maqueta
@@ -1771,11 +1992,11 @@ Todo lo que lleve `data-andamio` se retira en la versión real. Un solo selector
 
 ---
 
-## 10. Nueve trampas comprobadas
+## 10. Diez trampas comprobadas
 
-No son teoría: las seis primeras aparecieron aplicando este documento al módulo de clientes, y
-las tres últimas revisando esta misma página. Todas se ven solo si se comprueba en el navegador,
-no leyendo la hoja de estilos.
+No son teoría: las seis primeras aparecieron aplicando este documento al módulo de clientes, las
+tres siguientes revisando esta misma página, y la décima auditando las pantallas de Viáticos y
+Padrón. Todas se ven solo si se comprueba en el navegador, no leyendo la hoja de estilos.
 
 **El tamaño se mide en el navegador, no en el CSS.** La regla de los 12px se puede burlar sin
 querer con la forma abreviada `font:`, donde el tamaño no aparece como `font-size`. Los avatares
@@ -1846,6 +2067,20 @@ declarados = {--x: en el <style>}
 usados - declarados  →  tiene que ser vacío
 ```
 
+**Un nombre de clase corto no se declara dos veces en el mismo archivo, y no se comparte entre
+dos componentes sin relación.** `.resumen` se usó a la vez para el `<span>` de una línea de
+resumen en un encabezado y para el `<section>` de chips de estado de otra pantalla — un cambio
+pensado solo para el segundo (convertirlo a grid de tres columnas) rompió el primero en
+silencio: cada palabra del texto plano se volvió una celda de grid, partiéndolo en varias líneas
+sueltas. `.nota` y `.f` aparecieron declarados dos veces en el mismo archivo con reglas
+distintas, sin romper nada visible todavía solo porque ningún elemento activo dependía de las
+propiedades que la segunda declaración pisaba — la misma falta de disciplina, sin haber causado
+daño aún. Antes de escribir `.algo{...}`, se busca con `grep -n '^\.algo{'` en el archivo: si ya
+existe, la regla se añade a la declaración existente en vez de redeclarar el selector completo, o
+se usa un nombre más específico si el elemento es conceptualmente distinto. Nombres de una sola
+palabra genérica (`.resumen`, `.nota`, `.f`, `.leg`, `.cg`) son los que más se repiten sin
+querer — con esos, doble cuidado.
+
 ---
 
 ## 11. Checklist al añadir un componente nuevo
@@ -1887,6 +2122,9 @@ usados - declarados  →  tiene que ser vacío
 **Movimiento y voz**
 - ¿Toda animación que dure más de 5s se puede pausar pulsándola, sin botón aparte?
 - ¿El texto en pantalla dice qué se puede hacer, y no por qué se decidió así?
+- ¿Cada `.nota`/`.banda` nueva es una sola frase, bajo ~140 caracteres, y bloquea la acción
+  inmediata — no explica, no educa, no cita un documento? Si no, se borra o pasa a un
+  toggletip (§8, corrección final).
 - ¿Lo que es andamiaje de maqueta lleva `data-andamio` y está rotulado?
 
 **Comprobado en el navegador, no solo leído** (§10)
@@ -2195,3 +2433,102 @@ las tarjetas cortas a inventar relleno.
 **Y una del componente de barra.** Los segmentos contiguos se separan con superficie, no con
 espacio: `.barra span + span{border-left:2px solid var(--surface)}`. Un hueco transparente
 dejaría ver el fondo del carril y parecería un cuarto valor.
+
+---
+
+## 13. Composición y grid
+
+Las doce secciones anteriores dicen cómo se ve cada pieza — un botón, una tabla, una pastilla.
+Esta dice cómo se ordenan varias piezas juntas en una pantalla: cuándo una columna cede su ancho,
+cuándo dos bloques deben cerrar a la misma altura y cuándo no, y qué pasa cuando el contenido de
+uno crece más que el del otro. Ocho reglas, con su demo viva en la página del sistema
+(`web/entregables/reglas-de-diseno.html#composicion`).
+
+### 13.1 Lectura → control → objeto
+
+El orden de una pantalla es fijo: primero lo que se lee (el resumen), luego lo que controla qué
+se ve (buscador + filtros), luego el objeto sobre el que se actúa (la tabla). Un buscador puesto
+en su propia fila, separado de los filtros, rompe esto — parece un cuarto bloque flotando sin
+relación con nada, cuando hace exactamente el mismo trabajo que los filtros: acotar qué filas se
+ven, solo que por texto libre en vez de por valor exacto. Va en la misma fila que ellos (§6.12,
+regla 7). Aplicado de verdad al fusionar buscador y filtros en Trámites vehiculares, Trámites
+concluidos y Padrón de clientes.
+
+### 13.2 Proporción de columna: tres casos, no dos
+
+Un layout de columnas no es solo «columna fija + columna flexible». Hay tres patrones reales, y
+elegir el que no corresponde produce el defecto correcto para el caso equivocado:
+
+- **px fijo** (`240px 1fr`) — la columna A nunca cambia, sea cual sea el ancho de pantalla. Para
+  un panel lateral de navegación o un ícono de tamaño constante.
+- **fr puro** (`1.6fr 1fr`) — reparto proporcional fijo entre las dos. Para dos bloques que deben
+  crecer juntos manteniendo su proporción, como el panel de detalle y el de acciones.
+- **fr acotado** (`minmax(0,1.6fr) minmax(300px,360px)`) — la columna B fluye entre un piso y un
+  techo; no se aplasta por debajo de su contenido mínimo ni crece sin límite. Para una barra
+  lateral con contenido de ancho variable (una lista de eventos, una ficha).
+
+Los tres existen ya en pantallas reales: `minmax(88px,34%) 1fr` en el modo tarjeta de las tablas
+densas, `1.4fr 1fr` en `.kpis-d` de Cuentas por cobrar, y `minmax(320px,380px) 1fr` en `.split` de
+esa misma pantalla.
+
+### 13.3 Un contenedor no cede el ancho a un descendiente
+
+Si la tarjeta que envuelve un dato crece (porque el layout le da más espacio), el contenido debe
+crecer con ella. Un `max-width` heredado del layout anterior deja la tarjeta ancha con el número o
+la barra atrapados en su ancho viejo, con una franja vacía al lado — la tarjeta obedeció al grid,
+su contenido no. Se resuelve con `flex:1` en el hijo, nunca con un límite fijo copiado de otro
+contexto. Es la misma regla que §6.3; el caso medido que la originó fue Cuentas por cobrar, donde
+la tarjeta de resumen se hizo ancha y el bloque del gráfico se quedó angosto.
+
+### 13.4 Comparar exige igualar
+
+El valor por omisión de una fila de tarjetas es `align-items:start`: cada una a su alto real, sin
+estirarse para igualar a la más alta. `align-items:stretch` se reserva para un caso concreto:
+cuando las tarjetas se están comparando entre sí — mismo criterio, mismo campo, y su desigualdad
+de alto no debería depender de cuánto texto tenga cada una. Fuera de ese caso, `stretch` por
+omisión obliga a las tarjetas cortas a inventar relleno vacío que no significa nada.
+
+Esta regla no cubre el caso de dos bloques que no se comparan pero aun así deben cerrar a la
+misma altura — eso es 13.8, con un mecanismo distinto.
+
+### 13.5 El mismo criterio de la 13.2, en fila
+
+Los tres patrones de proporción de columna (px fijo, fr puro, fr acotado) aplican igual cuando la
+composición es de filas apiladas en vez de columnas lado a lado: una cabecera de alto fijo sobre
+contenido que fluye (`40px 1fr`), dos paneles en proporción fija (`1.6fr 1fr`), o una lista que
+fluye junto a un resumen acotado entre un piso y un techo (`1fr minmax(64px,96px)`). El resumen
+de estatus de Padrón de clientes usa esta misma lógica en `repeat(3,minmax(200px,1fr))`, para que
+sus tres grupos repartan el ancho completo de la fila en vez de ocupar solo lo que su texto pide.
+
+### 13.6 Un contenedor tampoco cede el alto a un descendiente
+
+Mismo problema que 13.3, en el eje vertical: una columna con `height:auto` en vez de `height:100%`
+se queda con el alto de su propio contenido en vez de llenar el alto real que el layout le dio.
+Validado en Trámite detalle: con `height:100%` la columna B llena su carril; con `auto`, se corta
+antes de tiempo aunque haya espacio libre debajo.
+
+### 13.7 La cadena de `min-height:0`
+
+Un contenedor flex o grid con scroll interno necesita `min-height:0` en **cada** eslabón de la
+cadena de ancestros hasta llegar al contenedor con scroll — el valor por omisión de `min-height`
+en un ítem flex es `auto`, que en la práctica significa «no me encojas por debajo de mi
+contenido», y basta que un solo eslabón lo incumpla para que todo el contenido empuje el marco
+hacia afuera en vez de hacer scroll dentro de él. Validado en Trámite detalle bajo un viewport
+restringido: con la cadena completa, `main` no se desborda (753px de contenido real dentro de
+415px de alto visible, con scroll interno); sin ella, el contenido rompe el marco.
+
+### 13.8 Cierre garantizado, no por casualidad
+
+Distinta de 13.4: no es que dos columnas se estén comparando — es que dos columnas que **no**
+se comparan (una columna principal y una barra lateral, por ejemplo, con contenido de naturaleza
+distinta) deben, aun así, terminar exactamente en el mismo punto, porque un cierre
+casi-pero-no-igual por pura coincidencia de longitud de contenido se lee peor que uno claramente
+distinto o uno garantizado — sugiere un error donde no lo hay. El mecanismo es otro: `stretch` en
+el contenedor y `flex:1` en el último bloque de la columna más corta, para que el cierre sea por
+construcción, no por cuánto texto tenga cada columna ese día.
+
+Caso real: en Viático detalle, la columna principal (Solicitud + Comprobantes) y la barra lateral
+(La cuenta + Bitácora) no se comparan entre sí — son contenido independiente — pero medían a ~3px
+de diferencia por casualidad. Con `stretch` en el contenedor y `flex:1` en la última tarjeta de la
+barra lateral, los dos `bottom` quedan en el mismo pixel, siempre, sin importar cuánto crezca o
+encoja el contenido de cada lado.
