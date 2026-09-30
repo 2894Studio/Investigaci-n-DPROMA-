@@ -1,0 +1,1585 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Viáticos, compras y cobros · Entregables DPROMA × 2894 Studio</title>
+<meta name="description" content="Revisión de UX, interfaz y accesibilidad de cuatro pantallas de SIO-DPROMA: viáticos, detalle de viático, autorización de compra de almacén y cuentas por cobrar." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cloud-white: #F7F8FA;
+  --soft-gray: #E6E8EC;
+  --ink-black: #0B0B0D;
+  --deep-cobalt: #0A46FF;
+  --sky-blue: #7DB7FF;
+
+  --bg: var(--cloud-white);
+  --surface: #FFFFFF;
+  --surface-alt: var(--soft-gray);
+  --text: var(--ink-black);
+  --text-muted: #53565f;
+  --border: #d8dbe2;
+  --accent: var(--deep-cobalt);
+  --accent-fill: var(--deep-cobalt);
+  --accent-text: #0A3FD6;
+  --accent-soft: var(--sky-blue);
+  --on-accent: var(--cloud-white);
+  --on-dark: var(--cloud-white);
+  --dark-surface: var(--ink-black);
+  --dark-surface-text-muted: #b9bec9;
+  --shadow: 0 1px 2px rgba(11,11,13,0.04), 0 8px 24px rgba(11,11,13,0.06);
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: #0B0B0D;
+    --surface: #16171c;
+    --surface-alt: #1c1e24;
+    --text: #F7F8FA;
+    --text-muted: #b9bec9;
+    --border: #2a2d35;
+    --accent: #3D6BFF;
+    --accent-fill: #2E56DE;
+    --accent-text: #8FA8FF;
+    --accent-soft: #9CC7FF;
+    --on-accent: #F7F8FA;
+    --dark-surface: #000000;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg: #0B0B0D;
+  --surface: #16171c;
+  --surface-alt: #1c1e24;
+  --text: #F7F8FA;
+  --text-muted: #b9bec9;
+  --border: #2a2d35;
+  --accent: #3D6BFF;
+  --accent-fill: #2E56DE;
+  --accent-text: #8FA8FF;
+  --accent-soft: #9CC7FF;
+  --on-accent: #F7F8FA;
+  --dark-surface: #000000;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+}
+:root[data-theme="light"]{
+  --bg: var(--cloud-white);
+  --surface: #FFFFFF;
+  --surface-alt: var(--soft-gray);
+  --text: var(--ink-black);
+  --text-muted: #53565f;
+  --border: #d8dbe2;
+  --accent: var(--deep-cobalt);
+  --accent-fill: var(--deep-cobalt);
+  --accent-text: #0A3FD6;
+  --accent-soft: var(--sky-blue);
+  --on-accent: var(--cloud-white);
+  --dark-surface: var(--ink-black);
+  --shadow: 0 1px 2px rgba(11,11,13,0.04), 0 8px 24px rgba(11,11,13,0.06);
+}
+
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior: auto; }
+  *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+a{ color: var(--accent-text); }
+a:focus-visible, button:focus-visible, summary:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.wrap{ max-width: 1120px; margin: 0 auto; padding: 0 clamp(1.25rem, 4vw, 2.5rem); }
+
+h1,h2,h3{ font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; margin: 0; }
+
+.prose p{ max-width: 66ch; color: var(--text-muted); }
+.prose p + p{ margin-top: 1em; }
+
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+.eyebrow{
+  display:inline-flex; align-items:center; gap: 0.5em;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent-text);
+}
+.eyebrow::before{ content:""; width: 0.5em; height: 0.5em; border-radius: 999px; background: var(--accent); display:inline-block; }
+
+/* Masthead */
+header.masthead{ padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
+.masthead-inner{ display:flex; align-items:center; justify-content:space-between; gap: 1rem; flex-wrap: wrap; }
+.wordmark{ font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em; text-transform: uppercase; text-decoration:none; color: var(--text); }
+.wordmark span{ color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+.masthead nav{ display:flex; align-items:center; gap: 1.5rem; flex-wrap: wrap; }
+.masthead nav a{ font-size: 0.875rem; font-weight: 500; color: var(--text-muted); text-decoration: none;
+  display:inline-flex; align-items:center; min-height: 24px; }
+.masthead nav a:hover{ color: var(--accent-text); }
+.masthead nav a.nav-cta{
+  background: var(--accent-fill); color: var(--on-accent);
+  padding: 0.45em 1.1em; border-radius: 999px; font-weight: 700;
+}
+.masthead nav a.nav-cta:hover{ background: var(--accent-fill); opacity:.88; color: var(--on-accent); }
+
+/* Sections */
+section{ padding: clamp(2.5rem, 6vw, 4rem) 0; }
+section + section{ border-top: 1px solid var(--border); }
+.section-head{ display:flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.section-head h2{ font-size: clamp(1.5rem, 3vw, 2rem); margin-top: 0.5rem; }
+.section-head .section-note{ max-width: 56ch; color: var(--text-muted); font-size: 0.9375rem; margin-top: 0.25rem; }
+
+/* Reveal-on-scroll */
+.reveal{ opacity:0; transform: translateY(16px); transition: opacity .5s ease, transform .5s ease; }
+.reveal.is-visible{ opacity:1; transform:none; }
+@media (prefers-reduced-motion: reduce){
+  .reveal{ opacity:1 !important; transform:none !important; }
+}
+
+/* Claim hero con scroll-linked word reveal */
+.claim-scroller{ height: 220vh; position: relative; }
+.claim-sticky{ position: sticky; top: 0; height: 100vh; display:flex; flex-direction:column; justify-content:center; }
+.claim-text{
+  font-size: clamp(2rem, 5.4vw, 3.5rem);
+  line-height: 1.12;
+  max-width: 18ch;
+}
+.claim-word{ color: var(--text-muted); transition: color .25s ease; }
+.claim-word.is-lit{ color: var(--accent-text); }
+.claim-sub{ margin-top: 1.5rem; max-width: 54ch; color: var(--text-muted); font-size: 1.0625rem; }
+.claim-scroll-hint{
+  margin-top: 2rem; font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--text-muted); display:flex; align-items:center; gap:0.5em;
+}
+.claim-scroll-hint::after{ content:"↓"; animation: claim-bob 1.6s ease-in-out infinite; }
+@keyframes claim-bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(5px); } }
+@media (prefers-reduced-motion: reduce){
+  .claim-scroller{ height:auto; }
+  .claim-sticky{ position:static; height:auto; padding: clamp(3rem,8vw,5.5rem) 0 clamp(2.5rem,6vw,4rem); }
+  .claim-scroll-hint{ display:none; }
+}
+
+/* Cards */
+.card{ border-radius: 18px; padding: 1.5rem; display:flex; flex-direction:column; gap: 0.75rem; box-shadow: var(--shadow); }
+.card-neutral{ background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+.card-brand{ background: var(--accent-fill); color: var(--on-accent); }
+.card-dark{ background: var(--dark-surface); color: var(--on-dark); }
+.card h3{ font-size: 1.0625rem; font-weight: 700; }
+.card p{ font-size: 0.9375rem; margin:0; opacity: 0.88; }
+.card-neutral p{ color: var(--text-muted); opacity: 1; }
+
+/* Diagnóstico */
+.evidence-stack{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+@media (max-width: 760px){ .evidence-stack{ grid-template-columns: 1fr; } }
+.evidence-card{ padding: 1.75rem 2rem; }
+
+/* Glosa: explica un término en español llano donde aparece */
+.glosa{
+  background: var(--surface-alt); border-left: 3px solid var(--accent-soft);
+  border-radius: 0 12px 12px 0; padding: 0.95rem 1.2rem; margin-top: 1.25rem;
+  font-size: 0.9375rem; color: var(--text-muted); max-width: 68ch;
+}
+.glosa b{ color: var(--text); font-weight: 700; }
+.glosa p{ margin: 0; }
+.glosa p + p{ margin-top: 0.6em; }
+
+/* Escenario: hoy contra después */
+.escenario{ display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.25rem; }
+@media (max-width: 720px){ .escenario{ grid-template-columns: 1fr; } }
+.escenario-col{
+  border: 1px solid var(--border); border-radius: 14px; padding: 1.15rem 1.3rem;
+  background: var(--surface);
+}
+.escenario-col.despues{
+  background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+  border-color: var(--accent-soft);
+}
+.escenario-col h4{
+  font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-muted); margin: 0 0 0.6rem; font-weight: 700;
+}
+.escenario-col.despues h4{ color: var(--accent-text); }
+.escenario-col ol{ margin:0; padding-left: 1.1rem; font-size: 0.9375rem; color: var(--text-muted); }
+.escenario-col li + li{ margin-top: 0.4rem; }
+
+/* Especificación técnica */
+.spec-scroll{ overflow-x: auto; margin-top: 1.25rem; }
+.spec-table{ width:100%; border-collapse: collapse; font-size: 0.875rem; }
+.spec-table th{
+  text-align:left; font-weight:700; font-size:0.75rem; text-transform:uppercase;
+  letter-spacing:0.08em; color:var(--text-muted); padding:0.6rem 0.75rem;
+  border-bottom:1px solid var(--border); white-space:nowrap;
+}
+.spec-table td{ padding:0.7rem 0.75rem; border-bottom:1px solid var(--border); color:var(--text-muted); vertical-align:top; }
+.spec-table td:first-child{ color:var(--text); font-weight:500; }
+.spec-table code{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8125rem; color: var(--accent-text); }
+.code{
+  background: var(--surface-alt); border: 1px solid var(--border); border-radius: 12px;
+  padding: 1rem 1.15rem; overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8125rem; line-height: 1.6; color: var(--text); margin-top: 1rem;
+  white-space: pre;
+}
+
+/* Listas numeradas colapsables */
+.finding-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap: 0; border-top: 1px solid var(--border); }
+.finding{ list-style:none; border-bottom: 1px solid var(--border); }
+.finding-details > summary{
+  cursor:pointer; list-style:none; display:grid; grid-template-columns: 2.5rem 1fr auto auto;
+  align-items:center; gap: 1rem; padding: 1.5rem 0;
+}
+.finding-details > summary::-webkit-details-marker{ display:none; }
+.finding-details .n{ font-weight: 700; color: var(--accent-text); font-size: 0.9375rem; }
+.finding-details summary h3{ font-size: 1.0625rem; font-weight: 700; }
+@media (max-width: 640px){ .finding-details > summary{ grid-template-columns: 2.5rem 1fr auto; } .finding-details summary .marca{ grid-column: 2; } }
+.finding-toggle{ position:relative; display:inline-block; width:0.8rem; height:0.8rem; color: var(--accent-text); transition: transform .2s ease; flex:none; }
+.finding-toggle::before, .finding-toggle::after{ content:""; position:absolute; top:50%; left:50%; background:currentColor; transform:translate(-50%,-50%); }
+.finding-toggle::before{ width:100%; height:2px; }
+.finding-toggle::after{ width:2px; height:100%; }
+.finding-details[open] > summary .finding-toggle{ transform: rotate(45deg); }
+.finding-body{ padding: 0 0 1.75rem calc(2.5rem + 1rem); }
+@media (max-width: 620px){ .finding-body{ padding-left: 0; } }
+.finding-body > p{ margin:0; color: var(--text-muted); font-size: 0.9375rem; max-width: 68ch; }
+.finding-body > * + p{ margin-top: 1.25rem; }
+.finding-body > p + p{ margin-top: 0.85em; }
+/* Especificidad igual a `.finding-body > p`, que si no gana y anula el margen */
+.finding-body > p.finding-cierre{
+  margin-top: 1.25rem; font-size: 0.9375rem; color: var(--text);
+  font-weight: 500; max-width: 68ch;
+}
+.finding-cierre b{ color: var(--accent-text); }
+
+/* Detalle técnico anidado */
+.tecnico{ margin-top: 1.25rem; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.tecnico > summary{
+  cursor:pointer; list-style:none; padding: 0.75rem 1.1rem; display:flex; align-items:center; gap:0.6rem;
+  font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-text);
+}
+.tecnico > summary::-webkit-details-marker{ display:none; }
+.tecnico > summary .finding-toggle{ width:0.65rem; height:0.65rem; }
+.tecnico[open] > summary .finding-toggle{ transform: rotate(45deg); }
+.tecnico-body{ padding: 0 1.1rem 1.25rem; }
+.tecnico-body p{ margin:0 0 0.5rem; font-size:0.875rem; color: var(--text-muted); max-width: 68ch; }
+.tecnico-body p b{ color: var(--text); }
+
+/* Sección de arquitectura: índice sticky + scroll-spy */
+.capas-layout{ display:grid; grid-template-columns: 220px 1fr; gap: 3rem; align-items:start; }
+/* Los hijos de grid y flex traen min-width:auto, así que un bloque de código
+   ancho estira la pista en vez de scrollear dentro de sí mismo. */
+.capas-layout > *, .capas-steps, .capas-step, .escenario > *,
+.evidence-stack > *, .finding-body, .tecnico, .tecnico-body,
+.fase > *{ min-width: 0; }
+.capas-sticky{ position:sticky; top: 1.5rem; }
+.capas-index{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap: 0.75rem; }
+.capas-index li{
+  padding-left: 0.9rem; border-left: 2px solid var(--border);
+  font-size: 0.875rem; color: var(--text-muted);
+  transition: color .2s ease, border-color .2s ease;
+}
+.capas-index li.is-active{ color: var(--accent-text); font-weight: 700; border-color: var(--accent); }
+.capas-steps{ display:flex; flex-direction:column; gap: 3rem; }
+.capas-step{
+  border: 1px solid var(--border); border-radius: 20px; padding: 1.75rem 2rem; box-shadow: var(--shadow);
+  background: var(--surface);
+}
+.capas-step h3{ font-size: 1.125rem; }
+.capas-step > p{ font-size: 0.9375rem; color: var(--text-muted); margin: 0.6rem 0 0; max-width: 68ch; }
+.resp-list{ list-style: none; margin: 1.1rem 0 0; padding: 0; border-top: 1px solid var(--border); }
+.resp-list li{ padding: 0.75rem 0; border-bottom: 1px solid var(--border); color: var(--text-muted); font-size: 0.9375rem; }
+.resp-list li::before{ content: "•"; color: var(--accent-text); font-weight: 700; margin-right: 0.6em; }
+.resp-list li b{ color: var(--text); font-weight: 600; }
+@media (max-width: 760px){
+  .capas-layout{ grid-template-columns: 1fr; gap: 1.5rem; }
+  .capas-sticky{ position:static; }
+  .capas-index{ flex-direction:row; flex-wrap:wrap; gap: 0.5rem 1.25rem; }
+}
+
+/* Mejoras de pantalla con captura anotada */
+.mejora-list{ list-style:none; margin:1.1rem 0 0; padding:0; border-top:1px solid var(--border); }
+.mejora{ border-bottom:1px solid var(--border); }
+.mejora summary{
+  cursor:pointer; list-style:none; display:flex; align-items:flex-start; gap:0.8rem;
+  padding:0.9rem 0; font-size:0.9375rem; color:var(--text-muted);
+}
+.mejora summary::-webkit-details-marker{ display:none; }
+.mejora summary::marker{ content:""; }
+.mejora summary b{ color:var(--text); font-weight:600; }
+.mejora summary .finding-toggle{ margin-top:0.28rem; }
+.mejora details[open] > summary .finding-toggle{ transform: rotate(45deg); }
+.mejora-body{ padding:0 0 1.25rem 1.6rem; }
+@media (max-width: 560px){ .mejora-body{ padding-left:0; } }
+.mejora-shot-link{ display:block; text-decoration:none; }
+.mejora-donde{
+  margin:0 0 0.7rem; font-size:0.8125rem; font-weight:700; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--accent-text);
+}
+.mejora-shot{
+  display:block; width:100%; height:auto; border-radius:12px;
+  border:1px solid var(--border); box-shadow:var(--shadow); background:#10161F;
+}
+.mejora-pie{ margin:0.6rem 0 0; font-size:0.875rem; color:var(--text-muted); max-width:66ch; }
+.mejora-zoom{ margin:0.45rem 0 0; font-size:0.8125rem; font-weight:500; color:var(--accent-text); }
+
+/* Animaciones de flujo: SVG + keyframes, sin librerías.
+   Ciclo compartido de 8s; cada nodo enciende en su fase y cada paquete
+   viaja en el hueco entre dos nodos. */
+.anim{
+  margin:1.25rem 0 0; border:1px solid var(--border); border-radius:14px;
+  background:var(--surface); padding:1.25rem 1.35rem 1.1rem;
+}
+.anim svg{ width:100%; height:auto; display:block; overflow:visible; }
+.anim figcaption{ margin:0.85rem 0 0; font-size:0.8125rem; color:var(--text-muted); }
+.anim text{ font-family:'DM Sans',system-ui,sans-serif; text-anchor:middle; }
+.anim .t1{ font-size:13px; font-weight:700; fill:var(--text); }
+.anim .t2{ font-size:11px; fill:var(--text-muted); }
+.anim .caja{ fill:var(--surface-alt); stroke:var(--border); stroke-width:1.2; }
+.anim .destino .caja{ fill:color-mix(in srgb, var(--accent) 12%, var(--surface)); stroke:var(--accent-soft); }
+.anim .puerta .caja{ fill:color-mix(in srgb, var(--accent) 16%, var(--surface)); stroke:var(--accent); stroke-width:1.8; }
+.anim .via{ stroke:var(--border); stroke-width:1.5; fill:none; }
+.anim .pk{ fill:var(--accent); }
+
+.anim .nodo{ opacity:.32; animation:8s linear infinite; }
+.anim .n1{ animation-name:anim-on1; }
+.anim .n2{ animation-name:anim-on2; }
+.anim .n3{ animation-name:anim-on3; }
+.anim .n4{ animation-name:anim-on4; }
+@keyframes anim-on1{ 0%,5%{opacity:.32} 11%,100%{opacity:1} }
+@keyframes anim-on2{ 0%,30%{opacity:.32} 36%,100%{opacity:1} }
+@keyframes anim-on3{ 0%,55%{opacity:.32} 61%,100%{opacity:1} }
+@keyframes anim-on4{ 0%,80%{opacity:.32} 86%,100%{opacity:1} }
+
+.anim .pk{ opacity:0; animation:8s linear infinite; }
+.anim .p1{ animation-name:anim-viaja1; }
+.anim .p2{ animation-name:anim-viaja2; }
+.anim .p3{ animation-name:anim-viaja3; }
+@keyframes anim-viaja1{
+  0%,11%   { transform:translate(0,0); opacity:0 }
+  14%      { transform:translate(calc(var(--dx)*.12), calc(var(--dy,0px)*.12)); opacity:1 }
+  27%      { transform:translate(calc(var(--dx)*.88), calc(var(--dy,0px)*.88)); opacity:1 }
+  30%,100% { transform:translate(var(--dx), var(--dy,0px)); opacity:0 }
+}
+@keyframes anim-viaja2{
+  0%,36%   { transform:translate(0,0); opacity:0 }
+  39%      { transform:translate(calc(var(--dx)*.12), calc(var(--dy,0px)*.12)); opacity:1 }
+  52%      { transform:translate(calc(var(--dx)*.88), calc(var(--dy,0px)*.88)); opacity:1 }
+  55%,100% { transform:translate(var(--dx), var(--dy,0px)); opacity:0 }
+}
+@keyframes anim-viaja3{
+  0%,61%   { transform:translate(0,0); opacity:0 }
+  64%      { transform:translate(calc(var(--dx)*.12), calc(var(--dy,0px)*.12)); opacity:1 }
+  77%      { transform:translate(calc(var(--dx)*.88), calc(var(--dy,0px)*.88)); opacity:1 }
+  80%,100% { transform:translate(var(--dx), var(--dy,0px)); opacity:0 }
+}
+
+/* Cuando el trazo se bifurca o curva, el paquete recorre la ruta real
+   con offset-path en lugar de cruzar en línea recta. */
+.anim .r1{ animation-name:anim-ruta1; }
+.anim .r2{ animation-name:anim-ruta2; }
+.anim .r3{ animation-name:anim-ruta3; }
+@keyframes anim-ruta1{
+  0%,11%   { offset-distance:0%;   opacity:0 }
+  14%      { offset-distance:12%;  opacity:1 }
+  27%      { offset-distance:88%;  opacity:1 }
+  30%,100% { offset-distance:100%; opacity:0 }
+}
+@keyframes anim-ruta2{
+  0%,36%   { offset-distance:0%;   opacity:0 }
+  39%      { offset-distance:12%;  opacity:1 }
+  52%      { offset-distance:88%;  opacity:1 }
+  55%,100% { offset-distance:100%; opacity:0 }
+}
+@keyframes anim-ruta3{
+  0%,61%   { offset-distance:0%;   opacity:0 }
+  64%      { offset-distance:12%;  opacity:1 }
+  77%      { offset-distance:88%;  opacity:1 }
+  80%,100% { offset-distance:100%; opacity:0 }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .anim .nodo{ animation:none; opacity:1; }
+  .anim .pk{ display:none; }
+}
+
+/* Esquema de datos y recorridos por rol */
+.esquema{
+  margin:1.25rem 0 0; border:1px solid var(--border); border-radius:14px;
+  background:var(--surface); padding:1.35rem;
+}
+.esquema svg{ width:100%; height:auto; display:block; }
+.esquema text{ font-family:'DM Sans',system-ui,sans-serif; }
+.esquema .caja{ fill:var(--surface-alt); stroke:var(--border); stroke-width:1.2; }
+.esquema .raiz .caja{ fill:color-mix(in srgb, var(--accent) 12%, var(--surface)); stroke:var(--accent); stroke-width:1.6; }
+.esquema .et{ font-size:13.5px; font-weight:700; fill:var(--text); }
+.esquema .ec{ font-size:10.5px; fill:var(--text-muted); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+.esquema .rel{ stroke:var(--border); stroke-width:1.4; fill:none; }
+.esquema .card{ font-size:10px; font-weight:700; fill:var(--accent); text-anchor:middle; }
+.esquema .eje{ font-size:10px; font-weight:700; fill:var(--text-muted); letter-spacing:0.1em; text-anchor:middle; }
+.esquema .cardg rect{ fill:var(--surface); stroke:none; }
+.esquema figcaption{ margin:0.9rem 0 0; font-size:0.8125rem; color:var(--text-muted); }
+
+.rol-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; margin-top:1.25rem; }
+@media (max-width: 760px){ .rol-grid{ grid-template-columns:1fr; } }
+.rol{
+  border:1px solid var(--border); border-radius:14px; padding:1.15rem 1.3rem;
+  background:var(--surface); min-width:0;
+}
+.rol.externo{ background:color-mix(in srgb, var(--accent) 7%, var(--surface)); border-color:var(--accent-soft); }
+.rol h4{ margin:0; font-size:1rem; font-weight:700; }
+.rol-entra{
+  margin:0.4rem 0 0; font-size:0.75rem; font-weight:700; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--accent-text);
+}
+.rol ol{ margin:0.85rem 0 0; padding-left:1.1rem; font-size:0.875rem; color:var(--text-muted); }
+.rol ol li + li{ margin-top:0.35rem; }
+.rol-limite{
+  margin:0.85rem 0 0; padding-top:0.7rem; border-top:1px solid var(--border);
+  font-size:0.8125rem; color:var(--text);
+}
+.rol-limite b{ color:var(--accent-text); font-weight:700; }
+
+/* Recomendación de tecnología */
+.tec-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; margin-top:1.25rem; }
+@media (max-width: 760px){ .tec-grid{ grid-template-columns:1fr; } }
+.tec{ border:1px solid var(--border); border-radius:14px; padding:1.15rem 1.3rem; background:var(--surface); min-width:0; }
+.tec.contra{ background:var(--surface-alt); border-style:dashed; }
+.tec h4{ margin:0 0 0.15rem; font-size:0.9375rem; font-weight:700; }
+.tec-para{ margin:0 0 0.6rem; font-size:0.75rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--accent-text); }
+.tec.contra .tec-para{ color:var(--text-muted); }
+.tec p{ margin:0; font-size:0.875rem; color:var(--text-muted); }
+.tec p + p{ margin-top:0.5rem; }
+.tec b{ color:var(--text); font-weight:600; }
+
+/* Etiquetas de estado: resuelto, brecha, propuesta */
+.marca{
+  display:inline-flex; align-items:center; gap:0.4em; font-size:0.6875rem;
+  font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+  padding:0.28em 0.75em; border-radius:999px; white-space:nowrap; flex:none;
+}
+.marca-ok{ background:var(--surface-alt); color:var(--text-muted); border:1px solid var(--border); }
+.marca-brecha{ background: var(--accent-fill); color:var(--on-accent); }
+.marca-nueva{ background:transparent; color:var(--accent-text); border:1px solid var(--accent); }
+.marca-fila{ display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; }
+
+/* Tabla de contraste */
+.contraste-table td:last-child{ white-space:nowrap; }
+.contraste-grupo td{
+  background:var(--surface-alt); color:var(--text); font-weight:700;
+  font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;
+}
+
+/* Brechas desarrolladas */
+.brecha{
+  border:1px solid var(--border); border-radius:16px; padding:1.5rem 1.75rem;
+  background:var(--surface); box-shadow:var(--shadow); min-width:0;
+}
+.brecha + .brecha{ margin-top:1.25rem; }
+.brecha h3{ font-size:1.0625rem; margin:0.6rem 0 0; }
+.brecha > p{ margin:0.7rem 0 0; font-size:0.9375rem; color:var(--text-muted); max-width:68ch; }
+.brecha-efecto{
+  margin:1rem 0 0; padding-left:1rem; border-left:3px solid var(--accent-soft);
+  font-size:0.9375rem; color:var(--text);
+}
+.brecha-efecto b{ color:var(--accent-text); }
+
+/* Entidades */
+
+/* Fases de implementación */
+.fase-list{ display:flex; flex-direction:column; gap: 1rem; margin-top: 1.75rem; }
+.fase{
+  display:grid; grid-template-columns: 2.25rem 1fr; gap: 1.1rem; align-items:start;
+  border:1px solid var(--border); border-radius:16px; padding:1.25rem 1.5rem; background: var(--surface);
+}
+.fase-n{
+  display:inline-flex; align-items:center; justify-content:center; width:2.25rem; height:2.25rem;
+  border-radius:50%; background: var(--accent-fill); color: var(--on-accent); font-weight:700; font-size:0.875rem;
+}
+.fase h3{ font-size: 1rem; margin:0 0 0.3rem; }
+.fase p{ margin:0; font-size:0.9375rem; color: var(--text-muted); }
+
+.responsibility-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap: 1.25rem; margin-top: 1.75rem; max-width: 66ch; }
+@media (max-width: 560px){ .responsibility-grid{ grid-template-columns: 1fr; } }
+.tech-proposal{ margin-top: 2rem; }
+.tech-proposal p{ color: var(--text-muted); }
+
+footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
+.footer-meta{ display:flex; justify-content: space-between; align-items:center; flex-wrap: wrap; gap: 1rem; font-size: 0.8125rem; color: var(--text-muted); }
+.footer-meta a{ color: var(--text-muted); display:inline-flex; align-items:center; min-height: 24px; }
+.footer-nav{ margin-bottom: 1.5rem; }
+.footer-nav a{ color: var(--accent-text); text-decoration:none; font-weight: 500; font-size: 0.9375rem;
+  display:inline-flex; align-items:center; min-height: 24px; }
+
+/* ═══ Pestañas ═══════════════════════════════════════════════════════════════
+   Mismo patrón que el entregable del acceso, con una diferencia de color: allí
+   la pestaña elegida se rellena de acento con --chip-cliente-bg, token que aquí
+   no existe. Y rellenarla con --accent tampoco vale: en oscuro, --on-accent
+   sobre --accent da 4,16:1 y este texto va a 14px en negrita, que pide 4,5:1.
+   Así que la elegida se levanta sobre --surface con el texto en --text —19,7:1
+   en claro y 16,8:1 en oscuro— y se marca con un borde de acento, que como
+   elemento gráfico solo necesita 3:1 y da 5,14 y 3,76. */
+.tabs-wrap{padding:clamp(2rem,5vw,3rem) 0 0}
+.tabs{display:inline-flex;gap:.3rem;background:var(--surface-alt);padding:.3rem;
+  border-radius:999px;border:1px solid var(--border);max-width:100%;flex-wrap:wrap}
+.tab{appearance:none;font-family:inherit;font-size:.875rem;font-weight:700;
+  padding:.62em 1.25em;border-radius:999px;border:1px solid transparent;
+  background:transparent;color:var(--text-muted);cursor:pointer;min-height:2.75rem;
+  transition:background-color 160ms ease,color 160ms ease,border-color 160ms ease}
+.tab:hover{color:var(--text)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--text);
+  border-color:var(--accent);box-shadow:var(--shadow)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.panel:focus{outline:none}
+.panel[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.tab{transition:none}}
+
+/* Índice de las tres maquetas del módulo */
+.maquetas-mod{padding:clamp(2rem,5vw,3rem) 0 clamp(3rem,7vw,5rem)}
+.maquetas-lede{max-width:62ch;margin:.75rem 0 1.75rem}
+.maquetas-lista{list-style:none;padding:0;margin:0;display:grid;gap:1rem;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.maquetas-lista a{display:flex;flex-direction:column;gap:.4rem;height:100%;
+  padding:1.15rem 1.25rem;border:1px solid var(--border,#e5e7eb);border-radius:12px;
+  text-decoration:none;color:inherit;transition:border-color .2s,transform .2s}
+.maquetas-lista a:hover{border-color:currentColor;transform:translateY(-2px)}
+.maquetas-lista b{font-size:1.0625rem}
+.maquetas-lista span{font-size:.9375rem;color:var(--text-muted);line-height:1.5}
+.maquetas-cambio{font-size:.875rem;opacity:1;color:var(--text-muted);
+  margin-top:.5rem;padding-top:.7rem;border-top:1px solid var(--border)}
+.maquetas-cambio code{font-size:.875em;padding:.1em .3em;border-radius:4px;
+  background:rgba(127,127,127,.14)}
+.maquetas-pie{margin-top:1.5rem;font-size:.9375rem;color:var(--text-muted);max-width:70ch}
+.maquetas-pie code{font-size:.875em;padding:.1em .35em;border-radius:4px;
+  background:rgba(127,127,127,.14)}
+@media (prefers-reduced-motion:reduce){.maquetas-lista a:hover{transform:none}}
+
+/* ───────────── Simulación del componente de filtros ─────────────
+   Maqueta de baja fidelidad animada solo con CSS, sin librerías ni textos:
+   enseña el comportamiento del componente —abrir, buscar, marcar, bajar a
+   pastillas— sin comprometer el contenido, que todavía no está escrito.
+   El ciclo va en --cyc y el fotograma congelado en --freeze, para cuando el
+   sistema pide movimiento reducido. */
+.fsim{
+  --cyc: 11s;
+  --freeze: -5.4s;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 2rem 1.75rem;
+}
+@media (max-width: 560px){ .fsim{ padding: 1.4rem 1.1rem; } }
+
+.fsim-stage{
+  position: relative;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-alt);
+  padding: 1.1rem 1.15rem 1.25rem;
+  min-height: 15.5rem;
+}
+.fsim-bar{ display:flex; gap:.5rem; flex-wrap:wrap; }
+.fsim-chip{
+  display:flex; align-items:center; gap:.55rem;
+  height:2rem; padding:0 .75rem;
+  border:1.5px solid var(--border); border-radius:999px; background:var(--surface);
+}
+.fsim-chip i{ display:block; height:.5rem; border-radius:999px; background:var(--border); }
+.fsim-chip .w-lg{ width:2.6rem } .fsim-chip .w-md{ width:1.9rem } .fsim-chip .w-sm{ width:1.2rem }
+.fsim-chip .caret{ width:0; height:0; border-left:4px solid transparent; border-right:4px solid transparent;
+  border-top:5px solid var(--text-muted); border-radius:0; background:none; }
+.fsim-chip--mas{ border-style:dashed; }
+.fsim-chip--mas .mas{ position:relative; width:.6rem; height:.6rem; }
+.fsim-chip--mas .mas::before,.fsim-chip--mas .mas::after{ content:""; position:absolute; background:var(--text-muted); }
+.fsim-chip--mas .mas::before{ left:0; right:0; top:calc(50% - .5px); height:1px }
+.fsim-chip--mas .mas::after{ top:0; bottom:0; left:calc(50% - .5px); width:1px }
+/* El chip activo: es el que se pulsa en la simulación. */
+.fsim-chip--on{ border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+.fsim-chip--on i{ background:color-mix(in srgb, var(--accent) 55%, var(--border)); }
+.fsim-chip--on .caret{ border-top-color:var(--accent); }
+
+.fsim-pop{
+  position:absolute; z-index:3; top:3.3rem; left:1.15rem; width:14.5rem;
+  border:1.5px solid var(--border); border-radius:10px; background:var(--surface);
+  box-shadow:var(--shadow); padding:.5rem; transform-origin:top left;
+  opacity:0; transform:scale(.96) translateY(-4px);
+}
+.fsim-busc{ display:flex; align-items:center; gap:.45rem; height:1.9rem; padding:0 .55rem; margin-bottom:.35rem;
+  border:1.5px solid var(--border); border-radius:7px; background:var(--surface-alt); }
+.fsim-lupa{ flex:none; width:.7rem; height:.7rem; border:1.5px solid var(--text-muted); border-radius:50%; position:relative; }
+.fsim-lupa::after{ content:""; position:absolute; right:-3px; bottom:-2px; width:4px; height:1.5px;
+  background:var(--text-muted); transform:rotate(45deg); }
+.fsim-caret{ width:1px; height:.85rem; background:var(--accent); opacity:0; }
+.fsim-tecleo{ height:.45rem; width:0; border-radius:999px; background:var(--border); }
+.fsim-fila{ display:flex; align-items:center; gap:.55rem; height:1.9rem; padding:0 .5rem; border-radius:6px; }
+.fsim-box{ flex:none; width:.85rem; height:.85rem; border:1.5px solid var(--border); border-radius:3px;
+  background:var(--surface); position:relative; }
+.fsim-box .ll{ position:absolute; inset:-1.5px; border-radius:3px; background:var(--accent);
+  transform:scale(.2); opacity:0; }
+.fsim-box b{ position:absolute; z-index:2; left:3px; top:1px; width:4px; height:7px; opacity:0;
+  border:solid var(--on-accent); border-width:0 1.5px 1.5px 0; transform:rotate(42deg); }
+.fsim-fila i{ display:block; height:.5rem; border-radius:999px; background:var(--border); }
+.fsim-fila .n{ margin-left:auto; width:.9rem; height:.4rem; border-radius:999px; background:var(--border); opacity:.7 }
+
+.fsim-aplic{ display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; margin-top:.85rem; min-height:1.9rem; }
+.fsim-pill{
+  display:flex; align-items:center; gap:.45rem; height:1.6rem; padding:0 .35rem 0 .7rem;
+  border:1.5px solid var(--accent); border-radius:999px;
+  background:color-mix(in srgb, var(--accent) 10%, transparent);
+  opacity:0; transform:translateY(4px);
+}
+.fsim-pill i{ display:block; height:.45rem; border-radius:999px;
+  background:color-mix(in srgb, var(--accent) 55%, var(--border)); }
+.fsim-pill .x{ position:relative; flex:none; width:.9rem; height:.9rem; }
+.fsim-pill .x::before,.fsim-pill .x::after{ content:""; position:absolute; left:1px; right:1px;
+  top:calc(50% - .5px); height:1.2px; background:var(--text-muted); }
+.fsim-pill .x::before{ transform:rotate(45deg) } .fsim-pill .x::after{ transform:rotate(-45deg) }
+.fsim-quitar{ height:.45rem; width:3.4rem; border-radius:999px;
+  background:color-mix(in srgb, var(--accent) 45%, transparent); opacity:0; }
+
+.fsim-tabla{ margin-top:1.1rem; display:flex; flex-direction:column; gap:.45rem; }
+.fsim-tabla i{ display:block; height:.55rem; border-radius:999px; background:var(--border); opacity:.55 }
+
+.fsim-cursor{ position:absolute; z-index:5; left:0; top:0; width:1.05rem; height:1.05rem;
+  color:var(--text); pointer-events:none; }
+.fsim-cursor svg{ width:100%; height:100%; display:block; filter:drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+.fsim-ripple{ position:absolute; z-index:4; width:2.2rem; height:2.2rem; margin:-1.1rem 0 0 -1.1rem;
+  border-radius:50%; border:2px solid var(--accent); opacity:0; pointer-events:none; }
+
+/* Motor: todo comparte ciclo, cada pieza pone su propio nombre de animación. */
+.fsim .an{ animation-duration:var(--cyc); animation-iteration-count:infinite;
+  animation-timing-function:linear; animation-fill-mode:both; }
+@media (prefers-reduced-motion: reduce){
+  /* La regla global de la página aplana toda duración a 0.001ms. Aquí se
+     restituye solo para poder congelar un fotograma con delay negativo y
+     play-state pausado: no hay movimiento en ningún caso. */
+  .fsim .an{ animation-duration:var(--cyc) !important; animation-delay:var(--freeze) !important;
+    animation-play-state:paused !important; }
+}
+
+@keyframes fs-cursor{
+  0%,4%   { transform:translate(17.5rem,11.5rem) }
+  12%     { transform:translate(12.6rem,2.16rem) }
+  20%,30% { transform:translate(12.6rem,2.16rem) }
+  38%     { transform:translate(8.09rem,6.73rem) }
+  44%,52% { transform:translate(8.09rem,6.73rem) }
+  58%     { transform:translate(8.09rem,8.56rem) }
+  64%,74% { transform:translate(8.09rem,8.56rem) }
+  84%     { transform:translate(17.5rem,11.5rem) }
+  100%    { transform:translate(17.5rem,11.5rem) }
+}
+@keyframes fs-ripple{
+  0%,17%   { opacity:0; transform:scale(.4) }
+  19%      { opacity:.7; transform:scale(.5) }
+  25%      { opacity:0; transform:scale(1.1) }
+  40%      { opacity:0; transform:scale(.4) }
+  42%      { opacity:.7; transform:scale(.5) }
+  48%      { opacity:0; transform:scale(1.1) }
+  59%      { opacity:0; transform:scale(.4) }
+  61%      { opacity:.7; transform:scale(.5) }
+  67%,100% { opacity:0; transform:scale(1.1) }
+}
+@keyframes fs-ripple-pos{
+  0%,32%   { transform:translate(12.6rem,2.16rem) }
+  33%,56%  { transform:translate(8.09rem,6.73rem) }
+  57%,100% { transform:translate(8.09rem,8.56rem) }
+}
+@keyframes fs-chip-on{
+  0%,18%   { border-color:var(--border); background:var(--surface) }
+  20%,76%  { border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--surface)) }
+  78%,100% { border-color:var(--border); background:var(--surface) }
+}
+@keyframes fs-pop{
+  0%,18%   { opacity:0; transform:scale(.96) translateY(-4px); visibility:hidden }
+  21%,74%  { opacity:1; transform:scale(1) translateY(0); visibility:visible }
+  77%,100% { opacity:0; transform:scale(.96) translateY(-4px); visibility:hidden }
+}
+@keyframes fs-caret{
+  0%,23%   { opacity:0 }
+  24%,32%  { opacity:1 }
+  33%,100% { opacity:0 }
+}
+@keyframes fs-tecleo{
+  0%,24%   { width:0 }
+  32%      { width:3.2rem }
+  74%      { width:3.2rem }
+  75%,100% { width:0 }
+}
+@keyframes fs-marca{
+  0%,43%   { opacity:0; transform:scale(.2) }
+  46%,100% { opacity:1; transform:scale(1) }
+}
+@keyframes fs-marca-2{
+  0%,62%   { opacity:0; transform:scale(.2) }
+  65%,100% { opacity:1; transform:scale(1) }
+}
+@keyframes fs-tic{ 0%,45%{ opacity:0 } 48%,100%{ opacity:1 } }
+@keyframes fs-tic-2{ 0%,64%{ opacity:0 } 67%,100%{ opacity:1 } }
+@keyframes fs-pill{
+  0%,46%   { opacity:0; transform:translateY(4px) }
+  50%,100% { opacity:1; transform:translateY(0) }
+}
+@keyframes fs-pill-2{
+  0%,65%   { opacity:0; transform:translateY(4px) }
+  69%,100% { opacity:1; transform:translateY(0) }
+}
+@keyframes fs-quitar{ 0%,48%{ opacity:0 } 52%,100%{ opacity:.8 } }
+@keyframes fs-tabla{
+  0%,49%   { opacity:.55; transform:scaleX(1) }
+  54%,100% { opacity:.85; transform:scaleX(.72) }
+}
+.fsim-tabla i{ transform-origin:left center }
+
+
+/* ═══ Listas de recomendaciones y simulaciones (mismo motor que el entregable de acceso) ═══ */
+/* Lista numerada de recomendaciones — mismo ritmo que .resp-list, con contador */
+.rec-list{ list-style:none; margin: 0; padding: 0; counter-reset: rec; border-top: 1px solid var(--border); }
+.rec-list li{
+  counter-increment: rec;
+  display:grid; grid-template-columns: 2.25rem minmax(0,1fr); gap: 0 1rem;
+  padding: 0.85rem 0; border-bottom: 1px solid var(--border);
+  color: var(--text-muted); font-size: 0.9375rem;
+}
+.rec-list li::before{
+  content: counter(rec, decimal-leading-zero);
+  font-weight: 700; color: var(--accent-text); font-size: 0.8125rem; line-height: 1.7;
+}
+.rec-list li > span{ max-width: 68ch; }
+@media (max-width: 560px){
+  .rec-list li{ grid-template-columns: 1.75rem minmax(0,1fr); gap: 0 0.75rem; }
+}
+
+/* ───────────── Simulaciones wireframe ─────────────
+   Maquetas de baja fidelidad animadas con CSS, sin librerías: enseñan el
+   comportamiento recomendado frente al habitual sin comprometer decisiones
+   visuales que todavía no están tomadas.
+   Cada figura declara su ciclo en --cyc y el fotograma en el que se congela
+   (--freeze) cuando el sistema pide movimiento reducido. */
+.wire{
+  --cyc: 9s;
+  --freeze: -6.2s;
+  --err: #b32d2d; /* 5.1:1 sobre el gris de la maqueta — el mínimo que pide este mismo entregable */
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 1.5rem 1.75rem 1.35rem;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .wire{ --err:#ff7b7b; } }
+:root[data-theme="dark"] .wire{ --err:#ff7b7b; }
+@media (max-width: 560px){ .wire{ padding: 1.25rem 1.1rem 1.1rem; } }
+
+.wire-head{ display:flex; align-items:center; gap:0.5rem 1rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+.wire-head .wire-title{ font-size:1.0625rem; font-weight:700; flex:1 1 16ch; }
+.wire-tag{
+  flex:none; font-size:0.6875rem; font-weight:700; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--accent-text);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  padding:0.3em 0.7em; border-radius:999px;
+}
+.wire-toggle{
+  flex:none; appearance:none; font-family:inherit; font-size:0.75rem; font-weight:700;
+  color:var(--text-muted); background:var(--surface); border:1px solid var(--border);
+  border-radius:999px; padding:0 0.95em; min-height:2.25rem; cursor:pointer;
+}
+.wire-toggle:hover{ color:var(--accent-text); border-color:var(--accent); }
+
+.wire-stage{ display:grid; gap:1.5rem; }
+.wire-stage--split{ grid-template-columns:repeat(2,1fr); }
+@media (max-width: 720px){ .wire-stage--split{ grid-template-columns:1fr; } }
+.wire-panel{ display:flex; flex-direction:column; gap:0.65rem; min-width:0; }
+.wire-panel-label{
+  display:flex; align-items:center; gap:0.45em; font-size:0.75rem; font-weight:700;
+  letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted);
+}
+.wire-panel-label::before{ content:""; width:0.5em; height:0.5em; border-radius:999px; background:currentColor; flex:none; }
+.wire-panel.is-good .wire-panel-label{ color:var(--accent-text); }
+.wire-panel.is-bad .wire-panel-label{ color:var(--err); }
+.wire figcaption{ margin:1.1rem 0 0; font-size:0.8125rem; line-height:1.5; color:var(--text-muted); max-width:74ch; }
+.wire-refs{ display:block; margin-top:0.35rem; font-weight:700; color: var(--chip-ink); }
+
+/* Maqueta de la pantalla */
+.wf{
+  position:relative; overflow:hidden;
+  border:1.5px solid var(--border); border-radius:12px;
+  background:var(--surface-alt); padding:1.05rem 1.1rem 1.2rem;
+}
+.wf-logo{ width:2.1rem; height:2.1rem; border-radius:7px; border:1.5px dashed var(--border); margin-bottom:0.85rem; }
+.wf-label{ display:block; font-size:0.6875rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.3rem; }
+.wf-field{
+  position:relative; display:flex; align-items:center; gap:0.5rem;
+  height:2.5rem; padding:0 0.7rem; margin-bottom:0.8rem;
+  border:1.5px solid var(--border); border-radius:8px; background:var(--surface);
+}
+.wf-field.is-err{ border-color:var(--err); }
+.wf-field:last-of-type{ margin-bottom:0; }
+.wf-slot{ display:grid; min-width:0; }
+.wf-slot > *{ grid-area:1 / 1; }
+.wf-value{ font-size:0.8125rem; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.wf-value.is-ph{ color:var(--text-muted); }
+.wf-dots{ letter-spacing:0.16em; }
+.wf-eye{ position:relative; margin-left:auto; flex:none; width:1.3rem; height:1.3rem; color:var(--text-muted); }
+.wf-eye svg{ position:absolute; inset:0; width:100%; height:100%; }
+.wf-ico-err{ flex:none; width:1rem; height:1rem; color:var(--err); margin-left:auto; }
+
+.wf-check{ display:flex; align-items:center; gap:0.85rem; margin:0.85rem 0 0.9rem; font-size:0.75rem; color:var(--text-muted); }
+.wf-box{ position:relative; flex:none; width:1.05rem; height:1.05rem; border:1.5px solid var(--border); border-radius:4px; background:var(--surface); }
+
+.wf-btn{
+  position:relative; display:grid; place-items:center;
+  height:2.5rem; margin-top:0.9rem; border-radius:8px;
+  background: var(--accent-fill); color:var(--on-accent);
+  font-size:0.8125rem; font-weight:700;
+}
+.wf-btn > span{ grid-area:1 / 1; display:flex; align-items:center; gap:0.5rem; }
+.wf-spin{ flex:none; width:0.9rem; height:0.9rem; border-radius:50%; border:2px solid currentColor; border-top-color:transparent; }
+
+.wf-msgbox{ min-height:3.6rem; padding-top:0.7rem; }
+.wf-msgbox--sm{ min-height:2.4rem; }
+.wf-msg{ margin:0; display:flex; align-items:flex-start; gap:0.4rem; font-size:0.75rem; line-height:1.35; color:var(--err); }
+.wf-msg .wf-ico{ flex:none; width:0.9rem; height:0.9rem; margin-top:0.08rem; }
+.wf-sub{ margin:0.35rem 0 0; font-size:0.75rem; line-height:1.35; color:var(--text-muted); }
+.wf-link{ display:inline-block; position:relative; margin-top:0.5rem; font-size:0.75rem; font-weight:700; color:var(--accent-text); }
+.wf-pad{ height:2.4rem; }
+
+/* Cursor y pulsación */
+.wf-cursor{ position:absolute; left:50%; top:50%; z-index:4; width:1.05rem; height:1.05rem; color:var(--text); pointer-events:none; }
+.wf-cursor svg{ width:100%; height:100%; display:block; filter:drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+.wf-ripple{
+  position:absolute; left:50%; top:50%; z-index:3; width:2.4rem; height:2.4rem;
+  margin:-1.2rem 0 0 -1.2rem; border-radius:50%; border:2px solid var(--on-accent); opacity:0; pointer-events:none;
+}
+.wf-ripple--dead{ border-color:var(--text-muted); }
+
+/* Anillo de foco para el recorrido de tabulación */
+.wf-focus{ position:absolute; inset:-5px; border:2px solid var(--accent); border-radius:10px; opacity:0; pointer-events:none; }
+.wf-focus--tight{ inset:-6px; border-radius:8px; }
+/* En objetivos pequeños pegados a su etiqueta, la insignia se pone a la
+   izquierda para no tapar el texto que está justo al lado. */
+.wf-focus--flip .wf-focus-n{ right:auto; left:-11px; }
+.wf-focus-n{
+  position:absolute; top:-10px; right:-10px; width:18px; height:18px; border-radius:50%;
+  background: var(--accent-fill); color:var(--on-accent); font-size:10px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; line-height:1;
+}
+
+/* Tira de peticiones al servidor */
+.wf-net{ display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; margin-top:0.15rem; }
+.wf-net-l{ font-size:0.6875rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-muted); margin-right:0.15rem; }
+.wf-net-c{
+  font-size:0.6875rem; font-weight:700; color:var(--err);
+  border:1px solid color-mix(in srgb, var(--err) 40%, transparent);
+  background: color-mix(in srgb, var(--err) 10%, transparent);
+  border-radius:999px; padding:0.2em 0.6em; opacity:0;
+}
+.wf-net-c.is-ok{
+  color:var(--accent-text); border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* Etiqueta de estado de la simulación (figura del color) */
+.wire-note{ display:grid; margin-bottom:1rem; font-size:0.75rem; font-weight:700; color:var(--text-muted); min-height:1.2rem; }
+.wire-note > span{ grid-area:1 / 1; }
+
+/* Indicador de tecla */
+.wf-key{
+  display:inline-flex; align-items:center; justify-content:center; min-width:2.6rem; height:1.6rem;
+  border:1.5px solid var(--border); border-bottom-width:3px; border-radius:6px; background:var(--surface);
+  font-size:0.6875rem; font-weight:700; color:var(--text-muted);
+}
+.wf-step{ display:grid; min-height:1.3rem; font-size:0.75rem; font-weight:700; color:var(--accent-text); }
+.wf-step > span{ grid-area:1 / 1; }
+.wf-keyrow{ display:flex; align-items:center; gap:0.6rem; margin-top:0.9rem; }
+
+/* Motor de animación compartido */
+.wire .wa{
+  animation-duration: var(--d, var(--cyc));
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+.wire .wa--2s{ --d:2s; }
+.wire .wa--spin{ --d:0.75s; animation-name:wf-spin; }
+@keyframes wf-spin{ to{ transform:rotate(360deg) } }
+
+.wire.is-paused .wa{ animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce){
+  /* La regla global de la página fuerza animation-duration a 0.001ms, que
+     dejaría cada simulación en su último fotograma: todo oculto. Aquí se
+     restituye la duración solo para poder congelar la animación, en pausa
+     desde el primer momento, en el fotograma que explica el punto. No hay
+     movimiento en ningún caso; se usa el motor de animación como si fuera
+     una imagen fija. */
+  .wire .wa{
+    animation-duration: var(--d, var(--cyc)) !important;
+    animation-delay: var(--freeze) !important;
+    animation-play-state: paused !important;
+  }
+  .wire .wa--spin{ animation: none !important; }
+  .wire-toggle{ display:none; }
+}
+
+/* Los aciertos no son una lista numerada de tareas: se marcan, no se cuentan. */
+.rec-list--ok li::before{ content:"\2713"; font-size:1rem; line-height:1.5; }
+
+/* Tarjeta de apoyo: mismo sistema que .card-neutral, pero se distingue de las
+   fichas de hallazgo para que no se lean como uno más. */
+.card-aparte{ background:var(--surface-alt); border:1px solid var(--border);
+  border-left:3px solid var(--accent); color:var(--text); }
+.card-aparte p{ font-size:0.9375rem; line-height:1.68; color:var(--text-muted); max-width:68ch; }
+.card-aparte strong{ color:var(--text); }
+.copy-prop{ margin-top:1rem; background:var(--surface-alt); border:1px solid var(--border);
+  border-radius:12px; padding:1.15rem 1.25rem; max-width:44ch; }
+.copy-prop-t{ font-size:1rem !important; font-weight:700; color:var(--text) !important;
+  margin-bottom:0.5rem; }
+.copy-prop-btns{ display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.9rem !important; }
+.copy-prop-btns span{ font-size:0.8125rem; font-weight:700; border:1px solid var(--border);
+  border-radius:6px; padding:0.5em 0.9em; color:var(--text); }
+.copy-prop-btns span:first-child{ background:var(--chip-cliente-bg); color:var(--on-accent);
+  border-color:var(--chip-cliente-bg); }
+.copy-prop-ref{ font-size:0.75rem !important; margin-top:0.8rem !important;
+  font-variant-numeric:tabular-nums; letter-spacing:0.03em; }
+
+
+/* Observaciones generales: dos columnas de tarjetas breves. La regla de una
+   sola columna es para las secciones con lista larga, no para estas. */
+#p-diag #diagnostico .evidence-stack{ grid-template-columns:repeat(2,1fr); align-items:stretch }
+#diagnostico .evidence-card{ padding:1.35rem 1.5rem }
+#diagnostico .evidence-card h3{ font-size:1rem; line-height:1.35 }
+#diagnostico .evidence-card p{ font-size:0.875rem }
+@media (max-width:860px){ #p-diag #diagnostico .evidence-stack{ grid-template-columns:1fr } }
+
+/* Con listas largas, la lista va a ancho completo y la simulación debajo:
+   en dos columnas la figura se estiraba hasta la altura de la lista. */
+#p-diag .evidence-stack{ grid-template-columns:1fr; align-items:start }
+#funciona .evidence-stack{ grid-template-columns:1fr }
+
+
+/* Motor de las simulaciones del diagnóstico. */
+.wire .an{ animation-duration:var(--cyc); animation-iteration-count:infinite;
+  animation-timing-function:linear; animation-fill-mode:both }
+.wire.is-paused .an{ animation-play-state:paused }
+@media (prefers-reduced-motion: reduce){
+  .wire .an{ animation-duration:var(--cyc) !important; animation-delay:var(--freeze) !important;
+    animation-play-state:paused !important }
+}
+
+/* ── Fragmentos de pantalla con la paleta real de SIO-DPROMA ──────────────
+   Las simulaciones dejan de ser grises: usan los mismos tokens de estado que
+   la aplicación, para que lo que se ve aquí sea lo que se ve allí. */
+.wf{
+  --a-surface:#FAFCFD; --a-surface-2:#E7EDF3; --a-bg:#F2F5F7;
+  --a-border:rgba(27,36,48,.14); --a-ctrl:rgba(27,36,48,.50);
+  --a-text:#1B2430; --a-text-2:#4C5A6B; --a-text-3:#5D6774;
+  --a-link:#2F6B3C; --a-accent:#3E7A4C; --a-accent-ink:#F7FAF9;
+  --a-ok:#22705A; --a-ok-bg:#E2EFEC; --a-warn:#7E5B0E; --a-warn-bg:#F1ECDE;
+  --a-err:#B03A31; --a-err-bg:#F4E8E7; --a-block:#6D4FA3; --a-block-bg:#EDEBF7;
+  background:var(--a-bg); border-color:var(--a-border);
+  color:var(--a-text); font-size:.8125rem;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .wf{
+  --a-surface:#171F2C; --a-surface-2:#1D2735; --a-bg:#10161F;
+  --a-border:rgba(231,236,242,.12); --a-ctrl:rgba(231,236,242,.37);
+  --a-text:#E7ECF2; --a-text-2:#A8B3C2; --a-text-3:#8B96A6;
+  --a-link:#8FD3A2; --a-accent:#4A8F5A; --a-accent-ink:#08120D;
+  --a-ok:#7FD9B8; --a-ok-bg:#16302B; --a-warn:#F0C04A; --a-warn-bg:#332C15;
+  --a-err:#F09189; --a-err-bg:#37211F; --a-block:#C3AEF0; --a-block-bg:#272238; } }
+:root[data-theme="dark"] .wf{
+  --a-surface:#171F2C; --a-surface-2:#1D2735; --a-bg:#10161F;
+  --a-border:rgba(231,236,242,.12); --a-ctrl:rgba(231,236,242,.37);
+  --a-text:#E7ECF2; --a-text-2:#A8B3C2; --a-text-3:#8B96A6;
+  --a-link:#8FD3A2; --a-accent:#4A8F5A; --a-accent-ink:#08120D;
+  --a-ok:#7FD9B8; --a-ok-bg:#16302B; --a-warn:#F0C04A; --a-warn-bg:#332C15;
+  --a-err:#F09189; --a-err-bg:#37211F; --a-block:#C3AEF0; --a-block-bg:#272238; }
+
+/* Barra superior del fragmento: sitúa lo que se está mirando. */
+.wf-top{display:flex;align-items:baseline;gap:.5rem;margin:-.15rem 0 .8rem}
+.wf-top b{font-size:.875rem;font-weight:700;color:var(--a-text)}
+.wf-top span{font-size:.75rem;color:var(--a-text-3)}
+
+.wf-bar{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.wf-pill{display:inline-flex;align-items:center;gap:.35rem;height:1.5rem;padding:0 .55rem;
+  border-radius:6px;font-size:.6875rem;font-weight:700;white-space:nowrap;border:1px solid transparent}
+.wf-pill--err{background:var(--a-err-bg);color:var(--a-err)}
+.wf-pill--warn{background:var(--a-warn-bg);color:var(--a-warn)}
+.wf-pill--ok{background:var(--a-ok-bg);color:var(--a-ok)}
+.wf-pill--block{background:var(--a-block-bg);color:var(--a-block)}
+.wf-pill--gris{background:var(--a-surface-2);color:var(--a-text-2)}
+.wf-pill--punteado{border:1px dashed var(--a-ctrl);background:transparent;color:var(--a-text-2)}
+/* Un control se ve control: superficie propia, borde de control y chevron. */
+.wf-pill--control{background:var(--a-surface);border:1px solid var(--a-ctrl);color:var(--a-text);
+  border-radius:999px;height:1.75rem;padding:0 .7rem}
+.wf-pill .g{font-size:.6rem;color:var(--a-text-3)}
+.wf-pill .ic{width:.55rem;height:.55rem;border-radius:50%;background:currentColor;flex:none}
+
+/* Tabla del listado. */
+.wf-tabla{background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow:hidden}
+.wf-thead{display:flex;gap:.6rem;padding:.4rem .65rem;background:var(--a-surface-2);
+  font-size:.625rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--a-text-3)}
+.wf-fila{display:flex;align-items:center;gap:.6rem;padding:.5rem .65rem;
+  border-top:1px solid var(--a-border);font-size:.75rem;color:var(--a-text-2)}
+.wf-tabla .wf-fila:first-of-type{border-top:0}
+.wf-fila .folio{font-weight:700;color:var(--a-link);white-space:nowrap;min-width:5.2rem}
+/* Aviso de bloqueo y su toggletip, para la simulación de §8. */
+.wf-avisobox{border:1px solid var(--a-err);border-radius:8px;padding:.55rem .65rem;
+  background:color-mix(in srgb, var(--a-err) 8%, var(--a-surface))}
+.wf-avisobox .wf-msg{font-weight:700}
+.wf-avisobox .wf-sub{margin-top:.3rem}
+.wf-i{display:inline-grid;place-items:center;width:1rem;height:1rem;border-radius:50%;
+  border:1px solid currentColor;font-size:.5625rem;font-weight:700;font-style:italic;
+  vertical-align:middle;margin-left:.2rem}
+.wf-tip{margin:.45rem 0 0 auto;width:max-content;max-width:100%;
+  padding:.45rem .6rem;border-radius:6px;background:var(--a-text);color:var(--a-surface);
+  font-size:.6875rem;line-height:1.45}
+/* El identificador de fila va sin color de enlace (§6.11, regla 10). Los paneles
+   de «recomendado» lo cumplen, para que el diagrama no contradiga al texto. */
+.wire-panel.is-good .wf-fila .folio{color:var(--a-text)}
+.wf-fila .cli{color:var(--a-text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wf-fila .sep{margin-left:auto;flex:none}
+
+/* Zonas declaradas. */
+.wf-zona{border:1px dashed var(--a-ctrl);border-radius:8px;padding:.5rem .6rem;background:var(--a-surface)}
+.wf-zona-et{display:block;font-size:.625rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--a-text-3);margin-bottom:.4rem}
+
+/* Botones del fragmento. */
+.wf-mini{display:inline-grid;place-items:center;height:1.6rem;padding:0 .6rem;border-radius:6px;
+  border:1px solid var(--a-ctrl);background:var(--a-surface);font-size:.6875rem;font-weight:700;
+  color:var(--a-text-2)}
+.wf-mini.pri{background:var(--a-accent);border-color:transparent;color:var(--a-accent-ink)}
+.wf-acc{display:inline-flex;align-items:center}
+.wf-acc.juntos{gap:6px}
+.wf-acc.sueltos{gap:1.15rem}
+.wf-msg{margin:0;font-size:.75rem;font-weight:700;color:var(--a-err)}
+.wf-sub{margin:.3rem 0 0;font-size:.75rem;line-height:1.45;color:var(--a-text-2)}
+.wf-ref{margin:.45rem 0 0;font-size:.6875rem;color:var(--a-text-3)}
+.wf-pad{height:.7rem}
+
+/* Rótulo del paso: dice en palabras lo que está pasando en la simulación. */
+.wire-paso{display:grid;min-height:1.35rem;margin:0 0 .75rem;font-size:.75rem;font-weight:700;color:var(--accent-text)}
+.wire-paso > span{grid-area:1 / 1}
+
+.wf-cursor{position:absolute;z-index:5;left:0;top:0;width:1.05rem;height:1.05rem;
+  color:var(--a-text);pointer-events:none}
+.wf-cursor svg{width:100%;height:100%;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+.wf-ripple{position:absolute;z-index:4;width:2.2rem;height:2.2rem;margin:-1.1rem 0 0 -1.1rem;
+  border-radius:50%;border:2px solid var(--a-accent);opacity:0;pointer-events:none}
+.wf-ripple--dead{border-color:var(--a-err)}
+.wf-halo{position:absolute;z-index:2;border-radius:8px;border:2px solid var(--a-accent);opacity:0;pointer-events:none}
+
+/* Escenas */
+@keyframes av-parpadeo{ 0%,44%{ box-shadow:none } 50%,72%{ box-shadow:0 0 0 3px var(--a-warn-bg) } 78%,100%{ box-shadow:none } }
+@keyframes av-lat{ 0%,45%{ opacity:.25 } 55%,100%{ opacity:1 } }
+@keyframes av-paso1{ 0%,30%{ opacity:1 } 34%,100%{ opacity:0 } }
+@keyframes av-paso2{ 0%,32%{ opacity:0 } 36%,64%{ opacity:1 } 68%,100%{ opacity:0 } }
+@keyframes av-paso3{ 0%,66%{ opacity:0 } 70%,100%{ opacity:1 } }
+@keyframes av-cursor-filtro{
+  0%,6%   { transform:translate(13rem,11rem) }
+  20%,32% { transform:translate(3.84rem,3.87rem) }
+  48%,62% { transform:translate(19.18rem,3.87rem) }
+  80%,100%{ transform:translate(13rem,11rem) }
+}
+@keyframes av-press{
+  0%,18%  { opacity:0; transform:scale(.4) }
+  22%     { opacity:.8; transform:scale(.55) }
+  30%     { opacity:0; transform:scale(1.15) }
+  46%     { opacity:0; transform:scale(.4) }
+  50%     { opacity:.8; transform:scale(.55) }
+  58%,100%{ opacity:0; transform:scale(1.15) }
+}
+@keyframes av-press-pos{ 0%,38%{ transform:translate(3.84rem,3.87rem) } 39%,100%{ transform:translate(19.18rem,3.87rem) } }
+@keyframes av-nada{ 0%,32%{ opacity:0 } 36%,44%{ opacity:1 } 48%,100%{ opacity:0 } }
+@keyframes av-filtra{ 0%,60%{ opacity:1; transform:none } 66%,100%{ opacity:.12; transform:translateX(-4px) } }
+@keyframes av-cursor-tap{
+  0%,12%  { transform:translate(3rem,5rem) }
+  34%,58% { transform:translate(21.3rem,2.47rem) }
+  80%,100%{ transform:translate(3rem,5rem) }
+}
+@keyframes av-fallo{ 0%,36%{ opacity:0; transform:translateY(3px) } 42%,68%{ opacity:1; transform:none } 74%,100%{ opacity:0; transform:translateY(3px) } }
+@keyframes av-halo{ 0%,40%{ opacity:0 } 46%,70%{ opacity:1 } 76%,100%{ opacity:0 } }
+
+</style>
+</head>
+
+<body>
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="wordmark" href="/">2894 <span>Studio × DPROMA</span></a>
+    <nav>
+      <a href="/">Informe general</a>
+      <a href="#diagnostico">Diagnóstico</a>
+      <a href="#ux">UX</a>
+      <a href="#ui">Interfaz</a>
+      <a href="#accesibilidad">Accesibilidad</a>
+      <a href="#pantallas">Las pantallas</a>
+      <a class="nav-cta" href="/entregables">Entregables</a>
+    </nav>
+  </div>
+</header>
+
+<section class="claim-hero" id="claim">
+  <div class="claim-scroller" id="claimScroller">
+    <div class="claim-sticky">
+      <div class="wrap">
+        <div class="eyebrow">Entregable · Viáticos, compras y cobros</div>
+        <h1 class="claim-text" id="claimText">
+          <span class="claim-word">Cuatro</span> <span class="claim-word">pantallas</span>
+          <span class="claim-word">donde</span> <span class="claim-word">el</span>
+          <span class="claim-word">sistema</span> <span class="claim-word">mueve</span>
+          <span class="claim-word">dinero.</span>
+        </h1>
+        <p class="claim-sub">Viáticos, el detalle de un viático, la autorización de una compra de almacén y las cuentas por cobrar. Revisadas de experiencia, interfaz y accesibilidad, y medidas contra el sistema de diseño.</p>
+        <p class="claim-scroll-hint" id="claimScrollHint">Sigue bajando</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="tabs-wrap">
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Contenido del entregable">
+      <button type="button" class="tab" id="t-diag" role="tab"
+              aria-selected="true" aria-controls="p-diag">Diagnóstico</button>
+      <button type="button" class="tab" id="t-pant" role="tab"
+              aria-selected="false" aria-controls="p-pant" tabindex="-1">Las pantallas</button>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="p-diag" role="tabpanel" aria-labelledby="t-diag" tabindex="-1">
+
+<section id="diagnostico">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Observaciones generales</div>
+        <h2>Lo que se repite en las cuatro pantallas.</h2>
+        <p class="section-note">Son los seis temas de los dos informes de revisión, el del 29 y el del 30 de septiembre. Se resuelven una vez en el sistema, no pantalla por pantalla.</p>
+      </div>
+    </div>
+
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <span class="eyebrow">Promesas</span>
+        <h3>Hay controles que parecen pulsables y no hacen nada</h3>
+        <p>El folio lleva <code>href="#"</code>: es lo que anuncia la fila como zona pulsable, y al pulsarlo no ocurre nada. Los chips de conteo son <code>&lt;button aria-pressed="false"&gt;</code> con cursor de mano que nunca cambian de estado. El buscador no filtra y ninguna cabecera ordena: no hay <code>aria-sort</code> en las cuatro pantallas. §6.12 regla 8 lo dice con estas palabras: «se ve pulsable y no lo es».</p>
+      </article>
+      <article class="evidence-card card card-neutral reveal">
+        <span class="eyebrow">Duplicidad</span>
+        <h3>Dos y tres formas de hacer lo mismo en cada fila</h3>
+        <p>«Ver detalle» y «Ver comprobantes» en Viáticos, «Ver agencias» en Cuentas por cobrar: un botón al final de la fila que repite lo que hacer clic en la fila ya debería hacer. Trámites vehiculares nunca los tuvo, y ahí la fila entera es la zona pulsable, con el fondo al pasar el cursor como única señal necesaria.</p>
+      </article>
+      <article class="evidence-card card card-neutral reveal">
+        <span class="eyebrow">Filtros</span>
+        <h3>La barra de filtros del sistema no está en ninguna de las cuatro</h3>
+        <p>Viáticos y Cuentas por cobrar tienen una franja de contadores con forma de control y un buscador, pero ninguna monta el componente de filtro del sistema —desplegable con buscador, casillas y pastillas removibles—, que §6.21 fija como el único para filtrar por un campo con más de un valor. Trámites vehiculares ya lo usa con cinco dimensiones.</p>
+      </article>
+      <article class="evidence-card card card-neutral reveal">
+        <span class="eyebrow">Color</span>
+        <h3>Verde de enlace dentro de una tabla</h3>
+        <p>El folio y el nombre del grupo automotriz van en el color de enlace, como si fueran hipervínculos distintos al resto de la fila. El verde se reserva para navegación real fuera de tabla; dentro, la zona pulsable es la fila entera. El nombre del grupo lleva además una flechita que ninguna otra tabla tiene y que no significa nada.</p>
+      </article>
+      <article class="evidence-card card card-neutral reveal">
+        <span class="eyebrow">Ritmo</span>
+        <h3>La celda absorbe texto libre y rompe la altura de la fila</h3>
+        <p>El motivo de un rechazo y la justificación de un excedente viven como texto suelto dentro de la celda, con largo variable. Por eso las seis filas de Viáticos miden 161, 100, 127, 111, 124 y 83 px. Las cinco de partidas de Autorización de compra miden 47 px las cinco: la misma tabla, resuelta bien, dentro del mismo entregable.</p>
+      </article>
+      <article class="evidence-card card card-neutral reveal">
+        <span class="eyebrow">Voz</span>
+        <h3>El aviso de bloqueo llevaba el racional completo delante</h3>
+        <p>El banner que impide pedir un viático nuevo explicaba, en el mismo párrafo, la regla de los tres días hábiles y a quién se le aplica el descuento. Es información real, pero no hace falta leerla entera para entender la instrucción: este viático está bloqueado. Igual la nota de 690 caracteres que explicaba las columnas de Aprobación y Comprobación debajo de la tabla.</p>
+      </article>
+      <article class="evidence-card card card-neutral reveal">
+        <span class="eyebrow">Gráfico</span>
+        <h3>La barra de cartera es, literalmente, el ejemplo de «mal» del sistema</h3>
+        <p>Pinta sus cuatro tramos de tiempo con el semáforo de estado: <code>--ok</code>, <code>--warn</code>, <code>--block</code> y <code>--err</code>, a 57, 23, 12 y 8 por ciento. §1.4 recoge ese mismo bloque, con esos mismos anchos, como el ejemplo de lo que no hay que hacer: ninguno de los cuatro tramos es un estado, y aun así 0–30 días queda en «correcto» y +90 en «error». Y los tramos solo dicen el rango, que por sí solo no dice qué tan grave es ninguno.</p>
+      </article>
+    </div>
+
+    <figure class="wire reveal" style="--cyc:9s; --freeze:-5s">
+      <div class="wire-head">
+        <span class="wire-tag">Simulación</span>
+        <span class="wire-title">La instrucción delante, el racional en un ícono</span>
+        <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
+      </div>
+      <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">El aviso explica la regla entera.</span><span class="an" style="animation-name:av-paso2">Para saber que está bloqueado hay que leerlo todo.</span><span class="an" style="animation-name:av-paso3">Ahora la instrucción se queda y el resto entra en un ícono.</span></p>
+      <div class="wire-stage wire-stage--split" aria-hidden="true">
+        <div class="wire-panel is-bad">
+          <span class="wire-panel-label">Antes</span>
+          <div class="wf"><div class="wf-avisobox">
+              <p class="wf-msg">Rubén Beltrán Ochoa no puede pedir un viático nuevo.</p>
+              <p class="wf-sub">Tiene el comprobante de VI-2026-0709 rechazado y $640 sin comprobar desde el 6 de agosto. El plazo eran 3 días hábiles tras el regreso — y la semana hábil va de lunes a sábado. Como es instalador externo, si el gasto no se comprueba el descuento se aplica a su jefe directo, Nayeli Cruz Padilla, que fue quien lo asignó.</p>
+            </div>
+            <p class="wf-sub">402 caracteres, cuatro frases, siempre a la vista.</p></div>
+        </div>
+        <div class="wire-panel is-good">
+          <span class="wire-panel-label">Después</span>
+          <div class="wf"><div class="wf-avisobox">
+              <p class="wf-msg">Rubén Beltrán Ochoa no puede pedir un viático nuevo. <span class="wf-i an" style="animation-name:av-lat">i</span></p>
+            </div>
+            <div class="wf-tip">El plazo eran 3 días hábiles tras el regreso. Como es instalador externo, el descuento se aplica a su jefe directo, que fue quien lo asignó.</div>
+            <div class="wf-pad"></div>
+            <p class="wf-sub">La instrucción se lee de un vistazo. El resto se abre si hace falta.</p></div>
+        </div>
+      </div>
+      <figcaption>Mismo contenido, distinto momento de lectura. Es la §8 del sistema: lo que bloquea se queda visible, lo que aclara pasa a un toggletip.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="funciona">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Lo que ya funciona bien</div>
+        <h2>Decisiones acertadas que conviene convertir en norma.</h2>
+      </div>
+    </div>
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list rec-list--ok">
+          <li><span>Los mensajes de error explican qué <strong>no</strong> se ha roto: «Ninguna solicitud se aprobó ni se rechazó sola y ningún comprobante se perdió». Es el mejor material de las cuatro pantallas.</span></li>
+          <li><span>Y van más allá, diciendo qué no dar por hecho: «Si estabas a punto de aprobar una, no la des por aprobada: vuelve a entrar y compruébalo antes de avisarle a nadie».</span></li>
+          <li><span>Cada error trae una referencia consultable, como <code>VIA-20260821-1418</code>. Soporte y la persona hablan del mismo incidente.</span></li>
+          <li><span>Las cuatro situaciones están previstas en las cuatro pantallas: con datos, cargando, vacío y error. Evita que el equipo de desarrollo improvise esos casos.</span></li>
+          <li><span>El esqueleto de carga imita la forma real de la tabla: seis filas de esqueleto para las seis filas que carga, con las mismas anchuras de columna. No hay salto visual cuando llegan los datos.</span></li>
+          <li><span>En Viáticos, la aprobación del gasto y la comprobación de papeles viven en <strong>dos columnas separadas</strong>. Son dos procesos, con dos responsables y dos momentos.</span></li>
+          <li><span>El botón bloqueado de Autorización de compra explica por qué lo está y da una salida: «Si crees que es un error de asignación, levanta un ticket en vez de pedirle a alguien que la apruebe por ti».</span></li>
+          <li><span>Esa misma pantalla resuelve bien una regla delicada: autoriza el rol, no la persona, «y por eso no hay nadie a quien esperar ni ausencia que cubrir».</span></li>
+          <li><span>Aprobar y rechazar exigen comentario en los dos casos, y la pantalla avisa de que queda en una traza que no se puede editar después.</span></li>
+          <li><span>Cuentas por cobrar declara el alcance exacto de su cifra —«sólo factura timbrada y no pagada»— y deja «Cerrado y sin facturar» fuera del número grande a propósito, para que un retraso de facturación no se lea como un problema de cobranza.</span></li>
+          <li><span>Y declara la limitación de su propio dato: la antigüedad se cuenta desde la fecha de la factura porque el padrón todavía no guarda los días de crédito del cliente.</span></li>
+          <li><span>Las tres tablas llevan <code>&lt;caption&gt;</code> y <code>scope</code> en todas sus cabeceras.</span></li>
+          <li><span>El anillo de foco mide 2 px y cambia de color según la zona: da <strong>5,68:1</strong> sobre el menú azul y <strong>4,99:1</strong> sobre el fondo claro, muy por encima del 3:1 que pide un elemento gráfico.</span></li>
+          <li><span>No hay ningún <code>id</code> duplicado, ninguna referencia <code>aria-controls</code> o <code>aria-labelledby</code> rota, ningún control sin nombre accesible y ningún error de JavaScript en las cuatro pantallas.</span></li>
+          <li><span>Folios y UUID están marcados con <code>translate="no"</code>, así que ningún traductor automático los altera.</span></li>
+          <li><span>Hay tema claro y oscuro en las cuatro, sobre las mismas variables: cambiar un color se hace en un solo sitio.</span></li>
+          <li><span>La preferencia de movimiento reducido se respeta de verdad: con ella puesta no queda ni una animación corriendo en la página, ni siquiera la del asistente flotante.</span></li>
+          <li><span>El conmutador de estados del pie es andamiaje de maqueta y está declarado como tal: lleva <code>data-andamio</code>, va separado del producto y rotulado «Estado», que es exactamente lo que pide §9. Un solo selector lo retira en la versión real.</span></li>
+          <li><span>Y lo más útil de todo: <strong>el patrón correcto ya existe dentro del mismo sistema</strong>. Trámites vehiculares resuelve bien los filtros —su «Estatus» son seis valores de un solo campo real— y nunca tuvo botones de «ver detalle», porque la fila entera ya es la zona pulsable. No hay que inventar la solución, hay que copiarla.</span></li>
+        </ul>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section id="ux">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Recomendaciones</div>
+        <h2>UX y arquitectura de la información</h2>
+        <p class="section-note">Las de los dos informes ya están aplicadas en las versiones corregidas de Viáticos y Viático detalle, y se pueden abrir en la otra pestaña. Las demás siguen abiertas.</p>
+      </div>
+    </div>
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list">
+          <li><span>Montar la barra de filtros del sistema, con una dimensión por pregunta: Aprobación, Comprobación y Monto en Viáticos; marca, grupo y antigüedad en Cuentas por cobrar. El componente existe, está documentado en §6.21 y corre ya en Trámites vehiculares con cinco dimensiones.</span></li>
+          <li><span>Quitar los botones de «ver detalle» de las filas y dejar que la fila entera entre al registro. Son dos o tres caminos para lo mismo, y el del medio —el folio— ni siquiera funciona.</span></li>
+          <li><span>Fijar un único nombre por concepto y usarlo en toda la pantalla. Elegir entre «excedente» y «por encima del estándar», y no alternar entre la cabecera, el chip y la celda.</span></li>
+          <li><span>Nombrar los tramos del gráfico de antigüedad por lo que significan —recientes, atrasadas, críticas, urgentes— y dejar el rango de días como dato secundario. «61–90» obliga a hacer la cuenta de qué tan grave es; «críticas» no.</span></li>
+          <li><span>Sacar de la celda la razón de un estado. Hoy la celda de comprobación de <code>VI-2026-0722</code> contiene «Motivo: "El vuelo no procede para un trayecto de 3 h por carretera. Se aprueba de nuevo si viaja en autobús"». El sistema ya lo resolvió en §6.12, regla 9: esa razón vive en el detalle del registro.</span></li>
+          <li><span>Hacer lo mismo con la justificación del monto: la cita «El hotel del tabulador estaba lleno por la feria; el más cercano con disponibilidad costaba $400 más la noche» está dentro de la columna de importes, y es lo que hace que esa fila mida 161 px.</span></li>
+          <li><span>Escribir la capa interactiva o retirar la promesa. Un <code>&lt;button aria-pressed="false"&gt;</code> anuncia un interruptor; si al pulsarlo no cambia nada, el atributo miente a quien navega con lector de pantalla y la forma miente a todos los demás.</span></li>
+          <li><span>Permitir ordenar por importe y por antigüedad. Hoy ninguna de las tres tablas ofrece ordenación, y son las dos preguntas con las que se entra a estas pantallas.</span></li>
+          <li><span>Unificar la última columna de Viáticos. Hoy mezcla cinco cosas distintas: acción primaria («Aprobar»), acción secundaria («Rechazar…»), navegación («Ver detalle», «Ver comprobantes»), acción de otro proceso («Subir uno nuevo») y texto explicativo suelto.</span></li>
+          <li><span>Decidir qué pasa tras cada acción. Al aprobar, ¿la fila desaparece, se atenúa, se puede deshacer? Es donde más se rompen las herramientas internas, y el prototipo no lo prevé.</span></li>
+          <li><span>Separar visualmente el resumen de los filtros cuando estos existan, y mientras tanto no dar forma de control a lo que solo cuenta. Hoy los contadores son botones con cursor de mano en una franja donde no hay ningún filtro.</span></li>
+          <li><span>Unificar los dos indicadores de posición de Cuentas por cobrar. En la misma barra, a la izquierda hay una miga («Todas las marcas ↓ Marca A») y a la derecha un rótulo («Nivel 2 de 3 · marca › grupo › agencia») que dicen lo mismo por separado.</span></li>
+          <li><span>Permitir moverse al registro anterior y siguiente desde el detalle. Viático detalle y Autorización de compra tienen miga de vuelta, pero revisar comprobantes o autorizar compras es un trabajo por lotes y obliga a salir y volver a entrar.</span></li>
+          <li><span>Dejar que el texto que explica un bloqueo cuelgue del control que bloquea, no del espacio de al lado. Es lo mismo que pide la recomendación de accesibilidad, y aquí resuelve además dónde colocarlo.</span></li>
+        </ul>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section id="ui">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Recomendaciones</div>
+        <h2>Interfaz</h2>
+      </div>
+    </div>
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list">
+          <li><span>Usar la escala que las propias pantallas declaran. <code>:root</code> define seis tamaños —<code>--fs-meta</code> 12, <code>--fs-dense</code> 13, <code>--fs-base</code> 14, <code>--fs-sub</code> 16, <code>--fs-title</code> 20 y <code>--fs-kpi</code> 30— y sobre la página se cuentan ocho o nueve.</span></li>
+          <li><span>Eliminar los tamaños fuera de esa escala: 10,5, 11, 11,5 y 13,5 px. Entre 13 y 13,5 px no hay diferencia perceptible, y sí una escala rota.</span></li>
+          <li><span>Reducir los grosores. Viáticos y Cuentas por cobrar usan cuatro —400, 600, 700 y 800—, y el 800 aparece cuatro veces en cada una.</span></li>
+          <li><span>Aplicar la escala de espaciado declarada, que va de cuatro en cuatro desde <code>--sp-1</code>. Hoy conviven 1, 2, 3, 5, 6, 7, 9, 10, 13 y 14 px con los valores del token.</span></li>
+          <li><span>Quitar el color de enlace del identificador de fila. El folio va hoy en <code>rgb(47, 107, 60)</code> a peso 600; el sistema fija en §6.11, regla 10, que va en <code>--text</code>, porque la zona pulsable es la fila entera y no el texto verde.</span></li>
+          <li><span>Sacar el semáforo de estado de la barra de antigüedad. Los cuatro tramos usan <code>--ok</code>, <code>--warn</code>, <code>--block</code> y <code>--err</code>, y §1.4 es explícita —«una serie de gráfica nunca reutiliza un color de estado»— y trae este caso con su corrección escrita: los mismos anchos, con <code>--serie-1</code> a <code>--serie-4</code>.</span></li>
+          <li><span>Garantizar por construcción el cierre de las dos columnas del detalle, en vez de dejarlo a la longitud del contenido. Con <code>align-items:start</code> cierran a 3,8 px de diferencia a 1440 px de ancho y a 60,7 px a 1200: casi alineado se ve peor que claramente distinto, y el «casi» depende del ancho de la ventana.</span></li>
+          <li><span>Igualar la altura de las filas. Las seis de Viáticos miden entre 83 y 161 px; las cinco de partidas de Autorización de compra miden 47 px las cinco, que es el modelo a seguir.</span></li>
+          <li><span>Unificar la cabecera de las cuatro pantallas. Viáticos y Cuentas por cobrar llevan buscador y franja de chips; Viático detalle y Autorización de compra, miga y botones. No hay una plantilla reconocible.</span></li>
+          <li><span>Dejar una sola acción principal por pantalla. En Viáticos compiten «Nueva solicitud», «Columnas» y un icono de exportar sin texto.</span></li>
+          <li><span>Mover el asistente flotante o reservarle espacio al final de las listas. Hoy se solapa con la última fila de las tablas largas.</span></li>
+          <li><span>Prever los estados de las acciones que tardan: aprobando, aprobado, falló. Aprobar mueve dinero, y el prototipo solo tiene el reposo.</span></li>
+          <li><span>Llevar los bloques explicativos a un toggletip sobre el control al que se refieren. La explicación bajo la cifra de Cuentas por cobrar suma 524 caracteres y compite con un número de 30 px que debería leerse solo.</span></li>
+        </ul>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section id="accesibilidad">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Recomendaciones</div>
+        <h2>Accesibilidad</h2>
+        <p class="section-note">WCAG 2.2 nivel AA. La base está mejor de lo habitual —foco, nombres y tablas cumplen—; lo que falta es tamaño de zonas pulsables, estructura de encabezados y anuncio de cambios.</p>
+      </div>
+    </div>
+    <div class="evidence-stack">
+      <article class="evidence-card card card-neutral reveal">
+        <ul class="rec-list">
+          <li><span>Cambiar el <code>disabled</code> del botón bloqueado por <code>aria-disabled="true"</code>, y asociar la razón con <code>aria-describedby</code>. En Viáticos, el «Aprobar» de <code>VI-2026-0730</code> está <code>disabled</code> y la razón —«No puedes aprobar tu propia solicitud»— está en la misma celda sin asociar. El sistema ya resuelve el caso: un botón deshabilitado no recibe el foco, así que quien navega con teclado pasa de largo y nunca llega a la explicación de por qué no puede seguir.</span></li>
+          <li><span>Subir a 24 px como mínimo real las zonas pulsables. Los seis folios de Viáticos miden 98×15 px, los cinco enlaces de grupo de Cuentas por cobrar 23 px de alto, la miga de Autorización de compra 141×14 y el enlace de la cotización 180×15.</span></li>
+          <li><span>Convertir en encabezados reales los títulos de los estados vacío y error. Hoy son <code>&lt;b&gt;</code> en las ocho situaciones de las cuatro pantallas, así que no se puede navegar por ellos.</span></li>
+          <li><span>Dar encabezados a los bloques de contenido de Viáticos y Cuentas por cobrar, que tienen un <code>h1</code> y ningún <code>h2</code>. Viático detalle y Autorización de compra sí estructuran con <code>h2</code>: son el modelo dentro del mismo entregable.</span></li>
+          <li><span>Anunciar los estados de vacío y de error. Solo el esqueleto de carga lleva <code>role="status"</code>; quien no ve la pantalla no se entera de que no hay nada o de que falló.</span></li>
+          <li><span>Anunciar el cambio de resultados al filtrar, cuando el filtrado exista. Es la otra mitad de escribir la capa interactiva.</span></li>
+          <li><span>Subir el contraste de las iniciales del avatar, que quedan en 3,06:1 sobre el verde a 12 px en negrita, donde se pide 4,5:1. Están <code>aria-hidden</code>, así que no afectan a un lector de pantalla, pero sí a quien las mira.</span></li>
+          <li><span>Describir la acción completa en los botones de icono. El de exportar de Viáticos y Cuentas por cobrar dice «Exportar», sin decir qué exporta ni con qué alcance.</span></li>
+          <li><span>Dar nombre único a las filas navegables, que hoy repiten el mismo destino sin distinguir el registro.</span></li>
+          <li><span>Comprobar el tema oscuro con el mismo rasero. Las medidas de este informe están tomadas en claro, y el sistema tiene los dos.</span></li>
+        </ul>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+</div><!-- /#p-diag -->
+
+<div class="panel" id="p-pant" role="tabpanel" aria-labelledby="t-pant" tabindex="-1" hidden>
+
+<section class="maquetas-mod" id="pantallas">
+  <div class="wrap">
+    <h2>Las cuatro pantallas revisadas</h2>
+    <p class="maquetas-lede">Son las que entregó el equipo de desarrollo, tal como llegaron. Cada
+      una lleva sus cuatro estados, tema claro y oscuro, y se recorre con el teclado.</p>
+    <p class="maquetas-pie" style="margin-top:0">De las cuatro hay ya una versión con los
+      hallazgos aplicados, que se puede abrir y comparar al lado de la original.</p>
+    <ul class="maquetas-lista">
+      <li><a href="/entregables/propuestas/viaticos">
+        <b>Viáticos · versión corregida</b>
+        <span>El listado de solicitudes, con la aprobación del gasto y la comprobación de
+          papeles en columnas separadas.</span>
+        <span class="maquetas-cambio">Los chips decorativos pasan al componente estándar de la
+          §6.21, con buscador, casillas y pastillas removibles, y filtran de verdad. El folio deja
+          el color de enlace, la explicación de las dos columnas baja a un toggletip y desaparece
+          el botón «Ver» que duplicaba la navegación de la fila.</span></a></li>
+      <li><a href="/entregables/propuestas/viatico-detalle">
+        <b>Viático detalle · versión corregida</b>
+        <span>Un viático abierto: la solicitud, los comprobantes con su folio fiscal, la cuenta
+          y la bitácora.</span>
+        <span class="maquetas-cambio">El cierre de las dos columnas deja de depender de que su
+          contenido coincida en alto, y las pastillas usan el token <code>--fs-meta</code> en vez
+          de los 11 px escritos a mano.</span></a></li>
+      <li><a href="/entregables/propuestas/autorizacion-compra">
+        <b>Autorización de compra · versión corregida</b>
+        <span>La compra <code>CO-2026-00148</code>, con sus cinco partidas, el bloque de quién
+          autoriza y la traza de la decisión.</span>
+        <span class="maquetas-cambio">El aviso de bloqueo baja de 258 a 95 caracteres y el resto
+          entra en un toggletip, igual que en Viáticos. Y desaparece <code>.bloqueado</code>, una
+          clase que duplicaba <code>.banda.b-info</code> —mismo <code>display</code>, mismo
+          <code>gap</code>, mismo <code>padding</code>, mismo propósito— sin que nadie mirara si el
+          componente ya existía en el mismo archivo. Esa es la regla que el sistema estrena en la
+          2.13.2.</span></a></li>
+      <li><a href="/entregables/propuestas/cuentas-por-cobrar">
+        <b>Cuentas por cobrar · versión corregida</b>
+        <span>El desglose por marca, grupo y agencia, con la antigüedad de la deuda y los grupos
+          marcados por proporción a más de 60 días.</span>
+        <span class="maquetas-cambio">Cada tramo de la barra gana un nombre que dice qué tan
+          urgente es —Recientes, Atrasadas, Críticas, Urgentes— y el rango de días queda como dato
+          secundario. El nombre del grupo pierde el verde y la flecha, y el botón «Ver agencias»
+          desaparece: entra la fila entera. El color de los tramos sigue saliendo del semáforo de
+          estado, que es lo que §1.4 no admite para una serie.</span></a></li>
+    </ul>
+    <p class="maquetas-pie">El relato de las correcciones, con cada captura de antes y después
+      tomada del HTML real en ese punto del historial, está en los dos informes de revisión:
+      <a href="/entregables/revisiones/SIO-DPROMA-ajustes-29sep2026.pdf">las ocho del 29 de
+      septiembre</a> y <a href="/entregables/revisiones/SIO-DPROMA-ajustes-v2-30sep2026.pdf">las
+      seis del 30</a>, que reordenan las mismas en lenguaje llano.</p>
+    <p class="maquetas-pie">El sistema de diseño contra el que se midieron es el entregable
+      <a href="/entregables/reglas-de-diseno">Sistema de diseño</a>, en su versión 2.13.2. Dos de
+      las reglas que se citan aquí —§6.11 regla 10, el identificador sin color de enlace, y §6.12
+      regla 9, la razón del estado fuera de la celda— nacieron en la versión 2.11.1 de revisar
+      estas mismas pantallas, y el límite de una frase para <code>.nota</code> y <code>.banda</code>
+      se fijó en la 2.13.0.</p>
+  </div>
+</section>
+
+</div><!-- /#p-pant -->
+
+<footer>
+  <div class="wrap">
+    <div class="footer-nav"><a href="/entregables">← Volver a Entregables</a></div>
+    <div class="footer-meta">
+      <span>2894 Studio × DPROMA · Entregable, septiembre 2026</span>
+      <a href="/">Ver la síntesis completa →</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* Pestañas. El panel oculto no dispara el IntersectionObserver de .reveal, así
+   que al abrirlo hay que revelar lo suyo o el contenido se queda invisible. */
+(function(){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  if(!tabs.length) return;
+  var paneles = tabs.map(function(t){ return document.getElementById(t.getAttribute('aria-controls')); });
+
+  function revela(panel){
+    panel.querySelectorAll('.reveal:not(.is-visible)').forEach(function(el){
+      el.classList.add('is-visible');
+    });
+  }
+  function activa(tab, mueveFoco){
+    tabs.forEach(function(t, i){
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      paneles[i].hidden = !on;
+      if(on) revela(paneles[i]);
+    });
+    if(mueveFoco) tab.focus();
+  }
+  tabs.forEach(function(tab, i){
+    tab.addEventListener('click', function(){ activa(tab, false); });
+    tab.addEventListener('keydown', function(e){
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if(d){ e.preventDefault(); activa(tabs[(i + d + tabs.length) % tabs.length], true); }
+      else if(e.key === 'Home'){ e.preventDefault(); activa(tabs[0], true); }
+      else if(e.key === 'End'){ e.preventDefault(); activa(tabs[tabs.length - 1], true); }
+    });
+  });
+
+  /* Un enlace a una sección abre antes la pestaña que la contiene: si no, el
+     navegador no encuentra a dónde desplazarse. */
+  function abrePara(hash){
+    if(!hash || hash === '#') return false;
+    var destino;
+    try { destino = document.querySelector(hash); } catch(err){ return false; }
+    if(!destino) return false;
+    var panel = destino.closest('.panel');
+    if(!panel) return false;
+    var i = paneles.indexOf(panel);
+    if(i < 0 || !panel.hidden) return false;
+    activa(tabs[i], false);
+    return true;
+  }
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(){
+      if(abrePara(a.getAttribute('href'))){
+        var destino = document.querySelector(a.getAttribute('href'));
+        requestAnimationFrame(function(){ destino.scrollIntoView({ block:'start' }); });
+      }
+    });
+  });
+
+  /* #pantallas abre la pestaña de las maquetas: sirve para enviar el enlace directo. */
+  function porHash(){
+    if(location.hash === '#pantallas'){ activa(tabs[1], false); return; }
+    abrePara(location.hash);
+  }
+  window.addEventListener('hashchange', porHash);
+  porHash();
+})();
+/* Reveal-on-scroll */
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var els = document.querySelectorAll('.reveal');
+  if(reduced || !('IntersectionObserver' in window)){
+    els.forEach(function(el){ el.classList.add('is-visible'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('is-visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
+  /* threshold 0: con 0.15 un bloque más alto que la ventana nunca llegaba a
+     mostrar el 15% exigido y se quedaba invisible para siempre. */
+  els.forEach(function(el){ io.observe(el); });
+})();
+
+/* Claim con scroll-linked word reveal */
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var scroller = document.getElementById('claimScroller');
+  var words = Array.prototype.slice.call(document.querySelectorAll('.claim-word'));
+  var hint = document.getElementById('claimScrollHint');
+  if(!scroller || !words.length) return;
+
+  if(reduced){
+    words.forEach(function(w){ w.classList.add('is-lit'); });
+    return;
+  }
+
+  var raf = null;
+  function update(){
+    var rect = scroller.getBoundingClientRect();
+    var total = scroller.offsetHeight - window.innerHeight;
+    var scrolled = -rect.top;
+    var progress = Math.max(0, Math.min(1, total > 0 ? scrolled / total : 1));
+    var lit = Math.round(progress * words.length);
+    words.forEach(function(w, i){ w.classList.toggle('is-lit', i < lit); });
+    if(hint) hint.style.opacity = progress > 0.05 ? '0' : '1';
+  }
+  window.addEventListener('scroll', function(){
+    if(raf) return;
+    raf = requestAnimationFrame(function(){ update(); raf = null; });
+  }, { passive: true });
+  update();
+})();
+</script>
+
+<script>
+/* Pausa de las simulaciones. WCAG 2.2.2: todo movimiento que arranca solo,
+   dura más de 5s y convive con texto necesita una forma de detenerlo. */
+(function(){
+  document.querySelectorAll('[data-wire-toggle]').forEach(function(btn){
+    var fig = btn.closest('.wire');
+    if(!fig) return;
+    btn.addEventListener('click', function(){
+      var paused = fig.classList.toggle('is-paused');
+      btn.setAttribute('aria-pressed', paused ? 'true' : 'false');
+      btn.textContent = paused ? 'Reproducir' : 'Pausar';
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
