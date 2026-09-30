@@ -1043,6 +1043,14 @@ alerta.
 **El icono tiene que coincidir con la variante.** El alta de cliente abría con un triángulo de
 advertencia sobre una banda neutra: señal mixta, el lector no sabe si preocuparse.
 
+**Antes de escribir una clase nueva para un aviso de ancho completo, se verifica si `.banda` +
+una de sus cuatro variantes ya lo cubre.** La maqueta de Autorización de compra declaró
+`.bloqueado` — mismo `display:flex`, mismo `gap`, mismo `padding`, mismo propósito que
+`.banda.b-info` — sin darse cuenta de que el componente ya existía en el mismo archivo. No rompió
+nada visible (los valores coincidían caso por caso), pero duplicó CSS y deja dos nombres para la
+misma cosa, que es la trampa 10 en otra forma: no solo se repiten nombres de clase por accidente,
+también se reinventan componentes enteros por no buscar primero si ya existen.
+
 **Un aviso que cambia cómo se interpreta lo de abajo va antes del título de esa sección**, no
 después ni al pie. En la ficha, la advertencia de que las listas están recortadas por alcance
 —que cambia el significado de todos los ceros que vienen después— se presentaba como una nota
