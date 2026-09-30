@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.11.1
-last_updated: 2026-09-29
+version: 2.12.0
+last_updated: 2026-09-30
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -1912,6 +1912,20 @@ en la interfaz.
 | Aclara una consecuencia, sin bloquear nada ahora | Qué pasa si un comprobante se rechaza | Toggletip sobre el control relacionado |
 | Racional de diseño o caso que no aplica aquí | Referencias a documentos internos | No va en la interfaz |
 
+**Corrección final, porque el criterio de arriba seguía dejando pasar texto.** Auditar cinco
+pantallas volvió a encontrar párrafos de más de 400 caracteres colgando de una `.banda` que ya
+tenía su instrucción en la primera frase. Cuatro reglas sin margen de interpretación:
+
+1. `.nota` y `.banda` llevan como máximo una frase. Una segunda oración que aclara, justifica o
+   da contexto se borra o pasa a un toggletip (§6.23) sobre el control al que se refiere.
+2. Ningún bloque de texto siempre visible pasa de ~140 caracteres — se mide con el contador de
+   caracteres, no a ojo.
+3. `.nota` no es un componente de explicación general: solo para el nivel 1 de la tabla de
+   arriba. Si el texto no bloquea nada ahora mismo, `.nota` es la clase equivocada aunque sea
+   cierto y breve.
+4. Se revisa al escribir el componente, no después: §11 gana el paso de releer cada
+   `.nota`/`.banda` nueva contra estas tres reglas antes de dar la pantalla por terminada.
+
 ---
 
 ## 9. Andamiaje de maqueta
@@ -2052,6 +2066,8 @@ usados - declarados  →  tiene que ser vacío
 **Movimiento y voz**
 - ¿Toda animación que dure más de 5s se puede pausar pulsándola, sin botón aparte?
 - ¿El texto en pantalla dice qué se puede hacer, y no por qué se decidió así?
+- ¿Cada `.nota`/`.banda` nueva es una sola frase, bajo ~140 caracteres, y bloquea la acción
+  inmediata — no explica, no educa, no cita un documento? Si no, se borra o pasa a un toggletip.
 - ¿Lo que es andamiaje de maqueta lleva `data-andamio` y está rotulado?
 
 **Comprobado en el navegador, no solo leído** (§10)
@@ -2463,4 +2479,5 @@ columna principal y barra lateral no se comparan, medían a ~3px por casualidad;
 | 2.6.2 | 2026-09-28 | Añade un caso real a §1.4 (series de gráfica): una barra de antigüedad de cartera pintada con `--ok`/`--warn`/`--block`/`--err` por tramo de tiempo en vez de `--serie-1`…`--serie-4`, con el antes/después completo. La regla de "una serie nunca reutiliza color de estado" ya existía; el hueco era no tener un ejemplo real citable, y por eso se pasó por alto al construir Cuentas por cobrar. Sin cambios de valor ni de regla. |
 | 2.7.0 | 2026-09-28 | Dos reglas nuevas salidas de rediseñar Cuentas por cobrar en maqueta. §6.12 gana la regla 7 —resumen arriba, buscador y filtros en una sola fila justo encima de la tabla, nunca el buscador suelto por su cuenta— y la regla 8 —un control con `aria-pressed`/`data-activo` tiene que interactuar de verdad o presentarse como cifra de lectura, no fingir ser un filtro sin filtrado detrás; era el caso de los cuatro `.schip` originales de la pantalla, que no tenían ni un solo listener detrás. §6.3 gana una cuarta advertencia: si la tarjeta crece, su contenido crece con ella —`flex:1`, nunca un `max-width` heredado del layout anterior—, a partir del caso medido donde la tarjeta de resumen se hizo ancha y el bloque interno del gráfico se quedó angosto, dejando una franja vacía. Sin cambios de token ni de componente visual, así que `reglas-de-diseno.html` no se toca. |
 | 2.8.0 | 2026-09-28 | Documenta el toggletip de información (`.infob` + `.tip`, §6.23): un botón de icono que revela una aclaración corta en un globo, para las filas de ficha (§6.20) donde el texto no cabe siempre visible. Seis reglas, con dos correcciones que salieron de auditar la maqueta contra el propio sistema antes de aprobarla: el botón medía 20×20px y bajaba del suelo táctil de 24px que ya exige §7.3, y el `aria-controls` sin `aria-describedby` no garantiza que un lector de pantalla anuncie el texto señalado. Contraste verificado por cálculo, no a ojo: 15,2:1 / 13,9:1 el texto del globo, 4,8:1 / 5,5:1 el icono en reposo, en claro y oscuro. La regla 6 fija el límite: no sustituye al texto siempre visible de un dato protagonista (§8 sigue mandando ahí). Pendiente: `reglas-de-diseno.html` no tiene todavía la demo viva del componente — solo la fuente y la copia descargable lo documentan por ahora. |
+| 2.12.0 | 2026-09-30 | §8 (voz de producto) gana una corrección final: el criterio de tres niveles seguía dejando pasar texto porque era un juicio, no un límite. Ahora `.nota`/`.banda` llevan como máximo una frase, bajo ~140 caracteres, y solo cuando bloquean la acción inmediata — cualquier segunda oración, o cualquier texto que aclare/eduque/cite un documento, se borra o pasa a un toggletip (§6.23). `.nota` deja de ser un componente de explicación general. §11 gana el paso de releer cada `.nota`/`.banda` nueva contra estas reglas antes de dar la pantalla por terminada, en vez de encontrarlo en una auditoría posterior. |
 | 2.11.1 | 2026-09-29 | Cuatro reglas salidas de revisar Viáticos, Viático detalle, Cuentas por cobrar, Padrón de clientes y Editar cliente contra el sistema. §6.11 (tabla densa) gana la regla 10: el identificador de fila (folio) no lleva color de enlace — va en `--text`, porque `--link` es para navegación fuera de tabla y la fila entera, no el texto verde, es la zona pulsable. §6.12 gana la regla 9: la razón de un estado no vive como texto libre en la celda — va al detalle del registro. §8 (voz de producto) endurece su criterio a tres niveles: lo que bloquea una acción ahora se queda visible en una frase, lo que aclara una consecuencia sin bloquear nada pasa a un toggletip (§6.23) sobre el control relacionado, y el racional de diseño o la educación sobre un caso que no aplica al registro visible no va en la interfaz. Y se aprueba §13 Composición y grid, con sus ocho reglas —de la proporción de columna al orden lectura → control → objeto—, validadas contra pantallas reales; deja de estar marcada como borrador. 13.4 (comparar exige igualar) y 13.8 (cierre garantizado, no por casualidad) quedan como dos reglas separadas, con mecanismos distintos para dos preguntas distintas. |

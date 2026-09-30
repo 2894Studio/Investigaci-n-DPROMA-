@@ -1919,6 +1919,34 @@ completa entonces tiene tres niveles, no dos:
 | Aclara una consecuencia, pero no bloquea nada en este momento | Qué pasa si un comprobante se rechaza; qué falta si no hay los dos documentos | Toggletip sobre el control o columna relacionada |
 | Explica por qué se diseñó así, o educa sobre un caso que no aplica aquí | Referencias a documentos internos, mecánica general de un componente | No va en la interfaz |
 
+**Corrección final, porque el criterio de arriba seguía dejando pasar texto.** Los tres niveles
+son correctos, pero son un juicio — "¿esto condiciona la acción inmediata?" es una pregunta que
+se puede responder que sí con demasiada facilidad cuando quien escribe el texto es quien también
+lo redactó, convencido de que hace falta. Auditar cinco pantallas volvió a encontrar párrafos de
+más de 400 caracteres colgando de una `.banda` que ya tenía su instrucción en la primera frase —
+la regla existía y no impidió que se escribieran. Hace falta un límite que no dependa de
+interpretación:
+
+1. **`.nota` y `.banda` llevan como máximo una frase, sin punto y coma ni raya explicativa
+   después del primer punto.** Si al escribir el texto aparece una segunda oración que aclara,
+   justifica o da contexto a la primera, esa segunda oración no se queda ahí — se borra o se
+   convierte en el contenido de un toggletip (§6.23) sobre el control al que se refiere. No hay
+   excepción por importancia del contenido: la excepción de "esto sí hace falta que se vea
+   completo" es exactamente el razonamiento que ya falló cinco veces.
+2. **Ningún bloque de texto siempre visible pasa de ~140 caracteres.** Es una regla de regla, no
+   de estilo: un texto que no cabe en 140 caracteres está, casi siempre, tratando de explicar algo
+   además de instruir. Se mide con el contador de caracteres, no a ojo.
+3. **`.nota` no es un componente de explicación general.** Se usa solo para el nivel 1 de la
+   tabla de arriba —una restricción o instrucción que bloquea la acción inmediata—, nunca para
+   racional, mecánica de un componente, o contexto de negocio. Si el texto que se está por
+   escribir no bloquea nada ahora mismo, `.nota` es la clase equivocada aunque el texto sea
+   cierto y breve.
+4. **Se revisa al momento de escribir el componente, no después.** §11 (checklist al añadir un
+   componente nuevo) gana el paso: antes de dar por terminada una pantalla, cada `.nota`/`.banda`
+   nueva se relee contra las reglas 1–3 de este apartado. Encontrar el exceso en una auditoría
+   posterior significa que ya se construyó mal una vez; el checklist existe para que no haga
+   falta esa segunda pasada.
+
 ---
 
 ## 9. Andamiaje de maqueta
@@ -2059,6 +2087,9 @@ usados - declarados  →  tiene que ser vacío
 **Movimiento y voz**
 - ¿Toda animación que dure más de 5s se puede pausar pulsándola, sin botón aparte?
 - ¿El texto en pantalla dice qué se puede hacer, y no por qué se decidió así?
+- ¿Cada `.nota`/`.banda` nueva es una sola frase, bajo ~140 caracteres, y bloquea la acción
+  inmediata — no explica, no educa, no cita un documento? Si no, se borra o pasa a un
+  toggletip (§8, corrección final).
 - ¿Lo que es andamiaje de maqueta lleva `data-andamio` y está rotulado?
 
 **Comprobado en el navegador, no solo leído** (§10)
