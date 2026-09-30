@@ -1,0 +1,54 @@
+# Vercel publica desde claude/artefacto-informe-ygarye, no desde la rama por
+# defecto del repositorio. Sin esto, cada merge a la rama por defecto se queda
+# sin llegar al sitio: fue lo que pasó entre el 26 y el 30 de septiembre, ocho
+# versiones del sistema de diseño y cuatro entregables sin publicar.
+#
+# Este flujo lleva la rama por defecto a la de publicación en cada push.
+# Si algún día se cambia la Production Branch de Vercel a la rama por defecto,
+# este archivo sobra y se puede borrar.
+name: Publicar en producción
+
+on:
+  push:
+    branches: [claude/research-data-bible-project-vcfhlm]
+  workflow_dispatch:
+
+concurrency:
+  group: publicar-produccion
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    env:
+      ORIGEN: claude/research-data-bible-project-vcfhlm
+      PUBLICACION: claude/artefacto-informe-ygarye
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Llevar la rama por defecto a la de publicación
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git checkout "$PUBLICACION"
+
+          if git merge-base --is-ancestor "origin/$ORIGEN" HEAD; then
+            echo "Producción ya está al día."
+            exit 0
+          fi
+
+          # Merge normal, nunca --force ni reescritura de historia: si hay
+          # conflicto, el flujo falla y alguien lo mira. Publicar a ciegas una
+          # resolución automática sería peor que no publicar.
+          git merge --no-edit "origin/$ORIGEN" \
+            -m "Publica en producción los cambios de $ORIGEN"
+
+          git push origin "$PUBLICACION"
+          echo "Producción actualizada."
