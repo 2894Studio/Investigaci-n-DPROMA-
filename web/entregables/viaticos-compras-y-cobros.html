@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Viáticos · Entregables DPROMA × 2894 Studio</title>
-<meta name="description" content="Entregable de UX/UI y accesibilidad del proceso de viáticos de SIO-DPROMA: el diagnóstico del proceso actual, el modelo que lo sostiene y las dos pantallas construidas." />
+<title>Viáticos, compras y cobros · Entregables DPROMA × 2894 Studio</title>
+<meta name="description" content="Revisión de UX, interfaz y accesibilidad de cuatro pantallas de SIO-DPROMA: viáticos, detalle de viático, autorización de compra de almacén y cuentas por cobrar." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
@@ -554,10 +554,13 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
 .maquetas-lede{max-width:62ch;margin:.75rem 0 1.75rem}
 .maquetas-lista{list-style:none;padding:0;margin:0;display:grid;gap:1rem;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-.maquetas-lista a{display:flex;flex-direction:column;gap:.4rem;height:100%;
+.maquetas-lista a, .maquetas-lista .sin-abrir{display:flex;flex-direction:column;gap:.4rem;height:100%;
   padding:1.15rem 1.25rem;border:1px solid var(--border,#e5e7eb);border-radius:12px;
   text-decoration:none;color:inherit;transition:border-color .2s,transform .2s}
 .maquetas-lista a:hover{border-color:currentColor;transform:translateY(-2px)}
+/* Las pantallas sin versión corregida no se pueden abrir: la tarjeta se queda,
+   con el borde punteado que dice que no hay nada detrás. */
+.maquetas-lista .sin-abrir{border-style:dashed;background:var(--surface-alt)}
 .maquetas-lista b{font-size:1.0625rem}
 .maquetas-lista span{font-size:.9375rem;color:var(--text-muted);line-height:1.5}
 .maquetas-cambio{font-size:.875rem;opacity:1;color:var(--text-muted);
@@ -1038,6 +1041,9 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
   border-top:1px solid var(--a-border);font-size:.75rem;color:var(--a-text-2)}
 .wf-tabla .wf-fila:first-of-type{border-top:0}
 .wf-fila .folio{font-weight:700;color:var(--a-link);white-space:nowrap;min-width:5.2rem}
+/* El identificador de fila va sin color de enlace (§6.11, regla 10). Los paneles
+   de «recomendado» lo cumplen, para que el diagrama no contradiga al texto. */
+.wire-panel.is-good .wf-fila .folio{color:var(--a-text)}
 .wf-fila .cli{color:var(--a-text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wf-fila .sep{margin-left:auto;flex:none}
 
@@ -1113,7 +1119,6 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     <nav>
       <a href="/">Informe general</a>
       <a href="#diagnostico">Diagnóstico</a>
-      <a href="#modelo">Modelo</a>
       <a href="#ux">UX</a>
       <a href="#ui">Interfaz</a>
       <a href="#accesibilidad">Accesibilidad</a>
@@ -1127,14 +1132,14 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
   <div class="claim-scroller" id="claimScroller">
     <div class="claim-sticky">
       <div class="wrap">
-        <div class="eyebrow">Entregable · Viáticos</div>
+        <div class="eyebrow">Entregable · Viáticos, compras y cobros</div>
         <h1 class="claim-text" id="claimText">
-          <span class="claim-word">Viáticos:</span> <span class="claim-word">dos</span>
-          <span class="claim-word">pantallas</span> <span class="claim-word">para</span>
-          <span class="claim-word">un</span> <span class="claim-word">proceso</span>
-          <span class="claim-word">sin</span> <span class="claim-word">registro.</span>
+          <span class="claim-word">Cuatro</span> <span class="claim-word">pantallas</span>
+          <span class="claim-word">donde</span> <span class="claim-word">el</span>
+          <span class="claim-word">sistema</span> <span class="claim-word">mueve</span>
+          <span class="claim-word">dinero.</span>
         </h1>
-        <p class="claim-sub">La lista de solicitudes y el detalle de un viático, construidas. El proceso que hay debajo, el modelo que lo sostiene y las decisiones de UX, interfaz y accesibilidad que se tomaron al levantarlas.</p>
+        <p class="claim-sub">Viáticos, el detalle de un viático, la autorización de una compra de almacén y las cuentas por cobrar. Revisadas de experiencia, interfaz y accesibilidad, y medidas contra el sistema de diseño.</p>
         <p class="claim-scroll-hint" id="claimScrollHint">Sigue bajando</p>
       </div>
     </div>
@@ -1159,79 +1164,76 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">Observaciones generales</div>
-        <h2>Lo que falla es el proceso, no la pantalla.</h2>
-        <p class="section-note">A diferencia de los otros módulos, aquí no hay nada construido que revisar. Lo que hay es un formato que circula por correo, y seis problemas que se repiten en todas las áreas.</p>
+        <h2>Lo que se repite en las cuatro pantallas.</h2>
+        <p class="section-note">Se resuelven una vez en el sistema, no pantalla por pantalla. Todo lo que sigue está medido sobre los archivos entregados.</p>
       </div>
     </div>
 
     <div class="evidence-stack">
       <article class="evidence-card card card-neutral reveal">
-        <span class="eyebrow">La solicitud</span>
-        <h3>El formato no recoge los datos del viaje</h3>
-        <p>Llega en una hoja de cálculo que no dice quién viaja, a dónde ni cuántos días estará fuera. Eso impide presupuestar el gasto y, además, saber dónde está el personal desplazado. El área lo planteó en esos dos términos: control administrativo y seguridad.</p>
+        <span class="eyebrow">Vocabulario</span>
+        <h3>El mismo concepto cambia de nombre dentro de una pantalla</h3>
+        <p>En Viáticos, la cabecera dice «2 con excedente», la columna se titula «Monto y excedente», el chip de al lado dice «2 por encima del estándar» y la celda de una fila dice «Pide por encima del estándar». Son la misma cifra y el mismo concepto, con dos nombres, a la vista al mismo tiempo.</p>
       </article>
       <article class="evidence-card card card-neutral reveal">
-        <span class="eyebrow">El recorrido</span>
-        <h3>Pasa por tres buzones y solo el último decide</h3>
-        <p>El colaborador descarga el formato público —parte de la documentación ISO 9001—, lo llena y lo copia a Jurídico y Recursos Humanos, que lo reenvía a Administración, que es quien aprueba. Un eslabón que no decide es un eslabón donde la solicitud se puede parar sin que nadie se entere.</p>
+        <span class="eyebrow">Voz</span>
+        <h3>La interfaz explica sus propias reglas, y ocupa</h3>
+        <p>Los bloques de texto siempre visibles llegan a 690 caracteres en Viáticos, 524 en Cuentas por cobrar y 414 en Autorización de compra. El sistema de diseño fija desde la versión 2.13.0 que <code>.nota</code> y <code>.banda</code> lleven una frase y no pasen de ~140 caracteres, y que lo que aclara sin bloquear pase a un toggletip.</p>
       </article>
       <article class="evidence-card card card-neutral reveal">
-        <span class="eyebrow">El monto</span>
-        <h3>No hay tabulador contra el que comparar</h3>
-        <p>Cada importe se estima a ojo y se aprueba contra lo que quien autoriza recuerde. Sin una cifra de referencia por destino y duración, cada solicitud se negocia desde cero y el exceso no se distingue de lo normal.</p>
+        <span class="eyebrow">Controles</span>
+        <h3>Hay controles que prometen filtrar y no filtran</h3>
+        <p>Los chips de la franja superior de Viáticos y de Cuentas por cobrar son <code>&lt;button aria-pressed="false"&gt;</code> con cursor de mano. Al pulsarlos no cambia ninguna fila, y tampoco cambia su propio <code>aria-pressed</code>. El buscador no filtra y ninguna cabecera de tabla ordena: no hay <code>aria-sort</code> en ninguna de las cuatro.</p>
       </article>
       <article class="evidence-card card card-neutral reveal">
-        <span class="eyebrow">El plazo</span>
-        <h3>Tres días que se cuentan desde el sitio equivocado</h3>
-        <p>La política da tres días para comprobar. Si el reloj arranca al entregarse el dinero, quien sale una semana llega tarde el día que vuelve: la regla se incumple por diseño y deja de tomarse en serio.</p>
+        <span class="eyebrow">Escala</span>
+        <h3>La escala se declara en el código y luego no se usa</h3>
+        <p>Cada pantalla declara seis tamaños en <code>:root</code> —12, 13, 14, 16, 20 y 30 px— y en pantalla aparecen ocho o nueve, con 10,5, 11, 11,5 y 13,5 px fuera de esa escala. Con el espaciado pasa igual: los tokens van de cuatro en cuatro y sobre la página conviven 1, 2, 3, 5, 6, 7, 9, 10, 13 y 14 px.</p>
       </article>
       <article class="evidence-card card card-neutral reveal">
-        <span class="eyebrow">La evidencia</span>
-        <h3>La comprobación llega como fotografía</h3>
-        <p>Una foto de un recibo no es fiscalizable. Sin el PDF y el XML el gasto no se deduce, y el problema aparece en el cierre, cuando el dinero ya salió y no hay forma de pedir otra factura.</p>
+        <span class="eyebrow">Ritmo</span>
+        <h3>Las filas miden lo que les toque</h3>
+        <p>Las seis filas de Viáticos miden 161, 100, 127, 111, 124 y 83 px, porque la celda del monto y la del estado absorben texto libre de longitud variable. Las cinco filas de partidas de Autorización de compra miden 47 px las cinco: la misma tabla, resuelta bien, está ya dentro del mismo sistema.</p>
       </article>
       <article class="evidence-card card card-neutral reveal">
-        <span class="eyebrow">El techo</span>
-        <h3>Nadie tiene presupuesto, así que todo es urgente</h3>
-        <p>Sin techo de gasto por área una solicitud no se compara con nada: se atiende o no se atiende. Administración libera el fondo para que el servicio no se detenga, y Dirección gestiona el efectivo por reacción.</p>
+        <span class="eyebrow">Capas</span>
+        <h3>El asistente flotante se apoya sobre el contenido</h3>
+        <p>Está fijo en la esquina inferior derecha de las cuatro pantallas. En Viáticos, su rectángulo se solapa con el botón «Subir uno nuevo» de la última fila; en Cuentas por cobrar cae sobre el «Ver agencias» de la última. Es la zona donde acaban las tablas largas.</p>
       </article>
     </div>
 
     <figure class="wire reveal" style="--cyc:9s; --freeze:-5s">
       <div class="wire-head">
         <span class="wire-tag">Simulación</span>
-        <span class="wire-title">Una solicitud que no dice nada del viaje</span>
+        <span class="wire-title">La misma cifra, dos nombres</span>
         <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
       </div>
-      <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Llega una solicitud de $4,200.</span><span class="an" style="animation-name:av-paso2">No dice destino, ni fechas, ni conceptos.</span><span class="an" style="animation-name:av-paso3">Se aprueba a ojo, y nadie sabe dónde está esa persona.</span></p>
+      <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Dos solicitudes piden más de lo estándar.</span><span class="an" style="animation-name:av-paso2">La cabecera las llama «con excedente».</span><span class="an" style="animation-name:av-paso3">El chip de debajo las llama «por encima del estándar».</span></p>
       <div class="wire-stage wire-stage--split" aria-hidden="true">
         <div class="wire-panel is-bad">
-          <span class="wire-panel-label">El formato de hoy</span>
-          <div class="wf"><div class="wf-top"><b>Solicitud de viáticos</b><span>hoja de cálculo adjunta</span></div>
-            <div class="wf-tabla">
-              <div class="wf-fila"><span class="folio">Sin folio</span><span class="cli">Rubén Beltrán Ochoa</span><span class="sep"><span class="wf-pill wf-pill--gris">$4,200</span></span></div>
-            </div>
-            <p class="wf-msg an" style="animation-name:av-nada">Sin destino, sin fechas y sin conceptos.</p>
-            <div class="wf-pad"></div>
-            <span class="wf-mini">Aprobar</span></div>
-        </div>
-        <div class="wire-panel is-good">
-          <span class="wire-panel-label">En el módulo</span>
-          <div class="wf"><div class="wf-top"><b>VI-2026-0731</b><span>Rubén Beltrán Ochoa</span></div>
-            <div class="wf-zona" style="margin-bottom:.5rem">
-              <span class="wf-zona-et">El viaje</span>
-              <p class="wf-sub" style="margin:0">Instalación en Irapuato · 25–27 ago 2026 · hospedaje, comida y transporte</p>
-            </div>
+          <span class="wire-panel-label">Cabecera</span>
+          <div class="wf"><div class="wf-top"><b>Viáticos</b><span>6 solicitudes · 2 por aprobar</span></div>
             <div class="wf-bar">
-              <span class="wf-pill wf-pill--gris">pide $4,200</span>
-              <span class="wf-pill wf-pill--ok">estándar $3,800</span>
-              <span class="wf-pill wf-pill--warn an" style="animation-name:av-lat">+$400</span>
+              <span class="wf-pill wf-pill--gris an" style="animation-name:av-parpadeo">2 con excedente</span>
             </div>
             <div class="wf-pad"></div>
-            <span class="wf-acc sueltos"><span class="wf-mini pri">Aprobar</span><span class="wf-mini">Rechazar…</span></span></div>
+            <div class="wf-tabla">
+              <div class="wf-thead"><span style="min-width:5.2rem">Folio</span><span class="sep">Monto y excedente</span></div>
+              <div class="wf-fila"><span class="folio">VI-0731</span><span class="sep"><span class="wf-pill wf-pill--warn">+$400</span></span></div>
+            </div></div>
+        </div>
+        <div class="wire-panel is-bad">
+          <span class="wire-panel-label">Franja de chips</span>
+          <div class="wf"><div class="wf-top"><b>Viáticos</b><span>la misma pantalla, 40 px más abajo</span></div>
+            <div class="wf-bar">
+              <span class="wf-pill wf-pill--gris">2 por aprobar</span>
+              <span class="wf-pill wf-pill--warn an" style="animation-name:av-parpadeo">2 por encima del estándar</span>
+            </div>
+            <div class="wf-pad"></div>
+            <p class="wf-sub">Y en la celda de una fila: «Pide por encima del estándar y no escribió por qué».</p></div>
         </div>
       </div>
-      <figcaption>El mismo importe. A la derecha se puede decidir en dos segundos; a la izquierda hay que preguntar.</figcaption>
+      <figcaption>Tres formas de nombrar lo mismo, visibles a la vez. Cada nombre nuevo obliga a volver a aprender la pantalla.</figcaption>
     </figure>
   </div>
 </section>
@@ -1240,244 +1242,63 @@ footer{ padding: clamp(2.5rem, 6vw, 3.5rem) 0 3rem; }
   <div class="wrap">
     <div class="section-head reveal">
       <div>
-        <div class="eyebrow">Lo que las dos pantallas ya resuelven</div>
-        <h2>Decisiones tomadas al construirlas, y por qué conviene conservarlas.</h2>
+        <div class="eyebrow">Lo que ya funciona bien</div>
+        <h2>Decisiones acertadas que conviene convertir en norma.</h2>
       </div>
     </div>
     <div class="evidence-stack">
       <article class="evidence-card card card-neutral reveal">
         <ul class="rec-list rec-list--ok">
-          <li><span>La aprobación del gasto y la comprobación de papeles avanzan en <strong>dos columnas separadas</strong>. Son dos procesos, con dos responsables y dos momentos: un viático aprobado y sin comprobar es el estado normal de todo viaje en curso, no una incidencia.</span></li>
-          <li><span>Cada fila enseña lo que se pide, lo que marca el estándar y la diferencia ya calculada. Aprobar deja de exigir que alguien recuerde cuánto suele costar ese viaje.</span></li>
-          <li><span>El bloqueo por adeudo dice <strong>qué folio, cuánto y desde cuándo</strong>, y lleva el botón que abre el comprobante rechazado. Un bloqueo que solo dice «tienes adeudos» obliga a preguntar por mensaje, que es el trabajo que se quería quitar.</span></li>
-          <li><span>Un comprobante rechazado no se borra: se conserva con su motivo y su importe vuelve al saldo por comprobar, para que se pueda subir otro. El histórico no pierde el intento fallido.</span></li>
-          <li><span>«Comprobado» solo suma lo que Administración ya revisó y aceptó. Lo que está en revisión no cuenta todavía, porque si contara la cuenta diría que está comprobado algo que nadie ha mirado.</span></li>
-          <li><span>El estado vacío distingue «ninguna es tuya» de «no hay ninguna». Los viáticos se asignan a personas, no a plazas, y esa es la confusión que genera el modelo.</span></li>
-          <li><span>Las cuatro situaciones están previstas: con datos, cargando, vacío y error. El esqueleto de carga imita la forma real de la tabla, así que no hay salto cuando llegan los datos.</span></li>
-          <li><span>El error trae referencia consultable, como <code>VIA-20260821-1418</code>. Soporte y la persona hablan del mismo incidente.</span></li>
-          <li><span>Los filtros usan el componente estándar de la §6.21 —desplegable con buscador, casillas y pastillas removibles—, el mismo motor que Trámites vehiculares y Padrón. Dos pantallas hermanas que filtren distinto son fricción gratuita.</span></li>
-          <li><span>El folio es la unidad de conversación y la fila entera navega al detalle. Hay <strong>una sola forma de entrar</strong>: no conviven un enlace y un botón «Ver» que hacen lo mismo.</span></li>
-          <li><span>La bitácora registra quién pidió, quién aprobó, quién subió y quién revisó, cada uno con fecha y hora. Es lo que convierte el registro en evidencia.</span></li>
-          <li><span>Folios y UUID fiscales están marcados con <code>translate="no"</code>, para que ningún traductor automático los altere.</span></li>
+          <li><span>Los mensajes de error explican qué <strong>no</strong> se ha roto: «Ninguna solicitud se aprobó ni se rechazó sola y ningún comprobante se perdió». Es el mejor material de las cuatro pantallas.</span></li>
+          <li><span>Y van más allá, diciendo qué no dar por hecho: «Si estabas a punto de aprobar una, no la des por aprobada: vuelve a entrar y compruébalo antes de avisarle a nadie».</span></li>
+          <li><span>Cada error trae una referencia consultable, como <code>VIA-20260821-1418</code>. Soporte y la persona hablan del mismo incidente.</span></li>
+          <li><span>Las cuatro situaciones están previstas en las cuatro pantallas: con datos, cargando, vacío y error. Evita que el equipo de desarrollo improvise esos casos.</span></li>
+          <li><span>El esqueleto de carga imita la forma real de la tabla, así que no hay salto visual cuando llegan los datos.</span></li>
+          <li><span>En Viáticos, la aprobación del gasto y la comprobación de papeles viven en <strong>dos columnas separadas</strong>. Son dos procesos, con dos responsables y dos momentos.</span></li>
+          <li><span>El botón bloqueado de Autorización de compra explica por qué lo está y da una salida: «Si crees que es un error de asignación, levanta un ticket en vez de pedirle a alguien que la apruebe por ti».</span></li>
+          <li><span>Esa misma pantalla resuelve bien una regla delicada: autoriza el rol, no la persona, «y por eso no hay nadie a quien esperar ni ausencia que cubrir».</span></li>
+          <li><span>Aprobar y rechazar exigen comentario en los dos casos, y la pantalla avisa de que queda en una traza que no se puede editar después.</span></li>
+          <li><span>Cuentas por cobrar declara el alcance exacto de su cifra —«sólo factura timbrada y no pagada»— y deja «Cerrado y sin facturar» fuera del número grande a propósito, para que un retraso de facturación no se lea como un problema de cobranza.</span></li>
+          <li><span>Y declara la limitación de su propio dato: la antigüedad se cuenta desde la fecha de la factura porque el padrón todavía no guarda los días de crédito del cliente.</span></li>
+          <li><span>Las tres tablas llevan <code>&lt;caption&gt;</code> y <code>scope</code> en todas sus cabeceras.</span></li>
+          <li><span>El anillo de foco mide 2 px y cambia de color según la zona: da <strong>5,68:1</strong> sobre el menú azul y <strong>4,99:1</strong> sobre el fondo claro, muy por encima del 3:1 que pide un elemento gráfico.</span></li>
+          <li><span>No hay ningún <code>id</code> duplicado, ninguna referencia <code>aria-controls</code> o <code>aria-labelledby</code> rota, ningún control sin nombre accesible y ningún error de JavaScript en las cuatro pantallas.</span></li>
+          <li><span>Folios y UUID están marcados con <code>translate="no"</code>, así que ningún traductor automático los altera.</span></li>
+          <li><span>Hay tema claro y oscuro en las cuatro, sobre las mismas variables: cambiar un color se hace en un solo sitio.</span></li>
         </ul>
       </article>
 
       <figure class="wire reveal" style="--cyc:9s; --freeze:-5.4s">
         <div class="wire-head">
           <span class="wire-tag">Simulación</span>
-          <span class="wire-title">Un estado, o dos</span>
+          <span class="wire-title">Un error que dice qué no se ha roto</span>
           <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
         </div>
-        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Tres viáticos en curso.</span><span class="an" style="animation-name:av-paso2">Con un estado, los tres dicen «pendiente».</span><span class="an" style="animation-name:av-paso3">Con dos, cada rol ve su propia cola.</span></p>
+        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">El servicio no responde.</span><span class="an" style="animation-name:av-paso2">Uno solo dice que falló.</span><span class="an" style="animation-name:av-paso3">El otro dice qué sigue intacto, y con qué referencia.</span></p>
         <div class="wire-stage wire-stage--split" aria-hidden="true">
           <div class="wire-panel is-bad">
-            <span class="wire-panel-label">Un solo estado</span>
-            <div class="wf"><div class="wf-tabla">
-                <div class="wf-thead"><span style="min-width:5.2rem">Folio</span><span>Quién</span><span class="sep">Estatus</span></div>
-                <div class="wf-fila"><span class="folio">VI-0731</span><span class="cli">Rubén Beltrán Ochoa</span><span class="sep"><span class="wf-pill wf-pill--gris">Pendiente</span></span></div>
-                <div class="wf-fila"><span class="folio">VI-0715</span><span class="cli">Jonathan Olvera Sandoval</span><span class="sep"><span class="wf-pill wf-pill--gris">Pendiente</span></span></div>
-                <div class="wf-fila"><span class="folio">VI-0709</span><span class="cli">Mauricio Ríos Cantú</span><span class="sep"><span class="wf-pill wf-pill--gris">Pendiente</span></span></div>
-              </div>
-              <p class="wf-msg an" style="animation-name:av-nada">Tres pendientes distintos, y hay que abrirlos para saber de qué.</p></div>
+            <span class="wire-panel-label">Lo habitual</span>
+            <div class="wf"><div class="wf-top"><b>Viáticos</b></div>
+              <p class="wf-msg">Error al cargar los datos.</p>
+              <div class="wf-pad"></div>
+              <span class="wf-mini">Reintentar</span></div>
           </div>
           <div class="wire-panel is-good">
-            <span class="wire-panel-label">Dos procesos</span>
-            <div class="wf"><div class="wf-tabla">
-                <div class="wf-thead"><span style="min-width:5.2rem">Folio</span><span style="min-width:7rem">Aprobación</span><span class="sep">Comprobación</span></div>
-                <div class="wf-fila"><span class="folio">VI-0731</span><span class="cli"><span class="wf-pill wf-pill--gris">Por aprobar</span></span><span class="sep"><span class="wf-pill wf-pill--gris">Sin comprobar</span></span></div>
-                <div class="wf-fila"><span class="folio">VI-0715</span><span class="cli"><span class="wf-pill wf-pill--ok">Aprobado</span></span><span class="sep"><span class="wf-pill wf-pill--warn an" style="animation-name:av-lat">En revisión</span></span></div>
-                <div class="wf-fila"><span class="folio">VI-0709</span><span class="cli"><span class="wf-pill wf-pill--ok">Aprobado</span></span><span class="sep"><span class="wf-pill wf-pill--err an" style="animation-name:av-lat">Rechazado</span></span></div>
-              </div>
-              <p class="wf-sub">Quien aprueba filtra la primera columna; Administración, la segunda.</p></div>
+            <span class="wire-panel-label">Lo que ya hace esta herramienta</span>
+            <div class="wf"><div class="wf-top"><b>Viáticos</b></div>
+              <p class="wf-msg">No se pudo cargar el listado de viáticos.</p>
+              <p class="wf-sub">Ninguna solicitud se aprobó ni se rechazó sola y ningún comprobante se perdió.</p>
+              <div class="wf-pad"></div>
+              <span class="wf-mini pri">Reintentar</span>
+              <p class="wf-ref an" style="animation-name:av-lat">Referencia del error: VIA-20260821-1418</p></div>
           </div>
         </div>
-        <figcaption>Aprobado y sin comprobar no está a medias: es el estado normal de todo viático en curso.</figcaption>
+        <figcaption>La referencia es lo que permite que soporte y la persona hablen del mismo incidente.</figcaption>
       </figure>
 
       <article class="card card-aparte reveal">
-        <p><strong>La barra inferior de estados es andamiaje del prototipo.</strong> Sirve para enseñar las cuatro situaciones de cada pantalla —con datos, cargando, vacío y error— sin tener que provocarlas. Conviene marcarla como tal para que no se interprete como funcionalidad a construir.</p>
+        <p><strong>La barra inferior de estados es andamiaje del prototipo.</strong> Sirve para enseñar las cuatro situaciones sin tener que provocarlas. Conviene marcarla como tal para que el equipo de DPROMA no la interprete como funcionalidad a construir.</p>
       </article>
-    </div>
-  </div>
-</section>
-
-<section id="modelo">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div>
-        <div class="eyebrow">Arquitectura de la información</div>
-        <h2>Lo que hay que construir por debajo.</h2>
-        <p class="section-note">Las pantallas enseñan cifras que hoy no tienen origen. Estas son las piezas que las sostienen, y las tres decisiones de negocio que no puede tomar el equipo de desarrollo.</p>
-      </div>
-    </div>
-
-    <figure class="esquema reveal">
-      <svg viewBox="0 0 690 400" role="img" aria-label="Esquema del módulo de viáticos. De la persona cuelgan sus solicitudes de viático, y la persona pertenece a un departamento. De cada solicitud cuelgan sus comprobantes y sus eventos de bitácora, y si vence sin comprobar genera un adeudo de esa persona. La solicitud consulta tres catálogos: el tabulador de montos estándar, el presupuesto semanal del área y los conceptos de gasto que se pueden solicitar.">
-        <text class="eje" x="100" y="18">QUIÉN VIAJA</text>
-        <text class="eje" x="358" y="18">EL VIÁTICO</text>
-        <text class="eje" x="589" y="18">LAS REGLAS</text>
-
-        <path class="rel" d="M100 84 V124"/>
-        <path class="rel" d="M176 62 H222 V116 H268"/>
-        <path class="rel" d="M268 150 H222 V254 H176"/>
-        <path class="rel" d="M340 170 V236"/>
-        <path class="rel" d="M268 160 H246 V362 H268"/>
-        <path class="rel" d="M512 62 H490 V120 H448"/>
-        <path class="rel" d="M512 146 H448"/>
-        <path class="rel" d="M512 258 H470 V150 H448"/>
-
-        <g class="ent">
-          <rect class="caja" x="24" y="40" width="152" height="44" rx="11"/>
-          <text class="et" x="37" y="63">Persona</text>
-          <text class="ec" x="37" y="81">departamento · jefe</text>
-        </g>
-        <g class="ent">
-          <rect class="caja" x="24" y="124" width="152" height="44" rx="11"/>
-          <text class="et" x="37" y="147">Departamento</text>
-          <text class="ec" x="37" y="165">area · responsable</text>
-        </g>
-        <g class="ent">
-          <rect class="caja" x="24" y="232" width="152" height="44" rx="11"/>
-          <text class="et" x="37" y="255">Adeudo</text>
-          <text class="ec" x="37" y="273">monto · desde</text>
-        </g>
-
-        <g class="ent raiz">
-          <rect class="caja" x="268" y="96" width="180" height="74" rx="11"/>
-          <text class="et" x="281" y="119">Solicitud de viático</text>
-          <text class="ec" x="281" y="137">persona · motivo</text>
-          <text class="ec" x="281" y="151">destino · fechas</text>
-          <text class="ec" x="281" y="165">monto · estandar</text>
-        </g>
-        <g class="ent">
-          <rect class="caja" x="268" y="236" width="180" height="60" rx="11"/>
-          <text class="et" x="281" y="259">Comprobante</text>
-          <text class="ec" x="281" y="277">concepto · importe</text>
-          <text class="ec" x="281" y="291">pdf + xml · uuid</text>
-        </g>
-        <g class="ent">
-          <rect class="caja" x="268" y="340" width="180" height="44" rx="11"/>
-          <text class="et" x="281" y="363">Evento de bitácora</text>
-          <text class="ec" x="281" y="381">actor · accion · fecha</text>
-        </g>
-
-        <g class="ent">
-          <rect class="caja" x="512" y="40" width="154" height="44" rx="11"/>
-          <text class="et" x="525" y="63">Tabulador</text>
-          <text class="ec" x="525" y="81">destino · dias</text>
-        </g>
-        <g class="ent">
-          <rect class="caja" x="512" y="124" width="154" height="44" rx="11"/>
-          <text class="et" x="525" y="147">Presupuesto</text>
-          <text class="ec" x="525" y="165">area · semana</text>
-        </g>
-        <g class="ent">
-          <rect class="caja" x="512" y="236" width="154" height="44" rx="11"/>
-          <text class="et" x="525" y="259">Concepto</text>
-          <text class="ec" x="525" y="277">clave · tope</text>
-        </g>
-
-        <g class="cardg">
-          <rect x="81" y="96" width="38" height="16" rx="4"/>
-          <text class="card" x="100" y="108">1 a N</text>
-        </g>
-        <g class="cardg">
-          <rect x="203" y="77" width="38" height="16" rx="4"/>
-          <text class="card" x="222" y="89">1 a N</text>
-        </g>
-        <g class="cardg">
-          <rect x="203" y="190" width="38" height="16" rx="4"/>
-          <text class="card" x="222" y="202">0 a 1</text>
-        </g>
-        <g class="cardg">
-          <rect x="321" y="195" width="38" height="16" rx="4"/>
-          <text class="card" x="340" y="207">1 a N</text>
-        </g>
-        <g class="cardg">
-          <rect x="227" y="250" width="38" height="16" rx="4"/>
-          <text class="card" x="246" y="262">1 a N</text>
-        </g>
-        <g class="cardg">
-          <rect x="471" y="76" width="38" height="16" rx="4"/>
-          <text class="card" x="490" y="88">N a 1</text>
-        </g>
-        <g class="cardg">
-          <rect x="461" y="138" width="38" height="16" rx="4"/>
-          <text class="card" x="480" y="150">N a 1</text>
-        </g>
-        <g class="cardg">
-          <rect x="451" y="188" width="38" height="16" rx="4"/>
-          <text class="card" x="470" y="200">N a N</text>
-        </g>
-      </svg>
-      <figcaption>Cuatro objetos propios —solicitud, comprobante, adeudo y evento— y tres catálogos. Los catálogos no son adorno: son lo que convierte una solicitud en algo que se puede aprobar sin discutir.</figcaption>
-    </figure>
-
-    <div class="glosa reveal">
-      <p><b>La decisión que ya tomó el área, y que conviene respetar.</b> El viático se controla <b>por persona, no por servicio</b>. El costo por servicio se obtiene después agregando, pero el objeto vive colgado de quien viaja. Al revés no funciona, porque un viaje puede cubrir varios servicios.</p>
-      <p>La relación de la izquierda es la que hoy no existe: cuando una solicitud vence sin comprobarse genera <b>un adeudo con nombre, importe y fecha de origen</b>. Eso es lo que convierte la política de descuento en algo aplicable, porque deja de haber que reconstruir el caso a mano.</p>
-    </div>
-
-    <details class="tecnico reveal">
-      <summary><span class="finding-toggle" aria-hidden="true"></span>Detalle para implementación</summary>
-      <div class="tecnico-body">
-        <p><b>Los dos ejes de estado no se mezclan.</b> El único punto de contacto es la aprobación, que es la que arma el saldo por comprobar y arranca el reloj.</p>
-        <div class="spec-scroll">
-        <table class="spec-table">
-          <thead><tr><th>Entidad</th><th>Campos que decide este análisis</th></tr></thead>
-          <tbody>
-            <tr><td><code>solicitud_viatico</code></td><td>Dos campos separados: <code>estado_aprobacion</code> (por_aprobar, aprobado, rechazado) y <code>estado_comprobacion</code> (sin_comprobar, en_revision, comprobado, vencido)</td></tr>
-            <tr><td><code>solicitud_viatico</code></td><td><code>fecha_regreso</code> obligatoria y <code>comprobar_antes_de</code> calculado sobre ella, nunca tecleado</td></tr>
-            <tr><td><code>solicitud_viatico</code></td><td><code>monto_estandar</code> se copia del tabulador al crear y se congela: un cambio posterior del catálogo no debe reescribir el histórico</td></tr>
-            <tr><td><code>comprobante</code></td><td>El par <code>archivo_pdf</code> y <code>archivo_xml</code> es obligatorio, y <code>uuid_fiscal</code> lleva índice único: es lo que impide subir dos veces la misma factura</td></tr>
-            <tr><td><code>comprobante</code></td><td>Un rechazo no borra la fila: <code>estado = rechazado</code> más <code>motivo_rechazo</code>, y su importe vuelve al saldo por comprobar</td></tr>
-            <tr><td><code>adeudo</code></td><td>Se crea al vencer. <code>aplicado_por</code> nace nulo y solo lo llena una persona</td></tr>
-          </tbody>
-        </table>
-        </div>
-        <div class="code">al aprobar(solicitud):
-  solicitud.estado_aprobacion   = "aprobado"
-  solicitud.estado_comprobacion = "sin_comprobar"
-  solicitud.saldo_por_comprobar = solicitud.monto_aprobado
-  solicitud.comprobar_antes_de  = habiles(solicitud.fecha_regreso, 3)
-  registrar_evento(actor, "aprobo", ahora)
-
-al rechazar_comprobante(comprobante, motivo):
-  comprobante.estado         = "rechazado"
-  comprobante.motivo_rechazo = motivo
-  solicitud.saldo_por_comprobar += comprobante.importe
-  si solicitud.saldo_por_comprobar &gt; 0:
-    solicitud.estado_comprobacion = "sin_comprobar"</div>
-      </div>
-    </details>
-
-    <div class="section-head reveal" style="margin-top:3.5rem">
-      <div>
-        <div class="eyebrow">Las tres brechas</div>
-        <h2>Lo que la pantalla enseña y todavía no tiene origen.</h2>
-        <p class="section-note">Ninguna de las tres es una decisión de software.</p>
-      </div>
-    </div>
-
-    <div class="brecha reveal">
-      <div class="marca-fila"><span class="marca marca-brecha">Brecha</span></div>
-      <h3>El monto estándar aparece en la pantalla, pero detrás no hay tabla</h3>
-      <p>La lista compara lo que se pide contra un estándar y calcula la diferencia. Es la columna que convierte la aprobación en una decisión de dos segundos. Pero ese estándar hoy solo existe en la cabeza de quien autoriza: no hay una tabla que diga cuánto corresponde para tres días en Irapuato con hospedaje y transporte.</p>
-      <p class="brecha-efecto">Sin tabulador, <b>cada solicitud se sigue negociando desde cero</b>, que es exactamente el problema que el área pidió resolver.</p>
-    </div>
-
-    <div class="brecha reveal">
-      <div class="marca-fila"><span class="marca marca-brecha">Brecha</span></div>
-      <h3>El plazo de tres días no se puede cumplir si se cuenta desde el pago</h3>
-      <p>El detalle dice «plazo para comprobar: hasta el 17 de agosto». Falta fijar desde cuándo cuenta. Si arranca al entregarse el fondo, quien sale una semana ya llega tarde el día que vuelve, y la regla deja de tomarse en serio. Tiene que empezar al cerrarse el viaje.</p>
-      <p class="brecha-efecto">Contado desde la fecha de regreso, <b>el plazo deja de ser un recordatorio y pasa a ser un dato</b>: el sistema sabe quién está en plazo, quién está por vencer y quién ya debe.</p>
-    </div>
-
-    <div class="brecha reveal">
-      <div class="marca-fila"><span class="marca marca-brecha">Brecha</span></div>
-      <h3>Cuando el que no comprueba es externo, el descuento cae sobre su jefe</h3>
-      <p>La pantalla ya lo enuncia en un toggletip: si un instalador externo no comprueba, el descuento se aplica a quien lo asignó. Tiene lógica —quien asigna responde de a quién asigna— pero es una consecuencia laboral sobre una tercera persona, y hoy vive en un texto de ayuda.</p>
-      <p class="brecha-efecto">El sistema puede preparar el dato y señalar el caso, pero <b>quien aplica un descuento salarial tiene que ser una persona</b>, con el expediente delante y la regla comunicada de antemano.</p>
     </div>
   </div>
 </section>
@@ -1493,53 +1314,47 @@ al rechazar_comprobante(comprobante, motivo):
     <div class="evidence-stack">
       <article class="evidence-card card card-neutral reveal">
         <ul class="rec-list">
-          <li><span>Hacer obligatorios los campos del viaje: quién, a dónde, desde cuándo hasta cuándo y qué conceptos. Sin ellos no se puede presupuestar ni saber dónde está el personal desplazado.</span></li>
-          <li><span>Arrancar el reloj de comprobación en la fecha de regreso y contar días hábiles. Es la diferencia entre una regla que se puede cumplir y una que se incumple por diseño.</span></li>
-          <li><span>Avisar dos veces y no cinco: cuando quedan dos días hábiles, a la persona, y el día que se agota, también a su jefe directo. Un aviso diario deja de leerse en una semana.</span></li>
-          <li><span>Quitar del recorrido al eslabón que no decide. Jurídico y Recursos Humanos custodia el formato dentro de ISO 9001; eso no exige que la solicitud pase por su bandeja.</span></li>
-          <li><span>Proponer el importe del tabulador al elegir destino, fechas y conceptos, y volver obligatorio el campo de justificación cuando se pide por encima. El exceso deja de ser invisible.</span></li>
-          <li><span>Decir siempre a qué se refiere cada cifra de la cabecera: de todas las solicitudes, de las que pasan el filtro o de esta página.</span></li>
-          <li><span>Permitir ordenar por plazo y por importe. Hoy el orden lo fija el sistema y no se puede cambiar.</span></li>
-          <li><span>Dar salida a la acción que resuelve el problema. Si el bloqueo es por un comprobante rechazado, el botón que lo abre va junto al aviso, y ya está: no al final de la pantalla.</span></li>
-          <li><span>Añadir la ruta de vuelta en el detalle, y permitir moverse al viático anterior y siguiente dentro del mismo filtro. Revisar comprobantes es un trabajo por lotes.</span></li>
-          <li><span>Definir qué pasa tras cada acción. Al aprobar, ¿la fila desaparece del filtro «por aprobar», se atenúa, se puede deshacer? Es donde más se rompen las herramientas internas.</span></li>
-          <li><span>Separar el resumen de la cabecera de los filtros. «6 solicitudes · 2 por aprobar · 2 con excedente» informa; las pastillas de abajo filtran. No deben parecerse.</span></li>
-          <li><span>Prever el caso del instalador externo desde el recorrido, no como excepción: entra desde la orden que le asignaron, no ve el resto del sistema, y su plazo es visible para quien lo asignó.</span></li>
-          <li><span>No dejar que nadie apruebe su propio viático, ni siquiera quien tiene autoridad presupuestaria sobre su área. Es lo que permite que el registro sirva como evidencia.</span></li>
-          <li><span>Exportar el expediente completo —solicitud, comprobantes con sus dos archivos y bitácora— como un documento único. El formato es parte de la documentación ISO 9001 y hoy se reconstruye a mano cuando lo piden.</span></li>
+          <li><span>Fijar un único nombre por concepto y usarlo en toda la pantalla. Elegir entre «excedente» y «por encima del estándar», y no alternar entre la cabecera, el chip y la celda.</span></li>
+          <li><span>Sacar de la celda la razón de un estado. Hoy la celda de comprobación de <code>VI-2026-0722</code> contiene «Motivo: "El vuelo no procede para un trayecto de 3 h por carretera. Se aprueba de nuevo si viaja en autobús"». El sistema ya lo resolvió en §6.12, regla 9: esa razón vive en el detalle del registro.</span></li>
+          <li><span>Hacer lo mismo con la justificación del monto: la cita «El hotel del tabulador estaba lleno por la feria; el más cercano con disponibilidad costaba $400 más la noche» está dentro de la columna de importes, y es lo que hace que esa fila mida 161 px.</span></li>
+          <li><span>Escribir la capa interactiva o retirar la promesa. Un <code>&lt;button aria-pressed="false"&gt;</code> anuncia un interruptor; si al pulsarlo no cambia nada, el atributo miente a quien navega con lector de pantalla y la forma miente a todos los demás.</span></li>
+          <li><span>Permitir ordenar por importe y por antigüedad. Hoy ninguna de las tres tablas ofrece ordenación, y son las dos preguntas con las que se entra a estas pantallas.</span></li>
+          <li><span>Unificar la última columna de Viáticos. Hoy mezcla cinco cosas distintas: acción primaria («Aprobar»), acción secundaria («Rechazar…»), navegación («Ver detalle», «Ver comprobantes»), acción de otro proceso («Subir uno nuevo») y texto explicativo suelto.</span></li>
+          <li><span>Decidir qué pasa tras cada acción. Al aprobar, ¿la fila desaparece, se atenúa, se puede deshacer? Es donde más se rompen las herramientas internas, y el prototipo no lo prevé.</span></li>
+          <li><span>Separar visualmente lo que informa de lo que filtra. Hoy los chips de conteo y los controles de filtro comparten franja, forma y tamaño.</span></li>
+          <li><span>Unificar los dos indicadores de posición de Cuentas por cobrar. En la misma barra, a la izquierda hay una miga («Todas las marcas ↓ Marca A») y a la derecha un rótulo («Nivel 2 de 3 · marca › grupo › agencia») que dicen lo mismo por separado.</span></li>
+          <li><span>Permitir moverse al registro anterior y siguiente desde el detalle. Viático detalle y Autorización de compra tienen miga de vuelta, pero revisar comprobantes o autorizar compras es un trabajo por lotes y obliga a salir y volver a entrar.</span></li>
+          <li><span>Dejar que el texto que explica un bloqueo cuelgue del control que bloquea, no del espacio de al lado. Es lo mismo que pide la recomendación de accesibilidad, y aquí resuelve además dónde colocarlo.</span></li>
         </ul>
       </article>
 
       <figure class="wire reveal" style="--cyc:10s; --freeze:-5.6s">
         <div class="wire-head">
           <span class="wire-tag">Simulación</span>
-          <span class="wire-title">Desde dónde se cuentan los tres días</span>
+          <span class="wire-title">La razón del estado, dentro de la celda</span>
           <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
         </div>
-        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">El fondo se entrega el 10 de agosto.</span><span class="an" style="animation-name:av-paso2">Contado desde ahí, el plazo vence durante el viaje.</span><span class="an" style="animation-name:av-paso3">Contado desde el regreso, se puede cumplir.</span></p>
+        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Una solicitud rechazada, con su motivo.</span><span class="an" style="animation-name:av-paso2">El motivo entero cabe en la celda, y la estira.</span><span class="an" style="animation-name:av-paso3">En el detalle, la fila vuelve a medir lo mismo que las demás.</span></p>
         <div class="wire-stage wire-stage--split" aria-hidden="true">
           <div class="wire-panel is-bad">
-            <span class="wire-panel-label">Desde la entrega del fondo</span>
-            <div class="wf"><div class="wf-top"><b>VI-2026-0715</b><span>Jonathan Olvera Sandoval</span></div>
-              <p class="wf-sub">Fondo entregado: 10 ago · Viaje: 12 – 16 ago</p>
-              <div class="wf-bar">
-                <span class="wf-pill wf-pill--gris">Plazo: hasta el 13 ago</span>
+            <span class="wire-panel-label">Hoy</span>
+            <div class="wf"><div class="wf-tabla">
+                <div class="wf-fila"><span class="folio">VI-0731</span><span class="cli">Rubén Beltrán Ochoa</span><span class="sep"><span class="wf-pill wf-pill--gris">Por aprobar</span></span></div>
+                <div class="wf-fila"><span class="folio">VI-0722</span><span class="cli">Mauricio Ríos Cantú</span><span class="sep"><span class="wf-pill wf-pill--err">Rechazado</span></span></div>
               </div>
-              <div class="wf-pad"></div>
-              <p class="wf-msg an" style="animation-name:av-fallo">Vencido el 13, con la persona todavía de viaje.</p></div>
+              <p class="wf-sub an" style="animation-name:av-nada">Motivo: «El vuelo no procede para un trayecto de 3 h por carretera. Se aprueba de nuevo si viaja en autobús.»</p></div>
           </div>
           <div class="wire-panel is-good">
-            <span class="wire-panel-label">Desde el regreso</span>
-            <div class="wf"><div class="wf-top"><b>VI-2026-0715</b><span>Jonathan Olvera Sandoval</span></div>
-              <p class="wf-sub">Regreso: 16 ago · Tres días hábiles después</p>
-              <div class="wf-bar">
-                <span class="wf-pill wf-pill--ok an" style="animation-name:av-lat">Plazo: hasta el 21 ago</span>
+            <span class="wire-panel-label">Recomendado</span>
+            <div class="wf"><div class="wf-tabla">
+                <div class="wf-fila"><span class="folio">VI-0731</span><span class="cli">Rubén Beltrán Ochoa</span><span class="sep"><span class="wf-pill wf-pill--gris">Por aprobar</span></span></div>
+                <div class="wf-fila"><span class="folio">VI-0722</span><span class="cli">Mauricio Ríos Cantú</span><span class="sep"><span class="wf-pill wf-pill--err an" style="animation-name:av-lat">Rechazado</span></span></div>
               </div>
               <div class="wf-pad"></div>
-              <p class="wf-sub">Aviso el 19 a la persona; el 21, también a su jefe directo.</p></div>
+              <p class="wf-sub">El motivo, completo, en el detalle del registro. §6.12, regla 9.</p></div>
           </div>
         </div>
-        <figcaption>Una regla que se incumple por diseño deja de tomarse en serio. Es lo que ha pasado con los tres días.</figcaption>
+        <figcaption>La regla ya está escrita en el sistema de diseño, y salió de revisar estas mismas pantallas.</figcaption>
       </figure>
     </div>
   </div>
@@ -1556,52 +1371,50 @@ al rechazar_comprobante(comprobante, motivo):
     <div class="evidence-stack">
       <article class="evidence-card card card-neutral reveal">
         <ul class="rec-list">
-          <li><span>Mantener tres familias visuales distintas y no mezclarlas: etiqueta de estado, indicador de importe y control de filtro. En la primera versión de esta pantalla las tres compartían forma de pastilla.</span></li>
-          <li><span>No usar color en los identificadores. El folio se distingue por peso y por ser enlace, no por ser verde: el verde en un folio se lee como «correcto» y no significa nada.</span></li>
-          <li><span>Usar los tokens de tamaño en lugar de valores sueltos. Las pastillas llevaban <code>11px</code> escrito a mano donde correspondía <code>--fs-meta</code>, y eso rompe la escala en cuanto el token cambia.</span></li>
-          <li><span>Dar una sola forma de entrar a un registro. Si la fila entera navega al detalle, el botón «Ver» de la última columna sobra y añade ruido a diez filas.</span></li>
-          <li><span>Aplicar una única escala de espaciado, múltiplos de cuatro, sin valores intermedios sueltos.</span></li>
-          <li><span>Igualar la altura de las filas. El bloque de montos —pedido, estándar y diferencia— hace que unas filas crezcan y otras no; conviene que ocupe siempre el mismo alto aunque la diferencia sea cero.</span></li>
-          <li><span>Distinguir «en revisión» de «rechazado» por algo más que el color: llevan icono propio, porque son los dos estados sobre los que alguien tiene que actuar.</span></li>
-          <li><span>Hacer evidente el paso del cursor sobre la fila, con cambio de fondo visible y no un matiz, ya que la fila entera es pulsable.</span></li>
-          <li><span>Dejar una sola acción principal por pantalla. En la lista es «Nueva solicitud»; «Columnas» y «Exportar» son secundarias y no deben competir con ella.</span></li>
-          <li><span>Prever los estados de las acciones que tardan: aprobando, aprobado, falló. Aprobar toca dinero, y el reposo no basta.</span></li>
-          <li><span>Evitar que el texto se corte sin recuperación. Los nombres largos y los motivos de rechazo quedan truncados y hoy no hay forma de ver el valor completo sin abrir el detalle.</span></li>
-          <li><span>Respetar la densidad elegida. El conmutador cómoda/compacta existe porque Administración revisa lotes largos y quien pide entra una vez al mes; la preferencia debe recordarse.</span></li>
+          <li><span>Usar la escala que las propias pantallas declaran. <code>:root</code> define seis tamaños —<code>--fs-meta</code> 12, <code>--fs-dense</code> 13, <code>--fs-base</code> 14, <code>--fs-sub</code> 16, <code>--fs-title</code> 20 y <code>--fs-kpi</code> 30— y sobre la página se cuentan ocho o nueve.</span></li>
+          <li><span>Eliminar los tamaños fuera de esa escala: 10,5, 11, 11,5 y 13,5 px. Entre 13 y 13,5 px no hay diferencia perceptible, y sí una escala rota.</span></li>
+          <li><span>Reducir los grosores. Viáticos y Cuentas por cobrar usan cuatro —400, 600, 700 y 800—, y el 800 aparece cuatro veces en cada una.</span></li>
+          <li><span>Aplicar la escala de espaciado declarada, que va de cuatro en cuatro desde <code>--sp-1</code>. Hoy conviven 1, 2, 3, 5, 6, 7, 9, 10, 13 y 14 px con los valores del token.</span></li>
+          <li><span>Quitar el color de enlace del identificador de fila. El folio va hoy en <code>rgb(47, 107, 60)</code> a peso 600; el sistema fija en §6.11, regla 10, que va en <code>--text</code>, porque la zona pulsable es la fila entera y no el texto verde.</span></li>
+          <li><span>Igualar la altura de las filas. Las seis de Viáticos miden entre 83 y 161 px; las cinco de partidas de Autorización de compra miden 47 px las cinco, que es el modelo a seguir.</span></li>
+          <li><span>Unificar la cabecera de las cuatro pantallas. Viáticos y Cuentas por cobrar llevan buscador y franja de chips; Viático detalle y Autorización de compra, miga y botones. No hay una plantilla reconocible.</span></li>
+          <li><span>Dejar una sola acción principal por pantalla. En Viáticos compiten «Nueva solicitud», «Columnas» y un icono de exportar sin texto.</span></li>
+          <li><span>Mover el asistente flotante o reservarle espacio al final de las listas. Hoy se solapa con la última fila de las tablas largas.</span></li>
+          <li><span>Prever los estados de las acciones que tardan: aprobando, aprobado, falló. Aprobar mueve dinero, y el prototipo solo tiene el reposo.</span></li>
+          <li><span>Llevar los bloques explicativos a un toggletip sobre el control al que se refieren. La explicación bajo la cifra de Cuentas por cobrar suma 524 caracteres y compite con un número de 30 px que debería leerse solo.</span></li>
         </ul>
       </article>
 
       <figure class="wire reveal" style="--cyc:8s; --freeze:-4.6s">
         <div class="wire-head">
           <span class="wire-tag">Simulación</span>
-          <span class="wire-title">La cuenta no se adelanta</span>
+          <span class="wire-title">Seis filas, seis alturas</span>
           <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
         </div>
-        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Tres comprobantes subidos, dos en revisión.</span><span class="an" style="animation-name:av-paso2">Si se suman todos, la cuenta dice comprobado.</span><span class="an" style="animation-name:av-paso3">Solo cuenta lo que una persona ya aceptó.</span></p>
+        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Seis solicitudes en la misma tabla.</span><span class="an" style="animation-name:av-paso2">Miden 161, 100, 127, 111, 124 y 83 px.</span><span class="an" style="animation-name:av-paso3">La tabla de partidas, al lado, mide 47 px en las cinco.</span></p>
         <div class="wire-stage wire-stage--split" aria-hidden="true">
           <div class="wire-panel is-bad">
-            <span class="wire-panel-label">Sumando todo lo subido</span>
-            <div class="wf"><div class="wf-top"><b>La cuenta</b><span>VI-2026-0715</span></div>
-              <div class="wf-bar">
-                <span class="wf-pill wf-pill--gris">Aprobado $2,100</span>
-                <span class="wf-pill wf-pill--ok">Comprobado $2,100</span>
+            <span class="wire-panel-label">Viáticos</span>
+            <div class="wf"><div class="wf-tabla">
+                <div class="wf-fila" style="min-height:3.4rem"><span class="folio">VI-0731</span><span class="cli">161 px</span><span class="sep"><span class="wf-pill wf-pill--warn">+$400 y su cita</span></span></div>
+                <div class="wf-fila" style="min-height:1.6rem"><span class="folio">VI-0730</span><span class="cli">100 px</span><span class="sep"><span class="wf-pill wf-pill--ok">igual</span></span></div>
+                <div class="wf-fila" style="min-height:2.4rem"><span class="folio">VI-0722</span><span class="cli">127 px</span><span class="sep"><span class="wf-pill wf-pill--err">motivo</span></span></div>
+                <div class="wf-fila" style="min-height:1.1rem"><span class="folio">VI-0698</span><span class="cli">83 px</span><span class="sep"><span class="wf-pill wf-pill--gris">—</span></span></div>
               </div>
-              <div class="wf-pad"></div>
-              <p class="wf-msg an" style="animation-name:av-nada">Nadie ha mirado $1,940 de esa cifra.</p></div>
+              <p class="wf-msg an" style="animation-name:av-nada">El ojo no puede recorrer una columna que no tiene ritmo.</p></div>
           </div>
           <div class="wire-panel is-good">
-            <span class="wire-panel-label">Sumando solo lo aceptado</span>
-            <div class="wf"><div class="wf-top"><b>La cuenta</b><span>VI-2026-0715</span></div>
-              <div class="wf-bar">
-                <span class="wf-pill wf-pill--gris">Aprobado $2,100</span>
-                <span class="wf-pill wf-pill--ok">Comprobado $160</span>
-                <span class="wf-pill wf-pill--warn an" style="animation-name:av-lat">Por comprobar $1,940</span>
+            <span class="wire-panel-label">Partidas de la compra</span>
+            <div class="wf"><div class="wf-tabla">
+                <div class="wf-fila"><span class="folio">CAB-08-ROJ</span><span class="cli">47 px</span><span class="sep">$9,200</span></div>
+                <div class="wf-fila"><span class="folio">CAB-08-NEG</span><span class="cli">47 px</span><span class="sep">$9,200</span></div>
+                <div class="wf-fila"><span class="folio">CAB-08-BLA</span><span class="cli">47 px</span><span class="sep">$9,200</span></div>
+                <div class="wf-fila"><span class="folio">ITM-40A</span><span class="cli">47 px</span><span class="sep">$9,888</span></div>
               </div>
-              <div class="wf-pad"></div>
-              <p class="wf-sub">Lo que está en revisión todavía puede rechazarse.</p></div>
+              <p class="wf-sub an" style="animation-name:av-lat">Mismo sistema, misma semana, resuelto bien.</p></div>
           </div>
         </div>
-        <figcaption>Esa cifra decide si se libera un viático nuevo o si se abre un adeudo. Conviene que se equivoque por lo bajo.</figcaption>
+        <figcaption>No hay que inventar el arreglo: está en la otra pantalla del mismo entregable.</figcaption>
       </figure>
     </div>
   </div>
@@ -1613,25 +1426,22 @@ al rechazar_comprobante(comprobante, motivo):
       <div>
         <div class="eyebrow">Recomendaciones</div>
         <h2>Accesibilidad</h2>
-        <p class="section-note">WCAG 2.2 nivel AA. Aquí el riesgo no es solo de lectura: una acción pulsada por error aprueba o rechaza dinero.</p>
+        <p class="section-note">WCAG 2.2 nivel AA. La base está mejor de lo habitual —foco, nombres y tablas cumplen—; lo que falta es tamaño de zonas pulsables, estructura de encabezados y anuncio de cambios.</p>
       </div>
     </div>
     <div class="evidence-stack">
       <article class="evidence-card card card-neutral reveal">
         <ul class="rec-list">
-          <li><span>Separar «Aprobar» y «Rechazar» dentro de la fila, y poner al final la que no se puede deshacer sola. A seis píxeles, en pantalla táctil se pulsa una por otra.</span></li>
-          <li><span>Subir a 24 píxeles como mínimo real todas las zonas pulsables: los botones pequeños de la fila, el aspa que quita un filtro y el botón de información de la cabecera.</span></li>
-          <li><span>Subir el contraste de bordes y separadores. Los bordes de campos, pastillas y botones tienen que llegar a 3:1, que es lo que pide un elemento gráfico.</span></li>
-          <li><span>No confiar solo en el color para los estados: cada uno lleva icono propio, en especial «en revisión» y «rechazado», que son los que piden acción.</span></li>
-          <li><span>Comprobar el tema oscuro con el mismo rasero. El texto cumple, pero los bordes bajan más que en el claro.</span></li>
-          <li><span>Verificar que el anillo de foco se ve sobre todos los fondos, incluidas las pastillas de color y el menú lateral azul.</span></li>
-          <li><span>Anunciar el cambio de resultados al filtrar. Quien no ve la pantalla no percibe que la lista pasó de seis solicitudes a dos.</span></li>
-          <li><span>Anunciar también los estados de vacío y de error, no solo el de carga.</span></li>
-          <li><span>Convertir los títulos de las pantallas vacías y de error en encabezados reales, para poder navegar por ellos.</span></li>
-          <li><span>Asegurar que los filtros desplegables funcionan con teclado y que se sale con escape sin perder la selección.</span></li>
-          <li><span>Garantizar que los toggletips —el de las dos columnas de estado y el del descuento— se abren con teclado, se cierran con escape y están asociados con <code>aria-describedby</code> al control que los dispara.</span></li>
-          <li><span>Describir la acción completa en los botones de icono: «Exportar las solicitudes que se están viendo», no un icono de descarga suelto.</span></li>
-          <li><span>Dar nombre único a cada fila navegable: «Ver el detalle de VI-2026-0731», no «Ver detalle» repetido seis veces.</span></li>
+          <li><span>Asociar con <code>aria-describedby</code> el texto que explica un bloqueo. En Viáticos, el «Aprobar» de <code>VI-2026-0730</code> está <code>disabled</code> y la razón —«No puedes aprobar tu propia solicitud»— está en la misma celda pero sin asociar: un lector de pantalla anuncia el botón como no disponible y nada más.</span></li>
+          <li><span>Subir a 24 px como mínimo real las zonas pulsables. Los seis folios de Viáticos miden 98×15 px, los cinco enlaces de grupo de Cuentas por cobrar 23 px de alto, la miga de Autorización de compra 141×14 y el enlace de la cotización 180×15.</span></li>
+          <li><span>Convertir en encabezados reales los títulos de los estados vacío y error. Hoy son <code>&lt;b&gt;</code> en las ocho situaciones de las cuatro pantallas, así que no se puede navegar por ellos.</span></li>
+          <li><span>Dar encabezados a los bloques de contenido de Viáticos y Cuentas por cobrar, que tienen un <code>h1</code> y ningún <code>h2</code>. Viático detalle y Autorización de compra sí estructuran con <code>h2</code>: son el modelo dentro del mismo entregable.</span></li>
+          <li><span>Anunciar los estados de vacío y de error. Solo el esqueleto de carga lleva <code>role="status"</code>; quien no ve la pantalla no se entera de que no hay nada o de que falló.</span></li>
+          <li><span>Anunciar el cambio de resultados al filtrar, cuando el filtrado exista. Es la otra mitad de escribir la capa interactiva.</span></li>
+          <li><span>Subir el contraste de las iniciales del avatar, que quedan en 3,06:1 sobre el verde a 12 px en negrita, donde se pide 4,5:1. Están <code>aria-hidden</code>, así que no afectan a un lector de pantalla, pero sí a quien las mira.</span></li>
+          <li><span>Describir la acción completa en los botones de icono. El de exportar de Viáticos y Cuentas por cobrar dice «Exportar», sin decir qué exporta ni con qué alcance.</span></li>
+          <li><span>Dar nombre único a las filas navegables, que hoy repiten el mismo destino sin distinguir el registro.</span></li>
+          <li><span>Comprobar el tema oscuro con el mismo rasero. Las medidas de este informe están tomadas en claro, y el sistema tiene los dos.</span></li>
           <li><span>Respetar la preferencia de movimiento reducido en todas las animaciones, incluida la del asistente flotante.</span></li>
         </ul>
       </article>
@@ -1639,97 +1449,33 @@ al rechazar_comprobante(comprobante, motivo):
       <figure class="wire reveal" style="--cyc:8s; --freeze:-4.8s">
         <div class="wire-head">
           <span class="wire-tag">Simulación</span>
-          <span class="wire-title">Seis píxeles entre aprobar y rechazar</span>
+          <span class="wire-title">Un botón bloqueado que no dice por qué</span>
           <button type="button" class="wire-toggle" data-wire-toggle aria-pressed="false">Pausar</button>
         </div>
-        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">Dos acciones pegadas al final de la fila.</span><span class="an" style="animation-name:av-paso2">El dedo cae entre las dos.</span><span class="an" style="animation-name:av-paso3">Se aprueba un viático que había que rechazar.</span></p>
+        <p class="wire-paso" aria-hidden="true"><span class="an" style="animation-name:av-paso1">«Aprobar» está deshabilitado.</span><span class="an" style="animation-name:av-paso2">La razón está al lado, sin asociar.</span><span class="an" style="animation-name:av-paso3">El lector de pantalla dice «no disponible» y se calla.</span></p>
         <div class="wire-stage wire-stage--split" aria-hidden="true">
           <div class="wire-panel is-bad">
-            <span class="wire-panel-label">Lo habitual</span>
+            <span class="wire-panel-label">Hoy</span>
             <div class="wf"><div class="wf-tabla">
-                <div class="wf-fila"><span class="folio">VI-0731</span><span class="cli">Rubén Beltrán Ochoa</span><span class="sep wf-acc juntos"><span class="wf-mini">Aprobar</span><span class="wf-mini">Rechazar…</span></span></div>
+                <div class="wf-fila"><span class="folio">VI-0730</span><span class="cli">Nayeli Cruz Padilla</span><span class="sep wf-acc sueltos"><span class="wf-mini">Aprobar</span></span></div>
               </div>
-              <p class="wf-msg an" style="animation-name:av-fallo">Se aprobó el viático equivocado.</p>
-              <span class="wf-ripple wf-ripple--dead an" style="animation-name:av-press; transform:translate(21.3rem,2.47rem)"></span>
-              <span class="wf-cursor an" style="animation-name:av-cursor-tap"><svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--a-surface)" stroke-width="1.1" stroke-linejoin="round"><path d="M4.5 2.2v16.4l4.3-3.9 2.8 6.2 2.9-1.3-2.8-6.1 5.6-.2z"/></svg></span></div>
+              <p class="wf-sub">No puedes aprobar tu propia solicitud. La aprueba tu jefe directo.</p>
+              <div class="wf-pad"></div>
+              <p class="wf-msg an" style="animation-name:av-fallo">Se anuncia: «Aprobar, no disponible».</p></div>
           </div>
           <div class="wire-panel is-good">
-            <span class="wire-panel-label">Lo recomendado</span>
+            <span class="wire-panel-label">Recomendado</span>
             <div class="wf"><div class="wf-tabla">
-                <div class="wf-fila"><span class="folio">VI-0731</span><span class="cli">Rubén Beltrán Ochoa</span><span class="sep wf-acc sueltos"><span class="wf-mini pri">Aprobar</span><span class="wf-mini">Rechazar…</span></span></div>
+                <div class="wf-fila"><span class="folio">VI-0730</span><span class="cli">Nayeli Cruz Padilla</span><span class="sep wf-acc sueltos"><span class="wf-mini">Aprobar</span></span></div>
               </div>
+              <p class="wf-sub an" style="animation-name:av-lat">aria-describedby apunta a esta frase.</p>
               <div class="wf-pad"></div>
-              <p class="wf-sub">Zonas de 24 píxeles, separadas, una sola acción principal, y el rechazo pide confirmación.</p></div>
+              <p class="wf-sub">Se anuncia: «Aprobar, no disponible. No puedes aprobar tu propia solicitud».</p></div>
           </div>
         </div>
-        <figcaption>Aquí un error de pulsación no descoloca una lista: libera dinero o lo niega.</figcaption>
+        <figcaption>El texto ya está escrito y es bueno. Lo único que falta es el atributo que lo conecta con el botón.</figcaption>
       </figure>
     </div>
-  </div>
-</section>
-
-<section id="plan">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div>
-        <div class="eyebrow">Por dónde se empieza</div>
-        <h2>Cinco fases, ordenadas por lo que desbloquean.</h2>
-        <p class="section-note">Las tres primeras son semanas de trabajo. Las dos últimas no dependen del ritmo de desarrollo.</p>
-      </div>
-    </div>
-
-    <div class="responsibility-grid reveal">
-      <div class="card card-brand">
-        <p>Existe un tabulador de montos estándar, acordado y publicado, antes de que se codifique. Sin él, la columna del estándar enseña una cifra que nadie puede defender.</p>
-      </div>
-      <div class="card card-dark">
-        <p>El proceso es uno solo para todas las áreas. Hoy cada una ha ido adaptando el formato, y un módulo que admita cinco variantes no resuelve nada.</p>
-      </div>
-    </div>
-
-    <div class="reveal" style="margin-top:2.75rem">
-      <div class="fase-list">
-        <div class="fase">
-          <span class="fase-n" aria-hidden="true">1</span>
-          <div>
-            <h3>La solicitud con campos obligatorios</h3>
-            <p>Quién viaja, a dónde, desde cuándo hasta cuándo, para qué y qué conceptos. Es la fase más barata y la que más cambia la rutina desde el primer día: quita la hoja de cálculo vaga, hace previsible el gasto y contesta la pregunta de seguridad —quién está dónde— sin construir nada más.</p>
-          </div>
-        </div>
-        <div class="fase">
-          <span class="fase-n" aria-hidden="true">2</span>
-          <div>
-            <h3>Los dos procesos separados y la bitácora</h3>
-            <p>Aprobación del gasto y comprobación de papeles como columnas independientes, con quién hizo qué y cuándo. Es lo que convierte la lista en una herramienta para dos roles distintos en lugar de un tablero de avisos.</p>
-          </div>
-        </div>
-        <div class="fase">
-          <span class="fase-n" aria-hidden="true">3</span>
-          <div>
-            <h3>El reloj de comprobación y el par PDF + XML</h3>
-            <p>La política de tres días convertida en algo que se cumple solo, contada desde la fecha de regreso, con sus dos avisos. La subida exige los dos archivos, lee el folio fiscal del XML y comprueba que no esté cancelado ni repetido.</p>
-          </div>
-        </div>
-        <div class="fase">
-          <span class="fase-n" aria-hidden="true">4</span>
-          <div>
-            <h3>El tabulador, el adeudo y el bloqueo</h3>
-            <p>El catálogo de montos estándar, la diferencia calculada en la lista, y el adeudo que nace al vencer con el bloqueo que impide pedir de nuevo. Va aquí y no antes porque depende del acuerdo del tabulador y de que la regla del escalado esté comunicada.</p>
-          </div>
-        </div>
-        <div class="fase">
-          <span class="fase-n" aria-hidden="true">5</span>
-          <div>
-            <h3>Presupuesto semanal por área y costo por servicio</h3>
-            <p>Va al final no porque sea lo menos importante —es la aspiración declarada del área— sino porque necesita el histórico real que generan las cuatro fases anteriores, y porque depende de que las áreas operativas adopten la planeación semanal. Construirlo antes sería inventarse las cifras.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <article class="card card-aparte reveal" style="margin-top:2rem">
-      <p><strong>Una advertencia sobre el plazo.</strong> Si las condiciones de negocio —el tabulador, la regla del escalado y la planeación semanal— se tratan como tareas del proyecto de software, el módulo queda construido y sin usar. Si se abren ahora, en paralelo al desarrollo de las fases 1 a 3, llegan a tiempo.</p>
-    </article>
   </div>
 </section>
 
@@ -1739,38 +1485,49 @@ al rechazar_comprobante(comprobante, motivo):
 
 <section class="maquetas-mod" id="pantallas">
   <div class="wrap">
-    <h2>Las pantallas, para abrirlas</h2>
-    <p class="maquetas-lede">Construidas con los tokens del sistema y con los hallazgos ya
-      aplicados. Cambian entre sus cuatro estados, tienen tema claro y oscuro, bajan a móvil y se
-      recorren con el teclado.</p>
-    <p class="maquetas-pie" style="margin-top:0">El proceso completo tiene más superficie que
-      estas dos pantallas. Quedan fuera el formulario de alta de una solicitud, el tablero de
-      adeudos abiertos y la vista de presupuesto por área, que depende de la fase 5.</p>
+    <h2>Las cuatro pantallas revisadas</h2>
+    <p class="maquetas-lede">Son las que entregó el equipo de desarrollo, tal como llegaron. Cada
+      una lleva sus cuatro estados, tema claro y oscuro, y se recorre con el teclado.</p>
+    <p class="maquetas-pie" style="margin-top:0">De dos de ellas hay ya una versión con los
+      hallazgos aplicados, que se puede abrir y comparar. De las otras dos todavía no.</p>
     <ul class="maquetas-lista">
       <li><a href="/entregables/propuestas/viaticos">
-        <b>Viáticos</b>
-        <span>La lista de solicitudes: resumen de estatus, filtros por aprobación,
-          comprobación y monto, el estándar junto a lo pedido y el bloqueo por adeudo.</span>
-        <span class="maquetas-cambio">El estado se parte en dos columnas —aprobación del gasto y
-          comprobación de papeles— porque son dos procesos con dos responsables. Los filtros dejan
-          el <code>.schip</code> decorativo y pasan al componente estándar de la §6.21, con
-          buscador, casillas y pastillas removibles.</span></a></li>
+        <b>Viáticos · versión corregida</b>
+        <span>El listado de solicitudes, con la aprobación del gasto y la comprobación de
+          papeles en columnas separadas.</span>
+        <span class="maquetas-cambio">Los chips decorativos pasan al componente estándar de la
+          §6.21, con buscador, casillas y pastillas removibles, y filtran de verdad. El folio deja
+          el color de enlace, la explicación de las dos columnas baja a un toggletip y desaparece
+          el botón «Ver» que duplicaba la navegación de la fila.</span></a></li>
       <li><a href="/entregables/propuestas/viatico-detalle">
-        <b>Viático · detalle</b>
-        <span>Un viático abierto: la solicitud, sus comprobantes con folio fiscal, la cuenta
-          de lo comprobado y lo pendiente, y la bitácora completa.</span>
-        <span class="maquetas-cambio">La cuenta solo suma lo que ya se revisó y se aceptó. Un
-          comprobante rechazado no se borra: se conserva con su motivo y su importe vuelve al saldo
-          por comprobar. El cierre de las dos columnas dejó de depender de que su contenido
-          coincidiera en alto.</span></a></li>
+        <b>Viático detalle · versión corregida</b>
+        <span>Un viático abierto: la solicitud, los comprobantes con su folio fiscal, la cuenta
+          y la bitácora.</span>
+        <span class="maquetas-cambio">El cierre de las dos columnas deja de depender de que su
+          contenido coincida en alto, y las pastillas usan el token <code>--fs-meta</code> en vez
+          de los 11 px escritos a mano.</span></a></li>
+      <li><div class="sin-abrir">
+        <b>Autorización de compra de almacén</b>
+        <span>La compra <code>CO-2026-00148</code>, con sus cinco partidas, el bloque de quién
+          autoriza y la traza de la decisión.</span>
+        <span class="maquetas-cambio">Sin versión corregida todavía. Es la pantalla con mejor
+          resuelto el bloqueo —dice por qué y da salida— y la que tiene la tabla con ritmo
+          constante; lo suyo es el volumen de texto siempre visible: 414 y 266
+          caracteres.</span></div></li>
+      <li><div class="sin-abrir">
+        <b>Cuentas por cobrar</b>
+        <span>El desglose por marca, grupo y agencia, con la antigüedad de la deuda y los grupos
+          marcados por proporción a más de 60 días.</span>
+        <span class="maquetas-cambio">Sin versión corregida todavía. Declara muy bien el alcance
+          y los límites de cada cifra; lo suyo son los 524 caracteres bajo el número grande, los
+          dos indicadores de posición separados y las zonas pulsables de 23 px.</span></div></li>
     </ul>
-    <p class="maquetas-pie">El sistema de diseño que comparten se puede leer en el entregable
-      <a href="/entregables/reglas-de-diseno">Sistema de diseño</a>, en su versión 2.13.1, y la
-      barra de filtros que usan, en su sección
-      <a href="/entregables/reglas-de-diseno#g-filtros">§6.21</a>. El módulo de Finanzas del que
-      este proceso forma parte —facturación, proveedores y presupuesto de área— está en
-      <a href="/entregables/finanzas">Finanzas</a>, y el registro del que cuelga el servicio contra
-      el que se gasta, en <a href="/entregables/padron-clientes">Padrón de clientes</a>.</p>
+    <p class="maquetas-pie">El sistema de diseño contra el que se midieron es el entregable
+      <a href="/entregables/reglas-de-diseno">Sistema de diseño</a>, en su versión 2.13.1. Dos de
+      las reglas que se citan aquí —§6.11 regla 10, el identificador sin color de enlace, y §6.12
+      regla 9, la razón del estado fuera de la celda— nacieron en la versión 2.11.1 de revisar
+      estas mismas pantallas, y el límite de una frase para <code>.nota</code> y <code>.banda</code>
+      se fijó en la 2.13.0.</p>
   </div>
 </section>
 
