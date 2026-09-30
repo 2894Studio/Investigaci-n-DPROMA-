@@ -1703,14 +1703,14 @@ la pantalla, y la tabla de detrás sigue siendo legible mientras se decide. Por 
 Ninguna pantalla nueva declara su propio patrón de filtro de un solo valor para ese caso —
 auditando Viáticos, Trámites vehiculares, Trámites concluidos, Padrón de clientes y Cuentas por
 cobrar encontramos tres patrones distintos resolviendo el mismo tipo de filtro: el motor
-completo de aquí (Viáticos, Trámites), botones de un solo valor sin selección múltiple ni
-overflow (Padrón, previo a que este componente existiera, nunca migrado), y chips booleanos
-(Cuentas por cobrar). Solo el último es una excepción legítima: filtra sobre dos condiciones
-sí/no, no sobre una categoría con varios valores posibles, y forzar un desplegable de un solo
-valor booleano añadiría un paso sin necesidad — ahí el chip-toggle es el patrón correcto. El
-patrón de Padrón no es una excepción, es deuda: filtra los mismos campos categóricos (Tipo,
-Estado, Documentos, Actividad) que Viáticos filtra con este componente, y debería migrar a él
-la próxima vez que se toque esa pantalla.
+completo de aquí (Viáticos, Trámites, y ahora también Padrón), botones de un solo valor sin
+selección múltiple ni overflow (el patrón que tenía Padrón antes de migrar, ver nota abajo), y
+chips booleanos (Cuentas por cobrar). Solo el último es una excepción legítima: filtra sobre dos
+condiciones sí/no, no sobre una categoría con varios valores posibles, y forzar un desplegable de
+un solo valor booleano añadiría un paso sin necesidad — ahí el chip-toggle es el patrón correcto.
+Padrón filtraba los mismos campos categóricos (Tipo, Estado, Documentos, Actividad) con botones
+de un solo valor, sin ser una excepción legítima; ya migró a este componente, conservando los
+mismos cuatro campos y su filtrado real sobre la tabla.
 
 ---
 
