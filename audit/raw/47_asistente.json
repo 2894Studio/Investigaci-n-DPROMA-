@@ -1,0 +1,313 @@
+{
+ "pantalla": "47_asistente",
+ "ruta_zip": "06-soporte/47_asistente.html",
+ "carpeta": "06-soporte",
+ "area": "soporte",
+ "arquetipo": "asistente/IA",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "47_asistente--ok.png",
+  "47_asistente--loading.png",
+  "47_asistente--empty.png",
+  "47_asistente--error.png",
+  "47_asistente--oscuro.png",
+  "47_asistente--390.png (viewport 390x844, captura propia)"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-47asis-01",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles + §10 trampa 4",
+    "dice_el_sistema": "«Todo destino interactivo mide 24x24px como mínimo (WCAG 2.2, 2.5.8)» · «un campo de búsqueda dentro de un <div> con forma de pastilla no cumple, porque pulsar la pastilla no hace nada. El contenedor tiene que ser una <label for=\"…\">»",
+    "hay_en_el_build": "<div class=\"search\"><input id=\"buscar\" type=\"search\" aria-label=\"Buscar conversaciones\"></div> — la pastilla es un div y el único destino real es el input",
+    "selector": ".hist .search > input#buscar",
+    "evidencia": "Medición propia: el input mide 216x15px a 1440px y 307x15px a 390px; el contenedor .search mide 33px de alto; document.querySelector('label[for=\"buscar\"]') = null. Es el caso literal de la trampa 4, con el mismo componente (.search) que el documento usa como ejemplo.",
+    "por_que_importa": "15px de alto es menos de dos tercios del mínimo de WCAG 2.2. Pulsar el icono de lupa o el espacio de la pastilla no enfoca nada, y es el único modo de encontrar una conversación anterior."
+   },
+   {
+    "id": "f1-47asis-02",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles — enlaces que son el elemento primario de su fila",
+    "dice_el_sistema": "«Enlaces que son el elemento primario de su fila (folio, miga, “Ver en Maps”): no son texto en prosa, llevan padding hasta llegar a 24px»",
+    "hay_en_el_build": "Los cuatro enlaces de procedencia y de acción dentro de las respuestas miden 19,8px de alto; `.fuentes a` no declara relleno ni alto mínimo",
+    "selector": ".fuentes a",
+    "evidencia": "Brief: tactil_24px.por_debajo_de_24px = 5, con la muestra «Bandeja de gestoría · 6 expedientes», «Trámites vehiculares · 5 expedientes», «Abrir GT-2026-02417», «Abrir GT-2026-02416», todos 780x19,8. Medición propia a 390px: 282x19,8. Confirmado en 47_asistente--ok.png.",
+    "por_que_importa": "«Abrir GT-2026-02417» es la acción que el propio asistente ofrece como salida cuando se niega a hacer algo («te dejo los dos abiertos para que lo hagas en dos clics»). Es el elemento primario de su fila y el final del camino de la conversación; a 19,8px queda por debajo del mínimo justo donde la interacción se decide."
+   },
+   {
+    "id": "f1-47asis-03",
+    "severidad": "alta",
+    "regla": "§1.1 Superficies y texto / §1.7 Ratios de contraste",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)» · «si el elemento puede caer sobre --surface-2, se mide también ahí»",
+    "hay_en_el_build": "--text-3: #66717F, y el rótulo del bloque de procedencia cae sobre --surface-2 (#E7EDF3)",
+    "selector": ".fuentes .et",
+    "evidencia": "Brief: tokens.text_3_declarado = '#66717F'; contraste.muestra: span.et «De dónde salió», 10,5px, rgb(102,113,127) sobre rgb(231,237,243) = 4,21:1 frente al mínimo de 4,5:1. Con el valor canónico #5C6675 la misma combinación mide 4,93:1 (cálculo propio).",
+    "por_que_importa": "«De dónde salió» es el rótulo que distingue una afirmación comprobable de una afirmación sin más: es la pieza que hace auditable al asistente, y es la que peor se lee."
+   },
+   {
+    "id": "f1-47asis-04",
+    "severidad": "alta",
+    "regla": "§2.1 Suelo tipográfico",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» · Única excepción: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta",
+    "hay_en_el_build": "Seis familias de texto de producto por debajo de 12px, incluidas la autoría y hora de cada turno de la conversación y el descargo del asistente",
+    "selector": ".msg .qn (11px x4) · .aviso-ia (11px) · .hist .cc span (11px) · .msg .av (11px) · .cromo-quien small (11px) · .fuentes .et (10,5px)",
+    "evidencia": "Medición propia del estilo calculado (Playwright, andamio excluido): .qn 11px («Tú · hoy 10:31», «Asistente · hoy 10:33»), .aviso-ia 11px, small 11px x7, .av 11px, .et 10,5px. El 10,5px de .fuentes .et no entra en la excepción admitida: no es un rótulo de la barra lateral ni una etiqueta de campo del modo tarjeta.",
+    "por_que_importa": "«Tú» y «Asistente» a 11px es lo único que distingue quién afirmó cada cosa en una pantalla donde esa distinción es el asunto entero."
+   },
+   {
+    "id": "f1-47asis-05",
+    "severidad": "alta",
+    "regla": "§8 Voz de producto (límites 1 y 2) + §6.9 Avisos + §6.23 Toggletip",
+    "dice_el_sistema": "«Ningún bloque de texto siempre visible pasa de ~140 caracteres. Se mide con el contador de caracteres, no a ojo» · «.nota y .banda llevan como máximo UNA frase… No hay excepción por importancia del contenido» · nivel 2 («aclara una consecuencia pero no bloquea nada ahora») → «toggletip (§6.23) sobre el control o columna relacionada»",
+    "hay_en_el_build": "Párrafo permanente de 228 caracteres y tres frases bajo el compositor: «El asistente consulta y resume: no da de alta, no asigna, no aprueba ni cierra nada. Lo que ves es lo que tu usuario alcanza a ver — no tiene más alcance que tú. Cada respuesta enseña de dónde salió para que la puedas comprobar.» Va en una clase nueva (.aviso-ia) que no es .note ni .banda, pese a que .note está declarada en este mismo archivo y sin usar.",
+    "selector": ".aviso-ia",
+    "evidencia": "Medición propia del textContent: 228 caracteres, 3 frases (límite ~140 y una frase). Grep en el archivo: `.nota{…}` declarada, 0 usos de class=\"nota\"; 0 ocurrencias de .infob / .tip, es decir, el toggletip de §6.23 no se usa en ninguna parte de la pantalla.",
+    "por_que_importa": "Las tres frases dicen cosas de nivel distinto: la primera bloquea expectativas ahora (va visible), las otras dos aclaran una consecuencia y por tanto son exactamente el caso que §8 manda a un toggletip. Tal como está, el descargo ocupa permanentemente el sitio donde el usuario mira al escribir, y por repetido deja de leerse."
+   },
+   {
+    "id": "f1-47asis-06",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado (reglas 1 y 2) + §11 Estructura",
+    "dice_el_sistema": "«(1) el cambio se anuncia (aria-live=\"polite\") y mueve el foco; (2) cada estado lleva encabezado real, no un <b>» · «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo»",
+    "hay_en_el_build": "<b>Todavía no has hablado con el asistente</b> y <b>El asistente no está disponible</b> como título; los dos estados flotan sobre --bg con un icono de 30px, sin .tarjeta-estado (480px, --r-modal, --sh-modal) ni medallón .estado-ico de 52px; ninguna región aria-live y ninguna llamada a focus()",
+    "selector": ".state-empty > b, .state-error > b",
+    "evidencia": "Capturas 47_asistente--empty.png y 47_asistente--error.png; grep aria-live en el archivo: 0 coincidencias (el único role=\"status\" es el contenedor del esqueleto). El contenido de los textos sí cumple §6.4 regla 3 (qué pasó, qué no se perdió, referencia ASI-20260821-1015): lo que falla es la estructura.",
+    "por_que_importa": "En una pantalla conversacional el anuncio no es un detalle: quien usa lector de pantalla depende de aria-live para saber que algo cambió. Aquí no hay ninguno, ni para los estados ni para las respuestas."
+   },
+   {
+    "id": "f1-47asis-07",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga",
+    "dice_el_sistema": "«Imita la forma de lo que va a llegar: mismas columnas, mismos anchos (en fr) y el mismo alto» · «sin texto real dentro de las barras» · «prefers-reduced-motion aplana el fondo»: `.skel{animation:none;background:var(--surface-2)}`",
+    "hay_en_el_build": "El esqueleto no reproduce la forma de la conversación: ocupa ~170px de alto sobre un lienzo de 900, no dibuja el compositor ni los turnos alternos, y sus barras aparecen pegadas unas a otras porque el contenedor `.sk` declara `flex-direction` y `gap` sin `display:flex` (la regla que se lo daba, `main[data-state=loading] .state-loading{display:flex}`, se aplica al padre, no a los dos `.sk`). Además las barras llevan texto real dentro y la reducción de movimiento solo pone animation:none",
+    "selector": ".state-loading .sk, .state-loading .skel",
+    "evidencia": "Captura 47_asistente--loading.png: las cinco barras de la columna izquierda se tocan sin separación y el bloque entero termina a un quinto de la altura del área de conversación. Medición propia: textContent de los .skel = ['buscador','conversación anterior' x4,'pregunta',…]. Regla resuelta bajo reduced-motion: '.skel{animation:… none}' sin background.",
+    "por_que_importa": "§6.7 existe para que la espera no cambie de forma al terminar. Aquí el esqueleto promete una pantalla que no se parece a la que llega, y un lector de pantalla recita «buscador, conversación anterior, conversación anterior…» como si fueran datos."
+   },
+   {
+    "id": "f1-47asis-08",
+    "severidad": "media",
+    "regla": "§6.2 Botones (.btn) y §6.8 Chip (.chip)",
+    "dice_el_sistema": "`.btn{min-height:36px;padding:8px 14px}` · «el suelo se declara con min-height, no se confía al relleno (medido: 35px y 27px sin él)» · `.chip{min-width:40px;min-height:34px;padding:8px 12px}`",
+    "hay_en_el_build": "`.btn` se declara sin min-height (solo `padding:8px 13px`), y el único min-height del componente está en la regla táctil `[data-tacto=\"dedo\"] .btn{min-height:46px}`, que esta pantalla no activa (no hay data-tacto en el <html>). Los chips de sugerencia son una clase nueva, `.rapido`, con `padding:5px 12px` y sin min-height",
+    "selector": ".btn.p (33px) · .rapido (26px)",
+    "evidencia": "Medición propia con getBoundingClientRect: «Enviar» y «Nueva conversación» = 33px de alto, getComputedStyle(.btn).minHeight = 'auto'; los cuatro .rapido = 26px. Es el fallo exacto que §6.2 documenta («medido: 35px y 27px sin él»).",
+    "por_que_importa": "«Enviar» es la acción principal de la pantalla y se queda tres píxeles por debajo del suelo del sistema; los chips de sugerencia, ocho por debajo del de §6.8. Ninguno baja de 24px, pero el componente no es el del sistema aunque se llame igual."
+   },
+   {
+    "id": "f1-47asis-09",
+    "severidad": "media",
+    "regla": "§13.3 / §3.1 — el relleno y el ancho no se reparten entre hijos; §11 «comprobado en el navegador»",
+    "dice_el_sistema": "«Un contenedor no cede el ancho a un descendiente» · §3.1: «el relleno de un contenedor no vive en un hijo opcional»",
+    "hay_en_el_build": "`.fuentes{margin:calc(var(--sp-3) * -1) calc(var(--sp-4) * -1) calc(var(--sp-3) * -1)}` — margen superior negativo de 12px para sangrar el bloque hasta los bordes de la burbuja; el resultado es que se monta sobre la última línea de la respuesta",
+    "selector": ".msg.ia .tx > .fuentes",
+    "evidencia": "Medición propia en los dos mensajes del asistente: el borde inferior del <p> anterior está en y=353 y el borde superior de .fuentes en y=341 → 12px de solape; segundo mensaje, 621 contra 609, mismo solape. Visible en 47_asistente--ok.png: las frases «…con Mauricio Ríos.» y «…lo hagas en dos clics.» aparecen tachadas por el borde del bloque de procedencia.",
+    "por_que_importa": "La última línea de cada respuesta —la que da la conclusión— queda cruzada por el bloque de fuentes. Es el defecto más visible de la pantalla y se ve solo en el navegador, no leyendo el CSS."
+   },
+   {
+    "id": "f1-47asis-10",
+    "severidad": "media",
+    "regla": "§5 Movimiento — prefers-reduced-motion",
+    "dice_el_sistema": "«No es “cero animación”: se conservan opacidad y color, se elimina todo desplazamiento y escala»",
+    "hay_en_el_build": "El bloque de reducción de movimiento solo remapea duraciones; `button:active{transform:scale(.97)}` y `.skip:focus-visible{transform:translateY(70px)}` siguen vigentes",
+    "selector": "button:active, .skip:focus-visible",
+    "evidencia": "Reglas @media (prefers-reduced-motion:reduce) resueltas en el navegador: ':root{--dur-micro:1ms;…} || .fab:hover .ring{animation:none} || .side{transition:none} || .velo-menu{transition:none} || .skel{animation:none}'. Ninguna retira transform.",
+    "por_que_importa": "Afecta a los 17 botones de la pantalla; la reducción de movimiento queda a medio aplicar y el documento define exactamente qué significa aplicarla entera."
+   },
+   {
+    "id": "f1-47asis-11",
+    "severidad": "media",
+    "regla": "§10 trampa 5 — isotipo",
+    "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio» · «Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>",
+    "selector": ".side .logo svg use",
+    "evidencia": "Medición propia con getBoundingClientRect: <svg> en x=96, <use> en x=64 → desplazamiento −32,5px, el mismo valor que registra §10. Visible en 47_asistente--ok.png.",
+    "por_que_importa": "La marca sale recortada en el cromo, que es lo que más se repite en todo el producto."
+   },
+   {
+    "id": "f1-47asis-12",
+    "severidad": "baja",
+    "regla": "§7.2 Cromo de aplicación / §7.3",
+    "dice_el_sistema": "`.it{min-height:38px;padding:9px 10px;gap:10px}` · la regla táctil «lleva :root o no gana»",
+    "hay_en_el_build": "`.it{padding:6px 9px}` sin min-height: 30px medidos. Las seis reglas de modo dedo se escriben sin `:root` y, además, esta pantalla no declara `data-tacto` en el <html>, así que nunca se activan",
+    "selector": "nav.side .it",
+    "evidencia": "Medición propia: los quince ítems de navegación miden 212x30 a 1440px y 248x30 en el cajón de 390px. Brief: tactil_24px.regla_data_tacto_sin_root = 6; document.documentElement.dataset.tacto = undefined. Por encima de 24px, por debajo de los 38px del sistema.",
+    "por_que_importa": "No incumple el mínimo de WCAG, pero el cromo de esta pantalla no es el cromo del sistema: ocho píxeles por ítem, quince ítems, y la navegación entera queda más apretada que en la especificación."
+   }
+  ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 1,
+   "integridad": 2
+  },
+  "justificacion": "El contenido de esta pantalla es de los mejores del conjunto: el asistente se niega a actuar y explica la consecuencia («así queda tu nombre en la bitácora y no el mío»), cada afirmación enseña de dónde salió, y los textos de vacío y error dicen lo que §6.4 pide. La ejecución no acompaña. Accesibilidad 1: cinco destinos por debajo de los 24px de WCAG 2.2 —entre ellos el buscador, a 15px, dentro de un div-pastilla sin <label for>, que es la trampa 4 literal—, contraste de 4,21:1 en el rótulo de procedencia, seis familias de texto bajo el suelo de 12px, ningún aria-live en toda la pantalla y encabezados de estado en <b>. Responsive 1: a 390px el historial se come 30vh antes de la primera pregunta, el textarea del compositor recorta su propio marcador de posición a media palabra («…no modifica» cortado) porque crece con min-height:46px y max-height:140px sin acompañar el ancho, y el descargo de 228 caracteres empuja el envío fuera del pliegue. Integridad 2: el bloque de procedencia se monta 12px sobre la última línea de cada respuesta, el esqueleto de carga no tiene display:flex y sale apelmazado, y el isotipo se pinta desplazado −32,5px. Theming 3: los dos temas están completos y conmutan, pero arrastran el --text-3 obsoleto.",
+  "evidencia": [
+   "Medición táctil propia (Playwright): 35 destinos a 1440px, 5 por debajo de 24px (input de búsqueda 216x15; cuatro enlaces .fuentes a 780x19,8); .btn 33px, .rapido 26px, .it 30px.",
+   "Medición de solape: .fuentes monta 12px sobre el <p> anterior en los dos mensajes del asistente (353 vs 341 y 621 vs 609).",
+   "Captura propia 47_asistente--390.png: el marcador de posición del textarea se corta a media palabra y el historial ocupa el tercio superior.",
+   "Captura 47_asistente--loading.png: esqueleto de ~170px sobre un área de conversación de 900px, con las barras pegadas entre sí."
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 3,
+   "hallazgo": "No hay estado «pensando». Entre pulsar Enviar y recibir la respuesta no existe ninguna señal: ni turno en curso, ni indicador en el botón, ni región aria-live. El único role=\"status\" de la pantalla es el esqueleto de carga de la vista completa, que sustituye la conversación entera y no sirve para una respuesta en curso. En un asistente que consulta varias pantallas antes de responder, ese silencio es el estado más frecuente de todos.",
+   "selector": ".mensajes / .compositor .btn.p"
+  },
+  {
+   "n": 2,
+   "heuristica": "Correspondencia entre el sistema y el mundo real",
+   "severidad": 1,
+   "hallazgo": "Habla el idioma del área: folios reales, «recibido, sin admitir», «el reloj no ha arrancado». Distingue bien vencimiento de antigüedad, que es justo donde la gente se confunde.",
+   "selector": ".msg.ia .tx"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 3,
+   "hallazgo": "Nada se puede deshacer ni detener: no hay forma de parar una respuesta en curso, ni de borrar, renombrar o archivar una conversación del historial, ni de corregir la última pregunta. La única acción de la cabecera es «Nueva conversación».",
+   "selector": ".hist ol li a"
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 2,
+   "hallazgo": "Tres componentes del sistema reinventados con otro nombre en un archivo que ya los declara: .rapido por .chip, .aviso-ia por .note, y .btn redefinido sin su min-height. Es la décima trampa de §10 aplicada a un archivo nuevo.",
+   "selector": ".rapido, .aviso-ia, .btn"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 1,
+   "hallazgo": "El mejor acierto de la pantalla: el alcance se declara antes de preguntar («Consulta y resume · no modifica nada» en la cabecera y en el marcador de posición del compositor), y cuando el usuario pide una acción el asistente se niega y redirige. La expectativa se corrige antes de que haya error.",
+   "selector": ".p4-t .resumen"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocer antes que recordar",
+   "severidad": 1,
+   "hallazgo": "Las cuatro sugerencias rápidas evitan la pantalla en blanco y enseñan lo que el asistente sabe hacer. Lo que hay que recordar es lo que NO puede: eso solo está en un párrafo de 11px bajo el compositor.",
+   "selector": ".rapidos"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 2,
+   "hallazgo": "No hay atajo declarado para enviar (ni Enter, ni Ctrl+Enter, ni mención en el marcador de posición), el buscador del historial mide 15px de alto y no hay forma de copiar una respuesta ni de llevarla a otra pantalla. Para un usuario frecuente, todo pasa por el ratón.",
+   "selector": ".compositor .caja"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 2,
+   "hallazgo": "228 caracteres de descargo permanente justo donde el usuario escribe. Dos de sus tres frases son nivel 2 de §8 y pertenecen a un toggletip; repetidas en cada visita, dejan de leerse y se llevan por delante la que sí importa.",
+   "selector": ".aviso-ia"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de errores",
+   "severidad": 2,
+   "hallazgo": "El texto del error es correcto y tranquilizador, con referencia incluida. Dos restos: el título es un <b>, así que no existe para quien navega por encabezados, y no hay forma de recuperar la pregunta que se estaba escribiendo cuando el servicio cayó.",
+   "selector": ".state-error"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 3,
+   "hallazgo": "Un asistente es, sobre todo, una pantalla cuyo límite hay que poder consultar. Aquí el límite está en un párrafo fijo y no hay ningún toggletip (§6.23, cero usos de .infob en el archivo), ningún enlace a «qué puede y qué no», ni explicación de qué significa «de dónde salió». La única ayuda es el propio asistente, y no hay forma de preguntarle por sí mismo.",
+   "selector": ".aviso-ia"
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-103",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "«El nivel de uso de IA (Gemini) en la organización es aún muy básico; las consultas de soporte solo abordan configuración de cuentas, sin estrategia de uso más avanzada» (categoría falta_governance_ia). Esta pantalla es la respuesta de gobernanza: un asistente institucional con alcance escrito («consulta y resume: no da de alta, no asigna, no aprueba ni cierra nada»), herencia de permisos del usuario («no tiene más alcance que tú») y trazabilidad por respuesta («De dónde salió»). Sube el uso de IA de personal y suelto a corporativo y acotado."
+   },
+   {
+    "pp": "pp-104",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "«La certificación ISO 9001 en curso exige crear procedimientos normalizados y formatos de registro que hoy no existen de forma estandarizada entre departamentos». El bloque de procedencia convierte cada respuesta en un registro comprobable contra su fuente, que es exactamente lo que una auditoría pide: no la respuesta, sino de dónde salió. Queda a medias porque esa trazabilidad no se puede exportar ni fechar desde la pantalla."
+   },
+   {
+    "pp": "pp-100",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "ignora",
+    "evidencia": "Pain point de severidad alta: «No existe repositorio centralizado de contratos comerciales; cada área guarda su copia de forma aislada, generando cobros inconsistentes con lo pactado». El asistente solo alcanza lo que ya está en el sistema (bandejas de gestoría, trámites vehiculares, órdenes); los contratos siguen fuera, así que la pregunta que más falta hace en soporte —«qué dice el contrato de este cliente»— no se puede hacer aquí."
+   },
+   {
+    "pp": "pp-102",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "ignora",
+    "evidencia": "«Las cotizaciones de proveedores se envían a Dirección General por WhatsApp para autorización, sin flujo formal con trazabilidad». El asistente está declarado como solo lectura y no participa en ningún flujo de autorización; el camino de WhatsApp sigue intacto. Es coherente con su diseño, pero conviene anotarlo: el dolor de soporte es de flujo, y esta pantalla solo resuelve consulta."
+   },
+   {
+    "pp": "pp-106",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "ignora",
+    "evidencia": "Pain point de severidad alta: «Una campaña de marketing generó contactos por un número de WhatsApp de uso interno de instalaciones, que no consideraba que le correspondía atender gestoría; se perdió [contacto]». Nada en el asistente ayuda a detectar un conjunto de trabajo que está llegando a quien no le toca: no hay consulta sobre lo no asignado por canal ni alerta proactiva — el asistente solo responde cuando se le pregunta."
+   }
+  ],
+  "usabilidad_para_el_area": "Para soporte administrativo transversal, el valor de esta pantalla está en lo que decide no hacer: declarar el alcance por escrito, heredar los permisos del usuario y enseñar la fuente de cada afirmación convierte una herramienta de IA suelta (pp-103) en una pieza del sistema, y de paso deja un rastro que sirve al expediente de ISO 9001 (pp-104). Donde se queda corta es en el perímetro del dato: los dolores altos del área —contratos dispersos (pp-100) y trabajo que entra por el canal equivocado (pp-106)— viven fuera del sistema o requieren que alguien pregunte lo que no sabe que tiene que preguntar. Mientras el asistente sea solo reactivo y solo alcance lo que ya está capturado, resuelve la consulta rápida y deja intactos los dos dolores de severidad alta del área. En lo operativo, además, hay un obstáculo medido: el buscador del historial mide 15px y los enlaces de salida 19,8px, por debajo del mínimo, justo en los dos sitios donde la conversación se convierte en trabajo."
+ },
+ "cobertura": [
+  {
+   "patron": "Conversación con un asistente: turnos alternos usuario/sistema, el del usuario sin caja y el del asistente en superficie propia con borde y radio de tarjeta, avatar de 30px, autoría y hora por turno, ancho de línea limitado a 860px. El sistema no documenta ningún patrón conversacional.",
+   "propuesta_de_regla": "§6.25 Conversación con el asistente — `.mensajes`, `.msg`. Cuándo: la única pantalla del producto donde el usuario escribe en lenguaje libre y el sistema responde. Estructura: una lista de turnos en orden cronológico, cada turno con autoría y hora en `--fs-meta` (12px, §2.1) y `--text-3`; el turno de quien pregunta va sin superficie, el del asistente sobre `--surface` con `border:1px solid var(--border)` y `--r-card`, para que la respuesta se distinga del dictado sin depender del color. Ancho máximo de línea 860px o 75 caracteres, lo que ocurra antes. El avatar es decorativo (`aria-hidden`), la autoría va en texto: un color o un lado de la pantalla no son forma de saber quién afirmó qué. La conversación es la región en vivo de la pantalla: `aria-live=\"polite\"` en el contenedor de turnos, y cada turno nuevo entra sin desplazamiento bajo `prefers-reduced-motion` (§5)."
+  },
+  {
+   "patron": "No existe representación del tiempo que el asistente tarda en responder: la pantalla solo tiene el esqueleto de la vista completa, pensado para la carga inicial, y ninguna señal entre la pulsación de Enviar y la respuesta.",
+   "propuesta_de_regla": "§6.7.1 Espera de una respuesta generada. Mientras el asistente prepara una respuesta, la conversación muestra un turno en curso con el esqueleto de §6.7 **a la altura y la forma del mensaje que va a llegar** —no un esqueleto de pantalla completa, que borra lo que la persona está leyendo—, con `role=\"status\"` y un texto solo para lector de pantalla («El asistente está preparando la respuesta»). El compositor no se bloquea: se bloquea el envío, en el manejador y no solo con CSS (§6.1), y el botón declara `aria-busy=\"true\"`. Si la espera pasa de 5 segundos, el turno en curso dice qué está consultando («Revisando la bandeja de gestoría»), porque a partir de ahí el silencio se lee como fallo. Y toda espera tiene salida a error: un turno que lleva demasiado tiempo se convierte en el estado de error de §6.4, nunca en un esqueleto eterno."
+  },
+  {
+   "patron": "Bloque de procedencia al pie de cada respuesta («De dónde salió» / «Para hacerlo») con enlaces a las pantallas y conteos de los que salió el dato, sangrado a los bordes de la burbuja con margen negativo.",
+   "propuesta_de_regla": "§6.26 Procedencia de una respuesta — `.fuentes`. Toda respuesta generada que afirme un dato enseña de dónde salió: el nombre de la pantalla y su conteo («Bandeja de gestoría · 6 expedientes»), como enlaces, dentro de la burbuja de la respuesta y como última fila del contenedor. El rótulo del bloque usa `--fs-meta` (12px) y `--text-3` sobre `--surface-2`, medido (§1.1). Los enlaces son el elemento primario de su fila: llevan relleno hasta 24px de alto (§7.3). El bloque se sangra con el relleno del contenedor, nunca con margen negativo —un margen negativo monta el bloque sobre la última línea de la respuesta, que es justo la conclusión—. Una respuesta sin procedencia no se publica: el valor del asistente no es que acierte, es que se pueda comprobar."
+  },
+  {
+   "patron": "Declaración permanente del alcance del asistente en un párrafo de 228 caracteres y tres frases bajo el compositor, más la misma idea repetida en la cabecera y en el marcador de posición del campo.",
+   "propuesta_de_regla": "§8.1 Cómo se declara el alcance de un asistente. Lo que el asistente no hace se dice UNA vez, en una frase de menos de 140 caracteres, junto al compositor: «Consulta y resume: no da de alta, no asigna ni aprueba nada». El detalle —qué datos alcanza, por qué no modifica, qué pasa con lo que escribes— va en un toggletip (§6.23) anclado a esa frase, que se abre con clic o Enter y se cierra con Escape. Es el caso de manual del nivel 2 de §8: aclara una consecuencia y no bloquea nada ahora mismo. Regla práctica: un asistente que necesita tres frases de descargo permanente no tiene un problema de redacción, tiene un problema de alcance; se recorta el alcance hasta que quepa en una."
+  },
+  {
+   "patron": "El asistente se niega a ejecutar una acción que se le pide y responde con el motivo y con enlaces a donde sí se hace: «Eso no lo puedo hacer yo… los cambios los haces tú desde la pantalla: así queda tu nombre en la bitácora y no el mío».",
+   "propuesta_de_regla": "§6.25.1 Cuando el asistente no puede hacer algo. Lo dice en la primera frase, en primera persona y sin rodeos. Explica la consecuencia para quien pregunta —no la razón de diseño ni la arquitectura de permisos (§8)— y deja la acción a un clic, con enlaces a las pantallas donde sí se hace, nombrando el registro concreto («Abrir GT-2026-02417»). Nunca ofrece hacerlo «de otra manera» ni pide confirmación para algo que no puede ejecutar. Y nunca se disculpa dos veces: la negativa ocupa una frase, el camino alternativo otra."
+  },
+  {
+   "patron": "Cuatro sugerencias de consulta en forma de chip sobre el compositor («¿Qué vence hoy?», «Órdenes sin instalador»…), declaradas como componente nuevo `.rapido` de 26px.",
+   "propuesta_de_regla": "§6.8.1 Sugerencia de consulta — `.chip.sugerencia`. Reusa `.chip` (§6.8: `min-height:34px`, `padding:8px 12px`, `--r-ctrl`), no un componente nuevo: antes de escribir una clase, se busca si ya existe en el archivo (§10, trampa 10). Máximo cuatro, en una sola fila, y cambian según la pantalla desde la que se abre el asistente —son el inventario visible de lo que sabe hacer, no decoración—. Al pulsarse rellenan el compositor y dejan el cursor al final: no envían solas, porque una consulta que se envía sin que la persona la lea no es suya."
+  },
+  {
+   "patron": "Historial de conversaciones como columna de 300px con buscador, conteo, selección por `aria-current` y franja de 3px en el elemento activo; sin renombrar, borrar ni archivar.",
+   "propuesta_de_regla": "§6.27 Historial de conversaciones — `.hist`. Cuándo: el asistente guarda lo que se le preguntó. Cada entrada lleva el texto de la primera pregunta recortado a dos líneas y su antigüedad en `--fs-meta`; la activa se marca con `aria-current=\"true\"` y una franja de 3px en `--accent`, nunca solo con fondo. El buscador es el `.search` de §6.12 y su contenedor es una `<label for=\"…\">` (§10, trampa 4) —un campo de 15px dentro de una pastilla que no responde al clic es el error más fácil de repetir de todo el sistema—. Cada conversación se puede renombrar y borrar desde su propia fila (§6.14), y el borrado confirma diciendo qué se pierde (§6.13). Sin esas dos acciones, el historial solo crece."
+  },
+  {
+   "patron": "Pantalla de dos columnas (historial + conversación) que a 390px apila el historial encima con `max-height:30vh` y deja el compositor bajo un descargo largo; el textarea crece de 46 a 140px sin que su marcador de posición quepa.",
+   "propuesta_de_regla": "§13.10 Conversación en ancho de teléfono. Por debajo de 1024px el historial deja de ser columna y pasa a un control de apertura en la cabecera («5 conversaciones»), no a una franja de 30vh sobre la conversación: lo que ocupa el primer tercio de la pantalla tiene que ser lo que se está leyendo. El compositor queda anclado al pie con `env(safe-area-inset-bottom)` (§7.4), con una sola línea de altura inicial y un marcador de posición que quepa en ella —si el marcador no cabe, se acorta el marcador, no se recorta el campo—."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática sin backend que perfilar; no hay respuesta real que cronometrar, que es justamente la medida que faltaría para juzgar el estado «pensando».",
+  "contraste.muestra[0] y [1] del brief (span.cromo-av 3,05:1 y span «hace 4 min» 1,03:1): no los cuento como fallo. La medición toma el fondo rgba de --accent-soft como si fuera opaco; compuesto sobre --surface, ninguno de los dos cae bajo el mínimo. El fallo real es el de --text-3 sobre --surface-2 (4,21:1), medido sobre un fondo sólido.",
+  "§6.11 tablas, §6.18 diálogo, §12.x gráficas, §6.13 barra de selección: la pantalla no tiene ninguno de esos patrones (brief: tablas 0, dialogNativo 0, divDialog 0). No evaluado por ausencia.",
+  "§2 fuentes autoalojadas (D116): la pantalla declara --font-ui:'Inter' y no carga ninguna fuente — ni <link> ni @font-face —, así que se pinta con system-ui. Lo anoto sin registrarlo como hallazgo: no hay CDN que pueda caerse, pero la tipografía del producto no es la declarada y la comprobación que pide D116 («que la fuente aparezca cargada en las herramientas de red») da negativo.",
+  "Comportamiento real del asistente (latencia, respuesta en streaming, manejo de una pregunta sin respuesta): no hay lógica detrás de la maqueta, así que el estado «pensando» se evalúa por lo que la pantalla prevé, no por lo que hace."
+ ]
+}

@@ -1,0 +1,284 @@
+{
+ "pantalla": "28_instalador_mi_dia",
+ "ruta_zip": "03-icev-instalacion-de-cargadores/28_instalador_mi_dia.html",
+ "carpeta": "03-icev-instalacion-de-cargadores",
+ "area": "ICEV",
+ "arquetipo": "app de campo móvil",
+ "modo": "cobertura",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "28_instalador_mi_dia--ok.png",
+  "28_instalador_mi_dia--loading.png",
+  "28_instalador_mi_dia--empty.png",
+  "28_instalador_mi_dia--error.png",
+  "28_instalador_mi_dia--oscuro.png",
+  "28_instalador_mi_dia--390.png (viewport 390x844, medido por mí)"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "f1-28midia-01",
+    "severidad": "alta",
+    "regla": "§1.1 Superficies y texto / §1.7 Ratios de contraste mínimos",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)» · «No basta con medirlo sobre --surface: si el elemento puede caer sobre --surface-2, se mide también ahí»",
+    "hay_en_el_build": "--text-3: #66717F (valor obsoleto) y el texto de apoyo de las cifras cae sobre --surface-2 (#E7EDF3)",
+    "selector": ".llevas .cosa .pie",
+    "evidencia": "Brief MEDIDO_por_el_orquestador.tokens.text_3_declarado = '#66717F'; contraste.muestra: span.pie «Sin capturar el consumo todaví…», 11px, rgb(102,113,127) sobre rgb(231,237,243) = 4,21:1 frente al mínimo 4,5:1. Con el valor canónico #5C6675 la misma combinación mide 4,93:1 (cálculo propio, coincide con §1.1).",
+    "por_que_importa": "Es el pie que dice si el consumo de material ya se capturó o no — el dato que decide si el instalador tiene que volver sobre su jornada. Se lee a 11px, en un teléfono, a plena luz, y no llega al mínimo AA."
+   },
+   {
+    "id": "f1-28midia-02",
+    "severidad": "alta",
+    "regla": "§2.1 Suelo tipográfico (+ §10 trampa 1)",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» · «si un dato se lee todos los días, va a 12-13px como mínimo» · Única excepción: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta",
+    "hay_en_el_build": "11px de tamaño calculado en cinco familias de texto de producto, una de ellas escondida en la forma abreviada font:",
+    "selector": "span.pill.p-ok, span.pill.p-block, .llevas .cosa .pie, .cromo-quien small, .state .ref, span.cromo-av",
+    "evidencia": "Medición propia con el estilo calculado de cada elemento con texto (Playwright, 1440x900 y 390x844, andamio excluido): .pill 11px («Siguiente», «Falta material»), .pie 11px x3, small 11px x2, .ref 11px, .cromo-av 11px declarado como `font:700 11px var(--font-ui)` — la forma abreviada que §10 trampa 1 documenta. §6.10 además fija la etiqueta de estado en var(--fs-meta) = 12px.",
+    "por_que_importa": "La etiqueta que dice «Falta material» es la que decide si el instalador sale o no sale a la cita. A 11px y en movimiento, es el texto que primero se pierde."
+   },
+   {
+    "id": "f1-28midia-03",
+    "severidad": "media",
+    "regla": "§5 Movimiento — prefers-reduced-motion",
+    "dice_el_sistema": "«No es «cero animación»: se conservan opacidad y color, se elimina todo desplazamiento y escala»",
+    "hay_en_el_build": "El bloque de reduced-motion solo remapea duraciones (--dur-micro:1ms, --dur-base:120ms…); las transformaciones de escala y desplazamiento siguen declaradas y se siguen ejecutando, solo que más rápido",
+    "selector": "button:active,.pressable:active{transform:scale(.97)} · .skip:focus-visible{transform:translateY(70px)}",
+    "evidencia": "Lectura de las reglas @media (prefers-reduced-motion:reduce) resueltas en el navegador: ':root{--dur-micro:1ms;…} || .fab:hover .ring{animation:none} || .side{transition:none} || .velo-menu{transition:none} || .skel{animation:none}'. Ninguna retira transform. El `scale(.97)` de pulsación afecta a los 19 botones de la pantalla.",
+    "por_que_importa": "Quien activa reducción de movimiento lo hace por mareo o fotosensibilidad; una escala de 1ms sigue siendo un salto, y aquí ocurre en cada pulsación del botón más usado de la jornada."
+   },
+   {
+    "id": "f1-28midia-04",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga",
+    "dice_el_sistema": "«sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)» · «prefers-reduced-motion aplana el fondo, no solo detiene la animación»: `.skel{animation:none;background:var(--surface-2)}`",
+    "hay_en_el_build": "Las barras del esqueleto llevan texto real dentro y el bloque de reducción de movimiento solo pone animation:none, sin aplanar el degradado",
+    "selector": ".state-loading .skel",
+    "evidencia": "Medición propia: textContent de los .skel = ['hoy','00:00','cliente','domicilio','abrir la orden','hoy',…]. Regla resuelta bajo reduced-motion: '.skel{animation:auto … none}' sin background. Según §6.7 eso congela el degradado en la posición 0.",
+    "por_que_importa": "Un lector de pantalla lee «hoy, 00:00, cliente, domicilio, abrir la orden» como si fuera la agenda del día, cuando todavía no ha llegado nada. Y con movimiento reducido el esqueleto queda con un degradado congelado a medio camino, que se lee como un fallo de pintado."
+   },
+   {
+    "id": "f1-28midia-05",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado de una pantalla (reglas 1 y 2) + §11 Estructura",
+    "dice_el_sistema": "«(1) el cambio se anuncia (aria-live=\"polite\") y mueve el foco; (2) cada estado lleva encabezado real, no un <b>» · «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo» · `.tarjeta-estado{max-width:480px;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)}`, `.estado-ico{52px;border-radius:50%}`",
+    "hay_en_el_build": "<b>Hoy no tienes ninguna cita</b> y <b>No se pudo traer tu día</b> como título de estado; los estados van sueltos sobre --bg, con un icono de 30px y sin tarjeta; no hay ninguna región aria-live ni ninguna llamada a focus() al cambiar de vista",
+    "selector": "main#contenido .state-empty > b, .state-error > b, .state .ico",
+    "evidencia": "Captura 28_instalador_mi_dia--error.png: el bloque de error flota centrado sobre el fondo de página, sin superficie propia ni medallón de 52px. Grep sobre el archivo: 0 ocurrencias de aria-live (el único role=\"status\" es el contenedor del esqueleto). El CSS declara .state .ico{width:30px;height:30px;color:var(--text-3)} en vez de .estado-ico.",
+    "por_que_importa": "Quien navega por encabezados no encuentra el estado de la pantalla, y quien usa lector de pantalla no se entera de que la vista cambió: se queda esperando una agenda que ya no va a llegar."
+   },
+   {
+    "id": "f1-28midia-06",
+    "severidad": "alta",
+    "regla": "§8 Voz de producto (límites 1 y 2) + §6.9 Avisos (y su trampa documentada)",
+    "dice_el_sistema": "«si el texto explica una decisión, no va en pantalla» · «.nota y .banda llevan como máximo UNA frase… No hay excepción por importancia del contenido» · «Ningún bloque de texto siempre visible pasa de ~140 caracteres» · «Antes de escribir una clase nueva, verificar si .banda + una de sus cuatro variantes ya lo cubre»",
+    "hay_en_el_build": "Aviso de 268 caracteres y tres frases, la última de las cuales explica una decisión interna de producto: «…guardar en el teléfono lo que aún no llegó al servidor es una decisión que nadie ha tomado todavía, y no se toma de paso». Va en una clase nueva, .senal, que replica .banda + .b-warn, declaradas en este mismo archivo y sin usar en ningún sitio.",
+    "selector": ".senal p",
+    "evidencia": "Medición propia del textContent: 268 caracteres, 3 frases (límite ~140 y una frase). Grep en el mismo archivo: `.b-warn{background:var(--warn-bg);color:var(--warn-ink)}` declarado, 0 usos de class=\"banda\". En el teléfono (captura 390x844) el aviso ocupa 310 de los 844px del primer pliegue, por encima de la primera cita.",
+    "por_que_importa": "Es la trampa que §6.9 documenta con `.bloqueado`: un componente reinventado con otro nombre. Y el párrafo le cuenta al instalador una conversación de diseño que no puede usar para nada, en el sitio donde debería estar su primera cita."
+   },
+   {
+    "id": "f1-28midia-07",
+    "severidad": "media",
+    "regla": "§3 Espaciado («un token que no existe falla en silencio») + §11 («todo token var(--x) que usa el archivo está declarado en ese mismo archivo»)",
+    "dice_el_sistema": "«Un var() que no resuelve invalida la declaración entera (los tres paddings del diálogo computaban a 0)» · comprobación obligatoria: usados − declarados = vacío",
+    "hay_en_el_build": "`.gordo{padding:0 var(--sp-5)}` con --sp-5 nunca declarado: el :root declara --sp-1, -2, -3, -4, -6, -8 y -12, pero no --sp-5",
+    "selector": ".gordo",
+    "evidencia": "Brief: tokens.usados_sin_declarar = ['--sp-5']. Medición propia con getComputedStyle sobre el primer .gordo: padding-left = 0px, padding-right = 0px, min-height = 56px. El valor declarado del token en :root es cadena vacía.",
+    "por_que_importa": "Los botones de campo se quedan sin relleno horizontal. Hoy no se nota porque todos van estirados con flex:1 o .ancho; el día que uno se use suelto, el texto toca el borde y nadie sabrá por qué."
+   },
+   {
+    "id": "f1-28midia-08",
+    "severidad": "media",
+    "regla": "§10 trampa 5 — isotipo",
+    "dice_el_sistema": "«Correcto: <svg width=\"44\" height=\"42\"><use href=\"#dproma-mark\" width=\"44\" height=\"42\"/></svg> — medidas en el <use> y sin viewBox en el envoltorio» · «Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> — exactamente la forma que el documento marca como incorrecta",
+    "selector": ".side .logo svg use",
+    "evidencia": "Medición propia con getBoundingClientRect: caja del <svg> en x=96, caja del <use> en x=64 → desplazamiento −32,5px, el mismo número que §10 registra. Visible en 28_instalador_mi_dia--ok.png: del isotipo solo se ve una astilla verde sobre el wordmark.",
+    "por_que_importa": "La marca aparece recortada en todas las pantallas que comparten este cromo. Es el elemento más repetido del producto."
+   },
+   {
+    "id": "f1-28midia-09",
+    "severidad": "baja",
+    "regla": "§7.3 Objetivos táctiles — la regla táctil lleva :root",
+    "dice_el_sistema": "«El :root es lo que hace ganar la regla: con :root suma (0,3,0); sin él (0,2,0) y lo empata cualquier variante de tamaño del componente que, por ir después, gana»",
+    "hay_en_el_build": "Las seis reglas de modo dedo se escriben sin :root: `[data-tacto=\"dedo\"] .it{min-height:46px}`, `[data-tacto=\"dedo\"] .iconbtn{width:46px;height:46px}`, `.cromo-prof`, `.cromo-av`, `.seg button`, `.btn`",
+    "selector": "[data-tacto=\"dedo\"] .iconbtn",
+    "evidencia": "Brief: tactil_24px.regla_data_tacto_sin_root = 6. A diferencia del fallo registrado en §7.3, aquí data-tacto=\"dedo\" sí está en el <html>, y medido a 390x844 ningún destino queda por debajo de 44px (0 de 27). El defecto es latente: `.acciones .iconbtn{width:28px}` se declara después y, con la misma especificidad (0,2,0), ganaría en cuanto esta pantalla use una fila de acciones.",
+    "por_que_importa": "La pantalla cumple hoy por donde no se pretendía: porque no usa el componente que rompería la regla. Un cambio pequeño de markup la deja por debajo del mínimo sin que nadie toque el CSS táctil."
+   }
+  ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 2,
+   "integridad": 2
+  },
+  "justificacion": "Lo que esta pantalla hace bien es poco común: cumple el contrato táctil de campo sin una sola excepción (0 de 27 destinos por debajo de 44px, medido a 390x844 con el modo dedo puesto), tiene las cuatro vistas de §6.4, salto al contenido, un solo h1 y un texto de error ejemplar (qué pasó, qué no se ha perdido, referencia ORD-20260821-0703). Lo que la baja a 2 son defectos medidos y mecánicos: --text-3 obsoleto a 4,21:1, cinco familias de texto a 11px, los estados sin encabezado real ni anuncio, un token --sp-5 que invalida el relleno de los botones de campo, el isotipo desplazado −32,5px y un aviso de 268 caracteres que reinventa .banda. En theming cumple los dos temas con conmutador y respeta prefers-color-scheme; en responsive funciona a 390px (cajón lateral, modo tarjeta) pero a 1440px el contenido pensado para una mano se estira a 1160px sin ancho de lectura.",
+  "evidencia": [
+   "Medición táctil propia (Playwright, 390x844, hasTouch): 27 destinos interactivos, 0 por debajo de 44px; .gordo = 56px de alto, .it y .iconbtn = 46px.",
+   "Captura 28_instalador_mi_dia--ok.png a 1440px: el botón «Abrir la orden» mide 1120px de ancho.",
+   "Captura propia 28_instalador_mi_dia--390.png: el aviso .senal ocupa 310 de los 844px visibles antes de la primera cita.",
+   "getComputedStyle de .gordo: padding-left 0px / padding-right 0px por --sp-5 sin declarar."
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 2,
+   "hallazgo": "La pantalla dice bien el estado del mundo (sin señal, 2 citas, 1 con material incompleto) pero no el suyo: el cambio de vista no se anuncia ni mueve el foco, y «Lo que llevas encima» no dice de cuándo son esos datos — en una pantalla que admite no tener conexión, la antigüedad del dato es el dato.",
+   "selector": "main#contenido[data-state]"
+  },
+  {
+   "n": 2,
+   "heuristica": "Correspondencia entre el sistema y el mundo real",
+   "severidad": 1,
+   "hallazgo": "El lenguaje es el del instalador («Cómo llegar», «Llamar al sitio», «2 tramos de canaleta»). Se rompe en la última frase del aviso de señal, que habla el idioma del equipo de producto.",
+   "selector": ".senal p"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 2,
+   "hallazgo": "La cita de las 14:00 está bloqueada por material que almacén no despachó y la pantalla no ofrece ninguna salida: no hay «avisar a almacén», ni «reprogramar», ni a quién escribir. El aviso informa de un bloqueo que el usuario no puede tocar.",
+   "selector": ".aviso-fila"
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 3,
+   "hallazgo": "Tres inconsistencias que se refuerzan: .senal duplica .banda.b-warn declarado en el mismo archivo; .gordo convive con .btn sin que nada diga cuándo va cada uno; y esta pantalla afirma «No hay cola local» mientras 09_app_checklist_instalacion, del mismo módulo, muestra «3 por sincronizar» y «Guardada en el teléfono. Se enviará al recuperar señal».",
+   "selector": ".senal / .gordo"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 1,
+   "hallazgo": "Muy bien resuelto: avisa del material faltante antes de salir y el texto de error pide explícitamente no volver a marcar los mismos pasos. Falta solo el corolario: nada impide pulsar «Abrir la orden» de la cita bloqueada.",
+   "selector": ".aviso-fila"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocer antes que recordar",
+   "severidad": 1,
+   "hallazgo": "La jornada entera cabe en una pantalla con hora, duración, cliente y dirección completa. El pendiente de viáticos se enuncia con su fecha límite, no con una regla que haya que recordar.",
+   "selector": ".llevas"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 2,
+   "hallazgo": "El cajón lateral ofrece al instalador los quince módulos del sistema (Cuentas por cobrar, Usuarios, Tickets TI…). En un teléfono, a 272px de ancho, es una lista que nunca va a usar y que entierra lo que sí.",
+   "selector": "nav.side .it"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 3,
+   "hallazgo": "268 caracteres de aviso por encima del contenido, de los cuales la mitad explican por qué todavía no se ha decidido algo. En el teléfono desplazan la primera cita por debajo del pliegue.",
+   "selector": ".senal p"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de errores",
+   "severidad": 1,
+   "hallazgo": "El estado de error cumple las tres cosas de §6.4 en orden y da referencia. El único resto: el título es un <b>, así que quien navega por encabezados no lo alcanza.",
+   "selector": ".state-error"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": "n/a",
+   "hallazgo": "No aplica: la pantalla no documenta nada ni lo pretende.",
+   "selector": ""
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-022",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "«La programación y las rutas de instalación se elaboran en un Word manejado aparte, desconectado de la base de datos de clientes en Excel». La pantalla entrega la programación del día ya resuelta y pegada al cliente: hora, duración, razón social, equipo y domicilio completo («Blvd. Bernardo Quintana 501-B, Col. Centro Sur, 76090 Querétaro»), con «Cómo llegar» en el mismo bloque. El Word deja de ser el canal."
+   },
+   {
+    "pp": "pp-024",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "«La validación y despacho de materiales depende de la disponibilidad simultánea de dos personas; cuando alguna no está disponible, los materiales salen sin las firmas». La cita de las 14:00 lleva etiqueta «Falta material» y el aviso nombra la pieza y el responsable: «Te faltan 2 tramos de canaleta de los que pediste. Almacén no los ha despachado». El desfase deja de descubrirse en el sitio."
+   },
+   {
+    "pp": "pp-026",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "ignora",
+    "evidencia": "«Las hojas de servicio se registran en papel; la conciliación de materiales entre estas hojas y los totales de almacén se realiza como un cruce manual posterior». La pantalla reconoce el pendiente («4 renglones despachados · Sin capturar el consumo todavía») pero declara que sin señal no guarda nada: «lo que marques no se guarda hasta que vuelva la conexión. No hay cola local». En una instalación sin cobertura, el instalador vuelve al papel exactamente como hoy."
+   },
+   {
+    "pp": "pp-028",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "ignora",
+    "evidencia": "Pain point de severidad alta: «cuando esos vistos buenos se retrasan, la operación queda completamente detenida». La pantalla muestra el bloqueo pero no da ninguna vía para moverlo: no hay acción para avisar a almacén, escalar o reprogramar desde el aviso de material faltante."
+   },
+   {
+    "pp": "pp-030",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "«Las herramientas de trabajo diarias del equipo de operaciones se limitan a WhatsApp, Excel y correo electrónico». Esta pantalla es la primera superficie que reúne agenda, material, viáticos y pendientes del día en un solo sitio con identidad de usuario."
+   },
+   {
+    "pp": "pp-027",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "«La solicitud y aprobación de viáticos… se gestiona a través de un grupo de WhatsApp». «1 viático por comprobar · Vence el 24 ago. Después no puedes pedir otro» pone el pendiente y su consecuencia en la pantalla del día, no en un chat."
+   }
+  ],
+  "usabilidad_para_el_area": "Para un instalador de ICEV esta es la pantalla correcta: resuelve en un pliegue la pregunta de la mañana —a dónde voy, con qué llego, qué debo— y los destinos táctiles cumplen el mínimo de campo sin excepciones. Su límite no es visual sino de alcance: declara en pantalla que sin conexión no guarda nada, y el trabajo de campo de ICEV ocurre justamente donde no hay cobertura, así que el pain point de las hojas de papel (pp-026) sigue intacto. El segundo límite es que informa de bloqueos (pp-028) sin dar ninguna palanca para resolverlos: ve el problema que el área sufre a diario y lo deja en manos de WhatsApp otra vez. Si se arreglan esas dos cosas —cola local y una acción sobre el bloqueo— esta pantalla sola desplaza tres de las herramientas que hoy usa el área."
+ },
+ "cobertura": [
+  {
+   "patron": "Pantalla pensada para el teléfono renderizada dentro del cromo de escritorio, sin ancho de lectura: a 1440px el botón «Abrir la orden» mide 1120px y la tarjeta de cita se estira a 1160px (medido en 28_instalador_mi_dia--ok.png).",
+   "propuesta_de_regla": "§13.9 Ancho de lectura de una pantalla de campo. Una pantalla cuyo destino real es el teléfono declara su ancho máximo dentro de la zona de contenido (`max-width:560px`) y se alinea a la izquierda; el cromo no se retira, pero el contenido no se estira para llenarlo. El criterio ejecutable es el del botón: si la acción principal mide más de 560px de ancho en escritorio, la pantalla está gastando espacio sin propósito y la línea de texto ya pasó de 75 caracteres. No se resuelve centrando: centrado pierde la alineación con el resto del módulo."
+  },
+  {
+   "patron": "Botón de acción de campo de 56px (`.gordo`, `.gordo.p`, `.gordo.ancho`), por encima de los 36px de `.btn` de §6.2 y de los 46px del modo dedo, usado como única acción de cada tarjeta.",
+   "propuesta_de_regla": "§6.2.1 Botón de campo — `.btn.campo`. Cuándo: la acción principal de una pantalla que se usa de pie, con guantes o en movimiento. Valores: `min-height:56px; padding:0 var(--sp-5); border-radius:var(--r-card); font:700 var(--fs-base) var(--font-ui); gap:var(--sp-2)`; `width:100%` cuando es la única acción de su bloque, y dos por fila como máximo. Es una variante de `.btn`, no un componente nuevo: se declara junto a él para que comparta estados, foco y color de icono heredado (§6.2). Su suelo se declara con `min-height`, nunca con relleno."
+  },
+  {
+   "patron": "Barra de acción fija al pie, con la acción que cierra la tarea y respeto del área segura del dispositivo: `.pie-accion{position:sticky;bottom:0;padding-bottom:max(var(--sp-3),env(safe-area-inset-bottom))}`.",
+   "propuesta_de_regla": "§7.4 Barra de acción fija en pantalla táctil. Cuándo: la pantalla tiene una sola acción que cierra la tarea y el contenido se desplaza por debajo. Valores: `position:sticky;bottom:0;z-index:16;background:var(--surface);border-top:1px solid var(--border);box-shadow:0 -6px 18px var(--velo-suave);padding:var(--sp-3) var(--sp-6);padding-bottom:max(var(--sp-3),env(safe-area-inset-bottom))`. Lleva una sola acción primaria; si aparece una segunda, se queda dentro del contenido. El `env(safe-area-inset-bottom)` no es opcional: sin él, en un teléfono con barra de gestos el botón queda debajo del borde del dispositivo."
+  },
+  {
+   "patron": "Aviso de estado de conexión del dispositivo («Ahora mismo no hay señal») tratado como banda de advertencia permanente en la cabecera del contenido.",
+   "propuesta_de_regla": "§6.9.1 Aviso de conectividad. La falta de señal es una condición del dispositivo, no un error del sistema: se comunica con `.banda` + `.banda-warn` (§6.9), nunca con una clase nueva, y dice en UNA frase qué se puede hacer sin conexión y qué no («Sin señal: puedes consultar lo descargado; lo que marques se enviará al recuperar la conexión»). No explica por qué el producto se diseñó así. Se ancla sobre el contenido, lleva `role=\"status\"` y desaparece sola al volver la señal — un aviso de conectividad que hay que cerrar a mano miente sobre el estado actual."
+  },
+  {
+   "patron": "Dos pantallas del mismo módulo declaran comportamientos opuestos sin conexión: 28 dice «No hay cola local» y 09_app_checklist_instalacion muestra «3 por sincronizar» y evidencias «guardadas en el teléfono».",
+   "propuesta_de_regla": "§14 Comportamiento sin conexión. Toda pantalla de campo declara —en el sistema, no en la interfaz— qué hace sin red: solo lectura de lo descargado, cola local de escrituras, o ninguna de las dos. Dos pantallas del mismo módulo no pueden declarar comportamientos distintos. Cuando hay cola, su estado se muestra con un contador («N por sincronizar») con `role=\"status\"`, y cada elemento pendiente lleva su propia marca de estado, distinguible por forma además de por color (§1.3). Cuando no la hay, se dice una vez, en una frase, y el producto no ofrece capturar nada."
+  },
+  {
+   "patron": "Fila de cifras de campo con rótulo y apoyo (`.llevas .cosa`: 4 / «renglones despachados» / «Sin capturar el consumo todavía»), que replica la anatomía de `.cifras` de §12.4.1 con otro nombre, con borde y con apoyos de hasta dos frases.",
+   "propuesta_de_regla": "§12.4.2 Fila de cifras fuera del tablero. Una fila de cifras en una pantalla de campo reusa `.cifras` y sus dos ranuras (§12.4.1): rótulo y apoyo, el apoyo pegado al rótulo y de una sola línea (presupuesto medido: ~18 caracteres en la tarjeta mínima de 150px). Sin borde: dentro de una tarjeta, una cifra compacta es un relleno, no otra tarjeta. Si el apoyo necesita dos frases —«Vence el 24 ago. Después no puedes pedir otro»— el dato no es una cifra: es una fila de lista con su acción."
+  },
+  {
+   "patron": "El cromo de navegación completo (quince módulos, incluidos Cuentas por cobrar, Usuarios y Tickets TI) servido a un rol de campo dentro de un cajón de 272px en el teléfono.",
+   "propuesta_de_regla": "§7.2.1 Cromo por rol en pantalla de campo. Por debajo de 860px, la barra lateral de un rol operativo muestra solo los módulos que ese rol abre en su jornada, y el resto queda tras «Todos los módulos». El criterio es ejecutable: un ítem que el rol no puede abrir por permisos no se lista (§6.22, «no se ofrece ver la lista de una lista que no se puede ver»); un ítem que puede abrir pero no usa en campo va en el segundo nivel. El cajón nunca pasa de siete destinos en el primer nivel."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática sin backend que perfilar; no hay petición de datos real que medir.",
+  "contraste.muestra[0] y [1] del brief (span.et 1,09:1 y span.cromo-av 3,05:1): no los cuento como fallo. La medición toma el fondo rgba (--chrome-activo y --accent-soft) como si fuera opaco; compuesto sobre --chrome y --surface respectivamente, ninguno de los dos cae bajo el mínimo. El fallo real de contraste de esta pantalla es el de --text-3 sobre --surface-2 (4,21:1), que sí está medido sobre un fondo sólido.",
+  "§6.11 tablas, §6.18 diálogo, §12.x gráficas: la pantalla no tiene tabla, ni modal, ni gráfico (brief: tablas 0, dialogNativo 0, divDialog 0). No evaluado por ausencia del patrón.",
+  "§2 fuentes autoalojadas (D116): la pantalla declara --font-ui:'Inter' y no carga ninguna fuente — ni <link> ni @font-face —, así que se pinta con system-ui. No lo registro como hallazgo de cumplimiento porque el riesgo que D116 persigue (el CDN caído) no existe aquí; sí queda anotado para el orquestador, porque la tipografía del producto no es la declarada."
+ ]
+}

@@ -1,0 +1,237 @@
+{
+ "pantalla": "01_login",
+ "ruta_zip": "07-transversales/01_login.html",
+ "carpeta": "07-transversales",
+ "area": "transversal",
+ "arquetipo": "acceso/onboarding",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok"
+ ],
+ "capturas": [
+  "01_login--ok.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "f1-01login-01",
+    "severidad": "alta",
+    "regla": "§6.1 Botón primario del acceso — .gbtn",
+    "dice_el_sistema": "Se bloquea en el manejador de JS (var ocupado), no solo con CSS — «pointer-events:none detiene el ratón pero no el teclado» (cuatro Intro = cuatro envíos). Estado por aria-busy=\"true\".",
+    "hay_en_el_build": ".gbtn[data-busy=\"true\"]{pointer-events:none;color:var(--text-2)} y en el JS g.dataset.busy='true' — no hay variable guardián ni aria-busy en ninguna parte del archivo.",
+    "selector": "#google.gbtn",
+    "evidencia": "Leído en el <style> (línea .gbtn[data-busy=\"true\"]{pointer-events:none}) y en el <script> final: el manejador de click no comprueba ningún estado previo antes de ejecutar. grep de 'aria-busy' sobre 01_login.html: 0 coincidencias.",
+    "por_que_importa": "Quien entra con teclado y pulsa Intro varias veces mientras se abre la ventana de Google dispara varios envíos: es el incidente que §6.1 documenta como ya ocurrido en la maqueta original. Además el estado «ocupado» no se anuncia a un lector de pantalla, porque aria-busy no existe."
+   },
+   {
+    "id": "f1-01login-02",
+    "severidad": "alta",
+    "regla": "§3 (aviso duro de espaciado) y ANEXO C §11 — «todo token var(--x) que usa el archivo está declarado en ese mismo archivo»",
+    "dice_el_sistema": "«Un token que no existe falla en silencio»: un var() que no resuelve invalida la declaración entera.",
+    "hay_en_el_build": ".hint{color:var(--text-3-fuerte)} y .foot{color:var(--text-3-fuerte)}. --text-3-fuerte no está declarado en ningún :root del archivo.",
+    "selector": ".hint, .foot",
+    "evidencia": "Brief: tokens.usados_sin_declarar = [\"--text-3-fuerte\"]. Medido por mí con getComputedStyle en Chromium a 1440×900: .hint color = rgb(27,36,48) y .foot color = rgb(27,36,48), es decir --text (texto principal) heredado, no la tinta auxiliar prevista.",
+    "por_que_importa": "Dos bloques completos (la instrucción de qué va a pasar al pulsar y el pie con el enlace a TI) pierden su jerarquía: se pintan con el mismo peso de color que el título de la tarjeta. El fallo es silencioso — no hay error en consola ni nada que lo delate leyendo la hoja de estilos."
+   },
+   {
+    "id": "f1-01login-03",
+    "severidad": "media",
+    "regla": "§1.1 Superficies y texto — --text-3",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)».",
+    "hay_en_el_build": "--text-3:#66717F en el bloque :root,[data-theme=\"light\"].",
+    "selector": ":root",
+    "evidencia": "Brief: tokens.text_3_declarado = \"#66717F\". Línea 23 del archivo servido.",
+    "por_que_importa": "Es el valor obsoleto que el sistema corrigió por contraste. En esta pantalla concreta el daño es contenido porque --text-3 solo pinta el borde de :hover de .gbtn (las dos zonas que debían usarlo fallan por el hallazgo 02), pero el token entra al archivo con el valor viejo y de aquí se copia. Ver también el hallazgo de cobertura cob-01: el documento del acceso sigue publicando ese valor."
+   },
+   {
+    "id": "f1-01login-04",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla",
+    "dice_el_sistema": "«Toda pantalla que pida datos — cuatro formas: con datos, cargando, vacía, con error. No son un extra: son la pantalla.» En el acceso el contenedor es la propia tarjeta.",
+    "hay_en_el_build": "La tarjeta .glass contiene una sola vista. No existe ningún elemento .vista/.state, ni esqueleto, ni vista de error.",
+    "selector": ".glass",
+    "evidencia": "Medido en el navegador: document.querySelectorAll('.state').length = 0 y '.skel'.length = 0. El brief solo ofrece captura 'ok' porque no hay más estados que capturar.",
+    "por_que_importa": "Si la ventana de Google no abre, si el servidor de identidad no contesta o si la cuenta entra sin permisos, esta pantalla no tiene dónde decirlo: solo cambia el rótulo del botón a «Abriendo Google…». La pantalla hermana 51_acceso sí dibuja las cuatro, de modo que la propuesta visual v2 va por detrás de la pantalla real."
+   },
+   {
+    "id": "f1-01login-05",
+    "severidad": "media",
+    "regla": "§2 Tipografía — autoalojamiento (D116)",
+    "dice_el_sistema": "«Las fuentes se autoalojan (D116). Prohibido el <link> a Google Fonts para las fuentes de interfaz: un CDN caído falla en silencio (incidencia real de 4 días sin detección)». @font-face con font-display:swap sobre /fuentes/inter-variable.woff2 y /fuentes/michroma.woff2.",
+    "hay_en_el_build": "<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap\" rel=\"stylesheet\"> y ningún @font-face en el archivo.",
+    "selector": "head > link[href*=fonts.googleapis.com]",
+    "evidencia": "Línea 10 del archivo. Al abrir la pantalla en Chromium el propio navegador registró «Failed to load resource: ERR_CERT_AUTHORITY_INVALID» y un 404 para esa hoja: la página se pintó con la pila de respaldo system-ui sin avisar de nada — exactamente el modo de fallo que §2 cita.",
+    "por_que_importa": "La comprobación que §2 exige («que la fuente aparezca cargada en las herramientas de red») falla aquí de forma reproducible, y el usuario ve una tipografía distinta sin que nada lo señale."
+   },
+   {
+    "id": "f1-01login-06",
+    "severidad": "media",
+    "regla": "§6.5 Iconos — .msi",
+    "dice_el_sistema": "«Cuándo: todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1).» CSS canónico .msi con font-variation-settings 'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24.",
+    "hay_en_el_build": "Set propio de <symbol> SVG de trazo (#i-globe, #i-sun, #i-moon, #i-shield, #i-chevd) consumido con .ico{stroke:currentColor;stroke-width:1.6;fill:none}. No hay ningún .msi ni ningún link de Material Symbols.",
+    "selector": ".ico, svg > use",
+    "evidencia": "Bloque <defs> del archivo (líneas 125-135) y regla .ico de la línea 46.",
+    "por_que_importa": "Son iconos de trazo fino frente a la variante rellena del sistema: el peso visual no coincide con el de ninguna otra pantalla del lote, y el criterio de tamaño/relleno de §6.5 no puede aplicarse porque no hay familia de iconos que gobernar."
+   },
+   {
+    "id": "f1-01login-07",
+    "severidad": "media",
+    "regla": "§7.3 Objetivos táctiles",
+    "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8)». «Enlaces que son el elemento primario de su fila (folio, miga, «Ver en Maps»): no son texto en prosa, llevan padding hasta llegar a 24px».",
+    "hay_en_el_build": "El enlace del pie «¿Problemas para entrar? Levanta un ticket a TI» mide 318,2 × 14 px. .foot a solo declara color, text-decoration, font-weight y border-radius: ningún relleno.",
+    "selector": ".foot a",
+    "evidencia": "Brief: tactil_24px.por_debajo_de_24px = 1, muestra = {tag:'a', txt:'¿Problemas para entrar? ', w:318.2, h:14}.",
+    "por_que_importa": "Es el único camino de salida cuando alguien no consigue entrar, y es el destino más pequeño de la pantalla. No es prosa: es el elemento primario de su fila, el caso que §7.3 nombra expresamente."
+   },
+   {
+    "id": "f1-01login-08",
+    "severidad": "baja",
+    "regla": "§1.2 Acción y marca — verde lima / preámbulo «ningún hex literal en un componente»",
+    "dice_el_sistema": "«Ningún hex literal en un componente. Todo pasa por un token.» El verde lima #C7D97B es de marca y vive como --marca-7.",
+    "hay_en_el_build": ".brand :focus-visible{outline-color:#C7D97B}, .copy h1 .sio{color:#C7D97B}, .brand{background:#071120;color:#F2F5F7} y toda la escena SVG con hex sueltos (#1E4E79, #2e823d, #4FBF98, #0B1B30…).",
+    "selector": ".brand, .copy h1 .sio",
+    "evidencia": "Líneas 51, 59 y 70 del archivo, más los <stop> del bloque .scene. No existe ningún token --marca-* declarado: el brief cuenta 41 tokens declarados y ninguno de la familia de marca.",
+    "por_que_importa": "La familia de marca del sistema (§1.2: --marca-1..7, --marca-azul, --marca-lienzo, --marca-halo) existe precisamente para que el isotipo y la escena del acceso no dependan de valores sueltos. Aquí la escena entera está fuera del sistema de tokens."
+   },
+   {
+    "id": "f1-01login-09",
+    "severidad": "baja",
+    "regla": "ANEXO B §8 Voz de producto, límite 1",
+    "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto. Una segunda oración se borra o pasa a toggletip. No hay excepción por importancia del contenido.»",
+    "hay_en_el_build": ".note con dos oraciones: «SIO-DPROMA no guarda tu contraseña. Si no la recuerdas, recupérala desde la misma ventana de Google con «¿Olvidaste tu contraseña?».» (133 caracteres).",
+    "selector": "p.note",
+    "evidencia": "Texto literal del archivo, líneas 253-257. Dos oraciones completas; la segunda es la que §8 manda borrar o pasar a toggletip.",
+    "por_que_importa": "Está bajo el tope de ~140 caracteres, pero incumple la regla de una sola frase. Es el incumplimiento más leve de las cuatro pantallas del lote y se arregla borrando la segunda oración."
+   }
+  ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "Es la pantalla visualmente más resuelta del lote y la única que respeta el layout §7.1 (.split + .brand + main.access, corte a 920px) y la única que dibuja bien el isotipo (§10 trampa 5). Accesibilidad baja a 2 por el doble envío con teclado (§6.1), el enlace de 14px de alto y la ausencia total de vistas de estado. Theming 3: declara los dos temas, tiene conmutador, actualiza meta[name=theme-color] y respeta prefers-reduced-motion — pero no hay captura en oscuro para verificarlo pintado y el token roto afecta a ambos temas por igual. Integridad 2: un token usado sin declarar con daño medido, nueve tokens declarados sin usar, set de iconos fuera de §6.5 y fuentes por CDN que de hecho no cargaron.",
+  "evidencia": [
+   "getComputedStyle: .hint y .foot = rgb(27,36,48) por --text-3-fuerte inexistente",
+   "Caja del <use> del isotipo 32,9/40px frente a la del <svg> 32/40px: desplazamiento ~0,9px, correcto según §10 trampa 5",
+   "Consola de Chromium al cargar: ERR_CERT_AUTHORITY_INVALID + 404 sobre fonts.googleapis.com; la página siguió pintando con la pila de respaldo",
+   "Brief: 4 destinos interactivos, 1 por debajo de 24px (318,2 × 14)",
+   "Captura 01_login--ok.png a 1440×900"
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 2,
+   "hallazgo": "El único estado visible es el texto del botón cambiando a «Abriendo Google…» más una región aria-live. No hay vista de carga, ni de error, ni de cuenta sin permisos: entre pulsar y que aparezca la ventana de Google la pantalla no cambia de forma.",
+   "selector": "#google, #live"
+  },
+  {
+   "n": 2,
+   "heuristica": "Correspondencia entre el sistema y el mundo real",
+   "severidad": 0,
+   "hallazgo": "El lenguaje es el del usuario («Ingresa con tu cuenta @dproma.com», «Se abrirá la ventana de Google»). Sin problema.",
+   "selector": "main.access"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": "n/a",
+   "hallazgo": "No hay acción destructiva ni flujo del que haya que salir; el único control delega en Google.",
+   "selector": ""
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 2,
+   "hallazgo": "El estado ocupado se marca con un atributo propio (data-busy) en lugar del aria-busy que el sistema y la plataforma esperan, y los iconos son un set SVG propio en vez de la familia §6.5 que usan las otras tres pantallas del lote.",
+   "selector": ".gbtn[data-busy], .ico"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 3,
+   "hallazgo": "El bloqueo del doble envío se confía a pointer-events:none, que no detiene el teclado. Es el fallo que §6.1 documenta con su medición (cuatro Intro = cuatro envíos).",
+   "selector": "#google.gbtn"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocimiento antes que recuerdo",
+   "severidad": 0,
+   "hallazgo": "Un único camino visible y explicado antes de pulsarlo; no hay nada que recordar.",
+   "selector": ".glass"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 1,
+   "hallazgo": "No hay atajo ni recordatorio de la última cuenta usada; el selector de idioma es un chip sin menú detrás.",
+   "selector": ".access-top .chip"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 2,
+   "hallazgo": "El aviso .note lleva dos oraciones donde §8 admite una, y el bloque .hint repite información que la propia ventana de Google ya da. Tres bloques de texto explicativo seguidos bajo un único botón.",
+   "selector": "p.note, p.hint"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de los errores",
+   "severidad": 3,
+   "hallazgo": "No existe ninguna vista de error: si el acceso falla, no hay mensaje, ni referencia, ni «Reintentar». El único recurso es el enlace del pie, que además es el destino táctil más pequeño de la pantalla.",
+   "selector": "main.access"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 1,
+   "hallazgo": "Hay un enlace a TI, pero no dice qué información hace falta llevar ni ofrece una referencia que citar.",
+   "selector": ".foot a"
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-105",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-105 (baja): «Un proyecto previo con un proveedor tecnológico externo se detuvo en la fase de maquetado visual sin avanzar a desarrollo funcional». Esta pantalla es exactamente eso: el título del documento es «Acceso (propuesta visual v2)» y lo que entrega es la vista con datos y nada más — 0 elementos .state, 0 .skel, ningún manejador real tras el botón. La pantalla hermana 51_acceso sí dibuja los cuatro estados, de modo que esta propuesta repite el patrón que el pain point describe."
+   },
+   {
+    "pp": "pp-104",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-104 (media): la certificación ISO 9001 exige formatos de registro normalizados. La pantalla no deja rastro citable de un acceso fallido: no hay referencia tipo ACC-AAAAMMDD-NNNN como sí la tiene 51_acceso, así que un incidente de entrada no se puede registrar ni referir."
+   }
+  ],
+  "usabilidad_para_el_area": "Para el soporte administrativo transversal la entrada por cuenta de trabajo es la decisión correcta: elimina la contraseña y con ella el motivo más común de ticket a TI. El problema es lo que pasa cuando no entra. La pantalla no tiene ninguna de las cuatro vistas de estado, así que un fallo de identidad deja al usuario con el mismo botón y sin referencia que citar, y el único camino de salida —el enlace a TI— mide 14px de alto. Para un área cuyo dolor documentado es la falta de canales trazables, entregar el acceso sin estado de error ni referencia de incidente deja fuera justo la parte que generaría registro."
+ },
+ "cobertura": [
+  {
+   "patron": "El sistema tiene dos documentos de verdad que se contradicen. docs/sistema-diseno-acceso-sio-dproma.md (el antecesor) declara --text-3:#66717F (línea 35) y docs/sistema-diseno-sio-dproma.md declara #5C6675 (línea 64) con la corrección explicada en sus líneas 70-86. Esta maqueta, que es la de acceso, toma el valor del documento de acceso. Lo mismo ocurre con --sh-modal (acceso .20 / dashboard .22, línea 519) y --glass (acceso .74 / dashboard .66, línea 520): esta maqueta usa los tres valores del acceso.",
+   "propuesta_de_regla": "§1.1 — Fuente de verdad única de los tokens. El documento de acceso queda marcado como histórico en su encabezado y deja de declarar valores: remite a la tabla de §1.1 del documento principal para todo token compartido y conserva únicamente los patrones exclusivos de la pantalla de entrada (§7.1 .split/.brand/main.access y §6.1 .gbtn). Cuando un valor exista en los dos, el del documento principal gana sin excepción, y el del documento histórico se retira del archivo en lugar de dejarse como alternativa."
+  },
+  {
+   "patron": "--focus-w y --focus-offset se usan en la regla literal de §1.7 (outline:var(--focus-w) solid var(--accent); outline-offset:var(--focus-offset)) pero el sistema no les da valor. Esta maqueta lo resuelve escribiendo 2px literales (:focus-visible{outline:2px solid var(--accent);outline-offset:2px}); las otras tres del lote declaran --focus-w:2px y --focus-offset:2px en :root. Las cuatro coinciden en el número, y ninguna lo tiene documentado.",
+   "propuesta_de_regla": "§1.7 — Foco: --focus-w vale 2px y --focus-offset vale 2px, en los dos temas. Se declaran en :root junto al resto de la escala y nunca se escriben como literal en una regla de componente; el anillo dentro del cromo cambia solo de color (--chrome-focus), no de grosor ni de separación."
+  },
+  {
+   "patron": "Una pantalla de entrada necesita decir «no guardamos tu contraseña» y «se abrirá la ventana de Google», pero §6.9 solo contempla .note (nivel 1, lo que bloquea la acción inmediata) y .banda (lo que califica la sección de abajo). Ninguno de los dos cubre la instrucción previa de un acceso delegado, y la maqueta lo resuelve con una clase propia (.hint) sin regla escrita.",
+   "propuesta_de_regla": "§6.1 — Instrucción previa del acceso delegado. Bajo el botón principal del acceso cabe un único bloque .hint de una frase que diga qué va a aparecer al pulsar (la ventana del proveedor de identidad y qué se espera de la persona allí). Va en --fs-meta sobre --text-3, centrado, sin relleno ni borde: no es un aviso, es la continuación del botón. Si hace falta decir algo más, va a toggletip (§6.23); si lo que hay que decir bloquea la acción, deja de ser .hint y pasa a .note."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática, sin backend que perfilar",
+  "f3.theming: no hay captura en oscuro (brief: tema_oscuro_medido=false; capturas_disponibles solo 'ok'). El tema oscuro se evaluó leyendo el bloque [data-theme=\"dark\"] y el conmutador, no viéndolo pintado",
+  "estados cargando/vacío/error: no evaluables sobre captura porque la pantalla no los implementa (0 elementos .state, 0 .skel medidos en el navegador); se auditan como ausencia, no como calidad",
+  "contraste: el único fallo que trae el brief (span de .note, ratio 1,37:1 sobre rgba(62,122,76,.10)) es un artefacto del método de medición, que trata el rgba como si fuera opaco. Compuesto de verdad sobre --glass y --bg el par da ~5,9:1 y cumple. No lo cuento como hallazgo",
+  "§9 andamiaje: esta pantalla no tiene conmutador de maqueta (no hay [data-andamio]); no procede evaluar su rotulado ni su separación"
+ ]
+}

@@ -1,0 +1,277 @@
+{
+ "pantalla": "56_frontera_error",
+ "ruta_zip": "07-transversales/56_frontera_error.html",
+ "carpeta": "07-transversales",
+ "area": "transversal",
+ "arquetipo": "frontera de error",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "56_frontera_error--ok.png",
+  "56_frontera_error--loading.png",
+  "56_frontera_error--empty.png",
+  "56_frontera_error--error.png",
+  "56_frontera_error--oscuro.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "f1-56frontera-01",
+    "severidad": "alta",
+    "regla": "ANEXO B §8 Voz de producto — «el texto dice qué se puede hacer, no por qué se decidió así» (§11)",
+    "dice_el_sistema": "«Si el texto explica una consecuencia para quien está mirando, sí — y en una frase.» ANEXO C §11: «el texto dice qué se puede hacer».",
+    "hay_en_el_build": "El estado «El sistema no pudo arrancar» dice: «falló antes de que hubiera ninguna, así que tampoco hay menú al que ir» — mientras la barra lateral de navegación completa, con sus 14 enlaces, está dibujada y operativa a la izquierda de ese mismo texto.",
+    "selector": ".state-empty .aviso > p",
+    "evidencia": "Captura 56_frontera_error--empty.png a 1440×900: el menú ocupa 236px a la izquierda del aviso que afirma que no hay menú. El cromo (nav.side) está fuera de <main>, de modo que ningún estado lo retira.",
+    "por_que_importa": "El texto y la pantalla se contradicen a la vista. Quien lea el aviso o bien desconfía del mensaje, o bien no prueba el menú que sí funciona y que es la salida más rápida. Y si el arranque hubiera fallado de verdad, el cromo no podría estar ahí: la maqueta enseña un estado que no puede ocurrir tal como se dibuja."
+   },
+   {
+    "id": "f1-56frontera-02",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 — «un <symbol> ya trae su viewBox; repetirlo en el <svg> que lo invoca descoloca la marca»",
+    "dice_el_sistema": "«Correcto: <svg width=\"44\" height=\"42\" aria-hidden=\"true\"><use href=\"#dproma-mark\" width=\"44\" height=\"42\"/></svg> — medidas en el <use> y sin viewBox en el envoltorio… Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal.»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>: viewBox repetido en el envoltorio y <use> sin medidas.",
+    "selector": ".side .logo svg > use",
+    "evidencia": "Medido con getBoundingClientRect a 1440×900: <svg> en x=96, <use> en x=63,54 → 32,46px de desplazamiento a la izquierda, el mismo número que registra §10. Visible en las cinco capturas: del isotipo solo queda una astilla verde sobre «SIO-DPROMA».",
+    "por_que_importa": "El logotipo sale recortado en los cinco estados y en los dos temas. En una pantalla cuyo trabajo es tranquilizar («el resto del sistema sigue funcionando»), un logotipo roto dice lo contrario."
+   },
+   {
+    "id": "f1-56frontera-03",
+    "severidad": "alta",
+    "regla": "§6.4 regla 1 — «el cambio se anuncia (aria-live=\"polite\") y mueve el foco»",
+    "dice_el_sistema": "«Todo cambio de vista se anuncia (aria-live=\"polite\") y mueve el foco (main.focus() con tabindex=\"-1\").»",
+    "hay_en_el_build": "El cambio de vista es solo cont.setAttribute('data-state', …). El <main> tiene tabindex=\"-1\" y cada .aviso tiene role=\"alert\" y tabindex=\"-1\" preparados, pero nada llama a .focus().",
+    "selector": "main#contenido[data-state], .aviso[role=alert][tabindex=\"-1\"]",
+    "evidencia": "Medido sobre el documento servido: ninguna llamada .focus() en el <script>. Los tres role=\"alert\" son estáticos: existen desde la carga dentro de contenedores ocultos por CSS, de modo que pasar de display:none a display:flex no garantiza anuncio en lectores de pantalla.",
+    "por_que_importa": "Es una frontera de error: la vista aparece sin que la persona haya pedido nada, así que si no se anuncia y no se mueve el foco, quien usa lector de pantalla se queda con el foco en un control que ya no existe y sin noticia de que la pantalla ha fallado. La pantalla tiene el tabindex=\"-1\" puesto en el sitio correcto: falta la línea de JavaScript que lo use."
+   },
+   {
+    "id": "f1-56frontera-04",
+    "severidad": "media",
+    "regla": "§6.4 — valores de .tarjeta-estado y .estado-ico",
+    "dice_el_sistema": ".tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)} — «es --r-modal y --sh-modal, no los de .tarjeta». .estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}, glifo a 28px; .es-err cambia solo el fondo a --err.",
+    "hay_en_el_build": ".aviso{max-width:560px;padding:var(--sp-6);border-radius:var(--r-card);box-shadow:var(--sh-rest)} y .aviso .marca{width:44px;height:44px;background:var(--err-bg);color:var(--err-ink)} con glifo de 18px (.ico).",
+    "selector": ".aviso, .aviso .marca",
+    "evidencia": "Bloque .fr/.aviso del <style>. Captura --ok.png: tarjeta de 560px con sombra de reposo y medallón de 44px en rosa pálido. Las siete medidas divergen: 560 vs 480, --sp-6 vs --sp-8, --r-card vs --r-modal, --sh-rest vs --sh-modal, 44 vs 52px, --err-bg vs --err y --err-ink vs --on-state. --on-state no está declarado en el archivo.",
+    "por_que_importa": "La tarjeta se queda con el peso visual de una tarjeta normal (§6.3) cuando §6.4 pide el de un diálogo, y el medallón relleno de color —la señal que hace reconocible un error a un metro de distancia— se sustituye por un círculo pálido con un icono de trazo fino. De las cuatro pantallas del lote es la que más cerca está del componente correcto: le faltan los valores, no la estructura."
+   },
+   {
+    "id": "f1-56frontera-05",
+    "severidad": "media",
+    "regla": "§6.4 — «Un solo contenedor, las vistas dentro como hermanas» (la pantalla no cambia de forma según lo que tenga que decir)",
+    "dice_el_sistema": "«Un solo contenedor, las vistas dentro como hermanas.» El documento del acceso lo razona en su §6.3: «la pantalla no debe cambiar de forma según lo que tenga que decir, y así el usuario no pierde la referencia visual».",
+    "hay_en_el_build": "Las tres vistas usan el mismo .fr > .aviso, pero .state-empty y .state-error llevan además la clase .state, que trae text-align:center y align-items:center. La vista ok queda alineada a la izquierda y las otras dos centradas.",
+    "selector": ".state-ok .aviso frente a .state.state-empty .aviso",
+    "evidencia": "Comparando 56_frontera_error--ok.png (título, párrafos y botones alineados a la izquierda de la tarjeta) con --empty.png (lo mismo, centrado). El CSS lo confirma: .state{align-items:center;text-align:center} y .state-ok no lleva esa clase.",
+    "por_que_importa": "El mismo componente se reparte en dos alineaciones distintas según el estado, de modo que al pasar de un error a otro la tarjeta entera se reordena. Es un cambio de forma gratuito, y el centrado de los párrafos largos del estado «no pudo arrancar» hace el texto más difícil de leer."
+   },
+   {
+    "id": "f1-56frontera-06",
+    "severidad": "media",
+    "regla": "§1.1 Superficies y texto — --text-3",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)». «Si el elemento puede caer sobre --surface-2, se mide también ahí.»",
+    "hay_en_el_build": "--text-3:#66717F, y el archivo declara --surface-2:#E7EDF3 y lo usa como fondo de .ref, .seg y .p-s0.",
+    "selector": ":root",
+    "evidencia": "Brief: tokens.text_3_declarado = \"#66717F\". El brief no encuentra en esta pantalla ningún par --text-3 sobre --surface-2 realmente pintado (contraste.fallos = 1, y ese único fallo es el artefacto del avatar).",
+    "por_que_importa": "Aquí el riesgo es latente, no manifiesto: el token obsoleto está declarado junto a la superficie donde falla, de modo que cualquier texto auxiliar que se añada sobre .ref caerá a 4,21:1 sin que nadie lo note. Ver cobertura cob-01: el valor viene del documento antecesor del sistema."
+   },
+   {
+    "id": "f1-56frontera-07",
+    "severidad": "media",
+    "regla": "§2.1 Tipografía — suelo de 12px; §10 trampa 1",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» §10 trampa 1: «los avatares del cromo llevaban font:700 11px var(--font-ui) y sobrevivieron a una revisión completa de todos los font-size del archivo. Se comprueba con el estilo calculado».",
+    "hay_en_el_build": "18 elementos con texto por debajo de 12px. Entre ellos .cromo-av{font:700 11px var(--font-ui)} (la trampa 1 literal, con la forma abreviada), .cromo-quien small a 11px y .ref code a 11,5px — la propia referencia del error.",
+    "selector": ".cromo-av, .ref code, .cromo-quien small",
+    "evidencia": "Medido con el estilo calculado de cada elemento con nodo de texto: 18 por debajo de 12px. Brief: {sel:'span.cromo-av', px:11}. Las únicas excepciones admitidas presentes son .grp (10,5px, rótulo de grupo de la barra lateral) y los ::before del modo tarjeta.",
+    "por_que_importa": "La referencia de soporte (FR-20260826-0714) es el dato que alguien tiene que leer y dictar por teléfono, y se pinta a 11,5px en monoespaciada. El avatar reproduce la trampa 1 con la misma declaración abreviada que §10 registra como la que sobrevive a las revisiones."
+   },
+   {
+    "id": "f1-56frontera-08",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga — A11y y prefers-reduced-motion",
+    "dice_el_sistema": "«Sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad).» «prefers-reduced-motion aplana el fondo, no solo detiene la animación: .skel{animation:none;background:var(--surface-2)}.»",
+    "hay_en_el_build": "Las siete barras del esqueleto llevan el texto «x» dentro, y @media (prefers-reduced-motion:reduce){.skel{animation:none}} no repone el fondo.",
+    "selector": ".state-loading.sk .skel",
+    "evidencia": "Medido en el navegador: [...document.querySelectorAll('.skel')].map(e=>e.textContent.trim()) devuelve siete veces \"x\". El contenedor sí lleva role=\"status\" y aria-label=\"Cargando\", de modo que esas siete equis quedan dentro de la región viva.",
+    "por_que_importa": "Un lector de pantalla recita «x x x x x x x» mientras la frontera reintenta. Es el caso que §6.7 nombra, y se arregla vaciando las barras. Con movimiento reducido, además, el degradado se queda congelado en la posición 0 en vez de aplanarse."
+   },
+   {
+    "id": "f1-56frontera-09",
+    "severidad": "baja",
+    "regla": "§6.9 — «el icono tiene que coincidir con la variante» (una señal mixta es un error)",
+    "dice_el_sistema": "«El icono tiene que coincidir con la variante (triángulo de advertencia sobre banda neutra = señal mixta).»",
+    "hay_en_el_build": "El bloque de referencia de soporte (.ref, fondo --surface-2, texto --text-2) lleva un icono de escudo (#i-shield) delante de «Referencia para soporte: FR-20260826-0714».",
+    "selector": "p.ref > svg use[href='#i-shield']",
+    "evidencia": "Markup de los tres estados: <p class=\"ref\"><svg class=\"ico ico-xs\"><use href=\"#i-shield\"/></svg>… Visible en --ok.png y --empty.png.",
+    "por_que_importa": "Un escudo significa protección o seguridad, no identificador de incidente. En un bloque que lo único que hace es dar un código para citar, el icono introduce un significado que no está en el texto — la señal mixta que §6.9 prohíbe."
+   },
+   {
+    "id": "f1-56frontera-10",
+    "severidad": "baja",
+    "regla": "ANEXO B §8 límite 2 — «ningún bloque de texto siempre visible pasa de ~140 caracteres»",
+    "dice_el_sistema": "«Ningún bloque de texto siempre visible pasa de ~140 caracteres. Se mide con el contador de caracteres, no a ojo.»",
+    "hay_en_el_build": "Dos bloques por encima del tope: el primer párrafo del estado «no pudo arrancar» (167 caracteres) y el .gris de cierre de ese mismo estado (156).",
+    "selector": ".state-empty .aviso > p, .state-empty .gris",
+    "evidencia": "Medido con innerText: 167 y 156 caracteres. El resto de los bloques de las tres vistas se queda por debajo del tope.",
+    "por_que_importa": "Severidad baja porque los excesos son pequeños y el contenido sí habla de la consecuencia, no de la decisión: esta pantalla es, con diferencia, la mejor escrita del lote. Las dos frases que sobran se recortan sin perder nada."
+   },
+   {
+    "id": "f1-56frontera-11",
+    "severidad": "baja",
+    "regla": "§10 trampa 10 y §7.3 — herencia del arquetipo",
+    "dice_el_sistema": "§10 trampa 10: «un nombre de clase corto no se declara dos veces en el mismo archivo». §7.3: «toda regla táctil lleva :root».",
+    "hay_en_el_build": ".tabla-caja declarada dos veces fuera de media query (líneas 362 y 407); .dos, .nota, .f y .search declaradas y nunca usadas; seis reglas [data-tacto=\"dedo\"] escritas sin :root, con .acciones .iconbtn{width:28px} declarada después. 18 de los 83 tokens declarados no se usan.",
+    "selector": "[data-tacto=\"dedo\"] .iconbtn, .tabla-caja",
+    "evidencia": "Brief: regla_data_tacto_sin_root = 6; tokens declarados 83, usados 65. Comprobado midiendo con data-tacto=\"dedo\" puesto: .cromo-top .iconbtn pasa a 46×46px y .it a min-height 46px — aquí sí ganan, porque la pantalla no dibuja ningún .acciones .iconbtn que los empate. El bug está escrito, no manifiesto.",
+    "por_que_importa": "Severidad baja porque medido no falla, pero la frontera de error arrastra el CSS completo del dashboard (tablas densas, formularios, bandeja de dos paneles) que no usa, con los choques de nombre y la regla táctil defectuosa que §10 y §7.3 avisan."
+   }
+  ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 3,
+   "rendimiento": "no_evaluado",
+   "theming": 4,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "Es la pantalla mejor resuelta de las tres de dashboard del lote y la única que acierta en lo que más pesa de §6.4: los tres estados llevan <h1> real (no <b>), el error dice las tres cosas en orden —qué pasó, qué no se ha perdido, qué hacer— y da referencia citable, los botones llegan a 44px, hay skip link, role=\"alert\" y tabindex=\"-1\" ya puestos. Accesibilidad 3 y no 4 porque el cambio de estado no se anuncia ni mueve el foco, hay 18 elementos por debajo de 12px y las barras del esqueleto llevan texto. Theming 4: tres bloques de tema completos y la captura en oscuro pinta bien. Integridad 2: el isotipo recortado 32,46px (§10 trampa 5), el --text-3 obsoleto, --on-state sin declarar, .tabla-caja declarada dos veces y 18 de 83 tokens sin usar por arrastrar el arquetipo entero. Responsive 3: los cortes del cromo están bien, y la tarjeta de 560px se adapta sola.",
+  "evidencia": [
+   "getBoundingClientRect del isotipo: <svg> en x=96, <use> en x=63,54 → 32,46px de desplazamiento",
+   "querySelector('h1,h2,h3,h4') devuelve encabezado real en .state-empty y .state-error (a diferencia de 26 y 51)",
+   "Estilo calculado: 18 elementos con texto por debajo de 12px",
+   "querySelectorAll('.skel') = 7, todas con textContent 'x'",
+   "innerText: dos bloques siempre visibles de 167 y 156 caracteres",
+   "Capturas --ok.png y --empty.png: el mismo .aviso alineado a la izquierda en un estado y centrado en otro",
+   "Captura --oscuro.png: los dos temas pintan correctamente"
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 2,
+   "hallazgo": "El contenido explica muy bien en qué punto falló (al pintar, después de que el servidor respondiera), pero el cambio de vista no se anuncia ni mueve el foco, y el esqueleto de reintento no se parece a lo que va a llegar.",
+   "selector": "main#contenido[data-state]"
+  },
+  {
+   "n": 2,
+   "heuristica": "Correspondencia entre el sistema y el mundo real",
+   "severidad": 3,
+   "hallazgo": "«Tampoco hay menú al que ir» se dice con el menú completo dibujado y operativo a 236px a la izquierda. El modelo que el texto describe no es el que la pantalla muestra.",
+   "selector": ".state-empty .aviso > p"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 0,
+   "hallazgo": "Cada estado ofrece salida: «Reintentar» + «Ir al tablero», «Volver a cargar», «Ir al tablero» + «Avisar a soporte». La acción principal va primera y el camino de vuelta siempre existe.",
+   "selector": ".aviso .acc"
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 2,
+   "hallazgo": "La tarjeta de estado usa los valores de .tarjeta (--r-card, --sh-rest) donde §6.4 pide los de diálogo (--r-modal, --sh-modal), el medallón es de 44px en relleno pálido en vez de 52px en color sólido, y el mismo componente se alinea a la izquierda en un estado y al centro en otros dos.",
+   "selector": ".aviso, .aviso .marca"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 1,
+   "hallazgo": "El estado de reintento fallido dice expresamente «no tiene sentido seguir pulsando», que es justo la prevención que hace falta. Falta que el botón se bloquee mientras el reintento está en vuelo.",
+   "selector": ".state-error .acc .btn"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocimiento antes que recuerdo",
+   "severidad": 2,
+   "hallazgo": "La referencia (FR-20260826-0714) se pinta a 11,5px y no se puede copiar: hay que transcribirla a mano, aunque el texto diga «no hace falta que copies nada».",
+   "selector": "p.ref code"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 1,
+   "hallazgo": "No hay forma de ver el detalle técnico del fallo para quien pueda interpretarlo (un toggletip §6.23 bastaría), ni de enviar el aviso a soporte sin salir de la tarjeta.",
+   "selector": ".aviso"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 1,
+   "hallazgo": "Dos bloques pasan el tope de ~140 caracteres (167 y 156) y el .gris de cierre repite en parte lo que ya dijo el párrafo anterior. El exceso es pequeño comparado con el resto del lote.",
+   "selector": ".state-empty .aviso > p, .gris"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de los errores",
+   "severidad": 1,
+   "hallazgo": "Es el punto fuerte de la pantalla: los tres estados dicen qué falló, qué no se ha perdido («si venías de guardar algo, se guardó»), qué hacer y con qué referencia, y distinguen tres fallos distintos con tres textos distintos. Lo que resta puntos es que llega sin anunciarse y sin mover el foco.",
+   "selector": ".aviso"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 1,
+   "hallazgo": "«Avisar a soporte» solo aparece en el tercer estado; en los dos primeros hay que deducir que la referencia sirve para pedir ayuda. Y el botón no dice qué se enviará hasta que se lee el .gris de debajo.",
+   "selector": ".state-error .acc"
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-104",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-104 (media): «La certificación ISO 9001 en curso exige crear procedimientos normalizados y formatos de registro que hoy no existen de forma estandarizada entre departamentos.» La pantalla emite un registro normalizado de incidente en los tres estados (FR-20260826-0714, FR-20260826-0701) y declara que ya quedó registrado sin intervención del usuario. Es el formato de registro que el pain point pide, aplicado a los fallos de la aplicación."
+   },
+   {
+    "pp": "pp-105",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-105 (baja): el proyecto anterior «se detuvo en la fase de maquetado visual sin avanzar a desarrollo funcional». Una frontera de error es una pieza que solo tiene sentido en un sistema funcional: su existencia en el entregable señala que esta vez se está diseñando el comportamiento y no solo la vista. La cobertura es parcial porque el cambio de estado no se anuncia ni mueve el foco, de modo que la parte de comportamiento sigue a medias."
+   },
+   {
+    "pp": "pp-100",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-100 (alta): «No existe repositorio centralizado de contratos comerciales; cada área guarda su copia de forma aislada, generando cobros inconsistentes.» La pantalla es transversal de interfaz y no toca el dolor documental del área. Lo cito para dejar constancia de que el pain point de mayor severidad del área no tiene relación con esta pantalla."
+   }
+  ],
+  "usabilidad_para_el_area": "Para soporte administrativo transversal esta pantalla hace exactamente lo que el área necesita de un fallo: dice qué pasó, tranquiliza sobre lo guardado, da una referencia ya registrada y afirma que no hace falta copiar nada — eso convierte una llamada confusa en un ticket con número, que es la forma de registro que pp-104 pide para la ISO. Dos cosas lo estropean. La primera es que un estado afirma que no hay menú mientras el menú está ahí, lo que enseña a desconfiar del mensaje. La segunda es que la referencia se pinta a 11,5px y no se puede copiar, justo después de decir que no hace falta copiarla: quien llame a Sistemas va a tener que dictarla de memoria. Con un botón de copiar (§6.19, la variante que confirma en el sitio) y el párrafo del menú corregido, esta pantalla sería la mejor del lote sin discusión."
+ },
+ "cobertura": [
+  {
+   "patron": "Choque de valor entre los dos documentos del sistema. docs/sistema-diseno-acceso-sio-dproma.md declara --text-3:#66717F (línea 35), --sh-modal con .20 (línea 136) y --glass con .74 (línea 137); docs/sistema-diseno-sio-dproma.md declara #5C6675 (línea 64), .22 (línea 519) y .66 (línea 520). Esta maqueta trae los valores canónicos de --sh-modal y --glass pero el --text-3 del documento histórico: el token obsoleto viaja solo, en un :root por lo demás correcto.",
+   "propuesta_de_regla": "§1.1 — Fuente de verdad única de los tokens. El documento de acceso queda marcado como histórico en su encabezado y deja de declarar valores: remite a §1.1 del documento principal para todo token compartido y conserva solo los patrones exclusivos de la pantalla de entrada (§7.1 .split/.brand/main.access y §6.1 .gbtn). Donde un token exista en los dos, gana el del principal sin excepción, y el del histórico se retira del archivo en lugar de dejarse como alternativa."
+  },
+  {
+   "patron": "§6.4 define el error como una vista dentro de la pantalla («el estado ocupa la zona de contenido, no la pantalla»), pero no dice nada del caso en que lo que falla es el propio montaje de la aplicación, cuando no hay pantalla ni zona de contenido que ocupar. La maqueta inventa tres niveles —falla el render de una pantalla, falla el arranque de la aplicación, falla el reintento— y los distingue bien, pero sin regla escrita y con una incoherencia visible: el cromo sigue dibujado en el nivel donde el texto dice que no debería existir.",
+   "propuesta_de_regla": "§6.4.1 — Frontera de error. Hay tres niveles y se distinguen por lo que queda en pie. (1) Falla una pantalla: el error ocupa la zona de contenido, el cromo se mantiene y el texto puede ofrecer el menú como salida. (2) Falla el arranque de la aplicación: no hay cromo que dibujar — la frontera ocupa la ventana entera, con el isotipo en lugar de la barra lateral, y no nombra ningún destino interno. (3) Falla el reintento: misma forma que (1), y el texto dice expresamente que repetir no va a arreglarlo. Los tres llevan referencia de incidente con la forma AAA-AAAAMMDD-NNNN y declaran si ya quedó registrada. Nunca se dibuja el nivel 2 con el cromo visible: la contradicción entre lo que el texto afirma y lo que la pantalla muestra es peor que un error sin explicar."
+  },
+  {
+   "patron": "La referencia de incidente aparece en tres pantallas del lote (FR-…, CAT-…, ACC-…) siempre como texto plano que el usuario tiene que transcribir, y en dos de ellas por debajo del suelo de 12px. §6.19 ya documenta la variante .iconbtn.copiar.hecho que confirma en el sitio (cambia icono, cambia aria-label y lo anuncia por aria-live, con respaldo por textarea para file://), pero nada la conecta con la referencia del error de §6.4.",
+   "propuesta_de_regla": "§6.4 regla 3 (ampliación) — La referencia del error es un dato para dictar o pegar, no texto de lectura: va en --fs-dense como mínimo, en cifras tabulares, y lleva siempre al lado el botón de copiar de §6.19 con su confirmación en el sitio. Un texto que diga «no hace falta que copies nada» solo es cierto si existe ese botón; si no existe, se retira la frase."
+  },
+  {
+   "patron": "El documento principal se contradice a sí mismo sobre el anillo de foco en fondo oscuro: §1.2 (línea 138) asigna #C7D97B a «el wordmark y el anillo de foco sobre fondo oscuro» y §1.5 (línea 324) asigna la misma descripción a --chrome-focus #9FE0AE. Esta maqueta sigue §1.5 con .side :focus-visible{outline-color:var(--chrome-focus)}; 01_login sigue §1.2 con #C7D97B literal.",
+   "propuesta_de_regla": "§1.5 — Un solo anillo de foco sobre fondo oscuro: --chrome-focus (#9FE0AE), en el cromo y en cualquier otra superficie oscura de la aplicación, incluida la columna de marca del acceso. El verde lima #C7D97B queda reservado al wordmark y al isotipo, y §1.2 se corrige para no nombrar el foco."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática, sin backend que perfilar",
+  "contraste: el único fallo que trae el brief (span.cromo-av, 3,05:1 sobre rgba(62,122,76,.10)) es un artefacto del método de medición, que trata el rgba como si fuera opaco. El avatar vive dentro de .cromo-top, cuyo fondo es --surface, y compuesto de verdad el par supera con holgura 4,5:1. Lo descarto como fallo de contraste, pero sí cuento su tamaño de 11px (§2.1 / §10 trampa 1). No hay ningún otro fallo de contraste en la pantalla",
+  "§12 gráficas, §6.11 tablas y §6.16 formularios: la pantalla no dibuja canvas, ni tabla, ni campo de formulario (brief: tablas=0, inputs=0), aunque su hoja de estilos los declare. No se evalúan",
+  "§6.18 diálogo modal: no hay ningún diálogo (brief: dialogNativo=0, divDialog=0); no procede",
+  "modo dedo: comprobado activando data-tacto=\"dedo\" desde el navegador porque la pantalla no ofrece forma de activarlo; no hay control de tacto en el markup ni en el JS"
+ ]
+}

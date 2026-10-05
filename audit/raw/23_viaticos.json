@@ -1,0 +1,339 @@
+{
+  "pantalla": "23_viaticos",
+  "ruta_zip": "05-direccion-y-administracion/23_viaticos.html",
+  "carpeta": "05-direccion-y-administracion",
+  "area": "finanzas",
+  "arquetipo": "bandeja",
+  "modo": "cumplimiento",
+  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
+  "capturas": [
+    "23_viaticos--ok.png",
+    "23_viaticos--loading.png",
+    "23_viaticos--empty.png",
+    "23_viaticos--error.png",
+    "23_viaticos--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-23viaticos-01",
+        "severidad": "alta",
+        "regla": "§6.10 Etiqueta de estado .pill",
+        "dice_el_sistema": "Lleva color + icono + texto, nunca color a secas. .pill{...gap:5px} con .msi{font-size:15px}. Todas las de una familia se ven como una familia.",
+        "hay_en_el_build": "<span class=\"pill p-neutro\">Por aprobar</span>, <span class=\"pill p-err\">Rechazado</span>, <span class=\"pill p-ok\">Aprobado</span>, <span class=\"pill p-warn\">En revisión</span> — ninguna lleva icono.",
+        "selector": ".pill.p-neutro, .pill.p-ok, .pill.p-warn, .pill.p-err",
+        "evidencia": "23_viaticos--ok.png: las cinco etiquetas de las columnas «Aprobación del gasto» y «Comprobación de papeles» son texto plano sobre fondo de color. Medido en el fuente: 16 .pill en el <tbody> y 0 <svg class=\"ico\"> dentro de ninguna.",
+        "por_que_importa": "Toda la bandeja decide con esas dos columnas. Sin icono, el estado se comunica solo con color + palabra; quien no distingue el verde del ámbar (y el ámbar de .p-neutro a 11px es muy tenue) tiene que leer palabra por palabra las seis filas en vez de barrerlas."
+      },
+      {
+        "id": "f1-23viaticos-02",
+        "severidad": "alta",
+        "regla": "§6.10 — clases documentadas del semáforo",
+        "dice_el_sistema": "Clases: .p-ok, .p-warn, .p-err, .p-block, .p-pause (cada una -bg de fondo, -ink de texto). «--pause: Inactivo, en pausa — no es un fallo» (§1.3).",
+        "hay_en_el_build": ".p-neutro{background:var(--surface-2);color:var(--text-2)} — clase inventada, usada en 11 de las 16 etiquetas («Por aprobar», «Sin comprobar»).",
+        "selector": ".p-neutro (línea 457)",
+        "evidencia": "grep del <style>: .p-ok/.p-warn/.p-err declaradas (líneas 452-454), .p-block y .p-pause ausentes; --pause y --pause-fill figuran en «declarados_sin_usar» del brief.",
+        "por_que_importa": "«Por aprobar» pintado con --surface-2 es el mismo gris que usa el hover de fila (§6.11), así que el estado más frecuente de la bandeja desaparece sobre una fila al pasar el cursor. El sistema ya tenía un estado para «todavía no pasa nada»: --pause."
+      },
+      {
+        "id": "f1-23viaticos-03",
+        "severidad": "alta",
+        "regla": "§2.1 El suelo son 12px. «Nada baja de ahí.»",
+        "dice_el_sistema": "«si un dato se lee todos los días, va a 12-13px como mínimo». Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+        "hay_en_el_build": "25 declaraciones font-size:11px, 3 de 11,5px y 6 de 10,5px en el <style>, más font-size:11px en línea en cada celda de fechas. Afecta a: thead th (11px), .pill (11px), .std «estándar $3,800» (11px), .dif (11px), .justifica (11,5px), .motivo-r (11px), .porque-no (10,5px), .parcial (11px), .ref (11px).",
+        "selector": "thead th, .pill, .std, .dif, .justifica, .porque-no, .motivo-r",
+        "evidencia": "Estilo calculado (§10 trampa 1) en 1440×900: 23 agrupaciones distintas por debajo de 12px, entre ellas 5 <th> a 11px y 6 .pill a 11px. --fs-meta sí vale 12px en :root (línea 13): los 11px son literales que se saltan el token.",
+        "por_que_importa": "Es la pantalla con la que finanzas aprueba dinero todos los días. El monto estándar contra el que se compara el gasto («estándar $3,800») y el motivo del rechazo se leen a 11px: justo los dos datos que deciden si se aprueba."
+      },
+      {
+        "id": "f1-23viaticos-04",
+        "severidad": "alta",
+        "regla": "§6.12 regla 8 — «un control con pinta de interactivo tiene que interactuar»",
+        "dice_el_sistema": "Sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero.",
+        "hay_en_el_build": "Cuatro .schip con type=\"button\" y aria-pressed=\"false\" (data-f=\"warn|ok|err\") y el control segmentado .seg con aria-pressed. El único querySelectorAll del <script> es querySelectorAll('.demo [data-set]'): no existe ningún manejador para [data-f], para .seg ni para #buscar.",
+        "selector": ".p4-f .schip[data-f], .p4-f .seg button, #buscar",
+        "evidencia": "grep sobre el archivo: 6 addEventListener en total, todos del andamio, del tema o del menú; 0 referencias a data-f o a .seg en el JS. Además <html data-density=\"comfy\"> no tiene ninguna regla CSS que lea [data-density]: la clase compacta real se llama .denso (línea 381) y no se aplica a nada.",
+        "por_que_importa": "Los cuatro contadores son la única vía de filtrado de la pantalla y el conmutador de densidad es el único control de visualización. Anunciarlos como pulsados/no pulsados a un lector de pantalla y que no pase nada convierte la bandeja en una imagen."
+      },
+      {
+        "id": "f1-23viaticos-05",
+        "severidad": "alta",
+        "regla": "§6.4 Vistas de estado — .tarjeta-estado y encabezado real",
+        "dice_el_sistema": ".tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)} va opaca; .estado-ico{52px;border-radius:50%;background:var(--accent)}. «cada estado lleva encabezado real, no un <b>»; «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo» (§11).",
+        "hay_en_el_build": "<div class=\"state state-error\"><svg class=\"ico\">…<b>No se pudo cargar el listado de viáticos</b>…",
+        "selector": ".state.state-error, .state.state-empty",
+        "evidencia": "Estilo calculado del nodo .state-error: max-width «none», border-radius «0px», box-shadow «none», background «rgba(0,0,0,0)»; hijos = svg,B,P,P,DIV (ningún h1-h4); el icono mide 30×30px en vez del medallón de 52px. 23_viaticos--error.png lo muestra flotando sobre el fondo de página.",
+        "por_que_importa": "Sin encabezado real el error no aparece en la lista de encabezados de un lector de pantalla, y sin tarjeta queda a la misma altura visual que el contenido que acaba de desaparecer. La referencia (VIA-20260821-1418) sí está, que es lo que §6.4 regla 3 pide."
+      },
+      {
+        "id": "f1-23viaticos-06",
+        "severidad": "media",
+        "regla": "§6.11 regla 7 + §6.12 regla 9",
+        "dice_el_sistema": "«Una celda no lleva un párrafo. En la celda va la etiqueta; el matiz va a etiqueta emergente o a la ficha.» «La razón de un estado va al detalle del registro, no a la celda.»",
+        "hay_en_el_build": "Celda «Monto y excedente»: «El hotel del tabulador estaba lleno por la feria; el más cercano con disponibilidad costaba $400 más la noche.» (116 caracteres). Celda «Aprobación del gasto»: «Motivo: «El vuelo no procede para un trayecto de 3 h por carretera. Se aprueba de nuevo si viaja en autobús.»» (107). Celda «Acciones»: «No puedes aprobar tu propia solicitud. La aprueba tu jefe directo.»",
+        "selector": "td .justifica, td .motivo-r, td .porque-no",
+        "evidencia": "Altura real de las cuatro primeras <tr> medida en 1440px: 160,8 / 100,1 / 126,8 / 111 px, frente a --row-comfy = 40px. 23_viaticos--ok.png: sólo caben cuatro filas y media en la ventana.",
+        "por_que_importa": "La bandeja se dimensionó para 6 solicitudes. Con la carga real de viáticos de un mes, cada fila de 160px obliga a desplazarse por párrafos para localizar las dos que están «por aprobar»; es lo contrario de un listado denso."
+      },
+      {
+        "id": "f1-23viaticos-07",
+        "severidad": "media",
+        "regla": "§6.11 reglas 3 y 9",
+        "dice_el_sistema": "«aria-sort en todas las columnas ordenables, incluidas las que aún no ordenan (aria-sort=\"none\")». «Registros por página elegibles: selector de 10 / 25 / 50 / 100, recordado entre sesiones.»",
+        "hay_en_el_build": "Ningún <th> declara aria-sort (brief: thAriaSort 0 sobre 13 th) y no hay ningún <div class=\"tfoot\"> en el markup, aunque el <style> trae .tfoot (línea 390), .tfoot .pag (441) y thead th[aria-sort=\"ascending\"] .sort (377).",
+        "selector": "thead th, .tfoot",
+        "evidencia": "grep: 'aria-sort' aparece sólo en dos selectores CSS y en ninguna etiqueta; 'tfoot' aparece sólo en CSS. 23_viaticos--ok.png no muestra pie de tabla.",
+        "por_que_importa": "La hoja de estilos está escrita para una tabla ordenable y paginada que el markup no construye. Sin ordenar por fecha de regreso no hay forma de ver qué comprobaciones vencen antes, que es el trabajo que la pantalla existe para hacer."
+      },
+      {
+        "id": "f1-23viaticos-08",
+        "severidad": "media",
+        "regla": "§6.16 — botón deshabilitado",
+        "dice_el_sistema": "«Un botón deshabilitado no recibe el foco → aria-disabled=\"true\" + aria-describedby con el motivo, y al pulsarlo se explica.»",
+        "hay_en_el_build": "<button class=\"btn mini\" type=\"button\" disabled>Aprobar</button> seguido de <span class=\"porque-no\">No puedes aprobar tu propia solicitud…</span>, sin id ni aria-describedby que los una.",
+        "selector": ".acciones button[disabled] + .porque-no",
+        "evidencia": "Fila VI-2026-0730 en 23_viaticos--ok.png: el motivo se ve, pero el atributo disabled saca el botón del recorrido de teclado, así que quien navega con Tab nunca llega al control ni a su explicación.",
+        "por_que_importa": "Es la regla de autorización más importante de la pantalla (nadie aprueba su propio viático) y es justo la que un lector de pantalla no llega a oír."
+      },
+      {
+        "id": "f1-23viaticos-09",
+        "severidad": "media",
+        "regla": "§6.7 Esqueleto de carga",
+        "dice_el_sistema": "«Imita la forma de lo que va a llegar: mismas columnas, mismos anchos (en fr) y el mismo alto.» Tabla: .sk-fila{min-height:67px}, .sk-cab{min-height:35px}. A11y: «sin texto real dentro de las barras». prefers-reduced-motion «aplana el fondo»: {.skel{animation:none;background:var(--surface-2)}}. «El punto de ruptura del esqueleto es el de la tabla (860px, no 900px).»",
+        "hay_en_el_build": ".skel{height:12px} fijo para todas las barras; no hay .sk-cab en el markup; las barras llevan texto real («VI-2026-0000», «nombre y departamento», «motivo del viaje»); @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer el fondo; @media (max-width:900px){.sk-fila{…}}.",
+        "selector": ".state-loading .skel, .sk-fila",
+        "evidencia": "Medido: filas reales 160,8/100,1/126,8/111px frente a seis barras de esqueleto de 12px cada una (altura total del bloque 164px). Con reducedMotion:'reduce' emulado, animation-name «none» pero background-image sigue siendo el linear-gradient(90deg, rgb(231,237,243) 25%, …) congelado. 23_viaticos--loading.png.",
+        "por_que_importa": "El esqueleto promete una tabla de seis renglones finos y llega una de cuatro bloques de 100-160px: el salto de maquetación es de más de 500px. Y quien pide movimiento reducido ve un degradado detenido a mitad, no una superficie limpia."
+      },
+      {
+        "id": "f1-23viaticos-10",
+        "severidad": "media",
+        "regla": "§8 límites de voz (Anexo B) y §6.9",
+        "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto. No hay excepción por importancia del contenido.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres.»",
+        "hay_en_el_build": "Banda .b-err de cabecera: «Rubén Beltrán Ochoa no puede pedir un viático nuevo. Tiene el comprobante de VI-2026-0709 rechazado y $640 sin comprobar desde el 6 de agosto. El plazo eran 3 días hábiles tras el regreso — y la semana hábil va de lunes a sábado. Como es instalador externo, si el gasto no se comprueba el descuento se aplica a su jefe directo, Nayeli Cruz Padilla, que fue quien lo asignó.» — 4 frases, 389 caracteres.",
+        "selector": ".banda.b-err > p",
+        "evidencia": "Conteo de caracteres sobre el texto del nodo: 389. 23_viaticos--ok.png: la banda ocupa tres líneas completas y 90px de alto por encima de la tabla.",
+        "por_que_importa": "El contenido es correcto y es el dato más accionable de la pantalla, pero a 389 caracteres se lee como un párrafo de ayuda y se salta. La regla ya prevé la salida: la frase que bloquea queda, el resto va al toggletip (§6.23) o a la ficha."
+      },
+      {
+        "id": "f1-23viaticos-11",
+        "severidad": "media",
+        "regla": "§7.3 Objetivos táctiles + §10 trampa 4",
+        "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo.» «Enlaces que son el elemento primario de su fila (folio, miga, «Ver en Maps»): no son texto en prosa, llevan padding hasta llegar a 24px.» «Un <input> de búsqueda dentro de un <div> con forma de pastilla no cumple — el contenedor tiene que ser una <label for=…>.»",
+        "hay_en_el_build": "Los seis <a class=\"folio\"> miden 98,1×15px. El buscador es <div class=\"search\"><svg…><input id=\"buscar\"></div> y el <input> mide 329×15px.",
+        "selector": "a.folio, .search > input#buscar",
+        "evidencia": "Brief, tactil_24px: 7 de 44 destinos por debajo de 24px, los 7 listados son los folios y el input de búsqueda. Verificado con data-tacto=\"dedo\" puesto: siguen en 15px y 12 destinos quedan por debajo de 44px.",
+        "por_que_importa": "El folio es la entrada principal a cada solicitud. Y además, con data-tacto=\"dedo\" activado la regla no gana: las seis declaraciones [data-tacto=\"dedo\"] del archivo se escriben sin :root (§7.3)."
+      },
+      {
+        "id": "f1-23viaticos-12",
+        "severidad": "media",
+        "regla": "§10 trampa 5 — isotipo",
+        "dice_el_sistema": "Correcto: <svg width=\"44\" height=\"42\"><use href=\"#dproma-mark\" width=\"44\" height=\"42\"/></svg> — medidas en el <use> y sin viewBox en el envoltorio. «Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal.»",
+        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> — viewBox repetido en el envoltorio y <use> sin medidas.",
+        "selector": ".logo svg > use",
+        "evidencia": "Medido con getBoundingClientRect(): caja del <svg> x=96, caja del <use> x=63,5 → desplazamiento −32,5px, exactamente el valor que §10 trampa 5 documenta. 23_viaticos--ok.png: en la barra lateral se ve una astilla verde, no la marca.",
+        "por_que_importa": "La marca aparece recortada en todas las pantallas del lote y en los dos temas. Es el elemento más repetido del producto."
+      },
+      {
+        "id": "f1-23viaticos-13",
+        "severidad": "media",
+        "regla": "§1.1 — valor de --text-3",
+        "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2).»",
+        "hay_en_el_build": "--text-3: #66717F.",
+        "selector": ":root",
+        "evidencia": "Brief, tokens.text_3_declarado: «#66717F». La pantalla usa --surface-2 en thead th, en el hover de fila y en .p-neutro.",
+        "por_que_importa": "Hecho ya establecido para 51 de 52 maquetas; se marca aquí porque esta pantalla pinta con --text-3 las fechas del viaje y los montos estándar dentro de celdas que al pasar el cursor caen sobre --surface-2."
+      },
+      {
+        "id": "f1-23viaticos-14",
+        "severidad": "media",
+        "regla": "§6.12 regla 3 — contadores agrupados por criterio",
+        "dice_el_sistema": "«Contadores agrupados por criterio, con rótulo por grupo.»",
+        "hay_en_el_build": "Cuatro .schip en una sola fila sin rótulo: «2 por aprobar» (c-warn), «2 por encima del estándar» (c-warn), «1 comprobado» (c-ok), «1 con comprobante rechazado» (c-err). Mezclan tres criterios distintos: estado de aprobación, relación con el estándar y estado de comprobación.",
+        "selector": ".p4-f > .schip",
+        "evidencia": "23_viaticos--ok.png. Los dos primeros comparten la clase de color c-warn pese a medir cosas distintas, y los iconos (reloj vs triángulo) no nombran el criterio.",
+        "por_que_importa": "Las dos últimas columnas de la tabla son dos procesos distintos (aprobación del gasto / comprobación de papeles) y la propia pantalla lo dice en su nota; la fila de contadores los vuelve a mezclar."
+      },
+      {
+        "id": "f1-23viaticos-15",
+        "severidad": "baja",
+        "regla": "§6.9 nomenclatura de .banda",
+        "dice_el_sistema": "Cuatro variantes: .banda-info, .banda-warn, .banda-err, .banda-ok.",
+        "hay_en_el_build": ".banda.b-err, .banda.b-warn, .banda.b-ok, .banda.b-info.",
+        "selector": ".banda.b-err",
+        "evidencia": "Líneas 521-523 del <style>. Los tokens de fondo/tinta sí son los correctos (--err-bg/--err-ink).",
+        "por_que_importa": "Funciona igual; sólo diverge del nombre documentado, lo que complica el grep de auditoría entre maquetas."
+      },
+      {
+        "id": "f1-23viaticos-16",
+        "severidad": "baja",
+        "regla": "§2.1 — excepción de los 10,5px",
+        "dice_el_sistema": "«Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.»",
+        "hay_en_el_build": "Los seis <p class=\"grp\"> («Principal», «Operación», «ICEV»…) van a 10,5px con text-transform computado «none».",
+        "selector": ".side .grp",
+        "evidencia": "Estilo calculado: font-size 10.5px, text-transform «none». 23_viaticos--ok.png: los rótulos se leen en caja mixta.",
+        "por_que_importa": "La excepción se concedió para texto en mayúsculas, donde la altura de x compensa. En caja mixta a 10,5px no hay excepción que lo cubra."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 1,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 2,
+      "integridad": 1
+    },
+    "justificacion": "El fondo informativo de la pantalla es bueno —el caso de Rubén Beltrán, la separación de los dos procesos de aprobación y comprobación, el texto del error— y el tema oscuro resuelve de verdad, con tokens propios y no con un filtro. Pero la ejecución no sostiene nada de eso: 23 agrupaciones de texto por debajo del suelo de 12px en la pantalla con la que se aprueba dinero, etiquetas de estado sin icono, estados de vacío y error sin tarjeta ni encabezado real, y una hoja de estilos escrita para una tabla ordenable, paginada y con densidad conmutable cuyo markup y JS no existen. La integridad es lo más bajo: los cuatro contadores, el conmutador de densidad y el buscador anuncian estado (aria-pressed) y no tienen un solo manejador. Responsive sube a 2 porque el modo tarjeta de 860px sí está escrito y el padding de .p4-* se adapta a 1280px, pero el esqueleto rompe a 900px en vez de a 860.",
+    "evidencia": [
+      "Estilo calculado a 1440×900: 23 agrupaciones con font-size < 12px (5 <th> a 11px, 6 .pill a 11px, texto de justificación a 11,5px).",
+      "grep del <script>: 6 addEventListener, todos de andamio/tema/menú; 0 manejadores para .schip[data-f], .seg o #buscar.",
+      ".state-error calculado: max-width none, border-radius 0px, box-shadow none, fondo transparente, encabezado <b>, icono 30×30 (§6.4 pide 480px, --r-modal, --sh-modal y medallón de 52px).",
+      "Esqueleto: barras de 12px frente a filas reales de 160,8/100,1/126,8/111px; ruptura a 900px en vez de 860px.",
+      "Isotipo: desplazamiento del <use> respecto al <svg> = −32,5px.",
+      "23_viaticos--oscuro.png: los dos temas se resuelven con juegos de tokens completos."
+    ]
+  },
+  "f4_nielsen": [
+    {
+      "n": 1,
+      "heuristica": "Visibilidad del estado del sistema",
+      "severidad": 3,
+      "hallazgo": "El cambio de vista (ok/cargando/vacío/error) se hace cambiando data-state en <main> sin anunciarlo por aria-live ni mover el foco, como pide §6.4 regla 1: no hay ningún aria-live en el archivo y el <script> no llama a focus(). Para quien usa lector de pantalla, la tabla desaparece y la página queda en silencio.",
+      "selector": "main#contenido[data-state]"
+    },
+    {
+      "n": 2,
+      "heuristica": "Correspondencia entre el sistema y el mundo real",
+      "severidad": 1,
+      "hallazgo": "El vocabulario es el del área y está bien elegido: «Aprobación del gasto» y «Comprobación de papeles» como dos procesos separados, «estándar», «excedente». La única fricción es «+$400» sin decir sobre qué, que se resuelve leyendo la línea de arriba.",
+      "selector": "thead th, .dif"
+    },
+    {
+      "n": 3,
+      "heuristica": "Control y libertad del usuario",
+      "severidad": 3,
+      "hallazgo": "No hay forma de deshacer una aprobación ni de salir de un filtro: «Aprobar» es un botón sin confirmación ni paso atrás, y los cuatro contadores de filtro no tienen pastillas aplicadas ni «Quitar todos los filtros» (§6.12 regla 4). Aprobar dinero es irreversible y aquí está a un clic.",
+      "selector": ".acciones .btn.mini.p, .p4-f"
+    },
+    {
+      "n": 4,
+      "heuristica": "Consistencia y estándares",
+      "severidad": 3,
+      "hallazgo": "Clase .p-neutro inventada donde el sistema ya tiene .p-pause; .banda renombrada a .b-*; .pill sin icono frente a la receta de §6.10; cabeceras de tabla a 11px cuando --fs-meta vale 12px en el mismo archivo. Cada divergencia es pequeña y todas juntas hacen que esta bandeja no se lea como las demás del módulo.",
+      "selector": ".p-neutro, .banda.b-err, thead th"
+    },
+    {
+      "n": 5,
+      "heuristica": "Prevención de errores",
+      "severidad": 2,
+      "hallazgo": "Lo hace bien en el caso difícil —bloquea el viático nuevo de quien debe comprobación y explica a quién se le descuenta— y en el de autoaprobación. Pierde puntos porque el botón que bloquea lleva disabled en vez de aria-disabled, de modo que el teclado nunca llega a la explicación.",
+      "selector": ".banda.b-err, .acciones button[disabled]"
+    },
+    {
+      "n": 6,
+      "heuristica": "Reconocer antes que recordar",
+      "severidad": 2,
+      "hallazgo": "El estándar de cada viaje se muestra junto al monto pedido, que es exactamente lo que evita recordarlo. Pero se pinta a 11px y en --text-3, con menos peso visual que el importe pedido, así que la comparación —el único juicio que la pantalla pide— es la parte más difícil de leer.",
+      "selector": ".montos .std"
+    },
+    {
+      "n": 7,
+      "heuristica": "Flexibilidad y eficiencia de uso",
+      "severidad": 4,
+      "hallazgo": "Ninguno de los aceleradores existe de verdad: buscador inerte, cuatro contadores-filtro inertes, conmutador Cómoda/Compacta inerte (el atributo data-density=\"comfy\" que escribe el <html> no lo lee ninguna regla; la clase real es .denso y no se aplica), sin ordenación por columna y sin paginación. Con seis filas da igual; con el volumen real de viáticos de un mes, la pantalla no tiene una sola vía de reducción.",
+      "selector": "#buscar, .schip[data-f], .seg, thead th"
+    },
+    {
+      "n": 8,
+      "heuristica": "Diseño estético y minimalista",
+      "severidad": 3,
+      "hallazgo": "Las celdas llevan párrafos (justificación de 116 caracteres, motivo de rechazo de 107) y la banda de cabecera 389. §6.11 regla 7 y §8 dicen lo contrario: en la celda va la etiqueta y el matiz va a la ficha. El resultado son filas de 100-160px en un componente llamado «tabla densa».",
+      "selector": "td .justifica, td .motivo-r, .banda.b-err > p"
+    },
+    {
+      "n": 9,
+      "heuristica": "Ayudar a reconocer y recuperarse de los errores",
+      "severidad": 2,
+      "hallazgo": "El texto del error es ejemplar y cumple las tres cosas de §6.4 regla 3 en orden («El servicio no respondió. Ninguna solicitud se aprobó ni se rechazó sola… no la des por aprobada») con su referencia VIA-20260821-1418. Lo que falla es el envase: sin tarjeta, sin medallón y con el título en <b>.",
+      "selector": ".state-error"
+    },
+    {
+      "n": 10,
+      "heuristica": "Ayuda y documentación",
+      "severidad": 2,
+      "hallazgo": "La pantalla explica reglas de negocio reales (plazo de 3 días hábiles, semana hábil hasta el sábado, a quién se descuenta) pero las deja siempre visibles en prosa en vez de usar el toggletip de §6.23, que es el nivel 2 de §8. No hay ningún .infob en la pantalla.",
+      "selector": ".banda.b-err, .porque-no"
+    }
+  ],
+  "f5_investigacion": {
+    "pain_points_evaluados": [
+      {
+        "pp": "pp-113",
+        "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+        "cobertura": "cubre",
+        "evidencia": "«La comprobación de viáticos llega tarde o no llega… No hay mecanismo que avise del plazo ni que escale el incumplimiento». La pantalla levanta ese mecanismo: la columna «Comprobación de papeles» con sus cuatro estados, el contador «1 con comprobante rechazado», y la banda que bloquea a Rubén Beltrán nombrando el plazo («3 días hábiles tras el regreso»), el saldo sin comprobar ($640) y el escalado explícito al jefe directo que lo asignó. Es la cobertura más completa de todo el lote."
+      },
+      {
+        "pp": "pp-096",
+        "documento": "data/insights/2026-07-31_finanzas-cobranza-almacen.json",
+        "cobertura": "cubre",
+        "evidencia": "«La comprobación fiscal de viáticos depende de un seguimiento manual de plazos estrictos; si el colaborador no cumple el plazo, debe cubrir el costo de su bolsillo». El plazo y la consecuencia aparecen escritos en la banda. Cobertura parcial: sólo para el caso que ya incumplió. No hay columna de días restantes ni ordenación por vencimiento (§6.11 regla 3 no se implementa), así que el seguimiento sigue siendo manual para las solicitudes que todavía están a tiempo, que es donde el aviso serviría."
+      },
+      {
+        "pp": "pp-027",
+        "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+        "cobertura": "cubre",
+        "evidencia": "«La solicitud y aprobación de viáticos… se gestiona a través de un grupo de WhatsApp, sin un flujo estructurado de solicitud-revisión». La bandeja es ese flujo: folio, solicitante con departamento y jefe directo, botones Aprobar/Rechazar y rastro del motivo de rechazo. Aunque los botones son inertes en la maqueta, el modelo de interacción está definido."
+      },
+      {
+        "pp": "pp-114",
+        "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+        "cobertura": "ignora",
+        "evidencia": "«La evidencia de gasto llega como fotografía de un recibo o nota simple, que no es fiscalizable. La deducción exige el par completo de archivos del comprobante fiscal». La columna de comprobación cuenta piezas sin tipo: «2 de 3 comprobantes» con una barra de progreso. No distingue XML de PDF, no dice si falta la mitad fiscal del par, y no hay ningún .subida (§6.17) ni ningún input[type=file] en la pantalla."
+      },
+      {
+        "pp": "pp-108",
+        "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+        "cobertura": "ignora",
+        "evidencia": "«Las áreas operativas piden dinero a cualquier hora y sin planificación previa, lo que convierte cada solicitud en una urgencia y deja a dirección gestionando el flujo de caja». La bandeja muestra las fechas del viaje pero no la fecha en que se pidió, ni la antelación entre una y otra, ni agrupa por semana. No hay forma de ver desde esta pantalla si una solicitud llegó con tiempo, que es el dato que convertiría el dolor en una métrica."
+      },
+      {
+        "pp": "pp-117",
+        "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+        "cobertura": "ignora",
+        "evidencia": "«Ninguna área tiene presupuesto mensual ni semanal asignado, de modo que no hay techo de gasto contra el que contrastar una solicitud». El único techo que ofrece la pantalla es el estándar por solicitud. El resumen de cabecera cuenta solicitudes («6 solicitudes · 2 por aprobar · 2 con excedente»), no dinero: no hay total pedido, ni acumulado del mes, ni consumo por departamento, pese a que la tabla ya guarda el departamento de cada solicitante."
+      },
+      {
+        "pp": "pp-093",
+        "documento": "data/insights/2026-07-31_finanzas-cobranza-almacen.json",
+        "cobertura": "ignora",
+        "evidencia": "«La gestión de caja chica y la validación de gastos de transporte público se realizan de forma manual, exigiendo comprobante fiscal caso por caso». La bandeja sólo contempla el viático con anticipo; no hay tipo de solicitud ni ruta para el gasto menor comprobado a posteriori."
+      }
+    ],
+    "usabilidad_para_el_area": "Es la pantalla del lote que mejor entiende a su área: resuelve de lleno el dolor más caro de viáticos (pp-113, comprobación que no llega y nadie escala) y lo hace con el detalle que sólo sale de la entrevista —el plazo de 3 días hábiles, la semana hábil hasta el sábado, el descuento al jefe directo del instalador externo—. También separa en dos columnas dos procesos que el área vive separados, aprobación del gasto y comprobación de papeles. Lo que no hace es cerrar el circuito económico: no hay dinero agregado, ni presupuesto, ni antelación de la solicitud, así que pp-108 y pp-117 —dos de los ocho dolores de severidad alta de la entrevista de administración y finanzas— quedan intactos, y pp-114 se queda en un contador de piezas sin distinguir la mitad fiscal. En lo operativo, además, el área no recibiría nada de lo que la pantalla aparenta: el buscador, los cuatro contadores-filtro y el conmutador de densidad no tienen lógica, y la tabla no ordena ni pagina, de modo que con el volumen real de un mes de viáticos la bandeja se recorrería a rueda del ratón."
+  },
+  "cobertura": [
+    {
+      "patron": "Columna que mide el avance de un trámite documental con texto y barra («2 de 3 comprobantes» con .parcial + barra de progreso) dentro de una celda de tabla densa. El sistema documenta .progreso (§12.4) para «avance contra una meta declarada» dentro de un widget de dashboard, pero no dice nada de su uso dentro de una celda, ni del tamaño mínimo de la barra, ni de si el texto va antes o después.",
+      "propuesta_de_regla": "§6.11.1 Avance dentro de celda — .avance. Cuándo: una celda que resume cuántas piezas de un conjunto cerrado se han recibido. Reusa .progreso (§12.4) a 4px de alto y ancho máximo de 120px, con el texto siempre delante de la barra y a --fs-dense en --text, nunca sólo la barra: la cifra es el dato y la barra es el apoyo. Lleva aria-hidden=\"true\" en la barra, porque el texto ya dice lo mismo. Si el conjunto no está cerrado (no se sabe cuántas piezas faltan), no se usa barra: se escribe la cuenta y basta."
+    },
+    {
+      "patron": "Etiqueta de estado neutra, para un trámite que todavía no ha empezado y que por tanto no admite juicio («Por aprobar», «Sin comprobar»). La maqueta inventa .p-neutro con --surface-2/--text-2. §6.10 enumera cinco clases y ninguna cubre «aún no ha pasado nada»: --pause significa «inactivo, en pausa» (algo que estaba en marcha y se detuvo), no «todavía sin empezar».",
+      "propuesta_de_regla": "§6.10 (ampliación) — estado inicial. Un trámite que aún no ha empezado usa .p-pause con el texto en futuro o en pasiva («Por aprobar», «Sin comprobar»), y nunca --surface-2 como fondo: ese token es el del hover de fila (§6.11) y la etiqueta desaparece al pasar el cursor. Si el equipo necesita distinguir «en pausa» de «sin empezar», se añade un sexto estado al semáforo con su terna base/-ink/-bg medida en los dos temas; lo que no se hace es resolverlo con una superficie de layout."
+    },
+    {
+      "patron": "Resumen de cabecera de bandeja escrito como frase corrida dentro de un <span class=\"resumen\"> junto al <h1> («6 solicitudes · 2 por aprobar · 2 con excedente»), distinto del componente .resumen + .schip de §6.12 que vive debajo del título. Dos cosas con el mismo nombre de clase en el mismo archivo, que es exactamente el riesgo que §10 trampa 10 nombra para .resumen.",
+      "propuesta_de_regla": "§6.12 (ampliación) — línea de contexto del título. La frase que acompaña al <h1> se llama .contexto, no .resumen, y queda reservada a cifras de sólo lectura separadas por «·», a --fs-meta y en --text-3. El nombre .resumen queda reservado al contenedor de contadores pulsables de §6.12. Regla de higiene: antes de escribir .algo{…} se busca grep -n '^\\.algo{' en el archivo (§10 trampa 10)."
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática servida por un servidor de ficheros, sin backend, sin librerías externas y sin red que perfilar.",
+    "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (0 <dialog> y 0 div[role=dialog] según el brief); «Rechazar…» sugiere uno pero no existe, así que no hay implementación que auditar.",
+    "§12 Gráficas: no hay ningún <canvas> ni ninguna gráfica en la pantalla.",
+    "§6.21 Barra de filtros con desplegable: no se evalúa como incumplimiento porque la pantalla no ofrece filtrado por campo categórico; se recoge como limitación funcional en F4 heurística 7."
+  ]
+}

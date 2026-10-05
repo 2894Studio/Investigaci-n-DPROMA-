@@ -1,0 +1,252 @@
+{
+ "pantalla": "09_app_checklist_instalacion",
+ "ruta_zip": "03-icev-instalacion-de-cargadores/09_app_checklist_instalacion.html",
+ "carpeta": "03-icev-instalacion-de-cargadores",
+ "area": "ICEV",
+ "arquetipo": "app de campo móvil",
+ "modo": "cobertura",
+ "estados_auditados": [
+  "ok",
+  "oscuro (es el único tema de arranque)",
+  "exterior/sol directo (tema propio no documentado)"
+ ],
+ "capturas": [
+  "09_app_checklist_instalacion--ok.png",
+  "09_app_checklist_instalacion--390.png (viewport 390x844, captura propia)",
+  "09_app_checklist_instalacion--390-full.png (página completa, incluye el panel explicativo lateral)"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "f1-09check-01",
+    "severidad": "alta",
+    "regla": "§2 Tipografía — D116, fuentes autoalojadas",
+    "dice_el_sistema": "«Las fuentes se autoalojan (D116). Prohibido el <link> a Google Fonts para las fuentes de interfaz: un CDN caído falla en silencio (incidencia real de 4 días sin detección). @font-face con font-display:swap sobre /fuentes/inter-variable.woff2»",
+    "hay_en_el_build": "<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap\" rel=\"stylesheet\"> más dos preconnect a fonts.googleapis.com y fonts.gstatic.com. Ningún @font-face.",
+    "selector": "head > link[href*=\"fonts.googleapis.com\"] (líneas 8-10)",
+    "evidencia": "Lectura del documento servido en http://127.0.0.1:8731/03-icev-instalacion-de-cargadores/09_app_checklist_instalacion.html; grep: 3 coincidencias de fonts.google*, 0 de @font-face.",
+    "por_que_importa": "D116 no es una regla de formato: vale igual en móvil que en escritorio, y aquí el riesgo es mayor, no menor. Esta es la pantalla que declara en su propio texto que el instalador «pasa buena parte de la jornada» sin señal: la fuente de interfaz es exactamente lo que no va a llegar. El fallo es silencioso — la pantalla se pinta con la fuente del sistema y nadie lo nota hasta que alguien compara."
+   },
+   {
+    "id": "f1-09check-02",
+    "severidad": "alta",
+    "regla": "§2.1 Suelo tipográfico",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» · «si un dato se lee todos los días, va a 12-13px como mínimo» · Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta",
+    "hay_en_el_build": "Nueve familias de texto por debajo de 12px calculados, incluidas las dos etiquetas que califican cada punto del checklist (10px) y el detalle técnico de cada punto (11,5px)",
+    "selector": ".badge.b-req, .badge.b-pend (10px) · .tx small (11,5px x6) · .hdr .tt small (11px) · .status .tnum (11,5px) · .ctanote (11px) · .sigpad (11,5px) · .sechead (10,5px)",
+    "evidencia": "Medición propia del estilo calculado (Playwright, 390x844): badge 10px x2, small 11,5px x6, small 11px, tnum 11,5px, ctanote 11px, sigpad 11,5px, sechead 10,5px en mayúsculas. .sechead no entra en la excepción: no es un rótulo de la barra lateral ni una etiqueta de campo del modo tarjeta, es el encabezado de sección del contenido.",
+    "por_que_importa": "«foto obligatoria» a 10px es la etiqueta que decide si el instalador puede cerrar el punto o no, y «220 V ± 5 % · medido: 218 V» a 11,5px es el dato técnico que justifica la marca. Se leen a pulso, al sol y con casco; §2.1 existe precisamente para este caso."
+   },
+   {
+    "id": "f1-09check-03",
+    "severidad": "media",
+    "regla": "§5 Movimiento — `--ease-spring` y `prefers-reduced-motion`",
+    "dice_el_sistema": "«--ease-spring … Solo píldora de pestañas y tarjeta de kanban» · «rebasa el valor final y vuelve: válido solo en un elemento que el usuario acaba de mover; en cualquier otro sitio se lee como inestabilidad» · reducción de movimiento: «se conservan opacidad y color, se elimina todo desplazamiento y escala»",
+    "hay_en_el_build": "`.chk{transition:… transform var(--dur-micro) var(--ease-spring)}` con `.row input:checked + .chk{transform:scale(1.06)}`; además `button:active{transform:scale(.97)}` y el toast con `transform:translate(-50%,14px)`. El bloque de reducción de movimiento solo remapea duraciones (--ease-spring:linear incluido), no retira ninguna transformación.",
+    "selector": ".chk, button:active, .toast",
+    "evidencia": "Lectura de las reglas @media (prefers-reduced-motion:reduce) resueltas en el navegador: una sola regla, ':root{--dur-micro:1ms;--dur-base:120ms;--dur-enter:120ms;--ease-spring:linear;--stagger:0ms}'. El panel explicativo de la propia maqueta lo declara como característica: «la caja hace un rebote de 120 ms».",
+    "por_que_importa": "El rebote va en la casilla, que es «el gesto más repetido de la jornada» según el propio texto de la maqueta: el uso que §5 reserva para dos componentes concretos acaba siendo el más frecuente de la pantalla. Y con movimiento reducido activado, la escala y el desplazamiento siguen ocurriendo — más rápido, pero ocurren."
+   },
+   {
+    "id": "f1-09check-04",
+    "severidad": "media",
+    "regla": "§6.16 (A11y extra) — botón deshabilitado",
+    "dice_el_sistema": "«Un botón deshabilitado no recibe el foco → aria-disabled=\"true\" + aria-describedby con el motivo, y al pulsarlo se explica»",
+    "hay_en_el_build": "Los dos controles bloqueados usan el atributo `disabled` y confían su motivo a un `aria-describedby` que nunca se va a leer, porque un botón `disabled` está fuera del recorrido de teclado",
+    "selector": "button.ctabtn#close[disabled][aria-describedby=\"closenote\"] · button.sigpad[disabled][aria-describedby=\"signote\"]",
+    "evidencia": "Lectura del markup (líneas 294 y 300-302). El motivo de la firma está además en un párrafo .sr («La firma autógrafa se captura en pantalla una vez completos los 13 puntos»): texto escrito solo para lectores de pantalla, colgado de un control que ningún lector de pantalla puede enfocar.",
+    "por_que_importa": "La pantalla hace bien lo difícil —el botón dice en su propia etiqueta «faltan 7 puntos»— y lo pierde en lo mecánico: quien navega con teclado o lector pasa de largo por los dos controles bloqueados y nunca recibe la explicación que alguien se molestó en escribir."
+   },
+   {
+    "id": "f1-09check-05",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla / §9 Andamiaje de maqueta",
+    "dice_el_sistema": "§6.4: «toda pantalla que pida datos — cuatro formas: con datos, cargando, vacía, con error. No son un extra: son la pantalla» · §9: «Se marca siempre con data-andamio, va visualmente separado del producto y rotulado. Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra»",
+    "hay_en_el_build": "Una sola vista (con datos). No hay cargando, ni vacía, ni error — y el checklist se sirve de un servidor, con tres elementos pendientes de sincronizar. El andamiaje que sí existe (marco de teléfono, barra de estado simulada con hora y batería, panel explicativo «Qué cambia respecto de la v1», conmutador de modo) no lleva data-andamio en ningún sitio.",
+    "selector": "main.phone, .status, aside.cap, .switch",
+    "evidencia": "Brief: capturas_disponibles solo 'ok'; grep data-andamio en el archivo: 0 coincidencias (frente a 1 en 28_instalador_mi_dia y en 47_asistente). Medición táctil propia: los dos únicos destinos por debajo de 44px de toda la página son los botones del conmutador de modo del panel explicativo (110x30 y 186x30) — es decir, andamiaje sin marcar que además contamina la medición de la pantalla.",
+    "por_que_importa": "Sin vista de error, un checklist que no carga deja al instalador delante de una pantalla en blanco a mitad de instalación. Y sin data-andamio nadie puede retirar con un selector el marco del teléfono ni la barra de estado falsa: la hora «12:47» y la batería son la única parte de la pantalla que afirma algo que el producto no sabe."
+   },
+   {
+    "id": "f1-09check-06",
+    "severidad": "baja",
+    "regla": "§3 Radios",
+    "dice_el_sistema": "`--r-ctrl` 6px (botones, chips, campos, etiquetas de estado) y `--r-card` 10px (tarjetas)",
+    "hay_en_el_build": "--r-ctrl: 8px y --r-card: 12px, redefinidos en el :root de la maqueta; es la única de las 52 que lo hace",
+    "selector": ":root",
+    "evidencia": "getComputedStyle(document.documentElement) sobre la pantalla servida: --r-ctrl = 8px, --r-card = 12px (en 28_instalador_mi_dia y 47_asistente, 6px y 10px).",
+    "por_que_importa": "Lo registro como desviación de severidad baja, no como error de criterio: el radio se percibe en relación con el tamaño del control, y con destinos de 48px y casillas de 26px los 6px canónicos se leen como esquina viva. La adaptación está bien razonada y es coherente en toda la pantalla. Lo que no puede quedarse así es la forma: es una redefinición suelta, sin ámbito y sin nota, indistinguible de un descuido para quien audite la siguiente maqueta. La corrección no es volver a 6px, es declararla en el sistema con su ámbito — propuesta en el bloque de cobertura."
+   }
+  ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 3,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 3
+  },
+  "justificacion": "Es la pantalla mejor construida del lote en lo que más cuesta. El destino táctil está resuelto como manda §10 trampa 4 y no al revés: la <label> abarca la fila entera (298x53,2 y 298x93,4 medidos), el <input type=\"checkbox\"> real sigue en el árbol de accesibilidad y la casilla visible de 26px es solo pintura; ningún destino del producto baja de 44px y el token --touch está a 48px «por uso con guantes». El contraste es el mejor medido del lote: en su tema oscuro reproduce exactamente los ratios documentados de §1.3 (ok 5,67:1, warn 7,14:1, err 4,59:1) y usa el valor canónico de --text-3 (#8B96A6) — la única de las 52 que no arrastra el obsoleto. Su tercer tema, el de exterior, mide 18,3:1 en texto y 6,8:1 en texto auxiliar. Lo baja a 3: el <link> a Google Fonts en la pantalla que presume de funcionar sin señal, nueve familias de texto bajo el suelo de 12px, la ausencia completa de vistas de carga/vacío/error, el andamiaje sin marcar y el rebote con --ease-spring fuera de sus dos usos permitidos. Responsive no se ejerce de verdad: el marco de teléfono es fijo a 352px y la página lo centra, así que se comporta igual a 390 y a 1440; no lo penalizo ni lo premio.",
+  "evidencia": [
+   "Medición táctil propia (Playwright, 390x844, hasTouch): 12 destinos; los 6 label.row miden 298x53,2 o 298x93,4; .iconbtn 44x44; .addph 56x56; .ctabtn 312x48. Los dos únicos por debajo de 44px son los botones del conmutador de modo del panel explicativo (andamiaje).",
+   "Contraste calculado sobre los tokens declarados: tema oscuro text-3/surface-2 5,03:1, text-2/surface 7,80:1, ok-ink/ok-bg 5,67:1, warn-ink/warn-bg 7,14:1, err-ink/err-bg 4,59:1, foco (--accent) sobre --surface 4,23:1. Tema exterior: text/surface 18,31:1, text-2 10,42:1, text-3 6,82:1, text-3 sobre surface-2 6,19:1, accent-ink/accent 7,40:1.",
+   "Captura propia 09_app_checklist_instalacion--390.png: estado por evidencia distinguible por forma (✓ sincronizada / ↑ pendiente), no solo por color.",
+   "Brief: contraste.fallos = 0; tactil_24px.por_debajo_de_24px = 0; regla_data_tacto_sin_root = 0; inputsSinEtiqueta = 0; tokens.usados_sin_declarar = []."
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 1,
+   "hallazgo": "Ejemplar en lo visible: «6 de 13» con barra de avance y aria-valuenow, «3 por sincronizar» con role=\"status\", el estado de cada evidencia en su miniatura y un toast aria-live por cada marca. Lo que falta es el estado de lo que no se ve: no hay vista de carga ni de error, así que el sistema solo sabe comunicarse cuando todo va bien.",
+   "selector": "#pbar, .sync[role=status], .toast[aria-live=polite]"
+  },
+  {
+   "n": 2,
+   "heuristica": "Correspondencia entre el sistema y el mundo real",
+   "severidad": 0,
+   "hallazgo": "Habla el idioma del oficio sin traducir nada: «Conduit 3/4\" · THW cal. 8», «Varilla + zapata · medir continuidad», «220 V ± 5 % · medido: 218 V». Las secciones siguen el orden real del trabajo: preparación, instalación eléctrica, puesta en marcha.",
+   "selector": ".sechead, .tx small"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 3,
+   "hallazgo": "Una evidencia fotográfica, una vez tomada, no se puede quitar ni reemplazar: la miniatura no tiene ninguna acción. §6.17 exige las dos. En una app de campo, la foto mal encuadrada es el caso normal, no el excepcional.",
+   "selector": ".evrow .thumb"
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 2,
+   "hallazgo": "Internamente es coherentísima, pero se separa del resto del sistema en cuatro sitios a la vez: radios propios (8/12 frente a 6/10), un tercer tema, un token --touch que no existe en el sistema y un repertorio de iconos en SVG en línea en vez de los Material Symbols de §6.5. Cada decisión está razonada; ninguna está declarada.",
+   "selector": ":root"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 1,
+   "hallazgo": "Muy fuerte: el cierre está bloqueado hasta completar los 13 puntos y lo dice en la propia etiqueta del botón; la firma del cliente no se habilita antes de tiempo; las fotos obligatorias se marcan como tales en el punto que las exige. El resto es que el bloqueo se implementa con `disabled`, que esconde el motivo a quien usa teclado.",
+   "selector": "#close, .sigpad"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocer antes que recordar",
+   "severidad": 0,
+   "hallazgo": "Cada punto lleva su criterio técnico debajo, así que el instalador no tiene que recordar la norma; el contador y la barra dicen dónde va sin tener que contar.",
+   "selector": ".tx small"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 1,
+   "hallazgo": "El conmutador nocturno/exterior es exactamente la flexibilidad que pide el trabajo a la intemperie, pero hoy vive en el panel explicativo de la maqueta, no en la pantalla: en el producto el instalador no tendría forma de cambiarlo.",
+   "selector": ".switch"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 1,
+   "hallazgo": "Densidad bien resuelta para el pulgar. El único exceso es el pie del botón de cierre, que arrastra una referencia interna de documento: «Después eliges qué hacer con el material sobrante (D16)».",
+   "selector": ".ctanote"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de errores",
+   "severidad": 4,
+   "hallazgo": "No hay vista de error ni de vacío. Si la orden no carga, o la sincronización falla, la pantalla no tiene nada que decir — y es la pantalla del riesgo técnico declarado de la operación. Tampoco hay forma de reintentar un envío pendiente: el contador «3» informa, pero no es accionable.",
+   "selector": "main.phone"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": "n/a",
+   "hallazgo": "No aplica: el checklist es su propia documentación y cada punto lleva su criterio.",
+   "selector": ""
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-026",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "«Las hojas de servicio se registran en papel; la conciliación de materiales entre estas hojas y los totales de almacén se realiza como un cruce manual posterior». Esta pantalla es la hoja de servicio digital: 13 puntos con criterio, evidencia fotográfica por punto, firma del cliente en pantalla y —lo decisivo— una cola local («Guardada en el teléfono. Se enviará al recuperar señal», «3 por sincronizar»), que es lo que permite que el papel deje de ser necesario donde no hay cobertura."
+   },
+   {
+    "pp": "pp-025",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "«No existe un proceso formal de devolución o registro de materiales sobrantes al almacén; el ajuste se comunica por WhatsApp y se descuenta manualmente del siguiente pedido». El cierre del checklist encadena con ese flujo: «Después eliges qué hacer con el material sobrante». Lo enuncia como paso obligatorio del cierre, no como trámite aparte — aunque arrastre la referencia interna «(D16)» a la interfaz."
+   },
+   {
+    "pp": "pp-024",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "ignora",
+    "evidencia": "«La validación y despacho de materiales depende de la disponibilidad simultánea de dos personas; cuando alguna no está disponible, los materiales salen sin las firmas de control». El checklist registra la ejecución y la firma del cliente, pero no pide en ningún punto el consumo real de material («registrar metros usados» aparece como texto de ayuda de un punto, sin campo donde capturarlo). La conciliación con almacén sigue sin tener origen de dato."
+   },
+   {
+    "pp": "pp-030",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "«Las herramientas de trabajo diarias del equipo de operaciones se limitan a WhatsApp, Excel y correo electrónico, sin una plataforma centralizada». Las fotos de evidencia dejan de viajar por WhatsApp: quedan asociadas al punto del checklist de la orden ORD-202607-0119, con su estado de envío."
+   },
+   {
+    "pp": "pp-028",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "ignora",
+    "evidencia": "Pain point de severidad alta: «cuando esos vistos buenos se retrasan, la operación queda completamente detenida». El checklist no contempla el caso de la instalación que se detiene por una causa externa: no hay forma de dejar un punto como «no se pudo», con su motivo y su foto. Solo hay marcado y sin marcar, y el cierre exige los 13."
+   }
+  ],
+  "usabilidad_para_el_area": "Es la pantalla que más directamente ataca el dolor del área: sustituye la hoja de papel por un registro con evidencia, y lo hace asumiendo la condición real de ICEV —sin señal buena parte de la jornada— con cola local y estado de sincronización por elemento. Para un instalador con guantes, de pie y a contraluz, las decisiones de tamaño (destinos de 48px, fila entera pulsable, casilla de 26px) y el modo de exterior son las correctas, y están medidas, no supuestas. Le faltan dos cosas que el área sí sufre: capturar el consumo de material en el punto donde se consume (pp-024 sigue abierto) y poder cerrar un punto como «no se pudo» cuando la instalación se detiene por causa ajena (pp-028). Y le falta una tercera que no es del área sino del sistema: sin vista de error, el día que falle la carga la pantalla no sabrá decirlo."
+ },
+ "cobertura": [
+  {
+   "patron": "Tercer tema de color, `data-theme=\"sun\"`, rotulado «Modo exterior — alto contraste para sol directo», con paleta propia completa (bordes a rgba(15,22,32,.28)/.55, --accent #1F5E30, semáforo reoscurecido) y no seleccionable por prefers-color-scheme. El sistema (§1) solo documenta dos temas.",
+   "propuesta_de_regla": "§1.8 Tema de exterior — `data-theme=\"sun\"`. Cuándo: una pantalla que se usa a la intemperie, donde la luz ambiente lava la pantalla y el contraste nominal del tema claro no basta. No es «el tema claro con más contraste»: sube los suelos y se mide contra ellos. Suelos propios: 7:1 para texto, 4,5:1 para el borde de todo control cuya única frontera es el borde (§1.1, --border-ctrl), 3:1 para elementos gráficos ya medidos en los otros dos temas. Valores de referencia medidos en la primera implantación: texto 18,3:1, texto secundario 10,4:1, texto auxiliar 6,8:1 y 6,2:1 sobre --surface-2, tinta sobre acento 7,4:1. Se elige siempre a mano —`prefers-color-scheme` no distingue «estoy al sol»—, el conmutador vive en el cromo de la pantalla y no en una maqueta, la elección sobrevive a la navegación, y el `meta[name=theme-color]` se actualiza con él. Un tema de exterior sin conmutador visible en el producto es un tema que nadie va a poder encender cuando lo necesite."
+  },
+  {
+   "patron": "Arranque forzado en tema oscuro con `<html data-theme=\"dark\">`, sin botón de tema en el producto: la pantalla entra en oscuro y no ofrece salida (el conmutador que existe alterna oscuro↔exterior y vive en el panel explicativo de la maqueta). Es la única de las 52 que fuerza tema en el markup.",
+   "propuesta_de_regla": "§1.9 Tema inicial por contexto de uso. Una pantalla puede forzar un tema en el `<html>` cuando su contexto de uso lo justifica y está escrito —la instalación nocturna o en estacionamiento cerrado para el modo oscuro—, pero entonces hereda dos obligaciones: el conmutador de tema es obligatorio en esa misma pantalla, y el tema forzado solo es el valor inicial, nunca un bloqueo. La preferencia que la persona elija gana sobre el valor forzado y sobrevive a la navegación. Forzar un tema sin conmutador es un tema sin salida, y en campo significa quedarse en oscuro a mediodía."
+  },
+  {
+   "patron": "Escala de radios redefinida para táctil: --r-ctrl 8px y --r-card 12px frente a los 6px y 10px de §3, de forma coherente en toda la pantalla pero como redefinición suelta del :root.",
+   "propuesta_de_regla": "§3.2 Radios en formato de teléfono. El radio se percibe en relación con el tamaño del control: con destinos de 48px y casillas de 26px, los 6px de `--r-ctrl` se leen como esquina viva. En el formato de teléfono `--r-ctrl` vale 8px y `--r-card` 12px. Los nombres de token no cambian —ningún componente se reescribe—, cambia su valor, y cambia dentro de un ámbito declarado (`:root[data-formato=\"telefono\"]`), nunca en una redefinición suelta del `:root` de una maqueta: una redefinición sin ámbito es indistinguible de un descuido para quien audite la siguiente pantalla. `--r-modal` y `--r-pill` no cambian."
+  },
+  {
+   "patron": "Token `--touch: 48px` declarado con su razón en el comentario («≥44 pt; 48 por uso con guantes») y usado como min-height de la fila pulsable y del botón de cierre.",
+   "propuesta_de_regla": "§7.3.1 `--touch`, el suelo táctil del formato de campo. Una app de campo declara `--touch:48px` una sola vez en `:root` y lo usa como `min-height` de toda fila pulsable y de todo botón. 24px es el mínimo universal de §7.3 y 44px el de la acción principal o del uso en campo; 48px es el valor del sistema cuando se trabaja con guantes, porque el guante no reduce la precisión del toque, reduce la del borde. El token no sustituye a la comprobación: se sigue midiendo el destino en el navegador, y el destino es la región que acepta la pulsación (§10, trampa 4)."
+  },
+  {
+   "patron": "Casilla de verificación de campo: `<input type=\"checkbox\">` real escondido con position:absolute;opacity:0, casilla visible de 26px con borde de 2,5px, y una `<label class=\"row\">` que abarca la fila entera (medido 298x53,2 y 298x93,4).",
+   "propuesta_de_regla": "§6.16.1 Casilla de campo. En una app de campo la casilla visible mide 26x26px con borde de 2,5px y radio `--r-ctrl`, y vive dentro de una `<label>` que abarca la fila completa y no baja de `--touch`. El `<input type=\"checkbox\">` real se conserva en el árbol (`position:absolute;opacity:0;width:0;height:0`) y nunca se sustituye por un `div` con `role=\"checkbox\"`: el input da el teclado, el estado y el anuncio gratis. El foco se dibuja sobre la casilla visible (`input:focus-visible + .chk`), no sobre el input invisible. Sin zonas muertas: el texto de apoyo del punto va dentro de la etiqueta, no al lado."
+  },
+  {
+   "patron": "Evidencia fotográfica con estado de envío: miniatura de 56x56px con una marca de 18px en la esquina, ✓ sincronizada / ↑ pendiente, distinguible por forma además de por color, más un botón de 56px con borde discontinuo para añadir.",
+   "propuesta_de_regla": "§6.17.1 Evidencia fotográfica de campo. Cuándo: un punto de trabajo exige prueba visual. Valores: miniatura 56x56px, radio `--r-card`, con medallón de estado de 18px anclado a la esquina inferior derecha y borde de 2px del color de la superficie para separarlo de la foto; el estado se distingue por glifo además de por color (✓ enviada, ↑ pendiente de envío) (§1.3). El botón de añadir repite la medida (56px) con borde discontinuo. Toda evidencia se puede sustituir y quitar (§6.17): una miniatura sin esas dos acciones es una foto que nadie puede corregir, y la foto mal encuadrada es el caso normal del trabajo de campo, no el excepcional. El punto que exige evidencia lo dice antes de que se marque, con etiqueta visible («foto obligatoria»), no al intentar cerrar."
+  },
+  {
+   "patron": "Acción bloqueada que explica su bloqueo en su propia etiqueta y lo mantiene actualizado: «Cerrar instalación · faltan 7 puntos» → «Cerrar instalación y pedir firma».",
+   "propuesta_de_regla": "§6.2.2 Acción bloqueada con el motivo en la etiqueta. Cuando una acción no está disponible todavía por una condición que la persona puede cumplir, el motivo va en la etiqueta del botón y cuenta lo que falta («faltan 7 puntos»), no en un texto aparte; la etiqueta cambia sola cuando la condición se cumple. El bloqueo se declara con `aria-disabled=\"true\"` y nunca con `disabled`, para que el control siga recibiendo el foco y su `aria-describedby` llegue a leerse (§6.16). Un botón apagado sin motivo obliga a adivinar; un motivo que solo está en un párrafo debajo obliga a buscarlo."
+  },
+  {
+   "patron": "Confirmación efímera de una acción repetitiva: toast flotante con role=\"status\" + aria-live=\"polite\" que nombra el punto marcado («Marcado: Verificación de voltaje en tablero») y se retira a los 2,6s.",
+   "propuesta_de_regla": "§6.24 Confirmación efímera — `.toast`. Cuándo: confirmar una acción que se repite muchas veces en una sesión y que no merece interrumpir ni ocupar sitio fijo (marcar un punto, enviar una evidencia). Valores: `position:fixed;bottom:20px;left:50%`, superficie `--surface`, borde `--border-2`, radio `--r-ctrl`, sombra `--sh-modal`, `role=\"status\"` + `aria-live=\"polite\"`, visible ~2,6s. Nombra el elemento afectado, no la acción a secas. No lleva acciones dentro: lo que se puede deshacer va a la barra de selección (§6.13). No comunica errores — un error que se va solo a los 2,6s es un error que nadie leyó."
+  },
+  {
+   "patron": "Marco de dispositivo, barra de estado simulada (12:47, batería, sin señal) y panel explicativo de la propuesta («Qué cambia respecto de la v1») presentados como parte de la página, sin `data-andamio`.",
+   "propuesta_de_regla": "§9.1 Andamiaje de una maqueta de app. El marco de dispositivo, la barra de estado simulada (hora, batería, cobertura), el conmutador de tema o de modo de la demo y el panel que explica la propuesta son andamiaje: llevan `data-andamio`, van rotulados y se retiran con un solo selector. La barra de estado simulada merece mención propia porque es la única parte de la maqueta que afirma datos que el producto no controla: una hora y una batería inventadas conviven con datos reales de la orden y nada las distingue. Si el formato de teléfono necesita marco para entenderse, el marco es andamiaje; la pantalla de dentro es el producto."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática sin backend que perfilar.",
+  "Estados loading/empty/error/oscuro: no existen en la maqueta y no hay capturas (brief: capturas_disponibles solo 'ok'). La ausencia está registrada como hallazgo f1-09check-05; no se puede evaluar su contenido.",
+  "§6.11 tablas, §6.18 diálogo, §12.x gráficas, §6.12 filtros: la pantalla no tiene ninguno de esos patrones. No evaluado por ausencia.",
+  "§6.5 iconos Material Symbols: la pantalla usa un sprite SVG en línea en vez de la fuente de iconos. No lo registro como incumplimiento porque para una app declaradamente sin señal, cargar los iconos de un CDN sería el error mayor (§2, D116); queda anotado como decisión que el sistema no contempla y que merece regla propia junto al resto de cobertura.",
+  "Tema claro canónico (§1.1 columna clara): esta pantalla no lo implementa — tiene oscuro y exterior. No se puede comparar contra la tabla de tokens claros."
+ ]
+}

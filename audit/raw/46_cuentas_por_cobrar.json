@@ -1,0 +1,370 @@
+{
+  "pantalla": "46_cuentas_por_cobrar",
+  "ruta_zip": "05-direccion-y-administracion/46_cuentas_por_cobrar.html",
+  "carpeta": "05-direccion-y-administracion",
+  "area": "finanzas/cobranza",
+  "arquetipo": "panel administrativo",
+  "modo": "cumplimiento",
+  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
+  "capturas": [
+    "46_cuentas_por_cobrar--ok.png",
+    "46_cuentas_por_cobrar--loading.png",
+    "46_cuentas_por_cobrar--empty.png",
+    "46_cuentas_por_cobrar--error.png",
+    "46_cuentas_por_cobrar--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-46cxc-01",
+        "severidad": "alta",
+        "regla": "§1.4 Series de gráfica (paleta categórica)",
+        "dice_el_sistema": "Cuatro ranuras con valor fijo: --serie-1 azul #2a78d6 / #3987e5, --serie-2 naranja #eb6834 / #d95926, --serie-3 violeta #4a3aa7 / #9085e9, --serie-4 magenta #e87ba4 / #d55181. «Se asignan en orden fijo y no se ciclan.»",
+        "hay_en_el_build": "Sólo dos ranuras y con otros valores: --serie-1: #2C6CA8 (claro) / #6FA8DC (oscuro); --serie-2: #7A5FA8 (claro) / #B69BE0 (oscuro). --serie-3 y --serie-4 no existen en el archivo.",
+        "selector": ":root, :root[data-theme=\"dark\"]",
+        "evidencia": "grep -oE '--serie-[0-9]: *#[0-9a-fA-F]+' sobre el archivo: cuatro coincidencias, todas de serie-1 y serie-2. El brief cuenta 84 tokens declarados y ninguno «usado sin declarar», así que no es un olvido de declaración: la tabla se redujo a la mitad y se repintó.",
+        "por_que_importa": "La ranura 2 del sistema es naranja y aquí es violeta, de modo que una misma entidad cambia de color entre esta pantalla y cualquier otra que use la paleta —y §1.4 regla 2 dice que «el color sigue a la entidad». Además, las cinco comprobaciones de §1.4 (banda de luminosidad, suelo de croma, separación bajo daltonismo, suelo de visión normal y contraste contra la superficie) están medidas para los hexes documentados, no para estos: con valores nuevos, ninguna de las separaciones (suelo ΔE 15) está verificada. En esta pantalla --serie-1 pinta además la barra de proporción de cada grupo, que es el dato de la tabla."
+      },
+      {
+        "id": "f1-46cxc-02",
+        "severidad": "alta",
+        "regla": "§1 Gobierno de color (decisión previa) + §1.3 Semáforo",
+        "dice_el_sistema": "«Si el dato tiene juicio → semáforo §1.3; si solo distingue una cosa de otra → paleta categórica §1.4; si es un dato sobre el dato → sin color propio. Un color de estado no se reutiliza para una categoría, ni al revés.» §1.3: --block = «Bloqueado por una condición externa».",
+        "hay_en_el_build": "La barra de antigüedad reparte el total en cuatro tramos y los pinta con los cuatro colores del semáforo: <i style=\"width:57%;background:var(--ok)\"> 0–30 d, <i …var(--warn)> 31–60 d, <i …var(--block)> 61–90 d, <i …var(--err)> +90 d. La misma asignación se repite en la leyenda.",
+        "selector": ".barra-edad > i, .leg .sw",
+        "evidencia": "Líneas 722 y 725-728 del markup. 46_cuentas_por_cobrar--ok.png: la barra lee verde-ámbar-violeta-rojo. Ningún tramo de antigüedad está «bloqueado por una condición externa»; --block se está usando como el tercer peldaño de una rampa ordinal de cuatro.",
+        "por_que_importa": "El semáforo son cinco estados discretos con significado, no una escala de gravedad creciente. Al tomar prestado --block para «61–90 días», el violeta deja de significar «bloqueado» en todo el producto y el usuario que lo ha aprendido en otras pantallas lo lee mal aquí. La barra es además el elemento con el que esta pantalla comunica su único mensaje: cuánto del saldo está envejecido."
+      },
+      {
+        "id": "f1-46cxc-03",
+        "severidad": "alta",
+        "regla": "§1 Gobierno de color — un color de estado no se reutiliza para una categoría, ni al revés",
+        "dice_el_sistema": "Literal del preámbulo de §1 y repetido en §1.4: «Una serie nunca reutiliza un color de estado.»",
+        "hay_en_el_build": ".mini-barra i{background:var(--serie-1)} y .mini-barra i.tarde{background:var(--err)} — la misma barra de la columna «Proporción a más de 60 días» se pinta con un color categórico cuando el valor es bajo y con un color de estado cuando es alto.",
+        "selector": ".mini-barra i, .mini-barra i.tarde",
+        "evidencia": "Líneas 682-683 del <style>. En la tabla, Grupo Automotriz Vértice (25%) y Flotillas del Centro Norte (39%) salen en --err; Grupo Bajío Motors (8%) y Autotransportes Cerro Azul (6%) en --serie-1. 46_cuentas_por_cobrar--ok.png.",
+        "por_que_importa": "Un mismo elemento gráfico cruza las dos paletas según su valor, que es justo lo que la regla de gobierno prohíbe. Y el azul de --serie-1 no significa «esto está bien»: quien lo lea contra el rojo de la fila de al lado asumirá un juicio que la paleta categórica no tiene."
+      },
+      {
+        "id": "f1-46cxc-04",
+        "severidad": "alta",
+        "regla": "§2.1 El suelo son 12px. «Nada baja de ahí.»",
+        "dice_el_sistema": "«Si un dato se lee todos los días, va a 12-13px como mínimo.» Única excepción: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+        "hay_en_el_build": "21 declaraciones font-size:11px, 3 de 11,5px y 6 de 10,5px. En zona de producto: .hero .pie y .mini .pie a 11px (los párrafos que explican qué entra y qué no entra en cada cifra), .cfg-pie a 11px, .leg a 11,5px (los cuatro importes de la barra de antigüedad), .hero .lbl y .mini .lbl a 11,5px (los rótulos de los cuatro widgets), thead th a 11px, y el porcentaje de cada fila a 11px por estilo en línea.",
+        "selector": ".hero .pie, .mini .pie, .leg, .mini .lbl, thead th, td .tnum",
+        "evidencia": "Estilo calculado a 1440×900: 16 agrupaciones por debajo de 12px. --fs-meta vale 12px en :root (línea 13): los 11px son literales que se saltan el token. 46_cuentas_por_cobrar--ok.png: los dos bloques de texto explicativo bajo las cifras ocupan 10 líneas a 11px.",
+        "por_que_importa": "Esta pantalla pone casi todo su significado en el texto pequeño: «Sólo factura timbrada y no pagada», «no se suma a lo de arriba, y es a propósito», «la antigüedad se cuenta desde la fecha de la factura, no desde su vencimiento». Son las advertencias sin las cuales las cifras se interpretan mal, y son lo más pequeño de la pantalla."
+      },
+      {
+        "id": "f1-46cxc-05",
+        "severidad": "alta",
+        "regla": "§6.12 regla 8 — «un control con pinta de interactivo tiene que interactuar»",
+        "dice_el_sistema": "«Sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero.»",
+        "hay_en_el_build": "Cuatro .schip con aria-pressed=\"false\" y data-f; el control segmentado Cómoda/Compacta con aria-pressed; cinco .abrir-n de desglose; el buscador; «Ver antigüedad completa»; «Exportar»; cinco «Ver agencias»; las migas de desglose. El único querySelectorAll del <script> es querySelectorAll('.demo [data-set]').",
+        "selector": ".p4-f .schip[data-f], .seg button, .abrir-n, #buscar, .migas-drill a",
+        "evidencia": "grep sobre el archivo: 6 addEventListener, todos del andamio, del tema o del menú. Además <html data-density=\"comfy\"> no lo lee ninguna regla CSS, y el markup de la pantalla no tiene ninguna clase de densidad aplicada.",
+        "por_que_importa": "La pantalla se presenta como un desglose de tres niveles navegable (marca › grupo › agencia) y lo dice en su propia nota, pero no hay una sola vía para bajar de nivel ni para volver. Anunciar aria-pressed en controles inertes además engaña al lector de pantalla sobre un estado que nunca cambia."
+      },
+      {
+        "id": "f1-46cxc-06",
+        "severidad": "alta",
+        "regla": "§6.4 Vistas de estado — .tarjeta-estado y encabezado real",
+        "dice_el_sistema": ".tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)}, opaca, con .estado-ico de 52px. «Cada estado lleva encabezado real, no un <b>.» §11: «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo».",
+        "hay_en_el_build": "<div class=\"state state-error\"><svg class=\"ico\" style=\"color:var(--err-ink)\">…<b>No se pudo cargar el desglose de cobranza</b>…",
+        "selector": ".state.state-error, .state.state-empty",
+        "evidencia": "Estilo calculado del nodo: max-width «none», border-radius «0px», box-shadow «none», fondo «rgba(0,0,0,0)»; hijos svg,B,P,P,DIV sin ningún h1-h4; icono de 30×30px. 46_cuentas_por_cobrar--error.png lo muestra centrado y suelto sobre el fondo de página.",
+        "por_que_importa": "El contenido del error es correcto y cumple las tres cosas de §6.4 regla 3 con su referencia (COB-20260821-1840); el envase no. Sin encabezado real no aparece en la navegación por encabezados, que es como alguien con lector de pantalla descubre qué ha pasado."
+      },
+      {
+        "id": "f1-46cxc-07",
+        "severidad": "media",
+        "regla": "§4 Superficie translúcida — «el translúcido es de la pantalla de entrada»",
+        "dice_el_sistema": "«.glass lleva backdrop-filter:blur(16px) + -webkit-backdrop-filter y respaldo sólido obligatorio: @supports not (backdrop-filter:blur(1px)){.glass{background:var(--surface)}}. El translúcido es de la pantalla de entrada. En el dashboard las superficies son opacas.»",
+        "hay_en_el_build": ".hero{…background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-color:var(--border-2)} aplicado a la tarjeta principal del panel. No hay ninguna regla @supports en todo el archivo.",
+        "selector": ".card.hero",
+        "evidencia": "Líneas 655-656 del <style>. grep '@supports' sobre el archivo: 0 coincidencias. El token --glass se declara además con un valor oscuro propio (rgba(29,39,53,.55)) que el sistema no documenta: §4 le da un único valor, rgba(250,252,253,.66).",
+        "por_que_importa": "Dos incumplimientos en la misma declaración: el translúcido no corresponde a una pantalla de dashboard, y sin el @supports un navegador sin backdrop-filter pinta la cifra de $2,644,180 sobre un fondo semitransparente, con el contraste dependiendo de lo que haya detrás. §1.7 exige medir cada color sobre los fondos donde va a aparecer; con un fondo translúcido no hay fondo que medir."
+      },
+      {
+        "id": "f1-46cxc-08",
+        "severidad": "media",
+        "regla": "§12.4 Barra apilada de estado (.barra) y §12.6",
+        "dice_el_sistema": "Pieza «Barra apilada de estado», clase .barra. §12.6: «segmentos contiguos separados con superficie: .barra span + span{border-left:2px solid var(--surface)}».",
+        "hay_en_el_build": ".barra-edad{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px} con hijos <i> y separación por gap, no por borde de superficie.",
+        "selector": ".barra-edad, .barra-edad > i",
+        "evidencia": "Líneas 662-663 del <style>. El resultado visual es equivalente sobre fondo claro, pero el gap deja ver el fondo de la tarjeta (--glass sobre --surface) en vez de pintar una franja de --surface, y el nombre de la pieza no es el del sistema.",
+        "por_que_importa": "La divergencia visual es menor; la de nombre no: una pieza del dashboard con otro nombre y otra mecánica no se puede auditar ni reutilizar entre pantallas, y aquí convive además con .barra-form y .barra-sel, lo que agrava el riesgo de §10 trampa 10."
+      },
+      {
+        "id": "f1-46cxc-09",
+        "severidad": "media",
+        "regla": "§12.4 Leyenda inline (.leyenda) y §12.5",
+        "dice_el_sistema": "Pieza «Leyenda inline», clase .leyenda: «marca de color + rótulo en tinta de texto + cifra. §12.5: el texto nunca se pinta del color de la serie.»",
+        "hay_en_el_build": ".leg{…font-size:11.5px;color:var(--text-2)} con .sw{width:9px;height:9px} como marca. La estructura es la correcta (marca, rótulo en tinta, cifra en <b>), pero el nombre es .leg y el tamaño baja del suelo.",
+        "selector": ".leg, .leg .sw",
+        "evidencia": "Líneas 664-667 del <style>. .leg es, además, uno de los cinco nombres que §10 trampa 10 señala por nombre propio como de alto riesgo de colisión («.resumen, .nota, .f, .leg, .cg — con esos, doble cuidado»).",
+        "por_que_importa": "La leyenda es lo único que distingue los cuatro tramos de la barra para quien no separa el ámbar del violeta; a 11,5px y con un nombre de clase que el sistema marca como peligroso, es la pieza menos robusta de la tarjeta principal."
+      },
+      {
+        "id": "f1-46cxc-10",
+        "severidad": "media",
+        "regla": "§6.12 regla 7 y §13.1 — orden fijo",
+        "dice_el_sistema": "«Orden fijo: resumen → buscador + filtros en una sola fila → tabla» (§6.12 regla 7, repetido en §13.1 «Lectura → control → objeto»). §6.12: «son dos zonas distintas, no una fila».",
+        "hay_en_el_build": "Tres filas en este orden: .p4-t (título y resumen en frase), .p4-b (sólo el buscador), .p4-f (los cuatro contadores .schip más el conmutador de densidad). El resumen de contadores va debajo del buscador, y el buscador va solo en su propia fila en vez de compartirla con los filtros.",
+        "selector": ".p4-b, .p4-f",
+        "evidencia": "46_cuentas_por_cobrar--ok.png: buscador en la segunda franja, contadores en la tercera. El sistema pide exactamente el orden inverso entre esas dos.",
+        "por_que_importa": "El orden del sistema no es estético: pone primero lo que se lee (cuántos grupos están mal), después lo que se controla y al final el objeto. Invertido, lo primero que ofrece la pantalla es buscar algo cuyo nombre todavía no se conoce."
+      },
+      {
+        "id": "f1-46cxc-11",
+        "severidad": "media",
+        "regla": "§6.9 y §8 Anexo B — límites de voz",
+        "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres.» «.nota no es un componente de explicación general — solo nivel 1 (restricción/instrucción que bloquea la acción inmediata).» «Si el texto explica una decisión, no va en pantalla.»",
+        "hay_en_el_build": "Banda .b-warn de 316 caracteres citando un grep, un número de documento y una ruta de fichero. Dos <p class=\"nota\"> al pie: «Entran Dirección y Administración. Quien persigue el cobro es Administración: dejarla fuera sería dibujar la pantalla para quien no hace el trabajo. Por eso en el menú esta entrada cuelga de Dirección y Administración, no sólo de Dirección.» (242 caracteres) y «El desglose baja tres niveles… con filtros, quien mira no sabe en qué nivel está ni cómo volver…» (322 caracteres). Los dos párrafos explicativos de las tarjetas suman otros 600.",
+        "selector": ".banda.b-warn > p, p.nota > span, .hero .pie, .mini.aparte .pie",
+        "evidencia": "Conteo de caracteres sobre el texto de los nodos: 316, 242 y 322. Las dos .nota explican por qué se diseñó así —el nivel 3 de §8, que «no va en la interfaz»— y la banda cita «0 coincidencias de grep -i \"cuentas por cobrar\" en apps/; doc 31 PRD línea 270, D62».",
+        "por_que_importa": "Tres de los cuatro bloques explican decisiones de diseño o de construcción, no consecuencias para quien mira. Y si fueran andamiaje legítimo, §9 obliga a marcarlos con data-andamio y a rotularlos; aquí van dentro del producto y se publicarían tal cual, con nombres de fichero del repositorio incluidos."
+      },
+      {
+        "id": "f1-46cxc-12",
+        "severidad": "media",
+        "regla": "§6.7 Esqueleto de carga",
+        "dice_el_sistema": "«Sin texto real dentro de las barras.» prefers-reduced-motion «aplana el fondo»: {.skel{animation:none;background:var(--surface-2)}}. «El punto de ruptura del esqueleto es el de la tabla (860px, no 900px).»",
+        "hay_en_el_build": "Las barras contienen «Por cobrar en la marca», «$0,000,000», «barra de antigüedad», «renglón de grupo». @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer el fondo. @media (max-width:900px){.sk-fila{…}} frente al corte de tabla, que está en 860px.",
+        "selector": ".state-loading .skel, .sk-fila",
+        "evidencia": "Con reducedMotion:'reduce' emulado: animation-name «none» y background-image sigue siendo el linear-gradient(90deg, rgb(231,237,243) 25%, …) congelado — el fallo literal de §6.7. Las tres primeras .skel devuelven textContent no vacío. Líneas 621 y 624 del <style>.",
+        "por_que_importa": "Un lector de pantalla recita «$0,000,000» como si fuera un saldo real mientras la pantalla carga, en un panel de cobranza. A favor: las alturas del esqueleto (112/84/118px) sí se parecen a los bloques que sustituyen."
+      },
+      {
+        "id": "f1-46cxc-13",
+        "severidad": "media",
+        "regla": "§7.3 Objetivos táctiles + §10 trampa 4",
+        "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo.» «Enlaces que son el elemento primario de su fila (folio, miga, “Ver en Maps”): llevan padding hasta llegar a 24px.» «Un <input> de búsqueda dentro de un <div> con forma de pastilla no cumple — el contenedor tiene que ser una <label for=…>.»",
+        "hay_en_el_build": "El <input id=\"buscar\"> mide 329×15px dentro de <div class=\"search\">. La miga «Todas las marcas», que es la única vía de vuelta al primer nivel del desglose, mide 124,9×15px. Los cinco .abrir-n del desglose miden 23px de alto.",
+        "selector": ".search > input#buscar, .migas-drill > a, .abrir-n",
+        "evidencia": "Brief, tactil_24px: 7 de 40 destinos por debajo de 24px; los cinco .abrir-n a 23px quedan 1px por debajo del mínimo. Verificado con data-tacto=\"dedo\" puesto: sin cambios, porque las seis reglas [data-tacto=\"dedo\"] del archivo se escriben sin :root (§7.3).",
+        "por_que_importa": "La miga y los botones de desglose son los dos controles con los que se navega la jerarquía de tres niveles sobre la que se construye toda la pantalla."
+      },
+      {
+        "id": "f1-46cxc-14",
+        "severidad": "media",
+        "regla": "§10 trampa 5 — isotipo",
+        "dice_el_sistema": "Medidas en el <use> y sin viewBox en el envoltorio; «si el desplazamiento no es ~0, está mal».",
+        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>.",
+        "selector": ".logo svg > use",
+        "evidencia": "getBoundingClientRect(): <svg> en x=96, <use> en x=63,5 → desplazamiento −32,5px, el valor documentado en §10. 46_cuentas_por_cobrar--ok.png y --oscuro.png: en la barra lateral se ve una astilla verde.",
+        "por_que_importa": "Afecta a las cuatro pantallas del lote, en los dos temas."
+      },
+      {
+        "id": "f1-46cxc-15",
+        "severidad": "media",
+        "regla": "§1.1 — valor de --text-3",
+        "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2).»",
+        "hay_en_el_build": "--text-3: #66717F.",
+        "selector": ":root",
+        "evidencia": "Brief, tokens.text_3_declarado: «#66717F». La pantalla usa --surface-2 en thead th, en el hover de fila, en el fondo de .mini-barra y en .p-s0.",
+        "por_que_importa": "Hecho ya establecido; se marca porque aquí --text-3 pinta los párrafos de advertencia de las tarjetas y el porcentaje «a +60 d» de cada fila, dentro de celdas que al pasar el cursor caen sobre --surface-2."
+      },
+      {
+        "id": "f1-46cxc-16",
+        "severidad": "baja",
+        "regla": "§1.7 Anillo de foco de un control compuesto",
+        "dice_el_sistema": "«Un control compuesto lleva un solo anillo de foco, y lo lleva el envoltorio»: .search:focus-within{border-color:var(--accent);outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}.",
+        "hay_en_el_build": ".search input:focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)} — el anillo lo dibuja el <input>, no el envoltorio .search. No hay ninguna regla :focus-within en el archivo.",
+        "selector": ".search input:focus-visible",
+        "evidencia": "Línea 338 del <style>; grep ':focus-within' sobre el archivo: 0 coincidencias.",
+        "por_que_importa": "No hay doble anillo (que es lo que la regla prohíbe), pero el anillo se dibuja alrededor del campo y no de la pastilla, de modo que el foco queda visualmente dentro de un control que se presenta como una sola pieza."
+      },
+      {
+        "id": "f1-46cxc-17",
+        "severidad": "baja",
+        "regla": "§6.9 nomenclatura de .banda",
+        "dice_el_sistema": "Cuatro variantes: .banda-info, .banda-warn, .banda-err, .banda-ok.",
+        "hay_en_el_build": ".banda.b-warn, .banda.b-err, .banda.b-ok, .banda.b-info.",
+        "selector": ".banda.b-warn",
+        "evidencia": "Líneas 521-523 del <style>; los tokens de fondo y tinta sí son los documentados (--warn-bg/--warn-ink). El icono (triángulo) sí coincide con la variante de advertencia, que es lo que §6.9 exige.",
+        "por_que_importa": "Sólo diverge del nombre documentado."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 1,
+      "rendimiento": "no_evaluado",
+      "theming": 2,
+      "responsive": 2,
+      "integridad": 1
+    },
+    "justificacion": "Es la pantalla con mejor pensamiento analítico del lote —separa lo cobrable de lo cerrado sin facturar, declara que la antigüedad se cuenta desde la factura y no desde el vencimiento, y organiza la cartera por el eje que el área usa de verdad, el grupo automotriz— y a la vez la peor ejecutada. Accesibilidad a 1: 16 agrupaciones de texto por debajo de 12px, y todo el significado matizado está ahí; estados de vacío y error sueltos, sin tarjeta y con el título en <b>; cuatro contadores con aria-pressed que nunca cambia. Theming a 2 y no 3 porque, aunque los dos temas resuelven con juegos de tokens completos, las series están fuera de especificación en valor y en número, y la tarjeta principal usa --glass con backdrop-filter sin ningún @supports, lo que en un dashboard §4 prohíbe dos veces. Integridad a 1: no hay una sola interacción viva en la pantalla —ni el desglose de tres niveles que la propia nota describe, ni las migas, ni el buscador, ni los filtros, ni la densidad— y el atributo data-density=\"comfy\" del <html> no lo lee ninguna regla. Responsive a 2: el corte de tabla a 860px está escrito, pero el del esqueleto está a 900px y la rejilla de .minis a 900px.",
+    "evidencia": [
+      "Series: sólo --serie-1 (#2C6CA8/#6FA8DC) y --serie-2 (#7A5FA8/#B69BE0); §1.4 fija cuatro ranuras con otros hexes.",
+      "Barra de antigüedad con --ok/--warn/--block/--err (líneas 722, 725-728) y .mini-barra cruzando --serie-1 con --err (líneas 682-683).",
+      "Estilo calculado a 1440×900: 16 agrupaciones con font-size < 12px, incluidos los dos párrafos de advertencia de las tarjetas a 11px.",
+      "grep del <script>: 6 addEventListener, todos de andamio/tema/menú; 0 manejadores para .schip[data-f], .abrir-n, .seg, #buscar o las migas.",
+      ".state-error calculado: max-width none, border-radius 0px, box-shadow none, fondo transparente, título en <b>, icono de 30px.",
+      ".hero con --glass + backdrop-filter:blur(10px); grep '@supports' = 0 coincidencias.",
+      "46_cuentas_por_cobrar--oscuro.png: los dos temas se resuelven con tokens, sin filtros."
+    ]
+  },
+  "f4_nielsen": [
+    {
+      "n": 1,
+      "heuristica": "Visibilidad del estado del sistema",
+      "severidad": 3,
+      "hallazgo": "La cabecera dice dónde se está («Nivel 2 de 3 · marca › grupo › agencia»), que es lo correcto para un desglose. Pero el cambio de vista se hace con data-state en <main> sin aria-live y sin mover el foco (§6.4 regla 1): no hay ningún aria-live en el archivo y el <script> no llama a focus(). Tampoco se dice a qué fecha están los saldos.",
+      "selector": "main#contenido[data-state], .migas-drill .nivel"
+    },
+    {
+      "n": 2,
+      "heuristica": "Correspondencia entre el sistema y el mundo real",
+      "severidad": 2,
+      "hallazgo": "El vocabulario es el del área (factura timbrada, antigüedad, días promedio de cobro, grupo automotriz) y la pantalla es honesta sobre sus propias limitaciones. Rompe la correspondencia el texto que habla el idioma del repositorio: «0 coincidencias de grep -i \"cuentas por cobrar\" en apps/; doc 31 PRD línea 270, D62».",
+      "selector": ".banda.b-warn > p"
+    },
+    {
+      "n": 3,
+      "heuristica": "Control y libertad del usuario",
+      "severidad": 4,
+      "hallazgo": "La pantalla promete un recorrido de tres niveles con vuelta por las migas, y ninguna de las dos direcciones funciona: ni los cinco .abrir-n bajan ni la miga «Todas las marcas» sube. Quien entra por un enlace al nivel 2 no tiene forma de salir de él dentro de la pantalla.",
+      "selector": ".abrir-n, .migas-drill a"
+    },
+    {
+      "n": 4,
+      "heuristica": "Consistencia y estándares",
+      "severidad": 4,
+      "hallazgo": "Es la heurística peor servida y la que más daño hace fuera de la pantalla: la paleta categórica se redujo a dos ranuras con hexes distintos de los documentados; el semáforo se usa como rampa ordinal de antigüedad, con --block («bloqueado por una condición externa») significando «61–90 días»; y una misma barra cruza paleta categórica y semáforo según su valor. Cada una de las tres rompe la regla de gobierno de color del preámbulo de §1.",
+      "selector": ":root, .barra-edad > i, .mini-barra i"
+    },
+    {
+      "n": 5,
+      "heuristica": "Prevención de errores",
+      "severidad": 2,
+      "hallazgo": "Donde mejor está: la pantalla previene activamente la lectura errónea de sus propias cifras —el saldo cerrado sin facturar se mantiene fuera del total «y es a propósito», y se avisa de que la antigüedad se cuenta desde la factura y no desde el vencimiento—. Lo que impide subir de nota es que esas advertencias son el texto más pequeño de la pantalla (11px).",
+      "selector": ".mini.aparte .pie, .cfg-pie"
+    },
+    {
+      "n": 6,
+      "heuristica": "Reconocer antes que recordar",
+      "severidad": 2,
+      "hallazgo": "La barra de antigüedad con su leyenda de importes evita recordar el reparto, y la columna de proporción repite el porcentaje en texto junto a la barra, que es exactamente lo que §1.4 exige cuando el color no llega a 3:1. Baja un punto porque el código de colores de los cuatro tramos hay que aprenderlo aquí y no sirve en ninguna otra pantalla.",
+      "selector": ".barra-edad, .leg, .mini-barra + .tnum"
+    },
+    {
+      "n": 7,
+      "heuristica": "Flexibilidad y eficiencia de uso",
+      "severidad": 4,
+      "hallazgo": "Cero aceleradores vivos: buscador inerte, cuatro contadores-filtro inertes, densidad inerte, exportación inerte, sin ordenación por columna (ningún <th> declara aria-sort, brief: thAriaSort 0 sobre 11 th) y sin paginación. Para un panel de cartera, no poder ordenar por «a más de 60 días» es quedarse sin la pregunta principal.",
+      "selector": "#buscar, .schip[data-f], .seg, thead th"
+    },
+    {
+      "n": 8,
+      "heuristica": "Diseño estético y minimalista",
+      "severidad": 3,
+      "hallazgo": "Aproximadamente 1.480 caracteres de prosa explicativa compiten con cuatro cifras. Dos de los bloques (las .nota del pie) explican por qué se diseñó así, que §8 clasifica como nivel 3 y manda fuera de la interfaz, y la banda superior documenta el estado de construcción del proyecto. El contenido del panel —cuatro cifras y una tabla de cinco filas— queda por debajo del texto que lo rodea.",
+      "selector": "p.nota, .banda.b-warn, .hero .pie"
+    },
+    {
+      "n": 9,
+      "heuristica": "Ayudar a reconocer y recuperarse de los errores",
+      "severidad": 2,
+      "hallazgo": "El texto del error hace las tres cosas de §6.4 regla 3 en orden —qué pasó, qué no se ha perdido («ningún saldo cambió y ninguna factura se aplicó ni se canceló»), qué hacer— y lleva referencia COB-20260821-1840. Falla sólo el envase: sin tarjeta, sin medallón y con el título en <b>.",
+      "selector": ".state-error"
+    },
+    {
+      "n": 10,
+      "heuristica": "Ayuda y documentación",
+      "severidad": 3,
+      "hallazgo": "La pantalla tiene mucho que explicar y lo explica todo a la vez y siempre visible, cuando §8 reserva el nivel 2 al toggletip de §6.23 sobre el control o la columna relacionada. No hay ningún .infob en la pantalla: las advertencias sobre qué entra en cada cifra deberían colgar del rótulo de esa cifra, no ocupar diez líneas debajo.",
+      "selector": ".hero .pie, .mini .pie, .cfg-pie"
+    }
+  ],
+  "f5_investigacion": {
+    "pain_points_evaluados": [
+      {
+        "pp": "pp-080",
+        "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
+        "cobertura": "cubre",
+        "evidencia": "«La gestión de cobranzas ha recaído informalmente en Dirección comercial, ante la ausencia de un proceso o sistema definido de seguimiento de pagos». La pantalla es ese sistema: saldo por cobrar por grupo automotriz, reparto por antigüedad, días promedio de cobro y marcado de los grupos con más del 20% a más de 60 días. Y resuelve además el reparto organizativo: la entrada cuelga de «Dirección y Administración», con la justificación escrita en la propia pantalla («quien persigue el cobro es Administración»)."
+      },
+      {
+        "pp": "pp-090",
+        "documento": "data/insights/2026-07-31_finanzas-cobranza-almacen.json",
+        "cobertura": "cubre",
+        "evidencia": "«El proceso de facturación requiere validación manual exhaustiva de números de serie (VIN) contra las plataformas de cada cliente y corrección manual de errores». La pantalla hace visible por primera vez el coste de ese cuello de botella: $436,070 en «9 órdenes cerradas sin facturar», deliberadamente fuera del total de cobranza para que un retraso de facturación no se lea como un problema de cobro. Cobertura parcial: lo mide, no lo resuelve — el contador no se puede abrir ni dice de qué cliente es cada orden ni qué validación falta."
+      },
+      {
+        "pp": "pp-116",
+        "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+        "cobertura": "contradice",
+        "evidencia": "«Se manejan estados de factura —pendiente, por cobrar, por pagar, vencida, anulada— sin una definición común ni un flujo documentado que diga quién los cambia, cuándo y con qué efecto». Donde el dolor es la falta de vocabulario común, la pantalla añade vocabulario nuevo: un reparto propio en cuatro tramos de antigüedad (0–30 / 31–60 / 61–90 / +90 d) y una categoría «cerrado y sin facturar» que no corresponde a ninguno de los cinco estados que el área ya usa, sin decir en ningún sitio cómo se traducen unos a otros. Y lo refuerza con el color: pinta los tramos con los estados del semáforo, de modo que «61–90 días» aparece como --block, «bloqueado por una condición externa» (§1.3). El área acaba con dos vocabularios en vez de uno, y el segundo toma prestadas palabras de estado que significan otra cosa."
+      },
+      {
+        "pp": "pp-115",
+        "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+        "cobertura": "ignora",
+        "evidencia": "«Cuadrar lo que administración registró con lo que finanzas facturó y cobró es un proceso lento, porque cada mitad vive en su propia hoja y no hay identificador común que las una». La pantalla presume que el total «es el número que se puede defender renglón por renglón contra el SAT», pero no muestra ni un renglón: no hay folio de factura, ni identificador de orden, ni fecha de emisión. El nivel más fino que ofrece la navegación es la agencia, dos niveles por encima del documento que hay que cuadrar."
+      },
+      {
+        "pp": "pp-077",
+        "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
+        "cobertura": "ignora",
+        "evidencia": "«Cada grupo automotriz exige campos de validación distintos (TOT, VIN) no estandarizados para facturar, generando un cuello de botella financiero de casi 2 millones de pesos». La tabla está organizada exactamente por el eje correcto —el grupo automotriz— pero no guarda ni muestra qué exige cada grupo. Es el sitio natural para una columna «requisitos de facturación» y no existe; el chip «9 órdenes cerradas sin facturar» es la punta visible de ese cuello de botella y no se puede abrir."
+      },
+      {
+        "pp": "pp-109",
+        "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+        "cobertura": "ignora",
+        "evidencia": "«Los datos fiscales del cliente se transcriben a mano de una hoja a otra. Un error en la razón social o el RFC provoca el rechazo fiscal de la factura y obliga a rehacer el trámite». Una factura rechazada por datos fiscales sigue envejeciendo en esta pantalla indistinguible de una factura correcta que el cliente no ha pagado: no hay corte por motivo, ni estado «rechazada», ni enlace al dato fiscal del padrón."
+      },
+      {
+        "pp": "pp-110",
+        "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+        "cobertura": "ignora",
+        "evidencia": "«La revisión manual de facturas para detectar datos mal capturados consume más de 16 horas semanales de una sola persona del área». Nada en la pantalla toca la calidad del dato antes de facturar; el panel empieza a contar cuando la factura ya está timbrada («sólo factura timbrada y no pagada. Nada más entra aquí»), que es justo después de las 16 horas."
+      },
+      {
+        "pp": "pp-075",
+        "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
+        "cobertura": "ignora",
+        "evidencia": "«El envío de reportes semanales a clientes B2B se realiza de forma manual y sin horario fijo, provocando que se envíen cada vez más tarde». La cabecera ofrece un botón-icono de exportar, pero es inerte, no lleva texto ni dice qué exporta (sólo aria-label «Exportar»), y no hay nada de programación ni de envío. El contenido de un reporte semanal de cartera está en la pantalla; la vía para sacarlo, no."
+      },
+      {
+        "pp": "pp-074",
+        "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
+        "cobertura": "ignora",
+        "evidencia": "«No existe un espacio donde el cliente pueda consultar por sí mismo el estatus de sus trámites, generando disputas sobre a quién corresponde la responsabilidad». Es una pantalla interna y no pretende ser el portal del cliente, pero tampoco deja rastro de la gestión de cobro —ni última gestión, ni compromiso de pago, ni responsable— que sería lo que zanjaría la disputa desde dentro."
+      }
+    ],
+    "usabilidad_para_el_area": "Para finanzas y cobranza esta es la pantalla que hoy no existe en ninguna hoja de cálculo, y su mayor acierto es conceptual: define qué entra en el número (sólo factura timbrada y no pagada), saca de ahí lo que contaminaría la lectura (los $436,070 cerrados sin facturar, que son un problema de facturación y no de cobro) y confiesa la limitación de su propio cálculo (la antigüedad se cuenta desde la factura porque el padrón no guarda los días de crédito). Eso resuelve pp-080 de raíz y da por primera vez un número al cuello de botella de pp-090 y pp-077. Lo que no resuelve es nada de lo que ocurre antes de timbrar: pp-109, pp-110 y pp-111 —tres de los ocho dolores de severidad alta de la entrevista de administración y finanzas, y los que se llevan las 16 horas semanales— quedan completamente fuera, y una factura rechazada por un RFC mal transcrito envejece aquí igual que una impagada. Tampoco permite bajar al renglón que hay que cuadrar (pp-115), que era la mitad operativa del trabajo. Y en el vocabulario la pantalla empeora el problema que pp-116 describe: introduce un reparto propio de cuatro tramos y una categoría nueva sin traducirlos a los cinco estados que el área ya usa, y los pinta con colores de estado del sistema que significan otra cosa. Sumado a que ninguna interacción está viva —ni el desglose de tres niveles que la pantalla anuncia, ni el filtrado, ni la ordenación—, el área recibiría hoy un informe bien pensado y bien argumentado, pero no una herramienta de cobranza."
+  },
+  "cobertura": [
+    {
+      "patron": "Reparto de un total en tramos de antigüedad (0–30 / 31–60 / 61–90 / +90 días). No es ni semáforo ni paleta categórica: es una escala ordinal con juicio creciente y más de tres peldaños. §1 obliga a decidir entre semáforo (§1.3) y categórica (§1.4), y ninguna de las dos sirve: el semáforo tiene cinco estados discretos cuyo significado no es ordinal, y la categórica es por definición sin juicio. La maqueta lo resolvió tomando prestado --block como tercer peldaño.",
+      "propuesta_de_regla": "§1.3.1 Rampa ordinal de antigüedad — tokens --edad-1 a --edad-4. Cuándo: un total repartido en tramos de una misma magnitud creciente con juicio (antigüedad de cartera, antigüedad de un trámite, vencimiento). No se usa el semáforo: un tramo intermedio no es un estado. Los extremos sí se anclan a él para que la lectura sea aprendida —--edad-1 toma el tono de --ok y --edad-4 el de --err— y los intermedios se interpolan en luminosidad, con las cinco comprobaciones de §1.4 (banda de luminosidad, suelo de croma, separación bajo daltonismo con suelo ΔE 15, suelo de visión normal y contraste contra la superficie) reproducidas con el validador del método de visualización, no a ojo. Máximo cuatro tramos; un quinto se agrupa. La rampa siempre va acompañada de leyenda con el rótulo del tramo y su cifra (§12.4), porque el reparto no se puede leer sólo por el color."
+    },
+    {
+      "patron": "Migas de desglose jerárquico (.migas-drill: «Todas las marcas ↓ Marca A» más el indicador «Nivel 2 de 3 · marca › grupo › agencia»), distintas de las migas de navegación .migas porque no describen la ruta de la aplicación sino la profundidad del corte de datos dentro de una misma pantalla. El sistema no documenta ninguna de las dos, y §6.21 describe el filtrado por campo categórico, que es precisamente el patrón que esta pantalla descarta y explica por qué.",
+      "propuesta_de_regla": "§6.24 Migas de desglose — .migas-drill. Cuándo: una pantalla cuyo contenido es el mismo conjunto de datos cortado a distinta profundidad (marca › grupo › agencia). No es §6.21: el desglose sustituye al filtro cuando los niveles son jerárquicos y excluyentes, porque con filtros sueltos quien mira no sabe en qué nivel está. Estructura: cada nivel por encima del actual es un <a> con destino real y relleno hasta 24px (§7.3); el nivel actual es texto plano con aria-current=\"true\"; a la derecha, el indicador de profundidad a --fs-meta en --text-3, sin color propio (§6.22: es un dato sobre el dato). El contenedor es un <nav> con aria-label, y bajar o subir de nivel se anuncia por aria-live y mueve el foco al encabezado del contenido (§6.4 regla 1). Si un nivel no tiene datos, se dice en la vista vacía con el ámbito del nivel, nunca con un cero (§6.22)."
+    },
+    {
+      "patron": "Cifra que se declara explícitamente excluida de otra cifra de la misma pantalla (.mini.aparte, de borde discontinuo: «Cerrado y sin facturar · No se suma a lo de arriba, y es a propósito»). §12.4 documenta .kpi, .cifras y el ámbito de datos de §6.22, pero no tiene forma de decir «esta cifra pertenece al mismo asunto y queda fuera del total», que es una necesidad recurrente en finanzas.",
+      "propuesta_de_regla": "§12.4 (ampliación) — .kpi.aparte. Cuándo: una cifra del mismo asunto que una principal, deliberadamente fuera de su total. Se marca con borde discontinuo de 1px en --border-2 sobre el fondo del widget —la discontinuidad es el único canal que dice «fuera del conjunto» sin añadir un color— y su relación con el total se escribe en el ámbito de §6.22, en una sola frase bajo el rótulo y a --fs-meta en --text-3: «no entra en el total». La explicación de por qué se excluye no va en pantalla: va al toggletip de §6.23 colgando del rótulo (§8, nivel 2). Nunca se pinta con un color de estado: la exclusión no es un juicio."
+    },
+    {
+      "patron": "Barra de proporción dentro de una celda de tabla densa (.mini-barra: 120×6px con su porcentaje en texto al lado) para comparar un mismo ratio entre filas. §12.4 documenta .progreso para «avance contra una meta declarada» dentro de un widget de dashboard, pero no esta variante de tabla, ni cómo se colorea cuando el ratio cruza un umbral — que es donde la maqueta terminó mezclando --serie-1 con --err.",
+      "propuesta_de_regla": "§6.11.2 Proporción en celda — .proporcion. Cuándo: comparar un mismo ratio entre las filas de una tabla. Pista de 120×6px en --surface-2 y relleno de un solo token para todas las filas; el color no cambia con el valor, porque una barra que cambia de paleta según su valor cruza el gobierno de color de §1. Si hay un umbral que importa, se marca con una línea vertical de 1px en --border-fuerte sobre la pista, igual en todas las filas, y el juicio se expresa donde ya hay un canal de texto: la cifra de la celda contigua en --err-ink y peso 700. El porcentaje va siempre escrito junto a la barra, a --fs-dense, porque la barra sola no llega a 3:1 contra la superficie en todas las anchuras. La barra lleva aria-hidden=\"true\": el texto ya dice el dato."
+    },
+    {
+      "patron": "Token --velo-trama (rgba(19,29,43,.24) claro / rgba(4,8,14,.42) oscuro), declarado en las cuatro maquetas del lote y ausente de §1.6, que sólo documenta --velo-suave y --velo-modal.",
+      "propuesta_de_regla": "§1.6 (ampliación) — se añade --velo-trama a la tabla de velos, o se retira de las maquetas. Si se conserva, se documenta con su uso exacto (el velo del cajón del menú lateral por debajo de 860px, §7.2) y sus dos valores, y se mide el contraste del contenido que queda detrás en los dos temas. Mientras no esté en la tabla, es un hex suelto con nombre de token: el preámbulo de §1 exige que todo color pase por un token declarado aquí."
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática servida por un servidor de ficheros, sin backend, sin Chart.js y sin red que perfilar.",
+    "§12.1-§12.3 Envoltura de librería y tabla equivalente: no se evalúan porque la pantalla no usa ningún <canvas> ni ninguna librería de gráficas. La barra apilada y la de proporción son CSS, que es lo que §12.1 pide para esas dos piezas. Por tanto no hay repintado al cambiar de tema, ni aviso de CDN, ni tabla equivalente que auditar.",
+    "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (0 <dialog> y 0 div[role=dialog] según el brief).",
+    "§1.4, suelo de separación ΔE 15 entre series: no evaluado — la pantalla no muestra dos series categóricas juntas en ningún elemento (sólo usa --serie-1 suelto en .mini-barra y .p-s1), así que no hay ninguna combinación adyacente real que medir. Lo que sí queda sin verificar, y se recoge como hallazgo, es que los hexes declarados no son los documentados y por tanto ninguna de las cinco comprobaciones de §1.4 está hecha sobre ellos."
+  ]
+}

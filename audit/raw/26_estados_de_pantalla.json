@@ -1,0 +1,310 @@
+{
+ "pantalla": "26_estados_de_pantalla",
+ "ruta_zip": "07-transversales/26_estados_de_pantalla.html",
+ "carpeta": "07-transversales",
+ "area": "transversal",
+ "arquetipo": "catálogo de estados",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "26_estados_de_pantalla--ok.png",
+  "26_estados_de_pantalla--loading.png",
+  "26_estados_de_pantalla--empty.png",
+  "26_estados_de_pantalla--error.png",
+  "26_estados_de_pantalla--oscuro.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-26estados-01",
+    "severidad": "alta",
+    "regla": "§6.4 regla 2 — «cada estado lleva encabezado real, no un <b>»",
+    "dice_el_sistema": "«A11y / cinco reglas no opcionales: (2) cada estado lleva encabezado real, no un <b>.» ANEXO C §11 lo repite: «cada pantalla o vista tiene encabezado real, no texto en negrita».",
+    "hay_en_el_build": "<b>El catálogo de estados está vacío</b> y <b>No se pudo cargar el catálogo de estados</b> como hijos directos de .state, y la regla .state b{font-size:var(--fs-base)} que consagra el patrón en la hoja de estilos.",
+    "selector": ".state-empty > b, .state-error > b, .state b",
+    "evidencia": "Medido en el navegador: en .state-empty y en .state-error, querySelector('h1,h2,h3,h4') devuelve null y hay un <b> hijo directo. Visible en 26_estados_de_pantalla--empty.png. La clase gemela .esp (las muestras del catálogo) repite lo mismo: .esp b{font-size:var(--fs-base)}.",
+    "por_que_importa": "Esta es la pantalla que define cómo se ve un estado en todas las demás, y lo que enseña es el antipatrón que §6.4 nombra. El propio catálogo dibuja nueve muestras de estado y ninguna lleva encabezado real: lo que se copie de aquí nace incumpliendo."
+   },
+   {
+    "id": "f1-26estados-02",
+    "severidad": "alta",
+    "regla": "§6.4 valores de .tarjeta-estado y .estado-ico; ANEXO C §11 «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo»",
+    "dice_el_sistema": ".tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)} — «es --r-modal y --sh-modal, no los de .tarjeta», y va opaca. .estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}, glifo a 28px; .es-err cambia solo el fondo a --err.",
+    "hay_en_el_build": ".state{display:flex;flex-direction:column;align-items:center;text-align:center;padding:56px 16px} y .state .ico{width:30px;height:30px;color:var(--text-3)}. No hay tarjeta, no hay medallón y --on-state no está declarado en el archivo.",
+    "selector": ".state, .state .ico",
+    "evidencia": "Capturas 26_estados_de_pantalla--empty.png y --error.png: el estado es texto centrado sobre el fondo de página, con un icono de trazo de 30px en gris auxiliar. Bloque ARQ-ESTADOS del <style>. El brief no lista --on-state entre los 83 tokens declarados.",
+    "por_que_importa": "El catálogo enseña el estado vacío y el de error como texto suelto sobre el fondo, que es exactamente lo que §11 prohíbe, y lo enseña nueve veces. Sin medallón relleno no hay nada que distinga de un vistazo un vacío de un error, que es el punto que la propia pantalla declara como «el error más caro»."
+   },
+   {
+    "id": "f1-26estados-03",
+    "severidad": "alta",
+    "regla": "§6.7 Esqueleto de carga",
+    "dice_el_sistema": "«Imita la forma de lo que va a llegar: mismas columnas, mismos anchos (en fr) y el mismo alto.» A11y: «sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)». ANEXO C §11: «el esqueleto mide lo mismo de alto que el contenido que sustituye».",
+    "hay_en_el_build": "El estado cargando es una sola .sk-caja de unos 250px de alto con cuatro barras y un bloque gris, mientras el contenido real es un documento de varias pantallas con tabla de cuatro columnas, nueve muestras y seis secciones. Y las 17 barras llevan texto dentro: «nombre del cliente y su RFC», «estado», «28 ago 2026», «Los cuatro estados de una pantalla», «párrafo de introducción», «tabla de los cuatro estados».",
+    "selector": ".state-loading.sk .skel",
+    "evidencia": "Captura --loading.png frente a --ok.png a 1440×900: el esqueleto ocupa unos 250 de 800px de zona de contenido y el documento real se extiende muy por debajo del pliegue. Medido en el navegador: 17 elementos .skel, todos con textContent no vacío.",
+    "por_que_importa": "La pantalla que define el esqueleto incumple las dos reglas del esqueleto a la vez: ni imita la forma de lo que llega (el salto de altura al cargar es de varias pantallas) ni deja las barras mudas, de modo que un lector de pantalla recita «nombre del cliente y su RFC, estado, 28 ago 2026» cuatro veces mientras carga un catálogo que no tiene clientes."
+   },
+   {
+    "id": "f1-26estados-04",
+    "severidad": "alta",
+    "regla": "§6.4 regla 1 — «el cambio se anuncia (aria-live=\"polite\") y mueve el foco»",
+    "dice_el_sistema": "«Todo cambio de vista se anuncia (aria-live=\"polite\") y mueve el foco (main.focus() con tabindex=\"-1\").»",
+    "hay_en_el_build": "El cambio es solo cont.setAttribute('data-state', …). El <main id=\"contenido\" tabindex=\"-1\"> está preparado pero nada lo enfoca, y no hay región que reciba el texto del estado nuevo.",
+    "selector": "main#contenido[data-state]",
+    "evidencia": "Medido sobre el documento servido: ninguna llamada .focus() en el <script>, ninguna asignación de texto a una región aria-live. Las tres regiones vivas que cuenta el brief son role=\"status\" estáticos de esqueletos.",
+    "por_que_importa": "Es la regla número uno de §6.4 y la incumple la pantalla que la enseña. Todas las demás pantallas del sistema heredan este mismo guion, así que el fallo se multiplica."
+   },
+   {
+    "id": "f1-26estados-05",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 — «un <symbol> ya trae su viewBox; repetirlo en el <svg> que lo invoca descoloca la marca»",
+    "dice_el_sistema": "«Correcto: <svg width=\"44\" height=\"42\" aria-hidden=\"true\"><use href=\"#dproma-mark\" width=\"44\" height=\"42\"/></svg> — medidas en el <use> y sin viewBox en el envoltorio. Al revés… se pinta 32,5px a la izquierda de su caja y se recorta casi entera. Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal.»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg> — el viewBox repetido en el envoltorio y el <use> sin medidas: el caso invertido, literal.",
+    "selector": ".side .logo svg > use",
+    "evidencia": "Medido con getBoundingClientRect a 1440×900: la caja del <svg> empieza en x=96 y la del <use> en x=63,54 — desplazamiento de 32,46px a la izquierda, el mismo número que §10 registra. Visible en las cinco capturas: sobre «SIO-DPROMA» solo se ve una astilla verde del isotipo.",
+    "por_que_importa": "El logotipo de la aplicación sale recortado en todas las vistas y en los dos temas. Es el fallo que §10 describe con su medición exacta, reproducido carácter por carácter, en una pantalla cuyo trabajo es enseñar cómo se hacen las cosas. 01_login escribe el mismo isotipo bien, así que el patrón correcto existe en el repo."
+   },
+   {
+    "id": "f1-26estados-06",
+    "severidad": "media",
+    "regla": "ANEXO B §8 Voz de producto — prueba base y límite 2",
+    "dice_el_sistema": "«Si el texto explica una decisión, no va en pantalla. Si explica una consecuencia para quien está mirando, sí — y en una frase.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres.»",
+    "hay_en_el_build": "Tres bloques siempre visibles por encima del tope, y con referencias al propio archivo: .regla con 230 y 256 caracteres, y el párrafo del estado vacío con 260: «Este archivo es un catálogo: su estado vacío sólo tiene sentido como demostración de sí mismo. Aun así se dibuja, y a propósito — porque el defecto que este patrón viene a corregir es exactamente que una pantalla se salte este paso por parecerle que no aplica.» El estado de error empieza con «Mismo patrón que el de la última sección, aplicado a esta pantalla».",
+    "selector": ".regla, .state-empty > p, .state-error > p",
+    "evidencia": "Medido con innerText sobre los bloques siempre visibles: 230, 256 y 260 caracteres. Visible en --empty.png y --ok.png.",
+    "por_que_importa": "Es la voz de conversación interna que §8 persigue, con sus dos marcas: habla del archivo («este archivo», «la última sección») y explica la decisión de diseño en vez de la consecuencia. La pantalla está servida dentro del cromo de la aplicación, con barra lateral y menú, así que a ojos de cualquiera es una pantalla de producto y no documentación."
+   },
+   {
+    "id": "f1-26estados-07",
+    "severidad": "media",
+    "regla": "§1.1 Superficies y texto — --text-3 y §1.7 ratios mínimos",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)». «No basta con medirlo sobre --surface: si el elemento puede caer sobre --surface-2, se mide también ahí.»",
+    "hay_en_el_build": "--text-3:#66717F, y .muestra > .rot (fondo --surface-2, color --text-3) lo pone justo sobre la superficie donde falla.",
+    "selector": ".muestra > .rot .cuando",
+    "evidencia": "Brief: contraste.fallos incluye {sel:'span.cuando', color:'rgb(102,113,127)', fondo:'rgb(231,237,243)', px:11, ratio:4.21, min:4.5}. Es el mismo 4,21:1 que §1.1 documenta como motivo del cambio de token.",
+    "por_que_importa": "El fallo de contraste se materializa aquí, no queda en riesgo teórico: los rótulos «hay datos, tus filtros los esconden», «hay datos, no son tuyos» y «no hay datos, punto» —que son los que distinguen los tres vacíos— se pintan por debajo del mínimo AA. Con --text-3:#5C6675 ese mismo par daría 4,93:1."
+   },
+   {
+    "id": "f1-26estados-08",
+    "severidad": "media",
+    "regla": "§2.1 Tipografía — suelo de 12px; §10 trampa 1",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» Única excepción: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta. §10 trampa 1: «los avatares del cromo llevaban font:700 11px var(--font-ui) y sobrevivieron a una revisión completa».",
+    "hay_en_el_build": "45 elementos con texto por debajo de 12px. Entre ellos .cromo-av{font:700 11px var(--font-ui)} —la trampa 1 literal, escrita con la forma abreviada font:—, .cromo-quien small a 11px, thead th a 11px, .pill/.p-type/.sin-reloj a 11px, .dos small a 11px, .nota a 11,5px, .pz span.tx a 11,5px y .muestra .cuando a 11px.",
+    "selector": ".cromo-av, thead th, .pill, .nota, .muestra .cuando",
+    "evidencia": "Medido con el estilo calculado de cada elemento con nodo de texto: 45 por debajo de 12px. El brief confirma el avatar: {sel:'span.cromo-av', px:11}. Solo .grp (10,5px, rótulo de grupo de la barra lateral) y los ::before del modo tarjeta son excepciones admitidas.",
+    "por_que_importa": "La cabecera de tabla, las etiquetas de estado y el pie de nota son datos que se leen todos los días, y §2.1 los manda a 12-13px como mínimo. El avatar reproduce la trampa 1 con la misma declaración abreviada que el sistema registra como el caso que sobrevive a las revisiones."
+   },
+   {
+    "id": "f1-26estados-09",
+    "severidad": "media",
+    "regla": "§1.4 Series de gráfica (paleta categórica)",
+    "dice_el_sistema": "--serie-1 azul #2a78d6 / #3987e5; --serie-2 naranja #eb6834 / #d95926; --serie-3 violeta; --serie-4 magenta. «Se asignan en orden fijo y no se ciclan.»",
+    "hay_en_el_build": "--serie-1:#2C6CA8 y --serie-2:#7A5FA8 en claro (#6FA8DC y #B69BE0 en oscuro). --serie-3 y --serie-4 no se declaran. Se usan en .p-s1/.p-s2 (§6.10 etiquetas de clasificación).",
+    "selector": ":root",
+    "evidencia": "Bloque :root del archivo. Ninguno de los cuatro valores coincide con la tabla de §1.4: la ranura 2, que el sistema fija en naranja, aquí es violeta.",
+    "por_que_importa": "Las etiquetas de clasificación de §6.10 («lo que la cosa es») se tiñen con estas ranuras, así que una clasificación pintada en esta pantalla no coincidirá con la misma clasificación en una gráfica de otra. Además las dos ranuras declaradas son azul y violeta, el par que §1.4 señala como el peor en oscuro (ΔE 1,6 entre serie 1 y 3)."
+   },
+   {
+    "id": "f1-26estados-10",
+    "severidad": "media",
+    "regla": "§6.11 regla 1 — «<caption> siempre, aunque vaya oculto con .sr»",
+    "dice_el_sistema": "«<caption> siempre, aunque vaya oculto con .sr.»",
+    "hay_en_el_build": "La tabla de los cuatro estados (<table data-prosa>) no lleva <caption>. La regla caption{position:absolute;…} sí está declarada y suelta, lista para usarse.",
+    "selector": "table[data-prosa]",
+    "evidencia": "Comprobado sobre el markup: la única <table> del archivo tiene 9 <th> (4 scope=\"col\" y 4 scope=\"row\") y ningún <caption>. El brief lo refleja: tablas=1, th=8, thAriaSort=0.",
+    "por_que_importa": "Los scope están bien puestos, así que la tabla está a un elemento de cumplir. Sin <caption>, quien navega por tablas con lector de pantalla llega a una tabla sin nombre en la pantalla que debería ser el ejemplo."
+   },
+   {
+    "id": "f1-26estados-11",
+    "severidad": "media",
+    "regla": "§6.7 / §5 — prefers-reduced-motion aplana el fondo del esqueleto",
+    "dice_el_sistema": "«Hay que aplanar el fondo, no solo parar la animación. animation:none a secas congela el degradado en la posición 0. Correcto: .skel{animation:none;background:var(--surface-2)}.»",
+    "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}} — sin reponer background.",
+    "selector": ".skel",
+    "evidencia": "Bloque ARQ-ESTADOS del archivo. La misma regla incompleta está en 51_acceso y 56_frontera_error.",
+    "por_que_importa": "Con movimiento reducido las 17 barras se quedan con el degradado congelado en su posición inicial. Es el ejemplo exacto que §6.7 da como incorrecto, en la pantalla que documenta el esqueleto."
+   },
+   {
+    "id": "f1-26estados-12",
+    "severidad": "baja",
+    "regla": "§6.9 — «antes de escribir una clase nueva, verificar si .banda + una de sus cuatro variantes ya lo cubre»; trampa adicional de §6.9",
+    "dice_el_sistema": "«Antes de escribir una clase nueva, verificar si .banda + una de sus cuatro variantes ya lo cubre.» «No solo se repiten nombres de clase por accidente, también se reinventan componentes enteros por no buscar primero si ya existen.»",
+    "hay_en_el_build": ".regla{border-left:3px solid var(--accent);background:var(--accent-soft);padding:var(--sp-2) var(--sp-4);border-radius:0 var(--r-ctrl) var(--r-ctrl) 0}, en el mismo archivo donde ya están declaradas .banda, .b-info, .b-warn, .b-err y .b-ok.",
+    "selector": ".regla",
+    "evidencia": "Líneas 644 y 520-525 del archivo: las dos familias conviven en la misma hoja de estilos.",
+    "por_que_importa": "Es el caso .bloqueado / .banda.b-info que §6.9 registra, repetido. Además .regla no lleva icono ni role=\"status\", de modo que el aviso más importante de la pantalla («El error más caro es confundir vacío con error») no se anuncia."
+   },
+   {
+    "id": "f1-26estados-13",
+    "severidad": "baja",
+    "regla": "§10 trampa 10 — «un nombre de clase corto no se declara dos veces en el mismo archivo»",
+    "dice_el_sistema": "«.resumen se usó a la vez para el <span> de una línea de resumen y para el <section> de chips de estado de otra pantalla — convertirlo a grid de tres columnas rompió el primero en silencio.» «Antes de escribir .algo{...} se busca con grep -n '^\\.algo{' en el archivo.»",
+    "hay_en_el_build": ".dos declarada dos veces fuera de media query: línea 385 como pila vertical de celda de tabla (.dos{display:flex;flex-direction:column;gap:2px;…}) y línea 660 como rejilla de dos columnas (.dos{display:grid;grid-template-columns:1fr 1fr;…}). También .tabla-caja dos veces (362 y 407).",
+    "selector": ".dos",
+    "evidencia": "grep '^\\.dos{' sobre el archivo: dos coincidencias. En el markup .dos aparece una sola vez, en su uso de rejilla, así que la segunda declaración gana y la primera queda anulada sin romper nada visible aquí.",
+    "por_que_importa": "Es el mecanismo exacto de la trampa 10, latente: el .dos de celda de tabla viene del bloque ARQ-P4 que estas maquetas comparten, de modo que en cualquier pantalla que use las dos cosas la celda de dos líneas se convertirá en una rejilla de dos columnas en silencio."
+   },
+   {
+    "id": "f1-26estados-14",
+    "severidad": "baja",
+    "regla": "§7.3 — «toda regla táctil lleva :root»",
+    "dice_el_sistema": "«:root[data-tacto=\"dedo\"] .it, … {min-height:46px}. El :root es lo que hace ganar la regla: con :root suma (0,3,0); sin él (0,2,0) y lo empata cualquier variante de tamaño del componente (.acciones .iconbtn{width:28px}) que, por ir después, gana. Se comprueba midiendo con data-tacto=\"dedo\" puesto.»",
+    "hay_en_el_build": "Seis reglas [data-tacto=\"dedo\"] escritas sin :root, y .acciones .iconbtn{width:28px;height:28px} declarada 90 líneas más abajo. data-tacto no aparece ni en el markup ni en el JS.",
+    "selector": "[data-tacto=\"dedo\"] .iconbtn vs .acciones .iconbtn",
+    "evidencia": "Brief: regla_data_tacto_sin_root = 6. Comprobado midiendo con data-tacto=\"dedo\" puesto en el navegador: .cromo-top .iconbtn pasa a 46×46px y .it a min-height 46px — sí ganan, porque en esta pantalla no hay ningún .acciones .iconbtn en el markup que los empate. El bug está escrito pero no se manifiesta aquí.",
+    "por_que_importa": "Severidad baja por eso mismo: medido, no falla. Pero la declaración .acciones .iconbtn{width:28px} ya está en la hoja, así que en cuanto una pantalla que comparta este arquetipo dibuje acciones de fila, el modo dedo dejará de funcionar justo donde más falta hace. Y como data-tacto no se activa desde ninguna parte, el modo no se puede probar sin tocar el DOM a mano."
+   }
+  ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 4,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "El armazón es el mejor del lote: cromo de §7.2 con sus tres anchos (236px, 64px colapsada entre 860 y 1100, cajón con velo por debajo de 860), skip link, aria-current en el ítem activo, focus-visible con --chrome-focus dentro de la barra, modo tarjeta de tabla a 860px, --focus-w/--focus-offset declarados y los dos temas completos en tres bloques (media query, [data-theme=dark] y claro) — el tema oscuro se ve correcto en la captura. Theming 4 por eso. Accesibilidad baja a 2: 45 elementos por debajo de 12px, un fallo de contraste real medido a 4,21:1, estados sin encabezado y sin anuncio, y esqueletos que leen texto. Integridad 2: el isotipo recortado 32,46px, --on-state sin declarar, series fuera de la paleta de §1.4, .dos declarada dos veces y 17 tokens declarados sin usar. Responsive 3: los cortes están bien pensados, pero la rejilla .tres/.piezas del catálogo y el esqueleto no comparten punto de ruptura con la tabla (900 frente a 860), que es el detalle que §6.7 marca.",
+  "evidencia": [
+   "getBoundingClientRect del isotipo: <svg> en x=96, <use> en x=63,54 → 32,46px de desplazamiento",
+   "Brief: contraste span.cuando #66717F sobre #E7EDF3 = 4,21:1 a 11px (mínimo 4,5)",
+   "Estilo calculado: 45 elementos con texto por debajo de 12px",
+   "querySelectorAll('.skel') = 17, todas con texto dentro",
+   "Medido con data-tacto=\"dedo\": .cromo-top .iconbtn 46×46px, .it min-height 46px",
+   "Captura --oscuro.png: los dos temas pintan correctamente, incluida la tabla y las muestras"
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 3,
+   "hallazgo": "El cambio de estado no se anuncia ni mueve el foco, y el esqueleto no anticipa la forma de lo que llega: al cargar, la pantalla salta de 250px a varias pantallas de alto sin aviso.",
+   "selector": "main#contenido[data-state], .state-loading.sk"
+  },
+  {
+   "n": 2,
+   "heuristica": "Correspondencia entre el sistema y el mundo real",
+   "severidad": 2,
+   "hallazgo": "La pantalla habla del archivo y del propio patrón («este archivo es un catálogo», «mismo patrón que el de la última sección») en lugar de hablar del trabajo de quien la mira, y lo hace dentro del cromo de la aplicación, donde todo lo demás sí es producto.",
+   "selector": ".state-empty > p, .state-error > p"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 1,
+   "hallazgo": "El estado vacío ofrece «Volver al catálogo» desde el propio catálogo, que no lleva a ninguna parte distinta.",
+   "selector": ".state-empty .acc .btn"
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 4,
+   "hallazgo": "Es la pantalla normativa y contradice la norma que publica: estados sin tarjeta ni medallón, títulos en <b>, esqueleto que no imita la forma, series de color fuera de §1.4 y un componente .regla que duplica .b-info declarado tres bloques más arriba. Lo que se copie de aquí nace divergente.",
+   "selector": ".state, .esp, .regla"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 1,
+   "hallazgo": "La tabla y las muestras explican bien cómo no confundir vacío con error, pero el aviso que lo resume (.regla) no lleva icono ni role=\"status\", así que se lee como párrafo más.",
+   "selector": ".regla"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocimiento antes que recuerdo",
+   "severidad": 2,
+   "hallazgo": "Las nueve muestras del catálogo se distinguen solo por su rótulo en 10,5-11px y por un icono de trazo gris de 30px: no hay color ni forma que permita reconocer de un vistazo cuál es un vacío y cuál un error, que es justo lo que la pantalla enseña a distinguir.",
+   "selector": ".muestra > .rot, .esp .ico"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 1,
+   "hallazgo": "El catálogo es un documento largo sin índice ni anclas: para llegar a la sección del esqueleto hay que recorrerlo entero.",
+   "selector": ".cat"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 3,
+   "hallazgo": "Tres bloques siempre visibles por encima del tope de ~140 caracteres (230, 256 y 260) y párrafos de introducción de hasta 80ch encadenados. La pantalla explica sus propias decisiones en vez de mostrarlas.",
+   "selector": ".regla, p.intro, .state-empty > p"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de los errores",
+   "severidad": 2,
+   "hallazgo": "El estado de error trae referencia (CAT-20260821-0001) y dice que no se perdió nada, pero llega sin encabezado, sin tarjeta, sin medallón y sin anunciarse: cumple el contenido y falla la forma que la propia pantalla define.",
+   "selector": ".state-error"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 0,
+   "hallazgo": "Como documentación es completa y clara: la tabla de los cuatro estados, los tres vacíos y la anatomía del estado vacío son material utilizable. El problema no es lo que dice, es que esté dentro del producto y que la maqueta no siga lo que dice.",
+   "selector": ".cat"
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-104",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-104 (media): «La certificación ISO 9001 en curso exige crear procedimientos normalizados y formatos de registro que hoy no existen de forma estandarizada entre departamentos.» Esta pantalla es exactamente un procedimiento normalizado: define los cuatro estados, qué tiene que decir cada uno, qué no puede hacer, y da el formato de la referencia de incidente (CAT-20260821-0001). Es el tipo de documento que la certificación pide. La cobertura queda incompleta porque la maqueta no cumple su propio procedimiento."
+   },
+   {
+    "pp": "pp-105",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-105 (baja): el proyecto anterior «se detuvo en la fase de maquetado visual sin avanzar a desarrollo funcional». Un catálogo de los cuatro estados es la pieza que impide que eso se repita: obliga a decidir el comportamiento, no solo el aspecto, antes de construir. El propio texto de la pantalla lo nombra: «una pantalla que sólo existe con datos está a un cuarto de terminar»."
+   },
+   {
+    "pp": "pp-100",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-100 (alta): «No existe repositorio centralizado de contratos comerciales; cada área guarda su copia de forma aislada.» La pantalla no toca este dolor: es transversal de interfaz, no de contenido documental. Lo cito para dejar constancia de que el pain point de mayor severidad del área no tiene relación con esta pantalla."
+   }
+  ],
+  "usabilidad_para_el_area": "Como documento es la pieza más valiosa del lote para el soporte administrativo transversal: convierte en norma escrita algo que hoy se improvisa pantalla a pantalla, y eso es justo lo que pp-104 pide para la ISO 9001 y lo que pp-105 echó de menos en el proyecto anterior. Como pantalla no sirve a ninguna tarea del área: vive dentro del cromo de la aplicación, con barra lateral y menú de cuenta, pero no permite hacer nada — está ahí para leerse. El problema de fondo es que lo que enseña y lo que hace no coinciden: define el encabezado real, la tarjeta con medallón, el anuncio del cambio y el esqueleto que imita la forma, y no implementa ninguna de las cuatro. Quien copie de aquí copiará el incumplimiento."
+ },
+ "cobertura": [
+  {
+   "patron": "Choque de valor entre los dos documentos del sistema. docs/sistema-diseno-acceso-sio-dproma.md declara --text-3:#66717F (línea 35), --sh-modal con .20 (línea 136) y --glass con .74 (línea 137); docs/sistema-diseno-sio-dproma.md declara #5C6675 (línea 64), .22 (línea 519) y .66 (línea 520). Esta maqueta trae --sh-modal:.22 y --glass:.66 (los del dashboard, correctos) pero --text-3:#66717F (el del acceso, obsoleto): el token del documento histórico se cuela aislado en un :root por lo demás canónico.",
+   "propuesta_de_regla": "§1.1 — Fuente de verdad única de los tokens. El documento de acceso queda marcado como histórico y deja de declarar valores: remite a §1.1 del documento principal para todo token compartido y conserva solo los patrones exclusivos de la pantalla de entrada (§7.1 y §6.1). Donde un token exista en los dos, gana el del documento principal sin excepción, y el del documento histórico se retira del archivo."
+  },
+  {
+   "patron": "El documento principal documenta el ratio de las variantes -ink/-bg del semáforo (§1.3: ok 5,04:1, err 5,02:1 en claro) pero no publica su hex; solo el documento del acceso lo hace (--ok-ink:#22705A, --err-ink:#B03A31, líneas 39-40). Esta maqueta trae esos valores y, medidos, reproducen los ratios de §1.3 exactamente (#22705A sobre --ok-bg #E2EFEC = 5,03:1; #B03A31 sobre --err-bg #F4E8E7 = 5,02:1): son los correctos, pero solo están escritos en el documento antecesor, que es el mismo que arrastra el --text-3 obsoleto.",
+   "propuesta_de_regla": "§1.3 — Las tres variantes de cada estado se publican con su hex en la tabla, no solo con su ratio, en los dos temas, con el ratio medido al lado como comprobación. Lo mismo para los seis -bg que esta maqueta declara (--ok-bg #E2EFEC, --warn-bg #F1ECDE, --err-bg #F4E8E7, --block-bg #EDEBF7, --pause-bg #E7EAEC) y que ninguno de los dos documentos recoge."
+  },
+  {
+   "patron": "El documento principal se contradice a sí mismo sobre el anillo de foco en fondo oscuro: §1.2 (línea 138) asigna #C7D97B a «el wordmark y el anillo de foco sobre fondo oscuro» y §1.5 (línea 324) asigna la misma descripción a --chrome-focus #9FE0AE. Esta maqueta declara --chrome-focus:#9FE0AE y lo aplica con .side :focus-visible{outline-color:var(--chrome-focus)}; 01_login resuelve el mismo empate con #C7D97B literal.",
+   "propuesta_de_regla": "§1.5 — Un solo anillo de foco sobre fondo oscuro: --chrome-focus (#9FE0AE), en el cromo y en cualquier otra superficie oscura, incluida la columna de marca del acceso. El verde lima #C7D97B queda reservado al wordmark y al isotipo, y §1.2 se corrige para no nombrar el foco."
+  },
+  {
+   "patron": "--on-state (§1.4.1) no está declarado en ninguna de las tres maquetas de dashboard del lote, y §6.4 lo exige para el glifo del medallón de estado (.estado-ico{background:var(--accent);color:var(--on-state)}). Donde hace falta tinta sobre relleno sólido, la maqueta usa --accent-ink (.seccion .idx, .pz .n), que en claro coincide en valor (#F7FAF9) pero conceptualmente es otro token: --accent-ink es «sobre --accent», no «sobre cualquier relleno de estado».",
+   "propuesta_de_regla": "§1.4.1 — --on-state se declara siempre en el :root de toda pantalla que dibuje un relleno sólido de color, aunque su valor coincida con --accent-ink en el tema claro. El sistema comprueba la presencia del token, no su valor: usar --accent-ink sobre un relleno de --err o de --warn es el camino por el que vuelve el blanco literal a 2,27:1 que §1.4.1 documenta."
+  },
+  {
+   "patron": "La pantalla está servida dentro del cromo de la aplicación (barra lateral de navegación real, menú de cuenta, botón de tema, h1 de pantalla) pero no es producto: es documentación del sistema de diseño. §9 solo contempla marcar el conmutador de estados con data-andamio; no dice nada de una pantalla entera que es documentación vestida de producto.",
+   "propuesta_de_regla": "§9 — Una pantalla que es documentación del sistema, y no una pantalla del producto, se marca entera con data-doc en su <main> y lleva una banda .banda-info permanente en primera posición que lo diga en una frase («Esta pantalla documenta un patrón del sistema; no forma parte del producto»). No se sirve dentro del cromo de navegación: el cromo afirma que lo que hay dentro es una pantalla a la que se llega trabajando. Como el andamiaje, todo lo marcado con data-doc se retira en la versión real con un solo selector."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática, sin backend que perfilar",
+  "contraste: de los dos fallos que trae el brief, solo uno es real. El de span.cromo-av (3,05:1 sobre rgba(62,122,76,.10)) es un artefacto del método, que trata el rgba como si fuera opaco: el avatar vive dentro de .cromo-top, cuyo fondo es --surface, y compuesto de verdad el par #1B2430 sobre ~#F6F9F7 supera con holgura 4,5:1. Lo descarto como hallazgo de contraste, pero sí cuento su tamaño de 11px (§2.1 / §10 trampa 1). El de span.cuando (4,21:1 sobre --surface-2 opaco) sí es real y está en f1-26estados-07",
+  "§12 gráficas: la pantalla no dibuja ningún canvas ni leyenda, así que §12.1 a §12.6 no se evalúan",
+  "§6.18 diálogo modal: no hay ningún diálogo en la pantalla (brief: dialogNativo=0, divDialog=0); no procede",
+  "modo dedo: comprobado activando data-tacto=\"dedo\" desde el navegador porque la pantalla no ofrece forma de activarlo; no hay control de tacto en el markup ni en el JS"
+ ]
+}

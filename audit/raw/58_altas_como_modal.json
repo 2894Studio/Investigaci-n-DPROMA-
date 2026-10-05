@@ -1,0 +1,321 @@
+{
+  "pantalla": "58_altas_como_modal",
+  "ruta_zip": "02-padron-de-clientes/58_altas_como_modal.html",
+  "carpeta": "02-padron-de-clientes",
+  "area": "comercial",
+  "arquetipo": "modal/marco",
+  "modo": "cumplimiento",
+  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
+  "capturas": [
+    "58_altas_como_modal--ok.png",
+    "58_altas_como_modal--loading.png",
+    "58_altas_como_modal--empty.png",
+    "58_altas_como_modal--error.png",
+    "58_altas_como_modal--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-58modal-01",
+        "severidad": "alta",
+        "regla": "§6.18 Diálogo modal — `<dialog>` nativo",
+        "dice_el_sistema": "«Se usa `<dialog>` nativo con `showModal()`.» El navegador da el velo, la capa superior y la trampa de foco. La alternativa —un `<div role=\"dialog\" aria-modal=\"true\">` en el flujo del documento— «obliga a reimplementar las tres cosas, y en la práctica no se reimplementan». → Un `div` es no-cumple.",
+        "hay_en_el_build": "Seis `<div class=\"modal\" role=\"dialog\" aria-modal=\"true\" …>` en el flujo del documento (líneas 777, 868, 934, 1002, 1060 y 1125) y ningún `<dialog>`.",
+        "selector": "div.modal[role=\"dialog\"][aria-modal=\"true\"]",
+        "evidencia": "Brief MEDIDO: `dialogNativo: 0`, `divDialog: 6`. Medición propia en el navegador: `document.querySelectorAll('[role=dialog]').length === 6` y `document.querySelectorAll('dialog').length === 0`. Es una de las dos únicas pantallas de las 52 con modal, y usa el antipatrón que §6.18 nombra de forma explícita.",
+        "por_que_importa": "Sin `showModal()` no hay capa superior, ni velo del navegador, ni trampa de foco. Y con seis `aria-modal=\"true\"` presentes a la vez, un lector de pantalla puede ocultar todo lo que queda fuera de uno de ellos: la pantalla entera, las otras cinco altas y el propio marco de la página quedan inalcanzables."
+      },
+      {
+        "id": "f1-58modal-02",
+        "severidad": "alta",
+        "regla": "§6.18 Foco — las cuatro reglas",
+        "dice_el_sistema": "(1) Al abrir, el foco va al primer control que se puede rellenar — no al diálogo, no al aspa. (2) Mientras está abierto, `Tab` cicla dentro; lo da `showModal()`. (3) Al cerrar sin guardar, el foco vuelve al control desde el que se abrió. (4) Al cerrar guardando, va a la fila o el elemento que se acaba de cambiar; si ya no existe, al contenedor más cercano, nunca al `body`.",
+        "hay_en_el_build": "Ninguna de las cuatro está implementada. El `<script>` de la pantalla registra exactamente seis manejadores: los del panel `.demo` del andamiaje, el del conmutador de tema, el de `matchMedia`, el del botón de menú, el del velo del menú y un `keydown` de Escape que solo cierra el menú lateral (`document.addEventListener('keydown',function(e){if(e.key==='Escape')menu(false);})`).",
+        "selector": "div.modal[role=\"dialog\"], button.cerrar",
+        "evidencia": "Medición propia: cero llamadas a `focus()` en todo el archivo; cero referencias a `.modal` o a `[role=dialog]` desde el JS; el único `keydown` del documento es el del menú. Los diálogos no se abren ni se cierran nunca: están dibujados en el flujo.",
+        "por_que_importa": "§6.18 llama a estas cuatro «las que nadie escribe y todo el mundo incumple», y advierte de que con un `div` «en la práctica no se reimplementan». Aquí es literal: ninguna de las cuatro existe. Quien navega con teclado puede tabular fuera del diálogo hacia el formulario de debajo sin que nada lo impida."
+      },
+      {
+        "id": "f1-58modal-03",
+        "severidad": "alta",
+        "regla": "§6.18 Esc y cierre durante una operación",
+        "dice_el_sistema": "«Mientras una operación está en vuelo, nada cierra el diálogo: ni Escape, ni el aspa, ni el clic en el velo.» Motivo: «cerrar a medio guardar deja a alguien sin saber si se guardó». Implementación exigida: `dlg.addEventListener('cancel', function(e){ if (dlg.dataset.momento === 'guardando') e.preventDefault(); });`",
+        "hay_en_el_build": "No hay manejador `cancel`, ni atributo `data-momento`, ni ninguna noción de operación en vuelo. El `Escape` que sí existe cierra el menú lateral sin comprobar nada. El aspa (`button.cerrar`) no tiene manejador.",
+        "selector": "div.modal, button.cerrar, document keydown",
+        "evidencia": "Medición propia: cero ocurrencias de `cancel`, `momento` o `guardando` en el `<script>` y en los atributos del archivo; `button.cerrar` aparece seis veces en el markup y ninguna en el JS.",
+        "por_que_importa": "Es el requisito que §6.18 justifica con una consecuencia concreta: cerrar a medio guardar deja a alguien sin saber si el cliente se dio de alta. En un alta que ya viene de WhatsApp y Excel, un alta duplicada o perdida es el peor resultado posible."
+      },
+      {
+        "id": "f1-58modal-04",
+        "severidad": "alta",
+        "regla": "§6.18 `::backdrop` / §1.6 Velos",
+        "dice_el_sistema": "`dialog.modal::backdrop{background:var(--velo-modal)}` → `rgba(19,29,43,.45)` en claro, `rgba(4,8,14,.62)` en oscuro. «No se simula con un `div` de velo.»",
+        "hay_en_el_build": "`.velo{position:relative;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-card);padding:var(--sp-6);overflow:hidden}` + `.velo::before{content:\"\";position:absolute;inset:0;background:rgba(9,14,20,.44)}` — un `<div>` de velo con un hex literal escrito a mano.",
+        "selector": ".velo::before",
+        "evidencia": "Medición propia en el navegador: `getComputedStyle(.velo,'::before').backgroundColor` = `rgba(9, 14, 20, 0.44)`, mientras que el token `--velo-modal` resuelve a `rgba(19,29,43,.45)` y en la pantalla solo lo usa `.velo-menu` (el cajón del menú lateral). Cero reglas `::backdrop` en el archivo.",
+        "por_que_importa": "Incumple además la regla de fondo del preámbulo: «ningún hex literal en un componente. Todo pasa por un token.» El valor escrito a mano ni siquiera coincide con el del token, y al no ser `::backdrop` no cambia con el tema: en oscuro debería ser `rgba(4,8,14,.62)` y se queda en el mismo gris azulado."
+      },
+      {
+        "id": "f1-58modal-05",
+        "severidad": "alta",
+        "regla": "§3 — «un token que no existe falla en silencio»",
+        "dice_el_sistema": "Un `var()` que no resuelve invalida la declaración entera (los tres paddings del diálogo computaban a 0). «Cuando un espaciado se vea raro, lo primero es comprobar que su token está definido.» §11: «todo token `var(--x)` que usa el archivo está declarado en ese mismo archivo».",
+        "hay_en_el_build": "`--sp-5` se usa cinco veces y no está declarado en ningún `:root` del archivo: `.modal > header{padding:var(--sp-4) var(--sp-5)}`, `.modal .cuerpo{padding:var(--sp-5);…;gap:var(--sp-5)}`, `.modal > footer{padding:var(--sp-4) var(--sp-5)}` y `.tel-fila{gap:var(--sp-5)}`.",
+        "selector": ".modal > header, .modal .cuerpo, .modal > footer",
+        "evidencia": "Brief MEDIDO: `usados_sin_declarar: [\"--sp-5\"]`. Medición propia con el estilo calculado: `getComputedStyle(--sp-5)` devuelve cadena vacía, y el relleno computado de la cabecera, el cuerpo y el pie del diálogo es **0px, 0px y 0px**; el `gap` del cuerpo también queda en `normal`. Es exactamente el incidente que §3 documenta, repetido.",
+        "por_que_importa": "Los tres rellenos del diálogo valen cero: el título, los campos y los botones tocan el borde del cuadro. Y falla en silencio — nada en el CSS lo delata, solo el estilo calculado."
+      },
+      {
+        "id": "f1-58modal-06",
+        "severidad": "alta",
+        "regla": "§11 — todos los `id` únicos",
+        "dice_el_sistema": "Todos los `id` únicos, y cada `aria-describedby`/`aria-controls` apunta a algo que existe.",
+        "hay_en_el_build": "Catorce `id` repetidos dos veces cada uno, porque el diálogo del alta de cliente se dibuja una segunda vez en la maqueta de teléfono sin renumerar: `rs`, `rfc`, `tipo`, `cp`, `reg`, `dom`, `csf`, `idr`, `grp`, `mar`, `per`, `rol`, `cor`, `tel`.",
+        "selector": "#rs, #rfc, #tipo, #cp, #reg, #dom, #csf, #idr, #grp, #mar, #per, #rol, #cor, #tel",
+        "evidencia": "Medición propia recorriendo todos los `[id]`: los catorce aparecen con cuenta 2. La consecuencia la mide el brief: `inputsSinEtiqueta: 14` de 69 inputs — son exactamente las segundas instancias, porque `label[for=\"rs\"]` solo puede resolver al primer `#rs` del documento y la copia se queda sin nombre accesible.",
+        "por_que_importa": "Catorce campos del alta —razón social, RFC, código postal, domicilio, los dos documentos, el contacto entero— quedan sin nombre para un lector de pantalla en la versión de teléfono, que es precisamente la que esta maqueta existe para defender."
+      },
+      {
+        "id": "f1-58modal-07",
+        "severidad": "alta",
+        "regla": "§6.16 regla 3 — obligatoriedad real",
+        "dice_el_sistema": "`required` y `aria-required` de verdad, no asteriscos decorativos.",
+        "hay_en_el_build": "Treinta `<span class=\"req\">*</span>` repartidos por los cinco formularios, y cero atributos `required` y cero `aria-required` en todo el documento.",
+        "selector": ".req, input[required], [aria-required]",
+        "evidencia": "Medición propia: 30 elementos `.req` y `document.querySelectorAll('[required]').length === 0`, `document.querySelectorAll('[aria-required]').length === 0`.",
+        "por_que_importa": "Es el asterisco decorativo que §6.16 prohíbe por su nombre: lo que se ve dice «obligatorio» y lo que el campo declara dice que no lo es. Un lector de pantalla no anuncia ninguno de los treinta campos como requerido. Además, la versión en pantalla completa de este mismo formulario (41_alta_cliente) sí lo hace bien, con `required`+`aria-required` en los dos campos del alta y con las palabras de la regla 2 en lugar de asteriscos: aquí se perdió por el camino."
+      },
+      {
+        "id": "f1-58modal-08",
+        "severidad": "alta",
+        "regla": "§10 trampa 2 — selectores por exclusión, no por enumeración",
+        "dice_el_sistema": "El tamaño de los campos estaba definido como `.ctrl input[type=\"text\"], .ctrl input[type=\"date\"], .ctrl input[type=\"number\"]`. Al cambiar dos campos a `type=\"email\"` y `type=\"tel\"` —que es lo correcto— se quedaron fuera y colapsaron a 19px de alto. Lo que aplica a todos los campos se escribe `.ctrl input:not([type=\"file\"]):not([type=\"checkbox\"]):not([type=\"radio\"])`.",
+        "hay_en_el_build": "Línea 580: `.ctrl input[type=\"text\"],.ctrl input[type=\"date\"],.ctrl input[type=\"number\"],.ctrl select,.ctrl textarea{…min-height:38px…}` — sin `[type=\"email\"]` ni `[type=\"tel\"]`.",
+        "selector": ".ctrl input[type=\"email\"], .ctrl input[type=\"tel\"]",
+        "evidencia": "Brief MEDIDO: `input type=email` 335×19 e `input type=tel` 335×19. Medición propia: los cuatro campos de correo y teléfono de la pantalla miden 19px de alto (335×19 en la versión de escritorio, 264×19 en la de teléfono) frente a los 38px que §6.16 fija; son los únicos cuatro destinos realmente por debajo de 24px. En 41_alta_cliente el mismo selector sí incluye `email` y `tel`, y allí los campos miden lo que deben.",
+        "por_que_importa": "La trampa está documentada con este caso exacto y sigue viva. Los campos de correo y teléfono del contacto —que son los que pp-076 describe como el dato que hoy se pierde en WhatsApp— se dibujan a la mitad de alto que los demás y por debajo del mínimo táctil de §7.3."
+      },
+      {
+        "id": "f1-58modal-09",
+        "severidad": "media",
+        "regla": "§6.18 CSS canónico",
+        "dice_el_sistema": "`dialog.modal{border:0;padding:0;margin:auto;max-width:520px;width:calc(100% - 32px);max-height:calc(100dvh - 64px);background:var(--surface);color:var(--text);border-radius:var(--r-modal);box-shadow:var(--sh-modal)}`. Puntos auditables: `border:0`, `padding:0`, `margin:auto`, `max-width:520px`, `border-radius:var(--r-modal)` (16px), `box-shadow:var(--sh-modal)`.",
+        "hay_en_el_build": "`.modal{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--sh-float);max-width:720px;margin:0 auto;display:flex;flex-direction:column;max-height:620px;overflow:hidden}`.",
+        "selector": ".modal",
+        "evidencia": "Medición propia con el estilo calculado: `border-radius` 10px (es `--r-card`, el radio de tarjeta, no los 16px de `--r-modal`); `box-shadow` `rgba(19,29,43,0.1) 0px 6px 18px` (es `--sh-float`, no `--sh-modal` `0 24px 60px rgba(19,29,43,.22)`); `max-width` 720px frente a 520; `max-height` fijo de 620px en vez de `calc(100dvh - 64px)`; y hay `border:1px solid var(--border)` donde la receta dice `border:0`. `--r-modal` figura además entre los tokens declarados y no usados (brief).",
+        "por_que_importa": "Un diálogo con radio y sombra de tarjeta no se separa del plano de la página: se lee como una tarjeta más, que es justo lo que la receta de §6.18 evita subiendo el radio a 16px y la sombra a `0 24px 60px`. Y el `max-height` fijo de 620px no se adapta a la ventana, que es lo que `100dvh` resuelve en un teléfono — el caso que esta maqueta defiende."
+      },
+      {
+        "id": "f1-58modal-10",
+        "severidad": "media",
+        "regla": "§6.18 Tres reglas de contenido — qué va detrás",
+        "dice_el_sistema": "«Detrás va la pantalla real atenuada, no un esqueleto de carga. Las barras grises se confunden con “cargando”.»",
+        "hay_en_el_build": "`<div class=\"fondo\" aria-hidden=\"true\"><span></span>×5</div>` con `.fondo span{height:10px;border-radius:4px;background:var(--border-2)}` y anchos escalonados del 34% al 88% — es decir, barras grises con la forma exacta de un esqueleto de carga, detrás de cada uno de los seis diálogos.",
+        "selector": ".velo > .fondo",
+        "evidencia": "Medición propia del markup y del CSS (líneas 664-670), y captura 58_altas_como_modal--ok.png: tras el diálogo de «Nuevo cliente» se ven cinco barras grises de alturas y anchos escalonados, indistinguibles de `.skel`.",
+        "por_que_importa": "El documento señala este caso con su motivo: las barras grises se leen como «cargando». Quien mira la maqueta no sabe si el diálogo se abrió sobre una pantalla que todavía estaba cargando o sobre la pantalla real."
+      },
+      {
+        "id": "f1-58modal-11",
+        "severidad": "media",
+        "regla": "§6.18 Andamiaje dentro del diálogo / §9",
+        "dice_el_sistema": "«El andamiaje de maqueta no puede vivir fuera del diálogo.» Un modal bloquea todo lo que hay fuera de la capa superior, así que mientras está abierto el panel de estados se traslada dentro del `<dialog>`.",
+        "hay_en_el_build": "El `<aside class=\"demo\" data-andamio …>` con los cuatro botones de estado vive al final del documento, fuera de los seis `div[role=\"dialog\"][aria-modal=\"true\"]`.",
+        "selector": "aside.demo[data-andamio]",
+        "evidencia": "Medición propia del markup: un único bloque `data-andamio`, hermano de los diálogos y no descendiente de ninguno.",
+        "por_que_importa": "Con seis `aria-modal=\"true\"` declarados, el panel de estados queda fuera del alcance de un lector de pantalla: la maqueta no se puede recorrer con la herramienta con la que hay que auditarla."
+      },
+      {
+        "id": "f1-58modal-12",
+        "severidad": "media",
+        "regla": "§2.1 Suelo tipográfico",
+        "dice_el_sistema": "El suelo son 12px. «Nada baja de ahí.» Única excepción: 10,5px en mayúsculas con `letter-spacing` para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+        "hay_en_el_build": "23 declaraciones de tamaño por debajo de 12px, incluido un `font-size:10px` en la etiqueta del corte de pantalla de la maqueta de teléfono (`.corte b`) y la forma abreviada `font:600 11.5px var(--font-ui)`.",
+        "selector": ".corte b, .ayuda, .idx, small",
+        "evidencia": "Medición propia con el estilo calculado: 30 nodos de texto bajo 12px en la vista con datos; 23 declaraciones `font-size:1[01](.5)?px` / `font:… 11.5px` en el `<style>`. `--fs-meta` está declarado a 12px.",
+        "por_que_importa": "La ayuda de campo dentro del diálogo es la que explica el formato del RFC y del código postal; a 11px, en un cuadro cuyos rellenos además computan a cero, es el texto más difícil de leer de la pantalla."
+      },
+      {
+        "id": "f1-58modal-13",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto — `--text-3`",
+        "dice_el_sistema": "`--text-3` es `#5C6675`, no el antiguo `#66717F` (que caía a 4,21:1 sobre `--surface-2`).",
+        "hay_en_el_build": "`--text-3: #66717F` en el `:root` del tema claro.",
+        "selector": ":root{--text-3}",
+        "evidencia": "Brief MEDIDO: `text_3_declarado = \"#66717F\"`. La pantalla usa `--surface-2` como fondo de `.velo` y en las cabeceras de las tarjetas.",
+        "por_que_importa": "Hecho ya establecido para 51 de 52; se marca porque aquí `--text-3` cae sobre `.velo`, que es `--surface-2`."
+      },
+      {
+        "id": "f1-58modal-14",
+        "severidad": "media",
+        "regla": "§10 trampa 5 — `<symbol>` y `viewBox` repetido",
+        "dice_el_sistema": "Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca. Se comprueba midiendo la caja del `<use>` contra la del `<svg>`: si el desplazamiento no es ~0, está mal.",
+        "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>` en el logotipo del menú.",
+        "selector": ".logo > svg",
+        "evidencia": "Medición propia: el `<symbol id=\"dproma-mark\">` declara `viewBox=\"740 0 970 932\"` y el `<use>` queda desplazado −32,5px respecto de su `<svg>`.",
+        "por_que_importa": "El isotipo se recorta casi entero; coincide con los 32,5px que §10 documenta."
+      },
+      {
+        "id": "f1-58modal-15",
+        "severidad": "baja",
+        "regla": "§6.19 Botón-icono / §6.5 Iconos",
+        "dice_el_sistema": "Nunca viaja solo: `title` + `aria-label`.",
+        "hay_en_el_build": "Los 2 `.iconbtn` del cromo llevan `aria-label` y ninguno `title`. El aspa de los diálogos (`button.cerrar`) sí lleva `aria-label=\"Cerrar sin guardar\"` pero tampoco `title`.",
+        "selector": ".iconbtn, .modal > header .cerrar",
+        "evidencia": "Medición propia: 2 `.iconbtn`, 2 sin `title`, 0 sin `aria-label`; seis `button.cerrar` sin `title`.",
+        "por_que_importa": "Misma omisión que en toda la carpeta; impacto bajo aquí porque el aspa es un icono universal y su `aria-label` es correcto y nombra la consecuencia («sin guardar»)."
+      },
+      {
+        "id": "f1-58modal-16",
+        "severidad": "baja",
+        "regla": "§6.11 reglas 1 y 3 — tabla densa",
+        "dice_el_sistema": "`<caption>` siempre, aunque vaya oculto con `.sr`. `<th scope=\"row\">` en la primera celda de cada fila. `aria-sort` en todas las columnas ordenables.",
+        "hay_en_el_build": "La tabla de aritmética («ALTA / CAMPOS / ALTO DEL CUERPO / PANTALLAS / ¿CABE COMO DIÁLOGO?») tiene cinco `<th scope=\"col\">` y ningún `<caption>`; sus cinco filas no llevan `<th scope=\"row\">`.",
+        "selector": "table (tabla de aritmética de la maqueta)",
+        "evidencia": "Brief MEDIDO: `tablas: 1`, `th: 5`, `thAriaSort: 0`. Medición propia: 0 `<caption>` y 0 `tbody th[scope=row]` sobre 5 filas de cuerpo.",
+        "por_que_importa": "Severidad baja porque la tabla es contenido explicativo de la maqueta y no un listado del producto, pero §6.11 regla 1 no admite excepción por tipo de contenido: un `<caption>` en `.sr` cuesta una línea."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 1,
+      "rendimiento": "no_evaluado",
+      "theming": 2,
+      "responsive": 2,
+      "integridad": 1
+    },
+    "justificacion": "La pantalla tiene un propósito legítimo y bien argumentado —dirimir si las cinco altas caben como diálogo, con la aritmética delante— y el razonamiento es correcto y está medido. Como pieza auditable contra §6.18, en cambio, falla en todo lo que el documento marca como no negociable: seis `div[role=dialog]` en vez de `<dialog>`, ninguna de las cuatro reglas de foco, ningún bloqueo de cierre durante el guardado, ningún `::backdrop` y un velo simulado con un hex literal. Accesibilidad 1: a lo anterior se suman catorce `id` duplicados que dejan catorce campos sin nombre accesible, treinta asteriscos decorativos sin `required`, y cuatro campos de correo y teléfono a 19px por el selector enumerado de §10 trampa 2. Integridad 1: `--sp-5` no está declarado y los tres rellenos del diálogo computan a 0px — el incidente que §3 documenta, reproducido tal cual. Theming 2: los dos temas existen, pero el velo no cambia con el tema porque es un hex literal y `--text-3` arrastra el valor obsoleto. Responsive 2: la maqueta de teléfono está construida con cuidado y mide el corte real, pero el `max-height:620px` fijo del diálogo no es el `calc(100dvh - 64px)` que haría falta en ese mismo teléfono.",
+    "evidencia": [
+      "Brief MEDIDO: dialogNativo 0 / divDialog 6; `usados_sin_declarar: [\"--sp-5\"]`; inputsSinEtiqueta 14 de 69; 14 destinos bajo 24px declarados; 106 interactivos; ariaLive 1; th 5 / thAriaSort 0.",
+      "Medición propia con el estilo calculado: relleno de `.modal > header`, `.modal .cuerpo` y `.modal > footer` = 0px, 0px, 0px, y `gap` del cuerpo = `normal`, por `--sp-5` sin declarar; `.modal` con `border-radius` 10px y `box-shadow` `0 6px 18px` (`--r-card` y `--sh-float`), `max-width` 720px; `.velo::before` = `rgba(9,14,20,0.44)` frente a `--velo-modal` = `rgba(19,29,43,.45)`; 0 reglas `::backdrop`; 0 llamadas a `focus()`; 0 manejadores `cancel`; 30 `.req` con 0 `required` y 0 `aria-required`; 14 `id` duplicados.",
+      "Medición propia de destinos táctiles: de los 14 que el brief cuenta por debajo de 24px, 10 son casillas de 20px dentro de `.docs label{min-height:44px}` y por tanto **sí cumplen** §7.3 según §10 trampa 4 («el destino táctil es la región que acepta la pulsación»); los 4 incumplimientos reales son los `input[type=email]` y `input[type=tel]` a 19px de alto.",
+      "Capturas 58_altas_como_modal--ok.png y --oscuro.png."
+    ]
+  },
+  "f4_nielsen": [
+    {
+      "n": 1,
+      "heuristica": "Visibilidad del estado del sistema",
+      "severidad": 3,
+      "hallazgo": "Ninguno de los seis diálogos tiene estado: no se abren, no se cierran, no declaran «guardando» ni bloquean el cierre durante una operación. El fondo que los acompaña son barras grises que se leen como «cargando», de modo que lo único que la pantalla comunica sobre el estado del sistema es una señal equivocada.",
+      "selector": "div.modal[role=\"dialog\"], .velo > .fondo"
+    },
+    {
+      "n": 2,
+      "heuristica": "Coincidencia entre el sistema y el mundo real",
+      "severidad": 0,
+      "hallazgo": "La aritmética está contada en el lenguaje del problema real: ventana útil de un teléfono de 390×844, 77px por campo, «quedan ≈560 px de cuerpo», «1,4 a 2,3 pantallas». No hay jerga de implementación.",
+      "selector": "table, .cab-blq p"
+    },
+    {
+      "n": 3,
+      "heuristica": "Control y libertad del usuario",
+      "severidad": 4,
+      "hallazgo": "No hay ninguna salida implementada: ni Escape, ni aspa, ni clic en el velo tienen manejador, y tampoco hay el bloqueo durante el guardado que §6.18 exige. Con `aria-modal=\"true\"` en seis contenedores simultáneos y sin trampa de foco, quien usa teclado o lector de pantalla puede quedar atrapado o, al revés, salir del diálogo sin saberlo.",
+      "selector": "button.cerrar, document keydown"
+    },
+    {
+      "n": 4,
+      "heuristica": "Consistencia y estándares",
+      "severidad": 4,
+      "hallazgo": "El diálogo se construye con `div[role=dialog]` cuando el sistema exige `<dialog>` con `showModal()`, y se viste con la receta de tarjeta (`--r-card`, `--sh-float`, 720px) en vez de la de diálogo (`--r-modal`, `--sh-modal`, 520px). El mismo formulario en pantalla completa (41_alta_cliente) sí declara `required`/`aria-required` y aquí se sustituye por treinta asteriscos.",
+      "selector": ".modal, .req"
+    },
+    {
+      "n": 5,
+      "heuristica": "Prevención de errores",
+      "severidad": 3,
+      "hallazgo": "Nada impide cerrar el diálogo a medio guardar, que es el error que §6.18 nombra con su consecuencia; y treinta campos marcados como obligatorios no lo son para el navegador, así que el formulario se puede enviar incompleto sin que nada lo detenga.",
+      "selector": ".req, button.cerrar"
+    },
+    {
+      "n": 6,
+      "heuristica": "Reconocer antes que recordar",
+      "severidad": 2,
+      "hallazgo": "Los catorce `id` duplicados dejan sin nombre accesible a los campos de la versión de teléfono: quien los recorre con lector de pantalla oye «edición de texto» sin saber cuál es.",
+      "selector": "#rs, #rfc, #cp, #dom, #cor, #tel (segundas instancias)"
+    },
+    {
+      "n": 7,
+      "heuristica": "Flexibilidad y eficiencia",
+      "severidad": "n/a",
+      "hallazgo": "No aplica: la pantalla es un marco de decisión sobre cinco altas, no un flujo que alguien ejecute; no hay atajos ni personalización que evaluar.",
+      "selector": ""
+    },
+    {
+      "n": 8,
+      "heuristica": "Diseño estético y minimalista",
+      "severidad": 1,
+      "hallazgo": "Las bandas explicativas de cabecera ocupan varios párrafos de texto siempre visible, muy por encima del límite de ~140 caracteres y una frase de §8. Se entiende por ser un documento de decisión, pero el límite del sistema no admite excepción por importancia del contenido.",
+      "selector": ".banda, .nota"
+    },
+    {
+      "n": 9,
+      "heuristica": "Ayudar a reconocer y recuperarse de errores",
+      "severidad": 3,
+      "hallazgo": "Ningún diálogo declara qué pasa si el guardado falla: no hay estado de error dentro del cuadro, ni referencia, ni la garantía de que lo capturado sigue ahí. 59_editar_cliente sí dibuja ese caso; aquí falta en las cinco altas.",
+      "selector": "div.modal .cuerpo"
+    },
+    {
+      "n": 10,
+      "heuristica": "Ayuda y documentación",
+      "severidad": 0,
+      "hallazgo": "La pantalla es, en sí misma, documentación de alta calidad: explica el corte («a partir de dos pantallas, quien rellena ya no recuerda qué diálogo abrió»), lo justifica con medidas y dice explícitamente que no sustituye a las cinco maquetas.",
+      "selector": ".banda, table"
+    }
+  ],
+  "f5_investigacion": {
+    "pain_points_evaluados": [
+      {
+        "pp": "pp-097",
+        "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+        "cobertura": "cubre",
+        "evidencia": "«El alta de clientes se inicia en WhatsApp, sigue por correo y se captura manualmente en Excel; no existen formularios digitales automatizados.» La pantalla decide con medidas cuál de las cinco altas puede capturarse en un diálogo y cuál no: de las cinco, cuatro caben desplazando y solo `41_alta_cliente` pasa de dos pantallas. Esa decisión condiciona si el alta se puede hacer desde el teléfono, en la agencia, en el momento en que llega el dato."
+      },
+      {
+        "pp": "pp-076",
+        "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
+        "cobertura": "contradice",
+        "evidencia": "«La recepción de datos de clientes finales para instalaciones se realiza de forma informal por WhatsApp o correo, sin formato estandarizado, y algunos registros se pierden.» El remedio es capturar correo y teléfono en un formulario; en esta maqueta esos dos campos exactos miden 19px de alto por el selector enumerado de §10 trampa 2, y además son dos de los catorce que quedan sin nombre accesible por `id` duplicado en la versión de teléfono — precisamente el escenario móvil que la pantalla defiende."
+      },
+      {
+        "pp": "pp-078",
+        "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
+        "cobertura": "cubre",
+        "evidencia": "«Sin canal oficial trazable para autorizar clientes finales, vendedores comparten directamente el teléfono del equipo; las agencias luego no reconocen esos casos y no pagan.» Que el alta quepa en un diálogo desde el teléfono es lo que hace posible el canal trazable: si el alta solo existe como pantalla completa de escritorio, el vendedor sigue resolviendo por WhatsApp."
+      },
+      {
+        "pp": "pp-043",
+        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+        "cobertura": "ignora",
+        "evidencia": "«Los canales oficiales de coordinación interna se limitan prácticamente a WhatsApp, sin herramienta estructurada.» La pantalla trata la forma del alta, no su circulación: ninguno de los seis diálogos contempla avisar a otra área de que el alta se hizo."
+      },
+      {
+        "pp": "pp-040",
+        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+        "cobertura": "cubre",
+        "evidencia": "«El seguimiento de más de 20 clientes activos depende de la memoria del vendedor, sin registro estructurado.» Al resolver que cuatro de las cinco altas caben como diálogo, la pantalla permite que el registro se cree sin abandonar la bandeja desde la que se estaba trabajando, que es la condición para que el registro llegue a existir."
+      }
+    ],
+    "usabilidad_para_el_area": "Como decisión de diseño es útil para el área: resolver que cuatro de las cinco altas caben en un diálogo significa que el vendedor puede dar de alta sin perder de vista la lista, y que el alta llega a hacerse en el momento en que llega el dato en lugar de acumularse en el chat (pp-097, pp-078). El argumento está medido y escrito, no afirmado. Como implementación, sin embargo, el diálogo que propone no es el del sistema: ninguna de las cuatro reglas de foco existe, nada impide cerrar a medio guardar y los tres rellenos del cuadro computan a cero. Para quien tiene que capturar en un teléfono —el escenario que la pantalla defiende— lo que llega hoy son campos de correo y teléfono a 19px y catorce campos sin nombre accesible. La decisión es correcta; el patrón con el que se dibuja no se puede llevar a producción tal cual."
+  },
+  "cobertura": [
+    {
+      "patron": "Maqueta de decisión («marco compartido»): una pantalla que no es producto sino el soporte de una discusión entre diseño e implementación. Lleva la postura de cada parte escrita arriba, una tabla de aritmética que la sostiene, los cinco casos dibujados a tamaño real dentro del contenedor en disputa, y una declaración explícita de que no sustituye a las maquetas existentes. Se sirve en la misma carpeta y con el mismo cromo que las pantallas de producto, y por eso entra en la auditoría como si lo fuera. El sistema documenta el andamiaje de maqueta (§9, `data-andamio`) pero no este género: una maqueta cuyo contenido entero es argumentación, no interfaz.",
+      "propuesta_de_regla": "§9.1 Maqueta de decisión — `data-maqueta=\"decision\"`. **Cuándo:** hay que dirimir una divergencia entre lo dibujado y lo construido, y la discusión necesita los casos delante. **Se marca en el `<html>` con `data-maqueta=\"decision\"`**, igual que el andamiaje se marca con `data-andamio`, para que un solo selector la distinga del producto en cualquier barrido automático. **Qué lleva, en este orden:** la divergencia en una frase; la medida que la resuelve; los casos dibujados; y la declaración de qué maquetas **no** quedan sustituidas. **Los especímenes son especímenes:** un componente dibujado para mirarlo no lleva `aria-modal`, ni `role=\"dialog\"`, ni `required`, ni ningún `id` que compita con los de la pantalla real — se marcan con `inert` y `aria-hidden=\"true\"` sobre el contenedor del espécimen, y sus `id` se prefijan. **Qué se le exige igual que al producto:** los tokens, el suelo tipográfico de §2.1, el contraste de §1.7 y la declaración de todo `var()` que use. **Qué no se le exige:** el comportamiento del componente que ilustra, porque un espécimen no se opera; eso se audita en la maqueta de la que habla."
+    },
+    {
+      "patron": "Marco de teléfono con línea de corte (`.tel` + `.corte`): el diálogo dibujado dentro de un recuadro de 330px de ancho con una línea discontinua roja atravesándolo y una etiqueta que marca dónde termina la ventana útil del dispositivo. Es la forma en que esta maqueta demuestra la aritmética que afirma. El sistema no tiene regla para representar el límite de una ventana dentro de una maqueta, y aquí la línea se pinta con `--err-ink` —tinta de error— para algo que no es un error sino una medida.",
+      "propuesta_de_regla": "Anexo a §9 — Marco de dispositivo y línea de corte. **Cuándo:** una maqueta de decisión (§9.1) necesita demostrar que algo cabe o no cabe en una ventana concreta. **El marco declara el dispositivo y las dos cifras que lo definen**, alto físico y alto útil tras descontar la barra del navegador y las zonas seguras, en texto junto al marco y no solo en el dibujo. **La línea de corte no es un error:** se pinta en `--text` discontinua, con su etiqueta en `--surface` sobre `--text`, nunca en `--err`/`--err-ink` — el semáforo es para juicios sobre el dato (§1), y «aquí termina la pantalla» es una medida. Si además se quiere afirmar que ese corte es un problema, el juicio va en la banda de texto, no en el color de la línea. **Todo el marco lleva `data-maqueta=\"decision\"`** y desaparece con el mismo selector que el resto del andamiaje."
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática servida desde disco, sin backend ni librería que perfilar; el documento tampoco fija umbrales de rendimiento auditables.",
+    "§6.18 regla de foco 2 (`Tab` cicla dentro): no evaluado por medición directa del recorrido de teclado. Se declara incumplida por construcción —el documento dice que la trampa de foco «la da `showModal()`» y aquí no hay `<dialog>` ni implementación sustitutiva—, no porque se haya tabulado el documento.",
+    "§6.18 tres reglas de contenido, regla 1 («el nombre del botón y el contenido coinciden»): no evaluado — los diálogos no se abren desde ningún botón de la pantalla, así que no hay par botón/diálogo que contrastar.",
+    "Contraste en tema oscuro del velo simulado: no evaluado con cifra propia. Se constata que `.velo::before` es un hex literal y por tanto no cambia con el tema, pero no se ha medido qué ratio produce sobre el contenido atenuado, porque ese contenido es un esqueleto decorativo sin texto."
+  ]
+}

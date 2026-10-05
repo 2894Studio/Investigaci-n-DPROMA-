@@ -1,0 +1,313 @@
+{
+ "pantalla": "51_acceso",
+ "ruta_zip": "07-transversales/51_acceso.html",
+ "carpeta": "07-transversales",
+ "area": "transversal",
+ "arquetipo": "acceso (pantalla real de login)",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error"
+ ],
+ "capturas": [
+  "51_acceso--ok.png",
+  "51_acceso--loading.png",
+  "51_acceso--empty.png",
+  "51_acceso--error.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-51acceso-01",
+    "severidad": "alta",
+    "regla": "ANEXO B §8 Voz de producto — prueba base y límites 1 y 2",
+    "dice_el_sistema": "«Si el texto explica una decisión, no va en pantalla. Si explica una consecuencia para quien está mirando, sí — y en una frase.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres. Se mide con el contador de caracteres, no a ojo.»",
+    "hay_en_el_build": "El párrafo del estado de error mide 1.062 caracteres y explica el criterio de redacción del propio sistema: «Éste es uno de ocho mensajes distintos, y la diferencia importa… Unos los arregla Sistemas y otros los arregla quien entra, y por eso no comparten texto… Un solo texto para los cuatro mandaría a la mitad de la gente al sitio equivocado.»",
+    "selector": ".state-error > p",
+    "evidencia": "Medido en el navegador con innerText: 1.062 caracteres en un solo bloque siempre visible (7,6× el tope). Otros dos bloques de la misma pantalla pasan el tope: .sin-campos con 200 y el párrafo del estado vacío con 218. Visible en 51_acceso--error.png.",
+    "por_que_importa": "Es la voz de conversación interna que §8 persigue, en la pantalla donde más caro sale: alguien que no puede entrar al sistema recibe cinco párrafos sobre por qué hay ocho mensajes distintos en lugar de qué hacer ahora. Lo accionable («Vuelve a intentarlo en un momento») queda sepultado en el segundo párrafo de cinco."
+   },
+   {
+    "id": "f1-51acceso-02",
+    "severidad": "alta",
+    "regla": "§3 (aviso duro) y ANEXO C §11 — «todo token var(--x) que usa el archivo está declarado en ese mismo archivo»",
+    "dice_el_sistema": "«Un token que no existe falla en silencio»: un var() que no resuelve invalida la declaración entera (los tres paddings del diálogo computaban a 0).",
+    "hay_en_el_build": ".caja-acc{gap:var(--sp-5)} y .marca-acc .wm{font-size:var(--fs-h2)}. Ni --sp-5 ni --fs-h2 están declarados en el archivo.",
+    "selector": ".caja-acc, .marca-acc .wm",
+    "evidencia": "Brief: tokens.usados_sin_declarar = [\"--fs-h2\",\"--sp-5\"]. Medido por mí con getComputedStyle: .caja-acc row-gap = \"normal\" (es decir 0) y el <h1> .wm = 14px, el mismo tamaño que el cuerpo de texto. Se ve en 51_acceso--ok.png: el subtítulo, el botón y los párrafos quedan pegados sin separación, y el nombre del producto no destaca.",
+    "por_que_importa": "Es el fallo silencioso exacto que §3 documenta, y aquí se lleva por delante las dos únicas decisiones de composición de la tarjeta de acceso: su ritmo vertical y la jerarquía de su título. Nada en la hoja de estilos lo delata."
+   },
+   {
+    "id": "f1-51acceso-03",
+    "severidad": "alta",
+    "regla": "§6.4 regla 2 y ANEXO C §11 «cada pantalla o vista tiene encabezado real, no texto en negrita»",
+    "dice_el_sistema": "«Cada estado lleva encabezado real, no un <b>.»",
+    "hay_en_el_build": "<b>Tu cuenta entró, pero todavía no tiene acceso a nada</b> y <b>No pudimos preguntar si tu cuenta es válida</b>, como hijos directos de .state.",
+    "selector": ".state-empty > b, .state-error > b",
+    "evidencia": "Medido en el navegador: en .state-empty y .state-error, querySelector('h1,h2,h3,h4') devuelve null y existe un <b> hijo directo. El brief cuenta un solo h1 en toda la pantalla, que es el «SIO-DPROMA» de la vista con datos.",
+    "por_que_importa": "Quien use lector de pantalla no puede saltar al título del estado: en las dos vistas que más lo necesitan (sin permisos y error) la página se queda sin ningún encabezado. El documento del acceso lo exige también en su §6.3 («un encabezado real, <h1>, no negrita suelta»), así que los dos documentos coinciden y la maqueta incumple a los dos."
+   },
+   {
+    "id": "f1-51acceso-04",
+    "severidad": "alta",
+    "regla": "§6.1 Botón primario del acceso — .gbtn",
+    "dice_el_sistema": "«La acción principal de la pantalla de entrada.» width:100%; min-height:48px; padding:13px; gap:11px; box-shadow:var(--sh-rest); hover --sh-float + border-color:var(--text-3). Se bloquea en el manejador de JS, estado por aria-busy=\"true\" con spinner .spin.",
+    "hay_en_el_build": ".btn-google: min-height:48px y width:100% correctos, pero sin padding declarado, gap:var(--sp-3) (12px en vez de 11), sin box-shadow:var(--sh-rest), hover a --surface-2 en vez de --sh-float + border-color, y sin .spin, sin aria-busy y sin ningún manejador de JS asociado.",
+    "selector": "button.btn-google",
+    "evidencia": "Bloque .btn-google del <style> (líneas 645-649) y <script> final: no hay ningún addEventListener sobre .btn-google. grep de 'aria-busy' y de 'spin' en el archivo: 0 coincidencias.",
+    "por_que_importa": "El componente del sistema se reescribe con otro nombre y pierde justo lo que §6.1 declara obligatorio: el guardián del doble envío y el estado ocupado anunciable. Además el botón no hace nada: pulsarlo no cambia de estado ni dispara la vista «cargando» que la propia pantalla tiene preparada."
+   },
+   {
+    "id": "f1-51acceso-05",
+    "severidad": "alta",
+    "regla": "§6.4 regla 1 — «el cambio se anuncia (aria-live=\"polite\") y mueve el foco»",
+    "dice_el_sistema": "«Todo cambio de vista se anuncia (aria-live=\"polite\") y mueve el foco (main.focus() con tabindex=\"-1\")». El documento del acceso lo repite en su §6.3 con la función muestra(clave, mueveFoco).",
+    "hay_en_el_build": "El cambio de vista es solo cont.setAttribute('data-state', …). El <main> tiene tabindex=\"-1\" preparado, pero nada lo enfoca y no hay región que reciba el texto del estado nuevo.",
+    "selector": "main#contenido[tabindex=\"-1\"]",
+    "evidencia": "Medido sobre el documento servido: no aparece ninguna llamada .focus() en el <script>, ni ninguna asignación de textContent a una región aria-live. La única región viva de la pantalla es el role=\"status\" estático del esqueleto.",
+    "por_que_importa": "Al pasar de «cargando» a «error» la pantalla cambia entera sin decirlo: quien usa lector de pantalla se queda con el foco donde estaba y sin noticia de que ya no hay botón que pulsar. Es la regla que el documento del acceso marcó como corregida en su revisión de 19 puntos."
+   },
+   {
+    "id": "f1-51acceso-06",
+    "severidad": "alta",
+    "regla": "§6.4 — «Un solo contenedor, las vistas dentro como hermanas»; §6.3 del documento del acceso",
+    "dice_el_sistema": "«En el acceso el contenedor es la propia tarjeta (.glass).» «No una tarjeta suelta por estado: la pantalla no debe cambiar de forma según lo que tenga que decir, y así el usuario no pierde la referencia visual al pasar de cargando a error.»",
+    "hay_en_el_build": "Las vistas ok y loading van dentro de .acceso > .caja-acc (tarjeta de 420px, borde, sombra). Las vistas empty y error son <div class=\"state\"> sueltos, hermanos de aquéllas, sin tarjeta ninguna: texto centrado sobre --bg.",
+    "selector": ".state-ok .caja-acc frente a .state.state-empty / .state.state-error",
+    "evidencia": "Comparando 51_acceso--ok.png (tarjeta blanca de 420px centrada) con 51_acceso--error.png (texto suelto a 960px de ancho sobre el fondo de página). La estructura del markup lo confirma: solo dos de las cuatro vistas cuelgan de .caja-acc.",
+    "por_que_importa": "La pantalla cambia de forma entre estados exactamente como los dos documentos prohíben. Al pasar de cargando a error desaparece la tarjeta, cambia el ancho de línea y se pierde la referencia visual; §11 lo dice además como regla propia: «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo»."
+   },
+   {
+    "id": "f1-51acceso-07",
+    "severidad": "alta",
+    "regla": "ANEXO C §11 — «todos los id únicos y cada aria-describedby/aria-controls apunta a algo que existe» (integridad del guion de la maqueta)",
+    "dice_el_sistema": "La comprobación del sistema es que lo que el archivo referencia exista en el archivo.",
+    "hay_en_el_build": "El <script> hace document.getElementById('tema'), 'tema-ico' y 'menu-btn'. Ninguno de los tres existe en el markup de esta pantalla: los únicos id del documento son 'contenido'.",
+    "selector": "script (bt.addEventListener)",
+    "evidencia": "Medido en Chromium: la carga lanza «TypeError: Cannot read properties of null (reading 'addEventListener')». grep de id= sobre el archivo: solo id=\"contenido\" (más los id de los <symbol> y del gradiente).",
+    "por_que_importa": "La excepción corta el guion justo después de enlazar los botones del andamiaje, de modo que lo que viene detrás nunca se ejecuta: no hay conmutador de tema (no existe el botón), no se sincroniza meta[name=theme-color], no se enlaza el cajón de menú ni el cierre con Escape. La pantalla queda sin ningún control de tema aunque declara los dos temas completos."
+   },
+   {
+    "id": "f1-51acceso-08",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga — A11y",
+    "dice_el_sistema": "«role=\"status\" + aria-label en el contenedor y sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad).»",
+    "hay_en_el_build": "Las cuatro barras del esqueleto llevan texto dentro: «marca», «SIO-DPROMA», «entrar», «aviso».",
+    "selector": ".state-loading .skel",
+    "evidencia": "Medido en el navegador: [...document.querySelectorAll('.skel')].map(e=>e.textContent.trim()) devuelve [\"marca\",\"SIO-DPROMA\",\"entrar\",\"aviso\"]. El contenedor sí tiene role=\"status\" y aria-label=\"Cargando\", de modo que ese texto se anuncia como contenido de la región viva.",
+    "por_que_importa": "Es el caso literal que §6.7 nombra: la barra se ve vacía pero el lector de pantalla lee cuatro palabras sueltas sin sentido mientras la pantalla carga."
+   },
+   {
+    "id": "f1-51acceso-09",
+    "severidad": "media",
+    "regla": "§6.7 / §5 — prefers-reduced-motion aplana el fondo del esqueleto",
+    "dice_el_sistema": "«Hay que aplanar el fondo, no solo parar la animación. animation:none a secas congela el degradado en la posición 0. Correcto: @media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}.»",
+    "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}} — sin reponer el fondo.",
+    "selector": ".skel",
+    "evidencia": "Línea del bloque ARQ-ESTADOS del archivo. La misma regla incompleta aparece en 26_estados_de_pantalla y 56_frontera_error.",
+    "por_que_importa": "Con movimiento reducido las barras se quedan con el degradado congelado en su posición inicial, que es el caso que §6.7 describe como incorrecto."
+   },
+   {
+    "id": "f1-51acceso-10",
+    "severidad": "media",
+    "regla": "§1.1 Superficies y texto — --text-3",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)».",
+    "hay_en_el_build": "--text-3:#66717F.",
+    "selector": ":root",
+    "evidencia": "Brief: tokens.text_3_declarado = \"#66717F\".",
+    "por_que_importa": "Valor obsoleto. Aquí --text-3 pinta .sin-campos y la referencia del error sobre --surface, donde todavía cumple; el riesgo es el arrastre, porque el archivo trae declarado todo el bloque de tokens del dashboard (--surface-2 incluido) listo para reutilizarse. Ver cobertura cob-01."
+   },
+   {
+    "id": "f1-51acceso-11",
+    "severidad": "media",
+    "regla": "§2.1 Tipografía — suelo de 12px",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+    "hay_en_el_build": ".sin-campos a 11,5px (dos párrafos completos, uno de ellos con el enlace al aviso de privacidad) y .ref a 11px (la referencia del error).",
+    "selector": "p.sin-campos, a.lnk, p.ref",
+    "evidencia": "Medido con el estilo calculado de cada elemento con texto: 10 elementos por debajo de 12px; los de producto son p.sin-campos (11,5), a.lnk (11,5) y p.ref (11). Los de 10,5px pertenecen al andamiaje (.demo .et-g), que no es producto.",
+    "por_que_importa": "Ninguno de los dos es una de las dos excepciones admitidas, y la referencia del error a 11px es justo el dato que alguien tiene que leer y dictar por teléfono a Sistemas."
+   },
+   {
+    "id": "f1-51acceso-12",
+    "severidad": "media",
+    "regla": "§7.1 Entrada al sistema — .split",
+    "dice_el_sistema": "«Cuándo: cualquier pantalla de entrada. Columna de marca (fondo oscuro, ilustración) + columna de acceso, lado a lado desde 920px y apiladas debajo.» .brand{flex:1.05;background:#071120;min-height:520px}; main.access{flex:1}.",
+    "hay_en_el_build": "Una sola columna: .acceso{display:flex;place-content:center;flex:1} con una tarjeta .caja-acc de 420px centrada. No existen .split, .brand ni main.access, ni corte a 920px.",
+    "selector": ".acceso > .caja-acc",
+    "evidencia": "Captura 51_acceso--ok.png: tarjeta sola sobre fondo liso, sin columna de marca. grep de '.split{' en el archivo: la clase existe en el CSS heredado del arquetipo P7 (minmax(320px,380px) 1fr) pero no es el .split de §7.1 ni se usa en el markup — otro caso de nombre corto reutilizado para dos componentes distintos (§10 trampa 10).",
+    "por_que_importa": "Es la pantalla real de entrada y no usa el layout que el sistema define para las pantallas de entrada. Además se pierde el único sitio donde el sistema admite superficie translúcida (§4: «el translúcido es de la pantalla de entrada»): --glass está declarado en el archivo y no se usa en ninguna parte."
+   },
+   {
+    "id": "f1-51acceso-13",
+    "severidad": "media",
+    "regla": "§6.4 — valores de .tarjeta-estado y .estado-ico",
+    "dice_el_sistema": ".tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)} — «es --r-modal y --sh-modal, no los de .tarjeta», y va opaca. .estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}, glifo a 28px; .es-err cambia solo el fondo a --err.",
+    "hay_en_el_build": ".caja-acc{max-width:420px;padding:var(--sp-6);border-radius:var(--r-card);box-shadow:var(--sh-float)} y, en los estados sueltos, un icono de trazo de 30px sin medallón (.state .ico{width:30px;height:30px;color:var(--text-3)}; en el error, color:var(--err-ink) por style=\"\").",
+    "selector": ".caja-acc, .state .ico",
+    "evidencia": "Bloques .caja-acc (líneas 639-641) y .state .ico del archivo. Visible en 51_acceso--error.png: un círculo de trazo fino de 30px, no un medallón relleno de 52px.",
+    "por_que_importa": "Las cuatro medidas de la tarjeta y las tres del medallón divergen a la vez, y --on-state ni siquiera está declarado en el archivo. El resultado es que el estado de error del acceso no se parece al estado de error de ninguna otra pantalla del sistema."
+   },
+   {
+    "id": "f1-51acceso-14",
+    "severidad": "baja",
+    "regla": "§7.3 — «toda regla táctil lleva :root»",
+    "dice_el_sistema": "«:root[data-tacto=\"dedo\"] .it, :root[data-tacto=\"dedo\"] .iconbtn, :root[data-tacto=\"dedo\"] .btn{min-height:46px}. El :root es lo que hace ganar la regla: con :root suma (0,3,0); sin él (0,2,0) y lo empata cualquier variante de tamaño del componente.»",
+    "hay_en_el_build": "Seis reglas [data-tacto=\"dedo\"] escritas sin :root.",
+    "selector": "[data-tacto=\"dedo\"] .it, [data-tacto=\"dedo\"] .iconbtn, …",
+    "evidencia": "Brief: tactil_24px.regla_data_tacto_sin_root = 6. Comprobado midiendo con data-tacto=\"dedo\" puesto: en esta pantalla no hay ningún .it ni .iconbtn en el markup, así que el bug queda latente, no manifiesto. Además data-tacto no aparece ni en el markup ni en el JS, de modo que el modo dedo no se puede activar.",
+    "por_que_importa": "Severidad baja aquí porque no hay componente al que afecte, pero el bloque viaja con el arquetipo a las demás pantallas, donde sí hay .acciones .iconbtn{width:28px} declarado después que lo empata y gana."
+   },
+   {
+    "id": "f1-51acceso-15",
+    "severidad": "baja",
+    "regla": "§10 trampa 10 — «un nombre de clase corto no se declara dos veces en el mismo archivo»",
+    "dice_el_sistema": "«Antes de escribir .algo{...} se busca con grep -n '^\\.algo{' en el archivo: si ya existe, la regla se añade a la declaración existente.» Nombres de una palabra genérica son los que más se repiten sin querer.",
+    "hay_en_el_build": ".tabla-caja declarado dos veces fuera de media query (líneas 362 y 407), más .nota, .dos, .f, .search heredados del arquetipo y nunca usados en esta pantalla.",
+    "selector": ".tabla-caja, .nota, .dos",
+    "evidencia": "grep '^\\.tabla-caja{' sobre el archivo: dos coincidencias. El brief cuenta 83 tokens declarados y 67 usados, con 18 declarados sin usar.",
+    "por_que_importa": "La pantalla de acceso arrastra el CSS completo del dashboard (cromo, tablas densas, formularios, bandeja P7) que no usa: unas 600 líneas de hoja de estilos muerta y 18 tokens sin uso, con los choques de nombre que §10 avisa."
+   }
+  ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 1,
+   "responsive": 2,
+   "integridad": 1
+  },
+  "justificacion": "La pantalla tiene buenos cimientos —las cuatro vistas existen, hay skip link, el <main> trae tabindex=\"-1\", los botones llegan a 48/44px y el brief no encuentra ningún fallo de contraste real— pero la ejecución está rota en tres puntos a la vez. Integridad 1: dos tokens usados sin declarar con daño medido (gap 0 y h1 a 14px) y una excepción de JavaScript en la carga que deja medio guion sin ejecutar. Theming 1: declara los dos temas y el bloque [data-theme=\"dark\"] completo, pero no existe el botón que los conmuta y el guion que lo manejaría muere antes de llegar; no hay captura en oscuro. Accesibilidad 2: sin encabezado real en dos de las cuatro vistas, sin anuncio ni movimiento de foco al cambiar de estado, y texto real dentro de las barras del esqueleto. Responsive 2: la tarjeta se centra y cabe en móvil, pero no hay nada del layout §7.1 ni de su corte a 920px.",
+  "evidencia": [
+   "getComputedStyle: .caja-acc row-gap = normal (--sp-5 sin declarar) y h1.wm = 14px (--fs-h2 sin declarar)",
+   "Consola de Chromium al cargar: TypeError: Cannot read properties of null (reading 'addEventListener')",
+   "querySelectorAll('.skel').map(textContent) = ['marca','SIO-DPROMA','entrar','aviso']",
+   "innerText del párrafo de error = 1.062 caracteres",
+   "Capturas 51_acceso--ok.png y 51_acceso--error.png: la tarjeta desaparece entre un estado y otro",
+   "Brief: 3 destinos interactivos, 0 por debajo de 24px; 0 fallos de contraste"
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 3,
+   "hallazgo": "Las cuatro vistas existen pero nada las conmuta en producto: el botón de entrar no tiene manejador, el cambio de estado no se anuncia ni mueve el foco, y el esqueleto lee cuatro palabras sueltas a un lector de pantalla.",
+   "selector": "main#contenido[data-state]"
+  },
+  {
+   "n": 2,
+   "heuristica": "Correspondencia entre el sistema y el mundo real",
+   "severidad": 1,
+   "hallazgo": "El vocabulario es correcto («rol y plaza», «cuenta de trabajo»), pero el error habla del diseño del propio sistema («éste es uno de ocho mensajes distintos») en vez de hablar de lo que le pasa a quien lee.",
+   "selector": ".state-error > p"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 1,
+   "hallazgo": "El estado sin permisos ofrece «Salir», pero el estado de error solo deja «Reintentar»: no hay forma de volver al punto de partida ni de cambiar de cuenta.",
+   "selector": ".state-error .acc"
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 3,
+   "hallazgo": "El botón principal se reescribe como .btn-google en vez de .gbtn, la tarjeta usa --r-card/--sh-float en vez de --r-modal/--sh-modal, el medallón de estado es un icono de trazo de 30px, y no hay ni rastro del layout .split de §7.1. La pantalla de entrada no se parece al resto del sistema ni a su propia documentación.",
+   "selector": ".btn-google, .caja-acc, .state .ico"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 2,
+   "hallazgo": "No hay guardián de doble envío ni estado ocupado: el botón ni siquiera cambia al pulsarlo, de modo que nada impide pulsarlo repetidamente.",
+   "selector": "button.btn-google"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocimiento antes que recuerdo",
+   "severidad": 2,
+   "hallazgo": "La referencia del error (ACC-20260824-1121) se da a 11px al final de un bloque de 1.062 caracteres y no se puede copiar: hay que memorizarla o transcribirla a mano para dársela a Sistemas.",
+   "selector": "p.ref"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 2,
+   "hallazgo": "No existe conmutador de tema (el guion que lo manejaría busca un botón que no está en el markup y lanza una excepción), así que no hay forma de forzar claro u oscuro desde la pantalla.",
+   "selector": "script"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 4,
+   "hallazgo": "El estado de error es un ensayo de cinco párrafos sobre criterios de redacción. Tres bloques de la pantalla pasan el tope de ~140 caracteres (200, 218 y 1.062). Lo accionable queda enterrado.",
+   "selector": ".state-error > p, .sin-campos"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de los errores",
+   "severidad": 2,
+   "hallazgo": "El contenido acierta en el fondo —dice qué pasó, que no es culpa de la cuenta, qué hacer y da referencia— pero el orden de §6.4 se pierde entre la explicación, y el estado llega sin encabezado y sin anuncio.",
+   "selector": ".state-error"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 1,
+   "hallazgo": "Hay enlace al aviso de privacidad y un «Pedirlo a Sistemas» en el estado sin permisos, pero ninguna vía de ayuda en el estado de error, que es donde hace falta.",
+   "selector": ".state-empty .acc"
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-105",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "contradice",
+    "evidencia": "pp-105 (baja): «Un proyecto previo con un proveedor tecnológico externo se detuvo en la fase de maquetado visual sin avanzar a desarrollo funcional». Esta pantalla parece funcional —tiene las cuatro vistas y un andamiaje para recorrerlas— pero el botón de entrar no tiene manejador y la carga del documento lanza un TypeError que deja la mitad del guion sin ejecutar. Es maquetado visual presentado como pantalla real, que es precisamente la confusión que el pain point describe."
+   },
+   {
+    "pp": "pp-104",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-104 (media): la ISO 9001 en curso exige formatos de registro normalizados. El estado de error sí emite una referencia citable (ACC-20260824-1121) con el formato que §6.4 pide, que es la pieza que convierte un incidente de acceso en un registro. La cobertura es parcial porque la referencia va a 11px, al final de 1.062 caracteres y sin acción de copiado."
+   },
+   {
+    "pp": "pp-100",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-100 (alta): «No existe repositorio centralizado… cada área guarda su copia de forma aislada». La entrada única por cuenta de trabajo es el primer paso para que haya un sitio único, pero la pantalla no dice a qué se está entrando ni ofrece ninguna señal de qué queda detrás; el estado sin permisos describe la falta de rol y plaza sin decir quién la concede."
+   }
+  ],
+  "usabilidad_para_el_area": "Para soporte administrativo transversal esta es la puerta de todo el sistema, y el acierto de fondo es grande: quitar la contraseña elimina el ticket más repetido. Pero la pantalla falla justo donde este área trabaja. El estado sin permisos —el más frecuente en una organización que está dando de alta roles por primera vez— no tiene encabezado, no se anuncia y no dice quién concede el rol; el estado de error entrega 1.062 caracteres de explicación y esconde a 11px la única cosa que Sistemas necesita, la referencia. Y la pantalla no se puede usar: el botón de entrar no tiene manejador y el documento lanza una excepción al cargar. Tal como está, no sirve para probar el flujo con usuarios reales."
+ },
+ "cobertura": [
+  {
+   "patron": "Choque de valor entre los dos documentos del sistema, verificado token a token. docs/sistema-diseno-acceso-sio-dproma.md declara --text-3:#66717F (línea 35), --sh-modal:0 24px 60px rgba(19,29,43,.20) (línea 136) y --glass:rgba(250,252,253,.74) (línea 137). docs/sistema-diseno-sio-dproma.md declara --text-3:#5C6675 (línea 64), --sh-modal:…,.22 (línea 519) y --glass:…,.66 (línea 520). Esta maqueta trae --text-3:#66717F (valor del acceso) junto a --sh-modal:.22 y --glass:.66 (valores del dashboard): mezcla los dos documentos dentro del mismo :root.",
+   "propuesta_de_regla": "§1.1 — Fuente de verdad única de los tokens. El documento de acceso queda marcado como histórico en su encabezado y deja de declarar valores: remite a §1.1 del documento principal para todo token compartido y conserva solo los patrones exclusivos de la pantalla de entrada (§7.1 .split/.brand/main.access y §6.1 .gbtn). Donde un token exista en los dos, gana el del documento principal sin excepción, y el del documento histórico se retira del archivo en lugar de dejarse como alternativa."
+  },
+  {
+   "patron": "El documento principal documenta el ratio de contraste de las variantes -ink/-bg del semáforo (§1.3: ok 5,04:1, err 5,02:1 en claro) pero no publica su hex; el checklist lo registra como «no documentado». El documento del acceso sí publica --ok-ink:#22705A y --err-ink:#B03A31 (líneas 39-40 y 50). Las tres maquetas de dashboard de este lote traen esos mismos valores, y al medirlos reproducen exactamente los ratios de §1.3 (#22705A sobre --ok-bg #E2EFEC = 5,03:1; #B03A31 sobre --err-bg #F4E8E7 = 5,02:1). Es decir: el valor correcto existe, pero solo está escrito en el documento antecesor, que es el mismo que arrastra el --text-3 obsoleto.",
+   "propuesta_de_regla": "§1.3 — Las tres variantes de cada estado se publican con su hex en la tabla, no solo con su ratio. La tabla de §1.3 incorpora una columna de valor para -ink, -bg y -fill en los dos temas, con el ratio medido al lado como comprobación, no como sustituto. Mientras un valor solo exista en el documento histórico, cualquier maqueta que lo necesite se lo trae con el resto de su :root — que es como el #66717F obsoleto llegó a 51 de las 52 maquetas."
+  },
+  {
+   "patron": "El documento principal se contradice a sí mismo sobre el anillo de foco en fondo oscuro: §1.2 (línea 138) dice que el verde lima #C7D97B se usa «en el wordmark y el anillo de foco sobre fondo oscuro», y §1.5 (línea 324) asigna la misma descripción —«Anillo de foco sobre fondo oscuro»— a --chrome-focus #9FE0AE. 01_login resuelve el empate con #C7D97B literal sobre .brand; esta pantalla y las otras dos del lote declaran --chrome-focus:#9FE0AE.",
+   "propuesta_de_regla": "§1.5 — Un solo anillo de foco sobre fondo oscuro: --chrome-focus (#9FE0AE), en el cromo y en cualquier otra superficie oscura de la aplicación, incluida la columna de marca del acceso. El verde lima #C7D97B queda reservado al wordmark y al isotipo; §1.2 se corrige para no nombrar el foco. Si una superficie de marca necesita un anillo distinto, se declara como token propio y se mide, no se hereda del color del logotipo."
+  },
+  {
+   "patron": "La pantalla de entrada carga el CSS completo del arquetipo de dashboard —cromo, tablas densas, formularios, bandeja de dos paneles— del que no usa nada: 83 tokens declarados para 67 usados, 18 sin uso, y clases como .tabla-caja, .nota y .search declaradas sin que exista el elemento. El sistema no dice qué parte del arquetipo común se lleva una pantalla que no es de dashboard.",
+   "propuesta_de_regla": "§7.1 — Una pantalla de entrada no hereda el arquetipo de dashboard. Lleva solo la base (reinicio, .sr, foco, tokens de §1.1 a §1.6 y §3 a §5), los componentes que usa (§6.1, §6.4, §6.7, §6.8, §6.9) y el layout de §7.1. El cromo (§7.2), las tablas (§6.11) y los formularios (§6.16) no se copian «por si acaso»: cada clase declarada y no usada es un choque de nombre esperando a la siguiente pantalla (§10 trampa 10)."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática, sin backend que perfilar",
+  "f3.theming en oscuro: no hay captura --oscuro y el brief marca tema_oscuro_medido=false; además la pantalla no tiene botón de tema (el guion busca #tema y falla). El tema oscuro se evaluó leyendo los bloques @media (prefers-color-scheme:dark) y :root[data-theme=\"dark\"], no viéndolo pintado",
+  "§9 andamiaje: el conmutador existe, lleva data-andamio, role=\"group\" y etiqueta; no se pudo comprobar si queda visualmente separado del producto porque las capturas se tomaron con el andamiaje oculto",
+  "contraste: el brief no reporta ningún fallo en esta pantalla (contraste.fallos=0); no he medido pares adicionales por mi cuenta salvo los dos del semáforo citados en cobertura"
+ ]
+}

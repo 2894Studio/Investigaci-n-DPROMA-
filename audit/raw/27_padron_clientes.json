@@ -1,0 +1,369 @@
+{
+  "pantalla": "27_padron_clientes",
+  "ruta_zip": "02-padron-de-clientes/27_padron_clientes.html",
+  "carpeta": "02-padron-de-clientes",
+  "area": "comercial",
+  "arquetipo": "bandeja",
+  "modo": "cumplimiento",
+  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
+  "capturas": [
+    "27_padron_clientes--ok.png",
+    "27_padron_clientes--loading.png",
+    "27_padron_clientes--empty.png",
+    "27_padron_clientes--error.png",
+    "27_padron_clientes--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-27padron-01",
+        "severidad": "alta",
+        "regla": "§7.3 Objetivos táctiles",
+        "dice_el_sistema": "Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8). Dos casos que el bloque dejaba fuera: casillas de 15×15px → `.selfila{display:flex;align-items:center;min-height:24px;padding:4px;margin:-4px}` + `input[type=\"checkbox\"]{width:16px;height:16px}`; botones de orden de cabecera a ~19px por margin negativo → min-height:24px real.",
+        "hay_en_el_build": ".selfila{display:flex;gap:var(--sp-3);align-items:flex-start;min-width:0} y .selfila input[type=\"checkbox\"]{margin-top:3px;flex-shrink:0} — ni min-height, ni padding/margin negativo, ni tamaño declarado de la casilla.",
+        "selector": ".selfila input.rowsel, thead th button",
+        "evidencia": "Brief MEDIDO: 15 de 77 destinos interactivos por debajo de 24px, de los cuales 7 son casillas a 15×15px; los dos botones de orden de cabecera («Razón social / RFC», «Último movimiento») miden 163×19 y 165,5×19. La pantalla es la bandeja con selección múltiple: la casilla es el destino que más se pulsa.",
+        "por_que_importa": "Seleccionar filas para «Pedir por correo lo que falta» o «Exportar selección» exige acertar un cuadro de 15px; con ratón impreciso o en tableta se selecciona la fila equivocada y la acción masiva se ejecuta sobre quien no era."
+      },
+      {
+        "id": "f1-27padron-02",
+        "severidad": "alta",
+        "regla": "§7.3 Objetivos táctiles — modo dedo",
+        "dice_el_sistema": "El `:root` es lo que hace ganar la regla: con `:root` suma (0,3,0); sin él (0,2,0) y lo empata cualquier variante de tamaño del componente (`.acciones .iconbtn{width:28px}`) que, por ir después, gana. Se comprueba midiendo con `data-tacto=\"dedo\"` puesto.",
+        "hay_en_el_build": "Las seis reglas se escriben sin `:root`: `[data-tacto=\"dedo\"] .it{…}`, `[data-tacto=\"dedo\"] .iconbtn{…}`, `[data-tacto=\"dedo\"] .cromo-prof{…}`…; después, `.acciones .iconbtn{width:28px;height:28px}`.",
+        "selector": "[data-tacto=\"dedo\"] .iconbtn vs .acciones .iconbtn",
+        "evidencia": "Medición propia con Playwright: puesto `data-tacto=\"dedo\"` en el `<html>`, 18 de los 21 `.iconbtn` de la pantalla siguen midiendo 28px de alto (mínimo medido: 28px). Solo los `.it` del menú lateral llegan a 46px. Brief: regla_data_tacto_sin_root = 6.",
+        "por_que_importa": "El modo dedo queda sin efecto justo donde más falta hace: las tres acciones de cada fila de la tabla. Quien use la bandeja en tableta sigue teniendo destinos de 28px."
+      },
+      {
+        "id": "f1-27padron-03",
+        "severidad": "alta",
+        "regla": "§6.4 Vistas de estado de una pantalla",
+        "dice_el_sistema": "(1) el cambio se anuncia (`aria-live=\"polite\"`) y mueve el foco (`main.focus()` con `tabindex=\"-1\"`); (2) cada estado lleva encabezado real, no un `<b>`; «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo» (§11). `.tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)}`, `.estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}`.",
+        "hay_en_el_build": "`<div class=\"state state-error\"><svg class=\"ico\" style=\"color:var(--err-ink)\"…><b>No se pudo cargar el padrón</b><p>…` — título en `<b>`, icono de 30px en contorno, y `.state{padding:56px 16px;flex:1}` sin tarjeta ni medallón. El JS solo hace `cont.setAttribute('data-state', …)`.",
+        "selector": ".state.state-error, .state.state-empty, main#contenido",
+        "evidencia": "Medición propia: 0 ocurrencias de `tarjeta-estado` o `estado-ico` en el archivo; 0 atributos `aria-live` en todo el documento; el manejador de cambio de vista no llama a `focus()` ni escribe en ninguna región viva. `--r-modal` figura entre los tokens declarados y no usados (brief). Captura 27_padron_clientes--error.png.",
+        "por_que_importa": "Para quien usa lector de pantalla, pulsar «Reintentar» o perder la conexión no produce ningún anuncio y el foco se queda donde estaba: la pantalla cambia entera sin que nada lo diga. Y el título del error no es un encabezado, así que no aparece en la lista de encabezados."
+      },
+      {
+        "id": "f1-27padron-04",
+        "severidad": "alta",
+        "regla": "§6.7 Esqueleto de carga",
+        "dice_el_sistema": "Imita la forma de lo que va a llegar: mismas columnas, mismos anchos (en `fr`) y el mismo alto. Tabla: `.sk-fila{min-height:67px}`, `.sk-cab{min-height:35px;background:var(--surface-2)}`. §11: «el esqueleto mide lo mismo de alto que el contenido que sustituye».",
+        "hay_en_el_build": "`.skel{display:block;height:12px;border-radius:4px;…}` y `.sk-fila{display:grid;gap:var(--sp-4);align-items:center}` sin `min-height`; no existe `.sk-cab` ni barra de cabecera.",
+        "selector": ".sk-fila, .skel",
+        "evidencia": "Medición propia: con datos las filas del `<tbody>` miden 93, 232, 124, 124, 93, 109 y 155px y el `<thead>` 32px; en estado «cargando» cada `.sk-fila` mide 12px de alto y no hay ninguna barra de cabecera. Capturas 27_padron_clientes--ok.png vs --loading.png.",
+        "por_que_importa": "El esqueleto ocupa menos de la octava parte de lo que va a llegar: al cargar, la página da un salto de varios cientos de píxeles y lo que se iba a pulsar se mueve bajo el cursor."
+      },
+      {
+        "id": "f1-27padron-05",
+        "severidad": "media",
+        "regla": "§6.7 / §5 `prefers-reduced-motion`",
+        "dice_el_sistema": "Hay que aplanar el fondo, no solo parar la animación. `animation:none` a secas congela el degradado en la posición 0. Correcto: `@media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}`.",
+        "hay_en_el_build": "`@media (prefers-reduced-motion:reduce){.skel{animation:none}}` (línea 601), sin reponer el fondo.",
+        "selector": ".skel bajo @media (prefers-reduced-motion:reduce)",
+        "evidencia": "Medición propia con contexto `reducedMotion:'reduce'`: `animation-name` = none pero `background-image` sigue siendo `linear-gradient(90deg, rgb(231,237,243) 25%, rgba(27,36,…` y `background-color` queda en `rgba(0,0,0,0)`. Es el fallo que §6.7 describe literalmente.",
+        "por_que_importa": "Quien pide movimiento reducido ve el degradado congelado a medio recorrido: barras con un gradiente raro que parecen un fallo de pintado en vez de un esqueleto."
+      },
+      {
+        "id": "f1-27padron-06",
+        "severidad": "media",
+        "regla": "§6.7 — punto de ruptura del esqueleto",
+        "dice_el_sistema": "El punto de ruptura del esqueleto es el de la tabla (860px, no 900px).",
+        "hay_en_el_build": "`@media (max-width:900px){.sk-fila{grid-template-columns:1fr !important}}` (línea 618), mientras que el modo tarjeta de la tabla y el resto de la pantalla rompen en 860px (líneas 256, 290, 411, 699).",
+        "selector": "@media (max-width:900px) .sk-fila",
+        "evidencia": "Medición propia sobre el archivo: cuatro `@media (max-width:860px)` para el cromo y la tabla, y un único `@media (max-width:900px)` para el esqueleto. Entre 860 y 900px el esqueleto ya está apilado y la tabla todavía no.",
+        "por_que_importa": "En una franja de 40px de ancho de ventana el esqueleto no anticipa la forma de la tabla que va a llegar, que es su única razón de ser."
+      },
+      {
+        "id": "f1-27padron-07",
+        "severidad": "alta",
+        "regla": "§6.12 regla 8 — «un control con pinta de interactivo tiene que interactuar»",
+        "dice_el_sistema": "Un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin `aria-pressed` ni cursor de puntero.",
+        "hay_en_el_build": "Cuatro `.schip` con `type=\"button\"`, `aria-pressed=\"false\"` y `data-f=\"sin-documentos|documento-por-vencer|sin-ordenes-90d|activos\"`, más el segmentado de densidad `.seg` con `aria-pressed` en sus dos botones. El `<script>` completo solo registra manejadores para el tema, el menú lateral y el panel `.demo` del andamiaje.",
+        "selector": ".p4-f .schip[data-f], .seg button[aria-pressed]",
+        "evidencia": "Medición propia: el único `addEventListener` sobre elementos de producto es el del conmutador de tema y el del botón de menú; `[data-f]` y los botones de `.seg` no aparecen en ningún manejador. Captura 27_padron_clientes--ok.png (los cuatro contadores se dibujan con borde de pastilla y cursor de puntero).",
+        "por_que_importa": "«42 sin los dos documentos» se anuncia como botón de dos estados a los lectores de pantalla y se ve pulsable a todos los demás; al pulsarlo no pasa nada. Es el atajo más probable de la pantalla y promete un filtro que no existe."
+      },
+      {
+        "id": "f1-27padron-08",
+        "severidad": "media",
+        "regla": "§6.15 Fila desplegable — `.suc-btn` + `tr.hijas`",
+        "dice_el_sistema": "`aria-expanded` + `aria-controls` tienen que apuntar a algo que exista (cuatro de cinco botones del padrón apuntaban a `id` inexistentes). Cierra con Escape, y al cerrar el foco vuelve al botón que lo abrió.",
+        "hay_en_el_build": "Cuatro `button.suc-btn` con `aria-controls=\"suc-cvb\"`, `\"suc-aca\"`, `\"suc-rda\"` y `\"suc-dpa\"`; ninguno de esos `id` existe en el documento. No hay manejador de Escape ni devolución de foco para el desplegable.",
+        "selector": "button.suc-btn[aria-controls]",
+        "evidencia": "Medición propia: recorriendo todos los `aria-controls`/`aria-describedby`/`aria-labelledby` del documento, los cuatro valores huérfanos son exactamente `suc-cvb`, `suc-aca`, `suc-rda` y `suc-dpa`, todos sobre `BUTTON.suc-btn`. El fallo que §6.15 documenta sigue en pie.",
+        "por_que_importa": "Un lector de pantalla anuncia «contraído, controla …» y no encuentra nada que abrir; quien navega con teclado no tiene forma de saber adónde fue el detalle de sucursales."
+      },
+      {
+        "id": "f1-27padron-09",
+        "severidad": "media",
+        "regla": "§6.13 Barra de selección — `.barra-sel`",
+        "dice_el_sistema": "Aparece solo cuando hay selección, y se nota que ha aparecido. Valores: `display:none`, `[data-hay=\"true\"]{display:flex}`.",
+        "hay_en_el_build": "`.barra-sel{display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap;…}` sin `display:none` de partida ni ninguna regla `[data-hay]` en todo el archivo.",
+        "selector": ".barra-sel",
+        "evidencia": "Medición propia sobre el archivo: cinco reglas `.barra-sel*` (líneas 680-685) y cero ocurrencias de `data-hay`. En la captura --ok.png la barra está visible con «2 seleccionados» precargados, y en --loading.png y --error.png desaparece solo porque desaparece la vista entera.",
+        "por_que_importa": "Si la barra está siempre, deja de ser la señal de que hay algo seleccionado: la aparición es la mitad del componente. Y con cero filas marcadas quedan a la vista acciones masivas que no tienen sobre qué actuar."
+      },
+      {
+        "id": "f1-27padron-10",
+        "severidad": "media",
+        "regla": "§6.19 Botón-icono / §6.5 Iconos",
+        "dice_el_sistema": "Nunca viaja solo: `title` + `aria-label`, y el `aria-label` nombra el dato concreto. §6.5: si va sin texto visible, lleva como mínimo etiqueta emergente y `aria-label`.",
+        "hay_en_el_build": "Los 21 `.iconbtn` llevan `aria-label` correcto y nombrando el dato («Ver ficha de Grupo Automotriz Vértice»), pero ninguno lleva `title`.",
+        "selector": ".iconbtn",
+        "evidencia": "Medición propia: 21 `.iconbtn` en la pantalla, 21 sin atributo `title`, 0 sin `aria-label`.",
+        "por_que_importa": "Quien ve la pantalla y usa ratón no tiene forma de averiguar qué hace el tercer icono de la fila: el `aria-label` solo llega a quien usa lector de pantalla. En esta tabla hay tres iconos sin texto por fila."
+      },
+      {
+        "id": "f1-27padron-11",
+        "severidad": "media",
+        "regla": "§6.14 Menú de acciones por fila",
+        "dice_el_sistema": "Con una o dos acciones estables en todas las filas → botones de icono con `aria-label` y etiqueta emergente. Con más de dos, o si cambian según la fila → menú `⋯` con las opciones escritas.",
+        "hay_en_el_build": "Tres botones de icono por fila: «Ver ficha de …», «Editar …» y «Ver órdenes de …».",
+        "selector": "td[data-et=\"Acciones\"] .acciones .iconbtn",
+        "evidencia": "Medición propia del markup de las filas: tres `.iconbtn` consecutivos dentro de cada `.acciones`, los tres sin texto visible. Captura 27_padron_clientes--ok.png.",
+        "por_que_importa": "Tres iconos mudos en 28px cada uno obligan a adivinar; el sistema fija el umbral en dos precisamente para que la tercera acción pase a un menú con las opciones escritas."
+      },
+      {
+        "id": "f1-27padron-12",
+        "severidad": "alta",
+        "regla": "§2.1 Suelo tipográfico / §6.10 Etiqueta de estado y de clasificación",
+        "dice_el_sistema": "§2.1: «El suelo son 12px. Nada baja de ahí.» Única excepción admitida: 10,5px en mayúsculas con `letter-spacing` para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta. §6.10: ambas etiquetas llevan `font-size:var(--fs-meta)` (=12px).",
+        "hay_en_el_build": "`.pill{…font-size:11px;font-weight:700…}` y `.p-type{…font-size:11px…}`, con `--fs-meta` correctamente declarado a 12px y sin usarse ahí. En total 30 declaraciones de tamaño por debajo de 12px en el archivo (11px en `.pill`, `.p-type`, `.cromo-av`, `small` de la celda principal, `th`, `.ref`…; 11,5px en forma abreviada `font:600 11.5px var(--font-ui)`).",
+        "selector": ".pill, .p-type, tbody .rz small, thead th",
+        "evidencia": "Medición propia con el estilo calculado (§10 trampa 1): 96 nodos de texto por debajo de 12px en la vista con datos; `.pill` y `.p-type` computan 11px; 30 declaraciones `font-size:1[01](.5)?px` / `font:… 11.5px` en el `<style>`.",
+        "por_que_importa": "El dato que se lee todos los días en esta pantalla —el estado de documentos de cada cliente y su tipo— está bajo el suelo del sistema, que §2.1 fija en 12-13px precisamente para lo cotidiano."
+      },
+      {
+        "id": "f1-27padron-13",
+        "severidad": "alta",
+        "regla": "§1.7 Ratios de contraste mínimos / §6.10 `.p-type`",
+        "dice_el_sistema": "Texto normal: 4,5:1. «Cada color nuevo se mide contra los fondos donde va a aparecer, en los dos temas, antes de darlo por bueno.»",
+        "hay_en_el_build": "`.p-type` pinta `color:var(--text-2)` (#4C5A6B) sobre `color-mix(in srgb,var(--serie-N) 16%,var(--surface))`.",
+        "selector": "span.p-type.p-s1, span.p-type.p-s2",
+        "evidencia": "Brief MEDIDO: «Agencia» y «Empresa» a 2,97:1 sobre `color(srgb 0.851137 0.897882 0.938824)` y `color(srgb 0.900078 0.889726 0.938824)`, con mínimo 4,5. Mi barrido compositando el alfa de toda la cadena de ancestros confirma 5 instancias de `.p-type` a 2,97:1 en tema claro y ninguna otra: los otros tres fallos del brief (`span.et` del cromo y `span.cromo-av`) desaparecen al compositar el fondo translúcido sobre el color real que hay debajo.",
+        "por_que_importa": "La etiqueta que dice si el cliente es agencia o empresa —la que separa a quién se le factura de otra forma— se lee a menos de dos tercios del mínimo, y además a 11px."
+      },
+      {
+        "id": "f1-27padron-14",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto — `--text-3`",
+        "dice_el_sistema": "`--text-3` es `#5C6675`, no el antiguo `#66717F` (que caía a 4,21:1 sobre `--surface-2`).",
+        "hay_en_el_build": "`--text-3: #66717F` en el `:root` del tema claro (línea 67).",
+        "selector": ":root{--text-3}",
+        "evidencia": "Brief MEDIDO: `text_3_declarado = \"#66717F\"`. La pantalla usa `--surface-2` en las cabeceras de tabla, en el sobrevuelo de fila y en el esqueleto.",
+        "por_que_importa": "Hecho ya establecido para 51 de las 52 maquetas; se marca aquí porque esta pantalla sí hace caer texto `--text-3` sobre `--surface-2` (el RFC de la celda principal al pasar el cursor)."
+      },
+      {
+        "id": "f1-27padron-15",
+        "severidad": "media",
+        "regla": "§10 trampa 5 — `<symbol>` y `viewBox` repetido",
+        "dice_el_sistema": "Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca. Correcto: medidas en el `<use>` y sin `viewBox` en el envoltorio. Se comprueba midiendo la caja del `<use>` contra la del `<svg>`: si el desplazamiento no es ~0, está mal.",
+        "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>` en el logotipo, y `<svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>` en el botón flotante — el `viewBox` repetido y el `<use>` sin medidas.",
+        "selector": ".logo > svg, .fab > svg",
+        "evidencia": "Medición propia con `getBoundingClientRect()`: el `<symbol id=\"dproma-mark\">` declara `viewBox=\"740 0 970 932\"`; el `<use>` del logotipo queda desplazado −32,5px respecto de su `<svg>` y el del botón flotante −16,2px. El número coincide con el que §10 documenta.",
+        "por_que_importa": "El isotipo se pinta fuera de su caja y se recorta: en la captura queda una astilla verde en lugar de la marca, en todas las pantallas del módulo."
+      },
+      {
+        "id": "f1-27padron-16",
+        "severidad": "media",
+        "regla": "§10 trampa 4 / §7.3 — el destino es la región que acepta la pulsación",
+        "dice_el_sistema": "Un campo de búsqueda dentro de un `<div>` con forma de pastilla no cumple, porque pulsar la pastilla no hace nada. El contenedor tiene que ser una `<label for=\"…\">`.",
+        "hay_en_el_build": "`<div class=\"search\"><svg …><input id=\"buscar\" type=\"search\" … aria-label=\"Buscar en el padrón de clientes\"></div>`; el rótulo solo existe como `aria-label`.",
+        "selector": "div.search > input#buscar",
+        "evidencia": "Brief MEDIDO: el `<input type=\"search\">` mide 329×15px. El contenedor con forma de pastilla es un `<div>`, no una `<label for=\"buscar\">`.",
+        "por_que_importa": "La zona pulsable real del buscador son 15px de alto en medio de una pastilla de ~40px: pulsar el icono de lupa o el margen de la pastilla no enfoca el campo."
+      },
+      {
+        "id": "f1-27padron-17",
+        "severidad": "media",
+        "regla": "§6.11 regla 3 — `aria-sort`",
+        "dice_el_sistema": "`aria-sort` en todas las columnas ordenables, incluidas las que aún no ordenan (`aria-sort=\"none\"`).",
+        "hay_en_el_build": "13 `<th>` en la tabla y un solo `aria-sort`; hay dos botones de orden en cabecera («Razón social / RFC» y «Último movimiento») y ninguno tiene lógica asociada.",
+        "selector": "thead th, thead th button",
+        "evidencia": "Brief MEDIDO: `th: 13`, `thAriaSort: 1`. Medición propia: 2 `th button` y ningún manejador de orden en el `<script>`.",
+        "por_que_importa": "Quien usa lector de pantalla no puede saber por qué columna está ordenada la bandeja ni cuáles se pueden ordenar."
+      },
+      {
+        "id": "f1-27padron-18",
+        "severidad": "baja",
+        "regla": "§1.7 Anillo de foco — un control compuesto lleva un solo anillo",
+        "dice_el_sistema": "Si un contenedor reacciona a `:focus-within` dibujando foco, ningún descendiente suyo dibuja foco además. `.search:focus-within{border-color:var(--accent);outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}`.",
+        "hay_en_el_build": "`.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}` (no `outline`) **y además** `.search input:focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}`.",
+        "selector": ".search:focus-within, .search input:focus-visible",
+        "evidencia": "Medición propia sobre el archivo, líneas 329 y 332: las dos reglas coexisten; el envoltorio dibuja un realce de 1px por sombra y el hijo dibuja encima su propio anillo de 2px.",
+        "por_que_importa": "Dos marcas de foco concéntricas sobre el mismo control: se lee como dos elementos enfocados a la vez."
+      },
+      {
+        "id": "f1-27padron-19",
+        "severidad": "baja",
+        "regla": "§6.12 regla 7 / §13.1 — orden fijo",
+        "dice_el_sistema": "Orden fijo: resumen → buscador + filtros en una sola fila → tabla.",
+        "hay_en_el_build": "`.p4-t` (título + resumen de totales) → `.p4-b` (solo el buscador, en su propia fila) → `.p4-f` (los cuatro contadores de estatus + el segmentado de densidad, en otra fila) → tabla. El resumen de estatus va **debajo** del buscador, y los filtros propiamente dichos (§6.21) no existen.",
+        "selector": ".p4-t, .p4-b, .p4-f",
+        "evidencia": "Medición propia del markup (líneas 726-728) y captura 27_padron_clientes--ok.png.",
+        "por_que_importa": "La lectura que §13.1 fija —primero qué hay, después con qué acotarlo— queda invertida, y el buscador acaba separado de los controles con los que se combina."
+      },
+      {
+        "id": "f1-27padron-20",
+        "severidad": "baja",
+        "regla": "§6.11 regla 6 — densidad",
+        "dice_el_sistema": "Si se ofrece densidad, la compacta reduce contenido, no solo espacio: `[data-density=\"compact\"] tbody th,[data-density=\"compact\"] td{height:var(--row-compact)}` + `[data-density=\"compact\"] .rz small{display:none}`. Y la primera pregunta es si hace falta ofrecerla — el padrón la retiró.",
+        "hay_en_el_build": "`<html lang=\"es-MX\" data-density=\"comfy\">` y un segmentado «Cómoda · Compacta», pero no existe ninguna regla `[data-density=\"compact\"]` en la hoja ni manejador en el JS.",
+        "selector": ".seg[aria-label=\"Densidad de la tabla\"]",
+        "evidencia": "Medición propia: una sola ocurrencia de `data-density` en todo el archivo, el atributo del `<html>`; cero reglas CSS y cero manejadores.",
+        "por_que_importa": "Se reintroduce un control que el propio padrón había retirado, y además no hace nada: dos promesas rotas en el mismo botón."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 1,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 2,
+      "integridad": 1
+    },
+    "justificacion": "La pantalla está bien pensada —la tarjeta de duplicados, el texto del error y las etiquetas `aria-label` que nombran el dato concreto son de nivel alto— pero la implementación no sostiene lo que dibuja. Accesibilidad 1: 15 destinos bajo 24px con 7 casillas a 15px, cero `aria-live`, estados sin encabezado real, cuatro `aria-controls` huérfanos, `aria-sort` en 1 de 13 columnas y 21 botones de icono sin `title`. Integridad 1: ninguno de los controles de producto tiene lógica (contadores, densidad, orden, selección, desplegable de sucursales) y el esqueleto mide 12px donde el contenido mide 93-232px. Theming 3: los dos temas están declarados y el conmutador funciona, pero `--text-3` arrastra el valor obsoleto y `.p-type` queda a 2,97:1. Responsive 2: el modo tarjeta de la tabla está completo a 860px, pero el esqueleto rompe a 900px y el modo dedo no gana a las variantes de tamaño.",
+    "evidencia": [
+      "Brief MEDIDO: 15/77 destinos bajo 24px, 7 casillas a 15×15px, contraste 4 fallos (2,97:1 en `.p-type`), th 13 / thAriaSort 1, ariaLive 1 (ninguna sobre el cambio de vista).",
+      "Medición propia: `.sk-fila` 12px vs filas reales de 93 a 232px; 18/21 `.iconbtn` siguen a 28px con `data-tacto=\"dedo\"`; 21/21 `.iconbtn` sin `title`; 4 `aria-controls` huérfanos (`suc-cvb`, `suc-aca`, `suc-rda`, `suc-dpa`); 0 `aria-live`; 30 declaraciones de tipografía bajo 12px; desplazamiento del `<use>` del isotipo −32,5px.",
+      "Capturas 27_padron_clientes--ok.png, --loading.png, --error.png, --oscuro.png."
+    ]
+  },
+  "f4_nielsen": [
+    {
+      "n": 1,
+      "heuristica": "Visibilidad del estado del sistema",
+      "severidad": 3,
+      "hallazgo": "El cambio entre con datos / cargando / vacío / error no se anuncia por `aria-live` ni mueve el foco, y el esqueleto de 12px no anticipa la forma de lo que va a llegar. La barra de selección está siempre visible, así que deja de informar de que hay algo seleccionado.",
+      "selector": "main#contenido[data-state], .sk-fila, .barra-sel"
+    },
+    {
+      "n": 2,
+      "heuristica": "Coincidencia entre el sistema y el mundo real",
+      "severidad": 0,
+      "hallazgo": "El vocabulario es el del área: razón social, RFC, sucursales, documentos fiscales, «Los dos», «Puede recibir órdenes». La tarjeta de duplicados explica el criterio en lenguaje de negocio, no de algoritmo.",
+      "selector": ".dup, .tabla-caja"
+    },
+    {
+      "n": 3,
+      "heuristica": "Control y libertad del usuario",
+      "severidad": 2,
+      "hallazgo": "«Quitar la selección» existe y está separado a la derecha, pero las acciones masivas («Cambiar a inactivo», «Pedir por correo lo que falta») no declaran confirmación ni forma de deshacer, que §6.13 exige. El desplegable de sucursales no cierra con Escape ni devuelve el foco.",
+      "selector": ".barra-sel, button.suc-btn"
+    },
+    {
+      "n": 4,
+      "heuristica": "Consistencia y estándares",
+      "severidad": 3,
+      "hallazgo": "`.pill` y `.p-type` se apartan de `--fs-meta` y comparten `font-weight:700`, cuando §6.10 pide que la clasificación tenga peso visual más bajo que el estado; el esqueleto rompe a 900px y la tabla a 860px; se reintroduce la densidad que el padrón había retirado; el isotipo repite el `viewBox` del `<symbol>`.",
+      "selector": ".pill, .p-type, .sk-fila, .seg, .logo > svg"
+    },
+    {
+      "n": 5,
+      "heuristica": "Prevención de errores",
+      "severidad": 2,
+      "hallazgo": "Las casillas de selección miden 15×15px junto al nombre del cliente: el error de selección es fácil y la acción que sigue es masiva. Los contadores con `aria-pressed` prometen un filtro que no se aplica, de modo que se puede operar creyendo que la lista está acotada cuando no lo está.",
+      "selector": ".selfila input.rowsel, .schip[data-f]"
+    },
+    {
+      "n": 6,
+      "heuristica": "Reconocer antes que recordar",
+      "severidad": 1,
+      "hallazgo": "Las tres acciones de fila son iconos sin texto y sin etiqueta emergente; hay que recordar qué significa cada uno. No existe la fila de pastillas de filtros aplicados de §6.21, así que lo que está acotando la lista no se ve.",
+      "selector": ".acciones .iconbtn"
+    },
+    {
+      "n": 7,
+      "heuristica": "Flexibilidad y eficiencia",
+      "severidad": 2,
+      "hallazgo": "Hay buscador, contadores, densidad y orden, pero ninguno funciona; falta el selector de registros por página de §6.11 regla 9 y falta el componente de filtro por campo categórico de §6.21.",
+      "selector": ".p4-b, .p4-f, .tfoot"
+    },
+    {
+      "n": 8,
+      "heuristica": "Diseño estético y minimalista",
+      "severidad": 1,
+      "hallazgo": "La nota bajo la tarjeta de duplicados ocupa cinco líneas de texto siempre visible, muy por encima del límite de ~140 caracteres y una frase que §8 fija para `.nota`/`.banda`.",
+      "selector": ".dup .nota"
+    },
+    {
+      "n": 9,
+      "heuristica": "Ayudar a reconocer y recuperarse de errores",
+      "severidad": 1,
+      "hallazgo": "El texto del error es ejemplar —qué pasó, qué no se ha perdido, qué hacer, y referencia `PAD-20260821-1655`— pero no va en tarjeta con medallón, su título es un `<b>` y el cambio no se anuncia.",
+      "selector": ".state.state-error"
+    },
+    {
+      "n": 10,
+      "heuristica": "Ayuda y documentación",
+      "severidad": 0,
+      "hallazgo": "La explicación del cálculo de parecido y de qué conserva una fusión está escrita en la propia pantalla, en el momento en que hace falta.",
+      "selector": ".dup .nota"
+    }
+  ],
+  "f5_investigacion": {
+    "pain_points_evaluados": [
+      {
+        "pp": "pp-040",
+        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+        "cobertura": "cubre",
+        "evidencia": "«El área comercial no cuenta con una herramienta de CRM; el seguimiento de más de 20 clientes activos depende de la memoria del vendedor, sin registro estructurado.» La bandeja da el registro estructurado que falta: 1.248 clientes con razón social, RFC, tipo, sucursales, estado de documentos fiscales, último movimiento y estado comercial en una sola tabla."
+      },
+      {
+        "pp": "pp-045",
+        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+        "cobertura": "cubre",
+        "evidencia": "«Las bases de datos de clientes se comparten como Excel adjuntos por correo; los cambios de una parte no se reflejan para la otra.» La pantalla sustituye el adjunto por una fuente única, y conserva la salida («Exportar selección», botón de exportar en la cabecera) para quien siga necesitando el archivo."
+      },
+      {
+        "pp": "pp-077",
+        "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
+        "cobertura": "cubre",
+        "evidencia": "«Cada grupo automotriz exige campos de validación distintos (TOT, VIN) no estandarizados para facturar, generando un cuello de botella financiero de casi 2 millones de pesos.» La columna «Documentos fiscales» con «Los dos / falta uno / ninguno» y el contador «42 sin los dos documentos» ponen a la vista exactamente el bloqueo de facturación. El contador, sin embargo, no filtra (f1-27padron-07), así que la pantalla enseña el problema pero no deja atacarlo."
+      },
+      {
+        "pp": "pp-044",
+        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+        "cobertura": "ignora",
+        "evidencia": "«La documentación de clientes se envía por WhatsApp o se guarda en Drive personal, sin estructura de carpetas compartidas por cliente.» La bandeja dice si los documentos están o faltan, pero no ofrece ninguna entrada a los documentos mismos desde la fila; el dolor de dónde vive el archivo queda fuera de esta pantalla."
+      },
+      {
+        "pp": "pp-042",
+        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+        "cobertura": "ignora",
+        "evidencia": "«No existe un cuestionario o formato digital para perfilar a un cliente potencial antes de una visita comercial.» El padrón solo contiene clientes dados de alta; no hay noción de prospecto ni de contacto no cerrado en la bandeja."
+      },
+      {
+        "pp": "pp-047",
+        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+        "cobertura": "cubre",
+        "evidencia": "«Ante retrasos de facturación o trámites, los clientes contactan directamente al vendedor en lugar del área responsable.» La columna «Comercial» y la de último movimiento con su folio (`Orden ORD-202608-0392 programada`) dan al vendedor la respuesta sin tener que preguntar a otra área."
+      }
+    ],
+    "usabilidad_para_el_area": "Como pieza de información es la mejor respuesta que el módulo da al dolor central de comercial: sustituye la memoria del vendedor y el Excel por correo (pp-040, pp-045) por una lista con el estado de documentos fiscales, que es justo el bloqueo de facturación que describe pp-077. La tarjeta de duplicados, con su explicación de cómo se calcula el parecido y de qué conserva una fusión, es exactamente lo que falta cuando la base viene de varios Excel. El problema es que casi nada de lo que promete funciona: ni los cuatro contadores, ni el orden, ni la densidad, ni el desplegable de sucursales; y las casillas de 15px gobiernan acciones masivas sobre clientes. Para el vendedor, la pantalla hoy se lee bien y no se opera: resuelve el «dónde está el dato» y deja intacto el «cómo lo acoto y actúo sobre él»."
+  },
+  "cobertura": [
+    {
+      "patron": "Botón de acción flotante del asistente (`.fab`), un círculo de 52px fijo abajo a la derecha de la zona de contenido, con el isotipo y un anillo discontinuo que gira al pasar el cursor. Aparece en las cinco maquetas del módulo y el sistema no lo documenta en ninguna parte: no está entre las once piezas de §12.4 ni entre los componentes §6.1-§6.23. Además usa `--marca-halo` (rgba del verde lima) en el borde del botón, cuando §1.2 dice que el verde lima «no se usa en controles», y su anillo gira 14s de forma continua, por encima del umbral de 5s que §5/§11 obligan a poder pausar pulsando la propia animación.",
+      "propuesta_de_regla": "§6.24 Botón flotante del asistente — `.fab`. **Cuándo:** la entrada al asistente del sistema, y solo esa; es el único elemento flotante permitido sobre la zona de contenido. **Dónde:** `position:absolute` dentro de `.main`, nunca sobre el cromo ni sobre un diálogo. Valores: `width:52px;height:52px;border-radius:50%;border:0;box-shadow:var(--sh-float)`; `right`/`bottom` a `max(26px, env(safe-area-inset-*))`, y 46px con `max(16px, …)` por debajo de 860px. **Color:** el relleno es `linear-gradient(135deg,var(--marca-azul),var(--marca-3))` — es la única excepción a «la familia `--marca-*` no se usa en controles», y se admite porque el botón *es* la marca, no una acción del producto. El anillo de sobrevuelo usa `--marca-halo-suave`; el glifo interior va con las medidas en el `<use>` y sin `viewBox` repetido (§10 trampa 5). **A11y:** `aria-label` + `title`, destino de 52px (sobre los 44px de §7.3 por ser acción flotante), y el anillo giratorio es decorativo y se detiene bajo `prefers-reduced-motion` — por ser decorativo y no portar información queda exento de la norma de pausa de §5, que se limita a animaciones con contenido."
+    },
+    {
+      "patron": "La receta documentada de `.p-type` no pasa su propio mínimo de contraste. §6.10 fija `color:var(--text-2)` sobre `.p-s1/.p-s2{background:color-mix(in srgb,var(--serie-N) 16%,var(--surface))}`, y esa combinación exacta mide 2,97:1 en tema claro (brief MEDIDO sobre `color(srgb 0.851137 0.897882 0.938824)` y `color(srgb 0.900078 0.889726 0.938824)`), por debajo del 4,5:1 que §1.7 exige para texto normal. No es un fallo de la maqueta: la maqueta aplicó la regla. Es un hueco de la fuente de verdad, que además nunca midió esta mezcla a pesar de que §1.7 obliga a medir «cada color nuevo contra los fondos donde va a aparecer».",
+      "propuesta_de_regla": "Enmienda a §6.10 — tinta de `.p-type`. El relleno `color-mix(in srgb,var(--serie-N) 16%,var(--surface))` es lo bastante claro como para que `--text-2` no llegue a 4,5:1 (medido 2,97:1 con `--serie-1` y con `--serie-2` en claro). La clasificación pasa a usar su propia tinta, `--serie-N-ink`, oscurecida hasta cumplir 4,5:1 sobre su `-bg`, igual que hace el semáforo en §1.3; el punto de color del `::before` conserva el color base de la serie, que es quien hace de distintivo. El peso se queda en 600 y el tamaño en `var(--fs-meta)`, para que `.p-type` siga viéndose por debajo de `.pill` (700). Y se añade a §11 la comprobación que faltaba: «toda mezcla `color-mix` que vaya a llevar texto encima se mide como un color nuevo, en los dos temas»."
+    },
+    {
+      "patron": "Tarjeta de duplicados detectados («Dos pares de razones sociales se parecen demasiado»): una lista de pares candidatos a fusión con el porcentaje de parecido, la fecha de alta y el número de órdenes de cada lado, y un botón «Comparar y decidir» por par, encima de la tabla y fuera de ella. El sistema no tiene regla para este bloque: no es `.resumen` (§6.12), no es `.banda` (§6.9) y no es la tabla principal (§6.11); el porcentaje de parecido tampoco encaja en ninguna de las tres decisiones de color de §1 —no es un juicio del semáforo, no es una categoría, y sí es un «dato sobre el dato»— y aquí se pinta sobre `--warn-bg`.",
+      "propuesta_de_regla": "§6.25 Bloque de conflictos pendientes — `.dup`. **Cuándo:** una bandeja detecta pares o grupos de registros que podrían ser el mismo y hace falta que una persona decida. Va **entre la fila de filtros y la tabla**, nunca dentro de ella, porque habla de la lista y no de una fila. **Forma:** reusa la receta de superficie de `.tarjeta` (§6.3) con cabecera en `--surface-2`, un contador de pares a la derecha del título, y una fila por par con los dos lados enfrentados por la palabra «CONTRA» y sus datos de desempate (alta y volumen) en `--text-2`. **Color:** la cifra de parecido es un dato sobre el dato (§6.22) y por tanto **no lleva color de estado**: va en tinta de texto sobre `--surface-2`, no sobre `--warn-bg` — un parecido alto no es una advertencia, es una medida. **Acción:** un solo botón por par, que abre la comparación; la fusión nunca se ejecuta desde aquí (§6.13 regla 3). **Voz:** la explicación del criterio va en `.note` (§6.9) bajo el bloque y, por §8, en una frase bajo 140 caracteres; lo que no quepa va a toggletip (§6.23). **A11y:** la lista es un `<ul>` con un encabezado real, y el `aria-label` de cada botón nombra los dos registros que compara."
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática servida desde disco, sin backend ni librería que perfilar; el documento tampoco fija umbrales de rendimiento auditables.",
+    "§6.21 Barra de filtros con desplegable, buscador y selección múltiple: no se puede evaluar su comportamiento porque el componente no existe en la pantalla; se ha evaluado su ausencia contra §6.12 regla 7, no su implementación.",
+    "§6.13 reglas 3 y 4 (confirmación que dice a cuántos afecta, y deshacer): no evaluado — las acciones masivas no tienen manejador, así que no hay diálogo de confirmación ni mecanismo de deshacer que inspeccionar."
+  ]
+}
