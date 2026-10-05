@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es-MX" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F5F7">
+<title>SIO-DPROMA — Asistente D-PRIMI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   SIO-DPROMA — Contrato visual (design tokens)
+   Propuesta v2 · 2026-07-28 · NO sustituye a ningún documento aprobado.
+
+   Fuente: 34_UIUX_DESIGN_BRIEF_v1.0.md §2 (paleta), §3 (tipo/espaciado/motion),
+           22_ANALISIS_UX_UI_Y_ROBUSTECIMIENTO_v1.0.md (semáforo validado 2026-07-20),
+           14_REGLAS_CONSOLIDADAS_v1.3.md §4.
+   Curvas de easing: estándares de emilkowalski/skills · review-animations.
+
+   REGLA: ningún hex literal en componentes. Todo pasa por estas variables.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Tipografía ───────────────────────────────────────────────── */
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-brand: 'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif; /* solo momentos de marca */
+
+  --fs-meta: 12px;   /* captions, metadatos */
+  --fs-dense: 13px;  /* tablas densas */
+  --fs-base: 14px;   /* base UI */
+  --fs-sub: 16px;    /* subtítulos */
+  --fs-title: 20px;  /* títulos de página */
+  --fs-kpi: 30px;    /* cifra KPI */
+
+  /* ── Espaciado — escala de 4 px ───────────────────────────────── */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-6: 24px; --sp-8: 32px; --sp-12: 48px;
+
+  --row-comfy: 40px;    /* densidad de tabla cómoda */
+  --row-compact: 32px;  /* densidad compacta (con toggle) */
+
+  /* ── Radios ───────────────────────────────────────────────────── */
+  --r-ctrl: 6px; --r-card: 10px; --r-modal: 16px; --r-pill: 999px;
+
+  /* ── Movimiento ───────────────────────────────────────────────── */
+  --dur-micro: 120ms;  /* hover, press, checkbox */
+  --dur-base: 200ms;   /* estándar: dropdowns, tema, popovers */
+  --dur-enter: 300ms;  /* entrada de vistas — techo duro de la UI */
+  --ease-out: cubic-bezier(.23, 1, .32, 1);        /* entradas y respuestas al usuario */
+  --ease-in-out: cubic-bezier(.77, 0, .175, 1);    /* movimiento en pantalla */
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);  /* solo píldora de pestañas y kanban */
+  --stagger: 40ms;
+
+  /* ── Foco (idéntico en ambos temas) ───────────────────────────── */
+  --focus-w: 2px;
+  --focus-offset: 2px;
+
+  color-scheme: light;
+}
+
+/* ── TEMA CLARO — neutro 60 / azul-chrome 30 / verde 10 ─────────── */
+:root, [data-theme="light"] {
+  --chrome:      #1E4E79;   /* azul de marca — SOLO estructura, nunca fondo de página */
+  --chrome-ink:  #F2F5F7;
+  --chrome-dim:  rgba(242,245,247,.72);
+  --chrome-line: rgba(242,245,247,.14);
+
+  --bg:        #F2F5F7;
+  --surface:   #FAFCFD;   /* nunca blanco absoluto — regla de Ale, EN 301 549 */
+  --surface-2: #E7EDF3;
+  --border:    rgba(27,36,48,.14);
+  --border-2:  rgba(27,36,48,.26);
+
+  --text:   #1B2430;
+  --text-2: #4C5A6B;
+  --text-3: #66717F;
+
+  --accent:     #3E7A4C;   /* acción — distinto del verde de estado a propósito (H12) */
+  --accent-ink: #F7FAF9;
+  --accent-soft: rgba(62,122,76,.10);
+
+  /* Semáforo de 5 estados — validado por Jhon 2026-07-20 */
+  --ok:    #2F8F6F;  --ok-fill:    rgba(47,143,111,.12);
+  --warn:  #B98A1E;  --warn-fill:  rgba(185,138,30,.14);
+  --err:   #C24238;  --err-fill:   rgba(194,66,56,.11);
+  --block: #9678CC;  --block-fill: rgba(150,120,204,.13);
+  --pause: #4A5560;  --pause-fill: rgba(74,85,96,.11);
+
+  --ok-ink: #22705A; --warn-ink: #7E5B0E; --err-ink: #B03A31;
+  --block-ink: #6D4FA3; --pause-ink: #4A5560;
+
+  --ok-bg:#E2EFEC;--warn-bg:#F1ECDE;--err-bg:#F4E8E7;--block-bg:#EDEBF7;--pause-bg:#E7EAEC;--link:#2F6B3C;
+
+  --serie-1: #2C6CA8;
+  --serie-2: #7A5FA8;
+
+  --sh-rest:  0 1px 2px rgba(19,29,43,.07);
+  --sh-float: 0 6px 18px rgba(19,29,43,.10);
+  --sh-modal: 0 24px 60px rgba(19,29,43,.22);
+  --glass:    rgba(250,252,253,.66);
+}
+
+/* ── TEMA OSCURO ────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --chrome:      #122740;
+  --chrome-ink:  #E7ECF2;
+  --chrome-dim:  rgba(231,236,242,.72);
+  --chrome-line: rgba(231,236,242,.10);
+
+  --bg:        #10161F;
+  --surface:   #171F2C;
+  --surface-2: #1D2735;
+  --border:    rgba(231,236,242,.12);
+  --border-2:  rgba(231,236,242,.24);
+
+  --text:   #E7ECF2;
+  --text-2: #A8B3C2;
+  --text-3: #8B96A6;
+
+  --accent:     #4A8F5A;
+  --accent-ink: #08120D;
+  --accent-soft: rgba(74,143,90,.16);
+
+  --ok:    #4FBF98;  --ok-fill:    rgba(79,191,152,.14);
+  --warn:  #E8C24C;  --warn-fill:  rgba(232,194,76,.14);
+  --err:   #EE6E5F;  --err-fill:   rgba(238,110,95,.14);
+  --block: #C0A9F0;  --block-fill: rgba(192,169,240,.14);
+  --pause: #6B7684;  --pause-fill: rgba(107,118,132,.20);
+
+  --ok-ink: #4FBF98; --warn-ink: #E8C24C; --err-ink: #EE6E5F;
+  --block-ink: #C0A9F0; --pause-ink: #98A4B4;
+  --ok-bg:#1F353B;--warn-bg:#343630;--err-bg:#352A33;--block-bg:#2F3247;--pause-bg:#28303E;--link:#7FC08F;
+
+  --serie-1: #6FA8DC;
+  --serie-2: #B69BE0;
+
+  --sh-rest:  0 1px 2px rgba(0,0,0,.35);
+  --sh-float: 0 6px 18px rgba(0,0,0,.40);
+  --sh-modal: 0 24px 60px rgba(0,0,0,.55);
+  --glass:    rgba(29,39,53,.55);
+}
+
+/* ── Reducción de movimiento ─────────────────────────────────────
+   No es "cero animación": se conservan opacidad y color, se elimina
+   todo desplazamiento y escala.                                     */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-micro: 1ms; --dur-base: 120ms; --dur-enter: 120ms;
+    --ease-spring: linear; --stagger: 0ms;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   10_dprimi_asistente.html — Panel del asistente D-PRIMI.
+   Arquetipo P7 (bandeja + detalle, split view): bandeja de conversaciones
+   a la izquierda + hilo activo a la derecha. Es la pantalla que abre el
+   FAB visible en 02/03/09 — comparte chrome, iconografía y motion con
+   02_dashboard.html. Contenido (mensajes, cifras, folios, sugerencias)
+   preservado tal cual de src_v1/10_dprimi_asistente.html.
+   [hidden] cerca del inicio, según regla 11 del brief.
+   ══════════════════════════════════════════════════════════════════════ */
+[hidden]{display:none !important}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-ui);font-size:var(--fs-base);background:var(--bg);color:var(--text);
+  -webkit-font-smoothing:antialiased;touch-action:manipulation;overflow:hidden;
+  transition:background-color var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out)}
+.tnum{font-variant-numeric:tabular-nums}
+.wordmark{font-family:var(--font-brand);font-weight:400;letter-spacing:.08em}
+h1,h2,h3{text-wrap:balance}
+svg{display:block}
+.ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ico-sm{width:14px;height:14px}
+.ico-xs{width:11px;height:11px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--r-ctrl)}
+.side :focus-visible{outline-color:#9FE0AE}
+.skip{position:absolute;left:var(--sp-2);top:-60px;z-index:200;background:var(--accent);color:var(--accent-ink);
+  padding:var(--sp-2) var(--sp-4);border-radius:var(--r-ctrl);font-weight:600;
+  transition:transform var(--dur-base) var(--ease-out)}
+.skip:focus-visible{transform:translateY(72px)}
+button,.pressable{transition:transform var(--dur-micro) var(--ease-out),
+  background-color var(--dur-micro) var(--ease-out),border-color var(--dur-micro) var(--ease-out),
+  color var(--dur-micro) var(--ease-out),opacity var(--dur-micro) var(--ease-out);font-family:var(--font-ui)}
+button:active,.pressable:active{transform:scale(.97)}
+
+/* ══ Layout general — scroll de un solo eje (vertical), bloqueado a nivel body ══ */
+.app{display:flex;height:100vh;overflow:hidden}
+.side{width:224px;background:var(--chrome);color:var(--chrome-ink);padding:var(--sp-4) var(--sp-3);
+  display:flex;flex-direction:column;gap:2px;flex-shrink:0;overflow-y:auto}
+.side .logo{display:flex;flex-direction:column;align-items:center;gap:var(--sp-2);
+  padding:var(--sp-2) var(--sp-2) var(--sp-4);border-bottom:1px solid var(--chrome-line);margin-bottom:var(--sp-2)}
+.grp{margin:var(--sp-4) var(--sp-2) var(--sp-1);font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}
+.it{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;color:var(--chrome-dim);
+  font-size:13.5px;text-decoration:none;border-left:3px solid transparent;
+  transition:background-color var(--dur-micro) var(--ease-out),color var(--dur-micro) var(--ease-out)}
+.it:hover{background:rgba(255,255,255,.08);color:var(--chrome-ink)}
+.it:active{transform:scale(.98)}
+.it[aria-current="page"]{background:rgba(255,255,255,.12);color:var(--chrome-ink);font-weight:600;border-left-color:var(--ok)}
+.it .n{margin-left:auto;background:var(--err);color:#2A1512;border-radius:var(--r-pill);
+  font-size:10.5px;font-weight:800;padding:1px 7px;font-variant-numeric:tabular-nums}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
+.top{display:flex;align-items:center;gap:var(--sp-4);padding:10px var(--sp-6);
+  border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.top h1{font-size:var(--fs-sub);font-weight:700}
+.top .back{display:inline-flex;align-items:center;gap:6px;color:var(--text-2);text-decoration:none;font-size:var(--fs-dense);
+  border:1px solid var(--border);border-radius:var(--r-ctrl);padding:7px 11px}
+.top .back:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
+.top .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.iconbtn{position:relative;width:36px;height:36px;border:1px solid var(--border);border-radius:var(--r-ctrl);
+  display:grid;place-items:center;cursor:pointer;background:transparent;color:var(--text-2)}
+.iconbtn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
+.prof{display:flex;align-items:center;gap:10px;background:transparent;border:1px solid transparent;
+  border-radius:var(--r-ctrl);padding:3px 8px 3px 3px;cursor:pointer;color:var(--text);text-align:left}
+.prof:hover{background:var(--surface-2);border-color:var(--border)}
+.av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1E4E79,#3E7A4C);
+  color:#F2F5F7;display:grid;place-items:center;font-weight:700;font-size:12px;flex-shrink:0}
+.prof small{display:block;color:var(--text-3);font-size:11px}
+
+/* ══ Split view P7: bandeja de conversaciones + hilo activo ══ */
+.split{flex:1;display:grid;grid-template-columns:296px 1fr;min-height:0;overflow:hidden}
+
+/* ── Bandeja (izquierda) ── */
+.tray{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--border);background:var(--surface)}
+.tray-h{padding:var(--sp-4) var(--sp-4) var(--sp-3);border-bottom:1px solid var(--border);flex-shrink:0}
+.tray-h h2{font-size:var(--fs-base);font-weight:700}
+.tray-h p{color:var(--text-3);font-size:var(--fs-meta);margin-top:2px}
+.newchat{width:100%;margin-top:var(--sp-3);display:flex;align-items:center;justify-content:center;gap:7px;
+  background:var(--accent);color:var(--accent-ink);border:0;border-radius:var(--r-ctrl);padding:9px 12px;
+  font:600 var(--fs-dense) var(--font-ui);cursor:pointer}
+.newchat:hover{filter:brightness(1.08)}
+.tray-list{flex:1;overflow-y:auto;padding:var(--sp-2)}
+.conv{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;background:transparent;border:1px solid transparent;
+  border-radius:var(--r-ctrl);padding:10px 10px;cursor:pointer;color:var(--text)}
+.conv:hover{background:var(--surface-2)}
+.conv[aria-current="true"]{background:var(--surface-2);border-color:var(--accent)}
+.conv .cico{width:30px;height:30px;border-radius:8px;background:var(--surface-2);color:var(--text-2);
+  display:grid;place-items:center;flex-shrink:0}
+.conv[aria-current="true"] .cico{background:var(--surface);color:var(--accent)}
+.conv .body{min-width:0;flex:1}
+.conv .ttl{font-size:var(--fs-dense);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.conv .snip{font-size:11.5px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
+.conv .when{font-size:10.5px;color:var(--text-3);flex-shrink:0;margin-top:2px}
+.conv[aria-current="true"] .when{color:var(--text-2)}
+.tray-foot{padding:var(--sp-3) var(--sp-4);border-top:1px solid var(--border);flex-shrink:0}
+.tray-foot h3{font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text-3);text-transform:uppercase;margin-bottom:var(--sp-2)}
+.qchip{display:flex;align-items:flex-start;gap:7px;width:100%;text-align:left;background:transparent;border:0;
+  border-radius:var(--r-ctrl);padding:6px 6px;cursor:pointer;color:var(--text-2);font-size:11.5px;line-height:1.4}
+.qchip:hover{background:var(--surface-2);color:var(--text)}
+.qchip .ico{color:var(--text-3);margin-top:1px}
+
+/* Estados de la bandeja (cargando · vacío · error) — rule 8 aplica a toda lista */
+.skel{display:block;height:11px;border-radius:4px;
+  background:linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%);
+  background-size:200% 100%;animation:shimmer 1.4s linear infinite;color:transparent}
+@keyframes shimmer{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.skel{animation:none}}
+.tray-state{display:none;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-2);padding:var(--sp-8) var(--sp-3)}
+.tray-state .ico{width:26px;height:26px;color:var(--text-3)}
+.tray-state b{font-size:12.5px}
+.tray-state p{color:var(--text-2);font-size:11.5px;line-height:1.5}
+.tray[data-state="loading"] .tray-real,.tray[data-state="empty"] .tray-real,.tray[data-state="error"] .tray-real{display:none}
+.tray[data-state="loading"] .tray-loading{display:flex}
+.tray[data-state="empty"] .tray-empty{display:flex}
+.tray[data-state="error"] .tray-error{display:flex}
+.tray-loading{flex-direction:column;gap:4px;padding:var(--sp-2)}
+.tray-loading .row{display:flex;gap:10px;padding:10px}
+.tray-loading .sq{width:30px;height:30px;border-radius:8px;flex-shrink:0}
+
+/* ── Hilo activo (derecha) ── */
+.thread{display:flex;flex-direction:column;min-height:0;min-width:0;background:var(--bg)}
+.dp-h{display:flex;align-items:center;gap:11px;padding:14px 20px;border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg,var(--accent-soft),rgba(30,78,121,.12));flex-shrink:0}
+.dp-av{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#1E4E79,#2e823d);display:grid;place-items:center;flex-shrink:0}
+.dp-h .tt b{font-family:var(--font-brand);font-size:14px;letter-spacing:.05em;font-weight:400}
+.dp-h .tt small{display:block;color:var(--text-2);font-size:11px;margin-top:2px}
+.scope{display:flex;align-items:center;gap:8px;padding:9px 20px;background:var(--ok-fill);border-bottom:1px solid var(--border);
+  font-size:11px;color:var(--text-2);flex-shrink:0}
+.scope svg{color:var(--ok-ink);flex-shrink:0}
+.scope b{color:var(--ok-ink)}
+
+.chat{flex:1;overflow-y:auto;padding:var(--sp-4) var(--sp-6);display:flex;flex-direction:column;gap:var(--sp-4)}
+.msg{max-width:78%;font-size:12.5px;line-height:1.55}
+.msg.u{align-self:flex-end;background:var(--chrome);color:var(--chrome-ink);border-radius:12px 12px 3px 12px;padding:10px 14px}
+.msg.a{align-self:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:12px 12px 12px 3px;
+  padding:12px 14px;box-shadow:var(--sh-rest)}
+.msg.a .who{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-3);margin-bottom:7px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.msg.a .who svg{color:var(--accent)}
+
+.kpirow{display:flex;gap:8px;margin:10px 0}
+.kpimini{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;text-align:center}
+.kpimini b{display:block;font-size:16px}
+.kpimini span{font-size:9.5px;color:var(--text-3)}
+
+.src{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.src a{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:var(--link);background:var(--accent-soft);
+  border:1px solid var(--border);border-radius:6px;padding:4px 9px;text-decoration:none}
+.src a:hover{border-color:var(--border-2)}
+
+.acts{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.acts button{border:1px solid var(--ok);background:var(--ok-fill);color:var(--ok-ink);border-radius:7px;padding:7px 12px;font:600 11px var(--font-ui);cursor:pointer}
+.acts button:hover{filter:brightness(1.04)}
+
+.confirm{margin-top:10px;background:var(--warn-fill);border:1px solid var(--warn);border-radius:8px;padding:10px 12px;font-size:11.5px;color:var(--text-2)}
+.confirm .lbl{display:flex;align-items:center;gap:6px;color:var(--warn-ink);font-weight:700;margin-bottom:4px}
+.confirm .lbl svg{flex-shrink:0}
+.confirm .cbtns{display:flex;gap:8px;margin-top:9px}
+.confirm .cbtns .y{background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:7px 15px;font:700 11px var(--font-ui);cursor:pointer}
+.confirm .cbtns .y:hover{filter:brightness(1.08)}
+.confirm .cbtns .n{background:transparent;color:var(--text-2);border:1px solid var(--border);border-radius:6px;padding:7px 15px;font:600 11px var(--font-ui);cursor:pointer}
+.confirm .cbtns .n:hover{background:var(--surface-2)}
+
+.sugg{display:flex;gap:7px;padding:0 20px 12px;flex-wrap:wrap;flex-shrink:0}
+.sugg button{border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:6px 13px;font-size:11px;
+  color:var(--text-2);cursor:pointer;font-family:var(--font-ui)}
+.sugg button:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
+
+.inp{display:flex;gap:9px;padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;background:var(--surface)}
+.inp .field{flex:1;position:relative}
+.inp label{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0)}
+.inp input{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;
+  color:var(--text);font:400 12.5px var(--font-ui)}
+.inp input::placeholder{color:var(--text-3)}
+.inp input:hover{border-color:var(--border-2)}
+.inp button{width:44px;flex-shrink:0;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);
+  display:grid;place-items:center;cursor:pointer}
+.inp button:hover{filter:brightness(1.08)}
+.legal{text-align:center;font-size:9.5px;color:var(--text-3);padding:0 20px 12px;flex-shrink:0;line-height:1.5}
+
+@media (prefers-reduced-motion:reduce){
+  .enter{animation:none !important;opacity:1;transform:none}
+}
+.enter{opacity:0;transform:translateY(6px);animation:enter var(--dur-enter) var(--ease-out) forwards}
+@keyframes enter{to{opacity:1;transform:translateY(0)}}
+
+@media (max-width:980px){
+  .side{display:none}
+  .split{grid-template-columns:1fr}
+  .tray{display:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido principal</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="lgrad" x1="1233.32" y1="931.42" x2="1233.32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c361e"/><stop offset="0.14" stop-color="#12572b"/><stop offset="0.32" stop-color="#2e823d"/><stop offset="0.48" stop-color="#60a84b"/><stop offset="0.64" stop-color="#76b552"/><stop offset="0.78" stop-color="#a5c86a"/><stop offset="1" stop-color="#c7d97b"/></linearGradient>
+<symbol id="dproma-mark" viewBox="740 0 970 932"><path fill="url(#lgrad)" d="M869.35,924.63H811.84c-39.82,0-66.56-40.83-50.66-77.33L1048.86,108C1083.11,29.8,1146.12,0,1243.39,0c95.89,0,158.91,29.8,191.79,108L1705.76,854.8c15.27,36.41-11.47,76.62-51,76.62h-59.54a55.27,55.27,0,0,1-51-34L1285.73,191c-8.22-19.86-23.29-28.56-45.21-28.56s-37,8.7-46.58,28.56L920,891.4A55.26,55.26,0,0,1,869.35,924.63Z"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.9 3.9A2 2 0 0 0 8.2 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></symbol>
+<symbol id="i-box" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7L12 12l8.7-5M12 22V12"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+<symbol id="i-chevd" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+<symbol id="i-alertc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+<symbol id="i-report" viewBox="0 0 24 24"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12.5" y="7" width="3" height="10" rx="1"/><rect x="18" y="13" width="3" height="4" rx="1"/></symbol>
+<symbol id="i-arrowl" viewBox="0 0 24 24"><path d="M19 12H5M11 5l-7 7 7 7"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M3 8l4-4 4 4M3 8l2 5h4l2-5M13 8l4-4 4 4M13 8l2 5h4l2-5"/></symbol>
+<symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13l3.5 7v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></symbol>
+</defs></svg>
+
+<div class="app">
+  <nav class="side" aria-label="Navegación principal">
+    <div class="logo">
+      <svg width="40" height="38" aria-hidden="true"><use href="#dproma-mark" width="40" height="38"/></svg>
+      <span class="wordmark" translate="no" style="font-size:10.5px">SIO-DPROMA</span>
+    </div>
+    <p class="grp">Principal</p>
+    <a class="it" href="02_dashboard.html"><svg class="ico" aria-hidden="true"><use href="#i-grid"/></svg>Dashboard</a>
+    <a class="it" href="#main" aria-current="page"><svg class="ico" aria-hidden="true"><use href="#dproma-mark" width="18" height="17"/></svg>Asistente D-PRIMI</a>
+    <p class="grp">Operación</p>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>Padrón de clientes</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg>Órdenes de instalación</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-box"/></svg>Inventario</a>
+    <p class="grp">Gestoría</p>
+    <a class="it" href="03_kanban_gestoria.html"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg>Trámites</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-scale"/></svg>Jurídico</a>
+  </nav>
+
+  <div class="main">
+    <header class="top">
+      <a class="back" href="02_dashboard.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrowl"/></svg>Volver al dashboard</a>
+      <h1 class="sr">Asistente D-PRIMI</h1>
+      <div class="right">
+        <button class="iconbtn" id="theme" aria-label="Cambiar a tema oscuro">
+          <svg class="ico" aria-hidden="true"><use href="#i-moon" id="themeicon"/></svg></button>
+        <button class="prof" aria-label="Cuenta de Alex Rai, AdminV Director">
+          <span class="av" aria-hidden="true">AR</span>
+          <span><b style="font-size:13px">Alex Rai</b><small translate="no">AdminV Director</small></span>
+          <svg class="ico ico-sm" aria-hidden="true" style="color:var(--text-3)"><use href="#i-chevd"/></svg></button>
+      </div>
+    </header>
+
+    <main class="split" id="main">
+      <!-- ══ Bandeja de conversaciones (P7 · panel izquierdo) ══ -->
+      <section class="tray" aria-label="Conversaciones con D-PRIMI" data-state="ok">
+        <div class="tray-h">
+          <h2>Conversaciones</h2>
+          <p>Historial ligado a tu sesión y tu rol</p>
+          <button class="newchat"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-plus"/></svg>Nueva conversación</button>
+        </div>
+
+        <div class="tray-real" style="display:contents">
+          <div class="tray-list">
+            <button class="conv" aria-current="true">
+              <span class="cico"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-message"/></svg></span>
+              <span class="body">
+                <span class="ttl">SLA de trámites GNP</span>
+                <span class="snip">Reporte mensual de gestoría de junio…</span>
+              </span>
+              <span class="when">Hoy</span>
+            </button>
+            <button class="conv">
+              <span class="cico"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-message"/></svg></span>
+              <span class="body">
+                <span class="ttl">Alta de gestor externo</span>
+                <span class="snip">Requisitos y permisos para el rol…</span>
+              </span>
+              <span class="when">Ayer</span>
+            </button>
+            <button class="conv">
+              <span class="cico"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-message"/></svg></span>
+              <span class="body">
+                <span class="ttl">Contrato ELEKTRA</span>
+                <span class="snip">Vigencia y condiciones de flotilla…</span>
+              </span>
+              <span class="when">24 jul</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="tray-state tray-loading" aria-hidden="true">
+          <div class="row"><span class="skel sq"></span><span style="flex:1"><span class="skel" style="width:70%;margin-bottom:6px"></span><span class="skel" style="width:90%"></span></span></div>
+          <div class="row"><span class="skel sq"></span><span style="flex:1"><span class="skel" style="width:55%;margin-bottom:6px"></span><span class="skel" style="width:80%"></span></span></div>
+          <div class="row"><span class="skel sq"></span><span style="flex:1"><span class="skel" style="width:65%;margin-bottom:6px"></span><span class="skel" style="width:85%"></span></span></div>
+        </div>
+
+        <div class="tray-state tray-empty">
+          <svg class="ico" aria-hidden="true"><use href="#i-inbox"/></svg>
+          <b>Aún no tienes conversaciones</b>
+          <p>Escribe tu primera pregunta en el hilo de la derecha — quedará guardada aquí.</p>
+        </div>
+
+        <div class="tray-state tray-error">
+          <svg class="ico" style="color:var(--err-ink)" aria-hidden="true"><use href="#i-alertc"/></svg>
+          <b>No se pudo cargar tu historial</b>
+          <p>Tus conversaciones siguen a salvo; solo falló esta consulta. Ref. <span class="tnum" translate="no">DP-20260728-119</span></p>
+          <button class="btn" style="border:1px solid var(--border);background:var(--surface);border-radius:var(--r-ctrl);padding:7px 12px;font:600 11.5px var(--font-ui);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:6px"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg>Reintentar</button>
+        </div>
+
+        <div class="tray-foot">
+          <h3>Accesos rápidos</h3>
+          <button class="qchip"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-message"/></svg>¿Cómo doy de alta un gestor?</button>
+          <button class="qchip"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-message"/></svg>Busca el contrato de ELEKTRA</button>
+          <button class="qchip"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-message"/></svg>Llena un trámite desde esta ficha</button>
+        </div>
+      </section>
+
+      <!-- ══ Hilo activo (P7 · panel derecho / detalle) ══ -->
+      <section class="thread" aria-label="Conversación activa con D-PRIMI">
+        <div class="dp-h">
+          <div class="dp-av"><svg width="22" height="21" aria-hidden="true"><use href="#dproma-mark" width="22" height="21"/></svg></div>
+          <div class="tt">
+            <b>D-PRIMI</b>
+            <small>Asistente de SIO-DPROMA · ve lo mismo que tu rol (AdminV Director)</small>
+          </div>
+        </div>
+        <div class="scope">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#i-shield"/></svg>
+          <span>Respuestas limitadas a <b>tus permisos</b> · las acciones siempre se confirman antes de ejecutarse</span>
+        </div>
+
+        <div class="chat" aria-live="polite">
+          <div class="msg u enter">¿Cuántos trámites de GNP están vencidos y de quién son?</div>
+
+          <div class="msg a enter" style="animation-delay:var(--stagger)">
+            <div class="who"><svg width="12" height="11" aria-hidden="true"><use href="#dproma-mark" width="12" height="11"/></svg>D-PRIMI</div>
+            Flotillas GNP tiene <b>4 trámites con SLA vencido</b> de 31 activos:
+            <div class="kpirow">
+              <div class="kpimini"><b class="tnum" style="color:var(--err-ink)">4</b><span>vencidos</span></div>
+              <div class="kpimini"><b class="tnum" style="color:var(--warn-ink)">6</b><span>por vencer</span></div>
+              <div class="kpimini"><b class="tnum" style="color:var(--ok-ink)">21</b><span>en tiempo</span></div>
+            </div>
+            Los 4 vencidos: <b translate="no">TRM-202606-0798</b> (baja de placas, R. Cortés, −2 días), <b translate="no">TRM-202606-0801</b> y <b translate="no">0802</b> (reemplacado, L. Mendoza, −1 día) y <b translate="no">TRM-202607-0834</b> (verificación, J. Durán, −1 día). Tres esperan documentos del cliente.
+            <div class="src">
+              <a href="03_kanban_gestoria.html"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-folder"/></svg>Kanban · filtro aplicado</a>
+              <a href="#"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-file"/></svg>TRM-202606-0798</a>
+              <a href="#"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-report"/></svg>Reporte SLA junio</a>
+            </div>
+            <div class="acts">
+              <button>Ver los 4 en el kanban</button>
+              <button>Notificar a los responsables</button>
+            </div>
+          </div>
+
+          <div class="msg u enter" style="animation-delay:calc(var(--stagger)*2)">Genera el reporte mensual de gestoría de junio y mándalo a Dirección</div>
+
+          <div class="msg a enter" style="animation-delay:calc(var(--stagger)*3)">
+            <div class="who"><svg width="12" height="11" aria-hidden="true"><use href="#dproma-mark" width="12" height="11"/></svg>D-PRIMI</div>
+            Preparé el reporte con el formato oficial (hoja membretada): <b>1,187 trámites cerrados</b> en junio, duración promedio 5.2 días hábiles, 92.4% dentro de SLA.
+            <div class="confirm">
+              <p class="lbl"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-alert"/></svg>Acción que requiere tu confirmación</p>
+              Enviar "Reporte_Gestoria_Junio_2026.pdf" por correo a los 3 usuarios con rol Dirección. Quedará registrado en la bitácora a tu nombre.
+              <div class="cbtns">
+                <button class="y">Confirmar y enviar</button>
+                <button class="n">Solo descargar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sugg" aria-label="Sugerencias de mensaje">
+          <button type="button">¿Cómo doy de alta un gestor?</button>
+          <button type="button">Busca el contrato de ELEKTRA</button>
+          <button type="button">Llena un trámite desde esta ficha</button>
+        </div>
+
+        <form class="inp" id="chatform">
+          <div class="field">
+            <label for="msg">Pregunta o pide una acción a D-PRIMI</label>
+            <input id="msg" name="msg" type="text" autocomplete="off" placeholder="Pregunta o pide una acción a D-PRIMI…">
+          </div>
+          <button type="submit" aria-label="Enviar mensaje"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-send"/></svg></button>
+        </form>
+        <p class="legal">D-PRIMI puede equivocarse — verifica los datos críticos. Consultas procesadas por el backend (S13); nunca durante impersonaciones (S4).</p>
+      </section>
+    </main>
+  </div>
+</div>
+
+<p class="sr" id="live" aria-live="polite"></p>
+
+<script>
+const root = document.documentElement, tBtn = document.getElementById('theme');
+
+// ── Tema claro ⇄ oscuro, sincroniza theme-color y el icono ──
+const setTheme = t => {
+  root.dataset.theme = t;
+  document.querySelector('meta[name=theme-color]').content = t === 'dark' ? '#10161F' : '#F2F5F7';
+  tBtn.setAttribute('aria-label', t === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
+  document.getElementById('themeicon').setAttribute('href', t === 'dark' ? '#i-sun' : '#i-moon');
+};
+if (matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+tBtn.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+// ── Enviar sugerencia o acceso rápido al campo de mensaje ──
+const msgInput = document.getElementById('msg');
+document.querySelectorAll('.sugg button, .qchip').forEach(b => b.addEventListener('click', () => {
+  msgInput.value = b.textContent.trim();
+  msgInput.focus();
+}));
+
+// ── Envío de formulario (maqueta: confirma por voz asistiva, no llama backend) ──
+const live = document.getElementById('live');
+document.getElementById('chatform').addEventListener('submit', e => {
+  e.preventDefault();
+  if (!msgInput.value.trim()) return;
+  live.textContent = 'Mensaje enviado a D-PRIMI: ' + msgInput.value.trim();
+  msgInput.value = '';
+});
+
+// ── Selección de conversación en la bandeja ──
+document.querySelectorAll('.conv').forEach(c => c.addEventListener('click', () => {
+  document.querySelectorAll('.conv').forEach(x => x.removeAttribute('aria-current'));
+  c.setAttribute('aria-current', 'true');
+}));
+</script>
+</body>
+</html>

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es-MX" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10161F">
+<title>App Personal DPROMA — Acceso, verificación y modo campo (propuesta visual v2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Michroma&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   SIO-DPROMA — Contrato visual (design tokens) — copiado tal cual de
+   _sio-tokens.css. Cero hex literal fuera de este bloque.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root {
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-brand: 'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif;
+
+  --fs-meta: 12px;   --fs-dense: 13px;  --fs-base: 14px;
+  --fs-sub: 16px;    --fs-title: 20px;  --fs-kpi: 30px;
+
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-6: 24px; --sp-8: 32px; --sp-12: 48px;
+
+  --row-comfy: 40px; --row-compact: 32px;
+
+  --r-ctrl: 6px; --r-card: 10px; --r-modal: 16px; --r-pill: 999px;
+
+  --dur-micro: 120ms; --dur-base: 200ms; --dur-enter: 300ms;
+  --ease-out: cubic-bezier(.23, 1, .32, 1);
+  --ease-in-out: cubic-bezier(.77, 0, .175, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --stagger: 40ms;
+
+  --focus-w: 2px; --focus-offset: 2px;
+
+  color-scheme: light;
+}
+
+:root, [data-theme="light"] {
+  --chrome:      #1E4E79;
+  --chrome-ink:  #F2F5F7;
+  --chrome-dim:  rgba(242,245,247,.72);
+  --chrome-line: rgba(242,245,247,.14);
+
+  --bg:        #F2F5F7;
+  --surface:   #FAFCFD;
+  --surface-2: #E7EDF3;
+  --border:    rgba(27,36,48,.14);
+  --border-2:  rgba(27,36,48,.26);
+
+  --text:   #1B2430;
+  --text-2: #4C5A6B;
+  --text-3: #66717F;
+
+  --accent:     #3E7A4C;
+  --accent-ink: #F7FAF9;
+  --accent-soft: rgba(62,122,76,.10);
+
+  --ok:    #2F8F6F;  --ok-fill:    rgba(47,143,111,.12);
+  --warn:  #B98A1E;  --warn-fill:  rgba(185,138,30,.14);
+  --err:   #C24238;  --err-fill:   rgba(194,66,56,.11);
+  --block: #9678CC;  --block-fill: rgba(150,120,204,.13);
+  --pause: #4A5560;  --pause-fill: rgba(74,85,96,.11);
+
+  --ok-ink: #22705A; --warn-ink: #7E5B0E; --err-ink: #B03A31;
+  --block-ink: #6D4FA3; --pause-ink: #4A5560;
+
+  --ok-bg:#E2EFEC;--warn-bg:#F1ECDE;--err-bg:#F4E8E7;--block-bg:#EDEBF7;--pause-bg:#E7EAEC;--link:#2F6B3C;
+
+  --serie-1: #2C6CA8;
+  --serie-2: #7A5FA8;
+
+  --sh-rest:  0 1px 2px rgba(19,29,43,.07);
+  --sh-float: 0 6px 18px rgba(19,29,43,.10);
+  --sh-modal: 0 24px 60px rgba(19,29,43,.22);
+  --glass:    rgba(250,252,253,.66);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --chrome:      #122740;
+  --chrome-ink:  #E7ECF2;
+  --chrome-dim:  rgba(231,236,242,.72);
+  --chrome-line: rgba(231,236,242,.10);
+
+  --bg:        #10161F;
+  --surface:   #171F2C;
+  --surface-2: #1D2735;
+  --border:    rgba(231,236,242,.12);
+  --border-2:  rgba(231,236,242,.24);
+
+  --text:   #E7ECF2;
+  --text-2: #A8B3C2;
+  --text-3: #8B96A6;
+
+  --accent:     #4A8F5A;
+  --accent-ink: #08120D;
+  --accent-soft: rgba(74,143,90,.16);
+
+  --ok:    #4FBF98;  --ok-fill:    rgba(79,191,152,.14);
+  --warn:  #E8C24C;  --warn-fill:  rgba(232,194,76,.14);
+  --err:   #EE6E5F;  --err-fill:   rgba(238,110,95,.14);
+  --block: #C0A9F0;  --block-fill: rgba(192,169,240,.14);
+  --pause: #6B7684;  --pause-fill: rgba(107,118,132,.20);
+
+  --ok-ink: #4FBF98; --warn-ink: #E8C24C; --err-ink: #EE6E5F;
+  --block-ink: #C0A9F0; --pause-ink: #98A4B4;
+  --ok-bg:#1F353B;--warn-bg:#343630;--err-bg:#352A33;--block-bg:#2F3247;--pause-bg:#28303E;--link:#7FC08F;
+
+  --serie-1: #6FA8DC;
+  --serie-2: #B69BE0;
+
+  --sh-rest:  0 1px 2px rgba(0,0,0,.35);
+  --sh-float: 0 6px 18px rgba(0,0,0,.40);
+  --sh-modal: 0 24px 60px rgba(0,0,0,.55);
+  --glass:    rgba(29,39,53,.55);
+}
+
+/* ── Tercer tema — Exterior / sol directo (doc 34 §7.2) ─────────── */
+[data-theme="sun"] {
+  color-scheme: light;
+  --chrome:      #163A5C;
+  --chrome-ink:  #F7F9FB;
+  --chrome-dim:  rgba(11,18,25,.72);
+  --chrome-line: rgba(11,18,25,.14);
+
+  --bg:        #F7F9FB;
+  --surface:   #FAFCFD;
+  --surface-2: #EDF1F5;
+  --border:    rgba(15,22,32,.28);
+  --border-2:  rgba(15,22,32,.55);
+
+  --text:   #0B1219;
+  --text-2: #333F4D;
+  --text-3: #4E5A69;
+
+  --accent:     #1F5E30;
+  --accent-ink: #F7FAF9;
+  --accent-soft: rgba(31,94,48,.12);
+
+  --ok:    #1C6B52;  --ok-fill:    rgba(28,107,82,.14);
+  --warn:  #8A6410;  --warn-fill:  rgba(138,100,16,.16);
+  --err:   #A62C23;  --err-fill:   rgba(166,44,35,.13);
+  --block: #5B4A94;  --block-fill: rgba(91,74,148,.14);
+  --pause: #40495A;  --pause-fill: rgba(64,73,90,.14);
+
+  --ok-ink: #155844; --warn-ink: #6E5009; --err-ink: #8C241D;
+  --block-ink: #453874; --pause-ink: #40495A;
+  --ok-bg:#DBE8E5;--warn-bg:#E8E4D7;--err-bg:#EFE1E1;--block-bg:#E4E0F0;--pause-bg:#E2E5EA;--link:#1F5E30;
+
+  --serie-1: #1F5E30;
+  --serie-2: #5B4A94;
+
+  --sh-rest:  0 1px 2px rgba(11,18,25,.14);
+  --sh-float: 0 6px 18px rgba(11,18,25,.18);
+  --sh-modal: 0 24px 60px rgba(11,18,25,.30);
+  --glass:    rgba(250,252,253,.9);
+}
+
+[hidden]{display:none !important}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-micro: 1ms; --dur-base: 120ms; --dur-enter: 120ms;
+    --ease-spring: linear; --stagger: 0ms;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Componentes
+   ═══════════════════════════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-ui);font-size:var(--fs-base);background:var(--bg);color:var(--text);
+  -webkit-font-smoothing:antialiased;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  display:flex;gap:40px;justify-content:center;align-items:flex-start;padding:36px 24px;flex-wrap:wrap;
+  transition:background-color var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out)}
+svg{display:block}
+.wordmark{font-family:var(--font-brand);font-weight:400;letter-spacing:.08em}
+.tnum{font-variant-numeric:tabular-nums}
+.ico{width:20px;height:20px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ico-sm{width:14px;height:14px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus{outline:none}
+/* Anillo de foco reforzado — app de campo: 3px + offset 2px (regla 6) */
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:var(--r-ctrl)}
+button,a{transition:transform var(--dur-micro) var(--ease-out),background-color var(--dur-micro) var(--ease-out),
+  border-color var(--dur-micro) var(--ease-out),color var(--dur-micro) var(--ease-out),box-shadow var(--dur-micro) var(--ease-out)}
+button:active{transform:scale(.97)}
+
+/* ── Marco de teléfono ── */
+main.phone{width:360px;display:block;background:var(--bg);border:1px solid var(--border-2);border-radius:34px;overflow:hidden;
+  box-shadow:var(--sh-modal);transition:background-color var(--dur-base) var(--ease-out)}
+.screen{display:flex;flex-direction:column;height:740px;position:relative}
+.status{display:flex;justify-content:space-between;align-items:center;padding:12px 22px 4px;
+  font-size:11.5px;color:var(--text-2);font-weight:600;flex:none}
+.status .rt{display:flex;gap:7px;align-items:center}
+.status .rt .ico-sm{width:15px;height:15px}
+
+.view{flex:1;display:flex;flex-direction:column;min-height:0}
+
+/* ── Cabecera de marca (login / 2fa) ── */
+.hero{display:flex;flex-direction:column;align-items:center;gap:9px;padding:30px 0 18px;flex:none;text-align:center}
+.hero .wm{font-size:12.5px;color:var(--text)}
+.hero small{color:var(--text-3);font-size:11px}
+
+/* ── Cuerpo desplazable (eje único: vertical) ── */
+.body{flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:0 20px 16px;
+  display:flex;flex-direction:column;gap:12px;min-height:0}
+
+/* ── Botón Google (patrón de 01_login) ── */
+.gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:11px;padding:13px;
+  min-height:48px;border-radius:var(--r-ctrl);border:1px solid var(--border-2);background:var(--surface);color:var(--text);
+  font:700 var(--fs-base) var(--font-ui);cursor:pointer;box-shadow:var(--sh-rest)}
+.gbtn:hover{box-shadow:var(--sh-float);border-color:var(--text-3)}
+.gbtn[data-busy="true"]{pointer-events:none;color:var(--text-2)}
+.gbtn .spin{display:none;width:16px;height:16px;border:2px solid var(--border-2);border-top-color:var(--accent);
+  border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gbtn[data-busy="true"] .spin{display:block}
+.gbtn[data-busy="true"] .glogo{display:none}
+
+.hint{color:var(--text-3);font-size:11.5px;line-height:1.55;text-align:center}
+.hint strong{color:var(--text-2)}
+
+.note{display:flex;gap:9px;align-items:flex-start;margin-top:auto;padding:10px 12px;
+  background:var(--accent-soft);border-radius:var(--r-ctrl);font-size:11px;color:var(--text-2);line-height:1.55;flex:none}
+.note .ico{color:var(--accent);margin-top:1px;width:16px;height:16px}
+
+/* ── OTP: 6 casillas individuales con foco automático ── */
+fieldset{border:0}
+legend{font-size:var(--fs-dense);font-weight:700;color:var(--text);margin-bottom:2px;padding:0}
+.otp-help{color:var(--text-2);font-size:11.5px;line-height:1.5;margin-bottom:2px}
+.otprow{display:flex;gap:7px;justify-content:center;margin-top:6px}
+.otp{width:44px;height:52px;min-height:48px;border-radius:var(--r-ctrl);border:1.5px solid var(--border-2);
+  background:var(--surface-2);color:var(--text);text-align:center;font:700 20px/1 var(--font-ui);
+  font-variant-numeric:tabular-nums;caret-color:var(--accent);
+  transition:border-color var(--dur-micro) var(--ease-out),background-color var(--dur-micro) var(--ease-out)}
+.otp:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-color:var(--accent)}
+.otp[data-filled="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.otp[data-mask="true"]{-webkit-text-security:disc;text-security:disc}
+
+.altlink{display:block;text-align:center;font-size:11.5px;color:var(--text-3)}
+.altlink a,.altlink button.linklike{color:var(--link);text-decoration:none;font-weight:700;background:none;border:0;
+  padding:4px;font:inherit;cursor:pointer;border-radius:var(--r-ctrl)}
+.altlink a:hover,.altlink button.linklike:hover{text-decoration:underline}
+
+.infobox{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:11px 12px;
+  font-size:11.5px;color:var(--text-2);line-height:1.55;display:flex;gap:8px;align-items:flex-start;box-shadow:var(--sh-rest)}
+.infobox .ico{color:var(--text-2);width:16px;height:16px;margin-top:1px}
+.infobox b{color:var(--text)}
+
+.primarybtn{width:100%;min-height:48px;padding:13px;border-radius:var(--r-ctrl);border:1px solid transparent;
+  font:800 var(--fs-base) var(--font-ui);background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.primarybtn:disabled{background:var(--surface-2);color:var(--text-3);border-color:var(--border);cursor:not-allowed}
+.primarybtn:disabled:active{transform:none}
+.ctanote{text-align:center;font-size:11px;color:var(--text-3);line-height:1.5}
+
+/* ── Vista offline ── */
+.offbanner{display:flex;align-items:center;gap:9px;background:var(--warn-fill);border:1px solid color-mix(in srgb,var(--warn) 40%,transparent);
+  border-radius:var(--r-card);padding:10px 12px;font-size:11.5px;color:var(--warn-ink);font-weight:700;line-height:1.4;flex:none;margin:12px 20px 0}
+.offbanner .ico{color:var(--warn-ink);width:18px;height:18px}
+
+.identity{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 0 4px;flex:none}
+.avatar{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:19px;
+  background:linear-gradient(135deg,var(--chrome),var(--accent));color:var(--chrome-ink)}
+.uname{text-align:center;line-height:1.3}
+.uname b{font-size:15px;display:block}
+.uname small{color:var(--text-3);font-size:11px;display:block;margin-top:2px}
+
+.unlock{display:flex;flex-direction:column;align-items:center;gap:10px;padding:6px 0 4px;flex:none}
+.biobtn{width:64px;height:64px;min-width:48px;min-height:48px;border-radius:50%;border:2px solid var(--accent);
+  background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;cursor:pointer}
+.biobtn .ico{width:28px;height:28px;stroke-width:1.7}
+.biobtn:hover{background:var(--accent);color:var(--accent-ink)}
+.divider{display:flex;align-items:center;gap:10px;color:var(--text-3);font-size:11px;margin:2px 0}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--border)}
+
+.seclabel{display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:800;letter-spacing:.08em;
+  color:var(--text-3);text-transform:uppercase;margin:6px 2px 0}
+.seclabel .ico{width:14px;height:14px}
+
+.oklist,.qlist{display:flex;flex-direction:column;gap:7px}
+.oklist li,.qlist li{list-style:none;display:flex;gap:9px;align-items:flex-start;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r-card);padding:9px 10px;font-size:12px;line-height:1.5;box-shadow:var(--sh-rest)}
+.oklist .ico{color:var(--ok-ink);width:18px;height:18px;margin-top:1px;flex-shrink:0}
+.qlist .ico{color:var(--warn-ink);width:18px;height:18px;margin-top:1px;flex-shrink:0}
+.oklist small,.qlist small{display:block;color:var(--text-3);margin-top:2px;font-size:11px}
+.qcount{margin-left:auto;background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--r-pill);
+  padding:2px 8px;font-size:10.5px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.syncnote{font-size:11px;color:var(--text-3);text-align:center;padding-top:2px}
+
+.footnote{padding:12px 20px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--border);
+  background:var(--surface);font-size:10.5px;color:var(--text-3);line-height:1.6;text-align:center;flex:none}
+.footnote b{color:var(--warn-ink)}
+
+/* ── Toast ── */
+.toast{position:fixed;left:50%;bottom:20px;z-index:80;display:flex;align-items:center;gap:9px;
+  background:var(--surface);border:1px solid var(--border-2);border-radius:var(--r-ctrl);padding:11px 15px;
+  box-shadow:var(--sh-modal);font-size:var(--fs-dense);font-weight:700;color:var(--text);
+  opacity:0;transform:translate(-50%,14px);pointer-events:none;
+  transition:opacity var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out)}
+.toast[data-show="true"]{opacity:1;transform:translate(-50%,0)}
+.toast .ico{color:var(--ok-ink)}
+
+/* ── Panel lateral de la maqueta ── */
+.cap{width:340px;color:var(--text-2);font-size:var(--fs-dense);line-height:1.65}
+.cap h1{color:var(--text);font-size:var(--fs-sub);margin-bottom:10px}
+.cap ul{margin:10px 0 0 18px;display:flex;flex-direction:column;gap:7px}
+.cap b{color:var(--text)}
+.switchgroup{margin:14px 0}
+.switchgroup .lbl{font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--text-3);
+  text-transform:uppercase;display:block;margin-bottom:7px}
+.switch{display:flex;gap:6px;flex-wrap:wrap;background:var(--surface-2);border-radius:var(--r-pill);padding:4px;width:fit-content}
+.switch button{border:0;background:transparent;color:var(--text-2);border-radius:var(--r-pill);min-height:40px;
+  padding:8px 13px;font:700 var(--fs-meta) var(--font-ui);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.switch button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="lgrad" x1="1233.32" y1="931.42" x2="1233.32" y2="0" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#0c361e"/><stop offset="0.14" stop-color="#12572b"/><stop offset="0.32" stop-color="#2e823d"/><stop offset="0.48" stop-color="#60a84b"/><stop offset="0.64" stop-color="#76b552"/><stop offset="0.78" stop-color="#a5c86a"/><stop offset="1" stop-color="#c7d97b"/>
+  </linearGradient>
+  <symbol id="dproma-mark" viewBox="740 0 970 932"><path fill="url(#lgrad)" d="M869.35,924.63H811.84c-39.82,0-66.56-40.83-50.66-77.33L1048.86,108C1083.11,29.8,1146.12,0,1243.39,0c95.89,0,158.91,29.8,191.79,108L1705.76,854.8c15.27,36.41-11.47,76.62-51,76.62h-59.54a55.27,55.27,0,0,1-51-34L1285.73,191c-8.22-19.86-23.29-28.56-45.21-28.56s-37,8.7-46.58,28.56L920,891.4A55.26,55.26,0,0,1,869.35,924.63Z"/></symbol>
+
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-contrast" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-nosignal" viewBox="0 0 24 24"><path d="M2 2l20 20"/><path d="M5 19h.01M9.5 15.5a4 4 0 0 1 5 0M4.5 11.5a10 10 0 0 1 5-2.6M19.5 11.5a10 10 0 0 0-3-2"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0"/><path d="M8.5 16a5 5 0 0 1 7 0"/><path d="M12 19.5h.01"/></symbol>
+  <symbol id="i-battery" viewBox="0 0 24 24"><rect x="2" y="7" width="17" height="10" rx="2.5"/><path d="M22 11v2"/><rect x="4.5" y="9.5" width="9" height="5" rx="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-fingerprint" viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 1 7 7v2a12 12 0 0 1-.7 4"/><path d="M5 10a7 7 0 0 1 3.2-5.9"/><path d="M3.5 13.5A9 9 0 0 1 5 8"/><path d="M12 7a5 5 0 0 1 5 5v1.5a10 10 0 0 1-1 4.4"/><path d="M9 9.5A5 5 0 0 0 12 17"/><path d="M12 11a2.6 2.6 0 0 1 2.6 2.6c0 3-1.2 5.3-2.6 6.9"/><path d="M9.4 13a2.6 2.6 0 0 0 3.4 3.6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+  <symbol id="i-sync" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-14.5 7.1M3 12a9 9 0 0 1 14.5-7.1"/><path d="M3 20v-5h5M21 4v5h-5"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h2.5l1.5-2h6l1.5 2H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.6"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9"/><path d="M16 7l3 3"/><path d="M13 10l2.5 2.5"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></symbol>
+  <symbol id="i-login" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></symbol>
+</defs></svg>
+
+<!-- ══════════════════════ TELÉFONO ══════════════════════ -->
+<main class="phone" aria-label="App Personal DPROMA — acceso, verificación en dos pasos y modo campo sin conexión">
+<h1 class="sr">Acceso a la App Personal DPROMA</h1>
+<div class="screen">
+
+  <div class="status">
+    <span class="tnum" id="clock">9:41</span>
+    <span class="rt">
+      <svg class="ico ico-sm" aria-hidden="true" id="netico" style="color:var(--text-2)"><use href="#i-wifi"/></svg>
+      <svg class="ico ico-sm" aria-hidden="true"><use href="#i-battery"/></svg>
+    </span>
+  </div>
+
+  <!-- ══ Vista 1 · Login (primer acceso, requiere conexión) ══ -->
+  <section id="view-login" class="view" aria-label="Iniciar sesión">
+    <div class="hero">
+      <svg width="52" height="49" aria-hidden="true"><use href="#dproma-mark" width="52" height="49"/></svg>
+      <span class="wordmark wm">APP PERSONAL DPROMA</span>
+      <small>Sistema Integral de Operación</small>
+    </div>
+    <div class="body">
+      <button class="gbtn" id="google" data-busy="false">
+        <svg class="glogo" width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.1 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/>
+          <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.1 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+          <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
+          <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/>
+        </svg>
+        <span class="spin" aria-hidden="true"></span>
+        <span id="gtext">Continuar con Google</span>
+      </button>
+      <p class="hint">Usa tu cuenta <strong translate="no">@dproma.com</strong>.<br>El primer acceso requiere conexión a internet.</p>
+      <p class="note">
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-shield"/></svg>
+        <span>Después del primer acceso podrás entrar sin conexión con tu PIN o huella (modo campo).</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ Vista 2 · Verificación en dos pasos ══ -->
+  <section id="view-2fa" class="view" hidden aria-label="Verificación en dos pasos">
+    <div class="hero" style="padding-bottom:10px">
+      <svg width="40" height="38" aria-hidden="true"><use href="#dproma-mark" width="40" height="38"/></svg>
+      <span class="wordmark wm" style="font-size:11px">VERIFICACIÓN EN DOS PASOS</span>
+    </div>
+    <div class="body">
+      <form id="otpform" novalidate>
+        <fieldset>
+          <legend>Escribe el código de verificación</legend>
+          <p class="otp-help">Google envió un código de 6 dígitos a tu otro dispositivo.</p>
+          <div class="otprow" role="group" aria-label="Código de verificación de 6 dígitos">
+            <input class="otp" data-otp maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" aria-label="Dígito 1 de 6">
+            <input class="otp" data-otp maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Dígito 2 de 6">
+            <input class="otp" data-otp maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Dígito 3 de 6">
+            <input class="otp" data-otp maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Dígito 4 de 6">
+            <input class="otp" data-otp maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Dígito 5 de 6">
+            <input class="otp" data-otp maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Dígito 6 de 6">
+          </div>
+        </fieldset>
+        <p class="altlink" style="margin-top:10px">¿No llegó el código?
+          <button type="button" class="linklike" id="resend">Reenviarlo</button> ·
+          <a href="#" id="usealt">usar la app Authenticator</a>
+        </p>
+        <button class="primarybtn" id="verify" type="submit" disabled aria-describedby="verifynote" style="margin-top:6px">Confirmar código</button>
+        <p class="ctanote" id="verifynote">Faltan <span id="otpleft">6</span> dígitos por escribir.</p>
+      </form>
+
+      <div class="infobox">
+        <svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg>
+        <span>La sesión de campo quedará activa <b>7 días</b>; después la app pedirá reconectarte.</span>
+      </div>
+      <p class="note" style="margin-top:0">
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-shield"/></svg>
+        <span>La verificación en dos pasos la gestiona Google (D7) — la app nunca ve tu contraseña.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ Vista 3 · Regreso sin señal — modo campo ══ -->
+  <section id="view-offline" class="view" hidden aria-label="Desbloqueo sin conexión — modo campo">
+    <p class="offbanner" role="status">
+      <svg class="ico" aria-hidden="true"><use href="#i-nosignal"/></svg>
+      <span>Sin conexión — trabajarás en modo campo y todo se sincronizará después.</span>
+    </p>
+    <div class="body" style="padding-top:6px">
+      <div class="identity">
+        <span class="avatar" aria-hidden="true">MT</span>
+        <p class="uname"><b translate="no">Miguel Torres</b><small>Instalador · CDMX · sesión de campo activa</small></p>
+      </div>
+
+      <div class="unlock">
+        <button class="biobtn" id="biounlock" aria-label="Desbloquear con tu huella dactilar">
+          <svg class="ico" aria-hidden="true"><use href="#i-fingerprint"/></svg>
+        </button>
+        <p class="hint" style="margin:0">Desbloquea con tu huella</p>
+        <p class="divider">o escribe tu PIN de campo</p>
+        <div class="otprow" role="group" aria-label="PIN de campo de 6 dígitos">
+          <input class="otp" data-mask="true" data-pin maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Dígito 1 de 6 del PIN">
+          <input class="otp" data-mask="true" data-pin maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Dígito 2 de 6 del PIN">
+          <input class="otp" data-mask="true" data-pin maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Dígito 3 de 6 del PIN">
+          <input class="otp" data-mask="true" data-pin maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Dígito 4 de 6 del PIN">
+          <input class="otp" data-mask="true" data-pin maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Dígito 5 de 6 del PIN">
+          <input class="otp" data-mask="true" data-pin maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Dígito 6 de 6 del PIN">
+        </div>
+        <button class="primarybtn" id="unlockbtn" disabled aria-describedby="unlocknote">Desbloquear</button>
+        <p class="ctanote" id="unlocknote">Faltan <span id="pinleft">6</span> dígitos del PIN.</p>
+      </div>
+
+      <h2 class="seclabel"><svg class="ico" aria-hidden="true" style="color:var(--ok-ink)"><use href="#i-check"/></svg>Qué puedes hacer sin conexión</h2>
+      <ul class="oklist">
+        <li><svg class="ico" aria-hidden="true"><use href="#i-list"/></svg>
+          <span>Completar los checklists de instalación e inspección de tus órdenes asignadas
+            <small>Incluye <span translate="no">ORD-202607-0119</span> y las demás ya descargadas al dispositivo</small></span></li>
+        <li><svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg>
+          <span>Tomar fotografías de evidencia técnica
+            <small>Se guardan en el teléfono hasta que haya señal</small></span></li>
+        <li><svg class="ico" aria-hidden="true"><use href="#i-pen"/></svg>
+          <span>Capturar la firma del cliente al cerrar una instalación
+            <small>Queda almacenada localmente y cifrada</small></span></li>
+      </ul>
+
+      <h2 class="seclabel"><svg class="ico" aria-hidden="true" style="color:var(--warn-ink)"><use href="#i-sync"/></svg>En cola para sincronizar</h2>
+      <ul class="qlist">
+        <li><svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg>
+          <span>Fotografías pendientes de subir
+            <small>Orden <span translate="no">ORD-202607-0119</span> · tablero y montaje del centro de carga</small></span>
+          <span class="qcount tnum">3</span></li>
+        <li><svg class="ico" aria-hidden="true"><use href="#i-list"/></svg>
+          <span>Checklist completado por enviar
+            <small>Se sube completo, con evidencias y firma, en cuanto haya señal</small></span>
+          <span class="qcount tnum">1</span></li>
+      </ul>
+      <p class="syncnote">Última sincronización con éxito: hoy, 11:32.</p>
+    </div>
+    <p class="footnote">Sesión de campo válida <b>4 días más</b> (vence 24&nbsp;jul). Con señal, la app la renueva sola.
+      Si DPROMA desactiva la cuenta, el acceso se revoca en cuanto el dispositivo toque internet — y el PIN deja de
+      funcionar al vencer la sesión.</p>
+  </section>
+
+</div>
+</main>
+
+<!-- ══════════════════════ PANEL DE LA MAQUETA ══════════════════════ -->
+<aside class="cap">
+  <h1>Acceso, 2FA y modo campo — offline-first</h1>
+  <p>Un solo archivo con las tres pantallas del flujo v1: primer acceso en línea, verificación en dos pasos y
+    reingreso sin señal. Cambia de vista y de tema para revisarlas.</p>
+
+  <div class="switchgroup">
+    <span class="lbl">Vista</span>
+    <div class="switch" role="group" aria-label="Cambiar de pantalla">
+      <button data-view="login" aria-pressed="true"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-login"/></svg>1 · Login</button>
+      <button data-view="2fa" aria-pressed="false"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-shield"/></svg>2 · 2FA</button>
+      <button data-view="offline" aria-pressed="false"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-nosignal"/></svg>3 · Offline</button>
+    </div>
+  </div>
+
+  <div class="switchgroup">
+    <span class="lbl">Tema</span>
+    <div class="switch" role="group" aria-label="Cambiar de tema">
+      <button data-theme-btn="light" aria-pressed="false"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-sun"/></svg>Claro</button>
+      <button data-theme-btn="dark" aria-pressed="true"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-moon"/></svg>Oscuro</button>
+      <button data-theme-btn="sun" aria-pressed="false"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-contrast"/></svg>Exterior</button>
+    </div>
+  </div>
+
+  <p><b>Qué cambia respecto de la v1:</b></p>
+  <ul>
+    <li>El código de verificación se escribe en <b>6 casillas individuales</b> con foco automático al siguiente
+      dígito (y retroceso con Backspace) en vez del emparejamiento numérico de la maqueta original.</li>
+    <li>El PIN de campo reutiliza el mismo componente de 6 casillas, enmascarado, para consistencia visual.</li>
+    <li>La vista sin conexión ahora separa explícitamente <b>qué se puede hacer offline</b> de
+      <b>qué queda en cola para sincronizar</b>, con la misma orden (<span translate="no">ORD-202607-0119</span>)
+      y contador de pendientes que en el checklist de instalación (09).</li>
+    <li>Tercer tema <b>Exterior / sol directo</b> con contraste reforzado, igual que en 09.</li>
+    <li>Áreas táctiles de 48&nbsp;px y anillo de foco de 3&nbsp;px en todos los controles.</li>
+    <li><code>env(safe-area-inset-bottom)</code> en la nota inferior y <code>overscroll-behavior: contain</code>
+      en el cuerpo desplazable.</li>
+  </ul>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg><span id="tmsg"></span>
+</div>
+<p class="sr" id="live" aria-live="polite"></p>
+
+<script>
+const root = document.documentElement;
+
+/* ── Tema: claro / oscuro / exterior ── */
+function setTheme(t){
+  root.dataset.theme = t;
+  document.querySelector('meta[name=theme-color]').content =
+    t === 'dark' ? '#10161F' : (t === 'sun' ? '#F7F9FB' : '#F2F5F7');
+  document.querySelectorAll('[data-theme-btn]').forEach(b =>
+    b.setAttribute('aria-pressed', String(b.dataset.themeBtn === t)));
+}
+document.querySelectorAll('[data-theme-btn]').forEach(b =>
+  b.addEventListener('click', () => setTheme(b.dataset.themeBtn)));
+setTheme(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'dark'); // app de campo: oscuro por defecto
+
+/* ── Estado de conexión mostrado en la barra de estado ── */
+const netico = document.getElementById('netico');
+function setNet(online){
+  netico.style.color = online ? 'var(--text-2)' : 'var(--warn-ink)';
+  netico.querySelector('use').setAttribute('href', online ? '#i-wifi' : '#i-nosignal');
+}
+
+/* ── Cambio de vista ── */
+const views = { login: document.getElementById('view-login'), '2fa': document.getElementById('view-2fa'), offline: document.getElementById('view-offline') };
+const viewBtns = document.querySelectorAll('[data-view]');
+const live = document.getElementById('live');
+function showView(name){
+  Object.entries(views).forEach(([k, el]) => el.hidden = k !== name);
+  viewBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === name)));
+  setNet(name !== 'offline');
+  live.textContent = name === 'login' ? 'Pantalla de inicio de sesión'
+    : name === '2fa' ? 'Pantalla de verificación en dos pasos'
+    : 'Pantalla de desbloqueo sin conexión, modo campo';
+}
+viewBtns.forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+
+/* ── Botón Google: simula la petición y avanza a 2FA (patrón de 01_login) ── */
+const g = document.getElementById('google'), gt = document.getElementById('gtext');
+g.addEventListener('click', () => {
+  g.dataset.busy = 'true'; gt.textContent = 'Abriendo Google…';
+  live.textContent = 'Abriendo la ventana de Google…';
+  setTimeout(() => {
+    g.dataset.busy = 'false'; gt.textContent = 'Continuar con Google';
+    showView('2fa');
+    document.querySelector('#otpform [data-otp]').focus();
+  }, 1400);
+});
+
+/* ── Casillas OTP / PIN: foco automático, retroceso, pegado ── */
+function wireOtpGroup(selector, onComplete, leftEl, submitBtn){
+  const boxes = [...document.querySelectorAll(selector)];
+  function refresh(){
+    const filled = boxes.filter(b => b.value !== '').length;
+    boxes.forEach(b => b.dataset.filled = String(b.value !== ''));
+    if (leftEl) leftEl.textContent = boxes.length - filled;
+    if (submitBtn) submitBtn.disabled = filled < boxes.length;
+    if (filled === boxes.length && onComplete) onComplete();
+  }
+  boxes.forEach((b, i) => {
+    b.addEventListener('input', () => {
+      b.value = b.value.replace(/[^0-9]/g, '').slice(-1);
+      if (b.value && boxes[i + 1]) boxes[i + 1].focus();
+      refresh();
+    });
+    b.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !b.value && boxes[i - 1]) { boxes[i - 1].focus(); }
+    });
+    b.addEventListener('paste', e => {
+      const digits = (e.clipboardData.getData('text').match(/[0-9]/g) || []).slice(0, boxes.length);
+      if (!digits.length) return;
+      e.preventDefault();
+      digits.forEach((d, k) => { if (boxes[i + k]) boxes[i + k].value = d; });
+      (boxes[Math.min(i + digits.length, boxes.length - 1)]).focus();
+      refresh();
+    });
+  });
+  return refresh;
+}
+const otpRefresh = wireOtpGroup('#otpform [data-otp]', null, document.getElementById('otpleft'), document.getElementById('verify'));
+const pinRefresh = wireOtpGroup('[data-pin]', null, document.getElementById('pinleft'), document.getElementById('unlockbtn'));
+
+const toast = document.getElementById('toast'), tmsg = document.getElementById('tmsg');
+let toastTimer;
+function show(msg){
+  tmsg.textContent = msg; toast.dataset.show = 'true';
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.dataset.show = 'false', 2800);
+}
+
+document.getElementById('otpform').addEventListener('submit', e => {
+  e.preventDefault();
+  show('Verificación exitosa. Sesión de campo iniciada por 7 días.');
+  live.textContent = 'Código verificado. Sesión de campo iniciada.';
+});
+document.getElementById('resend').addEventListener('click', () => show('Se reenvió el código a tu otro dispositivo.'));
+document.getElementById('biounlock').addEventListener('click', () => {
+  show('Modo campo desbloqueado con huella.');
+  live.textContent = 'Modo campo desbloqueado con huella.';
+});
+document.getElementById('unlockbtn').addEventListener('click', () => {
+  show('Modo campo desbloqueado con PIN.');
+  live.textContent = 'Modo campo desbloqueado con PIN.';
+});
+
+/* ── Reloj de la barra de estado (estático, referencia visual) ── */
+document.getElementById('clock').textContent =
+  new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+showView('login');
+</script>
+</body>
+</html>

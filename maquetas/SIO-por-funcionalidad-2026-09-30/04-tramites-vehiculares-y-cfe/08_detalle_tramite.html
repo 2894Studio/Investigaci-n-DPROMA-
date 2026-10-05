@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es-MX" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F5F7">
+<title>SIO-DPROMA — Trámite TRM-202606-0798</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   SIO-DPROMA — Contrato visual (design tokens)
+   Propuesta v2 · 2026-07-28 · NO sustituye a ningún documento aprobado.
+
+   Fuente: 34_UIUX_DESIGN_BRIEF_v1.0.md §2 (paleta), §3 (tipo/espaciado/motion),
+           22_ANALISIS_UX_UI_Y_ROBUSTECIMIENTO_v1.0.md (semáforo validado 2026-07-20),
+           14_REGLAS_CONSOLIDADAS_v1.3.md §4.
+   Curvas de easing: estándares de emilkowalski/skills · review-animations.
+
+   REGLA: ningún hex literal en componentes. Todo pasa por estas variables.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Tipografía ───────────────────────────────────────────────── */
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-brand: 'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif; /* solo momentos de marca */
+
+  --fs-meta: 12px;   /* captions, metadatos */
+  --fs-dense: 13px;  /* tablas densas */
+  --fs-base: 14px;   /* base UI */
+  --fs-sub: 16px;    /* subtítulos */
+  --fs-title: 20px;  /* títulos de página */
+  --fs-kpi: 30px;    /* cifra KPI */
+
+  /* ── Espaciado — escala de 4 px ───────────────────────────────── */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-6: 24px; --sp-8: 32px; --sp-12: 48px;
+
+  --row-comfy: 40px;    /* densidad de tabla cómoda */
+  --row-compact: 32px;  /* densidad compacta (con toggle) */
+
+  /* ── Radios ───────────────────────────────────────────────────── */
+  --r-ctrl: 6px; --r-card: 10px; --r-modal: 16px; --r-pill: 999px;
+
+  /* ── Movimiento ───────────────────────────────────────────────── */
+  --dur-micro: 120ms;  /* hover, press, checkbox */
+  --dur-base: 200ms;   /* estándar: dropdowns, tema, popovers */
+  --dur-enter: 300ms;  /* entrada de vistas — techo duro de la UI */
+  --ease-out: cubic-bezier(.23, 1, .32, 1);        /* entradas y respuestas al usuario */
+  --ease-in-out: cubic-bezier(.77, 0, .175, 1);    /* movimiento en pantalla */
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);  /* solo píldora de pestañas y kanban */
+  --stagger: 40ms;
+
+  /* ── Foco (idéntico en ambos temas) ───────────────────────────── */
+  --focus-w: 2px;
+  --focus-offset: 2px;
+
+  color-scheme: light;
+}
+
+/* ── TEMA CLARO — neutro 60 / azul-chrome 30 / verde 10 ─────────── */
+:root, [data-theme="light"] {
+  --chrome:      #1E4E79;   /* azul de marca — SOLO estructura, nunca fondo de página */
+  --chrome-ink:  #F2F5F7;
+  --chrome-dim:  rgba(242,245,247,.72);
+  --chrome-line: rgba(242,245,247,.14);
+
+  --bg:        #F2F5F7;
+  --surface:   #FAFCFD;   /* nunca blanco absoluto — regla de Ale, EN 301 549 */
+  --surface-2: #E7EDF3;
+  --border:    rgba(27,36,48,.14);
+  --border-2:  rgba(27,36,48,.26);
+
+  --text:   #1B2430;
+  --text-2: #4C5A6B;
+  --text-3: #66717F;
+
+  --accent:     #3E7A4C;   /* acción — distinto del verde de estado a propósito (H12) */
+  --accent-ink: #F7FAF9;
+  --accent-soft: rgba(62,122,76,.10);
+  --on-state: #F7FAF9;   /* glifo sobre medallón de estado sólido (accent/err) — tarjeta-estado */
+
+  /* Semáforo de 5 estados — validado por Jhon 2026-07-20 */
+  --ok:    #2F8F6F;  --ok-fill:    rgba(47,143,111,.12);
+  --warn:  #B98A1E;  --warn-fill:  rgba(185,138,30,.14);
+  --err:   #C24238;  --err-fill:   rgba(194,66,56,.11);
+  --block: #9678CC;  --block-fill: rgba(150,120,204,.13);
+  --pause: #4A5560;  --pause-fill: rgba(74,85,96,.11);
+
+  /* Variante "ink": mismo estado, versión oscurecida a AA para texto e iconos
+     sobre superficie clara (doc 34 §2, "doble variante por estado").
+     Verificado: ok 5.9:1 · warn 5.4:1 · err 5.1:1 · block 6.4:1 sobre blanco. */
+  --ok-ink: #22705A; --warn-ink: #7E5B0E; --err-ink: #B03A31;
+  --block-ink: #6D4FA3; --pause-ink: #4A5560;
+
+  /* Fondos OPACOS de estado: el contraste no depende del fondo del contenedor */
+  --ok-bg:#E2EFEC;--warn-bg:#F1ECDE;--err-bg:#F4E8E7;--block-bg:#EDEBF7;--pause-bg:#E7EAEC;--link:#2F6B3C;
+
+  /* Series de gráfica — nunca reutilizan color de estado */
+  --serie-1: #2C6CA8;
+  --serie-2: #7A5FA8;
+
+  --sh-rest:  0 1px 2px rgba(19,29,43,.07);
+  --sh-float: 0 6px 18px rgba(19,29,43,.10);
+  --sh-modal: 0 24px 60px rgba(19,29,43,.22);
+  --glass:    rgba(250,252,253,.66);
+}
+
+/* ── TEMA OSCURO ────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --chrome:      #122740;
+  --chrome-ink:  #E7ECF2;
+  --chrome-dim:  rgba(231,236,242,.72);
+  --chrome-line: rgba(231,236,242,.10);
+
+  --bg:        #10161F;
+  --surface:   #171F2C;
+  --surface-2: #1D2735;
+  --border:    rgba(231,236,242,.12);
+  --border-2:  rgba(231,236,242,.24);
+
+  --text:   #E7ECF2;
+  --text-2: #A8B3C2;
+  --text-3: #8B96A6;
+
+  --accent:     #4A8F5A;
+  --accent-ink: #08120D;
+  --accent-soft: rgba(74,143,90,.16);
+  --on-state: #08120D;
+
+  --ok:    #4FBF98;  --ok-fill:    rgba(79,191,152,.14);
+  --warn:  #E8C24C;  --warn-fill:  rgba(232,194,76,.14);
+  --err:   #EE6E5F;  --err-fill:   rgba(238,110,95,.14);
+  --block: #C0A9F0;  --block-fill: rgba(192,169,240,.14);
+  --pause: #6B7684;  --pause-fill: rgba(107,118,132,.20);
+
+  /* En oscuro el color de estado ya cumple AA sobre superficie: ink = base */
+  --ok-ink: #4FBF98; --warn-ink: #E8C24C; --err-ink: #EE6E5F;
+  --block-ink: #C0A9F0; --pause-ink: #98A4B4;
+  --ok-bg:#1F353B;--warn-bg:#343630;--err-bg:#352A33;--block-bg:#2F3247;--pause-bg:#28303E;--link:#7FC08F;
+
+  --serie-1: #6FA8DC;
+  --serie-2: #B69BE0;
+
+  --sh-rest:  0 1px 2px rgba(0,0,0,.35);
+  --sh-float: 0 6px 18px rgba(0,0,0,.40);
+  --sh-modal: 0 24px 60px rgba(0,0,0,.55);
+  --glass:    rgba(29,39,53,.55);
+}
+
+/* ── Reducción de movimiento ─────────────────────────────────────
+   No es "cero animación": se conservan opacidad y color, se elimina
+   todo desplazamiento y escala.                                     */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-micro: 1ms; --dur-base: 120ms; --dur-enter: 120ms;
+    --ease-spring: linear; --stagger: 0ms;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   08 · Detalle de trámite — arquetipo P6 (vista de detalle con timeline)
+   Cabecera folio+semáforo · timeline de bitácora · panel lateral de datos
+   relacionados · acciones contextuales según etapa/rol.
+   Scroll de un solo eje: vertical (la página completa se desplaza; la
+   cabecera y el stepper quedan fijos arriba).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none !important}
+html,body{overflow-x:hidden}
+body{font-family:var(--font-ui);font-size:var(--fs-base);background:var(--bg);color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  transition:background-color var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out)}
+.tnum{font-variant-numeric:tabular-nums}
+.wordmark{font-family:var(--font-brand);font-weight:400;letter-spacing:.08em}
+h1,h2,h3{text-wrap:balance}
+svg{display:block}
+.ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ico-sm{width:13px;height:13px}
+.ico-lg{width:22px;height:22px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus{outline:none}
+:focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset);border-radius:var(--r-ctrl)}
+.side :focus-visible{outline-color:#9FE0AE}
+.skip{position:absolute;left:8px;top:-60px;z-index:200;background:var(--accent);color:var(--accent-ink);
+  padding:8px 16px;border-radius:var(--r-ctrl);font-weight:600;transition:transform var(--dur-base) var(--ease-out)}
+.skip:focus-visible{transform:translateY(70px)}
+button,.pressable{transition:transform var(--dur-micro) var(--ease-out),background-color var(--dur-micro) var(--ease-out),
+  border-color var(--dur-micro) var(--ease-out),color var(--dur-micro) var(--ease-out);font-family:inherit}
+button:active,.pressable:active{transform:scale(.97)}
+
+.app{display:flex;min-height:100vh}
+.side{width:224px;background:var(--chrome);color:var(--chrome-ink);padding:16px 12px;flex-shrink:0}
+.side .logo{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 8px 16px;
+  border-bottom:1px solid var(--chrome-line);margin-bottom:8px}
+.grp{margin:14px 8px 4px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}
+.it{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;color:var(--chrome-dim);
+  font-size:13.5px;text-decoration:none;border-left:3px solid transparent;
+  transition:background-color var(--dur-micro) var(--ease-out),color var(--dur-micro) var(--ease-out)}
+.it:hover{background:rgba(255,255,255,.08);color:var(--chrome-ink)}
+.it[aria-current="page"]{background:rgba(255,255,255,.12);color:var(--chrome-ink);font-weight:600;border-left-color:var(--ok)}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+
+/* ── Cabecera: migas, folio + semáforo grande, acciones primarias ── */
+.top{display:flex;flex-direction:column;gap:10px;padding:14px 24px;border-bottom:1px solid var(--border);
+  background:var(--surface);flex-shrink:0}
+.crumb{display:flex;align-items:center;gap:6px;color:var(--text-3);font-size:var(--fs-meta)}
+.crumb a{color:var(--text-3);text-decoration:none}
+.crumb a:hover{color:var(--text);text-decoration:underline}
+.top .row1{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top h1{font-size:var(--fs-title);font-weight:700;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top .right{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);
+  color:var(--text);border-radius:var(--r-ctrl);padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);
+  cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--surface-2);border-color:var(--border-2)}
+.btn.p{background:var(--accent);border-color:transparent;color:var(--accent-ink)}
+.btn.p:hover{filter:brightness(1.08)}
+.btn.w{border-color:var(--err);color:var(--err-ink)}
+.btn.w:hover{background:var(--err-bg)}
+.iconbtn{width:36px;height:36px;border:1px solid var(--border);border-radius:var(--r-ctrl);display:grid;
+  place-items:center;cursor:pointer;background:transparent;color:var(--text-2);flex-shrink:0}
+.iconbtn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
+.sep{width:1px;height:22px;background:var(--border);margin:0 2px}
+
+/* Pastilla grande de semáforo en cabecera: color + forma + texto (H1/H2) */
+.slabig{display:inline-flex;align-items:center;gap:7px;border-radius:var(--r-ctrl);padding:5px 12px;
+  font-size:var(--fs-dense);font-weight:700;white-space:nowrap}
+.slabig.s-ok{background:var(--ok-bg);color:var(--ok-ink)}
+.slabig.s-warn{background:var(--warn-bg);color:var(--warn-ink)}
+.slabig.s-err{background:var(--err-bg);color:var(--err-ink)}
+.slabig.s-block{background:var(--block-bg);color:var(--block-ink)}
+.slabig.s-pause{background:var(--pause-bg);color:var(--pause-ink)}
+/* Pastilla pequeña reutilizable (documentos, leyenda, etc.) */
+.sla{display:inline-flex;align-items:center;gap:5px;border-radius:var(--r-ctrl);padding:3px 9px;
+  font-size:11px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.s-ok{background:var(--ok-bg);color:var(--ok-ink)}
+.s-warn{background:var(--warn-bg);color:var(--warn-ink)}
+.s-err{background:var(--err-bg);color:var(--err-ink)}
+.s-block{background:var(--block-bg);color:var(--block-ink)}
+.s-pause{background:var(--pause-bg);color:var(--pause-ink)}
+
+/* ── Stepper de etapas del flujo ── */
+.flow{display:flex;gap:6px;padding:12px 24px;border-bottom:1px solid var(--border);align-items:center;
+  flex-wrap:wrap;background:var(--surface);flex-shrink:0}
+.fstep{display:inline-flex;align-items:center;gap:7px;border-radius:var(--r-pill);padding:6px 13px;
+  font-size:11.5px;font-weight:600;border:1px solid var(--border);color:var(--text-3)}
+.fstep .ico{width:14px;height:14px}
+.fstep.done{border-color:var(--ok);color:var(--ok-ink);background:var(--ok-bg)}
+.fstep.now{border-color:var(--warn);color:var(--warn-ink);background:var(--warn-bg)}
+.farrow{color:var(--text-3)}
+.farrow .ico{width:14px;height:14px}
+.flow .sladef{margin-left:auto;color:var(--text-3);font-size:11.5px}
+
+/* ── Cuerpo: columna izquierda (info + timeline) / derecha (panel) ── */
+.wrap{display:flex;gap:20px;padding:20px 24px 40px;align-items:flex-start;flex-wrap:wrap}
+.colL{flex:1.6;min-width:340px;display:flex;flex-direction:column;gap:16px}
+.colR{flex:1;min-width:300px;max-width:380px;display:flex;flex-direction:column;gap:16px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:16px 18px;
+  box-shadow:var(--sh-rest)}
+.panel h2,.panel h3{font-size:var(--fs-dense);font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.panel h2 .hint,.panel h3 .hint{color:var(--text-3);font-weight:400;font-size:11px;margin-left:2px}
+
+/* Datos clave del trámite */
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;font-size:var(--fs-dense)}
+.kv div span{display:block;color:var(--text-3);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+.kv div b{font-weight:600}
+
+/* ── Timeline vertical de bitácora ── */
+.tl{position:relative;margin-left:6px;margin-top:4px}
+.ev{display:flex;gap:12px;padding-bottom:16px;position:relative}
+.ev::before{content:"";position:absolute;left:6px;top:18px;bottom:0;width:2px;background:var(--border)}
+.ev:last-child::before{display:none}
+.ev .d{width:14px;height:14px;border-radius:50%;background:var(--surface-2);border:2px solid var(--text-3);
+  flex-shrink:0;margin-top:2px;display:grid;place-items:center}
+.ev.red .d{border-color:var(--err);background:var(--err-bg);color:var(--err-ink)}
+.ev.green .d{border-color:var(--ok);background:var(--ok-bg);color:var(--ok-ink)}
+.ev.purple .d{border-color:var(--block);background:var(--block-bg);color:var(--block-ink)}
+.ev .dot-ico{width:8px;height:8px}
+.ev .t{font-size:var(--fs-dense);line-height:1.45;padding-top:1px}
+.ev .t b{font-weight:600}
+.ev .who{color:var(--text-3);font-size:11px;margin-top:2px}
+.ev .note{margin-top:6px;background:var(--surface-2);border:1px solid var(--border);border-left:3px solid var(--warn);
+  border-radius:6px;padding:8px 11px;font-size:12px;color:var(--text-2);line-height:1.5}
+.lockrow{display:flex;align-items:center;gap:8px;color:var(--text-3);font-size:11px;margin-top:6px;
+  padding-top:10px;border-top:1px dashed var(--border)}
+.lockrow .ico{width:14px;height:14px}
+
+/* Aviso de atención */
+.warnbox{background:var(--err-bg);border:1px solid var(--border);border-radius:var(--r-card);padding:12px 14px;
+  font-size:var(--fs-dense);color:var(--text-2);line-height:1.5;display:flex;gap:10px;align-items:flex-start}
+.warnbox .ico{color:var(--err-ink);flex-shrink:0;margin-top:1px}
+.warnbox b{color:var(--err-ink)}
+
+/* Acciones */
+.act .btn{width:100%;justify-content:center;margin-bottom:8px}
+.act .btn:last-child{margin-bottom:0}
+
+/* Documentos */
+.docs .doc{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);
+  font-size:var(--fs-dense)}
+.docs .doc:last-of-type{border-bottom:0}
+.docs .doc .ico{color:var(--text-3)}
+.docs .doc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.docs .doc small{color:var(--text-3);margin-left:auto;font-size:11px;flex-shrink:0}
+
+/* ── Aviso de propuesta (banda) — este archivo no tenía componente de aviso
+   reutilizable (.banda/.aviso/.alerta); forma tomada de
+   direccion-admin/viaticos-reembolso.html (.banda/.b-info), con los tokens
+   propios de esta hoja. Extensión TRAZO, no de Studio. ── */
+.banda{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:var(--r-card);
+  font-size:var(--fs-dense);line-height:1.5}
+.banda svg{flex-shrink:0;margin-top:2px}
+.b-info{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}
+
+/* ── Tarjeta de estado (vacío/error) — componente real de Studio, ver
+   maquetas/studio-2026-09-08/tramite-detalle.html (citado literal). El
+   medallón es --accent por defecto; sólo .es-err lo pinta con --err. ── */
+.tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-modal);box-shadow:var(--sh-modal);display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-3);margin:0 auto}
+.estado-ico{width:52px;height:52px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--on-state)}
+.estado-ico .ico{width:26px;height:26px;color:inherit}
+.tarjeta-estado.es-err .estado-ico{background:var(--err)}
+.tarjeta-estado h2{font:700 var(--fs-sub) var(--font-ui);margin:0}
+.tarjeta-estado p{color:var(--text-2);font-size:var(--fs-dense);line-height:1.6;max-width:36ch;margin:0}
+.tarjeta-estado .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
+.tarjeta-estado .acc{display:flex;gap:var(--sp-2);flex-wrap:wrap;justify-content:center}
+
+/* ── Estados de página (con datos/cargando/vacío/error) — este archivo
+   quedó fijo en el pase de sólo-tokens de la tanda 2 sin el arnés de 4
+   estados que ya tiene el resto de maquetas/sistema/ (ver ARQ-ESTADOS en
+   33_cfe_detalle.html). Se añade aquí, mismo patrón, para poder verificar
+   los 4 estados con axe-core como pide esta tanda. ── */
+main#contenido{display:flex;flex-direction:column}
+.state{display:none;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:56px 16px;flex:1;justify-content:center}
+main#contenido>.state-ok,main#contenido>.state-loading,main#contenido>.state-empty,main#contenido>.state-error{display:none}
+main#contenido[data-state="ok"]>.state-ok{display:block}
+main#contenido[data-state="empty"]>.state-empty{display:flex}
+main#contenido[data-state="error"]>.state-error{display:flex}
+main#contenido[data-state="loading"]>.state-loading{display:flex}
+.skel{display:block;height:12px;border-radius:4px;background:linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%);background-size:200% 100%;animation:shimmer 1.4s linear infinite;color:transparent}
+@keyframes shimmer{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.skel{animation:none}}
+.sk{flex-direction:column;gap:12px;padding:20px 24px}
+.sk-caja{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:16px;display:flex;flex-direction:column;gap:10px}
+
+/* ── Arnés de demostración de estados (temporal, mismo patrón que el
+   resto de maquetas/sistema/) ── */
+.demo{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;
+  background:var(--surface);border-top:1px solid var(--border-2);padding:8px 12px;
+  box-shadow:0 -2px 10px rgba(19,29,43,.08);position:fixed;left:0;right:0;bottom:0;z-index:80}
+.demo .et-g{font-size:10.5px;color:var(--text-3);font-weight:700;letter-spacing:.06em;padding:0 6px}
+.demo button{border:0;background:transparent;color:var(--text-2);border-radius:var(--r-pill);
+  padding:6px 12px;font:600 11.5px var(--font-ui);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.demo button:hover{background:var(--surface-2);color:var(--text)}
+.demo button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+body{padding-bottom:46px}
+
+/* ── D-PRIMI FAB ── */
+.fab{position:fixed;right:26px;bottom:26px;width:52px;height:52px;border-radius:50%;border:0;
+  background:linear-gradient(135deg,#1E4E79,#2e823d);display:grid;place-items:center;cursor:pointer;
+  box-shadow:var(--sh-float),0 0 0 1px rgba(199,217,123,.35);z-index:50}
+.fab .ring{position:absolute;inset:-4px;border-radius:50%;border:1.5px dashed rgba(199,217,123,.5);
+  opacity:0;transition:opacity var(--dur-base) var(--ease-out)}
+.fab:hover .ring,.fab:focus-visible .ring{opacity:1;animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.fab:hover .ring{animation:none}}
+.fab .tip{position:absolute;right:64px;top:50%;transform:translateY(-50%);background:var(--surface);
+  border:1px solid var(--border);color:var(--text-2);font:600 11px var(--font-ui);padding:6px 11px;
+  border-radius:var(--r-ctrl);white-space:nowrap;opacity:0;pointer-events:none;box-shadow:var(--sh-float);
+  transition:opacity var(--dur-base) var(--ease-out)}
+.fab:hover .tip,.fab:focus-visible .tip{opacity:1}
+
+@media (max-width:900px){
+  .side{display:none}
+  .wrap{flex-direction:column}
+  .colR{max-width:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="lgrad" x1="1233.32" y1="931.42" x2="1233.32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c361e"/><stop offset="0.14" stop-color="#12572b"/><stop offset="0.32" stop-color="#2e823d"/><stop offset="0.48" stop-color="#60a84b"/><stop offset="0.64" stop-color="#76b552"/><stop offset="0.78" stop-color="#a5c86a"/><stop offset="1" stop-color="#c7d97b"/></linearGradient>
+<symbol id="dproma-mark" viewBox="740 0 970 932"><path fill="url(#lgrad)" d="M869.35,924.63H811.84c-39.82,0-66.56-40.83-50.66-77.33L1048.86,108C1083.11,29.8,1146.12,0,1243.39,0c95.89,0,158.91,29.8,191.79,108L1705.76,854.8c15.27,36.41-11.47,76.62-51,76.62h-59.54a55.27,55.27,0,0,1-51-34L1285.73,191c-8.22-19.86-23.29-28.56-45.21-28.56s-37,8.7-46.58,28.56L920,891.4A55.26,55.26,0,0,1,869.35,924.63Z"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.9 3.9A2 2 0 0 0 8.2 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol>
+<symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M3 8l4-4 4 4M3 8l2 5h4l2-5M13 8l4-4 4 4M13 8l2 5h4l2-5"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></symbol>
+<symbol id="i-box" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7L12 12l8.7-5M12 22V12"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></symbol>
+<symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M6 14h12v7H6z"/></symbol>
+<symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-1 4A8.5 8.5 0 0 1 12 20a8.4 8.4 0 0 1-4-1L3 21l2-5a8.4 8.4 0 0 1-1-4 8.5 8.5 0 0 1 8.5-8.5A8.5 8.5 0 0 1 21 11.5z"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></symbol>
+<symbol id="i-userplus" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 17V4M7 9l5-5 5 5M4 21h16"/></symbol>
+<symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13l3.5 7v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+</defs></svg>
+
+<div class="app">
+  <nav class="side" aria-label="Navegación principal">
+    <div class="logo">
+      <svg width="40" height="38" aria-hidden="true"><use href="#dproma-mark" width="40" height="38"/></svg>
+      <span class="wordmark" translate="no" style="font-size:10.5px">SIO-DPROMA</span>
+    </div>
+    <p class="grp">Gestoría</p>
+    <a class="it" href="#" aria-current="page"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg>Trámites</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-scale"/></svg>Jurídico</a>
+    <p class="grp">Operación</p>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>Padrón</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg>Órdenes</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-box"/></svg>Inventario</a>
+  </nav>
+
+  <div class="main">
+    <header class="top">
+      <nav class="crumb" aria-label="Ruta de navegación">
+        <a href="#">Trámites</a><span aria-hidden="true">/</span>
+        <a href="#">Kanban</a><span aria-hidden="true">/</span>
+        <span aria-current="page" class="tnum" translate="no">TRM-202606-0798</span>
+      </nav>
+      <div class="row1">
+        <h1><span class="tnum" translate="no">TRM-202606-0798</span>
+          <span class="slabig s-err"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-alert"/></svg>SLA vencido hace 2 días</span>
+        </h1>
+        <div class="right">
+          <button class="btn"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-print"/></svg>PDF membretado</button>
+          <button class="btn w"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-pause"/></svg>Pausar (justificar)</button>
+          <button class="btn p"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-r"/></svg>Mover a En revisión</button>
+          <span class="sep" aria-hidden="true"></span>
+          <button class="iconbtn" id="theme" aria-label="Cambiar a tema oscuro">
+            <svg class="ico" aria-hidden="true"><use href="#i-moon" id="themeicon"/></svg></button>
+        </div>
+      </div>
+    </header>
+
+    <div class="banda b-info" style="margin:12px 24px 0"><svg class="ico" aria-hidden="true"><use href="#i-alert"/></svg><p><b>Propuesta TRAZO con componentes de Studio — pendiente de revisión de Studio.</b></p></div>
+
+    <!-- ══ Stepper de etapas del flujo del trámite ══ -->
+    <nav class="flow" aria-label="Etapas del trámite">
+      <span class="fstep done"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Recibido</span>
+      <span class="farrow" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
+      <span class="fstep now" aria-current="step"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg>En proceso <span class="tnum" style="font-weight:400">· día 9 de 7</span></span>
+      <span class="farrow" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
+      <span class="fstep">En revisión</span>
+      <span class="farrow" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
+      <span class="fstep">Completado</span>
+      <span class="sladef">SLA del tipo "Baja de placas · Puebla": 7 días hábiles (configurable U-07)</span>
+    </nav>
+
+    <main id="contenido" data-state="ok" aria-label="Detalle del trámite">
+      <div class="state-ok">
+      <div class="wrap">
+        <div class="colL">
+          <section class="panel" aria-labelledby="h-info">
+            <h2 id="h-info"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-folder"/></svg>Información del trámite</h2>
+            <div class="kv">
+              <div><span>Tipo</span><b>Baja de placas</b></div>
+              <div><span>Ciudad / módulo</span><b>Puebla · Módulo Angelópolis</b></div>
+              <div><span>Vehículo</span><b class="tnum" translate="no">KLR-2210 · Nissan NP300 2022</b></div>
+              <div><span>VIN</span><b class="tnum" translate="no">3N6AD33A5NK012884</b></div>
+              <div><span>Cliente / sucursal</span><b>Flotillas GNP · Puebla Centro</b></div>
+              <div><span>Responsable</span><b>R. Cortés (Gestor)</b></div>
+              <div><span>Origen</span><b>Carga masiva CSV (lote #L-116)</b></div>
+              <div><span>Recibido</span><b class="tnum">28 jun 2026 · 09:14</b></div>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="h-bitacora">
+            <h2 id="h-bitacora"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"/></svg>Bitácora
+              <span class="hint">· inmutable, solo lectura (S11)</span></h2>
+            <ol class="tl" style="list-style:none">
+              <li class="ev red"><span class="d" aria-hidden="true"><svg class="ico dot-ico" aria-hidden="true"><use href="#i-alert"/></svg></span>
+                <div class="t"><b>SLA vencido</b> — el semáforo pasó a rojo automáticamente.
+                  <div class="who">Sistema · <span class="tnum">18 jul 2026 · 00:00</span></div></div></li>
+              <li class="ev"><span class="d" aria-hidden="true"></span>
+                <div class="t"><b>Comentario de R. Cortés:</b>
+                  <div class="note">El módulo de Puebla rechazó la factura original por endoso ilegible; el cliente enviará carta factura certificada. Cita reprogramada al 22 de julio.</div>
+                  <div class="who">R. Cortés (Gestor) · <span class="tnum">16 jul 2026 · 13:22</span></div></div></li>
+              <li class="ev purple"><span class="d" aria-hidden="true"><svg class="ico dot-ico" aria-hidden="true"><use href="#i-doc"/></svg></span>
+                <div class="t"><b>Documento agregado:</b> Acuse de cita módulo Angelópolis (PDF)
+                  <div class="who">R. Cortés (Gestor) · <span class="tnum">14 jul 2026 · 10:05</span></div></div></li>
+              <li class="ev"><span class="d" aria-hidden="true"></span>
+                <div class="t"><b>Reasignado</b> de L. Mendoza a R. Cortés — motivo: balanceo de carga Puebla.
+                  <div class="who">G. Ávila (AdminV Director) · <span class="tnum">08 jul 2026 · 17:40</span></div></div></li>
+              <li class="ev green"><span class="d" aria-hidden="true"><svg class="ico dot-ico" aria-hidden="true"><use href="#i-check"/></svg></span>
+                <div class="t"><b>Estado: Recibido → En proceso</b>
+                  <div class="who">L. Mendoza (Gestor) · <span class="tnum">30 jun 2026 · 11:02</span></div></div></li>
+              <li class="ev green"><span class="d" aria-hidden="true"><svg class="ico dot-ico" aria-hidden="true"><use href="#i-check"/></svg></span>
+                <div class="t"><b>Trámite creado</b> vía carga masiva (lote #L-116, fila 41) · folio generado por el sistema.
+                  <div class="who">Sistema · <span class="tnum">28 jun 2026 · 09:14</span></div></div></li>
+            </ol>
+            <div class="lockrow"><svg class="ico" aria-hidden="true"><use href="#i-lock"/></svg>
+              Esta bitácora no admite ediciones ni borrados — cada acción nueva agrega un registro (trazabilidad ISO 9001, D13).</div>
+          </section>
+        </div>
+
+        <div class="colR">
+          <section class="warnbox" aria-labelledby="h-atencion">
+            <svg class="ico" aria-hidden="true"><use href="#i-alert"/></svg>
+            <p><b id="h-atencion">Requiere atención:</b> 2 días sobre el SLA. Al mover de estado o pausar, la justificación es obligatoria y quedará en la bitácora.</p>
+          </section>
+
+          <section class="panel act" aria-labelledby="h-acciones">
+            <h3 id="h-acciones">Acciones <span class="hint">· según tu rol: AdminV Director</span></h3>
+            <button class="btn p"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow-r"/></svg>Mover a En revisión…</button>
+            <button class="btn"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-userplus"/></svg>Reasignar gestor…</button>
+            <button class="btn"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-msg"/></svg>Agregar comentario / documento</button>
+            <button class="btn"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-bell"/></svg>Notificar al cliente</button>
+            <button class="btn w"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-lock"/></svg>Marcar bloqueado por cliente</button>
+          </section>
+
+          <section class="panel docs" aria-labelledby="h-docs">
+            <h3 id="h-docs">Documentos <span class="hint">(4)</span></h3>
+            <div class="doc"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-doc"/></svg><span>Tarjeta de circulación.pdf</span><small class="tnum">28 jun</small></div>
+            <div class="doc"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-doc"/></svg><span>Factura original (rechazada).pdf</span><small class="tnum">28 jun</small></div>
+            <div class="doc"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-doc"/></svg><span>Identificación representante.pdf</span><small class="tnum">30 jun</small></div>
+            <div class="doc"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-doc"/></svg><span>Acuse cita Angelópolis.pdf</span><small class="tnum">14 jul</small></div>
+            <button class="btn" style="width:100%;margin-top:10px;justify-content:center">
+              <svg class="ico ico-sm" aria-hidden="true"><use href="#i-upload"/></svg>Subir documento</button>
+          </section>
+
+          <section class="panel" aria-labelledby="h-metricas">
+            <h3 id="h-metricas">Métricas del folio</h3>
+            <div class="kv">
+              <div><span>Días transcurridos</span><b class="tnum">22 naturales · 16 hábiles</b></div>
+              <div><span>Cambios de estado</span><b class="tnum">2</b></div>
+              <div><span>Personas involucradas</span><b class="tnum">3</b></div>
+              <div><span>Folio global</span><b class="tnum">#12,483</b></div>
+            </div>
+          </section>
+        </div>
+      </div>
+      </div>
+      <div class="state-loading sk" role="status" aria-label="Cargando">
+        <div class="sk-caja"><span class="skel" style="width:40%">Información del trámite</span><span class="skel" style="width:70%">tipo y ciudad</span><span class="skel" style="width:60%">vehículo</span><span class="skel" style="width:50%">responsable</span></div>
+        <div class="sk-caja"><span class="skel" style="width:28%">Bitácora</span><span class="skel" style="width:92%">evento</span><span class="skel" style="width:80%">evento</span><span class="skel" style="width:66%">evento</span></div>
+        <div class="sk-caja"><span class="skel" style="width:30%">Acciones</span><span class="skel" style="width:74%">botón</span><span class="skel" style="width:64%">botón</span></div>
+      </div>
+      <div class="state state-empty">
+        <div class="tarjeta-estado">
+          <span class="estado-ico"><svg class="ico" aria-hidden="true"><use href="#i-inbox"/></svg></span>
+          <h2>Este trámite todavía no tiene movimientos</h2>
+          <p>Se capturó hace un momento y aún nadie ha registrado avance. <b>No es un fallo</b>: la bitácora se llena según pasa el trámite por la dependencia.</p>
+          <div class="acc"><button class="btn p" type="button"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-edit"/></svg>Registrar avance</button></div>
+        </div>
+      </div>
+      <div class="state state-error">
+        <div class="tarjeta-estado es-err">
+          <span class="estado-ico"><svg class="ico" aria-hidden="true"><use href="#i-alert"/></svg></span>
+          <h2>No se pudo cargar el trámite</h2>
+          <p>El servicio no respondió. <b>Nada de lo registrado se perdió</b> y el plazo sigue contándose del lado del servidor: lo que falló fue esta consulta. Vuelve a intentar en unos segundos.</p>
+          <p class="ref" translate="no">Referencia del error: TRM-20260901-1131</p>
+          <div class="acc"><button class="btn p" type="button"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg>Reintentar</button></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- D-PRIMI: presente en todas las pantallas autenticadas del panel (abre el panel lateral, ver maqueta 10) -->
+<button class="fab" aria-label="Abrir D-PRIMI, el asistente del sistema">
+  <span class="ring" aria-hidden="true"></span>
+  <span class="tip" aria-hidden="true">Pregúntale a D-PRIMI</span>
+  <svg width="26" height="24" aria-hidden="true"><use href="#dproma-mark" width="26" height="24"/></svg>
+</button>
+
+<div class="demo" data-andamio role="group" aria-label="Ver la pantalla en sus distintos estados">
+  <span class="et-g">ESTADO</span>
+  <button type="button" data-set="ok" aria-pressed="true">Con datos</button>
+  <button type="button" data-set="loading" aria-pressed="false">Cargando</button>
+  <button type="button" data-set="empty" aria-pressed="false">Vacío</button>
+  <button type="button" data-set="error" aria-pressed="false">Error</button>
+</div>
+
+<script>
+const root = document.documentElement;
+
+// ── Tema ──
+const tBtn = document.getElementById('theme');
+const setTheme = t => {
+  root.dataset.theme = t;
+  document.querySelector('meta[name=theme-color]').content = t === 'dark' ? '#10161F' : '#F2F5F7';
+  tBtn.setAttribute('aria-label', t === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
+  document.getElementById('themeicon').setAttribute('href', t === 'dark' ? '#i-sun' : '#i-moon');
+};
+if (matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+tBtn.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+// ── Arnés de estados (con datos / cargando / vacío / error) ──
+const cont = document.getElementById('contenido');
+document.querySelectorAll('.demo [data-set]').forEach((b) => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.demo [data-set]').forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+    cont.setAttribute('data-state', b.dataset.set);
+  });
+});
+</script>
+</body>
+</html>

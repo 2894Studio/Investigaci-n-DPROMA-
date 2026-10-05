@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F5F7">
+<title>App Personal DPROMA — Checado de Asistencia (instalador)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Michroma&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   SIO-DPROMA — Contrato visual (design tokens)
+   ═══════════════════════════════════════════════════════════════════════ */
+:root{
+  --font-ui:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-brand:'Ethnocentric Rg','Michroma','Inter',sans-serif;
+  --fs-meta:12px;--fs-dense:13px;--fs-base:14px;--fs-sub:16px;--fs-title:20px;--fs-kpi:30px;
+  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-6:24px;--sp-8:32px;--sp-12:48px;
+  --r-ctrl:6px;--r-card:10px;--r-modal:16px;--r-pill:999px;
+  --dur-micro:120ms;--dur-base:200ms;--dur-enter:300ms;
+  --ease-out:cubic-bezier(.23,1,.32,1);--ease-in-out:cubic-bezier(.77,0,.175,1);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);--stagger:40ms;
+  --focus-w:2px;--focus-offset:2px;
+  color-scheme:light;
+}
+:root,[data-theme="light"]{
+  --chrome:#1E4E79;--chrome-ink:#F2F5F7;--chrome-dim:rgba(242,245,247,.72);--chrome-line:rgba(242,245,247,.14);
+  --bg:#F2F5F7;--surface:#FAFCFD;--surface-2:#E7EDF3;--border:rgba(27,36,48,.14);--border-2:rgba(27,36,48,.26);
+  --text:#1B2430;--text-2:#4C5A6B;--text-3:#66717F;
+  --accent:#3E7A4C;--accent-ink:#F7FAF9;--accent-soft:rgba(62,122,76,.10);
+  --ok:#2F8F6F;--ok-fill:rgba(47,143,111,.12);--warn:#B98A1E;--warn-fill:rgba(185,138,30,.14);
+  --err:#C24238;--err-fill:rgba(194,66,56,.11);--block:#9678CC;--block-fill:rgba(150,120,204,.13);
+  --pause:#4A5560;--pause-fill:rgba(74,85,96,.11);
+  --ok-ink:#22705A;--warn-ink:#7E5B0E;--err-ink:#B03A31;--block-ink:#6D4FA3;--pause-ink:#4A5560;
+  --ok-bg:#E2EFEC;--warn-bg:#F1ECDE;--err-bg:#F4E8E7;--block-bg:#EDEBF7;--pause-bg:#E7EAEC;--link:#2F6B3C;
+  --serie-1:#2C6CA8;--serie-2:#7A5FA8;
+  --sh-rest:0 1px 2px rgba(19,29,43,.07);--sh-float:0 6px 18px rgba(19,29,43,.10);--sh-modal:0 24px 60px rgba(19,29,43,.22);
+  --glass:rgba(250,252,253,.66);
+}
+[data-theme="dark"]{
+  color-scheme:dark;
+  --chrome:#122740;--chrome-ink:#E7ECF2;--chrome-dim:rgba(231,236,242,.72);--chrome-line:rgba(231,236,242,.10);
+  --bg:#10161F;--surface:#171F2C;--surface-2:#1D2735;--border:rgba(231,236,242,.12);--border-2:rgba(231,236,242,.24);
+  --text:#E7ECF2;--text-2:#A8B3C2;--text-3:#8B96A6;
+  --accent:#4A8F5A;--accent-ink:#08120D;--accent-soft:rgba(74,143,90,.16);
+  --ok:#4FBF98;--ok-fill:rgba(79,191,152,.14);--warn:#E8C24C;--warn-fill:rgba(232,194,76,.14);
+  --err:#EE6E5F;--err-fill:rgba(238,110,95,.14);--block:#C0A9F0;--block-fill:rgba(192,169,240,.14);
+  --pause:#6B7684;--pause-fill:rgba(107,118,132,.20);
+  --ok-ink:#4FBF98;--warn-ink:#E8C24C;--err-ink:#EE6E5F;--block-ink:#C0A9F0;--pause-ink:#98A4B4;
+  --ok-bg:#1F353B;--warn-bg:#343630;--err-bg:#352A33;--block-bg:#2F3247;--pause-bg:#28303E;--link:#7FC08F;
+  --serie-1:#6FA8DC;--serie-2:#B69BE0;
+  --sh-rest:0 1px 2px rgba(0,0,0,.35);--sh-float:0 6px 18px rgba(0,0,0,.40);--sh-modal:0 24px 60px rgba(0,0,0,.55);
+  --glass:rgba(29,39,53,.55);
+}
+@media (prefers-reduced-motion: reduce){:root{--dur-micro:1ms;--dur-base:120ms;--dur-enter:120ms;--ease-spring:linear;--stagger:0ms}}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-ui);font-size:var(--fs-base);background:var(--bg);color:var(--text);
+  -webkit-font-smoothing:antialiased;touch-action:manipulation;display:flex;justify-content:center;
+  align-items:flex-start;padding:28px;gap:28px;flex-wrap:wrap;
+  transition:background-color var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out)}
+.tnum{font-variant-numeric:tabular-nums}
+svg{display:block}
+.ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ico-sm{width:14px;height:14px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus{outline:none}
+:focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset);border-radius:var(--r-ctrl)}
+button{font-family:var(--font-ui);cursor:pointer;transition:transform var(--dur-micro) var(--ease-out),
+  background-color var(--dur-micro) var(--ease-out),border-color var(--dur-micro) var(--ease-out),
+  color var(--dur-micro) var(--ease-out),opacity var(--dur-micro) var(--ease-out)}
+button:active{transform:scale(.97)}
+button[disabled]{cursor:not-allowed;opacity:.55}
+button[disabled]:active{transform:none}
+
+/* ── Columna del teléfono ── */
+.col{display:flex;flex-direction:column;align-items:center}
+.topbar{width:390px;display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-3)}
+.topbar .brand{display:flex;align-items:center;gap:8px;font-size:var(--fs-dense);color:var(--text-2)}
+.wordmark{font-family:var(--font-brand);letter-spacing:.06em;color:var(--text)}
+.themebtn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border-2);background:var(--surface);
+  color:var(--text);border-radius:var(--r-pill);padding:8px 14px;font:700 var(--fs-meta) var(--font-ui);min-height:38px}
+.themebtn:hover{background:var(--surface-2)}
+
+main.phone{width:390px;display:block;background:var(--bg);border:1px solid var(--border-2);border-radius:34px;overflow:hidden;
+  box-shadow:var(--sh-modal);transition:background-color var(--dur-base) var(--ease-out)}
+.screen{display:flex;flex-direction:column;height:812px}
+.status{display:flex;justify-content:space-between;align-items:center;padding:12px 22px 4px;
+  font-size:11.5px;color:var(--text-2);font-weight:600}
+.status .rt{display:flex;gap:7px;align-items:center}
+
+.hdr{padding:10px 16px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.av{width:38px;height:38px;min-width:38px;border-radius:50%;background:linear-gradient(135deg,var(--chrome),var(--accent));
+  color:var(--chrome-ink);display:grid;place-items:center;font-weight:800;font-size:12.5px}
+.hdr .tt{line-height:1.3;min-width:0}
+.hdr .tt b{font-size:var(--fs-sub);display:block}
+.hdr .tt small{color:var(--text-3);font-size:11px;display:block}
+.sync{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--ok-ink);
+  background:var(--ok-bg);border:1px solid color-mix(in srgb,var(--ok) 35%,transparent);
+  border-radius:var(--r-pill);padding:6px 10px;font-weight:700;white-space:nowrap}
+.sync.off{color:var(--warn-ink);background:var(--warn-bg);border-color:color-mix(in srgb,var(--warn) 35%,transparent)}
+
+.body{flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:14px 16px 16px;
+  display:flex;flex-direction:column;gap:14px}
+[hidden]{display:none !important}
+.view[hidden]{display:none}
+.view{display:flex;flex-direction:column;gap:14px;animation:fade var(--dur-enter) var(--ease-out) both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── Selector de modalidad ── */
+.modeswitch{display:flex;background:var(--surface-2);border-radius:var(--r-pill);padding:4px;gap:4px}
+.modeswitch button{flex:1;border:0;background:transparent;color:var(--text-2);border-radius:var(--r-pill);
+  padding:9px 10px;font:700 12.5px var(--font-ui);display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px}
+.modeswitch button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:14px;box-shadow:var(--sh-rest)}
+
+/* ── Estatus del día ── */
+.daycard b.dt{font-size:var(--fs-sub);display:block;margin-bottom:2px}
+.daycard .sub{font-size:11.5px;color:var(--text-3)}
+.timeline{margin-top:12px;display:flex;flex-direction:column;gap:0}
+.tstep{display:flex;gap:10px;position:relative;padding-bottom:16px}
+.tstep:last-child{padding-bottom:0}
+.tstep::before{content:"";position:absolute;left:10px;top:22px;bottom:0;width:2px;background:var(--border)}
+.tstep:last-child::before{display:none}
+.tdot{width:22px;height:22px;border-radius:50%;background:var(--surface-2);border:2px solid var(--border-2);
+  display:grid;place-items:center;flex-shrink:0;color:var(--text-3)}
+.tdot.done{background:var(--ok-bg);border-color:var(--ok);color:var(--ok-ink)}
+.tdot.next{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.tdot.queued{background:var(--warn-bg);border-color:var(--warn);color:var(--warn-ink)}
+.tinfo b{font-size:13px;display:block}
+.tinfo span{font-size:11px;color:var(--text-3)}
+
+/* ── Botón grande de checado ── */
+.checkbtn{width:100%;border:0;border-radius:var(--r-card);padding:20px 16px;background:var(--accent);color:var(--accent-ink);
+  display:flex;align-items:center;gap:14px;box-shadow:var(--sh-float);text-align:left}
+.checkbtn:hover{background:color-mix(in srgb,var(--accent) 88%, black)}
+.checkbtn .ic{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;flex-shrink:0}
+.checkbtn .ic .ico{width:24px;height:24px}
+.checkbtn .txt{line-height:1.3}
+.checkbtn .txt b{font-size:16px;display:block}
+.checkbtn .txt span{font-size:11.5px;color:var(--accent-ink)}
+.checkbtn .arrow{margin-left:auto}
+
+/* ── Avisos contextuales ── */
+.note{display:flex;gap:10px;border-radius:var(--r-card);padding:12px 13px;align-items:flex-start}
+.note p{font-size:12px;line-height:1.5}
+.note b{display:block;font-size:12.5px;margin-bottom:2px}
+.n-block{background:var(--block-bg);border:1px solid color-mix(in srgb,var(--block) 35%,transparent);color:var(--block-ink)}
+.n-warn{background:var(--warn-bg);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);color:var(--warn-ink)}
+.n-ok{background:var(--ok-bg);border:1px solid color-mix(in srgb,var(--ok) 35%,transparent);color:var(--ok-ink)}
+.n-info{background:var(--surface-2);border:1px solid var(--border);color:var(--text-2)}
+.note .ico{margin-top:1px}
+
+/* ── Pantalla de captura ── */
+.backbtn{display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;color:var(--text-2);
+  font:700 12.5px var(--font-ui);padding:6px 4px;align-self:flex-start;min-height:40px}
+.backbtn:hover{color:var(--text)}
+.captitle b{font-size:var(--fs-title);display:block;line-height:1.25}
+.captitle span{font-size:12px;color:var(--text-3)}
+.camslot{aspect-ratio:4/3;border-radius:var(--r-card);border:2px dashed var(--border-2);background:var(--surface-2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--text-2);text-align:center;padding:12px}
+.camslot b{font-size:12.5px;color:var(--text-2)}
+.camslot small{font-size:11px}
+.camslot.shot{border-style:solid;border-color:var(--ok);color:var(--ok-ink);
+  background:linear-gradient(135deg,var(--ok-bg),var(--surface-2))}
+.camslot.shot b{color:var(--ok-ink)}
+.reqlist{display:flex;flex-direction:column;gap:8px}
+.req{display:flex;align-items:center;gap:10px;background:var(--surface-2);border-radius:var(--r-ctrl);padding:10px 12px}
+.req .ic{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;
+  background:var(--border);color:var(--text-3)}
+.req.done .ic{background:var(--ok-bg);color:var(--ok-ink)}
+.req .rt{flex:1;min-width:0;color:var(--text)}
+.req .rt b{font-size:12.5px;display:block;color:var(--text)}
+.req .rt span{font-size:11px;color:var(--text-2)}
+.pbtn{width:100%;border:0;border-radius:var(--r-ctrl);padding:14px;background:var(--accent);color:var(--accent-ink);
+  font:800 13.5px var(--font-ui);display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px}
+.pbtn:hover:not([disabled]){background:color-mix(in srgb,var(--accent) 88%, black)}
+.abtn{width:100%;border:1px solid var(--border-2);background:var(--surface-2);color:var(--text);border-radius:var(--r-ctrl);
+  padding:12px;font:700 12.5px var(--font-ui);display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px}
+.abtn:hover{background:var(--border)}
+
+/* ── Pantalla de confirmación ── */
+.okhero{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:22px 14px}
+.okhero .ring{width:74px;height:74px;border-radius:50%;background:var(--ok-bg);border:2px solid var(--ok);
+  display:grid;place-items:center;color:var(--ok-ink);animation:pop var(--dur-enter) var(--ease-spring) both}
+.okhero .ring .ico{width:34px;height:34px}
+@keyframes pop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+.okhero b{font-size:var(--fs-title)}
+.okhero .sub{font-size:12.5px;color:var(--text-2)}
+.dl{display:flex;flex-direction:column}
+.dl div{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);font-size:12.5px}
+.dl div:last-child{border-bottom:0}
+.dl dt{color:var(--text-3);min-width:104px;flex-shrink:0}
+.dl dd{color:var(--text);font-weight:600;text-align:right;margin-left:auto}
+
+/* ── Pastillas ── */
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:var(--r-ctrl);padding:3px 9px;font-size:10.5px;font-weight:800;white-space:nowrap}
+.b-ok{background:var(--ok-bg);color:var(--ok-ink)}
+.b-warn{background:var(--warn-bg);color:var(--warn-ink)}
+.b-block{background:var(--block-bg);color:var(--block-ink)}
+.b-info{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}
+
+/* ── Registros del día ── */
+.h2{font-size:var(--fs-sub);font-weight:800;margin:4px 2px 0}
+.regrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.regrow:last-child{border-bottom:0}
+.regrow .ic{width:30px;height:30px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;color:var(--text-2);flex-shrink:0}
+.regrow .rt{flex:1;min-width:0}
+.regrow .rt b{font-size:12.5px;display:block}
+.regrow .rt span{font-size:11px;color:var(--text-2)}
+.orderlink{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2);background:var(--surface-2);
+  border-radius:var(--r-ctrl);padding:9px 11px}
+.orderlink .ico{color:var(--accent)}
+
+.tabbar{display:flex;border-top:1px solid var(--border);background:var(--surface);
+  padding:8px 4px calc(10px + env(safe-area-inset-bottom))}
+.tabbar a{flex:1;text-align:center;font-size:10px;color:var(--text-3);display:flex;flex-direction:column;
+  align-items:center;gap:4px;text-decoration:none;padding:4px 2px;border-radius:var(--r-ctrl);min-height:44px;justify-content:center}
+.tabbar a[aria-current="page"]{color:var(--ok-ink);font-weight:800}
+.tabbar a:hover{background:var(--surface-2)}
+
+/* ── Panel lateral de la demostración ── */
+.cap{width:390px;color:var(--text-2);font-size:var(--fs-dense);line-height:1.65}
+.cap h2{color:var(--text);font-size:var(--fs-sub);margin-bottom:10px}
+.cap ul{margin:10px 0 0 18px;display:flex;flex-direction:column;gap:7px}
+.cap b{color:var(--text)}
+.demo{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:14px;margin-bottom:16px}
+.demo p.lb{margin-bottom:8px;font-weight:700;color:var(--text);font-size:var(--fs-meta)}
+.demo p.lb + .switch{margin-bottom:12px}
+.switch{display:flex;flex-wrap:wrap;gap:6px;background:var(--surface-2);border-radius:var(--r-pill);padding:4px;width:fit-content}
+.switch button{border:0;background:transparent;color:var(--text-2);border-radius:var(--r-pill);padding:9px 13px;
+  font:700 var(--fs-meta) var(--font-ui);display:inline-flex;align-items:center;gap:6px;min-height:38px}
+.switch button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11.5L12 4l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 14 6 10z"/><path d="M10 19a2 2 0 0 0 4 0"/></symbol>
+<symbol id="i-sync" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-14.5 7.1M3 12a9 9 0 0 1 14.5-7.1"/><path d="M3 20v-5h5M21 4v5h-5"/></symbol>
+<symbol id="i-cloudoff" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M7.5 8.1A5 5 0 0 0 7 18h9.5"/><path d="M12.5 6.2A5.5 5.5 0 0 1 20 12c0 1.6-.7 3-1.8 4"/></symbol>
+<symbol id="i-signal" viewBox="0 0 24 24"><path d="M4 19h.01M9 19v-4M14 19v-8M19 19V6"/></symbol>
+<symbol id="i-battery" viewBox="0 0 24 24"><rect x="2" y="7" width="17" height="10" rx="2.5"/><path d="M22 11v2"/><rect x="4.5" y="9.5" width="9" height="5" rx="1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M9 3l6 2.3 6-2.3v15l-6 2.3-6-2.3-6 2.3v-15z"/><path d="M9 3v15M15 5.3v15"/></symbol>
+<symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 3v6M15 3v6"/><path d="M6 9h12v3a6 6 0 0 1-12 0z"/><path d="M12 18v3"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.6 7-12a7 7 0 1 0-14 0c0 5.4 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h2.5l1.5-2h6l1.5 2H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.6"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+<symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.3 12.5l2.6 2.6L16 9.5"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-chevd" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="i-arrowl" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+</defs></svg>
+
+<div class="col">
+<header class="topbar" aria-label="Barra de la demostración">
+  <span class="brand"><span class="wordmark">DPROMA</span> · Asistencia — instalador</span>
+  <button class="themebtn" id="themebtn" aria-pressed="false">
+    <svg class="ico ico-sm" aria-hidden="true" id="themeicon"><use href="#i-moon"/></svg>
+    <span id="themelabel">Oscuro</span>
+  </button>
+</header>
+
+<main class="phone" aria-label="App Personal DPROMA — Checado de Asistencia">
+<h1 class="sr">App Personal DPROMA — Checado de asistencia de Miguel Torres, instalador</h1>
+<div class="screen">
+  <div class="status"><span class="tnum" id="clock">13:58</span>
+    <span class="rt"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-signal"/></svg><svg class="ico ico-sm" aria-hidden="true"><use href="#i-battery"/></svg></span>
+  </div>
+
+  <header class="hdr">
+    <span class="av" aria-hidden="true">MT</span>
+    <div class="tt"><b>Asistencia</b><small>Miguel Torres · Instalador</small></div>
+    <span class="sync" id="syncpill" role="status">
+      <svg class="ico ico-sm" aria-hidden="true" id="syncicon"><use href="#i-sync"/></svg><span id="synctxt">Sincronizado</span></span>
+  </header>
+
+  <div class="body" id="body">
+
+    <!-- ══ Vista 1 · Registro del día ══ -->
+    <section class="view" id="v-dia" aria-label="Registro del día">
+
+      <div class="modeswitch" role="group" aria-label="Modalidad de checado">
+        <button aria-pressed="false" id="tab-sede"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-home"/></svg>Sede</button>
+        <button aria-pressed="true" id="tab-campo"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-map"/></svg>Campo</button>
+      </div>
+
+      <div class="note n-warn" id="queuebanner" hidden>
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-cloudoff"/></svg>
+        <p><b>1 checado guardado en el teléfono</b>
+        Se registró la hora exacta en que lo hiciste. Se enviará solo, en cuanto haya señal — no tienes que repetirlo.</p>
+      </div>
+
+      <section class="card daycard" aria-label="Estado de la jornada de hoy">
+        <b class="dt">Jueves 30 de julio</b>
+        <span class="sub" id="horariotxt">Instaladores · 08:00–17:00 · modalidad Campo</span>
+        <div class="timeline">
+          <div class="tstep"><div class="tdot done"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check-circle"/></svg></div>
+            <div class="tinfo"><b>Entrada — 08:12</b><span translate="no">Almacén CDMX</span></div></div>
+          <div class="tstep"><div class="tdot done"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check-circle"/></svg></div>
+            <div class="tinfo"><b>Inicio de comida — 13:05</b><span>En ruta, Coyoacán</span></div></div>
+          <div class="tstep" id="step3"><div class="tdot next" id="dot3"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"/></svg></div>
+            <div class="tinfo"><b id="step3t">Fin de comida</b><span id="step3s">Siguiente movimiento</span></div></div>
+          <div class="tstep"><div class="tdot"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"/></svg></div>
+            <div class="tinfo"><b>Salida</b><span>Pendiente</span></div></div>
+        </div>
+      </section>
+
+      <button class="checkbtn" id="btnCheck">
+        <span class="ic"><svg class="ico" aria-hidden="true"><use href="#i-camera"/></svg></span>
+        <span class="txt"><b id="checkTitle">Registrar fin de comida</b><span>Toma foto en vivo + ubicación exacta</span></span>
+        <span class="arrow"><svg class="ico ico-sm" aria-hidden="true" style="transform:rotate(-90deg)"><use href="#i-chevd"/></svg></span>
+      </button>
+
+      <div class="note n-block" id="noteCampo">
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-pin"/></svg>
+        <p><b>Modo campo — cualquier ubicación es válida</b>
+        No hay zona que cumplir: el checado se acepta desde donde estés, siempre que la app capture tu punto exacto y una foto en vivo. Sin esos dos datos, el registro no se guarda.</p>
+      </div>
+
+      <div class="note n-info" id="noteSede" hidden>
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-home"/></svg>
+        <p><b>Modo sede — se valida contra la zona del centro de trabajo</b>
+        Estás a <b style="display:inline">32&nbsp;m</b> del <span translate="no">Almacén CDMX</span>, dentro de la zona permitida. Si checas fuera de ella, el registro se guarda igual y se marca para revisión.</p>
+      </div>
+
+      <div class="orderlink" id="orderlink">
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-plug"/></svg>
+        Vinculado a <b class="tnum" style="margin-left:2px" translate="no">ORD-202607-0119</b> — Instalación cargador, Coyoacán
+      </div>
+
+      <h2 class="h2">Registros de hoy</h2>
+      <div class="card" style="padding:4px 14px">
+        <div class="regrow">
+          <span class="ic"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check-circle"/></svg></span>
+          <div class="rt"><b>Entrada · 08:12</b><span translate="no">Almacén CDMX · a 32 m del centro</span></div>
+          <span class="badge b-ok">Puntual</span>
+        </div>
+        <div class="regrow">
+          <span class="ic"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-map"/></svg></span>
+          <div class="rt"><b>Inicio de comida · 13:05</b><span>En ruta, Coyoacán</span></div>
+          <span class="badge b-info">Registro correcto</span>
+        </div>
+        <div class="regrow" id="regQueued" hidden>
+          <span class="ic"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-cloudoff"/></svg></span>
+          <div class="rt"><b>Fin de comida · 14:03</b><span>Guardado en el teléfono</span></div>
+          <span class="badge b-warn">Por enviar</span>
+        </div>
+      </div>
+
+      <button class="abtn"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-file"/></svg>Solicitar incidencia (permiso, corrección, vacaciones…)</button>
+    </section>
+
+    <!-- ══ Vista 2 · Capturando el checado ══ -->
+    <section class="view" id="v-captura" hidden aria-label="Capturando checado">
+      <button class="backbtn" id="btnBack"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrowl"/></svg>Volver</button>
+
+      <div class="captitle">
+        <b id="capTitle">Fin de comida</b>
+        <span>Jueves 30 de julio · <span class="tnum">14:03</span> · modalidad <span id="capMode">Campo</span></span>
+      </div>
+
+      <div class="camslot" id="camslot">
+        <svg class="ico" aria-hidden="true" style="width:32px;height:32px"><use href="#i-camera"/></svg>
+        <b id="camTitle">Foto en vivo obligatoria</b>
+        <small id="camSub">Solo cámara — no se pueden subir fotos de la galería</small>
+      </div>
+      <button class="abtn" id="btnPhoto"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-camera"/></svg>Tomar foto</button>
+
+      <div class="reqlist" aria-live="polite">
+        <div class="req" id="reqGps">
+          <span class="ic"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-pin"/></svg></span>
+          <span class="rt"><b id="gpsT">Obteniendo ubicación…</b><span id="gpsS">Necesitamos tu punto exacto</span></span>
+        </div>
+        <div class="req" id="reqPhoto">
+          <span class="ic"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-camera"/></svg></span>
+          <span class="rt"><b id="phT">Foto pendiente</b><span id="phS">Toca "Tomar foto" para capturarla</span></span>
+        </div>
+        <div class="req done" id="reqOrder">
+          <span class="ic"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-plug"/></svg></span>
+          <span class="rt"><b>Orden del día detectada</b><span translate="no">ORD-202607-0119 — Coyoacán</span></span>
+        </div>
+      </div>
+
+      <div class="note n-info">
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-lock"/></svg>
+        <p>La hora que cuenta es la del servidor al recibir el checado, no la del teléfono. El resultado se calcula ahí y ya no vuelve a cambiar.</p>
+      </div>
+
+      <button class="pbtn" id="btnConfirm" disabled>
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg><span id="confirmTxt">Faltan datos por capturar</span></button>
+    </section>
+
+    <!-- ══ Vista 3 · Checado confirmado ══ -->
+    <section class="view" id="v-ok" hidden aria-label="Checado confirmado">
+      <div class="card okhero">
+        <span class="ring" id="okRing"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg></span>
+        <b id="okTitle">Fin de comida registrado</b>
+        <span class="sub" id="okSub">Jueves 30 de julio · <span class="tnum">14:03</span></span>
+        <span class="badge b-ok" id="okBadge">Registro confirmado</span>
+      </div>
+
+      <div class="card">
+        <dl class="dl">
+          <div><dt>Movimiento</dt><dd>Fin de comida</dd></div>
+          <div><dt>Hora</dt><dd class="tnum">14:03</dd></div>
+          <div><dt>Modalidad</dt><dd id="okMode">Campo</dd></div>
+          <div><dt>Ubicación</dt><dd id="okLoc">En ruta, Coyoacán</dd></div>
+          <div><dt>Precisión</dt><dd class="tnum">±8 m</dd></div>
+          <div><dt>Foto</dt><dd>Adjunta</dd></div>
+          <div><dt>Orden</dt><dd class="tnum" translate="no">ORD-202607-0119</dd></div>
+        </dl>
+      </div>
+
+      <div class="note n-ok" id="okNote">
+        <svg class="ico ico-sm" aria-hidden="true"><use href="#i-lock"/></svg>
+        <p><b>Este registro ya no cambia</b>
+        Si algo quedó mal, no se edita: se solicita una corrección y Recursos Humanos la revisa.</p>
+      </div>
+
+      <button class="abtn" id="btnFix"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-file"/></svg>Solicitar corrección de este registro</button>
+      <button class="pbtn" id="btnDone">Volver al día</button>
+    </section>
+
+  </div>
+
+  <nav class="tabbar" aria-label="Navegación principal">
+    <a href="#"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg>Hoy</a>
+    <a href="#" aria-current="page"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg>Asistencia</a>
+    <a href="#"><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg>Incidencias</a>
+    <a href="#"><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg>Avisos</a>
+  </nav>
+</div>
+</main>
+</div>
+
+<aside class="cap">
+  <div class="demo">
+    <p class="lb">Pantalla</p>
+    <div class="switch" role="group" aria-label="Cambiar de pantalla">
+      <button aria-pressed="true" data-go="dia">Registro del día</button>
+      <button aria-pressed="false" data-go="captura">Capturando checado</button>
+      <button aria-pressed="false" data-go="ok">Checado confirmado</button>
+    </div>
+    <p class="lb">Conexión</p>
+    <div class="switch" role="group" aria-label="Cambiar estado de conexión">
+      <button aria-pressed="true" data-net="on">Con señal</button>
+      <button aria-pressed="false" data-net="off">Sin conexión</button>
+    </div>
+  </div>
+
+  <h2>Checado de asistencia — instalador</h2>
+  <p>Escenario de campo: el instalador arranca en el almacén y pasa el resto del día en ruta.
+    Los botones de arriba y los del propio teléfono funcionan — se puede recorrer el flujo completo.</p>
+  <ul>
+    <li><b>Sede vs. Campo:</b> en Sede el checado se valida contra la zona del centro de trabajo. En Campo
+      <b>cualquier ubicación es válida</b>, siempre que se capture el punto exacto.</li>
+    <li><b>Foto en vivo + ubicación, siempre obligatorias.</b> Es el control antifraude: sin fricción extra,
+      y Recursos Humanos valida a mano cuando algo se ve raro.</li>
+    <li>El resultado (puntualidad, ubicación, estado) se calcula en el servidor y <b>se congela</b> —
+      nunca se recalcula después. Corregir algo se pide como incidencia, no se edita.</li>
+    <li><b>Se conecta con el Seguimiento del Instalador:</b> el checado en campo se liga a la orden del día
+      y aparece en las dos líneas de tiempo.</li>
+    <li><b>Sin conexión</b> el checado se guarda en el teléfono con su hora real y se envía solo al recuperar
+      señal: la persona no repite nada y no pierde el registro.</li>
+  </ul>
+</aside>
+
+<script>
+/* ── Tema claro/oscuro ── */
+const root = document.documentElement;
+const themebtn = document.getElementById('themebtn'), themeicon = document.getElementById('themeicon'),
+      themelabel = document.getElementById('themelabel');
+function applyTheme(t){
+  root.dataset.theme = t;
+  document.querySelector('meta[name=theme-color]').content = t === 'dark' ? '#10161F' : '#F2F5F7';
+  themebtn.setAttribute('aria-pressed', String(t === 'dark'));
+  themeicon.innerHTML = '<use href="#i-' + (t === 'dark' ? 'sun' : 'moon') + '"/>';
+  themelabel.textContent = t === 'dark' ? 'Claro' : 'Oscuro';
+}
+let theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+applyTheme(theme);
+themebtn.addEventListener('click', () => { theme = theme === 'dark' ? 'light' : 'dark'; applyTheme(theme); });
+
+/* ── Estado de la demostración ── */
+const S = { view:'dia', mode:'campo', online:true, gps:false, photo:false, sent:false };
+const $ = id => document.getElementById(id);
+const views = { dia:$('v-dia'), captura:$('v-captura'), ok:$('v-ok') };
+
+function pressGroup(sel, attr, val){
+  document.querySelectorAll(sel).forEach(b => b.setAttribute('aria-pressed', String(b.dataset[attr] === val)));
+}
+
+function showView(name){
+  S.view = name;
+  Object.keys(views).forEach(k => { views[k].hidden = k !== name; });
+  pressGroup('[data-go]', 'go', name);
+  $('body').scrollTop = 0;
+  if (name === 'captura') startCapture();
+}
+
+/* ── Modalidad Sede / Campo ── */
+function setMode(m){
+  S.mode = m;
+  $('tab-sede').setAttribute('aria-pressed', String(m === 'sede'));
+  $('tab-campo').setAttribute('aria-pressed', String(m === 'campo'));
+  $('noteCampo').hidden = m !== 'campo';
+  $('noteSede').hidden  = m === 'campo';
+  $('orderlink').hidden = m !== 'campo';
+  $('reqOrder').hidden  = m !== 'campo';
+  $('capMode').textContent = m === 'campo' ? 'Campo' : 'Sede';
+  $('okMode').textContent  = m === 'campo' ? 'Campo' : 'Sede';
+  $('okLoc').textContent   = m === 'campo' ? 'En ruta, Coyoacán' : 'Almacén CDMX · a 32 m del centro';
+  $('horariotxt').textContent = m === 'campo'
+    ? 'Instaladores · 08:00–17:00 · modalidad Campo'
+    : 'Instaladores · 08:00–17:00 · Almacén CDMX';
+}
+$('tab-sede').addEventListener('click', () => setMode('sede'));
+$('tab-campo').addEventListener('click', () => setMode('campo'));
+
+/* ── Conexión ── */
+function setNet(on){
+  S.online = on;
+  pressGroup('[data-net]', 'net', on ? 'on' : 'off');
+  const pill = $('syncpill');
+  pill.classList.toggle('off', !on);
+  $('syncicon').innerHTML = '<use href="#i-' + (on ? 'sync' : 'cloudoff') + '"/>';
+  $('synctxt').textContent = on ? 'Sincronizado' : 'Sin conexión';
+  $('queuebanner').hidden = !(!on && S.sent);
+  $('regQueued').hidden   = !(!on && S.sent);
+  refreshConfirm();
+  if (S.view === 'ok') paintOk();
+}
+document.querySelectorAll('[data-net]').forEach(b => b.addEventListener('click', () => setNet(b.dataset.net === 'on')));
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => {
+  if (b.dataset.go === 'ok') { S.sent = true; paintOk(); }
+  showView(b.dataset.go);
+}));
+
+/* ── Pantalla de captura ── */
+function startCapture(){
+  S.gps = false; S.photo = false;
+  $('camslot').classList.remove('shot');
+  $('camTitle').textContent = 'Foto en vivo obligatoria';
+  $('camSub').textContent = 'Solo cámara — no se pueden subir fotos de la galería';
+  $('btnPhoto').hidden = false;
+  $('reqPhoto').classList.remove('done');
+  $('phT').textContent = 'Foto pendiente'; $('phS').textContent = 'Toca "Tomar foto" para capturarla';
+  $('reqGps').classList.remove('done');
+  $('gpsT').textContent = 'Obteniendo ubicación…'; $('gpsS').textContent = 'Necesitamos tu punto exacto';
+  refreshConfirm();
+  setTimeout(() => {
+    if (S.view !== 'captura') return;
+    S.gps = true;
+    $('reqGps').classList.add('done');
+    $('gpsT').textContent = 'Ubicación capturada';
+    $('gpsS').textContent = S.mode === 'campo'
+      ? 'En ruta, Coyoacán · precisión ±8 m'
+      : 'Almacén CDMX · a 32 m del centro, dentro de la zona';
+    refreshConfirm();
+  }, 900);
+}
+$('btnPhoto').addEventListener('click', () => {
+  S.photo = true;
+  $('camslot').classList.add('shot');
+  $('camTitle').textContent = 'Foto capturada';
+  $('camSub').textContent = 'Tomada con la cámara, hace unos segundos';
+  $('btnPhoto').hidden = true;
+  $('reqPhoto').classList.add('done');
+  $('phT').textContent = 'Foto lista'; $('phS').textContent = 'Se envía junto con el checado';
+  refreshConfirm();
+});
+function refreshConfirm(){
+  const ready = S.gps && S.photo;
+  $('btnConfirm').disabled = !ready;
+  $('confirmTxt').textContent = !ready ? 'Faltan datos por capturar'
+    : (S.online ? 'Confirmar y enviar checado' : 'Guardar y enviar al recuperar señal');
+}
+$('btnConfirm').addEventListener('click', () => { S.sent = true; paintOk(); showView('ok'); });
+$('btnBack').addEventListener('click', () => showView('dia'));
+$('btnCheck').addEventListener('click', () => showView('captura'));
+$('btnDone').addEventListener('click', () => { paintDia(); showView('dia'); });
+
+/* ── Resultado ── */
+function paintOk(){
+  const on = S.online;
+  $('okTitle').textContent = on ? 'Fin de comida registrado' : 'Fin de comida guardado';
+  $('okBadge').textContent = on ? 'Registro confirmado' : 'Por enviar — pendiente de señal';
+  $('okBadge').className = 'badge ' + (on ? 'b-ok' : 'b-warn');
+  $('okRing').style.background = on ? 'var(--ok-bg)' : 'var(--warn-bg)';
+  $('okRing').style.borderColor = on ? 'var(--ok)' : 'var(--warn)';
+  $('okRing').style.color = on ? 'var(--ok-ink)' : 'var(--warn-ink)';
+  $('okRing').innerHTML = '<svg class="ico" aria-hidden="true"><use href="#i-' + (on ? 'check' : 'cloudoff') + '"/></svg>';
+  $('okNote').className = 'note ' + (on ? 'n-ok' : 'n-warn');
+  $('okNote').querySelector('p').innerHTML = on
+    ? '<b>Este registro ya no cambia</b>Si algo quedó mal, no se edita: se solicita una corrección y Recursos Humanos la revisa.'
+    : '<b>Guardado con su hora real</b>Se envía solo en cuanto haya señal. La hora que cuenta es la de este momento, no la del envío.';
+  $('btnFix').hidden = !on;
+}
+function paintDia(){
+  if (!S.sent) return;
+  const on = S.online;
+  $('dot3').className = 'tdot ' + (on ? 'done' : 'queued');
+  $('dot3').innerHTML = '<svg class="ico ico-sm" aria-hidden="true"><use href="#i-' + (on ? 'check-circle' : 'cloudoff') + '"/></svg>';
+  $('step3t').textContent = 'Fin de comida — 14:03';
+  $('step3s').textContent = on ? (S.mode === 'campo' ? 'En ruta, Coyoacán' : 'Almacén CDMX')
+                               : 'Guardado en el teléfono, por enviar';
+  $('checkTitle').textContent = 'Registrar salida';
+  $('clock').textContent = '14:03';
+  $('queuebanner').hidden = on;
+  $('regQueued').hidden = on;
+}
+
+setMode('campo');
+setNet(true);
+</script>
+</body>
+</html>

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es-MX" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F5F7">
+<title>SIO-DPROMA — Panel de Asistencia RHL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════════════════════
+   Panel de Asistencia — RHL
+   ══════════════════════════════════════════════════════════════════════ */
+:root{
+  --font-ui:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-brand:'Ethnocentric Rg','Michroma','Inter',sans-serif;
+  --fs-meta:12px;--fs-dense:13px;--fs-base:14px;--fs-sub:16px;--fs-title:20px;--fs-kpi:30px;
+  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-6:24px;--sp-8:32px;
+  --r-ctrl:6px;--r-card:10px;--r-modal:16px;--r-pill:999px;
+  --row:40px;
+  --dur-micro:120ms;--dur-base:200ms;--dur-enter:300ms;
+  --ease-out:cubic-bezier(.23,1,.32,1);--ease-in-out:cubic-bezier(.77,0,.175,1);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);--stagger:40ms;
+  color-scheme:light;
+}
+:root,[data-theme="light"]{
+  --chrome:#1E4E79;--chrome-ink:#F2F5F7;--chrome-dim:rgba(242,245,247,.74);--chrome-line:rgba(242,245,247,.14);
+  --bg:#F2F5F7;--surface:#FAFCFD;--surface-2:#E7EDF3;--border:rgba(27,36,48,.14);--border-2:rgba(27,36,48,.26);
+  --text:#1B2430;--text-2:#4C5A6B;--text-3:#66717F;
+  --accent:#3E7A4C;--accent-ink:#F7FAF9;--accent-soft:rgba(62,122,76,.10);
+  --ok:#2F8F6F;--ok-fill:rgba(47,143,111,.12);--warn:#B98A1E;--warn-fill:rgba(185,138,30,.14);
+  --err:#C24238;--err-fill:rgba(194,66,56,.11);--block:#9678CC;--block-fill:rgba(150,120,204,.13);
+  --pause:#4A5560;--pause-fill:rgba(74,85,96,.11);
+  --ok-ink:#22705A;--warn-ink:#7E5B0E;--err-ink:#B03A31;--block-ink:#6D4FA3;--pause-ink:#4A5560;
+  --ok-bg:#E2EFEC;--warn-bg:#F1ECDE;--err-bg:#F4E8E7;--block-bg:#EDEBF7;--pause-bg:#E7EAEC;--link:#2F6B3C;
+  --serie-1:#2C6CA8;--serie-2:#7A5FA8;
+  --sh-rest:0 1px 2px rgba(19,29,43,.07);--sh-float:0 6px 18px rgba(19,29,43,.10);--sh-modal:0 24px 60px rgba(19,29,43,.22);
+  --glass:rgba(250,252,253,.66);
+}
+[data-theme="dark"]{
+  color-scheme:dark;
+  --chrome:#122740;--chrome-ink:#E7ECF2;--chrome-dim:rgba(231,236,242,.74);--chrome-line:rgba(231,236,242,.10);
+  --bg:#10161F;--surface:#171F2C;--surface-2:#1D2735;--border:rgba(231,236,242,.12);--border-2:rgba(231,236,242,.24);
+  --text:#E7ECF2;--text-2:#A8B3C2;--text-3:#8B96A6;
+  --accent:#4A8F5A;--accent-ink:#08120D;--accent-soft:rgba(74,143,90,.16);
+  --ok:#4FBF98;--ok-fill:rgba(79,191,152,.14);--warn:#E8C24C;--warn-fill:rgba(232,194,76,.14);
+  --err:#EE6E5F;--err-fill:rgba(238,110,95,.14);--block:#C0A9F0;--block-fill:rgba(192,169,240,.14);
+  --pause:#6B7684;--pause-fill:rgba(107,118,132,.20);
+  --ok-ink:#4FBF98;--warn-ink:#E8C24C;--err-ink:#EE6E5F;--block-ink:#C0A9F0;--pause-ink:#98A4B4;
+  --ok-bg:#1F353B;--warn-bg:#343630;--err-bg:#352A33;--block-bg:#2F3247;--pause-bg:#28303E;--link:#7FC08F;
+  --serie-1:#6FA8DC;--serie-2:#B69BE0;
+  --sh-rest:0 1px 2px rgba(0,0,0,.35);--sh-float:0 6px 18px rgba(0,0,0,.40);--sh-modal:0 24px 60px rgba(0,0,0,.55);
+  --glass:rgba(29,39,53,.55);
+}
+@media (prefers-reduced-motion: reduce){
+  :root{--dur-micro:1ms;--dur-base:120ms;--dur-enter:120ms;--ease-spring:linear;--stagger:0ms}
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-ui);font-size:var(--fs-base);background:var(--bg);color:var(--text);
+  -webkit-font-smoothing:antialiased;touch-action:manipulation;
+  transition:background-color var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out)}
+.tnum{font-variant-numeric:tabular-nums}
+.wordmark{font-family:var(--font-brand);font-weight:400;letter-spacing:.08em}
+h1,h2,h3{text-wrap:balance}
+svg{display:block}
+.ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ico-sm{width:14px;height:14px}
+.ico-xs{width:11px;height:11px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--r-ctrl)}
+.side :focus-visible{outline-color:#9FE0AE}
+.skip{position:absolute;left:var(--sp-2);top:-60px;z-index:200;background:var(--accent);color:var(--accent-ink);
+  padding:var(--sp-2) var(--sp-4);border-radius:var(--r-ctrl);font-weight:600;
+  transition:transform var(--dur-base) var(--ease-out)}
+.skip:focus-visible{transform:translateY(72px)}
+button,.pressable{transition:transform var(--dur-micro) var(--ease-out),
+  background-color var(--dur-micro) var(--ease-out),border-color var(--dur-micro) var(--ease-out),
+  color var(--dur-micro) var(--ease-out),opacity var(--dur-micro) var(--ease-out)}
+button:active,.pressable:active{transform:scale(.97)}
+
+.app{display:flex;min-height:100vh}
+.side{width:236px;background:var(--chrome);color:var(--chrome-ink);padding:var(--sp-4) var(--sp-3);
+  display:flex;flex-direction:column;gap:2px;flex-shrink:0}
+.side .logo{display:flex;flex-direction:column;align-items:center;gap:var(--sp-2);
+  padding:var(--sp-2) var(--sp-2) var(--sp-4);border-bottom:1px solid var(--chrome-line);margin-bottom:var(--sp-2)}
+.grp{margin:var(--sp-4) var(--sp-2) var(--sp-1);font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}
+.it{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;color:var(--chrome-dim);
+  font-size:13.5px;text-decoration:none;border-left:3px solid transparent;
+  transition:background-color var(--dur-micro) var(--ease-out),color var(--dur-micro) var(--ease-out)}
+.it:hover{background:rgba(255,255,255,.08);color:var(--chrome-ink)}
+.it:active{transform:scale(.98)}
+.it[aria-current="page"]{background:rgba(255,255,255,.12);color:var(--chrome-ink);font-weight:600;border-left-color:var(--ok)}
+.it .n{margin-left:auto;background:var(--err);color:#2A1512;border-radius:var(--r-pill);
+  font-size:10.5px;font-weight:800;padding:1px 7px;font-variant-numeric:tabular-nums}
+.it .n.b{background:rgba(255,255,255,.18);color:var(--chrome-ink)}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{display:flex;align-items:center;gap:var(--sp-4);padding:10px var(--sp-6);
+  border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:20}
+.top h1{font-size:var(--fs-sub);font-weight:700}
+.searchbox{flex:1;max-width:420px;position:relative;display:flex;align-items:center}
+.searchbox .ico{position:absolute;left:11px;color:var(--text-3);pointer-events:none}
+.searchbox input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-ctrl);
+  padding:9px 12px 9px 36px;color:var(--text);font:400 var(--fs-dense) var(--font-ui);
+  transition:border-color var(--dur-micro) var(--ease-out)}
+.searchbox input::placeholder{color:var(--text-3)}
+.searchbox input:hover{border-color:var(--border-2)}
+.kbd{position:absolute;right:10px;font-size:10.5px;color:var(--text-3);border:1px solid var(--border);
+  border-radius:4px;padding:1px 5px;pointer-events:none}
+.top .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.iconbtn{position:relative;width:36px;height:36px;border:1px solid var(--border);border-radius:var(--r-ctrl);
+  display:grid;place-items:center;cursor:pointer;background:transparent;color:var(--text-2)}
+.iconbtn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
+.iconbtn .dot{position:absolute;top:5px;right:6px;width:8px;height:8px;border-radius:50%;
+  background:var(--err);outline:2px solid var(--surface)}
+.prof{display:flex;align-items:center;gap:10px;background:transparent;border:1px solid transparent;
+  border-radius:var(--r-ctrl);padding:3px 8px 3px 3px;cursor:pointer;color:var(--text);text-align:left}
+.prof:hover{background:var(--surface-2);border-color:var(--border)}
+.av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1E4E79,#3E7A4C);
+  color:#F2F5F7;display:grid;place-items:center;font-weight:700;font-size:12px;flex-shrink:0}
+.prof small{display:block;color:var(--text-3);font-size:11px}
+
+.content{padding:var(--sp-6);padding-bottom:96px;display:flex;flex-direction:column;gap:var(--sp-4);min-width:0}
+.head{display:flex;align-items:baseline;gap:var(--sp-3);flex-wrap:wrap}
+.head h2{font-size:var(--fs-title);font-weight:700;letter-spacing:-.01em}
+.head .rolechip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);
+  background:var(--surface);border-radius:var(--r-pill);padding:4px 11px;font-size:11.5px;color:var(--text-2)}
+.head .upd{margin-left:auto;color:var(--text-3);font-size:var(--fs-meta);display:inline-flex;align-items:center;gap:6px}
+.enter{opacity:0;transform:translateY(8px);animation:enter var(--dur-enter) var(--ease-out) forwards}
+@keyframes enter{to{opacity:1;transform:translateY(0)}}
+
+.kpi-zone{display:grid;grid-template-columns:minmax(300px,1.15fr) 2.6fr;gap:var(--sp-3);align-items:stretch}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--sh-rest)}
+.hero{padding:var(--sp-4) var(--sp-4) var(--sp-3);display:flex;flex-direction:column;gap:var(--sp-2);
+  background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-color:var(--border-2)}
+.hero .lbl{font-size:var(--fs-dense);color:var(--text-2);display:flex;align-items:center;gap:6px}
+.hero .chip{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-ctrl);padding:var(--sp-3) var(--sp-4)}
+.hero .v{font-size:38px;font-weight:700;letter-spacing:-.02em;line-height:1.05}
+.hero .v small{font-size:var(--fs-dense);font-weight:600;color:var(--text-2);letter-spacing:0}
+.slabar{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;margin-top:var(--sp-3)}
+.slabar i{display:block;height:100%;border-radius:2px;transform-origin:left;transform:scaleX(0);
+  animation:grow var(--dur-enter) var(--ease-out) forwards}
+@keyframes grow{to{transform:scaleX(1)}}
+.slabar .s-ok{background:var(--ok)}
+.slabar .s-warn{background:var(--warn);background-image:repeating-linear-gradient(45deg,transparent 0 3px,rgba(0,0,0,.22) 3px 6px)}
+.slabar .s-err{background:var(--err);background-image:repeating-linear-gradient(-45deg,transparent 0 2px,rgba(0,0,0,.32) 2px 4px)}
+.slalegend{display:flex;gap:var(--sp-4);margin-top:var(--sp-2);font-size:11.5px;color:var(--text-2);flex-wrap:wrap}
+.slalegend b{color:var(--text);font-weight:700}
+.slalegend span{display:inline-flex;align-items:center;gap:5px}
+.mini-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--sp-3)}
+.mini{padding:var(--sp-3) var(--sp-4);display:flex;flex-direction:column;justify-content:space-between;gap:var(--sp-2)}
+.mini .lbl{font-size:11.5px;color:var(--text-2);display:flex;align-items:center;gap:6px;line-height:1.3}
+.mini .v{font-size:var(--fs-kpi);font-weight:700;letter-spacing:-.02em;line-height:1}
+.mini .v small{font-size:var(--fs-dense);font-weight:600;color:var(--text-2);letter-spacing:0}
+.tag{display:inline-flex;align-items:center;gap:4px;border-radius:5px;padding:2px 7px;font-size:10.5px;font-weight:700}
+.t-ok{background:var(--ok-bg);color:var(--ok-ink)}
+.t-err{background:var(--err-bg);color:var(--err-ink)}
+.t-warn{background:var(--warn-bg);color:var(--warn-ink)}
+.t-block{background:var(--block-bg);color:var(--block-ink)}
+.t-mute{color:var(--text-3);font-weight:600;font-size:11px}
+
+.row2{display:grid;grid-template-columns:1.5fr 1fr;gap:var(--sp-3);align-items:start}
+.panel{padding:var(--sp-4) var(--sp-4) var(--sp-3)}
+.panel h3{font-size:var(--fs-dense);font-weight:700}
+.panel .sub{color:var(--text-3);font-size:11.5px;margin-top:2px}
+.panel-h{display:flex;align-items:flex-start;gap:var(--sp-3);margin-bottom:var(--sp-3)}
+
+/* ── Bandeja de incidencias — dictamen SOLO RHL (S-solo-RHL) ── */
+.inc[data-resuelta] .body b{color:var(--text-2);font-weight:600}
+.inc{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:var(--fs-dense);
+  align-items:flex-start}
+.inc:last-of-type{border-bottom:0}
+.inc .badge{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;flex-shrink:0;margin-top:1px}
+.i-warn .badge{background:var(--warn-bg);color:var(--warn-ink)}
+.i-block .badge{background:var(--block-bg);color:var(--block-ink)}
+.i-err .badge{background:var(--err-bg);color:var(--err-ink)}
+.inc .body{min-width:0;flex:1}
+.inc .body b{display:block;font-size:var(--fs-dense);line-height:1.35}
+.inc .body span{color:var(--text-2);font-size:var(--fs-meta);display:block;margin-top:1px}
+.inc .acts{display:flex;gap:6px;margin-top:8px}
+.mini-btn{border:1px solid var(--border);background:var(--surface);color:var(--text-2);border-radius:var(--r-ctrl);
+  padding:4px 10px;font:600 11.5px var(--font-ui);cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.mini-btn:hover{background:var(--surface-2);border-color:var(--border-2);color:var(--text)}
+.mini-btn.ok{background:var(--ok-bg);border-color:color-mix(in srgb,var(--ok) 45%,transparent);color:var(--ok-ink);font-weight:700}
+.mini-btn.ok:hover{filter:brightness(1.08)}
+.mini-btn.rej{background:transparent;border-color:var(--err);color:var(--err-ink)}
+
+/* ── Log de asistencia ── */
+table{width:100%;border-collapse:collapse;font-size:var(--fs-dense);table-layout:fixed}
+caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+thead th{text-align:left;color:var(--text-3);font-size:11px;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;padding:var(--sp-2) 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody th{text-align:left;font-weight:400;font-size:var(--fs-dense);color:var(--text);padding:0 10px;
+  height:var(--row);border-bottom:1px solid var(--border);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+td{padding:0 10px;height:var(--row);border-bottom:1px solid var(--border);vertical-align:middle;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tbody tr{transition:background-color var(--dur-micro) var(--ease-out)}
+tbody tr:hover{background:var(--surface-2)}
+tbody tr:last-child td,tbody tr:last-child th{border-bottom:0}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:var(--r-ctrl);padding:3px 9px;
+  font-size:11px;font-weight:700;white-space:nowrap}
+.p-ok{background:var(--ok-bg);color:var(--ok-ink)}
+.p-warn{background:var(--warn-bg);color:var(--warn-ink)}
+.p-err{background:var(--err-bg);color:var(--err-ink)}
+.p-block{background:var(--block-bg);color:var(--block-ink)}
+.p-mute{background:var(--surface-2);color:var(--text-2)}
+.tfoot{display:flex;align-items:center;color:var(--text-3);font-size:var(--fs-meta);padding-top:10px;gap:var(--sp-2);flex-wrap:wrap}
+.pag{margin-left:auto;display:flex;gap:5px}
+.pag button{background:var(--surface);border:1px solid var(--border);color:var(--text-2);
+  border-radius:var(--r-ctrl);min-width:32px;height:32px;padding:0 8px;cursor:pointer;font:600 var(--fs-meta) var(--font-ui)}
+.pag button:hover{background:var(--surface-2);color:var(--text)}
+.pag button[aria-current="page"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);
+  color:var(--text);border-radius:var(--r-ctrl);padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);cursor:pointer}
+.btn:hover{background:var(--surface-2);border-color:var(--border-2)}
+.btn.p{background:var(--accent);border-color:transparent;color:var(--accent-ink)}
+.btn.p:hover{filter:brightness(1.08)}
+
+/* ══ Estados de la tabla: cargando · vacío · error ══ */
+.skel{display:block;height:12px;border-radius:4px;
+  background:linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%);
+  background-size:200% 100%;animation:shimmer 1.4s linear infinite;color:transparent}
+@keyframes shimmer{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.skel{animation:none}}
+.state{display:none;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-2);padding:var(--sp-8) var(--sp-4)}
+.state .ico{width:30px;height:30px;color:var(--text-3)}
+.state b{font-size:var(--fs-base)}
+.state p{color:var(--text-2);font-size:var(--fs-dense);max-width:56ch;line-height:1.55}
+[data-state="empty"] .state-empty,[data-state="error"] .state-error{display:flex}
+[data-state="empty"] .real,[data-state="error"] .real,[data-state="loading"] .real{display:none}
+[data-state="loading"] .state-loading{display:block}
+.state-loading{display:none}
+#incVacio:not([hidden]){display:flex}
+
+/* ══ Controles de la maqueta (no forman parte del producto) ══ */
+.demo{position:fixed;left:16px;bottom:16px;z-index:60;display:flex;gap:6px;
+  background:var(--surface);border:1px solid var(--border-2);border-radius:var(--r-pill);
+  padding:5px;box-shadow:var(--sh-modal);align-items:center;flex-wrap:wrap;max-width:94vw}
+.demo span{font-size:10.5px;color:var(--text-3);font-weight:700;letter-spacing:.06em;padding:0 8px}
+.demo button{border:0;background:transparent;color:var(--text-2);border-radius:var(--r-pill);
+  padding:6px 12px;font:600 11.5px var(--font-ui);cursor:pointer}
+.demo button:hover{background:var(--surface-2);color:var(--text)}
+.demo button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+
+/* ── Filtros: conmutador Sede/Campo + búsqueda ── */
+.filters{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap;margin-bottom:var(--sp-3)}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:var(--r-pill);padding:3px;gap:2px}
+.seg button{border:0;background:transparent;color:var(--text-2);border-radius:var(--r-pill);
+  padding:6px 13px;font:600 12.5px var(--font-ui);cursor:pointer;position:relative}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:var(--sh-rest)}
+.selfilter{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-ctrl);
+  padding:7px 10px;font:400 var(--fs-dense) var(--font-ui);color:var(--text)}
+
+/* ── Horarios y zonas vigentes ── */
+.cfg-row{display:flex;align-items:center;gap:var(--sp-3);padding:10px 0;border-bottom:1px solid var(--border);font-size:var(--fs-dense)}
+.cfg-row:last-child{border-bottom:0}
+.cfg-row .nm{font-weight:600;min-width:180px}
+.cfg-row .meta{color:var(--text-2);font-size:var(--fs-meta)}
+.tinote{display:flex;gap:8px;align-items:flex-start;background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r-ctrl);padding:10px 12px;font-size:var(--fs-meta);color:var(--text-2);margin-top:var(--sp-3)}
+.tinote .ico{color:var(--text-3);margin-top:1px}
+
+@media (max-width:1180px){
+  .kpi-zone{grid-template-columns:1fr}
+  .mini-grid{grid-template-columns:repeat(2,1fr)}
+  .row2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido principal</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="lgrad" x1="1233.32" y1="931.42" x2="1233.32" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c361e"/><stop offset="0.14" stop-color="#12572b"/><stop offset="0.32" stop-color="#2e823d"/><stop offset="0.48" stop-color="#60a84b"/><stop offset="0.64" stop-color="#76b552"/><stop offset="0.78" stop-color="#a5c86a"/><stop offset="1" stop-color="#c7d97b"/></linearGradient>
+<symbol id="dproma-mark" viewBox="740 0 970 932"><path fill="url(#lgrad)" d="M869.35,924.63H811.84c-39.82,0-66.56-40.83-50.66-77.33L1048.86,108C1083.11,29.8,1146.12,0,1243.39,0c95.89,0,158.91,29.8,191.79,108L1705.76,854.8c15.27,36.41-11.47,76.62-51,76.62h-59.54a55.27,55.27,0,0,1-51-34L1285.73,191c-8.22-19.86-23.29-28.56-45.21-28.56s-37,8.7-46.58,28.56L920,891.4A55.26,55.26,0,0,1,869.35,924.63Z"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 4v13M15 7v13"/></symbol>
+<symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13l3.5 7v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+<symbol id="i-report" viewBox="0 0 24 24"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12.5" y="7" width="3" height="10" rx="1"/><rect x="18" y="13" width="3" height="4" rx="1"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+<symbol id="i-alertc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></symbol>
+<symbol id="i-chevd" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="i-badge" viewBox="0 0 24 24"><path d="M12 2l2.6 5.3 5.9.9-4.2 4.1 1 5.8L12 15.4 6.7 18.1l1-5.8L3.5 8.2l5.9-.9z"/></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+<symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M2 13h20"/></symbol>
+<symbol id="i-userplus" viewBox="0 0 24 24"><circle cx="9.5" cy="8" r="3.6"/><path d="M3 20a6.5 6.5 0 0 1 13 0"/><path d="M18 8h5M20.5 5.5v5"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4.5A2 2 0 0 1 6 3h13v15H6a2 2 0 0 0-2 2z"/><path d="M4 18.5V21h15v-3"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="14" r="4"/><path d="M11 11l9-9M17.5 4.5l2 2M15 7l2 2"/></symbol>
+<symbol id="i-sun2" viewBox="0 0 24 24"><path d="M12 3v2M12 19v2M5.6 5.6L7 7M17 17l1.4 1.4M3 12h2M19 12h2M5.6 18.4L7 17M17 7l1.4-1.4"/><circle cx="12" cy="12" r="3.4"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></symbol>
+</defs></svg>
+
+<div class="app">
+  <nav class="side" aria-label="Navegación principal">
+    <div class="logo">
+      <svg width="44" height="42" aria-hidden="true"><use href="#dproma-mark" width="44" height="42"/></svg>
+      <span class="wordmark" translate="no" style="font-size:11px">SIO-DPROMA</span>
+    </div>
+    <p class="grp">Principal</p>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-grid"/></svg>Dashboard</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg>Notificaciones<span class="n b tnum">5</span></a>
+    <p class="grp">Talento</p>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>Colaboradores</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-userplus"/></svg>Reclutamiento</a>
+    <a class="it" href="#" aria-current="page"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg>Asistencia<span class="n tnum" id="navCount">4</span></a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-inbox"/></svg>Incidencias y permisos<span class="n b tnum">14</span></a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-briefcase"/></svg>Incidencias a nómina</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-sun2"/></svg>Vacaciones</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-book"/></svg>Capacitación y equipo</a>
+    <p class="grp">Legal</p>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg>Contratos</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg>Actas administrativas</a>
+    <p class="grp">Sistema</p>
+    <a class="it" href="#" title="Roles y permisos — consulta"><svg class="ico" aria-hidden="true"><use href="#i-key"/></svg>Roles y permisos</a>
+    <a class="it" href="#"><svg class="ico" aria-hidden="true"><use href="#i-report"/></svg>Reportes</a>
+  </nav>
+
+  <div class="main">
+    <header class="top">
+      <button class="iconbtn" aria-label="Contraer navegación"><svg class="ico" aria-hidden="true"><use href="#i-menu"/></svg></button>
+      <h1>Asistencia</h1>
+      <div class="searchbox">
+        <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>
+        <label class="sr" for="q">Buscar colaborador o folio</label>
+        <input id="q" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="Buscar colaborador, área o folio…">
+        <span class="kbd" aria-hidden="true">⌘&nbsp;K</span>
+      </div>
+      <div class="right">
+        <button class="iconbtn" aria-label="Notificaciones — 5 sin leer">
+          <svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg><span class="dot"></span></button>
+        <button class="iconbtn" id="theme" aria-label="Cambiar a tema oscuro">
+          <svg class="ico" aria-hidden="true"><use href="#i-moon" id="themeicon"/></svg></button>
+        <button class="prof" aria-label="Cuenta de Rocío Hidalgo, RHL">
+          <span class="av" aria-hidden="true">RH</span>
+          <span><b style="font-size:13px">Rocío Hidalgo</b><small translate="no">RHL</small></span>
+          <svg class="ico ico-sm" aria-hidden="true" style="color:var(--text-3)"><use href="#i-chevd"/></svg></button>
+      </div>
+    </header>
+
+    <main class="content" id="main">
+      <div class="head">
+        <h2>Asistencia — hoy</h2>
+        <span class="rolechip"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-badge"/></svg>
+          Vista de <b translate="no">RHL</b></span>
+        <span style="color:var(--text-3);font-size:var(--fs-dense)">jueves 30 de julio de 2026</span>
+        <span class="upd"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg>Actualizado hace 3&nbsp;min</span>
+      </div>
+
+      <!-- ── KPIs del día: presentes / retardos / fuera de zona / ausencias / en campo ── -->
+      <section class="kpi-zone enter" aria-labelledby="h-kpi">
+        <h2 class="sr" id="h-kpi">Indicadores de asistencia del día</h2>
+        <article class="card hero">
+          <p class="lbl"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-users"/></svg>Colaboradores activos hoy</p>
+          <div class="chip">
+            <p class="v tnum">96 <small>de 104</small></p>
+            <div class="slabar" role="img" aria-label="78 puntuales, 12 con retardo, 6 fuera de zona">
+              <i class="s-ok" style="width:81%;animation-delay:60ms"></i>
+              <i class="s-warn" style="width:13%;animation-delay:120ms"></i>
+              <i class="s-err" style="width:6%;animation-delay:180ms"></i>
+            </div>
+            <p class="slalegend">
+              <span><svg class="ico ico-sm" style="color:var(--ok-ink)" aria-hidden="true"><use href="#i-check"/></svg><b class="tnum">78</b> puntuales</span>
+              <span><svg class="ico ico-sm" style="color:var(--warn-ink)" aria-hidden="true"><use href="#i-clock"/></svg><b class="tnum">12</b> con retardo</span>
+              <span><svg class="ico ico-sm" style="color:var(--err-ink)" aria-hidden="true"><use href="#i-alert"/></svg><b class="tnum">6</b> fuera de zona</span>
+            </p>
+          </div>
+        </article>
+
+        <div class="mini-grid">
+          <article class="card mini">
+            <p class="lbl"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>Puntuales</p>
+            <p class="v tnum">78</p>
+            <p><span class="tag t-ok">75&nbsp;% de sede</span></p>
+          </article>
+          <article class="card mini">
+            <p class="lbl"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"/></svg>Retardos</p>
+            <p class="v tnum">12</p>
+            <p><span class="tag t-warn">solo sede</span></p>
+          </article>
+          <article class="card mini">
+            <p class="lbl"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-pin"/></svg>Fuera de zona</p>
+            <p class="v tnum">6</p>
+            <p><span class="tag t-err">notificado a RHL</span></p>
+          </article>
+          <article class="card mini">
+            <p class="lbl"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-alertc"/></svg>Ausencias</p>
+            <p class="v tnum">8</p>
+            <p><span class="tag t-block">sin checado ni permiso</span></p>
+          </article>
+          <article class="card mini">
+            <p class="lbl"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-map"/></svg>En campo</p>
+            <p class="v tnum">21</p>
+            <p><span class="tag t-mute">instaladores</span></p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Bandeja de incidencias (dictamen SOLO RHL) + Config lateral ── -->
+      <section class="row2 enter" style="animation-delay:var(--stagger)">
+        <article class="card panel" aria-labelledby="h-inc">
+          <div class="panel-h">
+            <div><h3 id="h-inc">Bandeja de incidencias pendientes</h3>
+              <p class="sub">El dictamen (aprobar / rechazar) lo resuelve únicamente RHL — jefes directos solo consultan a su equipo</p></div>
+            <button class="btn" style="margin-left:auto">Ver todas (14)</button>
+          </div>
+
+          <div id="inbox">
+          <div class="inc i-warn">
+            <span class="badge"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"/></svg></span>
+            <span class="body">
+              <b>Pedro Salinas · retardo de horario (sede)</b>
+              <span>TI · entrada registrada 09:14, horario 09:00 · sin justificación adjunta</span>
+              <span class="acts">
+                <button class="mini-btn ok"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>Aprobar retardo</button>
+                <button class="mini-btn rej">Rechazar</button>
+                <button class="mini-btn">Ver evidencia</button>
+              </span>
+            </span>
+          </div>
+          <div class="inc i-block">
+            <span class="badge"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-map"/></svg></span>
+            <span class="body">
+              <b>Pedro Torres · inicio de instalación tardío (campo)</b>
+              <span>Checado 08:20 desde ruta · instalación en <span translate="no">ORD-202607-0119</span> iniciada 10:20 vs. 10:00 comprometida — alerta a RHL e ICEV, no es retardo de horario</span>
+              <span class="acts">
+                <button class="mini-btn ok"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>Marcar revisado</button>
+                <button class="mini-btn">Ver log completo</button>
+              </span>
+            </span>
+          </div>
+          <div class="inc i-err">
+            <span class="badge"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-pin"/></svg></span>
+            <span class="body">
+              <b>Marisol Gil · checado fuera de zona</b>
+              <span>Checado a 340&nbsp;m del <span translate="no">Almacén CDMX</span> · foto adjunta para validación manual</span>
+              <span class="acts">
+                <button class="mini-btn ok"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-check"/></svg>Validar con foto</button>
+                <button class="mini-btn rej">Rechazar</button>
+              </span>
+            </span>
+          </div>
+          <div class="inc i-warn">
+            <span class="badge"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-alertc"/></svg></span>
+            <span class="body">
+              <b>Juan Cadena · ausencia sin registro</b>
+              <span>Sin checado de entrada ni permiso previo — área Almacén</span>
+              <span class="acts">
+                <button class="mini-btn ok">Registrar permiso</button>
+                <button class="mini-btn rej">Marcar falta</button>
+              </span>
+            </span>
+          </div>
+          </div>
+
+          <div class="state" id="incVacio" hidden>
+            <svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>
+            <b>Bandeja al día</b>
+            <p>No queda ninguna incidencia por dictaminar de las que llegaron hoy. Las nuevas aparecen aquí en cuanto se registran.</p>
+          </div>
+
+          <div class="tinote">
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#i-alertc"/></svg>
+            <span>El sistema <b>no dictamina automáticamente</b> los casos de campo: el log completo de movimientos y diferencias (horario declarado vs. horario de instalación comprometido) se presenta para que RHL decida. Ver detalle en el registro individual.</span>
+          </div>
+        </article>
+
+        <article class="card panel" aria-labelledby="h-cfg">
+          <div class="panel-h"><div><h3 id="h-cfg">Horarios y zonas vigentes</h3>
+            <p class="sub">Consulta — así está configurado hoy cada área</p></div></div>
+
+          <div class="cfg-row"><span class="nm">TI</span><span class="meta">Lun–Vie 09:00–18:00</span></div>
+          <div class="cfg-row"><span class="nm">Gestoría</span><span class="meta">Lun–Vie 09:00–18:00 · Sáb 09:00–13:00</span></div>
+          <div class="cfg-row"><span class="nm">Almacén</span><span class="meta">Lun–Vie 08:00–17:00</span></div>
+          <div class="cfg-row"><span class="nm">Instaladores</span><span class="meta">Modalidad Campo — sin zona fija</span></div>
+        </article>
+      </section>
+
+      <!-- ── Log de asistencia del día, con filtro Sede/Campo ── -->
+      <section class="card panel enter" id="tabla" data-state="ok" style="animation-delay:calc(var(--stagger)*2)" aria-labelledby="h-log">
+        <div class="panel-h">
+          <div><h3 id="h-log">Registro de asistencia — hoy</h3><p class="sub">Cada registro queda confirmado y ya no cambia</p></div>
+          <button class="btn" style="margin-left:auto">Exportar</button>
+        </div>
+
+        <div class="filters">
+          <div class="seg" role="group" aria-label="Filtrar por modalidad">
+            <button aria-pressed="true">Todos</button>
+            <button aria-pressed="false">Sede</button>
+            <button aria-pressed="false">Campo</button>
+          </div>
+          <select class="selfilter" id="fArea" aria-label="Filtrar por área">
+            <option>Todas las áreas</option>
+            <option>TI</option>
+            <option>Gestoría</option>
+            <option>Almacén</option>
+            <option>Instaladores</option>
+          </select>
+          <select class="selfilter" id="fEstado" aria-label="Filtrar por estado">
+            <option>Todos los estados</option>
+            <option>Puntual</option>
+            <option>Retardo</option>
+            <option>Fuera de zona</option>
+            <option>En campo</option>
+            <option>Sin registro</option>
+          </select>
+        </div>
+
+        <div class="real">
+        <table>
+          <caption>Registro de asistencia del día, con modalidad, ubicación y estado</caption>
+          <colgroup><col style="width:20%"><col style="width:13%"><col style="width:12%"><col style="width:12%"><col style="width:20%"><col style="width:23%"></colgroup>
+          <thead><tr><th scope="col">Colaborador</th><th scope="col">Área</th><th scope="col">Modalidad</th><th scope="col">Hora</th><th scope="col">Ubicación</th><th scope="col">Estado</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Miguel Torres</th><td>Instaladores</td><td>Campo</td><td class="tnum">08:12</td>
+              <td title="Ruta a cliente — sin oficina asignada">Ruta a cliente</td>
+              <td><span class="pill p-mute"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-map"/></svg>En campo</span></td></tr>
+            <tr><th scope="row">Ana Beltrán</th><td>Gestoría</td><td>Sede</td><td class="tnum">08:58</td>
+              <td title="Oficina CDMX">Oficina CDMX</td>
+              <td><span class="pill p-ok"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>Puntual</span></td></tr>
+            <tr><th scope="row">Pedro Salinas</th><td>TI</td><td>Sede</td><td class="tnum">09:14</td>
+              <td title="Oficina CDMX">Oficina CDMX</td>
+              <td><span class="pill p-warn"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"/></svg>Retardo</span></td></tr>
+            <tr><th scope="row">Marisol Gil</th><td>Almacén</td><td>Sede</td><td class="tnum">08:05</td>
+              <td title="340 m del Almacén CDMX">340 m fuera de zona</td>
+              <td><span class="pill p-err"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-alert"/></svg>Fuera de zona</span></td></tr>
+            <tr><th scope="row">Pedro Torres</th><td>Instaladores</td><td>Campo</td><td class="tnum">08:20</td>
+              <td title="Camino a ORD-202607-0119">Camino a orden</td>
+              <td><span class="pill p-mute"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-map"/></svg>En campo</span></td></tr>
+            <tr><th scope="row">Juan Cadena</th><td>Almacén</td><td>Sede</td><td class="tnum">—</td>
+              <td>—</td>
+              <td><span class="pill p-block"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-alertc"/></svg>Sin registro</span></td></tr>
+          </tbody>
+        </table>
+        <div class="tfoot"><span class="tnum" id="conteo">Mostrando 6 de 104 registros</span>
+          <nav class="pag" aria-label="Paginación del registro de asistencia">
+            <button aria-label="Página anterior">‹</button>
+            <button aria-current="page">1</button><button>2</button><button>3</button>
+            <button aria-label="Página siguiente">›</button>
+          </nav>
+        </div>
+        </div>
+
+        <div class="state-loading" aria-hidden="true">
+          <table><tbody>
+            <tr><td><span class="skel">Miguel Torres</span></td><td><span class="skel">Instaladores</span></td><td><span class="skel">Campo</span></td><td><span class="skel">08:12</span></td><td><span class="skel">Ruta a cliente</span></td><td><span class="skel">En campo</span></td></tr>
+            <tr><td><span class="skel">Ana Beltrán</span></td><td><span class="skel">Gestoría</span></td><td><span class="skel">Sede</span></td><td><span class="skel">08:58</span></td><td><span class="skel">Oficina CDMX</span></td><td><span class="skel">Puntual</span></td></tr>
+            <tr><td><span class="skel">Pedro Salinas</span></td><td><span class="skel">TI</span></td><td><span class="skel">Sede</span></td><td><span class="skel">09:14</span></td><td><span class="skel">Oficina CDMX</span></td><td><span class="skel">Retardo</span></td></tr>
+            <tr><td><span class="skel">Marisol Gil</span></td><td><span class="skel">Almacén</span></td><td><span class="skel">Sede</span></td><td><span class="skel">08:05</span></td><td><span class="skel">Fuera de zona</span></td><td><span class="skel">Fuera de zona</span></td></tr>
+          </tbody></table>
+        </div>
+
+        <div class="state state-empty">
+          <svg class="ico" aria-hidden="true"><use href="#i-inbox"/></svg>
+          <b>Ningún registro con estos filtros</b>
+          <p>No hay checados que cumplan la combinación de área, modalidad y estado seleccionada. Quita alguno de los filtros o revisa otro día.</p>
+          <button class="btn">Quitar filtros</button>
+        </div>
+
+        <div class="state state-error">
+          <svg class="ico" style="color:var(--err-ink)" aria-hidden="true"><use href="#i-alertc"/></svg>
+          <b>No se pudo cargar el registro de asistencia</b>
+          <p>Falló la consulta, no los datos: los checados de hoy siguen guardados y ninguno se perdió. Vuelve a intentar en unos segundos y, si continúa, reporta la referencia de abajo.</p>
+          <p class="sub tnum" style="color:var(--text-3);font-size:11px" translate="no">Referencia del error: ASI-20260730-0914</p>
+          <button class="btn p"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-refresh"/></svg>Reintentar</button>
+        </div>
+      </section>
+
+      <p aria-live="polite" class="sr" id="live"></p>
+    </main>
+  </div>
+</div>
+
+<aside class="demo" aria-label="Controles de la maqueta (no forman parte del producto)">
+  <span>Estado de la tabla</span>
+  <button data-s="ok" aria-pressed="true">Con datos</button>
+  <button data-s="loading" aria-pressed="false">Cargando…</button>
+  <button data-s="empty" aria-pressed="false">Vacío</button>
+  <button data-s="error" aria-pressed="false">Error</button>
+</aside>
+
+<script>
+const root = document.documentElement, tBtn = document.getElementById('theme'), live = document.getElementById('live');
+const setTheme = t => {
+  root.dataset.theme = t;
+  document.querySelector('meta[name=theme-color]').content = t === 'dark' ? '#10161F' : '#F2F5F7';
+  tBtn.setAttribute('aria-label', t === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
+  document.getElementById('themeicon').setAttribute('href', t === 'dark' ? '#i-sun' : '#i-moon');
+};
+if (matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+tBtn.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+/* ── Estados de la tabla (con datos · cargando · vacío · error) ── */
+const tabla = document.getElementById('tabla');
+document.querySelectorAll('.demo button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.demo button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  tabla.dataset.state = b.dataset.s;
+  live.textContent = 'Registro de asistencia: ' + b.textContent;
+}));
+
+/* ── Filtros del registro: modalidad + área + estado ── */
+const filtro = { modalidad: 'Todos', area: 'Todas las áreas', estado: 'Todos los estados' };
+const filas = [...document.querySelectorAll('#tabla tbody tr')];
+const total = filas.length;
+
+function aplicarFiltros(){
+  let visibles = 0;
+  filas.forEach(tr => {
+    const area = tr.cells[1].textContent.trim();
+    const modalidad = tr.cells[2].textContent.trim();
+    const estado = tr.cells[5].textContent.trim();
+    const ok = (filtro.modalidad === 'Todos' || filtro.modalidad === modalidad)
+            && (filtro.area === 'Todas las áreas' || filtro.area === area)
+            && (filtro.estado === 'Todos los estados' || filtro.estado === estado);
+    tr.hidden = !ok;
+    if (ok) visibles++;
+  });
+  document.getElementById('conteo').textContent = 'Mostrando ' + visibles + ' de 104 registros';
+  tabla.dataset.state = visibles === 0 ? 'empty' : 'ok';
+  document.querySelectorAll('.demo button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.s === tabla.dataset.state)));
+  live.textContent = visibles === 0
+    ? 'Ningún registro cumple los filtros seleccionados'
+    : visibles + ' registros visibles de ' + total;
+}
+
+document.querySelectorAll('.seg').forEach(seg => {
+  seg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    filtro.modalidad = b.textContent.trim();
+    aplicarFiltros();
+  }));
+});
+document.getElementById('fArea').addEventListener('change', e => { filtro.area = e.target.value; aplicarFiltros(); });
+document.getElementById('fEstado').addEventListener('change', e => { filtro.estado = e.target.value; aplicarFiltros(); });
+document.querySelector('.state-empty .btn').addEventListener('click', () => {
+  filtro.modalidad = 'Todos'; filtro.area = 'Todas las áreas'; filtro.estado = 'Todos los estados';
+  document.querySelectorAll('.seg button').forEach((x, i) => x.setAttribute('aria-pressed', String(i === 0)));
+  document.getElementById('fArea').value = 'Todas las áreas';
+  document.getElementById('fEstado').value = 'Todos los estados';
+  aplicarFiltros();
+});
+
+/* ── Dictamen de incidencias ── */
+const inbox = document.getElementById('inbox');
+let pendientes = inbox.querySelectorAll('.inc').length;
+const badgeNav = document.getElementById('navCount');
+
+inbox.addEventListener('click', e => {
+  const btn = e.target.closest('.acts button');
+  if (!btn) return;
+  const inc = btn.closest('.inc');
+  if (!inc || inc.dataset.resuelta) return;
+  const accion = btn.textContent.trim();
+  const informativa = /Ver |log/i.test(accion);
+  if (informativa) { live.textContent = accion + ' — se abriría el detalle del registro'; return; }
+
+  inc.dataset.resuelta = '1';
+  const quien = inc.querySelector('b').textContent.split('·')[0].trim();
+  inc.querySelector('.acts').innerHTML =
+    '<span class="pill p-ok"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"/></svg>' + accion + '</span>' +
+    '<button class="mini-btn" data-undo="1">Deshacer</button>';
+  pendientes--;
+  actualizarConteo();
+  live.textContent = accion + ' — incidencia de ' + quien + ' resuelta. Quedan ' + pendientes + ' pendientes.';
+});
+
+inbox.addEventListener('click', e => {
+  const undo = e.target.closest('[data-undo]');
+  if (!undo) return;
+  const inc = undo.closest('.inc');
+  delete inc.dataset.resuelta;
+  inc.querySelector('.acts').innerHTML = inc.dataset.acts;
+  pendientes++;
+  actualizarConteo();
+  live.textContent = 'Dictamen deshecho. Quedan ' + pendientes + ' incidencias pendientes.';
+});
+
+function actualizarConteo(){
+  badgeNav.textContent = pendientes;
+  badgeNav.hidden = pendientes === 0;
+  document.getElementById('incVacio').hidden = pendientes !== 0;
+}
+inbox.querySelectorAll('.inc').forEach(i => { i.dataset.acts = i.querySelector('.acts').innerHTML; });
+
+addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); document.getElementById('q').focus(); }
+});
+</script>
+</body>
+</html>

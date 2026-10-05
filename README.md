@@ -44,6 +44,8 @@ research de DPROMA, en vez de un conjunto de notas de reunión dispersas.
 │   ├── raw/                           ← transcripciones nuevas por procesar (vacío por defecto)
 │   ├── insights/                      ← un JSON por entrevista ya procesada (10 hoy)
 │   └── aggregate.json                 ← dataset acumulado — la biblia de datos completa
+├── maquetas/                          ← maquetas HTML de SIO-DPROMA por funcionalidad (referencia, no se publica)
+│   └── README.md                      ← qué contiene cada paquete y cómo abrirlo
 └── web/
     └── index.html                     ← web narrativa, standalone, dataset embebido
 ```
