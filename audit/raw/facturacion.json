@@ -1,0 +1,178 @@
+{
+  "pantalla": "facturacion",
+  "ruta_zip": "05-direccion-y-administracion/facturacion.html",
+  "carpeta": "05-direccion-y-administracion",
+  "area": "finanzas",
+  "arquetipo": "panel (CFDI, Facturama)",
+  "modo": "cumplimiento",
+  "estados_auditados": [
+    "ok",
+    "loading",
+    "empty",
+    "error",
+    "oscuro"
+  ],
+  "capturas": [
+    "facturacion--ok.png",
+    "facturacion--loading.png",
+    "facturacion--empty.png",
+    "facturacion--error.png",
+    "facturacion--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-fact-01",
+        "severidad": "alta",
+        "regla": "§8 Voz de producto (límite 2 y nivel 3) + §9 Andamiaje de maqueta",
+        "dice_el_sistema": "§8: «Ningún bloque de texto siempre visible pasa de ~140 caracteres»; nivel 3 —«explica por qué se diseñó así o educa sobre un caso que no aplica aquí»— «no va en la interfaz». §9: «Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra.»",
+        "hay_en_el_build": "La vista «con datos» de la pantalla es un .state cuyo cuerpo dice: «No existe integración: cero coincidencias de «Facturama» en el código del servidor. Hoy <code>FACTURACION</code> es sólo un rol que participa en la revisión de padrón, viáticos y tickets — no hay un módulo de facturación propio. El propio PRD la marca como «bloqueador #1 del proyecto [A VALIDAR]» (doc 31, línea 179).» Sin data-andamio.",
+        "selector": "main#contenido .state-ok .state p",
+        "evidencia": "innerText medido con el andamio oculto: 305 caracteres, cuatro oraciones, frente al tope de ~140. Contiene un <code>, una cita del PRD y una referencia a documento y línea. grep de data-andamio en ese bloque: no lo lleva (el único data-andamio del archivo está en el conmutador .demo del pie). Captura facturacion--ok.png.",
+        "por_que_importa": "El estado «con datos» de la pantalla de Facturación no muestra facturación: muestra una nota de estado del proyecto, dirigida al equipo que construye y no a quien factura. Al no llevar data-andamio, el selector único de §9 no la encuentra y el texto viajaría al producto tal cual, con cita de documento incluida."
+      },
+      {
+        "id": "f1-fact-02",
+        "severidad": "alta",
+        "regla": "§6.4 Vistas de estado (valores y regla 2) + §11 Estructura",
+        "dice_el_sistema": "«.tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)}… .estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}» y «cada estado lleva encabezado real, no un <b>»; §11: «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo»",
+        "hay_en_el_build": ".state{…padding:56px 16px} sin fondo ni sombra; .state .ico{width:30px;height:30px;color:var(--text-3)}; los tres títulos son <b>: <b>La facturación (CFDI, Facturama) no está construida</b>, <b>No se pudo cargar la facturación</b>.",
+        "selector": ".state, .state .ico, .state b",
+        "evidencia": "getComputedStyle(.state-empty): backgroundColor rgba(0,0,0,0), boxShadow none, borderRadius 0px, maxWidth none; su .ico mide 30×30px, backgroundColor rgba(0,0,0,0), borderRadius 0px. Capturas facturacion--ok.png y --error.png: el bloque flota centrado sobre el fondo de página, sin tarjeta y con un glifo de contorno en vez del medallón de 52px.",
+        "por_que_importa": "Aquí es especialmente grave porque **todas** las vistas de esta pantalla son estados: no hay ninguna otra cosa que mirar. El único contenido de la pantalla incumple el componente con el que debería estar hecho, y ningún título entra en el índice de encabezados."
+      },
+      {
+        "id": "f1-fact-03",
+        "severidad": "alta",
+        "regla": "§6.4 Vistas de estado, regla 1",
+        "dice_el_sistema": "«el cambio se anuncia (aria-live=\"polite\") y mueve el foco» (main.focus() con tabindex=\"-1\")",
+        "hay_en_el_build": "<main id=\"contenido\" data-state=\"ok\" tabindex=\"-1\"> sin aria-live; el <script> solo escribe cont.setAttribute('data-state', …) y nunca llama a focus().",
+        "selector": "main#contenido",
+        "evidencia": "grep de aria-live en el archivo: 0 coincidencias (el único role=\"status\" es el del esqueleto). grep de focus(): 0 coincidencias.",
+        "por_que_importa": "La pantalla vive de sus estados: si el paso de «cargando» a «error» no se anuncia ni mueve el foco, con lector de pantalla no hay forma de enterarse de que el intento de cargar la facturación falló."
+      },
+      {
+        "id": "f1-fact-04",
+        "severidad": "alta",
+        "regla": "§6.7 Esqueleto de carga + §5 prefers-reduced-motion",
+        "dice_el_sistema": "§6.7: «Imita la forma de lo que va a llegar: mismas columnas, mismos anchos (en fr) y el mismo alto»; «sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)»; «prefers-reduced-motion aplana el fondo, no solo detiene la animación»: «.skel{animation:none;background:var(--surface-2)}»",
+        "hay_en_el_build": "<div class=\"state-loading sk\" role=\"status\" aria-label=\"Cargando\"><div class=\"sk-caja\"><span class=\"skel\" style=\"width:32%\">Facturación</span><span class=\"skel\" style=\"width:88%\">estado de la integración</span><span class=\"skel\" style=\"width:70%\">estado de la integración</span></div></div>, y @media (prefers-reduced-motion:reduce){.skel{animation:none}}.",
+        "selector": ".state-loading .skel, .sk-caja",
+        "evidencia": "Lo que llega después del esqueleto es una tarjeta de estado centrada en mitad de la pantalla (captura facturacion--ok.png); lo que el esqueleto dibuja son tres barras apiladas dentro de una caja de ancho completo arriba del todo (captura facturacion--loading.png): ni mismas columnas, ni mismos anchos, ni mismo alto. Con reducedMotion:'reduce': animationName \"none\" pero backgroundImage sigue siendo el degradado de tres paradas en backgroundPosition \"0% 0%\". textContent de la primera barra: \"Facturación\".",
+        "por_que_importa": "El esqueleto promete una pantalla con contenido y lo que aparece es un aviso de que el módulo no existe: el salto desconcierta y hace perder el sitio. Además role=\"status\" lee las barras en voz alta («Cargando Facturación estado de la integración…») y con movimiento reducido el degradado queda congelado en vez de aplanado."
+      },
+      {
+        "id": "f1-fact-05",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto",
+        "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)»",
+        "hay_en_el_build": "--text-3: #66717F",
+        "selector": ":root",
+        "evidencia": "brief tokens.text_3_declarado = \"#66717F\"; confirmado con getComputedStyle del documento. La pantalla usa --surface-2 en el esqueleto (barras y caja) y en el cromo.",
+        "por_que_importa": "Sobre --surface-2 cae a 4,21:1, por debajo del mínimo AA. En esta pantalla --text-3 tiñe el icono del estado (30px) y el texto de referencia del error."
+      },
+      {
+        "id": "f1-fact-06",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado, regla 3",
+        "dice_el_sistema": "«el error dice tres cosas en orden — qué pasó, qué no se ha perdido, qué hacer — más una referencia tipo PAD-20260729-0637»",
+        "hay_en_el_build": "«Esta pantalla no tiene un servicio real detrás — no hay integración con Facturama ni endpoint que consultar. Este estado de error sólo ilustra el patrón visual que usaría el módulo si llegara a construirse.» + «Referencia del error: FACT-20260929-0000» + botón «Reintentar».",
+        "selector": ".state-error p",
+        "evidencia": "innerText del párrafo: 206 caracteres. De las tres cosas exigidas solo cubre la primera a medias: no dice qué no se ha perdido ni qué hacer; lo que dice en su lugar es que el estado es una ilustración de la maqueta. La referencia sí está y el botón «Reintentar» también.",
+        "por_que_importa": "Un error que explica la maqueta en vez de explicar la consecuencia deja a quien lo lee sin saber si su trabajo sigue ahí ni qué hacer a continuación — que es exactamente lo que §6.4 regla 3 existe para evitar. Y encaja en el nivel 3 de §8: explica por qué se diseñó así."
+      },
+      {
+        "id": "f1-fact-07",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado, regla 5",
+        "dice_el_sistema": "«el esqueleto anticipa lo que va a aparecer (ocho filas de menú = ocho barras) y tiene salida a error pasados unos segundos»",
+        "hay_en_el_build": "El esqueleto solo se muestra si alguien pulsa «Cargando» en el conmutador de la maqueta; no hay temporizador ni ninguna transición automática a error.",
+        "selector": ".state-loading",
+        "evidencia": "El <script> completo del archivo contiene únicamente el conmutador de tema, el conmutador de estados de demo y el menú lateral: no hay setTimeout ni ninguna lógica de carga.",
+        "por_que_importa": "El esqueleto puede quedarse indefinidamente en pantalla. Como esta pantalla depende de un sistema externo (Facturama), la salida a error pasados unos segundos es justo el comportamiento que hace falta y el que no está."
+      },
+      {
+        "id": "f1-fact-08",
+        "severidad": "media",
+        "regla": "§6.16 A11y extra — botón deshabilitado",
+        "dice_el_sistema": "«un botón deshabilitado no recibe el foco → aria-disabled=\"true\" + aria-describedby con el motivo, y al pulsarlo se explica»",
+        "hay_en_el_build": "<button class=\"btn p\" type=\"button\" disabled aria-describedby=\"pq-factura\">Nueva factura</button>, con <p class=\"ref\" id=\"pq-factura\">No existe backend detrás de este botón.</p>",
+        "selector": ".state .acc .btn[disabled]",
+        "evidencia": "Markup de la vista «con datos». El disabled nativo saca el botón del orden de tabulación, así que el motivo de #pq-factura no llega a anunciarse. Además el motivo escrito habla del backend de la maqueta, no de lo que la persona puede hacer.",
+        "por_que_importa": "La única acción de la pantalla está bloqueada y su explicación es inalcanzable para quien navega con teclado: se encuentra un botón que no responde y ninguna razón."
+      },
+      {
+        "id": "f1-fact-09",
+        "severidad": "media",
+        "regla": "§10 trampa 5 — isotipo recortado",
+        "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio… Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal.»",
+        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>, y el mismo patrón a 22×21 en el botón flotante.",
+        "selector": ".side .logo svg, .fab svg",
+        "evidencia": "getBoundingClientRect medido en el navegador: <svg> en x=96, <use> en x=63,5 → −32,5px de desplazamiento. En las capturas la marca es una astilla vertical a la izquierda del rótulo.",
+        "por_que_importa": "La marca aparece recortada en todas las vistas. 01_login tiene el patrón correcto en el mismo repositorio."
+      },
+      {
+        "id": "f1-fact-10",
+        "severidad": "baja",
+        "regla": "§2.1 Suelo tipográfico + §10 trampa 1",
+        "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.»",
+        "hay_en_el_build": "15 declaraciones font-size:11px, 6 de 10,5px, 3 de 11,5px y un font:700 11px abreviado en la hoja; en la zona de contenido se ve solo una, p.ref a 11px.",
+        "selector": ".state .ref",
+        "evidencia": "Barrido con getComputedStyle sobre #contenido y .p4 con el andamio oculto: un único elemento con texto bajo el suelo visible en esta pantalla, p.ref a 11px («No existe backend detrás de este botón.» y «Referencia del error: FACT-20260929-0000»). El resto de las declaraciones por debajo del suelo están en el cromo, compartido con el lote.",
+        "por_que_importa": "La referencia del error es lo que se copia y se pega en un ticket: es justo el dato que conviene que se lea sin esfuerzo. Severidad baja porque en esta pantalla es un solo elemento, no un patrón extendido como en 54 o 50."
+      },
+      {
+        "id": "f1-fact-11",
+        "severidad": "baja",
+        "regla": "§6.5 Iconos — .msi",
+        "dice_el_sistema": "«Fuente: Material Symbols Rounded, variante rellena (FILL@1)… Carga por subconjunto, con un solo <link>»",
+        "hay_en_el_build": "Sprite propio de <symbol> SVG inline invocado con <svg class=\"ico\"><use href=\"#i-…\"/></svg>; no hay .msi ni <link> de Material Symbols.",
+        "selector": "svg.ico > use",
+        "evidencia": "grep de 'msi' y de 'Material+Symbols' en el archivo: 0 coincidencias.",
+        "por_que_importa": "Funciona y esquiva las trampas de ligadura y de subconjunto que el documento registra, pero es una familia distinta de la declarada: los glifos no coinciden con los de las pantallas que sí usan Material Symbols."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 1,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 3,
+      "integridad": 1
+    },
+    "justificacion": "Integridad 1: la pantalla no es un panel de facturación, es una nota de estado del proyecto montada sobre el andamio de estados. Su vista «con datos» cita el PRD, un número de documento y una línea; su vista de error explica que el estado es una ilustración de la maqueta; su esqueleto dibuja tres barras que no se parecen en nada a lo que después aparece. Accesibilidad 1: todo el contenido de la pantalla son estados, y los estados incumplen §6.4 en sus tres puntos duros —sin tarjeta ni medallón, titulados con <b>, y sin anuncio ni movimiento de foco al cambiar—, con la única acción bloqueada por disabled nativo y su explicación por tanto inalcanzable. Theming 3: los dos temas se pintan bien (captura --oscuro correcta), 83 tokens declarados y ninguno usado sin declarar, pero arrastra --text-3 obsoleto. Responsive 3: la tarjeta de estado centrada y el cromo con cajón por debajo de 860px responden, aunque hay poco que medir porque no hay tabla ni rejilla. Rendimiento no evaluado: maqueta estática sin backend — y aquí literalmente no hay integración que perfilar: cero coincidencias de «Facturama» según la propia pantalla.",
+    "evidencia": [
+      "innerText de la vista «con datos»: 305 caracteres frente al tope de ~140 de §8; incluye <code>FACTURACION</code> y «(doc 31, línea 179)»",
+      "getComputedStyle(.state-empty): background rgba(0,0,0,0), box-shadow none, border-radius 0px, max-width none; icono 30×30px sin fondo ni radio",
+      "Con reducedMotion:'reduce': .skel animationName \"none\" y backgroundImage aún el degradado de tres paradas en backgroundPosition \"0% 0%\"",
+      "getBoundingClientRect del <use> del isotipo contra su <svg>: −32,5px",
+      "capturas facturacion--ok.png, --loading.png, --error.png, --oscuro.png",
+      "brief estructura: tablas 0, inputs 0, dialogNativo 0, ariaLive 1 (el role=\"status\" del esqueleto)"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+  },
+  "cobertura": [
+    {
+      "patron": "Pantalla que depende de un sistema externo (aquí Facturama/CFDI). El sistema documenta las cuatro vistas de estado de §6.4 para «toda pantalla que pida datos», pero todas suponen que el servicio es propio: no hay forma documentada de distinguir «nuestro servicio no respondió» de «el sistema de terceros rechazó la petición», ni de comunicar que una operación quedó en vuelo del lado del tercero.",
+      "propuesta_de_regla": "§6.25 Pantalla con integración externa. **Cuándo:** la pantalla depende de un sistema que no es nuestro (timbrado CFDI, pasarela, padrón externo). **Requisitos:** (1) a las cuatro vistas de §6.4 se añade una quinta, **«el tercero no respondió»**, que se distingue del error propio porque **nombra al tercero** y dice **de quién es el fallo** — «Facturama no respondió. Lo que escribiste sigue aquí»; (2) el error del tercero conserva las tres cosas de §6.4 regla 3 y añade **la referencia del tercero** junto a la nuestra, porque es la que pedirá su soporte; (3) una operación que puede haber quedado en vuelo del otro lado **nunca se anuncia como fallida**: se anuncia como **«sin confirmar»** con la acción «Comprobar estado», y el botón de reintentar queda bloqueado hasta comprobarla, para no timbrar dos veces; (4) el estado de la integración (última respuesta correcta) se declara como `.ambito` (§6.22), **sin color de juicio**; (5) ni la vista de error ni la de carga explican la arquitectura: nombre del tercero y consecuencia, en una frase (§8)."
+    },
+    {
+      "patron": "Pantalla de un módulo que todavía no está construido. En el repositorio existen pantallas cuyo contenido completo es el aviso de que el módulo no existe, montado sobre componentes de producto (.state, .btn disabled). §9 cubre el conmutador de estados de la maqueta, pero no este caso.",
+      "propuesta_de_regla": "§9.2 Pantalla de módulo no construido. Una pantalla que todavía no tiene producto detrás **no se maqueta como si lo tuviera**. Lleva el aviso en un bloque `data-andamio` rotulado, fuera de los componentes de producto, y **no inventa estados que el módulo no tiene**: si no hay datos que cargar, no hay esqueleto, y si no hay servicio, no hay vista de error. El contenido de ese bloque habla del proyecto —estado, bloqueador, documento de referencia— y por tanto nunca entra en un `.state`, una `.banda` o una `.nota`, que son componentes de producto y viajan al producto."
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática servida como archivo, sin backend ni integración con Facturama que perfilar",
+    "f4_nielsen: fuera del subconjunto de este lote (solo F1 y F3)",
+    "f5_investigacion: fuera del subconjunto por arquetipo",
+    "f1: no se pudo evaluar el arquetipo declarado («panel»): la pantalla no contiene panel alguno — 0 tablas, 0 inputs, 0 widgets según el brief; lo auditado son sus cuatro vistas de estado",
+    "f1: no se evaluó el recorrido completo con teclado ni el comportamiento real con lector de pantalla"
+  ]
+}

@@ -1,0 +1,175 @@
+{
+ "pantalla": "11_app_login_2fa_offline",
+ "ruta_zip": "03-icev-instalacion-de-cargadores/11_app_login_2fa_offline.html",
+ "carpeta": "03-icev-instalacion-de-cargadores",
+ "area": "ICEV",
+ "arquetipo": "app movil / acceso",
+ "modo": "cobertura",
+ "estados_auditados": [
+  "login",
+  "2fa",
+  "offline",
+  "claro",
+  "oscuro",
+  "exterior",
+  "prefers-reduced-motion"
+ ],
+ "capturas": [
+  "11_app_login_2fa_offline--ok.png",
+  "11_app_login_2fa_offline--m-login.png",
+  "11_app_login_2fa_offline--m-2fa.png",
+  "11_app_login_2fa_offline--m-offline.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-11app-01",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos tactiles",
+    "dice_el_sistema": "Todo destino interactivo mide 24x24px como minimo (WCAG 2.2, 2.5.8). 44px si es la accion principal de la pantalla, o si el uso es en campo o tableta.",
+    "hay_en_el_build": ".altlink a,.altlink button.linklike{...padding:4px;font:inherit} sobre font-size 11,5px",
+    "selector": "button.linklike#resend, a#usealt",
+    "evidencia": "Medido con Playwright a 390x844 en la vista 2FA, con el andamio oculto: #resend ('Reenviarlo') sale 68,9x22,0px y #usealt ('usar la app Authenticator') 174,8x40,0px. El primero no llega ni al suelo absoluto de 24px; el segundo no llega a los 44px que §7.3 exige por uso en campo. Captura 11_app_login_2fa_offline--m-2fa.png.",
+    "por_que_importa": "Son las dos unicas salidas cuando el codigo de verificacion no llega. Quien esta en obra, con guantes o con el telefono en una mano, tiene que acertar en una franja de 22px para pedir el reenvio; si falla, se queda fuera del sistema sin via alterna en pantalla."
+   },
+   {
+    "id": "f1-11app-02",
+    "severidad": "alta",
+    "regla": "§1.7 Ratios de contraste minimos / §1.1 valor de --text-3",
+    "dice_el_sistema": "Texto normal: 4,5:1. No basta con medirlo sobre --surface: si el elemento puede caer sobre --surface-2, se mide tambien ahi. --text-3 es #5C6675, no el antiguo #66717F (que caia a 4,21:1 sobre --surface-2).",
+    "hay_en_el_build": ".primarybtn:disabled{background:var(--surface-2);color:var(--text-3)} con --text-3:#66717F",
+    "selector": "button.primarybtn#verify:disabled",
+    "evidencia": "Medido con composicion alfa real en tema claro: rgb(102,113,127) sobre rgb(231,237,243) = 4,21:1, por debajo del minimo de 4,5:1 para texto de 14px/800. Con el valor canonico #5C6675 el mismo par daria 4,93:1 y pasaria. Es el unico fallo de contraste real de la pantalla en los tres temas.",
+    "por_que_importa": "Cae justo en 'Confirmar codigo', la accion principal de la pantalla de verificacion, y en su estado por defecto: la etiqueta esta ilegible desde el primer segundo y hasta que se escriben los seis digitos. Es exactamente el fallo que §1.1 ya documento y que esta correccion de token resuelve sola."
+   },
+   {
+    "id": "f1-11app-03",
+    "severidad": "alta",
+    "regla": "§2 Tipografia — autoalojado (D116)",
+    "dice_el_sistema": "Las fuentes se autoalojan (D116). Prohibido el <link> a Google Fonts para las fuentes de interfaz: un CDN caido falla en silencio (incidencia real de 4 dias sin deteccion). @font-face con font-display:swap sobre /fuentes/inter-variable.woff2 y /fuentes/michroma.woff2.",
+    "hay_en_el_build": "<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Michroma&display=swap\" rel=\"stylesheet\">",
+    "selector": "head > link[href*='fonts.googleapis.com']",
+    "evidencia": "Lineas 8-10 del archivo: dos preconnect a fonts.googleapis.com / fonts.gstatic.com y un <link> de hoja de estilos. No hay ningun bloque @font-face en el archivo.",
+    "por_que_importa": "Es la pantalla de acceso de una app declaradamente offline-first: el propio texto dice 'podras entrar sin conexion con tu PIN o huella'. Cargar la tipografia de interfaz desde un CDN externo contradice la premisa de la pantalla, no solo la regla: sin red, la primera impresion del producto es la fuente de respaldo del sistema."
+   },
+   {
+    "id": "f1-11app-04",
+    "severidad": "media",
+    "regla": "§5 Movimiento — prefers-reduced-motion",
+    "dice_el_sistema": "No es «cero animacion»: se conservan opacidad y color, se elimina todo desplazamiento y escala.",
+    "hay_en_el_build": "@media (prefers-reduced-motion: reduce){:root{--dur-micro:1ms;--dur-base:120ms;--dur-enter:120ms;--ease-spring:linear;--stagger:0ms}} — y nada mas",
+    "selector": "button:active, .toast, .gbtn .spin",
+    "evidencia": "Cargada con reducedMotion:'reduce' y leidas las reglas de la hoja: el unico bloque de reduced-motion remapea duraciones. Sobreviven intactas button:active{transform:scale(.97)}, .toast{transform:translate(-50%,14px)} -> [data-show]{translate(-50%,0)} y .gbtn .spin{animation:spin .6s linear infinite}. Ninguna escala ni desplazamiento se retira; solo se acortan.",
+    "por_que_importa": "Quien activa el ajuste del sistema sigue viendo la pantalla encogerse en cada pulsacion, el aviso entrar desplazandose y el indicador del boton de Google girando sin parar. Acortar la duracion no es lo que §5 pide: pide quitar el movimiento y dejar opacidad y color."
+   },
+   {
+    "id": "f1-11app-05",
+    "severidad": "media",
+    "regla": "§2.1 Suelo tipografico",
+    "dice_el_sistema": "El suelo son 12px. «Nada baja de ahi.» Si un dato se lee todos los dias, va a 12-13px como minimo. Unica excepcion admitida: 10,5px en mayusculas con letter-spacing para rotulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+    "hay_en_el_build": ".hint/.otp-help/.altlink/.infobox a 11,5px; .note/.ctanote/.divider/.syncnote/small a 11px; .footnote y .qcount a 10,5px sin mayusculas",
+    "selector": "p.hint, p.otp-help, p.altlink, p.ctanote, p.divider, p.syncnote, p.footnote, span.qcount, .oklist small",
+    "evidencia": "Estilo calculado a 390x844, andamio excluido: en la vista offline salen 21 nodos de texto por debajo de 12px, entre ellos p.footnote a 10,50px (text-transform:none, 225 caracteres) y span.qcount a 10,50px. Solo h2.seclabel (10,5px, uppercase, letter-spacing) encaja en la excepcion documentada.",
+    "por_que_importa": "Toda la capa que explica que se puede y que no se puede hacer sin senal esta por debajo del suelo, y se lee a pleno sol y con el brazo estirado. El propio archivo declara un tema 'Exterior' para ese escenario: subir el contraste y dejar el cuerpo a 10,5-11px trabaja en contra de esa decision."
+   },
+   {
+    "id": "f1-11app-06",
+    "severidad": "media",
+    "regla": "§8 Voz de producto / §6.9 .note",
+    "dice_el_sistema": "Ningun bloque de texto siempre visible pasa de ~140 caracteres. «Se mide con el contador de caracteres, no a ojo.» .nota y .banda llevan como maximo UNA frase. Si el texto explica una decision, no va en pantalla.",
+    "hay_en_el_build": "p.footnote: «Sesion de campo valida 4 dias mas (vence 24 jul). Con senal, la app la renueva sola. Si DPROMA desactiva la cuenta, el acceso se revoca en cuanto el dispositivo toque internet — y el PIN deja de funcionar al vencer la sesion.» · p.note (2FA): «La verificacion en dos pasos la gestiona Google (D7) — la app nunca ve tu contrasena.»",
+    "selector": "p.footnote, #view-2fa p.note",
+    "evidencia": "innerText medido: p.footnote = 225 caracteres y 3 frases, siempre visible al pie de la vista offline. La .note de 2FA cita «(D7)», una referencia a documento interno, y usa raya explicativa.",
+    "por_que_importa": "La ultima frase del pie —que el PIN deja de funcionar— es la unica consecuencia operativa real y queda sepultada en el tercer renglon de un bloque de 225 caracteres a 10,5px. La referencia (D7) no significa nada para un instalador: §8 la clasifica como nivel 3, lo que explica por que se diseno asi, y eso no va en la interfaz."
+   },
+   {
+    "id": "f1-11app-07",
+    "severidad": "media",
+    "regla": "§6.1 Boton primario del acceso — .gbtn",
+    "dice_el_sistema": "Se bloquea en el manejador de JS (var ocupado), no solo con CSS — «pointer-events:none detiene el raton pero no el teclado» (cuatro Intro = cuatro envios). Estado por aria-busy=\"true\" (+ cursor:progress, spinner .spin).",
+    "hay_en_el_build": ".gbtn[data-busy=\"true\"]{pointer-events:none;color:var(--text-2)} y un manejador sin guarda: g.addEventListener('click', () => { g.dataset.busy='true'; ... setTimeout(..., 1400) })",
+    "selector": "button.gbtn#google",
+    "evidencia": "El archivo no declara ninguna variable de ocupado ni comprueba el estado al entrar al manejador; tampoco escribe aria-busy en ningun punto del script. El unico freno es pointer-events via data-busy, mas cursor:progress ausente.",
+    "por_que_importa": "Es el fallo que §6.1 describe literalmente: durante los 1400ms de espera, cada Intro vuelve a entrar al manejador y relanza el flujo. Y sin aria-busy, un lector de pantalla no tiene forma de saber que el boton esta trabajando — solo oye el cambio de texto a «Abriendo Google…» si pasa por ahi."
+   },
+   {
+    "id": "f1-11app-08",
+    "severidad": "media",
+    "regla": "§9 Andamiaje de maqueta (Anexo A)",
+    "dice_el_sistema": "Se marca siempre con data-andamio, va visualmente separado del producto y rotulado. Todo lo que lleve data-andamio se retira en la version real. Un solo selector lo encuentra.",
+    "hay_en_el_build": "<aside class=\"cap\"><h1>Acceso, 2FA y modo campo — offline-first</h1> … <div class=\"switch\" role=\"group\" aria-label=\"Cambiar de pantalla\">…",
+    "selector": "aside.cap, .switchgroup, .switch",
+    "evidencia": "Busqueda de 'data-andamio' en el archivo: 0 resultados. El panel lateral con los conmutadores de vista y de tema —que no es una funcion del producto— no lleva la marca. Para auditar la pantalla a 390px tuve que ocultarlo a mano con un selector por clase (aside.cap,.demo), no con el selector unico que §9 promete.",
+    "por_que_importa": "El <h1> del panel es ademas el segundo <h1> del documento (el brief mide h1=2): el titulo que un lector de pantalla encuentra compite con el de la propia app. Y sin la marca, nadie puede garantizar que el conmutador de vistas no viaje al build real."
+   },
+   {
+    "id": "f1-11app-09",
+    "severidad": "media",
+    "regla": "§1.1 Valor canonico de --text-3",
+    "dice_el_sistema": "--text-3 es #5C6675, no el antiguo #66717F.",
+    "hay_en_el_build": "--text-3: #66717F en el bloque :root,[data-theme=\"light\"]",
+    "selector": ":root, [data-theme=\"light\"]",
+    "evidencia": "Declaracion leida del <style> y confirmada por el brief (text_3_declarado). Es el valor obsoleto, el mismo que arrastra el documento antecesor del acceso.",
+    "por_que_importa": "Aqui produce ademas un fallo medible y no solo nominal: es el color del boton deshabilitado del hallazgo f1-11app-02. Corregir el token resuelve ese hallazgo sin tocar ningun componente."
+   },
+   {
+    "id": "f1-11app-10",
+    "severidad": "baja",
+    "regla": "§1.7 Anillo de foco",
+    "dice_el_sistema": "outline:var(--focus-w) solid var(--accent); outline-offset:var(--focus-offset)",
+    "hay_en_el_build": ":focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:var(--r-ctrl)}",
+    "selector": ":focus-visible, .otp:focus-visible",
+    "evidencia": "El archivo declara --focus-w:2px y --focus-offset:2px en su :root y el brief los lista entre los 'declarados_sin_usar'. El grosor se escribe a mano como 3px en dos sitios.",
+    "por_que_importa": "Reforzar el anillo a 3px para uso en campo es una decision razonable —y es justo lo que la propuesta de regla de cobertura recoge—, pero escribirla como literal esquiva el token que el propio archivo declara. El valor de --focus-w no esta documentado en el sistema, asi que la divergencia es de forma, no de valor: basta con subir el token."
+   }
+  ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 3
+  },
+  "justificacion": "Theming es lo mas solido: tres bloques de tema completos y coherentes (claro, oscuro y un tercero 'Exterior' con contraste reforzado), conmutador que actualiza meta[name=theme-color], y cero tokens usados sin declarar. Responsive cumple en el contexto real: a 390x844 no hay desbordamiento horizontal (scrollWidth 390 = innerWidth 390) en las tres vistas, el cuerpo lleva overscroll-behavior:contain y el pie usa env(safe-area-inset-bottom). Integridad es correcta en lo que mas suele romperse: el isotipo lleva sus medidas en el <use> y no repite viewBox en el <svg> —el patron bueno de §10 trampa 5—, no hay ids duplicados y los 34 tokens usados estan todos declarados. Accesibilidad es lo que hunde la nota: un destino tactil de 22px en la unica salida del 2FA, 4,21:1 en la etiqueta de la accion principal, el suelo de 12px roto en toda la capa explicativa y prefers-reduced-motion sin retirar ni una escala.",
+  "evidencia": [
+   "Playwright 390x844, andamio oculto: scrollWidth 390 / innerWidth 390 en login, 2fa y offline",
+   "#resend 68,9x22,0px y #usealt 174,8x40,0px (vista 2FA)",
+   "button.primarybtn:disabled rgb(102,113,127) sobre rgb(231,237,243) = 4,21:1 (tema claro, composicion alfa real)",
+   "0 fallos de contraste en tema oscuro y 1 falso positivo en claro/exterior (span.avatar, fondo de gradiente)",
+   "21 nodos de texto por debajo de 12px en la vista offline; p.footnote a 10,50px y 225 caracteres",
+   "reducedMotion:'reduce': unico bloque @media remapea duraciones; sobreviven scale(.97), translate(-50%,14px) y animation:spin infinite"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+ },
+ "cobertura": [
+  {
+   "patron": "Campo de codigo de un solo uso repartido en seis casillas (.otprow + .otp), reutilizado tal cual para el codigo de 2FA y para el PIN de campo enmascarado. El sistema no tiene ningun componente de captura de codigo: §6.16 solo describe campos de formulario de 38px de alto y no dice nada de avance automatico, retroceso ni pegado.",
+   "propuesta_de_regla": "§6.24 Campo de codigo de un solo uso — .codigo + .codigo-casilla. Cuando: un codigo corto que se teclea una sola vez (verificacion en dos pasos, PIN de campo). Una casilla por digito, nunca un solo campo: el digito a la vista es lo que permite corregir sin borrarlo todo. Valores: casilla de 44x52px —el ancho sale del suelo tactil de §7.3, no de la tipografia—, radio --r-ctrl, borde 1,5px --border-2, fondo --surface-2, cifra a 20px con font-variant-numeric:tabular-nums; casilla con contenido en --accent sobre --accent-soft. El grupo es un <div role=\"group\"> con aria-label que dice cuantos digitos son; cada casilla lleva inputmode=\"numeric\", pattern=\"[0-9]*\" y aria-label «Digito N de M»; autocomplete=\"one-time-code\" va solo en la primera. Comportamiento obligatorio: avance al escribir, retroceso al borrar en una casilla vacia, y pegado que reparte el codigo completo desde la casilla donde se pega. La variante de PIN anade -webkit-text-security:disc sin cambiar nada mas. A11y: cuantos digitos faltan se dice en un texto vinculado con aria-describedby al boton de envio y ese texto va en un aria-live=\"polite\"; el boton deshabilitado sigue la regla de §6.16 (aria-disabled, no disabled a secas, con el motivo enlazado)."
+  },
+  {
+   "patron": "Las dos vias de recuperacion de un acceso bloqueado —reenviar el codigo y usar la app Authenticator— estan escritas como texto dentro de una frase ('¿No llego el codigo? Reenviarlo · usar la app Authenticator'), una como <button class=\"linklike\" y otra como <a href=\"#\">, a 11,5px y 22px/40px de alto. El sistema no dice nada sobre como se presentan las salidas de un acceso que no avanza.",
+   "propuesta_de_regla": "§6.1.1 Vias de recuperacion del acceso. Cuando: cualquier pantalla de entrada o verificacion en la que el flujo normal pueda no completarse (el codigo no llega, el dispositivo alterno no esta a mano, la cuenta no responde). La salida es una accion, no prosa: va como .btn —no como enlace dentro de una frase— con su suelo de 44px, porque una pantalla de acceso se usa tambien en campo (§7.3). Se escriben todas las vias que existan, cada una con su propio boton y su nombre completo; si solo hay una, igual lleva boton. Lo que ejecuta es un <button> y lo que navega un <a> (§11): reenviar un codigo ejecuta. Nunca se dejan como el ultimo renglon pequeno de la pantalla: van inmediatamente debajo del campo que no se puede completar, antes de la accion principal, porque quien las busca ya esta bloqueado. Si una via tiene coste o espera (un reenvio con cuenta atras), el boton lo dice en su propia etiqueta y se bloquea en el manejador, igual que §6.1."
+  },
+  {
+   "patron": "La vigencia de la sesion de campo —'valida 4 dias mas (vence 24 jul)' y que el PIN deja de funcionar al vencer— se cuenta en un parrafo de 225 caracteres a 10,5px al pie de la vista sin conexion. §14 (propuesto en un lote anterior) cubre el comportamiento sin conexion en general, pero no donde ni como se declara que le queda a la sesion descargada.",
+   "propuesta_de_regla": "§14.1 Vigencia de la sesion descargada. Refina §14. Cuando: la app guarda una sesion para trabajar sin red. Lo que queda es un dato de estado, no una explicacion: va como .pill junto al bloque de identidad —en --pause mientras sobre holgura, en --warn cuando falte menos de un dia— con su icono y su texto, siguiendo §6.10 (color + icono + texto, nunca color a secas). El texto de la pastilla es solo el plazo («4 dias»); la fecha exacta y la condicion de revocacion son nivel 2 de §8 y van en un toggletip (§6.23) colgado de la propia pastilla, no en un pie siempre visible. Lo unico que puede quedar siempre visible es la consecuencia que bloquea la accion inmediata, en una frase bajo ~140 caracteres (§8). La vigencia se recalcula al desbloquear, no al sincronizar: si vencio, la pantalla de desbloqueo pasa a la vista de error de §6.4 con la via de reconexion, y no deja intentar el PIN."
+  },
+  {
+   "patron": "El avatar de identidad se pinta con background:linear-gradient(135deg,var(--chrome),var(--accent)) y el glifo con var(--chrome-ink). §1.4.1 solo documenta tinta sobre «relleno solido de color» (--on-state) y §1.2 reserva el gradiente de marca a las siete paradas --marca-1..7 del isotipo. No hay regla para un medallon de identidad.",
+   "propuesta_de_regla": "§1.4.1.1 Medallon de identidad (avatar de iniciales). Cuando: representar a una persona con sus iniciales. Relleno solido de un token, nunca un gradiente entre dos tokens de distinta funcion: --chrome es estructura y --accent es accion, y mezclarlos hace que el mismo glifo cambie de contraste segun donde caiga del degradado. Las iniciales van en --on-state (§1.4.1), que voltea por tema, no en --chrome-ink. El contraste se mide contra el relleno elegido en los dos temas y, si el medallon admite varios colores por persona, contra todos ellos. El gradiente de marca (--marca-1..7) queda reservado al isotipo (§1.2) y no se usa como fondo de ningun control ni medallon."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estatica sin backend que perfilar",
+  "f4_nielsen y f5_investigacion: fuera del subconjunto de este lote",
+  "§6.5 Iconos: la pantalla no usa Material Symbols sino un juego propio de <symbol> SVG en linea; no la evaluo contra §6.5 porque la decision parece deliberada (app sin red) y el hueco de regla pertenece a un lote de cobertura de iconografia, no a este"
+ ]
+}

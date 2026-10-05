@@ -1,0 +1,168 @@
+{
+  "pantalla": "36_recetas_despacho",
+  "ruta_zip": "03-icev-instalacion-de-cargadores/36_recetas_despacho.html",
+  "carpeta": "03-icev-instalacion-de-cargadores",
+  "area": "ICEV / almacén",
+  "arquetipo": "catálogo/listado",
+  "modo": "cumplimiento",
+  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
+  "capturas": [
+    "36_recetas_despacho--ok.png",
+    "36_recetas_despacho--loading.png",
+    "36_recetas_despacho--empty.png",
+    "36_recetas_despacho--error.png",
+    "36_recetas_despacho--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "cumple_parcialmente",
+    "hallazgos": [
+      {
+        "id": "f1-36recetas-01",
+        "severidad": "alta",
+        "regla": "§9 Andamiaje de maqueta + §8 Voz de producto (nivel 3)",
+        "dice_el_sistema": "«Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra.» / §8: «si el texto explica una decisión, no va en pantalla».",
+        "hay_en_el_build": "<div class=\"banda b-info\" style=\"grid-column:1/-1;...\"><svg class=\"ico\"><use href=\"#i-badge\"/></svg><p><b>Propuesta con componentes de Studio — pendiente de revisión de Studio.</b></p></div>, primer bloque dentro de <main>, sin data-andamio.",
+        "selector": "main .state-ok > .banda.b-info",
+        "evidencia": "Línea 688 del archivo. En 36_recetas_despacho--ok.png ocupa la primera banda de ancho completo bajo la cabecera. El archivo solo tiene 1 ocurrencia de data-andamio (el conmutador .demo del pie), así que el único selector de retirada no la alcanza: viajaría al producto.",
+        "por_que_importa": "Es metadato del proyecto de diseño, no información para quien gestiona recetas de despacho. Ocupa la primera franja de atención de la pantalla y, al no llevar data-andamio, nadie la va a retirar en la versión real."
+      },
+      {
+        "id": "f1-36recetas-02",
+        "severidad": "alta",
+        "regla": "§6.7 Esqueleto de carga — .skel",
+        "dice_el_sistema": "«role=\"status\" + aria-label en el contenedor y sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)». «prefers-reduced-motion aplana el fondo, no solo detiene la animación».",
+        "hay_en_el_build": "19 barras .skel con texto dentro: <span class=\"skel\" style=\"width:88%\">tipo de instalación</span>, «n materiales», «buscador». CSS línea 603-605: .skel{...;color:transparent}. Línea 607: @media (prefers-reduced-motion:reduce){.skel{animation:none}} — sin background:var(--surface-2).",
+        "selector": ".state-loading .skel",
+        "evidencia": "grep sobre el archivo: 19 nodos class=\"skel\" con contenido textual. 36_recetas_despacho--loading.png muestra las barras mudas visualmente, pero el texto sigue en el DOM con color:transparent.",
+        "por_que_importa": "Un lector de pantalla lee «tipo de instalación, n materiales, tipo de instalación…» seis veces durante la carga, como si fueran datos reales. Y con movimiento reducido el degradado se congela en la posición 0, dejando barras con un gradiente estático en lugar de la superficie plana que §6.7 exige."
+      },
+      {
+        "id": "f1-36recetas-03",
+        "severidad": "media",
+        "regla": "§10 trampa 5 — isotipo con viewBox repetido",
+        "dice_el_sistema": "«Correcto: <svg width=\"44\" height=\"42\" aria-hidden=\"true\"><use href=\"#dproma-mark\" width=\"44\" height=\"42\"/></svg> — medidas en el <use> y sin viewBox en el envoltorio. Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal.»",
+        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg> — viewBox en el envoltorio y <use> sin medidas.",
+        "selector": ".logo svg",
+        "evidencia": "Medido con getBoundingClientRect en Chromium a 1440px: svg x=96 w=44 h=42; use x=63,5 w=43. Desplazamiento dx = −32,5px. El <use> no declara width (null).",
+        "por_que_importa": "La marca se pinta 32,5px a la izquierda de su caja y se recorta casi entera: el isotipo de la barra lateral aparece como una astilla verde en lugar del logotipo. Es lo primero que se ve en todas las pantallas."
+      },
+      {
+        "id": "f1-36recetas-04",
+        "severidad": "media",
+        "regla": "§6.10 Etiqueta de estado .pill",
+        "dice_el_sistema": "«Lleva color + icono + texto, nunca color a secas.» §11: «un estado se comunica con color + icono + texto, nunca con color solo».",
+        "hay_en_el_build": "Las 7 etiquetas de estado del catálogo son <span class=\"pill p-ok\">Completa</span> y <span class=\"pill p-neutro\">Sin receta</span>: color de fondo + texto, sin ningún <svg class=\"ico\"> dentro.",
+        "selector": ".tk .pill, .vigencia + .pill",
+        "evidencia": "grep: 5 × class=\"pill p-ok\" y 2 × class=\"pill p-neutro\", ninguna con icono. Visible en 36_recetas_despacho--ok.png (columna derecha de la lista de tipos).",
+        "por_que_importa": "«Completa» y «Sin receta» se distinguen solo por el verde y el gris. Quien no distingue esos dos tonos tiene que leer la palabra en 11px para saber si el tipo de instalación puede despachar material automáticamente."
+      },
+      {
+        "id": "f1-36recetas-05",
+        "severidad": "media",
+        "regla": "§2.1 Suelo tipográfico",
+        "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+        "hay_en_el_build": "Fuera de las dos excepciones: .vigencia a 10,5px (1 nodo), .pill a 11px (7 nodos), .sku a 11px (12 nodos), thead th a 11px (3 nodos), .cromo-quien small a 11px, .cromo-av a 11px, además de un <span> y un <b> a 11,5px.",
+        "selector": ".sku, .pill, thead th, .vigencia",
+        "evidencia": "Medido con getComputedStyle sobre cada elemento con texto propio (excluyendo [data-andamio]) a 1440×900: {«10.5px|SPAN.vigencia»:1, «11px|SPAN.sku»:12, «11px|SPAN.pill p-ok»:5, «11px|SPAN.pill p-neutro»:2, «11px|TH.»:2, «11px|TH.num»:1, «11px|SMALL.»:1, «11.5px|SPAN.»:1}. Los valores son literales en la hoja (p. ej. thead th{font-size:11px}), no --fs-meta (12px).",
+        "por_que_importa": "El SKU es el dato que el almacén teclea para surtir y aparece 12 veces a 11px; la regla práctica del sistema es que «si un dato se lee todos los días, va a 12–13px como mínimo». Además rompe el gobierno de escala: se usan literales en vez de --fs-meta."
+      },
+      {
+        "id": "f1-36recetas-06",
+        "severidad": "media",
+        "regla": "§6.2 Botones — .btn",
+        "dice_el_sistema": "«.btn{min-height:36px;padding:8px 14px;…}» y «El suelo se declara con min-height, no se confía al relleno (medido: 35px y 27px sin él).»",
+        "hay_en_el_build": ".btn{display:inline-flex;align-items:center;gap:6px;…;padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);cursor:pointer;white-space:nowrap} — sin min-height. Tampoco .btn.mini declara min-height:28px.",
+        "selector": ".btn",
+        "evidencia": "Líneas 320-326 del archivo; getComputedStyle(.btn).minHeight = «auto» medido en Chromium. La pantalla no lleva data-tacto en el <html>, así que la regla [data-tacto=\"dedo\"] .btn{min-height:46px} tampoco repone el suelo.",
+        "por_que_importa": "La altura del botón depende del relleno y de la altura de línea de --fs-dense; cualquier cambio tipográfico lo deja por debajo del suelo de 36px sin que nada avise, que es exactamente el fallo que §6.2 documenta."
+      },
+      {
+        "id": "f1-36recetas-07",
+        "severidad": "media",
+        "regla": "§8 Voz de producto — límite de ~140 caracteres",
+        "dice_el_sistema": "«Ningún bloque de texto siempre visible pasa de ~140 caracteres. Se mide con el contador de caracteres, no a ojo.» «.nota y .banda llevan como máximo UNA frase.»",
+        "hay_en_el_build": "Dos bloques siempre visibles por encima del tope: .banda.b-info «Una receta no se edita: se sucede. Cambiarla crea una versión nueva con su fecha de vigencia…» y .nota «Los tres primeros renglones son el mismo cable en tres colores, y por…».",
+        "selector": ".banda.b-info > p, p.nota",
+        "evidencia": "Medido con innerText.length en Chromium, con [data-andamio] oculto: .banda.b-info = 230 caracteres (tres oraciones); p.nota = 246 caracteres. Tope del sistema: ~140 y una sola frase.",
+        "por_que_importa": "Ambos explican por qué el producto se diseñó así («por eso el botón dice “nueva versión” y no “editar”»), que es nivel 3 de §8 y no va en la interfaz. Quien entra a revisar una receta lee 476 caracteres de justificación antes de llegar a la tabla."
+      },
+      {
+        "id": "f1-36recetas-08",
+        "severidad": "media",
+        "regla": "§10 trampa 4 / §7.3 — el destino táctil es la región que acepta la pulsación",
+        "dice_el_sistema": "«Un campo de búsqueda dentro de un <div> con forma de pastilla no cumple, porque pulsar la pastilla no hace nada. El contenedor tiene que ser una <label for=\"…\">.»",
+        "hay_en_el_build": "<div class=\"search\"><svg class=\"ico ico-sm\" …/><input id=\"buscar\" type=\"search\" placeholder=\"Buscar tipo de instalación…\" aria-label=\"Buscar tipos de instalación\"></div>",
+        "selector": ".bh .search",
+        "evidencia": "Medido: el <input> mide 296×15px (brief, tactil_24px.muestra; reproducido con getBoundingClientRect). El envoltorio es un <div>, no una <label for=\"buscar\">, así que la zona de 24px+ que se ve no es el destino real.",
+        "por_que_importa": "Es el único control de filtrado de la pantalla. Pulsar el icono de lupa o el espacio en blanco de la pastilla no enfoca el campo: el destino efectivo es una franja de 15px de alto, por debajo del mínimo de 24px de WCAG 2.2."
+      },
+      {
+        "id": "f1-36recetas-09",
+        "severidad": "baja",
+        "regla": "§6.11 Tabla densa — markup canónico",
+        "dice_el_sistema": "Markup: «<table><caption class=\"sr\">…</caption>…»; regla 1: «<caption> siempre, aunque vaya oculto con .sr».",
+        "hay_en_el_build": "<caption>Materiales de la receta de despacho</caption> sin clase, ocultado por una regla global caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)} (línea 367), que duplica a mano lo que .sr ya hace (línea 214).",
+        "selector": "table > caption",
+        "evidencia": "Medido: la tabla tiene caption=true, capCls=\"\". Las dos declaraciones (.sr y caption) coexisten en el mismo archivo.",
+        "por_que_importa": "Funciona, pero diverge del markup canónico y repite la utilidad .sr como estilo de elemento; si mañana hace falta un caption visible, la regla global lo impide en silencio."
+      },
+      {
+        "id": "f1-36recetas-10",
+        "severidad": "baja",
+        "regla": "§7.3 / §10 — la regla táctil lleva :root",
+        "dice_el_sistema": "«El :root es lo que hace ganar la regla»; «Se comprueba midiendo con data-tacto=\"dedo\" puesto, no leyendo el archivo.»",
+        "hay_en_el_build": "Las 6 reglas se escriben sin :root: [data-tacto=\"dedo\"] .it{min-height:46px}, … .iconbtn{width:46px;height:46px}, … .btn{min-height:46px} (líneas 282-287). Además data-tacto no aparece en el <html> ni en el JS.",
+        "selector": "[data-tacto=\"dedo\"] .iconbtn",
+        "evidencia": "Medido forzando document.documentElement.setAttribute('data-tacto','dedo'): 0 elementos de .iconbtn/.btn/.it quedan por debajo de 46px (21 medidos). La pantalla no dibuja ningún .acciones .iconbtn, así que ninguna variante de tamaño compite y la regla gana igual.",
+        "por_que_importa": "El bug de especificidad es latente: hoy no rompe nada, pero en cuanto esta pantalla gane un bloque de acciones por fila con .acciones .iconbtn{width:28px} el modo dedo dejará de aplicar sin que nada falle visiblemente."
+      },
+      {
+        "id": "f1-36recetas-11",
+        "severidad": "baja",
+        "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+        "dice_el_sistema": "«Un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero.»",
+        "hay_en_el_build": "El único <script> del archivo (38 líneas) solo cablea el conmutador de tema, el cajón del menú y el andamiaje .demo [data-set]. El buscador, «Nuevo tipo», «Nueva versión de la receta», «Ver versiones anteriores» y la lista de tipos no tienen manejador.",
+        "selector": "script, .bh .search input, .acc .btn",
+        "evidencia": "Inventario del script: addEventListener('click') ×4 (demo, tema, menu-btn, velo), keydown ×1 (Escape del menú), change ×1 (matchMedia). querySelectorAll solo sobre '.demo [data-set]'. 11 atributos aria-pressed=\"true\" y 4 aria-pressed=\"false\" en el archivo, ninguno gobernado por el script fuera del andamiaje.",
+        "por_que_importa": "Hallazgo transversal del paquete, no específico de esta pantalla: las maquetas no traen lógica de producto. Se registra aquí porque §6.12 regla 8 exige que, sin lógica, el control no se vista de control; conviene decidirlo antes de que estos aria-pressed lleguen a un lector de pantalla prometiendo un estado conmutable."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 3,
+    "dimensiones": {
+      "accesibilidad": 2,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 3,
+      "integridad": 2
+    },
+    "justificacion": "Es la mejor construida de las cinco del lote: es la única que resuelve las vistas de estado como manda §6.4 (.tarjeta-estado con medallón .estado-ico y <h2> real en vacío y en error, visible en --empty.png), tiene h1 único, 4 landmarks, skip link, lang=\"es-MX\", <caption> y <th scope=\"row\"> en las 12 filas, 0 inputs sin etiqueta y 0 fallos de contraste medidos en los dos temas. Baja por accesibilidad (esqueleto que lee texto falso, destino táctil real de 15px en el buscador, etiquetas de estado sin icono, texto por debajo del suelo de 12px) y por integridad (isotipo desplazado 32,5px, .btn sin min-height declarado, banda de proceso del proyecto embebida en el producto, 0 lógica de producto).",
+    "evidencia": [
+      "Brief: tokens usados_sin_declarar = [] (único del lote junto a 36 y 25 sin tokens huérfanos); contraste 0 fallos claro / 0 oscuro; estructura h1=1, landmarks=4, inputsSinEtiqueta=0, skipLink=1.",
+      "Medido: isotipo dx=−32,5px; .btn minHeight computado «auto»; 19 .skel con texto; bloques siempre visibles de 230 y 246 caracteres; scrollWidth 1440 = clientWidth 1440 (sin desbordamiento horizontal); .tabla-caja 773/773 sin scroll.",
+      "36_recetas_despacho--empty.png: tarjeta de estado opaca con medallón --accent y encabezado real, conforme a §6.4."
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+  },
+  "cobertura": [
+    {
+      "patron": "Variante neutra de etiqueta de estado para «todavía sin dato». La pantalla usa .pill.p-neutro{background:var(--surface-2);color:var(--text-2)} para «Sin receta». §6.10 solo documenta cinco variantes (.p-ok, .p-warn, .p-err, .p-block, .p-pause) y ninguna significa «nadie lo ha contestado todavía»: --pause es «inactivo, en pausa», que es otra cosa.",
+      "propuesta_de_regla": "§6.10 — Sexta variante: `.p-neutro`. Cuándo: el dato existe como campo pero nadie lo ha contestado todavía («Sin receta», «Sin contestar», «Sin capturar»). No es un fallo ni una pausa: es ausencia de respuesta, y por eso no entra en el semáforo. Valores: `background:var(--surface-2);color:var(--text-2)`, con el mismo relleno, radio y tipografía del resto de `.pill`, e icono de reloj (`schedule`) para que la familia siga leyéndose como familia. No se usa para un cero medido: un cero es un dato y va con su cifra (§6.22)."
+    },
+    {
+      "patron": "Catálogo maestro-detalle a dos columnas: lista de entidades a la izquierda (.bandeja con buscador propio y cuenta) y la ficha de la seleccionada a la derecha, con aria-current=\"true\" en el ítem activo. §6.11 cubre la tabla densa y §6.20 la ficha de detalle, pero no hay regla para la composición de las dos en una sola pantalla.",
+      "propuesta_de_regla": "§13.9 Maestro-detalle en una pantalla. Cuándo: un catálogo corto (menos de ~25 entradas) cuya ficha cabe al lado sin obligar a navegar. Proporción `minmax(280px,360px) minmax(0,1fr)` (caso de §13.2, columna acotada entre piso y techo). El ítem seleccionado lleva `aria-current=\"true\"` y la ficha se anuncia con `aria-live=\"polite\"`. Por debajo de 860px la ficha pasa a pantalla propia y la lista conserva el foco de vuelta. La lista nunca es una tabla densa: si hace falta ordenar o filtrar por más de un campo, el arquetipo correcto es §6.11 + §6.21."
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática, sin backend que perfilar ni librería que cargar.",
+    "f1 §6.11 regla 3 (aria-sort): la tabla de materiales no ofrece ninguna columna ordenable (0 botones en thead, 0 th[aria-sort]); la regla exige aria-sort en las columnas ordenables y aquí no hay ninguna, así que no se puede declarar incumplimiento. Sí consta que el archivo trae el CSS thead th[aria-sort=\"ascending\"] .sort sin markup que lo active.",
+    "f1 §6.16 y §6.17: la pantalla no tiene formulario de captura ni subida de archivo (0 input de formulario, 0 input[type=file]); no evaluable aquí.",
+    "f1 §6.18: no hay diálogo en esta pantalla (0 <dialog>, 0 div[role=dialog]); no evaluable."
+  ]
+}

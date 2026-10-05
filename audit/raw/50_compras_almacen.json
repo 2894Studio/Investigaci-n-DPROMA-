@@ -1,0 +1,207 @@
+{
+  "pantalla": "50_compras_almacen",
+  "ruta_zip": "05-direccion-y-administracion/50_compras_almacen.html",
+  "carpeta": "05-direccion-y-administracion",
+  "area": "almacén",
+  "arquetipo": "recepción/tabla",
+  "modo": "cumplimiento",
+  "estados_auditados": [
+    "ok",
+    "loading",
+    "empty",
+    "error",
+    "oscuro"
+  ],
+  "capturas": [
+    "50_compras_almacen--ok.png",
+    "50_compras_almacen--loading.png",
+    "50_compras_almacen--empty.png",
+    "50_compras_almacen--error.png",
+    "50_compras_almacen--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "cumple_parcialmente",
+    "hallazgos": [
+      {
+        "id": "f1-50com-01",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto",
+        "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)»",
+        "hay_en_el_build": "--text-3: #66717F",
+        "selector": ":root",
+        "evidencia": "brief tokens.text_3_declarado = \"#66717F\"; confirmado con getComputedStyle del documento. La tabla usa --surface-2 en el sobrevuelo de fila (tbody tr:hover td) y en el esqueleto.",
+        "por_que_importa": "Sobre --surface-2 cae a 4,21:1, bajo el mínimo AA. Aquí --text-3 pinta la segunda línea de las celdas —el almacén de destino y «desde el 20 ago» / «decidida el 18 ago»—, que es el dato con el que se mide la antigüedad de lo que espera decisión, y se lee justo cuando el cursor está encima de la fila."
+      },
+      {
+        "id": "f1-50com-02",
+        "severidad": "alta",
+        "regla": "§7.3 Objetivos táctiles + §10 trampa 4",
+        "dice_el_sistema": "§7.3: «Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8)» y «Enlaces que son el elemento primario de su fila (folio, miga, «Ver en Maps»): no son texto en prosa, llevan padding hasta llegar a 24px». §10 trampa 4: «un <input> de búsqueda dentro de un <div> con forma de pastilla no cumple — el contenedor tiene que ser una <label for=\"…\">»",
+        "hay_en_el_build": "Los cinco folios son <a class=\"folio\" href=\"#\"> de 122,1×15px, y el buscador es <div class=\"search\"><svg…/><input id=\"buscar\" type=\"search\" …></div> con el <input> a 329×15px.",
+        "selector": "a.folio, .search > input#buscar",
+        "evidencia": "brief tactil_24px: 6 de 43 interactivos por debajo de 24px, y la muestra son exactamente el input de búsqueda (329×15) y los cinco folios (122,1×15). Reproducido con getBoundingClientRect: los cinco folios a h=15 y el input a h=15. El contenedor .search es un DIV (tagName medido) sin atributo for; su altura es 33px, de modo que la pastilla visible tampoco llega al suelo.",
+        "por_que_importa": "El folio es la entrada principal a cada compra y el buscador es el primer control de la pantalla: los dos destinos más pulsados son los dos que no llegan al suelo táctil. Y es exactamente el caso que §10 nombra: la pastilla parece el destino pero pulsarla no hace nada, porque el contenedor no es una <label for>."
+      },
+      {
+        "id": "f1-50com-03",
+        "severidad": "alta",
+        "regla": "§2.1 Suelo tipográfico + §10 trampa 1",
+        "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí» y «si un dato se lee todos los días, va a 12–13px como mínimo». Únicas excepciones: rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+        "hay_en_el_build": "16 declaraciones font-size:11px, 6 de 10,5px, 1 de 11,5px y un font:700 11px abreviado.",
+        "selector": "thead th, .prov small, .espera small, .pill, .mia, .nota",
+        "evidencia": "Barrido con getComputedStyle sobre #contenido y .p4, andamio oculto: thead th a 11px ×6 (FOLIO, PROVEEDOR Y ALMACÉN, IMPORTE, QUIÉN LA PIDE, LLEVA ESPERANDO, ESTADO), small a 11px ×10 (el almacén de cada fila y «desde el 20 ago» / «hoy» / «decidida el 14 ago»), .pill a 11px ×5 (Por autorizar / Autorizada / Rechazada), .mia a 10,5px («LA PEDISTE TÚ») y los dos .nota a 11,5px. Los tokens declarados son correctos (--fs-meta:12px, --fs-dense:13px): los valores están escritos como literales, fuera de la escala.",
+        "por_que_importa": "Lo que baja del suelo son los seis rótulos de columna, las etiquetas de estado y la antigüedad de la espera — el dato por el que la bandeja está ordenada («las que esperan decisión, primero y por antigüedad»). Y «LA PEDISTE TÚ», a 10,5px, es la marca que explica por qué una fila no se puede autorizar."
+      },
+      {
+        "id": "f1-50com-04",
+        "severidad": "alta",
+        "regla": "§6.4 Vistas de estado, regla 1",
+        "dice_el_sistema": "«el cambio se anuncia (aria-live=\"polite\") y mueve el foco» (main.focus() con tabindex=\"-1\")",
+        "hay_en_el_build": "<main id=\"contenido\" data-state=\"ok\" tabindex=\"-1\"> sin aria-live; el <script> solo escribe cont.setAttribute('data-state', …) y nunca llama a focus().",
+        "selector": "main#contenido",
+        "evidencia": "grep de aria-live en el archivo: 0 coincidencias (el único role=\"status\" es el del esqueleto). grep de focus(): 0 coincidencias. El tabindex=\"-1\" está puesto y nadie lo usa.",
+        "por_que_importa": "La bandeja se recarga cada vez que se filtra, se pagina o se decide una compra: sin anuncio ni movimiento de foco, con lector de pantalla no hay forma de saber que la lista cambió ni cuántas compras quedan esperando."
+      },
+      {
+        "id": "f1-50com-05",
+        "severidad": "alta",
+        "regla": "§6.4 Vistas de estado (valores y regla 2) + §11 Estructura",
+        "dice_el_sistema": "«.tarjeta-estado{max-width:480px;…border-radius:var(--r-modal);box-shadow:var(--sh-modal)}… .estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}» y «cada estado lleva encabezado real, no un <b>»",
+        "hay_en_el_build": ".state sin fondo ni sombra, .state .ico{width:30px;height:30px;color:var(--text-3)}, y los títulos en <b>: <b>No hay ninguna compra esperando decisión</b>, <b>No se pudo cargar las compras de almacén</b>.",
+        "selector": ".state, .state .ico, .state b",
+        "evidencia": "getComputedStyle(.state-empty): backgroundColor rgba(0,0,0,0), boxShadow none, borderRadius 0px, maxWidth none; su .ico mide 30×30px sin fondo ni radio. Capturas --empty.png y --error.png: el estado flota sobre el fondo de página.",
+        "por_que_importa": "El vacío de esta bandeja es información buena («nadie tiene una compra parada esperando a Dirección») y presentarlo suelto sobre el fondo lo hace parecer un fallo de carga. Con el título en <b> el estado no entra en el índice de encabezados."
+      },
+      {
+        "id": "f1-50com-06",
+        "severidad": "alta",
+        "regla": "§6.7 Esqueleto de carga (a11y) + §5 prefers-reduced-motion",
+        "dice_el_sistema": "«sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)» y «prefers-reduced-motion aplana el fondo, no solo detiene la animación»: «.skel{animation:none;background:var(--surface-2)}»",
+        "hay_en_el_build": "Cinco .sk-fila de siete barras cada una, todas con texto real dentro: <span class=\"skel\">CO-0000-00000</span><span class=\"skel\">proveedor y almacén</span><span class=\"skel\">$00,000</span>… y @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer el fondo.",
+        "selector": ".state-loading .skel",
+        "evidencia": "35 barras con texto dentro de un contenedor con role=\"status\" aria-label=\"Cargando\". Con reducedMotion:'reduce': animationName \"none\" pero backgroundImage sigue siendo linear-gradient(90deg, rgb(231,237,243) 25%, rgba(27,36,48,.14) 50%, …) en backgroundPosition \"0% 0%\" — congelado, no aplanado. textContent de la primera barra: \"CO-0000-00000\".",
+        "por_que_importa": "Al entrar en «cargando», un lector de pantalla lee 35 cadenas de relleno seguidas, entre ellas folios falsos («CO-0000-00000») e importes falsos («$00,000») — datos inventados anunciados como si fueran la bandeja. El acierto es que la rejilla del esqueleto sí copia los anchos reales de las columnas; el fallo es el texto y el degradado congelado."
+      },
+      {
+        "id": "f1-50com-07",
+        "severidad": "media",
+        "regla": "§6.11 Tabla densa, regla 10",
+        "dice_el_sistema": "«El identificador de fila no lleva color de enlace. --link es para navegación fuera de tabla (migas, «Ver en Maps»). El folio va en --text; lo pulsable lo indica tbody tr:hover td{background:var(--surface-2)}»",
+        "hay_en_el_build": ".folio{font-variant-numeric:tabular-nums;font-weight:600;color:var(--link);text-decoration:none;white-space:nowrap}",
+        "selector": "a.folio",
+        "evidencia": "Línea 382 de la hoja de estilos del archivo. En la captura --ok.png los cinco folios salen en verde de enlace, el mismo color que el botón primario «Revisar y decidir» de la columna de acciones.",
+        "por_que_importa": "El folio compite visualmente con la acción primaria de la misma fila: en una bandeja de autorización el verde debería significar «aquí se decide», no «aquí se navega». El sistema reserva --link para fuera de la tabla precisamente por eso."
+      },
+      {
+        "id": "f1-50com-08",
+        "severidad": "media",
+        "regla": "§6.12 Resumen y barra de filtros, regla 7 + §13.1",
+        "dice_el_sistema": "«Orden fijo: resumen → buscador + filtros en una sola fila → tabla» (§6.12 regla 7); §13.1: «Lectura → control → objeto.»",
+        "hay_en_el_build": "El orden del markup y del render es: .p4-t (título y acciones) → .p4-b (solo el buscador) → .p4-f (los cuatro .schip de resumen y el control de densidad) → tabla.",
+        "selector": ".p4-b, .p4-f",
+        "evidencia": "Líneas 670-672: <div class=\"p4-t\">, <div class=\"p4-b\"> con el único <div class=\"search\">, <div class=\"p4-f\"> con los schip y el .seg. Captura --ok.png: el buscador está encima de los contadores. Es el orden inverso al de §6.12, y además el buscador no comparte fila con los filtros.",
+        "por_que_importa": "Quien abre la bandeja lee primero un campo vacío y después la cifra que le dice si tiene trabajo («3 por autorizar · 1 esperando más de 3 días»). El orden del sistema pone la lectura antes que el control por ese motivo exacto."
+      },
+      {
+        "id": "f1-50com-09",
+        "severidad": "media",
+        "regla": "§6.12 Resumen y barra de filtros, regla 8",
+        "dice_el_sistema": "«un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero»",
+        "hay_en_el_build": "Los cuatro .schip llevan <button type=\"button\" aria-pressed=\"false\" data-f=\"…\">, el control de densidad .seg lleva role=\"group\" con dos <button aria-pressed>, y la paginación lleva cinco <button> con aria-current=\"page\" — ninguno tiene manejador.",
+        "selector": ".schip, .seg button, .pag button",
+        "evidencia": "El <script> completo del archivo contiene solo el conmutador de tema, el conmutador de estados de demo (.demo [data-set]) y el menú lateral. No hay ningún listener sobre .schip, .seg, .pag ni sobre el buscador. [Hallazgo transversal del lote 11: en las cuatro pantallas auditadas —45_autorizacion_compra, facturacion, 50_compras_almacen y 54_bitacora_descargas— el <script> es idéntico y solo maneja el andamio de demo; no hay lógica de producto en ninguna.]",
+        "por_que_importa": "La pantalla promete nueve controles de filtro, densidad y paginación con estado declarado (aria-pressed, aria-current) y ninguno responde. Un lector de pantalla anuncia «no pulsado» sobre botones que nunca se pueden pulsar, que es justo lo que §6.12 regla 8 prohíbe."
+      },
+      {
+        "id": "f1-50com-10",
+        "severidad": "media",
+        "regla": "§8 Voz de producto, límites 1 y 2 + §6.9",
+        "dice_el_sistema": "§8: «.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto» y «Ningún bloque de texto siempre visible pasa de ~140 caracteres»; «si el texto explica una decisión, no va en pantalla». §6.9: «.nota no es un componente de explicación general — solo nivel 1.»",
+        "hay_en_el_build": "Dos .nota al pie de la tabla: «Todas las autoriza Dirección, y una sola bandeja basta. No hay tramos por importe ni un nivel al que escalar… Por eso esta lista no tiene columna de «nivel» ni de «cuánto le falta para subir» — no hay a dónde subir.» y «La primera la pediste tú, y por eso su botón dice «Ver» y no «Revisar y decidir»…»",
+        "selector": ".nota",
+        "evidencia": "innerText medido con el andamio oculto: 289 y 218 caracteres, tres y tres oraciones, frente al tope de ~140 y al límite de una frase. Los dos textos explican por qué la pantalla está diseñada así («por eso esta lista no tiene columna de nivel», «por eso su botón dice Ver»), no una consecuencia para quien mira.",
+        "por_que_importa": "Es nivel 3 de §8 —explica una decisión de diseño— y ocupa dos bloques siempre visibles bajo la tabla. Lo que sí es nivel 1 (quien pide no autoriza) ya está dicho en la propia fila con la marca «LA PEDISTE TÚ» y con el botón «Ver»; la nota lo repite en 218 caracteres."
+      },
+      {
+        "id": "f1-50com-11",
+        "severidad": "media",
+        "regla": "§10 trampa 5 — isotipo recortado",
+        "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio… Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal.»",
+        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg> y el mismo patrón a 22×21 en el botón flotante.",
+        "selector": ".side .logo svg, .fab svg",
+        "evidencia": "getBoundingClientRect medido: <svg> en x=96, <use> en x=63,5 → −32,5px. En las capturas la marca sale como una astilla a la izquierda del rótulo SIO-DPROMA.",
+        "por_que_importa": "La marca aparece recortada en todas las vistas de la pantalla. 01_login tiene el patrón correcto en el mismo repositorio."
+      },
+      {
+        "id": "f1-50com-12",
+        "severidad": "media",
+        "regla": "§6.19 Botón-icono — .iconbtn",
+        "dice_el_sistema": "«Nunca viaja solo: title + aria-label, y el aria-label nombra el dato concreto («Copiar r.mendieta@…»), no la acción a secas.»",
+        "hay_en_el_build": "<button class=\"iconbtn\" type=\"button\" aria-label=\"Exportar\"> — sin title y con la acción a secas.",
+        "selector": ".p4-t .acc .iconbtn",
+        "evidencia": "grep de '<button class=\"iconbtn\"' en el archivo: dos resultados, el conmutador de tema (que sí lleva aria-label descriptivo y se actualiza por JS) y este, que solo lleva aria-label=\"Exportar\".",
+        "por_que_importa": "Es el único control de exportación de la bandeja y no dice qué exporta ni en qué formato: ni al pasar el cursor (no hay title) ni al lector de pantalla (aria-label genérico). Quien lo pulsa no sabe si se lleva las cinco filas visibles o las 28."
+      },
+      {
+        "id": "f1-50com-13",
+        "severidad": "baja",
+        "regla": "§6.11 Tabla densa, regla 11",
+        "dice_el_sistema": "«Si la fila entera navega, nada más dentro de ella repite esa acción… un botón se queda solo si hace algo que la fila no hace (Aprobar, Rechazar).»",
+        "hay_en_el_build": "Cada fila tiene el folio como <a class=\"folio\"> y además un <button class=\"btn mini\">Ver</button> en la columna de acciones; en las filas pendientes el botón es <button class=\"btn mini p\">Revisar y decidir</button>.",
+        "selector": "a.folio, .acciones .btn.mini",
+        "evidencia": "Markup de las cinco filas. «Revisar y decidir» pasa el criterio del sistema —hace algo que el folio no hace—; «Ver» no: va al mismo sitio que el folio de la misma fila.",
+        "por_que_importa": "En las tres filas ya decididas hay dos entradas idénticas a la misma ficha, en columnas distintas. No rompe nada, pero duplica el destino y gasta la columna de acciones. Severidad baja porque la fila entera no navega, así que el supuesto literal de la regla no se cumple del todo."
+      },
+      {
+        "id": "f1-50com-14",
+        "severidad": "baja",
+        "regla": "§6.5 Iconos — .msi",
+        "dice_el_sistema": "«Fuente: Material Symbols Rounded, variante rellena (FILL@1)… Carga por subconjunto, con un solo <link>»",
+        "hay_en_el_build": "Sprite propio de <symbol> SVG inline invocado con <svg class=\"ico\"><use href=\"#i-…\"/></svg>; no hay .msi ni <link> de Material Symbols.",
+        "selector": "svg.ico > use",
+        "evidencia": "grep de 'msi' y de 'Material+Symbols' en el archivo: 0 coincidencias.",
+        "por_que_importa": "Funciona y esquiva las trampas de ligadura y de subconjunto que el documento registra, pero es una familia distinta de la declarada: los glifos no coinciden con los de las pantallas que sí usan Material Symbols."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 1,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 3,
+      "integridad": 2
+    },
+    "justificacion": "Accesibilidad 1: seis de los destinos interactivos quedan por debajo de los 24px de §7.3 —los cinco folios y el buscador, medidos a 15px de alto—, el buscador repite literalmente la trampa 4 de §10 (input dentro de un <div> y no de una <label for>), 29 elementos con texto quedan por debajo del suelo de 12px incluidos los seis rótulos de columna y las etiquetas de estado, el cambio de vista no se anuncia ni mueve el foco, los estados se titulan con <b> sin tarjeta ni medallón, y el esqueleto mete 35 cadenas de relleno dentro de un role=\"status\". Theming 3: los dos temas se pintan bien (captura --oscuro correcta), 83 tokens declarados y ninguno usado sin declarar, pero arrastra --text-3 obsoleto y 23 tamaños de letra escritos como literales fuera de la escala. Responsive 3: modo tarjeta por debajo de 860px con data-et en todas las celdas, el esqueleto colapsa a una columna a 900px y hay ajustes de relleno a 1280px. Integridad 2: la tabla está bien construida —colgroup, caption, th scope=row en el folio, tfoot con la cuenta, estados con color + icono + texto— pero nueve controles con estado declarado (schip, densidad, paginación) no tienen lógica, el orden resumen/buscador está invertido respecto a §6.12 regla 7, el folio va en color de enlace contra §6.11 regla 10, el isotipo sale a −32,5px y dos bloques de 289 y 218 caracteres explican decisiones de diseño bajo la tabla. Rendimiento no evaluado: maqueta estática sin backend.",
+    "evidencia": [
+      "brief tactil_24px: 6 de 43 interactivos bajo 24px — input de búsqueda 329×15 y cinco a.folio 122,1×15",
+      ".search medido con tagName DIV, sin atributo for, altura 33px (§10 trampa 4)",
+      "Barrido de estilo calculado sobre #contenido y .p4: 29 elementos con texto a 10,5 / 11 / 11,5px",
+      "Con reducedMotion:'reduce': .skel animationName \"none\" y backgroundImage aún el degradado de tres paradas en backgroundPosition \"0% 0%\"; textContent \"CO-0000-00000\"",
+      "getComputedStyle(.state-empty): background rgba(0,0,0,0), box-shadow none, border-radius 0px, max-width none; icono 30×30px",
+      "getBoundingClientRect del <use> del isotipo contra su <svg>: −32,5px",
+      "innerText de los dos .nota: 289 y 218 caracteres frente al tope de ~140",
+      "capturas 50_compras_almacen--ok.png, --loading.png, --empty.png, --error.png, --oscuro.png"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+  },
+  "cobertura": [
+    {
+      "patron": "Columna de antigüedad de la espera («LLEVA ESPERANDO»: 4 d / 1 d / 0 d / —) con un umbral que tiñe la cifra de rojo a partir de cierto número de días (.espera.mucho b{color:var(--err-ink)}), y una cifra equivalente en la cabecera («1 lleva 4 días»). El sistema documenta el semáforo (§1.3) y las etiquetas de estado (§6.10), pero no dice nada de un dato continuo que cruza un umbral: ni dónde se declara el umbral, ni si el color puede ir solo sin icono ni texto, ni cómo se dice en la cabecera.",
+      "propuesta_de_regla": "§6.26 Dato con umbral de antigüedad. **Cuándo:** una columna que mide cuánto lleva algo esperando y cambia de tinta al pasar un límite. **Requisitos:** (1) el umbral **se declara en la pantalla, no se deduce del color** — un rótulo de columna o un `.ambito` (§6.22) que diga «se marca a partir de 3 días»; (2) el color **nunca viaja solo** (§1.3, §11): la cifra marcada lleva además icono o palabra, porque un número rojo sin más es color a secas; (3) la tinta es `-ink` del semáforo, nunca el color base, porque es texto sobre superficie clara; (4) el dato es **la fecha, y la antigüedad es su lectura**: la celda muestra las dos, con la fecha en `--text-3` como segunda línea (§6.11 regla 8); (5) la cifra de cabecera y la columna **salen del mismo umbral**, y si el filtro de la cabecera es un atajo, al pulsarlo se refleja en los filtros (§6.12 regla 2)."
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática servida como archivo, sin backend que perfilar",
+    "f4_nielsen: fuera del subconjunto de este lote (solo F1 y F3)",
+    "f5_investigacion: fuera del subconjunto por arquetipo",
+    "f1 §6.11 regla 3 (aria-sort): no evaluado como incumplimiento — la tabla no declara ninguna columna ordenable (no hay <button data-col> en el <thead>), así que la regla no tiene a qué aplicarse; los tres aria-sort del archivo están solo en selectores CSS",
+    "f1: la pantalla se declara como «recepción de mercancía: captura contra lo pedido», pero lo que contiene es la bandeja de autorización de compras — no hay captura de recepción, ni cantidad recibida contra cantidad pedida, ni ningún formulario; no se pudo auditar ese flujo porque no está en la maqueta",
+    "f1: no se evaluó el recorrido completo con teclado ni el comportamiento real con lector de pantalla"
+  ]
+}

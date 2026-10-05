@@ -1,0 +1,220 @@
+{
+  "pantalla": "35_incidencias",
+  "ruta_zip": "03-icev-instalacion-de-cargadores/35_incidencias.html",
+  "carpeta": "03-icev-instalacion-de-cargadores",
+  "area": "ICEV / almacén",
+  "arquetipo": "bandeja",
+  "modo": "cumplimiento",
+  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
+  "capturas": [
+    "35_incidencias--ok.png",
+    "35_incidencias--loading.png",
+    "35_incidencias--empty.png",
+    "35_incidencias--error.png",
+    "35_incidencias--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-35incidencias-01",
+        "severidad": "alta",
+        "regla": "§1.1 — `--text-3` es `#5C6675`, no `#66717F`",
+        "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)». §1.7: «No basta con medirlo sobre --surface: si el elemento puede caer sobre --surface-2, se mide también ahí.»",
+        "hay_en_el_build": "--text-3: #66717F en el bloque de tema claro, y .sv-baja{background:var(--surface-2);color:var(--text-3)}.",
+        "selector": "span.sev.sv-baja",
+        "evidencia": "Brief, contraste.detalle_claro (medición corregida con composición alfa real): {sel:«span.sev», txt:«Baja», color:rgb(102,113,127), fondo:rgb(231,237,243), px:10.5, peso:700, ratio:4.21, min:4.5}. Es el único fallo de contraste medido de la pantalla y cae exactamente en la combinación que §1.1 documenta.",
+        "por_que_importa": "La etiqueta de severidad «Baja» es el dato que decide si una incidencia se atiende hoy o esta semana, y es el único de las cuatro severidades que no alcanza el mínimo AA. Además va a 10,5px, por debajo del suelo tipográfico, lo que agrava el mismo fallo."
+      },
+      {
+        "id": "f1-35incidencias-02",
+        "severidad": "alta",
+        "regla": "§6.4 Vistas de estado — encabezado real y tarjeta con medallón",
+        "dice_el_sistema": "«(2) cada estado lleva encabezado real, no un <b>». §11: «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo».",
+        "hay_en_el_build": "<div class=\"state state-empty\"><svg class=\"ico\"><use href=\"#i-check\"/></svg><b>No hay incidencias abiertas</b><p>…</p></div> y lo mismo en state-error. 0 ocurrencias de .tarjeta-estado y .estado-ico en el archivo; el icono es un <svg> de 30px en --text-3.",
+        "selector": ".state.state-empty, .state.state-error",
+        "evidencia": "Medido: el árbol de encabezados completo de la pantalla es ['H1:Incidencias de servicio'] — 0 h2/h3/h4 en las cuatro vistas. Visible en 35_incidencias--empty.png: el mensaje flota centrado sobre el fondo de página, sin tarjeta, sin sombra y con un icono gris de 30px.",
+        "por_que_importa": "«No hay incidencias abiertas» es una buena noticia operativa que el propio texto se esfuerza en marcar como tal, pero no existe en el índice de encabezados y no se lee como una respuesta del sistema: visualmente es indistinguible de una pantalla que no cargó."
+      },
+      {
+        "id": "f1-35incidencias-03",
+        "severidad": "alta",
+        "regla": "§7.3 — enlaces que son el elemento primario de su fila",
+        "dice_el_sistema": "«Enlaces que son el elemento primario de su fila (folio, miga, «Ver en Maps»): no son texto en prosa, llevan padding hasta llegar a 24px.» «Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8).»",
+        "hay_en_el_build": "<th scope=\"row\" data-et=\"Folio\"><a class=\"folio\" href=\"#\" translate=\"no\">IN-2026-00312</a></th>, con .folio{font-variant-numeric:tabular-nums;font-weight:600;color:var(--link);text-decoration:none;white-space:nowrap} — sin padding ni min-height.",
+        "selector": "th[scope=\"row\"] a.folio",
+        "evidencia": "Brief, tactil_24px: por_debajo_de_24px = 7 sobre 50 interactivos; seis de ellos son los folios, medidos a 107,9 × 15px cada uno. Reproducido con getBoundingClientRect a 1440×900.",
+        "por_que_importa": "El folio es la entrada principal a cada incidencia: las seis filas de la bandeja ofrecen un destino de 15px de alto, 9px por debajo del mínimo de WCAG 2.2, justo en la columna congelada que más se pulsa."
+      },
+      {
+        "id": "f1-35incidencias-04",
+        "severidad": "alta",
+        "regla": "§8 Voz de producto — límites medibles",
+        "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto. No hay excepción por importancia del contenido.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres. Se mide con el contador de caracteres, no a ojo.» «.nota no es un componente de explicación general — solo nivel 1.»",
+        "hay_en_el_build": "Un único <p class=\"nota\"> bajo la tabla, siempre visible, con dos párrafos en negrita y cuatro oraciones: ««Días hasta el cierre» va vacío mientras la incidencia sigue abierta, y jamás en cero. […] La exportación la arma el servidor, no esta pantalla, porque es la que sabe enmascarar quién reportó. Un archivo armado con lo que se ve aquí saldría idéntico salvo en la única columna que importaba.»",
+        "selector": "p.nota",
+        "evidencia": "Medido con innerText.length (con [data-andamio] oculto): 534 caracteres. Tope del sistema: ~140. Línea 737 del archivo; visible en 35_incidencias--ok.png bajo la paginación.",
+        "por_que_importa": "Es 3,8 veces el tope, en el componente que §8 reserva para lo que bloquea la acción inmediata, y todo su contenido es nivel 3: explica por qué se diseñó la columna así y por qué el botón de exportar funciona como funciona. Ninguna de las dos cosas se puede hacer desde aquí."
+      },
+      {
+        "id": "f1-35incidencias-05",
+        "severidad": "alta",
+        "regla": "§6.7 Esqueleto de carga — .skel",
+        "dice_el_sistema": "«sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)»; «prefers-reduced-motion aplana el fondo, no solo detiene la animación».",
+        "hay_en_el_build": "42 barras .skel con texto: seis repeticiones de <span class=\"skel\">IN-2026-00000</span><span class=\"skel\">asunto de la incidencia</span><span class=\"skel\">severidad</span><span class=\"skel\">cliente</span><span class=\"skel\">ORD-202608-0000</span><span class=\"skel\">estado</span><span class=\"skel\">0 días</span>. Línea 604: @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin background:var(--surface-2).",
+        "selector": ".state-loading.sk .sk-fila .skel",
+        "evidencia": "Línea 739 del archivo; 42 ocurrencias de class=\"skel\" medidas por grep.",
+        "por_que_importa": "El esqueleto anuncia «IN-2026-00000 … 0 días» seis veces. Es exactamente el cero que la propia .nota de la pantalla declara prohibido («jamás en cero»): la vista de carga contradice la regla de dato que la vista con datos defiende."
+      },
+      {
+        "id": "f1-35incidencias-06",
+        "severidad": "media",
+        "regla": "§6.11 regla 10 — el identificador de fila no lleva color de enlace",
+        "dice_el_sistema": "«El identificador de fila no lleva color de enlace. --link es para navegación fuera de tabla (migas, «Ver en Maps»). El folio va en --text; lo pulsable lo indica tbody tr:hover td{background:var(--surface-2)}.»",
+        "hay_en_el_build": ".folio{…;color:var(--link);text-decoration:none} y .folio:hover{text-decoration:underline}; además .lnk sobre el folio de orden en la columna «Orden».",
+        "selector": "a.folio, a.lnk",
+        "evidencia": "Línea 382-383 del archivo. Visible en 35_incidencias--ok.png: los seis folios IN-2026-… están en verde de enlace, y los de orden ORD-202608-… también.",
+        "por_que_importa": "Dos columnas de la tabla van en color de enlace, lo que deja la bandeja con doce destinos verdes compitiendo entre sí y quita a --link su significado («esto te saca de aquí»). La regla existe precisamente porque en una tabla todo es pulsable y el color deja de informar."
+      },
+      {
+        "id": "f1-35incidencias-07",
+        "severidad": "media",
+        "regla": "§6.12 regla 7 (orden fijo) y regla 3 (contadores agrupados por criterio)",
+        "dice_el_sistema": "«Son dos zonas distintas, no una fila. Orden fijo: resumen → buscador + filtros en una sola fila → tabla» (regla 7). «Contadores agrupados por criterio, con rótulo por grupo» (regla 3).",
+        "hay_en_el_build": "Orden real: .p4-t (h1 + resumen en texto) → .p4-b (solo el buscador, en su propia fila) → .p4-f (los cuatro .schip + el segmentado de densidad) → tabla. Los cuatro contadores mezclan dos criterios sin rótulo: «1 críticas» y «2 altas» son severidad, «3 abiertas» y «3 cerradas» son estado.",
+        "selector": ".p4-b, .p4-f > .schip",
+        "evidencia": "Líneas 672-674 del archivo: el bloque .p4-f con los schips va después de .p4-b, que contiene solo el <div class=\"search\">. Visible en 35_incidencias--ok.png: buscador arriba, fila de contadores debajo.",
+        "por_que_importa": "La fila de contadores está invertida respecto al orden que el sistema fija, y al mezclar severidad con estado sin rótulo invita a leer «1 + 2 + 3 + 3 = 9» cuando la cabecera dice «3 abiertas · 1 crítica · 6 cerradas»: las dos críticas y altas ya están contadas dentro de las abiertas."
+      },
+      {
+        "id": "f1-35incidencias-08",
+        "severidad": "media",
+        "regla": "§6.9 trampa adicional — reinventar un componente que ya existe en el mismo archivo",
+        "dice_el_sistema": "«No solo se repiten nombres de clase por accidente, también se reinventan componentes enteros por no buscar primero si ya existen.» §6.10 fija la geometría de la etiqueta: border-radius:var(--r-ctrl);padding:3px 9px;font-size:var(--fs-meta).",
+        "hay_en_el_build": "En el mismo archivo conviven .pill (línea 450: border-radius:var(--r-ctrl);padding:3px 9px) y .sev (línea 640: border-radius:4px;padding:1px 7px;font-size:10.5px), que hace lo mismo —fondo -bg, tinta -ink, marca de color— con otro radio, otro relleno y otro tamaño.",
+        "selector": ".sev, .pill",
+        "evidencia": "Líneas 450 y 640-650. .sv-crit usa --err-bg/--err-ink, .sv-alta usa --warn-bg/--warn-ink: los mismos pares que .p-err y .p-warn. La diferencia real entre ambas es solo el radio (4px vs --r-ctrl 6px) y el tamaño (10,5px vs 11px).",
+        "por_que_importa": "La misma fila enseña dos etiquetas con la misma función visual y geometría distinta («Crítica» y «Abierta» una al lado de otra), y la nueva introduce un radio y un tamaño que no están en ningún token. Es la trampa documentada: el componente ya existía dos columnas más allá."
+      },
+      {
+        "id": "f1-35incidencias-09",
+        "severidad": "media",
+        "regla": "§6.10 — color + icono + texto, nunca color a secas",
+        "dice_el_sistema": "«Lleva color + icono + texto, nunca color a secas.» §11: «un estado se comunica con color + icono + texto, nunca con color solo».",
+        "hay_en_el_build": "Las seis etiquetas de la columna «Estado» son <span class=\"pill p-err\">Abierta</span>, <span class=\"pill p-warn\">En atención</span>, <span class=\"pill p-ok\">Cerrada</span>: sin icono. Las de severidad sí llevan marca, pero con ::before de CSS (triángulo, punto, raya, círculo), no con un icono del sistema.",
+        "selector": "td[data-et=\"Estado\"] .pill",
+        "evidencia": "grep: 6 nodos <span class=\"pill p-*\"> sin <svg class=\"ico\"> dentro. Visible en 35_incidencias--ok.png, columna ESTADO.",
+        "por_que_importa": "Abierta, En atención y Cerrada se distinguen solo por rojo/ámbar/verde en etiquetas de 11px. Es la columna que decide qué se atiende, y quien no distingue esos tonos tiene que leer la palabra."
+      },
+      {
+        "id": "f1-35incidencias-10",
+        "severidad": "media",
+        "regla": "§6.11 regla 11 — si la fila entera navega, nada más dentro de ella repite esa acción",
+        "dice_el_sistema": "«La fila entera es clicable y es la única entrada; un botón se queda solo si hace algo que la fila no hace (Aprobar, Rechazar).»",
+        "hay_en_el_build": "Cada fila ofrece tres entradas al mismo registro: <a class=\"folio\"> en la primera celda, <a class=\"lnk\"> a la orden, y <div class=\"acciones\"><button class=\"btn mini\">Ver incidencia</button></div> en la última. La <tr> no es clicable.",
+        "selector": "tbody tr .acciones .btn.mini",
+        "evidencia": "Markup de las seis filas (líneas 680-700). El botón «Ver incidencia» no hace nada distinto del enlace del folio.",
+        "por_que_importa": "Dos destinos para la misma acción en la misma fila, uno de ellos recortado fuera del viewport a 1440px (ver hallazgo del desbordamiento). Duplica el recorrido con teclado y obliga a decidir cuál usar."
+      },
+      {
+        "id": "f1-35incidencias-11",
+        "severidad": "media",
+        "regla": "§6.21 — es el único componente para filtrar por un campo categórico con más de un valor posible",
+        "dice_el_sistema": "«Es el único componente para filtrar por un campo categórico con más de un valor posible. Única excepción legítima: chips booleanos sobre dos condiciones sí/no.»",
+        "hay_en_el_build": "Severidad (cuatro valores: crítica, alta, media, baja) y Estado (tres: abierta, en atención, cerrada) se filtran con cuatro .schip sueltos, sin .fwrap, sin panel .pop, sin pastillas aplicadas y sin «+ Añadir filtro».",
+        "selector": ".p4-f .schip",
+        "evidencia": "grep: 0 ocurrencias de «fwrap» y de «class=\"pop\"» en el archivo. Los cuatro botones son .schip con aria-pressed, data-f=\"err|warn|neutro|ok\".",
+        "por_que_importa": "Dos dimensiones categóricas con más de dos valores quedan reducidas a cuatro atajos; no hay forma de filtrar por «media» ni por «baja», ni de ver qué filtros hay puestos, ni de quitarlos uno a uno, que son las cuatro cosas que §6.21 y §6.12 regla 4 exigen."
+      },
+      {
+        "id": "f1-35incidencias-12",
+        "severidad": "media",
+        "regla": "§2.1 Suelo tipográfico",
+        "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» Excepciones: 10,5px solo en rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+        "hay_en_el_build": "Fuera de las excepciones: .sev a 10,5px (6 nodos: crítica, alta ×2, media ×2, baja), .pill a 11px (6 nodos), thead th a 11px (7 nodos), .dos small a 11px (7 nodos), .ref a 11px, más dos <b> y un <span> a 11,5px.",
+        "selector": ".sev, .pill, thead th, .dos small",
+        "evidencia": "Medido con getComputedStyle por elemento con texto propio a 1440×900: {«10.5px|SPAN.sev sv-crit»:1, «10.5px|SPAN.sev sv-alta»:2, «10.5px|SPAN.sev sv-media»:2, «10.5px|SPAN.sev sv-baja»:1, «11px|SPAN.pill p-*»:6, «11px|TH.»:6, «11px|TH.num»:1, «11px|SMALL.»:7}. Valores literales en la hoja, no --fs-meta.",
+        "por_que_importa": "Severidad y estado —los dos datos por los que se triada esta bandeja— son los dos textos más pequeños de la pantalla, y la severidad está además 1,5px por debajo del propio --fs-meta. Es también lo que convierte el fallo de contraste de «Baja» en un problema de lectura real."
+      },
+      {
+        "id": "f1-35incidencias-13",
+        "severidad": "media",
+        "regla": "§10 trampa 5 — isotipo con viewBox repetido",
+        "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio»; «se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal».",
+        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>, y el mismo patrón en el .fab.",
+        "selector": ".logo svg, .fab svg",
+        "evidencia": "Medido con getBoundingClientRect a 1440px: svg x=96 w=44 h=42; use x=63,5 w=43; dx = −32,5px; el <use> no declara width.",
+        "por_que_importa": "La marca se recorta casi entera y sale como una astilla verde en la barra lateral y en el botón flotante."
+      },
+      {
+        "id": "f1-35incidencias-14",
+        "severidad": "media",
+        "regla": "§6.2 Botones — .btn",
+        "dice_el_sistema": "«El suelo se declara con min-height, no se confía al relleno (medido: 35px y 27px sin él).»",
+        "hay_en_el_build": ".btn{…padding:8px 13px;…} sin min-height; .btn.mini{padding:5px 10px;font-size:var(--fs-meta)} sin min-height:28px, y es la variante que usan los seis «Ver incidencia».",
+        "selector": ".btn, .btn.mini",
+        "evidencia": "getComputedStyle(.btn).minHeight = «auto» medido en Chromium; el <html> no lleva data-tacto, así que la regla de modo dedo tampoco repone el suelo.",
+        "por_que_importa": "Los seis botones de fila son .btn.mini sin suelo declarado: su altura depende solo del relleno y de --fs-meta, que es el fallo silencioso que §6.2 documenta."
+      },
+      {
+        "id": "f1-35incidencias-15",
+        "severidad": "baja",
+        "regla": "§7.3 / §10 — la regla táctil lleva :root",
+        "dice_el_sistema": "«El :root es lo que hace ganar la regla»; «se comprueba midiendo con data-tacto=\"dedo\" puesto».",
+        "hay_en_el_build": "Las 6 reglas de modo dedo se escriben sin :root (líneas 279-284) y data-tacto no aparece en el <html> ni en el JS. El archivo sí declara .acciones .iconbtn{width:28px;height:28px} (línea 389), la variante que ganaría el empate.",
+        "selector": "[data-tacto=\"dedo\"] .iconbtn",
+        "evidencia": "Medido forzando data-tacto=\"dedo\": 0 de 26 .iconbtn/.btn/.it quedan por debajo de 46px, porque la pantalla no dibuja ningún .acciones .iconbtn (medido: 0 nodos; los .acciones de las filas contienen .btn.mini, no botones de icono). El bug queda latente.",
+        "por_que_importa": "Hoy la regla gana por ausencia del competidor, pero el competidor ya está declarado en la hoja: basta cambiar «Ver incidencia» por un botón de icono para que el modo dedo deje de aplicar sin que nada falle visiblemente."
+      },
+      {
+        "id": "f1-35incidencias-16",
+        "severidad": "baja",
+        "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+        "dice_el_sistema": "«Un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero.»",
+        "hay_en_el_build": "El <script> (38 líneas) solo cablea tema, cajón del menú y andamiaje .demo. Los cuatro .schip con aria-pressed=\"false\", el segmentado de densidad, «Columnas», el buscador y la paginación no tienen manejador.",
+        "selector": ".p4-f .schip[aria-pressed], .seg button[aria-pressed]",
+        "evidencia": "Inventario del script: querySelectorAll únicamente sobre '.demo [data-set]'; 12 aria-pressed=\"true\" y 9 «false» en el archivo, ninguno gobernado fuera del andamiaje.",
+        "por_que_importa": "Hallazgo transversal del paquete: las maquetas no traen lógica de producto. En una bandeja pesa más porque los cuatro contadores se anuncian como conmutadores («no pulsado») a un lector de pantalla y no conmutan nada."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 1,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 2,
+      "integridad": 2
+    },
+    "justificacion": "Como bandeja la información está bien elegida (folio, asunto con subtipo, severidad, cliente, orden, estado, días hasta el cierre) y el markup de tabla cumple lo básico: <caption>, <th scope=\"row\"> en la columna de folio, data-et en todas las celdas para el modo tarjeta. Pero acumula el único fallo de contraste medido del lote en la etiqueta de severidad «Baja» (4,21:1), seis destinos táctiles de 15px en los folios, estados de vacío y error sin encabezado ni tarjeta (el árbol de encabezados completo es ['H1:Incidencias de servicio']), una .nota de 534 caracteres, un esqueleto que lee «0 días» seis veces y un componente .sev reinventado junto a .pill. Theming aguanta: dos temas completos y 0 fallos en oscuro. Responsive baja porque la tabla desborda ya a 1440px.",
+    "evidencia": [
+      "Brief: contraste fallos_claro=1 (span.sev «Baja», rgb(102,113,127) sobre rgb(231,237,243), 4,21:1, mínimo 4,5), fallos_oscuro=0; tactil_24px por_debajo_de_24px=7 de 50; tokens usados_sin_declarar=[]; estructura h1=1, th=14, thAriaSort=0, ariaLive=1, dialogNativo=0, skipLink=1.",
+      "Medido: .tabla-caja scrollWidth 1290 > clientWidth 1204 a 1440×900 — la columna de acciones queda fuera de la vista y hay que desplazar horizontalmente para alcanzar «Ver incidencia» (§6.11 regla 5 lo permite, pero es el ancho de pantalla completo).",
+      "Medido: encabezados = ['H1:Incidencias de servicio'] (0 h2/h3/h4); p.nota = 534 caracteres; 42 .skel con texto; isotipo dx=−32,5px; .btn minHeight «auto»; 6 enlaces .folio a 107,9×15px."
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+  },
+  "cobertura": [
+    {
+      "patron": "Escala ordinal de severidad de cuatro niveles (Crítica · Alta · Media · Baja) con marca de forma distinta por nivel (triángulo, punto lleno, raya, círculo hueco). El sistema no tiene regla para esto: §1.3 da cinco estados sin orden entre sí (ok, warn, err, block, pause), §1.4 da una paleta categórica explícitamente sin juicio, y §6.10 solo distingue «estado» (lo que puede cambiar solo) de «clasificación» (lo que la cosa es). Una severidad es un juicio Y está ordenada, que es un tercer caso.",
+      "propuesta_de_regla": "§6.10.1 Etiqueta de escala ordinal — `.pill` + `.esc-N`. Cuándo: el dato tiene juicio y además tiene orden (severidad, prioridad, riesgo). No se inventa un componente nuevo: se reusa `.pill` con su geometría de §6.10 (`border-radius:var(--r-ctrl)`, `padding:3px 9px`, `font-size:var(--fs-meta)`). El color sale del semáforo de §1.3 solo en los extremos (`--err` para el nivel que impide operar, `--ok` o neutro para el que no pide nada) y los intermedios bajan por `--warn` y por la superficie neutra, nunca por una serie de §1.4. El orden se comunica además con un segundo canal obligatorio —la forma de la marca `::before`— porque el color por sí solo no transmite orden. Todos los niveles llevan marca, o ninguno (§6.10). Y ningún nivel puede resolverse con `--text-3` sobre `--surface-2`: ese par está medido a 4,93:1 con el valor canónico y no deja margen para bajar de 12px."
+    },
+    {
+      "patron": "Columna cuyo valor es deliberadamente vacío mientras el registro sigue abierto, y que nunca debe mostrar cero («Días hasta el cierre» con «—» en las abiertas). La pantalla lo resuelve con <span class=\"abierta\">—</span> y lo explica en una .nota de 534 caracteres. §6.22 cubre el cero de un conjunto vacío, pero no el dato que todavía no se puede medir.",
+      "propuesta_de_regla": "§6.22.1 Dato aún no medible en una celda. Cuándo: una métrica que solo existe cuando el registro se cierra (días hasta el cierre, duración, tiempo de respuesta). La celda lleva una raya `—` en `--text-3`, nunca un cero: un cero afirma que se midió y la medición dio cero. La razón no va en la celda ni en una nota al pie (§6.12 regla 9): va en el toggletip de la cabecera de columna (§6.23), en una frase. Si la métrica se consulta a diario, la cabecera nombra la condición («Días hasta el cierre · solo cerradas») en lugar de explicarla debajo."
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática, sin backend que perfilar ni librería que cargar.",
+    "f1 §6.11 regla 3 (aria-sort): la tabla no ofrece ninguna columna ordenable — 0 botones en <thead>, 0 th[aria-sort], 0 <span class=\"sort\"> en el markup. La regla pide aria-sort en las columnas ordenables, y aquí no hay ninguna, así que no se declara incumplimiento. Sí consta que el archivo trae el CSS thead th[aria-sort=\"ascending\"] .sort (líneas 377-378) sin markup que lo active: la ordenación se dibujó y no se construyó.",
+    "f1 §6.16 (formulario): la pantalla no contiene campos de captura — el único <input> es el buscador (type=\"search\"), sin required ni aria-required, lo que es correcto para un buscador. No evaluable el bloque de obligatoriedad.",
+    "f1 §6.17 (subida de archivo): 0 input[type=file] y ningún componente de adjunto; no evaluable.",
+    "f1 §6.18: no hay diálogo (0 <dialog>, 0 div[role=dialog]); no evaluable.",
+    "f1 §6.13 (barra de selección): la tabla no ofrece selección múltiple (0 casillas); no evaluable."
+  ]
+}

@@ -1,0 +1,197 @@
+{
+  "pantalla": "45_autorizacion_compra",
+  "ruta_zip": "05-direccion-y-administracion/45_autorizacion_compra.html",
+  "carpeta": "05-direccion-y-administracion",
+  "area": "almacén",
+  "arquetipo": "autorización/detalle",
+  "modo": "cumplimiento",
+  "estados_auditados": [
+    "ok",
+    "loading",
+    "empty",
+    "error",
+    "oscuro"
+  ],
+  "capturas": [
+    "45_autorizacion_compra--ok.png",
+    "45_autorizacion_compra--loading.png",
+    "45_autorizacion_compra--empty.png",
+    "45_autorizacion_compra--error.png",
+    "45_autorizacion_compra--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-45aut-01",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto",
+        "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)»",
+        "hay_en_el_build": "--text-3: #66717F",
+        "selector": ":root",
+        "evidencia": "brief MEDIDO_por_el_orquestador.tokens.text_3_declarado = \"#66717F\"; confirmado con getComputedStyle(document.documentElement).getPropertyValue('--text-3') = #66717F. La pantalla usa --surface-2 en la cabecera de tabla, en .bloqueado y en el esqueleto.",
+        "por_que_importa": "Sobre --surface-2 ese valor cae a 4,21:1, bajo el mínimo AA de 4,5:1. Aquí --text-3 pinta los sellos de tiempo de la traza de la decisión y la referencia del error — justo los datos que hay que poder leer para auditar quién autorizó y cuándo."
+      },
+      {
+        "id": "f1-45aut-02",
+        "severidad": "alta",
+        "regla": "§6.4 Vistas de estado, regla 1",
+        "dice_el_sistema": "«el cambio se anuncia (aria-live=\"polite\") y mueve el foco» (main.focus() con tabindex=\"-1\")",
+        "hay_en_el_build": "<main id=\"contenido\" data-state=\"ok\" tabindex=\"-1\"> sin aria-live; el <script> solo hace cont.setAttribute('data-state', b.dataset.set) y nunca llama a focus().",
+        "selector": "main#contenido",
+        "evidencia": "grep de aria-live en el archivo: 0 coincidencias (el único role=\"status\" está en .state-loading, línea del esqueleto). grep de focus(): 0 coincidencias. El tabindex=\"-1\" está puesto pero nadie lo usa.",
+        "por_que_importa": "Quien use lector de pantalla pulsa «Aprobar», la vista cambia a error o a cargando y no se entera: el foco se queda donde estaba y nada se anuncia. En una pantalla que compromete $48,528 eso es no saber si la decisión se ejecutó."
+      },
+      {
+        "id": "f1-45aut-03",
+        "severidad": "alta",
+        "regla": "§6.4 Vistas de estado (valores y regla 2) + §11 Estructura",
+        "dice_el_sistema": "«.tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)} … .estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}» y «cada estado lleva encabezado real, no un <b>»; §11: «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo»",
+        "hay_en_el_build": ".state{display:none;flex-direction:column;align-items:center;…padding:56px 16px} / .state .ico{width:30px;height:30px;color:var(--text-3)} / .state b{font-size:var(--fs-base)} — y el título de cada estado es <b>Esta compra no tiene partidas</b> / <b>No se pudo cargar la compra</b>.",
+        "selector": ".state, .state .ico, .state b",
+        "evidencia": "getComputedStyle de .state-empty: backgroundColor rgba(0,0,0,0), boxShadow none, borderRadius 0px, maxWidth none. Su .ico mide 30×30px con backgroundColor rgba(0,0,0,0) y borderRadius 0px — no hay medallón de 52px. Captura 45_autorizacion_compra--empty.png: el estado flota sobre el fondo de página, sin tarjeta.",
+        "por_que_importa": "Sin tarjeta ni medallón el estado se lee como «la pantalla se quedó a medio pintar» en vez de como una respuesta del sistema; y con el título en <b> el estado no aparece en el índice de encabezados, así que con lector de pantalla no hay forma de saltar a él."
+      },
+      {
+        "id": "f1-45aut-04",
+        "severidad": "alta",
+        "regla": "§6.16 Formulario, regla 3",
+        "dice_el_sistema": "«required y aria-required de verdad, no asteriscos decorativos»",
+        "hay_en_el_build": "<label for=\"com\">Comentario <span class=\"req\">*</span></label><textarea id=\"com\" placeholder=\"Por qué se autoriza, o por qué no. Es obligatorio en los dos casos.\"></textarea> — el <textarea> no lleva required ni aria-required.",
+        "selector": "#com",
+        "evidencia": "grep -c 'required' sobre el archivo completo: 0 coincidencias. El asterisco es un <span class=\"req\"> teñido con --err-ink (línea 582: .req{color:var(--err-ink)}).",
+        "por_que_importa": "La propia pantalla dice «No se puede aprobar ni rechazar en blanco», pero esa obligatoriedad no existe en el árbol de accesibilidad: un lector de pantalla anuncia el campo como opcional. En la pantalla donde el comentario es la única justificación que queda en la traza, el asterisco es decoración."
+      },
+      {
+        "id": "f1-45aut-05",
+        "severidad": "alta",
+        "regla": "§11 Interacción + §6.18 Diálogo modal",
+        "dice_el_sistema": "§11: «toda acción destructiva confirma, dice a cuántos afecta y se puede deshacer»; §6.18: «Siempre <dialog> nativo con showModal()»",
+        "hay_en_el_build": "<button class=\"btn p\" type=\"button\" disabled …>Aprobar</button> y <button class=\"btn\" type=\"button\" disabled …>Rechazar</button>, sin ningún diálogo de confirmación en la pantalla.",
+        "selector": ".decidir .par .btn",
+        "evidencia": "brief estructura: dialogNativo = 0, divDialog = 0. grep de '<dialog' y 'role=\"dialog\"' en el archivo: 0 coincidencias. El importe que se compromete al pulsar está en la propia cabecera: $48,528 (h1 CO-2026-00148).",
+        "por_que_importa": "Aprobar y Rechazar son irreversibles —la propia pantalla lo dice: «La traza es inmutable… Nada de esto se puede editar ni borrar después»— y se ejecutan con una sola pulsación, sin un paso que diga a quién y por cuánto se compromete. Es el único punto de la maqueta donde un clic mueve dinero."
+      },
+      {
+        "id": "f1-45aut-06",
+        "severidad": "alta",
+        "regla": "§6.7 Esqueleto de carga (a11y) + §5 prefers-reduced-motion",
+        "dice_el_sistema": "§6.7: «role=\"status\" + aria-label en el contenedor y sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)» y «prefers-reduced-motion aplana el fondo, no solo detiene la animación»: «.skel{animation:none;background:var(--surface-2)}»",
+        "hay_en_el_build": "<span class=\"skel\" style=\"width:24%\">La compra</span><span class=\"skel\" style=\"width:86%\">proveedor</span>… (12 barras con texto real) y @media (prefers-reduced-motion:reduce){.skel{animation:none}} — sin reponer el fondo.",
+        "selector": ".state-loading .skel",
+        "evidencia": "Con reducedMotion:'reduce' en Playwright, getComputedStyle(.skel) devuelve animationName \"none\" pero backgroundImage sigue siendo linear-gradient(90deg, rgb(231,237,243) 25%, rgba(27,36,48,.14) 50%, …) con backgroundPosition \"0% 0%\" — el degradado queda congelado, no aplanado. textContent de la primera barra: \"La compra\". color computado: rgba(0,0,0,0).",
+        "por_que_importa": "El contenedor es role=\"status\", así que al entrar en «cargando» un lector de pantalla lee en voz alta «Cargando La compra proveedor almacén y solicitante entrega estimada Partidas partida partida partida total…» — ruido con forma de dato. Y con movimiento reducido queda una franja de tres tonos congelada que parece un fallo de pintado."
+      },
+      {
+        "id": "f1-45aut-07",
+        "severidad": "alta",
+        "regla": "§2.1 Suelo tipográfico + §10 trampa 1",
+        "dice_el_sistema": "§2.1: «El suelo son 12px. Nada baja de ahí» y «si un dato se lee todos los días, va a 12–13px como mínimo». Únicas excepciones: rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+        "hay_en_el_build": "20 declaraciones font-size:11px, 5 de font-size:10.5px, 3 de font-size:11.5px, más un font:700 11px abreviado.",
+        "selector": ".et, .cuando, .ayuda, .cfg-pie, .pill, th, el <span> del SKU",
+        "evidencia": "Barrido con getComputedStyle sobre todo #contenido y .p4 con el andamio oculto: span.et a 10.5px ×6 (los rótulos PROVEEDOR / ALMACÉN DESTINO / SOLICITÓ / MOTIVO / COTIZACIÓN / ENTREGA ESTIMADA), th a 11px ×4 (MATERIAL Y SKU, CANTIDAD, PRECIO UNITARIO, IMPORTE), span.cuando a 11px ×3 (las horas de la traza), span.ayuda a 11px (el texto que dice que el comentario es obligatorio), span.cfg-pie a 11.5px, .pill a 11px ×2, el SKU a 11px ×5.",
+        "por_que_importa": "Lo que baja del suelo no es adorno: son las etiquetas de los seis campos de la compra, los rótulos de las cuatro columnas de importes y las horas de la traza. Es exactamente el dato que alguien lee todos los días para decidir, y el único que queda como prueba después."
+      },
+      {
+        "id": "f1-45aut-08",
+        "severidad": "alta",
+        "regla": "§8 Voz de producto, límite 2 + §9 Andamiaje de maqueta",
+        "dice_el_sistema": "§8: «Ningún bloque de texto siempre visible pasa de ~140 caracteres» y «.nota y .banda llevan como máximo UNA frase»; nivel 3 («explica por qué se diseñó así») «no va en la interfaz». §9: «Todo lo que lleve data-andamio se retira en la versión real.»",
+        "hay_en_el_build": "Cinco bloques siempre visibles por encima del tope, y uno de ellos es una nota de construcción presentada como UI de producto: <div class=\"banda b-warn\">…<b>Propuesta — sin backend.</b> <code>CompraAlmacen</code>/<code>CompraAlmacenPartida</code> están declaradas explícitamente sin modelar en <code>prisma/schema.prisma:1682-1685</code> (doc 35, D65)… el contenido es el que ya proponía <code>html_v2/45_autorizacion_compra.html</code>…</div>, sin data-andamio.",
+        "selector": ".banda.b-warn, .regla-cfg, .bloqueado, .ayuda#pq-aut, .nota",
+        "evidencia": "innerText medido con el andamio oculto: .regla-cfg 414 caracteres; .banda.b-warn 314; .ayuda#pq-aut 266; .bloqueado 258; .nota de partidas 166. Tope del sistema: ~140. grep de data-andamio sobre esa .banda: no lo lleva (el único data-andamio del archivo está en el conmutador .demo del pie).",
+        "por_que_importa": "La banda de arriba cita una ruta de esquema, un número de línea, un número de documento y el nombre del propio archivo de maqueta: no es información para quien autoriza, y al no llevar data-andamio el selector único de §9 no la encuentra, así que viajaría al producto. El bloque .regla-cfg de 414 caracteres explica una decisión de configuración («Si mañana cambia, cambia la configuración y esta pantalla no se toca») — nivel 3 de §8, no va en la interfaz."
+      },
+      {
+        "id": "f1-45aut-09",
+        "severidad": "media",
+        "regla": "§6.9 — trampa adicional documentada",
+        "dice_el_sistema": "«.bloqueado en Autorización de compra era .banda.b-info con otro nombre: no solo se repiten nombres de clase por accidente, también se reinventan componentes enteros por no buscar primero si ya existen.»",
+        "hay_en_el_build": ".bloqueado{display:flex;gap:var(--sp-3);align-items:flex-start;border-radius:var(--r-card);background:var(--surface-2);border:1px solid var(--border-2);padding:var(--sp-3) var(--sp-4);font-size:var(--fs-dense);line-height:1.55;color:var(--text-2)} — frente a .b-info{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)} que el mismo archivo ya declara en la línea 524.",
+        "selector": ".bloqueado",
+        "evidencia": "Líneas 648-652 del archivo (.bloqueado) y línea 524 (.b-info), más .banda en 518-521: mismo fondo, mismo color de texto, mismo borde, misma geometría de icono + párrafo. El sistema nombra este caso por su nombre y por esta pantalla; sigue en el build.",
+        "por_que_importa": "Dos componentes para el mismo aviso significan dos sitios que mantener y dos avisos que se separan con el tiempo. Es el caso que el documento ya levantó en esta misma pantalla y que no se corrigió."
+      },
+      {
+        "id": "f1-45aut-10",
+        "severidad": "media",
+        "regla": "§10 trampa 5 — isotipo recortado",
+        "dice_el_sistema": "«Un <symbol> ya trae su viewBox; repetirlo en el <svg> que lo invoca descoloca la marca. Correcto: <svg width=\"44\" height=\"42\" aria-hidden=\"true\"><use href=\"#dproma-mark\" width=\"44\" height=\"42\"/></svg> — medidas en el <use> y sin viewBox en el envoltorio. Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal.»",
+        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg> en el logo de la barra lateral, y el mismo patrón a 22×21 en el botón flotante.",
+        "selector": ".side .logo svg, .fab svg",
+        "evidencia": "getBoundingClientRect medido en el navegador: el <svg> en x=96, el <use> en x=63,5 → desplazamiento de −32,5px. El documento da ~32,5px como la cifra exacta de este error. En las capturas --ok y --oscuro la marca aparece como una astilla vertical a la izquierda del rótulo SIO-DPROMA.",
+        "por_que_importa": "El isotipo es lo primero que se ve en todas las pantallas y aquí sale recortado casi entero. 01_login escribe el patrón correcto en el mismo repositorio, así que no falta la referencia."
+      },
+      {
+        "id": "f1-45aut-11",
+        "severidad": "media",
+        "regla": "§6.16 A11y extra — botón deshabilitado",
+        "dice_el_sistema": "«un botón deshabilitado no recibe el foco → aria-disabled=\"true\" + aria-describedby con el motivo, y al pulsarlo se explica»",
+        "hay_en_el_build": "<button class=\"btn p\" type=\"button\" disabled aria-describedby=\"pq-aut\">Aprobar</button> y el gemelo de Rechazar: llevan el atributo disabled nativo junto al aria-describedby.",
+        "selector": ".decidir .par .btn[disabled]",
+        "evidencia": "Markup de la tarjeta «Quién autoriza». Con disabled nativo el botón sale del orden de tabulación, así que el motivo que apunta aria-describedby (#pq-aut, «Deshabilitados porque solicitaste esta compra…») no llega nunca a anunciarse.",
+        "por_que_importa": "Quien navega con teclado o lector de pantalla no puede alcanzar los dos botones y por tanto nunca oye por qué están bloqueados: la explicación existe en el HTML y es inalcanzable justo para quien más la necesita."
+      },
+      {
+        "id": "f1-45aut-12",
+        "severidad": "media",
+        "regla": "§7.3 Objetivos táctiles",
+        "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8)» y «Enlaces que son el elemento primario de su fila (folio, miga, «Ver en Maps»): no son texto en prosa, llevan padding hasta llegar a 24px»",
+        "hay_en_el_build": "La miga «Compras de almacén» mide 141×14px y el enlace de la cotización «cotizacion-mec-4471.pdf» mide 180,3×15px.",
+        "selector": ".migas a, a.lnk",
+        "evidencia": "brief tactil_24px: 2 de 27 interactivos por debajo de 24px, con esas dos medidas exactas; reproducido con getBoundingClientRect (h=14 y h=15).",
+        "por_que_importa": "La cotización es el documento contra el que se comprueba el importe antes de aprobar. Es el enlace que más se pulsa en esta pantalla y es el que no llega al suelo táctil."
+      },
+      {
+        "id": "f1-45aut-13",
+        "severidad": "baja",
+        "regla": "§6.5 Iconos — .msi",
+        "dice_el_sistema": "«Fuente: Material Symbols Rounded, variante rellena (FILL@1)… Carga por subconjunto, con un solo <link>»",
+        "hay_en_el_build": "Un sprite propio de <symbol> SVG inline (#i-shield, #i-receipt, #i-box, #i-clock…) invocado con <svg class=\"ico\"><use href=\"#i-…\"/></svg>. No hay ni .msi ni el <link> de Material Symbols.",
+        "selector": "svg.ico > use",
+        "evidencia": "grep de 'msi' y de 'Material+Symbols' en el archivo: 0 coincidencias. El <defs> de la cabecera declara los símbolos propios.",
+        "por_que_importa": "Funciona y de hecho esquiva varias trampas del documento (la de la ligadura en cabeceras en mayúsculas, la del subconjunto desactualizado), pero es una familia de iconos distinta de la que el sistema declara: los glifos no coinciden con los de las pantallas que sí usan Material Symbols."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 1,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 3,
+      "integridad": 2
+    },
+    "justificacion": "Accesibilidad 1: se acumulan fallos duros y medidos, no de matiz — ningún anuncio ni movimiento de foco al cambiar de vista, estados titulados con <b> y sin tarjeta ni medallón, el campo que la propia pantalla declara obligatorio sin required ni aria-required, los dos botones de decisión con disabled nativo que deja su explicación inalcanzable, 28 declaraciones de texto por debajo del suelo de 12px (medidas con estilo calculado) y un esqueleto cuyas barras llevan texto real dentro de un contenedor role=\"status\". Theming 3: los dos temas se pintan bien (captura --oscuro correcta), 84 tokens declarados y ninguno usado sin declarar, pero arrastra --text-3 obsoleto y 28 tamaños de letra escritos como literales fuera de la escala. Responsive 3: hay modo tarjeta por debajo de 860px, data-et en todas las celdas y puntos de ruptura a 1280/900px; no se midieron anchos intermedios. Integridad 2: una nota de construcción con rutas de esquema y nombres de archivo viaja como UI de producto sin data-andamio, el componente .bloqueado que el propio sistema señaló en esta pantalla sigue reinventado, el isotipo sale a −32,5px, y la acción que compromete $48,528 no tiene confirmación. Rendimiento no evaluado: maqueta estática sin backend.",
+    "evidencia": [
+      "getComputedStyle con reducedMotion:'reduce': .skel animationName \"none\" pero backgroundImage sigue siendo el degradado de tres paradas y backgroundPosition \"0% 0%\"",
+      "getBoundingClientRect del <use> del isotipo contra su <svg>: −32,5px",
+      "Barrido de estilo calculado sobre #contenido y .p4: 28 elementos con texto por debajo de 12px (10,5 / 11 / 11,5px)",
+      "innerText de los bloques siempre visibles: 414, 314, 266, 258 y 166 caracteres frente al tope de ~140 de §8",
+      "getComputedStyle(.state-empty): background rgba(0,0,0,0), box-shadow none, border-radius 0px, max-width none; su icono 30×30px sin fondo ni radio",
+      "captura 45_autorizacion_compra--empty.png y --error.png"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+  },
+  "cobertura": [
+    {
+      "patron": "Pantalla de decisión con consecuencia económica: la pantalla pone delante el importe, las partidas, el proveedor y la traza, y resuelve con dos botones irreversibles (Aprobar / Rechazar) más un comentario obligatorio. El sistema documenta el diálogo modal (§6.18) y la barra de selección (§6.13, que sí exige confirmar «a cuántos y a quiénes afecta» y poder deshacer), pero no dice nada de la decisión unitaria que compromete dinero: ni qué tiene que estar a la vista antes de decidir, ni si confirma, ni qué pasa con el comentario.",
+      "propuesta_de_regla": "§6.24 Decisión con consecuencia económica — .decidir. **Cuándo:** una pantalla cuyo resultado compromete un importe o cierra un expediente de forma irreversible. **Requisitos:** (1) el importe que se compromete y el documento de respaldo (cotización, factura) están a la vista **en la misma vista que los botones**, sin abrir otra pantalla; (2) la acción principal es `.btn.p` y la contraria `.btn`, **nunca las dos al mismo peso**, y la contraria no es destructiva por omisión; (3) **confirma en un `<dialog>` nativo (§6.18) que repite el importe y la contraparte en una línea** — «Aprobar $48,528 a Materiales Eléctricos del Centro» — porque el nombre del botón no basta cuando lo que se aprueba es una cifra; (4) el comentario que queda en la traza es `required` + `aria-required` de verdad (§6.16 regla 3), no un asterisco; (5) mientras la decisión está en vuelo, nada cierra el diálogo (§6.18) y el botón se bloquea en el manejador (§6.1); (6) ejecutada la decisión, la pantalla dice **qué quedó registrado y con qué hora**, y si no se puede deshacer lo dice **antes** de ejecutar, no después."
+    },
+    {
+      "patron": "Pantalla de un módulo que todavía no existe (aquí, la banda «Propuesta — sin backend» con rutas de esquema y números de documento dentro de una .banda de producto). §9 cubre el conmutador de estados de la maqueta, pero no el caso de contenido de proyecto —referencias a documentos, rutas de repositorio, nombres de archivo de maqueta— incrustado en componentes de producto.",
+      "propuesta_de_regla": "§9.1 Contenido de proyecto dentro de una maqueta. Toda frase que hable del proyecto y no del trabajo de quien mira —rutas de repositorio, nombres de archivo, números de documento o de línea, estado de construcción de un módulo— **es andamiaje y lleva `data-andamio`**, aunque esté escrita dentro de un componente de producto (`.banda`, `.nota`, `.state`). No se escribe dentro de un componente del sistema: va en el bloque `.demo` rotulado, junto al conmutador de estados. Comprobación: `document.querySelectorAll(':not([data-andamio]) code')` sobre el contenido de producto **tiene que salir vacío**."
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática servida como archivo, sin backend que perfilar",
+    "f4_nielsen: fuera del subconjunto de este lote (solo F1 y F3)",
+    "f5_investigacion: fuera del subconjunto por arquetipo",
+    "f1: no se evaluó el recorrido completo con teclado (orden de tabulación real) ni el comportamiento con lector de pantalla; las conclusiones de a11y se apoyan en el markup y en el estilo calculado"
+  ]
+}

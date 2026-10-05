@@ -1,0 +1,182 @@
+{
+  "pantalla": "13_panel_asistencia_rhl",
+  "ruta_zip": "05-direccion-y-administracion/13_panel_asistencia_rhl.html",
+  "carpeta": "05-direccion-y-administracion",
+  "area": "jurídico/RH",
+  "arquetipo": "panel",
+  "modo": "cumplimiento",
+  "estados_auditados": ["ok"],
+  "capturas": ["13_panel_asistencia_rhl--ok.png"],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-13asistencia-01",
+        "severidad": "alta",
+        "regla": "§6.7 Esqueleto de carga — A11y",
+        "dice_el_sistema": "role=\"status\" + aria-label en el contenedor y sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)",
+        "hay_en_el_build": "<tr><td><span class=\"skel\">Miguel Torres</span></td>…<span class=\"skel\">Marisol Gil</span>…<span class=\"skel\">Fuera de zona</span>, con .skel{…;color:transparent}",
+        "selector": ".state-loading .skel",
+        "evidencia": "Medido con Playwright: 24 barras .skel cuyo textContent no está vacío. Los literales son nombres reales de colaboradores y su estado de asistencia: 'Miguel Torres', 'Ana Beltrán', 'Pedro Salinas', 'Marisol Gil', y 'Retardo', 'Fuera de zona', 'Oficina CDMX', '09:14'. El contenedor .state-loading además lleva aria-hidden=\"true\" y no role=\"status\" ni aria-label.",
+        "por_que_importa": "Es el peor caso posible de la regla: no son rótulos de forma, son datos personales de asistencia. Un lector de pantalla lee en voz alta quién llegó tarde y quién checó fuera de zona mientras la tabla todavía no ha cargado, y lo hace aunque el usuario no tenga permiso de ver ese detalle. El aria-hidden tapa el problema para unos lectores pero no para la copia de texto ni para las extensiones que leen el DOM."
+      },
+      {
+        "id": "f1-13asistencia-02",
+        "severidad": "alta",
+        "regla": "§5 / §6.7 prefers-reduced-motion",
+        "dice_el_sistema": "hay que aplanar el fondo, no solo parar la animación. animation:none a secas congela el degradado en la posición 0. Correcto: @media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}",
+        "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}}",
+        "selector": ".skel",
+        "evidencia": "Línea 226 del archivo. Leído en el navegador con document.styleSheets: la única regla dentro del bloque reduced-motion que toca .skel es '.skel { animation: auto ease 0s 1 normal none running none; }'. El linear-gradient de 200% se queda congelado en background-position 0.",
+        "por_que_importa": "Quien activa reducción de movimiento ve barras con un degradado detenido a medias en vez de barras planas: parece un fallo de pintado, no una carga."
+      },
+      {
+        "id": "f1-13asistencia-03",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto — valor de --text-3",
+        "dice_el_sistema": "--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)",
+        "hay_en_el_build": "--text-3: #66717F",
+        "selector": ":root, [data-theme=\"light\"]",
+        "evidencia": "Brief medido: tokens.text_3_declarado = \"#66717F\". La pantalla usa --surface-2 en .state-loading, en .seg y en los fondos de .tag.",
+        "por_que_importa": "Hecho ya establecido para 51 de las 52 maquetas: sobre --surface-2 el valor obsoleto queda en 4,21:1, por debajo del mínimo AA de 4,5:1 para texto normal."
+      },
+      {
+        "id": "f1-13asistencia-04",
+        "severidad": "alta",
+        "regla": "§2.1 Suelo tipográfico",
+        "dice_el_sistema": "El suelo son 12px. «Nada baja de ahí.» Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta",
+        "hay_en_el_build": "17 selectores distintos con texto propio por debajo de 12px, 11 de ellos fuera de la excepción",
+        "selector": "thead th (11px), .pill (11px), .tag (10,5px), .mini-btn (11,5px), .panel .sub (11,5px), .mini .lbl (11,5px), .slalegend (11,5px), .rolechip (11,5px), .kbd (10,5px), .prof small (11px), .t-mute (11px)",
+        "evidencia": "Medido con getComputedStyle sobre cada elemento con nodo de texto propio (§10 trampa 1): TH@11px ×6 ('Colaborador'), SPAN.pill@11px ×6 ('En campo'), SPAN.tag@10.5px ×4 ('75 % de sede'), BUTTON.mini-btn@11.5px ×9 ('Aprobar retardo'), P.sub@11.5px ×3, P.lbl@11.5px ×5. Solo P.grp@10.5px cae dentro de la excepción documentada.",
+        "por_que_importa": "La cabecera de la tabla, las etiquetas de estado y los nueve botones de dictamen son lo que RHL lee todos los días; §2.1 dice literalmente «si un dato se lee todos los días, va a 12-13px como mínimo». Nueve botones de acción a 11,5px son también destinos pequeños de leer, no solo de pulsar."
+      },
+      {
+        "id": "f1-13asistencia-05",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado — reglas no opcionales 1 y 2 + §11 Estructura",
+        "dice_el_sistema": "cada estado lleva encabezado real, no un <b> · los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo · .tarjeta-estado{max-width:480px;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)} · .estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}",
+        "hay_en_el_build": "<div class=\"state state-empty\"><svg class=\"ico\">…<b>Ningún registro con estos filtros</b><p>…</p></div>, con .state{display:none;flex-direction:column;align-items:center;padding:var(--sp-8) var(--sp-4)} y .state .ico{width:30px;height:30px;color:var(--text-3)}",
+        "selector": ".state, .state b, .state .ico, #incVacio",
+        "evidencia": "Los cuatro estados de la pantalla (#incVacio, .state-empty, .state-error y el vacío de la bandeja) titulan con <b>. Ninguno tiene .tarjeta-estado ni .estado-ico: no hay ni border-radius de --r-modal, ni --sh-modal, ni medallón de 52px; el icono es un trazo de 30px en --text-3.",
+        "por_que_importa": "Un <b> no entra en el índice de encabezados del lector de pantalla, así que quien navega por encabezados no encuentra el estado en que está la pantalla. Y sin tarjeta ni medallón el estado se lee como un párrafo suelto en medio del panel, no como la respuesta de la pantalla."
+      },
+      {
+        "id": "f1-13asistencia-06",
+        "severidad": "media",
+        "regla": "§9 Andamiaje de maqueta (ANEXO A)",
+        "dice_el_sistema": "Se marca siempre con data-andamio, va visualmente separado del producto y rotulado. Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra",
+        "hay_en_el_build": "<aside class=\"demo\" aria-label=\"Controles de la maqueta (no forman parte del producto)\"> — sin data-andamio",
+        "selector": "aside.demo",
+        "evidencia": "grep -c 'data-andamio' sobre el archivo devuelve 0. El conmutador existe y funciona (JS en .demo button), pero no es localizable por el selector único que el sistema exige. En la captura --ok el panel .demo (position:fixed;left:16px;bottom:16px) se superpone además al texto de .tinote del panel de incidencias.",
+        "por_que_importa": "La regla existe para poder borrar el andamiaje de un barrido antes de entregar. Sin la marca, el conmutador «Con datos · Cargando · Vacío · Error» viaja al producto como si fuera una función real, y encima tapa contenido."
+      },
+      {
+        "id": "f1-13asistencia-07",
+        "severidad": "media",
+        "regla": "§8 Voz de producto, límites 1 y 2 (ANEXO B)",
+        "dice_el_sistema": "Ningún bloque de texto siempre visible pasa de ~140 caracteres. «Se mide con el contador de caracteres, no a ojo.» · .nota y .banda llevan como máximo UNA frase · si el texto explica una decisión, no va en pantalla",
+        "hay_en_el_build": ".tinote: «El sistema no dictamina automáticamente los casos de campo: el log completo de movimientos y diferencias (horario declarado vs. horario de instalación comprometido) se presenta para que RHL decida. Ver detalle en el registro individual.»",
+        "selector": ".tinote span",
+        "evidencia": "Medido con innerText en el navegador: 236 caracteres y 3 frases, a 12px, siempre visible. El segundo bloque largo es el párrafo de .state-error con 173 caracteres y 2 frases.",
+        "por_que_importa": "Es el caso que §8 llama nivel 3: explica por qué se diseñó así (por qué el sistema no dictamina solo), no una consecuencia para quien mira. Ocupa sitio permanente debajo de la bandeja y en la captura queda tapado por el panel de maqueta, así que ni siquiera se lee entero."
+      },
+      {
+        "id": "f1-13asistencia-08",
+        "severidad": "media",
+        "regla": "§6.10 Etiqueta de estado .pill / §1.3 Semáforo de cinco estados",
+        "dice_el_sistema": "Clases: .p-ok, .p-warn, .p-err, .p-block, .p-pause (cada una -bg de fondo, -ink de texto) · --pause: Inactivo, en pausa — no es un fallo · todas las de una familia se ven como una familia",
+        "hay_en_el_build": ".p-mute{background:var(--surface-2);color:var(--text-2)} usado en <span class=\"pill p-mute\">En campo</span>, y .t-mute{color:var(--text-3);font-weight:600;font-size:11px}",
+        "selector": ".pill.p-mute, .tag.t-mute",
+        "evidencia": "La familia de pastillas de la columna Estado es .p-ok / .p-warn / .p-err / .p-block / .p-mute: cuatro de las cinco clases documentadas más una inventada. El brief confirma que --pause, --pause-bg, --pause-ink y --pause-fill están declarados y sin usar en esta pantalla.",
+        "por_que_importa": "Hay un quinto estado ya definido y medido (6,30:1 claro) sin estrenar, y en su lugar se pinta con --surface-2/--text-2, que no es un color de estado. «En campo» queda visualmente por debajo de sus hermanas y se lee como «sin dato» cuando en realidad es la modalidad normal de 21 de los 104 colaboradores."
+      },
+      {
+        "id": "f1-13asistencia-09",
+        "severidad": "media",
+        "regla": "§1.5 Cromo de aplicación",
+        "dice_el_sistema": "Un badge sobre el cromo usa --chrome-alerta; un aviso sobre --surface sigue usando el semáforo normal (§1.3). --err sobre --chrome midió 1,00:1 en oscuro (invisible) · --chrome-focus (#9FE0AE) es el anillo de foco sobre fondo oscuro",
+        "hay_en_el_build": ".it .n{background:var(--err);color:#2A1512} y .side :focus-visible{outline-color:#9FE0AE}",
+        "selector": ".it .n, .side :focus-visible",
+        "evidencia": "Medido en el navegador: el badge '4' de «Asistencia» computa background rgb(194,66,56) = --err, color rgb(42,21,18). Los tokens --chrome-alerta, --chrome-alerta-ink y --chrome-focus no están declarados en el archivo; el verde del foco se escribe como hex literal.",
+        "por_que_importa": "Contradice el preámbulo del sistema («ningún hex literal en un componente»). Además el contador de incidencias pendientes es exactamente el caso que §1.5 saca del semáforo por una medición de contraste sobre el cromo, y aquí se mantiene en --err."
+      },
+      {
+        "id": "f1-13asistencia-10",
+        "severidad": "media",
+        "regla": "§7.2 Cromo de aplicación — tres anchos",
+        "dice_el_sistema": "Tres anchos: completa ≥1100px, colapsada a solo iconos 860–1100px, cajón con velo <860px. En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece",
+        "hay_en_el_build": ".side{width:236px} fija, sin ninguna @media que la toque; el único punto de ruptura del archivo es @media (max-width:1180px) y solo cambia rejillas de tarjetas",
+        "selector": ".side",
+        "evidencia": "grep '@media' sobre el archivo devuelve tres bloques: prefers-reduced-motion ×2 y max-width:1180px. Además <button class=\"iconbtn\" aria-label=\"Contraer navegación\"> no tiene ningún manejador en el <script>.",
+        "por_que_importa": "Por debajo de 1100px la barra lateral de 236px se come el ancho del registro de asistencia, que ya tiene seis columnas; y el botón que promete contraerla no hace nada al pulsarlo."
+      },
+      {
+        "id": "f1-13asistencia-11",
+        "severidad": "baja",
+        "regla": "Preámbulo del sistema + §1.2",
+        "dice_el_sistema": "ningún hex literal en un componente. Todo pasa por un token",
+        "hay_en_el_build": ".av{background:linear-gradient(135deg,#1E4E79,#3E7A4C);color:#F2F5F7}",
+        "selector": ".av",
+        "evidencia": "Tres hex literales que reproducen --chrome, --accent y --chrome-ink. Nota sobre el brief: el fallo de contraste que reporta para span.av (1,06:1, 'RH' sobre rgb(250,252,253)) es un artefacto de medición — el fondo de .av es un linear-gradient, así que backgroundColor computa transparente y el medidor hereda --surface. No lo cuento como fallo de contraste.",
+        "por_que_importa": "Al cambiar de tema el avatar no se entera: el gradiente queda con los valores del tema claro sobre el cromo oscuro."
+      },
+      {
+        "id": "f1-13asistencia-12",
+        "severidad": "baja",
+        "regla": "§6.5 Iconos — .msi",
+        "dice_el_sistema": "Cuándo: todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1) · Carga por subconjunto, con un solo <link>",
+        "hay_en_el_build": "Sprite SVG propio de 23 <symbol> con iconos de trazo (.ico{stroke:currentColor;stroke-width:1.6;fill:none})",
+        "selector": ".ico",
+        "evidencia": "grep 'msi' y grep 'Material+Symbols' devuelven 0 en las cuatro pantallas de este lote. Los iconos son de trazo, no rellenos.",
+        "por_que_importa": "Divergencia de nomenclatura y de familia visual, no de función: los iconos se ven, llevan aria-hidden y no dependen de una fuente remota. Lo señalo por completitud porque §6.5 es categórico, pero el sprite propio resuelve bien el problema que §6.5 intenta evitar (el 400 del subconjunto mal generado)."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 1,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 1,
+      "integridad": 2
+    },
+    "justificacion": "La accesibilidad se lleva el 1: diecisiete selectores con texto por debajo del suelo de 12px (seis de ellos la cabecera de la tabla), cuatro vistas de estado tituladas con <b>, y un esqueleto de carga que mete nombres y estados reales de personas dentro de las barras. Responsive también 1: la pantalla tiene un único punto de ruptura (1180px) que solo recoloca tarjetas; la barra lateral de 236px no se colapsa nunca, la tabla de seis columnas no tiene modo tarjeta por debajo de 860px, y el botón «Contraer navegación» no tiene manejador. Theming 3 porque los dos temas están declarados completos y el conmutador sincroniza theme-color e icono, pero el tema oscuro no se pudo verificar (sin captura) y el avatar y el anillo de foco llevan hex literales que no voltean. Integridad 2: el andamiaje funciona pero no lleva data-andamio y se superpone al contenido, --text-3 arrastra el valor obsoleto, y la familia de pastillas inventa .p-mute teniendo --pause sin estrenar. Sube de 1 a 2 porque, a diferencia de otras maquetas del lote, aquí la lógica de producto sí existe y es buena: los tres filtros filtran de verdad, el dictamen de incidencias se resuelve, se puede deshacer, el contador del menú se actualiza y todo se anuncia por aria-live.",
+    "evidencia": [
+      "getComputedStyle sobre todo elemento con nodo de texto propio: 17 claves por debajo de 12px, p. ej. TH@11px ×6, BUTTON.mini-btn@11.5px ×9, SPAN.tag@10.5px ×4",
+      "24 barras .skel con textContent no vacío ('Miguel Torres', 'Marisol Gil', 'Fuera de zona', '09:14')",
+      "grep '@media' = 3 bloques, uno solo de layout (max-width:1180px); .side{width:236px} sin media query",
+      "document.styleSheets: la única regla de reduced-motion sobre .skel es animation:none, sin background plano",
+      "Captura 13_panel_asistencia_rhl--ok.png: el panel .demo tapa el bloque .tinote",
+      "Brief: 0 de 44 destinos interactivos por debajo de 24px; 0 reglas data-tacto sin :root; 1 h1, 5 landmarks, skipLink, lang es-MX"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+  },
+  "cobertura": [
+    {
+      "patron": "Pantalla que trata datos de asistencia y ubicación de personas identificadas. El registro del día lista, por nombre y apellidos, la hora exacta de checado, la ubicación («Oficina CDMX», «Ruta a cliente», «340 m fuera de zona», «Camino a orden») y el estado; la bandeja de incidencias añade la distancia exacta a la que alguien checó, que hay una foto adjunta, y que una ausencia fue «sin checado ni permiso previo». Todo ello en la vista por defecto, sin ninguna gradación: quien abre la pantalla ve el máximo detalle de todas las personas a la vez. El sistema de diseño no tiene ninguna sección sobre minimización de datos personales: §6.22 habla de ámbito de datos (de qué conjunto habla una cifra) pero no de cuánto detalle de una persona se muestra por defecto.",
+      "propuesta_de_regla": "§6.28 Detalle mínimo sobre una persona. Cuando una pantalla muestra datos de una persona identificada (asistencia, ubicación, incidencia disciplinaria), la vista de listado muestra únicamente lo que hace falta para decidir si hay que entrar al detalle: nombre, área y el estado en una .pill. Lo que describe el caso concreto —la distancia exacta de un checado fuera de zona, la ubicación literal, la existencia de una foto o de una evidencia, el motivo de una ausencia— vive en el registro individual, detrás de una acción explícita que queda en la bitácora. La regla operativa: «si para dictaminar hay que abrir el registro, el listado no adelanta la evidencia». El estado vacío por falta de permiso sigue la regla de §6.22 (ámbito, nunca un 0), y una lista de personas nunca se exporta desde el listado sin que el ámbito exportado se declare antes de exportar."
+    },
+    {
+      "patron": "Bandeja de dictamen dentro de un panel: cuatro incidencias, cada una con su propio juego de dos o tres acciones que cambian según el caso («Aprobar retardo / Rechazar / Ver evidencia», «Marcar revisado / Ver log completo», «Registrar permiso / Marcar falta»). Al resolver, la fila sustituye sus botones por una .pill p-ok con el nombre de la acción y un botón «Deshacer», el contador del menú lateral baja, y todo se anuncia por aria-live. Es un patrón resuelto con cuidado y no lo cubre ningún §: §6.13 (.barra-sel) es para selección múltiple sobre una tabla, §6.14 (.iconbtn + .menu) es para acciones por fila de una tabla densa, y ninguno de los dos contempla una acción que resuelve el elemento y lo deja en pantalla con su deshacer.",
+      "propuesta_de_regla": "§6.29 Fila de dictamen — `.inc`. Cuándo: una bandeja donde cada elemento se resuelve con un juicio (aprobar, rechazar, marcar revisado) y las opciones cambian de un elemento a otro. Estructura: medallón de estado a la izquierda con el color del semáforo del caso, cuerpo con el título en encabezado real (nunca <b>), una línea de contexto y la fila de acciones. Requisitos: (1) la acción que confirma va primera y la que niega después, ambas como <button> y nunca como enlace; (2) al resolver, la fila no desaparece: sus acciones se sustituyen por la .pill del estado alcanzado más un «Deshacer» acotado a esa fila, durante el resto de la sesión; (3) el cambio se anuncia por aria-live diciendo a quién afecta y cuántos quedan pendientes, y todo contador de la pantalla que dependa del pendiente se recalcula en el mismo gesto; (4) una acción que solo abre detalle («Ver evidencia», «Ver log completo») no resuelve la fila y se distingue visualmente de las que sí; (5) cuando no queda ninguna pendiente, la bandeja muestra su estado vacío de §6.4, en tarjeta y con encabezado real."
+    },
+    {
+      "patron": "Barra apilada de un total entre tres estados del semáforo (.slabar con role=\"img\" y aria-label=\"78 puntuales, 12 con retardo, 6 fuera de zona\") dentro de una tarjeta de KPI, con su leyenda debajo en .slalegend. §12.4 documenta .barra («reparto de un total entre estados del semáforo») y §12.5 la leyenda inline, pero ambas como piezas del dashboard (.dash/.widget). Aquí viven dentro de una .card de un panel que no es un dashboard, y la barra resuelve su accesibilidad con role=\"img\" + aria-label en vez de la tabla equivalente que §12.3 exige para los gráficos.",
+      "propuesta_de_regla": "§12.4.2 .barra fuera del dashboard. La barra apilada de estado y su leyenda se pueden usar en cualquier tarjeta, no solo en un .widget de .dash, siempre que (1) los segmentos se separen con `.barra span + span{border-left:2px solid var(--surface)}` como en §12.6, (2) la leyenda repita cifra y rótulo en tinta de texto, nunca en el color de la serie, y (3) la equivalencia accesible sea la propia leyenda —que ya lleva el dato en texto—, declarando la barra `aria-hidden=\"true\"` en vez de `role=\"img\"` con un aria-label que duplique lo que la leyenda ya dice. Un role=\"img\" con aria-label obliga al lector de pantalla a leer dos veces los mismos tres números."
+    },
+    {
+      "patron": "Tabla de seis columnas sin ninguna columna ordenable y con <caption> visible, en una pantalla cuyo conteo («Mostrando 6 de 104 registros») y paginación de tres páginas están fijos en el markup. §6.11 regla 3 solo obliga a aria-sort en columnas ordenables, así que aquí no aplica; pero §6.11 regla 9 pide selector de registros por página de 10/25/50/100 y no hay ninguno, y el documento no dice qué pasa cuando una tabla densa deliberadamente no ordena.",
+      "propuesta_de_regla": "Aclaración a §6.11: una tabla densa puede no ofrecer ordenación, y entonces no declara aria-sort en ninguna columna —declararlo en una columna que no ordena es peor que no declararlo—. Lo que no es opcional aunque no haya ordenación es el selector de registros por página (regla 9) y que el conteo visible («Mostrando N de M») se recalcule con los filtros aplicados; si el total M es el del conjunto completo y N el del filtrado, el rótulo lo dice con palabras, no solo con dos cifras."
+    }
+  ],
+  "sin_datos": [
+    "estados loading/empty/error/oscuro: no_evaluado — solo existe la captura --ok; la pantalla sí trae los tres estados en el markup y un conmutador funcional, pero sin captura no afirmo nada visual sobre ellos. Lo que sí es auditable de forma estática (texto dentro de las barras del esqueleto, titulado con <b>, ausencia de tarjeta y medallón, regla de prefers-reduced-motion) está en los hallazgos 01, 02 y 05.",
+    "tema oscuro: no_evaluado — brief.tema_oscuro_medido = false y no hay captura --oscuro. Los tokens del bloque [data-theme=\"dark\"] están completos, pero no he comprobado ningún par de contraste real en oscuro.",
+    "f3.rendimiento: maqueta estática, sin backend que perfilar"
+  ]
+}
