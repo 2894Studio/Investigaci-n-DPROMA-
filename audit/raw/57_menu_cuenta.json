@@ -1,0 +1,193 @@
+{
+ "pantalla": "57_menu_cuenta",
+ "ruta_zip": "07-transversales/57_menu_cuenta.html",
+ "carpeta": "07-transversales",
+ "area": "transversal",
+ "arquetipo": "menu de cuenta",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro",
+  "cajon <860px",
+  "data-tacto=dedo",
+  "prefers-reduced-motion"
+ ],
+ "capturas": [
+  "57_menu_cuenta--ok.png",
+  "57_menu_cuenta--loading.png",
+  "57_menu_cuenta--empty.png",
+  "57_menu_cuenta--error.png",
+  "57_menu_cuenta--oscuro.png",
+  "57_menu_cuenta--auditor-dedo.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-57menu-01",
+    "severidad": "alta",
+    "regla": "§6.14 Menu de acciones / §11 «un control con pinta de interactivo tiene que interactuar»",
+    "dice_el_sistema": "aria-haspopup=\"menu\", aria-expanded=\"false\", aria-controls apuntando al id real; role=\"menu\" + role=\"menuitem\". Cierra con Escape y devuelve el foco al boton que lo abrio. Un control con pinta de interactivo tiene que interactuar.",
+    "hay_en_el_build": "<button class=\"cromo-prof\" type=\"button\" aria-label=\"Cuenta de Alex Rai, Administracion de sistemas\" aria-expanded=\"false\">",
+    "selector": "button.cromo-prof",
+    "evidencia": "Medido: aria-haspopup=null, aria-controls=null, aria-expanded=\"false\". Hecho clic con Playwright, el estado no cambia: antes '2 menus en el DOM | aria-expanded=false', despues '2 menus en el DOM | aria-expanded=false'. No hay manejador. Los dos .menu-cuenta que existen son las dos ilustraciones estaticas del cuerpo, declaradas role=\"group\" con 0 elementos role=\"menuitem\".",
+    "por_que_importa": "Es el boton de cuenta real del cromo, en la pantalla cuyo unico tema es el menu de cuenta. Declara aria-expanded=\"false\" —afirma que es un control desplegable y que esta cerrado— y no despliega nada: un lector de pantalla anuncia un menu contraible que nunca se abre, y el teclado se queda sin la unica via a 'Cerrar sesion'. La propia pantalla se escribe para evitar que 'no quedara ninguna forma de salir de la sesion', y su boton de cuenta no la tiene."
+   },
+   {
+    "id": "f1-57menu-02",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 — isotipo recortado",
+    "dice_el_sistema": "Un <symbol> ya trae su viewBox; repetirlo en el <svg> que lo invoca descoloca la marca. Correcto: medidas en el <use> y sin viewBox en el envoltorio. Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, esta mal.",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>",
+    "selector": ".side .logo > svg, .side .logo use",
+    "evidencia": "Medido con getBoundingClientRect a 1440x900: el <svg> queda en x=96,0 con 44x42px; el <use> queda en x=63,5 con 43x42px. Desplazamiento = -32,5px, el valor exacto que §10 documenta. El <svg> repite viewBox=\"740 0 970 932\" y el <use> no lleva width ni height. Visible en 57_menu_cuenta--ok.png: en la esquina superior izquierda la marca aparece como una astilla verde en vez del isotipo.",
+    "por_que_importa": "Es la marca, en la barra lateral, presente en todas las pantallas del dashboard. 01_login escribe el mismo isotipo bien, asi que hay un patron correcto en el mismo repositorio para copiar. Lo que se ve hoy no es una version pequena del logotipo: es un recorte que no lo representa."
+   },
+   {
+    "id": "f1-57menu-03",
+    "severidad": "alta",
+    "regla": "§6.7 Esqueleto de carga — .skel",
+    "dice_el_sistema": "role=\"status\" + aria-label en el contenedor y sin texto real dentro de las barras (color:transparent sigue en el arbol de accesibilidad). prefers-reduced-motion aplana el fondo, no solo detiene la animacion: @media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}.",
+    "hay_en_el_build": "<span class=\"skel\" style=\"width:40px;height:40px\">x</span> (x6) · @media (prefers-reduced-motion:reduce){.skel{animation:none}}",
+    "selector": ".state-loading .skel",
+    "evidencia": "Dos fallos medidos. (1) Las seis barras del esqueleto llevan la letra 'x' como contenido de texto: color computa a rgba(0,0,0,0) pero textContent sigue siendo \"x\", que es exactamente lo que §6.7 advierte que permanece en el arbol de accesibilidad. (2) Cargada con reducedMotion:'reduce', .skel computa animationName:\"none\" pero conserva backgroundImage con el gradiente de tres paradas y backgroundSize:200% 100%, sin ningun background plano: el degradado queda congelado en la posicion 0, el caso literal que §6.7 describe.",
+    "por_que_importa": "Mientras carga el menu de cuenta, un lector de pantalla lee «x x x x x x» dentro de una region role=status. Y quien pidio movimiento reducido no ve un bloque gris neutro sino un degradado detenido a medias, que se lee como un fallo de pintado en vez de como una espera."
+   },
+   {
+    "id": "f1-57menu-04",
+    "severidad": "alta",
+    "regla": "§6.4 regla 2 — cada estado lleva encabezado real",
+    "dice_el_sistema": "Cada estado lleva encabezado real, no un <b>. Cada pantalla o vista tiene encabezado real, no texto en negrita (§11).",
+    "hay_en_el_build": "<div class=\"state state-empty\"><svg…><b>No se pudo leer tu cuenta</b><p>…</p><div class=\"acc\">…  ·  <div class=\"state state-error\"><svg…><b>No se pudo cerrar la sesion</b><p>…</p>…",
+    "selector": "div.state.state-empty > b, div.state.state-error > b",
+    "evidencia": "Estructura medida de los dos estados: hijos 'svg,b,p,div' y 'svg,b,p,p,div'. El titulo de cada estado es un <b> directo. Los unicos encabezados del documento son H1 'Menu de cuenta' y los dos H2 de escenario; ningun estado aparece en el esquema.",
+    "por_que_importa": "'No se pudo cerrar la sesion' es el error mas serio que esta pantalla puede dar —la propia copia avisa de que en un equipo compartido no hay que dar por hecho que saliste— y no es alcanzable navegando por encabezados. Es la regla 2 de §6.4 y la de 'estructura' de §11 a la vez."
+   },
+   {
+    "id": "f1-57menu-05",
+    "severidad": "alta",
+    "regla": "§8 Voz de producto / §6.9 .note",
+    "dice_el_sistema": "Ningun bloque de texto siempre visible pasa de ~140 caracteres. «Se mide con el contador de caracteres, no a ojo.» .nota y .banda llevan como maximo UNA frase. Si el texto explica una decision, no va en pantalla. Nivel 3 — explica por que se diseno asi — no va en la interfaz. .nota no es un componente de explicacion general: solo nivel 1.",
+    "hay_en_el_build": "«Esta maqueta existe por un fallo que ya le paso al sistema anterior. En el telefono, el pie donde vivian cerrar sesion y el tema se ocultaba al estrechar, y no quedaba ninguna forma de salir de la sesion. SIO tiene la misma estructura. Por eso aqui el menu se dibuja en los dos anchos, y en el telefono no cuelga de una esquina: sube desde abajo.»",
+    "selector": "p.nota (los dos del cuerpo)",
+    "evidencia": "innerText medido: la primera .nota = 346 caracteres y 4 frases; la segunda («Cerrar sesion va en rojo y va abajo, separada. Es la unica del menu que no se puede deshacer sin volver a entrar, y la separacion existe para que no se pulse por inercia al buscar el tema.») = 188 caracteres y 2 frases. Las dos superan el tope de ~140 y la frase unica. Y las dos son nivel 3 de §8: la primera explica por que existe el archivo, la segunda por que se eligio ese orden. La pantalla no tiene ningun toggletip donde llevarlas: medidos 0 elementos .infob y 0 .tip.",
+    "por_que_importa": "La primera .nota habla del propio archivo —'esta maqueta existe'—, que es lo que §8 descarta de forma mas tajante: no es una consecuencia para quien mira la pantalla, es una justificacion de diseno. Ocupa ademas el primer bloque de la zona de contenido, antes de lo que si es el patron."
+   },
+   {
+    "id": "f1-57menu-06",
+    "severidad": "media",
+    "regla": "§10 trampa 10 — un nombre de clase corto no se declara dos veces en el mismo archivo",
+    "dice_el_sistema": "Antes de escribir .algo{...} se busca con grep -n '^\\.algo{' en el archivo: si ya existe, la regla se anade a la declaracion existente, o se usa un nombre mas especifico. Nombres de una sola palabra generica (.resumen, .nota, .f, .leg, .cg) son los que mas se repiten sin querer — con esos, doble cuidado.",
+    "hay_en_el_build": "Linea 398: .nota{…padding:var(--sp-4) calc(var(--sp-6) + 68px)…;font-size:11.5px;border-top:1px solid var(--border);background:var(--surface)} · Linea 676: .nota{…font-size:var(--fs-dense);background:var(--surface-2);border-radius:var(--r-card);padding:var(--sp-3) var(--sp-4)}",
+    "selector": ".nota, .nota svg, .tabla-caja",
+    "evidencia": "grep sobre el archivo: .nota declarada 2 veces (398 y 676), .nota svg 2 veces, .tabla-caja 2 veces (362 y 407). El estilo calculado del .nota real da el hibrido: font-size 13px, padding 12px 16px y background rgb(231,237,243) —todo de la segunda declaracion— mas border-top 1px rgba(27,36,48,.14), que solo existe en la primera y sobrevive porque la segunda no lo repite. El color --text-3 del icono tambien viene de la primera (medido rgb(102,113,127)).",
+    "por_que_importa": "El resultado no es ninguna de las dos reglas que alguien escribio: es un bloque con fondo de superficie secundaria y radio de tarjeta que arrastra un borde superior pensado para un pie a ancho completo sobre --surface. Y es la clase que §10 nombra explicitamente como una de las que mas se repiten sin querer."
+   },
+   {
+    "id": "f1-57menu-07",
+    "severidad": "media",
+    "regla": "§3 — un token que no existe falla en silencio",
+    "dice_el_sistema": "Aviso duro de §3: «un token que no existe falla en silencio». Un var() que no resuelve invalida la declaracion entera (los tres paddings del dialogo computaban a 0). §11: todo token var(--x) que usa el archivo esta declarado en ese mismo archivo.",
+    "hay_en_el_build": ".demo-cuenta{…gap:var(--sp-5)…} · .lienzo{…padding:var(--sp-5)…} · .lienzo .anclado{position:absolute;right:var(--sp-5);top:var(--sp-5)}",
+    "selector": ".demo-cuenta, .lienzo, .lienzo .anclado",
+    "evidencia": "Medido: getPropertyValue('--sp-5') en :root devuelve cadena vacia. Un elemento de prueba con padding:var(--sp-5) computa padding:0px. Los tres usos reales estan en el <style> del archivo. El brief ya lo lista en usados_sin_declarar.",
+    "por_que_importa": "El dano es el que §3 describe: el gap entre los bloques del cuerpo colapsa, el relleno del lienzo donde se muestra el menu desaparece y el menu anclado se pega a la esquina superior derecha del lienzo en vez de separarse 20px. Lo que se ve no es la composicion que se escribio, y nada en el archivo lo delata."
+   },
+   {
+    "id": "f1-57menu-08",
+    "severidad": "media",
+    "regla": "§6.19 Boton-icono — .iconbtn",
+    "dice_el_sistema": "Nunca viaja solo: title + aria-label, y el aria-label nombra el dato concreto. Si va sin texto visible, lleva como minimo etiqueta emergente y aria-label (§6.5).",
+    "hay_en_el_build": "<button class=\"iconbtn hamburguesa\" id=\"menu-btn\" aria-label=\"Abrir el menu\" …> y <button class=\"iconbtn\" id=\"tema\" aria-label=\"Cambiar a tema claro\" aria-pressed=\"false\">",
+    "selector": "button.iconbtn#menu-btn, button.iconbtn#tema",
+    "evidencia": "Medidos los dos .iconbtn de la pantalla: ambos tienen aria-label y ninguno tiene atributo title (title=null en los dos).",
+    "por_que_importa": "Quien usa el raton y no conoce el icono no tiene forma de averiguar que hacen: §6.19 pide las dos cosas precisamente porque cubren a dos personas distintas. El del tema ademas cambia de significado segun el tema actual, que es cuando la etiqueta emergente mas falta hace."
+   },
+   {
+    "id": "f1-57menu-09",
+    "severidad": "media",
+    "regla": "§6.18 Dialogo modal — foco",
+    "dice_el_sistema": "Se usa <dialog> nativo con showModal(). El navegador da el velo, la capa superior y la trampa de foco. La alternativa —un div en el flujo del documento— obliga a reimplementar las tres cosas, y en la practica no se reimplementan. Al abrir, el foco va al primer control.",
+    "hay_en_el_build": "<button class=\"velo-menu\" data-cromo type=\"button\" aria-label=\"Cerrar el menu\" tabindex=\"-1\"></button> + <nav class=\"side\"> desplazada por CSS, con document.addEventListener('keydown', e => { if (e.key==='Escape') menu(false) })",
+    "selector": "nav.side, button.velo-menu, #menu-btn",
+    "evidencia": "Probado a 800x900 (el ancho de cajon que §7.2 define por debajo de 860px): al pulsar #menu-btn, aria-expanded pasa a \"true\" pero document.activeElement sigue siendo el propio #menu-btn — el foco no entra en el cajon. Escape si cierra y devuelve el foco al boton. De las tres cosas que §6.18 dice que hay que reimplementar, estan hechas una y media: cierre por Escape y retorno del foco; faltan la entrada del foco y cualquier contencion detras del velo.",
+    "por_que_importa": "Con el velo puesto, un usuario de teclado sigue tabulando por el boton de tema y el de cuenta que estan visualmente tapados, y para llegar al menu que acaba de abrir tiene que recorrer toda la barra superior. El velo es un <button> con tabindex=\"-1\", asi que tampoco marca la frontera. §7.2 define los tres anchos pero no describe el comportamiento de foco del cajon: por eso lo evaluo contra §6.18, que es la regla que cubre una capa con velo encima del contenido."
+   },
+   {
+    "id": "f1-57menu-10",
+    "severidad": "media",
+    "regla": "§1.1 Valor canonico de --text-3",
+    "dice_el_sistema": "--text-3 es #5C6675, no el antiguo #66717F (que caia a 4,21:1 sobre --surface-2). Medido ahora: 5,65 / 5,31 / 4,93 en claro.",
+    "hay_en_el_build": "--text-3: #66717F",
+    "selector": ":root (bloque de tema claro)",
+    "evidencia": "Declaracion del <style>, confirmada por el brief. El barrido de contraste con composicion alfa real da 0 fallos en claro y 0 en oscuro en esta pantalla, asi que hoy no produce dano medible. Pero .nota svg computa a rgb(102,113,127) sobre un fondo .nota de rgb(231,237,243): ese par es exactamente el 4,21:1 documentado, y se salva solo porque es un icono —minimo 3:1— y no texto.",
+    "por_que_importa": "El riesgo esta a un cambio de distancia: cualquier texto auxiliar que pase a vivir dentro de un .nota con fondo --surface-2 reproduce el 4,21:1. Corregir el token cierra el caso sin tocar ningun componente, y es el mismo arreglo que piden las otras 51 maquetas."
+   },
+   {
+    "id": "f1-57menu-11",
+    "severidad": "baja",
+    "regla": "§7.3 Objetivos tactiles — la regla lleva :root",
+    "dice_el_sistema": "El :root es lo que hace ganar la regla: con :root suma (0,3,0); sin el (0,2,0) y lo empata cualquier variante de tamano del componente que, por ir despues, gana. Se comprueba midiendo con data-tacto=\"dedo\" puesto. Modo dedo: min-height:46px.",
+    "hay_en_el_build": "[data-tacto=\"dedo\"] .it, [data-tacto=\"dedo\"] .iconbtn, [data-tacto=\"dedo\"] .cromo-prof, [data-tacto=\"dedo\"] .cromo-av, [data-tacto=\"dedo\"] .seg button, [data-tacto=\"dedo\"] .btn — las seis sin :root",
+    "selector": "[data-tacto=\"dedo\"] .it, [data-tacto=\"dedo\"] .iconbtn, [data-tacto=\"dedo\"] .btn, [data-tacto=\"dedo\"] .cromo-prof",
+    "evidencia": "Medido con data-tacto=\"dedo\" puesto, como exige §7.3: de los 26 elementos .it/.iconbtn/.btn/.op/.cromo-prof visibles, ninguno de los cubiertos por las seis reglas se queda por debajo de 46px — la pantalla no dibuja ninguna variante de tamano posterior que las empate, asi que el bug de especificidad es latente, no activo. Lo que si queda fuera son los cuatro .op del menu de cuenta, que se quedan en 44,0px porque no hay ninguna regla [data-tacto=\"dedo\"] .op.",
+    "por_que_importa": "Severidad baja por lo medido, no por lo escrito: hoy la regla gana igual. Pero son seis selectores que dejan de funcionar en cuanto alguien anada un .acciones .iconbtn{width:28px} a este archivo. Y .op —la fila del menu de cuenta, que es el componente propio de la pantalla— no esta en la lista: en modo dedo se queda a 44px, dos por debajo del suelo que el propio bloque establece."
+   },
+   {
+    "id": "f1-57menu-12",
+    "severidad": "baja",
+    "regla": "§5 Movimiento / §11 — animacion de mas de 5s",
+    "dice_el_sistema": "§11: ¿Toda animacion que dure mas de 5s se puede pausar pulsandola, sin boton aparte? §5: se pausa pulsando la propia animacion — el contenedor es un <button> con aria-pressed, nunca un boton «Pausar» aparte.",
+    "hay_en_el_build": ".fab:hover .ring,.fab:focus-visible .ring{opacity:1;animation:spin 14s linear infinite}",
+    "selector": ".fab .ring",
+    "evidencia": "Regla leida del <style> (linea 273). El ciclo es de 14s e infinito. Hay bloque de prefers-reduced-motion para ella (linea 275, animation:none), pero no hay forma de pausarla pulsandola.",
+    "por_que_importa": "Severidad baja porque solo corre mientras el puntero esta encima o el boton tiene el foco, y con movimiento reducido no corre: retirar el foco la detiene. Aun asi, un usuario de teclado que deje el foco ahi tiene una rotacion indefinida sin via de pausa, y §11 no pone excepcion por ser decorativa."
+   }
+  ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "Theming es solido: dos temas completos y 0 fallos de contraste reales con composicion alfa en claro y en oscuro, con conmutador propio en el cromo. Responsive tambien: la pantalla es justamente la que documenta los dos anchos, implementa el cajon con velo por debajo de 860px que §7.2 define, trae enlace de salto y no rompe en ninguno de los cinco estados. Accesibilidad se queda en 1 por la acumulacion: el boton de cuenta declara aria-expanded y no abre nada, el esqueleto lee «x» seis veces dentro de una region role=status, los dos estados de error abren con <b> en vez de encabezado, los dos .iconbtn van sin title y el cajon no lleva el foco adentro. Integridad en 2 por los tres fallos silenciosos de §10 y §3 que solo aparecen midiendo: el isotipo desplazado -32,5px, .nota declarada dos veces con resultado hibrido y --sp-5 sin declarar computando a 0. A favor, y pesa: los cuatro estados de §6.4 existen de verdad, el error trae su referencia (CTA-20260826-0930) y dice las tres cosas en orden —que paso, que no se ha perdido, que hacer—, y no hay ningun id duplicado.",
+  "evidencia": [
+   "isotipo: svg x=96,0 (44x42) vs use x=63,5 (43x42) -> desplazamiento -32,5px, con viewBox repetido en el <svg>",
+   "button.cromo-prof: aria-haspopup=null, aria-controls=null; clic sin efecto (antes y despues identicos)",
+   ".skel: textContent \"x\" en las seis barras; bajo reducedMotion animationName=none con backgroundImage de gradiente y backgroundSize 200% 100% intactos",
+   "--sp-5: getPropertyValue vacio; padding:var(--sp-5) computa 0px; 3 usos reales en el <style>",
+   ".nota declarada en 398 y 676; computado hibrido: 13px / padding 12px 16px / fondo rgb(231,237,243) + border-top 1px rgba(27,36,48,.14)",
+   "data-tacto=\"dedo\": 6 reglas sin :root pero ninguna empatada; 4 .op a 44,0px sin regla tactil propia",
+   "cajon a 800px: aria-expanded=true y activeElement sigue siendo #menu-btn; Escape cierra y devuelve el foco",
+   "contraste: 0 fallos en claro y 0 en oscuro; 0 ids duplicados"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+ },
+ "cobertura": [
+  {
+   "patron": "El menu de cuenta en si: el panel que cuelga del boton de identidad del cromo y que reune datos personales, tema y cierre de sesion, con dos formas segun el ancho (anclado al boton en escritorio, hoja desde el borde inferior en telefono) y una accion destructiva separada al final. §6.14 cubre el menu de acciones de una fila y §7.2 describe el cromo pero no menciona el boton de cuenta ni lo que cuelga de el. Hoy la pantalla lo dibuja con role=\"group\" y sin ningun role=\"menuitem\", porque no hay regla que diga cual es el contrato.",
+   "propuesta_de_regla": "§7.2.1 Menu de cuenta — .cuenta-btn + .menu-cuenta. Cuando: la unica salida de la sesion y los ajustes personales, colgando del boton de identidad del cromo. Es un menu, no un grupo: el boton lleva aria-haspopup=\"menu\", aria-expanded y aria-controls al id real del panel; el panel es role=\"menu\" y cada opcion role=\"menuitem\", siguiendo el mismo contrato de §6.14. Abre con clic o Enter/Espacio, el foco entra en la primera opcion, Escape cierra y devuelve el foco al boton, un clic fuera cierra y un clic dentro no. Encabeza con la identidad —nombre y rol, no solo iniciales— porque es lo que confirma de que sesion se esta saliendo. El cierre de sesion va ultimo, separado por un .sep y en --err-ink, aplicando la regla de §6.13 de apartar la accion destructiva del grupo; no es reversible sin volver a entrar, asi que no comparte borde con el resto. La opcion de tema vive aqui y muestra su valor actual a la derecha de la etiqueta, en --text-3, incluido el caso «sigue al sistema». Lo que nunca hace: depender de un pie de pagina que se oculte al estrechar — es el fallo que esta pantalla existe para evitar."
+  },
+  {
+   "patron": "El mismo componente con dos anclajes segun el ancho: colgado del boton en escritorio y como hoja pegada al borde inferior en telefono, con tirador y renglones mas altos (52px declarados en la copia). §7.2 fija tres anchos para la barra lateral pero el sistema no tiene ninguna regla para un panel que cambia de anclaje —no solo de tamano— al cruzar un punto de ruptura.",
+   "propuesta_de_regla": "§7.5 Panel que cambia de anclaje por ancho — .hoja-abajo. Cuando: un panel emergente que en escritorio cuelga de su disparador y en telefono sube desde el borde inferior. Es el mismo contrato de foco y teclado en los dos anchos (§7.2.1): lo que cambia es donde aparece, nunca que se puede hacer ni en que orden. En telefono ocupa el ancho completo, se ancla al borde inferior respetando env(safe-area-inset-bottom), lleva un tirador visible como senal de que se puede descartar y sus filas suben al suelo tactil de modo dedo. Se elige por ancho disponible, no por tipo de dispositivo. La razon de la variante se escribe en el sistema y no en la pantalla: el alcance del pulgar no es un dato que el usuario necesite leer. Y ningun contenido queda detras del punto de ruptura: si una opcion existe en escritorio, existe en telefono."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estatica sin backend que perfilar",
+  "f4_nielsen y f5_investigacion: fuera del subconjunto de este lote",
+  "§6.23 Toggletip: no evaluable como cumplimiento — la pantalla no declara ningun .infob ni ningun .tip (medido: 0 y 0). Su ausencia se reporta en f1-57menu-05 como la razon por la que las dos explicaciones de nivel 2-3 de §8 acaban siempre visibles",
+  "§6.11 Tabla densa: .tabla-caja esta declarada dos veces en el CSS pero la pantalla no dibuja ninguna tabla (brief: tablas=0), asi que solo evaluo la colision de nombres, no el componente"
+ ]
+}

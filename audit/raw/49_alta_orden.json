@@ -1,0 +1,248 @@
+{
+  "pantalla": "49_alta_orden",
+  "ruta_zip": "03-icev-instalacion-de-cargadores/49_alta_orden.html",
+  "carpeta": "03-icev-instalacion-de-cargadores",
+  "area": "ICEV",
+  "arquetipo": "formulario",
+  "modo": "cumplimiento",
+  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
+  "capturas": [
+    "49_alta_orden--ok.png",
+    "49_alta_orden--loading.png",
+    "49_alta_orden--empty.png",
+    "49_alta_orden--error.png",
+    "49_alta_orden--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-49ord-01",
+        "severidad": "alta",
+        "regla": "§6.16 Formulario — regla 3",
+        "dice_el_sistema": "(3) **`required` y `aria-required` de verdad**, no asteriscos decorativos",
+        "hay_en_el_build": "3 `<span class=\"req\">*</span>` (Cliente, Sucursal, Modelo de cargador) y cero atributos. Literal: `<label for=\"cli\">Cliente <span class=\"req\">*</span></label><input type=\"text\" id=\"cli\" value=\"Comercializadora Vértice del Bajío\" placeholder=\"\">`",
+        "selector": ".ctrl > label .req",
+        "evidencia": "grep -c 'required' = 0 y grep -c 'aria-required' = 0 en el archivo. Comprobado en el navegador control por control: los 7 devuelven hasAttribute('required') = false y getAttribute('aria-required') = null, incluidos los tres con asterisco. El documento no tiene ningún `<form>` (0 elementos), así que tampoco hay contexto de validación.",
+        "por_que_importa": "Es el antipatrón que la regla nombra por su nombre. Ningún lector de pantalla anuncia los tres campos como obligatorios, y nada impide crear la orden sin ellos: la obligatoriedad es solo un asterisco rojo."
+      },
+      {
+        "id": "f1-49ord-02",
+        "severidad": "alta",
+        "regla": "§6.16 Formulario — regla 8",
+        "dice_el_sistema": "(8) **guardado automático o botón de guardar, no los dos**",
+        "hay_en_el_build": "`<div class=\"barra-form\"><span class=\"izq\">Borrador guardado hace <b>1 min</b>. Puedes salir y volver.</span><div class=\"der\"><button class=\"btn\">Cancelar</button><button class=\"btn\">Guardar borrador</button><button class=\"btn p\">Crear la orden</button></div></div>`",
+        "selector": ".barra-form",
+        "evidencia": "Leído del markup y confirmado en 49_alta_orden--ok.png: la barra inferior afirma guardado automático («Borrador guardado hace 1 min») y a la vez ofrece el botón «Guardar borrador». Son los dos mecanismos a la vez, que es justo lo que la regla excluye. Comparación dentro del mismo lote: 44_alta_tramite_cfe ofrece el botón sin afirmar guardado automático y no incurre.",
+        "por_que_importa": "Si el borrador ya se guarda solo, el botón hace dudar de si se guardó; si no se guarda solo, la frase miente. Con los dos a la vez nadie sabe si puede cerrar la pestaña."
+      },
+      {
+        "id": "f1-49ord-03",
+        "severidad": "alta",
+        "regla": "§8 Voz de producto (ANEXO B, prueba base y límites 1 y 2)",
+        "dice_el_sistema": "«si el texto explica **una decisión**, no va en pantalla. Si explica **una consecuencia** para quien está mirando, sí — y en una frase.» (…) **`.nota` y `.banda` llevan como máximo UNA frase.** (…) **Ningún bloque de texto siempre visible pasa de ~140 caracteres.** «No hay excepción por importancia del contenido.»",
+        "hay_en_el_build": "Banda de cierre: «Dos cosas que esta pantalla no pide, y es a propósito. La firma del proyecto no se captura aquí: se firma en papel. Poner un bloque de firma en la pantalla haría creer que existe una firma electrónica, y no la hay. El material tampoco se elige en el alta. Sale de la receta del tipo de instalación cuando la orden se despacha, y elegirlo dos veces es como se acaba despachando lo que no era.»",
+        "selector": ".form-cuerpo > .banda.b-info:last-of-type",
+        "evidencia": "Medido con innerText.length a 1440px con [data-andamio] oculto: **391 caracteres y 5 frases** — 2,8 veces el tope de 140. Es texto de nivel 3 en la clasificación de §8 («explica por qué se diseñó así»), y lo dice con sus propias palabras: «y es a propósito». La misma pantalla tiene otra banda de 211 caracteres y 3 frases («Esta orden todavía no tiene folio…») y tres `.ayuda` de 151, 124 y 111 caracteres con dos frases cada una, una de las cuales se refiere al historial del proyecto («y ya se quitó una vez»).",
+        "por_que_importa": "La pantalla dedica más texto a justificar lo que no hace que a guiar lo que sí pide. El bloque de 391 caracteres está siempre visible al final del formulario, justo encima de la barra de acciones, y empuja «Crear la orden» fuera de la vista."
+      },
+      {
+        "id": "f1-49ord-04",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto — valor de --text-3",
+        "dice_el_sistema": "`--text-3` **es `#5C6675`**, no el antiguo `#66717F` (que caía a 4,21:1 sobre `--surface-2`)",
+        "hay_en_el_build": "--text-3: #66717F",
+        "selector": ":root",
+        "evidencia": "brief.MEDIDO_por_el_orquestador.tokens.text_3_declarado = '#66717F'. Lo usan las cinco `.ctrl .ayuda` del formulario, `.barra-form .izq` y `.p4-t .resumen`.",
+        "por_que_importa": "Toda la ayuda de campo del formulario va con esa tinta; sobre `--surface-2` cae a 4,21:1, bajo el mínimo AA."
+      },
+      {
+        "id": "f1-49ord-05",
+        "severidad": "alta",
+        "regla": "§10 trampa 5 — isotipo con viewBox repetido",
+        "dice_el_sistema": "medidas en el `<use>` y **sin `viewBox` en el envoltorio**; se comprueba midiendo la caja del `<use>` contra la del `<svg>`.",
+        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> y lo mismo a 22×21 en el .fab",
+        "selector": ".side .logo svg, .fab svg",
+        "evidencia": "Medido con getBoundingClientRect: dx = -32,5px (logotipo) y dx = -16,2px (.fab). Visible en 49_alta_orden--ok.png.",
+        "por_que_importa": "La marca sale recortada en todas las pantallas del módulo."
+      },
+      {
+        "id": "f1-49ord-06",
+        "severidad": "alta",
+        "regla": "§7.2 Cromo de aplicación — modo colapsado",
+        "dice_el_sistema": "En modo colapsado **el rótulo se convierte en etiqueta emergente; no desaparece**.",
+        "hay_en_el_build": "@media (min-width:860.02px) and (max-width:1100px){.side{width:64px}.side .et,.grp,.side .wordmark{display:none}} con `<a class=\"it\" href=\"#\">` sin `title` ni `aria-label`.",
+        "selector": ".side .it",
+        "evidencia": "Medido a 1000px: .side = 64px, .it .et display:none, .it title = null.",
+        "por_que_importa": "Entre 860 y 1100px la navegación queda en iconos anónimos, sin nombre visible ni accesible."
+      },
+      {
+        "id": "f1-49ord-07",
+        "severidad": "alta",
+        "regla": "§10 trampa 2 — selectores por exclusión, no por enumeración + §6.16 valores",
+        "dice_el_sistema": "Lo que aplica a todos los campos se escribe `.ctrl input:not([type=\"file\"]):not([type=\"checkbox\"]):not([type=\"radio\"])`. (…) `input/select/textarea{min-height:38px;…}`",
+        "hay_en_el_build": "`.ctrl input[type=\"text\"],.ctrl input[type=\"date\"],.ctrl input[type=\"number\"],.ctrl select,.ctrl textarea{…padding:9px 12px;…}` — enumerado, y sin `min-height` en ninguna parte de la regla.",
+        "selector": ".ctrl input[type=\"text\"], .ctrl select",
+        "evidencia": "Es literalmente el selector que §10 trampa 2 pone como ejemplo del fallo. Medido en el navegador: los `input[type=text]` computan 35px de alto y los `select` y el `input[type=date]` 37px, los dos por debajo de los 38px de §6.16; el suelo no se declara con `min-height` (§6.2: «medido 35px sin él»).",
+        "por_que_importa": "El día que «Unidad» pase a un control de búsqueda real o se añada un `type=\"tel\"` para contacto en obra, ese campo se saldrá del selector y colapsará sin aviso, que es el daño exacto que la trampa documenta."
+      },
+      {
+        "id": "f1-49ord-08",
+        "severidad": "media",
+        "regla": "§6.16 Formulario — regla 7",
+        "dice_el_sistema": "(7) el contador de sección **habla en español, no en aritmética, y si cuenta, cuenta bien**",
+        "hay_en_el_build": "Sección 4 «Programación»: `<span class=\"est\">2 de 2 capturados</span>`",
+        "selector": ".seccion > header .est",
+        "evidencia": "Comprobado el valor de los dos controles de esa sección en el navegador: «Instalador asignado» vale «— sin asignar —», que la propia ayuda del campo describe como no asignado («Se puede guardar sin instalador. Una orden sin asignar aparece marcada en el listado hasta que alguien la tome»); «Fecha propuesta» vale 2026-09-02. Es 1 de 2, no 2 de 2. La sección 2 («1 de 2 capturados») sí cuadra.",
+        "por_que_importa": "El contador afirma que la programación está completa cuando la orden sale sin instalador, que es justo el caso que 30_ordenes_listado marca en rojo como «hay que resolver primero»."
+      },
+      {
+        "id": "f1-49ord-09",
+        "severidad": "media",
+        "regla": "§6.16 Formulario — regla 2",
+        "dice_el_sistema": "(2) **dos niveles de obligatoriedad con palabras distintas** — «obligatorio para dar de alta» vs «necesario para facturar o programar»",
+        "hay_en_el_build": "Un único asterisco `*` repetido en tres etiquetas, y la misma ranura `.est` de la cabecera de sección usada para tres cosas distintas: «obligatorio» (sección 1), «1 de 2 capturados» (sección 2), «opcional» (sección 3) y «2 de 2 capturados» (sección 4).",
+        "selector": ".ctrl > label .req, .seccion > header .est",
+        "evidencia": "Medido: 3 `.req` idénticos y 4 valores de `.est` que mezclan dos vocabularios (nivel de obligatoriedad y recuento) en el mismo sitio. No aparece en ningún punto la distinción entre lo que impide crear la orden y lo que hará falta para programarla o facturarla, pese a que las ayudas de campo la describen en prosa («Se puede guardar sin instalador», «Sólo aparecen los clientes con sus dos documentos al día: sin ellos no se puede programar»).",
+        "por_que_importa": "La información existe —las ayudas la cuentan— pero no está en el lugar donde se decide: en la etiqueta del campo. Quien captura no puede ver de un vistazo qué le bloquea el alta y qué le bloqueará la programación."
+      },
+      {
+        "id": "f1-49ord-10",
+        "severidad": "media",
+        "regla": "§6.16 Formulario — regla 6",
+        "dice_el_sistema": "(6) **el tipo de campo es el tipo del dato** (`type=\"email\"`, `type=\"tel\"`, `inputmode=\"numeric\"`) + `autocomplete`",
+        "hay_en_el_build": "«Cliente» es `<input type=\"text\">` con un valor ya puesto, pese a que su ayuda dice «Sólo aparecen los clientes con sus dos documentos al día» (es una selección, no texto libre). «Unidad» es `<input type=\"text\" placeholder=\"Buscar por VIN, placas o número económico\">` sin `list`, `datalist` ni `type=\"search\"`. Ningún control declara `autocomplete` ni `inputmode`.",
+        "selector": "#cli, #uni",
+        "evidencia": "Medido control por control: los 7 devuelven autocomplete = null e inputmode = null. #cli es type=\"text\" con value=\"Comercializadora Vértice del Bajío\" y sin ninguna lista asociada; #uni es type=\"text\" aunque su marcador de posición empieza por «Buscar por».",
+        "por_que_importa": "Dos campos que son búsquedas sobre un catálogo se presentan como texto libre. Nada impide escribir un cliente que no existe, que es exactamente lo que la ayuda del campo dice que no debe pasar."
+      },
+      {
+        "id": "f1-49ord-11",
+        "severidad": "media",
+        "regla": "§7.3 Objetivos táctiles + §10 trampa 4 — el destino es la región que acepta la pulsación",
+        "dice_el_sistema": "**El destino táctil es la región que acepta la pulsación, no el elemento.** (…) **44px** si es la acción principal de la pantalla.",
+        "hay_en_el_build": "El botón flotante `.fab` queda por encima del botón primario «Crear la orden» de la barra inferior fija.",
+        "selector": ".fab / .barra-form .btn.p",
+        "evidencia": "Medido a 1440×960 con getBoundingClientRect: `.fab` ocupa x 1362–1414, y 839–891; «Crear la orden» ocupa x 1264–1416, y 872–908. Se solapan (comprobado con la prueba de intersección de cajas): el `.fab` tapa unos 52×19px de la esquina superior derecha del botón primario, y por estar en una capa superior se lleva esas pulsaciones. Visible en 49_alta_orden--ok.png.",
+        "por_que_importa": "Una parte de la región pulsable de la acción principal de la pantalla no ejecuta la acción principal: abre el asistente. Es el fallo que la trampa 4 describe, aquí en el botón que crea la orden."
+      },
+      {
+        "id": "f1-49ord-12",
+        "severidad": "media",
+        "regla": "§2.1 Suelo tipográfico",
+        "dice_el_sistema": "**El suelo son 12px. «Nada baja de ahí.»**",
+        "hay_en_el_build": "`.ctrl .ayuda{font-size:11px}` y los índices de sección `.idx` a 11px.",
+        "selector": ".ctrl .ayuda, .seccion > header .idx",
+        "evidencia": "Medido con getComputedStyle a 1440×960: 18 nodos con texto propio por debajo de 12px — las 5 ayudas de campo a 11px, los 4 índices de sección a 11px, el `<code>ORD-202608-0000</code>` de la banda a 11,5px.",
+        "por_que_importa": "La ayuda de campo es el único sitio donde la pantalla explica qué se puede y qué no («Se puede guardar sin instalador»), y es el texto más pequeño del formulario."
+      },
+      {
+        "id": "f1-49ord-13",
+        "severidad": "media",
+        "regla": "§6.7 Esqueleto de carga — barras mudas y aplanado",
+        "dice_el_sistema": "**sin texto real dentro de las barras**; `prefers-reduced-motion` **aplana el fondo**, no solo detiene la animación.",
+        "hay_en_el_build": "<span class=\"skel\" style=\"width:92%;height:38px\">cliente</span> y 8 barras más con texto; `@media (prefers-reduced-motion:reduce){.skel{animation:none}}` sin `background`.",
+        "selector": ".state-loading .skel",
+        "evidencia": "Medido con reducedMotion:'reduce' (mismo bloque CSS en las 5 maquetas del lote): el `.skel` conserva el `linear-gradient` con `background-size:200% 100%` congelado en `background-position: 0% 0%`, `animation-name:none` y `background-color: rgba(0,0,0,0)`; el texto sigue en el árbol de accesibilidad con `color:transparent`.",
+        "por_que_importa": "Mientras carga, un lector de pantalla lee «cliente, sucursal, modelo, unidad, instalador, fecha» como si el formulario ya estuviera relleno; y con movimiento reducido se ve un degradado fijo a medias, no una superficie plana."
+      },
+      {
+        "id": "f1-49ord-14",
+        "severidad": "media",
+        "regla": "§6.5 Iconos — `.msi`",
+        "dice_el_sistema": "todo icono del sistema: Material Symbols Rounded, variante **rellena (`FILL@1`)**, carga por subconjunto con **un solo `<link>`**",
+        "hay_en_el_build": "0 ocurrencias de 'Material Symbols' y de class=\"msi\"; sprite SVG propio (`<symbol id=\"i-*\">` + `.ico`).",
+        "selector": ".ico",
+        "evidencia": "grep -c 'Material Symbols\\|class=\"msi\"' = 0 en el archivo.",
+        "por_que_importa": "Los requisitos de §6.5 no se pueden verificar contra este archivo y los iconos no coincidirán con los de una pantalla que sí los siga."
+      },
+      {
+        "id": "f1-49ord-15",
+        "severidad": "media",
+        "regla": "§1.4 Series de gráfica (paleta categórica)",
+        "dice_el_sistema": "`--serie-1` `#2a78d6` · `--serie-2` `#eb6834` · `--serie-3` `#4a3aa7` · `--serie-4` `#e87ba4`",
+        "hay_en_el_build": "--serie-1: #2C6CA8; --serie-2: #7A5FA8; sin --serie-3 ni --serie-4.",
+        "selector": ":root",
+        "evidencia": "Leído del bloque :root del archivo; ni los valores ni el número de ranuras coinciden con §1.4.",
+        "por_que_importa": "Las comprobaciones de separación cromática de §1.4 están calculadas sobre los hex publicados y dejan de ser válidas con otros valores."
+      },
+      {
+        "id": "f1-49ord-16",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado — regla 1",
+        "dice_el_sistema": "(1) el cambio **se anuncia (`aria-live=\"polite\"`) y mueve el foco**",
+        "hay_en_el_build": "El JS cambia `data-state` en <main>; no hay `aria-live` en el documento ni ninguna llamada a focus().",
+        "selector": "main#contenido",
+        "evidencia": "grep de 'aria-live' en el archivo → 0 ocurrencias (el ariaLive:1 del brief es el `role=\"status\"` del esqueleto). El <main> lleva `tabindex=\"-1\"` pero nada lo enfoca.",
+        "por_que_importa": "Al fallar la creación de la orden, el error aparece sin anunciarse y el foco se queda en el botón «Crear la orden», que ya no está en pantalla."
+      },
+      {
+        "id": "f1-49ord-17",
+        "severidad": "baja",
+        "regla": "§7.3 — la regla táctil lleva `:root`",
+        "dice_el_sistema": "**El `:root` es lo que hace ganar la regla** (…) **Se comprueba midiendo con `data-tacto=\"dedo\"` puesto**.",
+        "hay_en_el_build": "Las 6 reglas de modo dedo escritas sin `:root`.",
+        "selector": "[data-tacto=\"dedo\"] .it, .iconbtn, .btn",
+        "evidencia": "Medido con data-tacto=\"dedo\" puesto: .it = 46px ×3, .iconbtn = 46px ×2, .btn = 46px ×3. La pantalla no dibuja `.acciones .iconbtn` (0 elementos), así que la regla gana igual. Los campos del formulario no los cubre ningún bloque de modo dedo, pero sí el `@media (pointer:coarse)` que sube su tipografía a 16px.",
+        "por_que_importa": "Bug latente: hoy funciona porque falta la variante de 28px que lo rompe; al añadirla dejará de aplicarse sin aviso."
+      },
+      {
+        "id": "f1-49ord-18",
+        "severidad": "baja",
+        "regla": "§6.9 Avisos — nomenclatura de las variantes de `.banda`",
+        "dice_el_sistema": "Cuatro variantes: `.banda-info`, `.banda-warn`, `.banda-err`, `.banda-ok`.",
+        "hay_en_el_build": "class=\"banda b-info\"; `.b-info{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}`.",
+        "selector": ".banda.b-info",
+        "evidencia": "Los valores de token son los correctos; solo diverge el nombre del modificador.",
+        "por_que_importa": "Buscar el componente por su nombre documentado no lo encuentra; la divergencia está en las 52 maquetas."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 2,
+      "rendimiento": "no_evaluado",
+      "theming": 2,
+      "responsive": 2,
+      "integridad": 1
+    },
+    "justificacion": "Accesibilidad 2 (la mejor del lote): es la única pantalla con **cero** destinos interactivos por debajo de 24px aparte de las etiquetas de texto (brief.tactil_24px.por_debajo_de_24px = 0), las 7 entradas tienen etiqueta, hay skip link, h1 único, 7 landmarks, anillo de foco canónico con `--focus-w:2px`/`--focus-offset:2px`, la excepción correcta del cromo y el bloque `@media (pointer:coarse)` de §6.16. La baja a 2 el que no exista obligatoriedad programática (0 `required`, 0 `aria-required`, 0 `<form>`), que las ayudas vayan a 11px, que el cromo colapsado pierda los rótulos y que no haya `aria-live`. Theming 2: dos temas resueltos y 0 fallos de contraste medidos en claro y oscuro, pero `--text-3` obsoleto y series fuera de §1.4. Responsive 2: la rejilla `auto-fit` responde bien, pero el `.fab` se solapa con el botón primario de la barra fija a 1440px y el cromo colapsado pierde los nombres. Integridad 1: el contador de la sección 4 dice «2 de 2» con el instalador sin asignar, conviven guardado automático y botón de guardar, dos campos de catálogo son texto libre y la pantalla carga 672 caracteres de texto explicativo permanente (211 + 391 en dos bandas) por encima de los 140 que §8 fija por bloque.",
+    "evidencia": [
+      "Control por control en el navegador: 7 controles, todos con required=false, aria-required=null, autocomplete=null, inputmode=null; 0 `<form>`.",
+      "Alturas medidas: input[type=text] 35px, select e input[type=date] 37px (el sistema pide min-height:38px declarado).",
+      "innerText.length: banda de cierre = 391 caracteres y 5 frases; banda del folio = 211 y 3 frases.",
+      "getBoundingClientRect: .fab (1362–1414, 839–891) se solapa con .barra-form .btn.p (1264–1416, 872–908).",
+      "Sección 4: instalador = «— sin asignar —» y el contador dice «2 de 2 capturados».",
+      "49_alta_orden--oscuro.png y brief.contraste.fallos_oscuro = 0."
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+  },
+  "cobertura": [
+    {
+      "patron": "Toda la interacción de producto es inerte. El único <script> del archivo maneja el andamio de demo (`data-set`), el conmutador de tema y el cajón del menú. Los siete controles de captura y los tres botones de la barra inferior (Cancelar, Guardar borrador, Crear la orden) no tienen ningún manejador, no hay `<form>` y el texto «Borrador guardado hace 1 min» es estático. Lo digo una sola vez para toda la pantalla: no es un hallazgo por control.",
+      "propuesta_de_regla": "§9 (andamiaje) — añadir: «En una maqueta, todo control de producto sin lógica detrás se declara una sola vez dentro del bloque `data-andamio`. Un texto de estado que afirma un hecho del sistema —“Borrador guardado hace 1 min”, “3 de 5 capturados”— es un control de lectura: o lo calcula la pantalla, o se escribe con un valor evidentemente ficticio y queda dentro del andamiaje. Afirmar un guardado que no ocurrió es el peor caso, porque nadie puede comprobarlo mirando.»"
+    },
+    {
+      "patron": "El archivo declara `--text-3-fuerte: #5D6774` con el comentario «defecto de tanda 2: se citaba sin definir». Es un token que el sistema no tiene, y su valor está a un dígito del `--text-3` canónico (#5C6675): es el valor correcto de `--text-3` añadido con otro nombre en vez de corregir el token original.",
+      "propuesta_de_regla": "§1.1 — añadir: «No se crea un token paralelo para arreglar el valor de otro. Si un token publicado tiene mal el valor, se corrige el token; un nombre nuevo deja los dos conviviendo y multiplica la tinta auxiliar por dos.»"
+    },
+    {
+      "patron": "`--focus-w: 2px` y `--focus-offset: 2px` están declarados y usados correctamente, pero el documento los marca como «no documentado»: la maqueta es hoy la única fuente de esos dos valores.",
+      "propuesta_de_regla": "§1.7 — publicar los dos valores: «`--focus-w` = 2px, `--focus-offset` = 2px, iguales en los dos temas, con la única excepción del color dentro del cromo (§1.5).»"
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática, sin backend que perfilar.",
+    "f2_tokens: lo inyecta el orquestador desde la medición mecánica; no se escribe aquí.",
+    "§6.16 regla 1 (dato calculado como dato, `.dato-calc`): hay un candidato claro —el folio, que la pantalla dice que «se genera al guardar»— pero no se presenta como campo ni como dato: se cuenta en una banda de texto. Sin `.dato-calc` en el archivo (0 ocurrencias) y sin un campo que lo suplante, no puedo dictaminar incumplimiento; lo dejo señalado.",
+    "§6.16 regla 4 (no hay error antes de la interacción): ningún `.ctrl` arranca con la clase `error` y no hay ningún `.mal` en la pantalla, así que se cumple.",
+    "§6.17 subida de archivo: la pantalla no pide ningún adjunto —la propia banda de cierre dice que la firma va en papel— y no hay ningún `<input type=\"text\">` haciendo ese papel (0 `input[type=file]` en el archivo), así que la regla no se ejerce.",
+    "§6.11 tabla densa: la pantalla no tiene tablas (brief.estructura.tablas = 0).",
+    "§6.18 diálogo modal: no hay diálogo (0 `<dialog>` y 0 `div[role=dialog]`)."
+  ]
+}
