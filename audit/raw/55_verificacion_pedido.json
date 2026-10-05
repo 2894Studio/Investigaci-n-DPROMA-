@@ -1,0 +1,169 @@
+{
+  "pantalla": "55_verificacion_pedido",
+  "ruta_zip": "03-icev-instalacion-de-cargadores/55_verificacion_pedido.html",
+  "carpeta": "03-icev-instalacion-de-cargadores",
+  "area": "ICEV / almacén",
+  "arquetipo": "verificación/checklist",
+  "modo": "cumplimiento",
+  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
+  "capturas": [
+    "55_verificacion_pedido--ok.png",
+    "55_verificacion_pedido--loading.png",
+    "55_verificacion_pedido--empty.png",
+    "55_verificacion_pedido--error.png",
+    "55_verificacion_pedido--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-55verifica-01",
+        "severidad": "alta",
+        "regla": "§6.4 regla 2 y §11 (Estructura) — encabezado real",
+        "dice_el_sistema": "§11: «cada pantalla o vista tiene encabezado real, no texto en negrita». §6.4: «cada estado lleva encabezado real, no un <b>».",
+        "hay_en_el_build": "La pantalla no tiene ni un solo encabezado. El título del pedido es <span class=\"folio\" translate=\"no\">PED-202608-0117</span> dentro de un <div class=\"cabeza\">, estilado con .cabeza .folio{font:800 var(--fs-title) var(--font-ui)}. Los estados vacío y error abren con <b>No tienes ningún pedido que verificar</b> y <b>No se pudo cargar el pedido</b>.",
+        "selector": ".cabeza .folio, .state.state-empty > b, .state.state-error > b",
+        "evidencia": "Brief, estructura: h1 = 0. Medido con document.querySelectorAll('h1,h2,h3,h4'): lista vacía en las cuatro vistas. Medido: getComputedStyle(.cabeza .folio).fontSize = 20px, tagName = SPAN — un título de 20px que no es un encabezado.",
+        "por_que_importa": "Es la única pantalla del lote sin ningún encabezado. Quien navega por encabezados con un lector de pantalla no tiene ni un punto de entrada: ni el folio del pedido, ni la lista de materiales, ni el bloque de cierre incompleto, ni los estados. El documento entero es una secuencia plana de <div> y <span>."
+      },
+      {
+        "id": "f1-55verifica-02",
+        "severidad": "alta",
+        "regla": "§3 — «un token que no existe falla en silencio»",
+        "dice_el_sistema": "«Un var() que no resuelve invalida la declaración entera (los tres paddings del diálogo computaban a 0). Cuando un espaciado se vea raro, lo primero es comprobar que su token está definido.» §11: «todo token var(--x) que usa el archivo está declarado en ese mismo archivo».",
+        "hay_en_el_build": ".cabeza{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:var(--sp-4) var(--sp-5);…} — y --sp-5 no está declarado en ningún :root del archivo.",
+        "selector": ".cabeza",
+        "evidencia": "Brief, tokens.usados_sin_declarar = [\"--sp-5\"]. Medido en Chromium: getPropertyValue('--sp-5') devuelve cadena vacía, y getComputedStyle(.cabeza).padding = «0px». Visible en 55_verificacion_pedido--ok.png: «PED-202608-0117» y las tres líneas de identidad del pedido salen pegadas al borde de su tarjeta, sin un píxel de relleno.",
+        "por_que_importa": "El bloque de identidad del pedido —folio, cliente, sucursal, orden, almacén, hora de recogida— es lo primero que el instalador lee para saber que tiene en la mano el pedido correcto, y se presenta sin margen interior, tocando el borde de la tarjeta. El fallo es silencioso: nada en la hoja indica que la declaración está invalidada."
+      },
+      {
+        "id": "f1-55verifica-03",
+        "severidad": "alta",
+        "regla": "§6.4 — los estados van en tarjeta, con su medallón",
+        "dice_el_sistema": "§11: «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo». Valores: .tarjeta-estado{max-width:480px;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)} y .estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}.",
+        "hay_en_el_build": "<div class=\"state state-empty\"><svg class=\"ico\"><use href=\"#i-box\"/></svg><b>…</b><p>…</p><div class=\"acc\">…</div></div>. 0 ocurrencias de .tarjeta-estado y de .estado-ico en el archivo; el icono es un <svg class=\"ico\"> de 30px teñido con --text-3.",
+        "selector": ".state.state-empty, .state.state-error",
+        "evidencia": "grep: 0 ocurrencias de «tarjeta-estado» y «estado-ico». CSS .state .ico{width:30px;height:30px;color:var(--text-3)}. Mismo patrón que 25, 35 y 29; contrastar con 36_recetas_despacho--empty.png, que sí lleva la tarjeta opaca con medallón.",
+        "por_que_importa": "«No tienes ningún pedido que verificar» es una afirmación operativa fuerte —significa que el almacén todavía no ha surtido— y se presenta flotando sobre el fondo, indistinguible de una pantalla que no cargó."
+      },
+      {
+        "id": "f1-55verifica-04",
+        "severidad": "alta",
+        "regla": "§6.7 Esqueleto de carga — .skel",
+        "dice_el_sistema": "«sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)»; «prefers-reduced-motion aplana el fondo, no solo detiene la animación»: {.skel{animation:none;background:var(--surface-2)}}.",
+        "hay_en_el_build": "23 barras .skel, todas con el carácter «x» dentro: <span class=\"skel\" style=\"width:40%;height:22px\">x</span>, etc. Línea 604: @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin background.",
+        "selector": ".state-loading.sk .sk-caja .skel",
+        "evidencia": "Línea 828 del archivo; 23 ocurrencias de class=\"skel\", cada una con el texto «x». CSS .skel{…;color:transparent} línea 600-602.",
+        "por_que_importa": "Un lector de pantalla anuncia veintitrés veces la letra «x» durante la carga. El relleno es literalmente ruido, y bastaba dejar las barras vacías, que es justo lo que §6.7 pide. Y con movimiento reducido el degradado queda congelado en la posición 0 en vez de aplanarse a --surface-2."
+      },
+      {
+        "id": "f1-55verifica-05",
+        "severidad": "media",
+        "regla": "§6.16 regla 3 — required y aria-required de verdad",
+        "dice_el_sistema": "«required y aria-required de verdad, no asteriscos decorativos» (regla 3). Regla 5: «el error se vincula: aria-invalid=\"true\" + aria-describedby al id del mensaje».",
+        "hay_en_el_build": "<label for=\"motivo\">Por qué se cierra incompleto</label><textarea id=\"motivo\" placeholder=\"Ej.: el centro de carga y la varilla no estaban en el andén\"></textarea> — sin required, sin aria-required, sin aria-describedby al párrafo que explica la obligación. El texto de encima dice literalmente «hace falta que digas por qué».",
+        "selector": "#motivo",
+        "evidencia": "Medido: document.querySelectorAll('input,select,textarea') devuelve un único elemento, TEXTAREA con required=false y aria-required=null. grep sobre el archivo: 0 ocurrencias de «required» y 0 de «aria-required». Comprobado el punto que pedía el encargo: no hay asteriscos decorativos, pero tampoco hay obligatoriedad declarada de ninguna forma.",
+        "por_que_importa": "El único campo de la pantalla es obligatorio según su propio texto, y el botón «Cerrar con 3 sin verificar» está habilitado con el campo vacío. Un lector de pantalla no anuncia el campo como obligatorio, y nada impide cerrar el pedido sin el motivo que el encargado de almacén tiene que leer."
+      },
+      {
+        "id": "f1-55verifica-06",
+        "severidad": "media",
+        "regla": "§7.2 Cromo de aplicación — aria-current=\"page\"",
+        "dice_el_sistema": "«aria-current=\"page\" en el ítem activo».",
+        "hay_en_el_build": "El único [aria-current] de la pantalla está sobre «Recetas de despacho», que no es esta pantalla ni su sección.",
+        "selector": ".side [aria-current=\"page\"]",
+        "evidencia": "Medido: el único [aria-current] devuelve el texto «Recetas de despacho». El <title> es «SIO-DPROMA — Verificar el pedido · instalador». Visible en 55_verificacion_pedido--ok.png: el resaltado del menú está sobre «Recetas de despacho».",
+        "por_que_importa": "El menú afirma que estás en otra pantalla, y lo anuncia así a un lector de pantalla. Mismo defecto que en 25_consumo_de_material."
+      },
+      {
+        "id": "f1-55verifica-07",
+        "severidad": "media",
+        "regla": "§8 Voz de producto — límite de ~140 caracteres y una sola frase",
+        "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres.» «.nota no es un componente de explicación general — solo nivel 1 (restricción/instrucción que bloquea la acción inmediata).»",
+        "hay_en_el_build": "<p class=\"nota\">…<b>Aquí sólo confirmas que te dieron lo que se pidió.</b> Revisar si falta algo en el almacén no es tu trabajo: eso ya lo hicieron ICEV y el encargado de inventario antes de que llegaras. <b>Si un material no está, no lo marques y ya está.</b></p>, y el párrafo del bloque .incompleto.",
+        "selector": "p.nota, .incompleto > p",
+        "evidencia": "Medido con innerText.length (con [data-andamio] oculto): p.nota = 229 caracteres y tres oraciones; el párrafo de .incompleto = 154 caracteres. Tope del sistema: ~140 y una frase.",
+        "por_que_importa": "La .nota no bloquea ninguna acción inmediata —delimita responsabilidades entre áreas—, así que por §8 es nivel 2 y le corresponde un toggletip, no un bloque permanente. Ocupa 229 caracteres entre la barra de avance y el primer material, en una pantalla que se usa de pie, con el pedido en la mano."
+      },
+      {
+        "id": "f1-55verifica-08",
+        "severidad": "media",
+        "regla": "§10 trampa 5 — isotipo con viewBox repetido",
+        "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio»; «se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal».",
+        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>.",
+        "selector": ".logo svg",
+        "evidencia": "Medido con getBoundingClientRect a 1440px: svg x=96 w=44 h=42; use x=63,5 w=43; dx = −32,5px; el <use> no declara width.",
+        "por_que_importa": "La marca se recorta casi entera en la barra lateral."
+      },
+      {
+        "id": "f1-55verifica-09",
+        "severidad": "baja",
+        "regla": "§2.1 Suelo tipográfico",
+        "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» Excepciones: 10,5px solo en rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+        "hay_en_el_build": "Fuera de las excepciones: .sku a 11px (12 nodos, uno por material), .ref a 11px, .cromo-quien small a 11px, .cromo-av a 11px.",
+        "selector": ".lista .sku",
+        "evidencia": "Medido con getComputedStyle por elemento con texto propio a 1440×900: {«11px|SPAN.sku»:12, «11px|SMALL.»:1, «11px|SPAN.cromo-av»:1, «11px|P.ref»:1}. Valor literal en la hoja, no --fs-meta (12px).",
+        "por_que_importa": "El SKU es lo que el instalador compara contra la etiqueta física de la caja en el andén, de pie y a veces con poca luz: es el caso típico de «si un dato se lee todos los días, va a 12–13px como mínimo». Severidad baja porque el nombre del material va completo y legible encima, así que el SKU no es la única vía."
+      },
+      {
+        "id": "f1-55verifica-10",
+        "severidad": "baja",
+        "regla": "§7.3 / §10 — la regla táctil lleva :root",
+        "dice_el_sistema": "«El :root es lo que hace ganar la regla»; «se comprueba midiendo con data-tacto=\"dedo\" puesto, no leyendo el archivo».",
+        "hay_en_el_build": "El <html> sí lleva data-tacto=\"dedo\" (línea 2: <html lang=\"es-MX\" data-density=\"comfy\" data-tacto=\"dedo\">), pero las 6 reglas se escriben sin :root (líneas 279-284), con especificidad (0,2,0) en lugar de (0,3,0).",
+        "selector": "[data-tacto=\"dedo\"] .iconbtn, [data-tacto=\"dedo\"] .btn",
+        "evidencia": "Medido con el modo dedo activo (que es el estado real de esta pantalla): 0 de 18 elementos .iconbtn/.btn/.it/.gordo quedan por debajo de 46px, y .acciones .iconbtn no se dibuja (0 nodos). getComputedStyle(.btn).minHeight = 46px. A 390×844 el único destino por debajo de 44px es el enlace de salto (182×32px), que solo aparece al enfocar.",
+        "por_que_importa": "Aquí el modo dedo sí está puesto y sí está ganando, así que el bug es latente: ninguna variante de tamaño compite hoy. Pero esta es una pantalla de campo, y en cuanto gane un bloque .acciones con botones de icono de 28px el suelo táctil desaparecerá sin aviso."
+      },
+      {
+        "id": "f1-55verifica-11",
+        "severidad": "baja",
+        "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+        "dice_el_sistema": "«Un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero.»",
+        "hay_en_el_build": "El <script> (38 líneas) solo cablea tema, cajón del menú y andamiaje .demo. Los doce <button class=\"ren\" aria-pressed=\"true|false\"> de la lista de verificación —que son el propósito entero de la pantalla— no tienen manejador, igual que «Cerrar con 3 sin verificar».",
+        "selector": ".lista button.ren[aria-pressed]",
+        "evidencia": "Inventario del script: querySelectorAll únicamente sobre '.demo [data-set]'; 22 aria-pressed=\"true\" y 7 «false» en el archivo, ninguno gobernado fuera del andamiaje. La barra de avance «9 de 12 verificados» está escrita a mano con style=\"width:75%\".",
+        "por_que_importa": "Hallazgo transversal del paquete: las maquetas no traen lógica de producto. Aquí es el caso extremo, porque la pantalla es exactamente doce conmutadores y un contador, y ninguno de los trece responde."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 1,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 3,
+      "integridad": 1
+    },
+    "justificacion": "La idea está bien resuelta para el andén: un renglón por material con caja de confirmación, cantidad y unidad a la derecha, barra de avance «9 de 12» con aria-label, cuerpo acotado a 720px centrado y 0 destinos táctiles por debajo de 24px (el único del lote con cero). Pero falla en lo estructural: no tiene ni un encabezado en toda la pantalla (h1=0, y 0 h2/h3/h4 medidos), el bloque de identidad del pedido computa padding 0 porque --sp-5 no está declarado, los estados van sueltos sobre el fondo con <b> por título, el esqueleto mete veintitrés «x» en el árbol de accesibilidad y el único campo obligatorio no declara obligatoriedad. Theming completo y sin fallos de contraste medidos en ninguno de los dos temas. Responsive bien: a 390×844 no hay desbordamiento horizontal (scrollWidth = clientWidth = 390) y todos los destinos llegan a 44px.",
+    "evidencia": [
+      "Brief: estructura h1=0, tablas=0, inputs=1, inputsSinEtiqueta=0, ariaLive=1, dialogNativo=0, skipLink=1; contraste 0 fallos claro / 0 oscuro; tactil_24px por_debajo_de_24px=0 de 33; tokens usados_sin_declarar=[\"--sp-5\"].",
+      "Medido: document.querySelectorAll('h1,h2,h3,h4') = [] en las cuatro vistas; getComputedStyle(.cabeza).padding = «0px» y getPropertyValue('--sp-5') = «» (cadena vacía); .cabeza .folio es un SPAN a 20px; getComputedStyle(.btn).minHeight = 46px (el modo dedo gana); 23 .skel con el texto «x».",
+      "Medido a 390×844: scrollWidth 390 = clientWidth 390, 0 elementos desbordan, 0 destinos por debajo de 24px y solo el enlace de salto (32px) por debajo de 44px."
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+  },
+  "cobertura": [
+    {
+      "patron": "Lista de verificación de recepción: un renglón por material, cada uno un <button class=\"ren\" aria-pressed> que ocupa la fila entera (caja de confirmación de 44px a la izquierda, nombre y SKU en el centro, cantidad y unidad a la derecha), más un contador de avance «9 de 12 verificados» con barra. El sistema no documenta este componente: §6.21 exige <input type=\"checkbox\"> de verdad, pero esa regla es para el panel de filtros, no para una lista de confirmación que se usa de pie.",
+      "propuesta_de_regla": "§6.24 Lista de verificación — `.lista` + `.ren`. Cuándo: confirmar renglón a renglón que lo que se recibió coincide con lo que se pidió. Cada renglón es un `<button type=\"button\" aria-pressed>` cuya región pulsable es la fila completa (§10 trampa 4), con `min-height:56px` y la marca de confirmación a la izquierda a 44px mínimo, porque el uso es en campo (§7.3). El renglón enseña siempre las tres cosas en el mismo orden: qué (nombre y referencia), cuánto (cifra y unidad) y si está confirmado; la unidad nunca va en otra columna. El contador de avance va arriba, dice «N de M verificados» en palabras y no solo en barra, y la barra lleva `role=\"img\"` con el mismo texto en `aria-label`. Cada marca se guarda al tocarla, no al cerrar, y el texto de error de §6.4 lo dice. Cerrar con renglones sin verificar es legítimo pero obliga a un motivo escrito: ese campo es `required` + `aria-required=\"true\"` de verdad (§6.16 regla 3) y el botón de cierre lleva `aria-disabled=\"true\"` con `aria-describedby` al motivo mientras esté vacío."
+    },
+    {
+      "patron": "Pantalla de app personal de campo servida dentro del cromo de dashboard: barra lateral de 236px, barra superior con avatar y conmutador de tema, y el contenido real acotado a 720px centrados en el resto. A 1440px la mitad del ancho queda vacía; a 390px el cromo se repliega y la pantalla funciona bien. El sistema es de dashboard y §7.2 no contempla que una pantalla de teléfono viva dentro de él.",
+      "propuesta_de_regla": "§7.4 Pantalla de campo dentro del cromo. Cuándo: una pantalla cuyo uso real es un teléfono en obra pero que se sirve desde la misma aplicación. El cromo de §7.2 se conserva por coherencia de navegación, pero la pantalla declara `data-tacto=\"dedo\"` en el `<html>` y su contenido se acota con `max-width:720px;margin:0 auto`, no se estira. Todos sus destinos miden 44px (§7.3, «si el uso es en campo»), los botones de acción usan la variante gorda (`min-height:56px`) y la acción principal vive en una barra fija al pie, no al final del desplazamiento. Por debajo de 860px el cromo pasa a cajón y la pantalla ocupa el ancho completo. El bloque de identidad (folio, cliente, dirección) va primero y a ancho completo, como en §6.20."
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática, sin backend que perfilar ni librería que cargar.",
+    "f1 §6.11 (tabla densa): la pantalla no tiene ninguna tabla (brief: tablas=0, th=0); no evaluable.",
+    "f1 §6.17 (subida de archivo): 0 input[type=file] y ningún componente de adjunto; no evaluable.",
+    "f1 §6.18: no hay diálogo (0 <dialog>, 0 div[role=dialog]); no evaluable.",
+    "f1 §6.16 reglas 1, 2, 6, 7 y 8 (dato calculado, dos niveles de obligatoriedad, tipo de campo, contador de sección, guardado): la pantalla tiene un solo campo, un <textarea> libre; esas cinco reglas no tienen superficie donde medirse aquí."
+  ]
+}

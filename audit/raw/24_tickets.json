@@ -1,0 +1,215 @@
+{
+  "pantalla": "24_tickets",
+  "ruta_zip": "06-soporte/24_tickets.html",
+  "carpeta": "06-soporte",
+  "area": "soporte",
+  "arquetipo": "bandeja (mesa de ayuda)",
+  "modo": "cumplimiento",
+  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
+  "capturas": [
+    "24_tickets--ok.png",
+    "24_tickets--loading.png",
+    "24_tickets--empty.png",
+    "24_tickets--error.png",
+    "24_tickets--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-24tickets-01",
+        "severidad": "alta",
+        "regla": "§1 Decisión previa a elegir color (preámbulo) + §6.10",
+        "dice_el_sistema": "si el dato tiene juicio → semáforo §1.3; si solo distingue una cosa de otra → paleta categórica §1.4 … «Un color de estado no se reutiliza para una categoría, ni al revés» · Cuándo .p-type = clasificación: «lo que la cosa es» … No cambia solo, sin connotación → usa las series de §1.4, no el semáforo",
+        "hay_en_el_build": ".pr-crit{background:var(--err-bg);color:var(--err-ink)} y .pr-alta{background:var(--warn-bg);color:var(--warn-ink)} para la prioridad, conviviendo en la misma fila con .plazo.rojo{color:var(--err-ink)} / .plazo.ambar{color:var(--warn-ink)} para el plazo, y con .pill.p-warn{background:var(--warn-bg);color:var(--warn-ink)} para el estatus",
+        "selector": ".prio.pr-crit, .prio.pr-alta, .plazo.rojo, .plazo.ambar, .pill.p-warn",
+        "evidencia": "Medido en el navegador: «Crítica» = rgb(176,58,49) sobre rgb(244,232,231) (--err-ink sobre --err-bg, la receta literal de .p-err); «Venció hace 3 d» = rgb(176,58,49) (--err-ink); «Alta» = rgb(126,91,14) sobre rgb(241,236,222) (--warn-ink sobre --warn-bg, la receta de .p-warn); «Vence hoy» = rgb(126,91,14); «En atención» = rgb(126,91,14) sobre rgb(241,236,222). En la cabecera del detalle coinciden a la vez, uno al lado del otro, «Crítica» en rojo y «En atención» en ámbar, mientras la fila seleccionada de la bandeja lleva «Crítica» en rojo y «Vence hoy» en ámbar.",
+        "por_que_importa": "Es el fallo exacto que el preámbulo del documento prohíbe, y además triplicado. En esta pantalla el rojo significa dos cosas distintas («la prioridad asignada es Crítica» y «el plazo ya venció») y el ámbar significa tres («prioridad Alta», «vence hoy», «estatus En atención»). La prioridad no cambia sola —se fija al abrir el ticket— así que es una clasificación y le toca la paleta categórica de §1.4; el plazo sí cambia solo y es el que tiene derecho al semáforo. Con los dos en semáforo, un ticket de prioridad Baja que ya venció sale verde-a-la-izquierda y rojo-a-la-derecha, y el escaneo de la bandeja deja de funcionar: la columna de colores ya no ordena nada."
+      },
+      {
+        "id": "f1-24tickets-02",
+        "severidad": "alta",
+        "regla": "§8 Voz de producto, límites 1 y 2 (ANEXO B) + §6.9",
+        "dice_el_sistema": ".nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto. Una segunda oración se borra o pasa a toggletip. «No hay excepción por importancia del contenido.» · Ningún bloque de texto siempre visible pasa de ~140 caracteres · lo que explica por qué se diseñó así o educa sobre un caso que no aplica aquí → no va en la interfaz",
+        "hay_en_el_build": "Siete bloques siempre visibles por encima del tope. El mayor, dentro de .caja-plazo: «Un ticket crítico tiene 1 día hábil. Éste se abrió el viernes 21 a las 08:12, así que su plazo termina hoy — el sábado y el domingo no cuentan.<br><br>El plazo de este ticket se fijó al abrirlo y ya no cambia. Si mañana alguien ajusta cuántos días lleva un crítico, este ticket conserva el suyo: si no fuera así, cambiar la configuración movería la fecha de todos los abiertos, y los que ya vencieron dejarían de estar vencidos.»",
+        "selector": ".caja-plazo p, .banda.b-warn p, .descrip, .inmutable, p.texto",
+        "evidencia": "Medido con innerText, filtrando el andamiaje: .caja-plazo p = 422 caracteres / 4 frases a 11,5px; .banda b-warn p = 368 caracteres / 4 frases a 13px; la nota del semáforo = 405 caracteres / 3 frases a 11,5px; la de «espera del usuario» = 205 caracteres / 3 frases; .descrip = 319 caracteres; el estado vacío = 226 caracteres; el de error = 244 caracteres.",
+        "por_que_importa": "Dos de los siete bloques son explicaciones de nivel 3 puras —«si no fuera así, cambiar la configuración movería la fecha de todos los abiertos» explica por qué se diseñó así, no una consecuencia para quien mira el ticket— y ambos van en un componente que §8 limita a una frase. En la captura --ok, los dos bloques ocupan juntos 180px verticales del panel de detalle, por encima de los campos y de la descripción real del problema: quien atiende el ticket lee dos párrafos de doctrina antes de llegar a lo que el usuario reportó."
+      },
+      {
+        "id": "f1-24tickets-03",
+        "severidad": "alta",
+        "regla": "§9 Andamiaje de maqueta (ANEXO A) + §8 Voz de producto",
+        "dice_el_sistema": "Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra · si el texto explica una decisión, no va en pantalla",
+        "hay_en_el_build": "<div class=\"banda b-info\" style=\"grid-column:1/-1;margin:var(--sp-3) var(--sp-4) 0\"><svg …><p><b>Propuesta con componentes de Studio — pendiente de revisión de Studio.</b></p></div>",
+        "selector": "main#contenido .banda.b-info",
+        "evidencia": "La banda vive dentro de <main id=\"contenido\" data-state=\"ok\">, en la primera posición de .split, y no lleva data-andamio (el único data-andamio del archivo es el conmutador .demo). Es visible en la captura 24_tickets--ok.png, a ancho completo, encima de la bandeja y del detalle.",
+        "por_que_importa": "Es una nota del proceso de maquetado publicada como aviso del producto, en el componente que el sistema reserva para avisos que califican lo que viene debajo. Quien use la pantalla lee «pendiente de revisión de Studio» y no tiene forma de saber si eso califica a los tickets que está viendo. Y como no lleva data-andamio, el barrido que §9 promete no la encuentra."
+      },
+      {
+        "id": "f1-24tickets-04",
+        "severidad": "alta",
+        "regla": "§10 trampa 5 — isotipo",
+        "dice_el_sistema": "Un <symbol> ya trae su viewBox; repetirlo en el <svg> que lo invoca descoloca la marca. Correcto: medidas en el <use> y sin viewBox en el envoltorio. Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal",
+        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>",
+        "selector": ".side .logo svg",
+        "evidencia": "Medido con getBoundingClientRect: dx = −32,5px sobre un <svg> de 44×42. En 24_tickets--ok.png el isotipo es una astilla verde vertical. El mismo error se repite en el FAB del asistente (<svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\">). Para comparar, 13_panel_asistencia_rhl y 10_dprimi_asistente escriben el patrón correcto y miden dx = +0,9px y +0,5px.",
+        "por_que_importa": "La marca sale rota en los dos sitios donde aparece, del modo exacto que §10 trampa 5 describe, y el producto ya contiene archivos que lo escriben bien."
+      },
+      {
+        "id": "f1-24tickets-05",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto — valor de --text-3",
+        "dice_el_sistema": "--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)",
+        "hay_en_el_build": "--text-3: #66717F, usado entre otros en .plazo.gris («Sin plazo registrado»), .cuando, .inmutable y .p4-t .resumen",
+        "selector": ":root, .plazo.gris",
+        "evidencia": "Brief: tokens.text_3_declarado = \"#66717F\". Medido en el navegador: .plazo.gris computa rgb(102,113,127) a 11px. La pantalla usa --surface-2 en .pr-media, .pr-baja y los fondos de cabecera.",
+        "por_que_importa": "Hecho ya establecido en 51 de las 52 maquetas: sobre --surface-2 el valor obsoleto queda en 4,21:1, por debajo del mínimo AA. El brief no reporta fallo de contraste en esta pantalla porque los pares concretos que midió caen sobre --surface, no sobre --surface-2."
+      },
+      {
+        "id": "f1-24tickets-06",
+        "severidad": "alta",
+        "regla": "§7.3 Objetivos táctiles + §10 trampa 4",
+        "dice_el_sistema": "Todo destino interactivo mide 24×24px como mínimo · un campo de búsqueda dentro de un <div> con forma de pastilla no cumple, porque pulsar la pastilla no hace nada. El contenedor tiene que ser una <label for=\"…\">",
+        "hay_en_el_build": "<div class=\"search\"><svg …><input id=\"buscar\" type=\"search\" aria-label=\"Buscar tickets\"></div>",
+        "selector": ".bh .search",
+        "evidencia": "Medido: el contenedor .search es un DIV de 347×33px sin for; el <input> mide 296×15px. Brief: único destino por debajo de 24px de los 34 interactivos.",
+        "por_que_importa": "Mismo caso que §10 trampa 4 nombra, con el mismo componente. El destino real son 15px de alto."
+      },
+      {
+        "id": "f1-24tickets-07",
+        "severidad": "alta",
+        "regla": "§6.12 regla 8 + §11 Interacción",
+        "dice_el_sistema": "un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero · lo que ejecuta es un <button> y lo que navega un <a>",
+        "hay_en_el_build": "<div class=\"seg\" role=\"group\" aria-label=\"Bandeja\"><button aria-pressed=\"true\">Abiertos</button><button aria-pressed=\"false\">Míos</button><button aria-pressed=\"false\">Todos</button></div>, más «Nuevo ticket», «Marcar resuelto», «Reasignar» y «Poner en espera del usuario»; y los seis tickets de la bandeja como <a class=\"tk\" href=\"#\">",
+        "selector": ".p4-t .seg button, .detalle .acciones .btn, ol li a.tk",
+        "evidencia": "El <script> del archivo contiene 6 addEventListener, todos de cromo y andamiaje: tema, cambio de prefers-color-scheme, botones .demo [data-set], botón de menú, velo y Escape. Ninguno toca .seg, .tk ni las acciones del detalle. Los seis tickets son enlaces a href=\"#\", así que pulsarlos no selecciona nada y además salta al principio del documento.",
+        "por_que_importa": "Toda la pantalla miente sobre su estado: el conmutador «Abiertos / Míos / Todos» declara aria-pressed=\"true\" en «Abiertos» y nunca cambia, y seleccionar un ticket de la lista —la acción central de una mesa de ayuda— no cambia el detalle. Y la selección de un elemento en una vista maestro-detalle no es navegación: son <button> con aria-current, no <a href=\"#\">."
+      },
+      {
+        "id": "f1-24tickets-08",
+        "severidad": "media",
+        "regla": "§6.9 — trampa adicional documentada («reinventar un componente que ya existe en el mismo archivo»)",
+        "dice_el_sistema": "Antes de escribir una clase nueva, verificar si .banda + una de sus cuatro variantes ya lo cubre · «no solo se repiten nombres de clase por accidente, también se reinventan componentes enteros por no buscar primero si ya existen»",
+        "hay_en_el_build": ".caja-plazo y .banda.b-warn, apilados uno sobre otro en el panel de detalle",
+        "selector": ".caja-plazo, .banda.b-warn",
+        "evidencia": "Medido con getComputedStyle: .caja-plazo computa background rgb(241,236,222), border-color rgb(126,91,14), border-radius 10px, padding 16px. .banda.b-warn computa background rgb(241,236,222), border-color rgb(126,91,14), border-radius 10px, padding 12px 16px. Son el mismo componente con otro nombre y 4px menos de relleno vertical.",
+        "por_que_importa": "En la captura --ok se ven dos cajas ámbar idénticas, una debajo de la otra, diciendo cosas distintas. El lector no tiene forma de saber por qué hay dos avisos del mismo nivel seguidos ni cuál pesa más; y la de arriba, que es la que lleva la cifra importante («Vence hoy, 24 ago 2026»), se confunde con la de abajo, que es doctrina de proceso."
+      },
+      {
+        "id": "f1-24tickets-09",
+        "severidad": "media",
+        "regla": "§6.9 Avisos — «el icono tiene que coincidir con la variante»",
+        "dice_el_sistema": "el icono tiene que coincidir con la variante (triángulo de advertencia sobre banda neutra = señal mixta)",
+        "hay_en_el_build": "<div class=\"banda b-warn\"><svg class=\"ico\"><use href=\"#i-users\"/></svg>… y <div class=\"banda b-info\"><svg class=\"ico\"><use href=\"#i-badge\"/></svg>…",
+        "selector": ".banda.b-warn svg, .banda.b-info svg",
+        "evidencia": "La banda de advertencia (fondo --warn-bg, borde --warn) lleva el icono i-users, dos siluetas de persona. La banda informativa lleva i-badge, una estrella. Ninguno de los dos pertenece a la familia de advertencia/información.",
+        "por_que_importa": "Es la señal mixta que la regla nombra al revés: aquí el color grita advertencia y el icono dice «esto va de personas». La estrella sobre la banda informativa es peor: sugiere destacado o favorito, que no es lo que dice el texto."
+      },
+      {
+        "id": "f1-24tickets-10",
+        "severidad": "media",
+        "regla": "§6.7 Esqueleto de carga — A11y y medidas",
+        "dice_el_sistema": "sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad) · prefers-reduced-motion aplana el fondo, no solo detiene la animación · Imita la forma de lo que va a llegar: mismas columnas, mismos anchos (en fr) y el mismo alto · el esqueleto mide lo mismo de alto que el contenido que sustituye",
+        "hay_en_el_build": "19 barras con texto dentro («TKT-202608-0000 · crítica», «asunto del ticket», «quien lo reporta», «caja del plazo», «descripción»), @media (prefers-reduced-motion:reduce){.skel{animation:none}}, y un bloque de carga que ocupa unos 420px de los ~810px que ocupa la bandeja real",
+        "selector": ".state-loading .skel, .state-loading .sk",
+        "evidencia": "Medido: 19 .skel con textContent no vacío. La única regla de reduced-motion sobre .skel leída con document.styleSheets es animation:none, sin background plano. En la captura 24_tickets--loading.png el esqueleto termina a media altura y deja la mitad inferior de la pantalla en blanco, y el panel de detalle pierde su fondo de superficie.",
+        "por_que_importa": "Tres fallos de la misma regla. El más visible es el alto: la pantalla «salta» al pasar de cargando a con datos porque el esqueleto no reserva el espacio que va a ocupar. El texto dentro de las barras hace que el lector de pantalla lea «asunto del ticket, quien lo reporta» cuatro veces; y con reducción de movimiento el degradado se queda congelado a medias."
+      },
+      {
+        "id": "f1-24tickets-11",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado — regla 2 + §11 Estructura",
+        "dice_el_sistema": "cada estado lleva encabezado real, no un <b> · los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo",
+        "hay_en_el_build": "<div class=\"state state-empty\"><svg class=\"ico\">…<b>…</b> y lo mismo en .state-error",
+        "selector": ".state b, .state .ico",
+        "evidencia": "Los dos estados titulan con <b> y no aplican la receta de .tarjeta-estado (--r-modal + --sh-modal + medallón de 52px con --on-state). Revisadas las capturas --empty y --error.",
+        "por_que_importa": "El título del estado no entra en el índice de encabezados. Lo escrito, en cambio, cumple bien §6.4 regla 3: el error dice qué pasó, qué no se ha perdido («ningún ticket cambió de estado ni venció por esto») y lleva su referencia."
+      },
+      {
+        "id": "f1-24tickets-12",
+        "severidad": "baja",
+        "regla": "§10 trampa 10 — nombres de clase cortos y genéricos + §6.12",
+        "dice_el_sistema": ".resumen se usó a la vez para el <span> de una línea de resumen y para el <section> de chips de estado de otra pantalla — convertirlo a grid de tres columnas rompió el primero en silencio … Nombres de una sola palabra genérica (.resumen, .nota, .f, .leg, .cg) son los que más se repiten sin querer — con esos, doble cuidado",
+        "hay_en_el_build": ".p4-t .resumen{color:var(--text-3);font-size:var(--fs-meta);line-height:1.5} sobre <span class=\"resumen\"><b>6</b> abiertos · <b>1</b> vencido · <b>2</b> vencen hoy o mañana</span>",
+        "selector": ".p4-t .resumen",
+        "evidencia": "Es exactamente el uso que §10 trampa 10 nombra: .resumen como <span> de una línea de texto plano, mientras §6.12 reserva .resumen para la zona de chips de estatus (.resumen + .schip).",
+        "por_que_importa": "Aquí está acotado por .p4-t y no rompe nada hoy. Lo señalo porque es el caso literal del documento y porque 40_usuarios, del mismo lote y con el mismo cromo, repite el mismo .resumen en la misma posición: dos archivos ya comparten el nombre."
+      },
+      {
+        "id": "f1-24tickets-13",
+        "severidad": "baja",
+        "regla": "§1.3 Semáforo — nomenclatura de los cinco estados",
+        "dice_el_sistema": "Cinco estados: --ok Correcto, completo, vigente · --warn Falta algo, o vence pronto · --err Falta lo que impide operar · --block Bloqueado por una condición externa · --pause Inactivo, en pausa · Clases: .p-ok, .p-warn, .p-err, .p-block, .p-pause",
+        "hay_en_el_build": ".plazo.rojo, .plazo.ambar, .plazo.verde, .plazo.gris",
+        "selector": ".plazo.rojo, .plazo.ambar, .plazo.verde, .plazo.gris",
+        "evidencia": "Los valores que consumen sí son los tokens correctos (--err-ink, --warn-ink, --ok-ink, --text-3), pero las clases se nombran por el color, no por el significado.",
+        "por_que_importa": "Solo nomenclatura, pero va contra el propósito del sistema: el nombre de la clase es lo que impide que mañana alguien ponga «ámbar» a algo que no está por vencer. Y el caso de .gris («Sin plazo registrado») delata el problema: no es un color, es un sexto caso —la ausencia de dato— que ninguno de los cinco estados cubre."
+      },
+      {
+        "id": "f1-24tickets-14",
+        "severidad": "baja",
+        "regla": "§7.3 Objetivos táctiles — «el :root es lo que hace ganar la regla»",
+        "dice_el_sistema": "El :root es lo que hace ganar la regla … Se comprueba midiendo con data-tacto=\"dedo\" puesto",
+        "hay_en_el_build": "[data-tacto=\"dedo\"] .it / .iconbtn / .cromo-prof / .cromo-av / .seg button / .btn — las seis sin :root (líneas 285-290)",
+        "selector": "[data-tacto=\"dedo\"] .iconbtn",
+        "evidencia": "Brief: regla_data_tacto_sin_root = 6. Comprobado midiendo con data-tacto=\"dedo\" puesto: esta pantalla no dibuja ningún .iconbtn dentro de un contenedor con regla de tamaño posterior, así que todas las reglas táctiles ganan igual. Bug latente.",
+        "por_que_importa": "No afecta hoy. Queda como deuda de una línea."
+      },
+      {
+        "id": "f1-24tickets-15",
+        "severidad": "baja",
+        "regla": "§6.5 Iconos — .msi",
+        "dice_el_sistema": "Cuándo: todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1)",
+        "hay_en_el_build": "Sprite SVG propio de 38 <symbol> con iconos de trazo",
+        "selector": ".ico",
+        "evidencia": "grep 'msi' y grep 'Material+Symbols' devuelven 0. Transversal a las cuatro pantallas del lote.",
+        "por_que_importa": "Divergencia de familia visual, no de función."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 2,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 3,
+      "integridad": 1
+    },
+    "justificacion": "Integridad 1: la pantalla no ejecuta nada —seis addEventListener, todos de cromo y andamiaje—, así que el conmutador «Abiertos / Míos / Todos» está congelado en «Abiertos» con aria-pressed=\"true\" y seleccionar un ticket no cambia el detalle; el isotipo sale roto 32,5px en los dos sitios donde aparece; hay una banda de proceso de maquetado publicada como aviso del producto; y .caja-plazo es .banda.b-warn con otro nombre, apilada justo encima de una .banda.b-warn de verdad. Accesibilidad 2: el buscador es un <div> con un input de 15px, el esqueleto lleva texto y se congela, los estados titulan con <b>, y el detalle entero es un aria-live=\"polite\" que, en cuanto haya lógica, recitará un panel de más de mil caracteres cada vez que se cambie de ticket; a favor, skip link, h1 único, main[tabindex=\"-1\"], aria-label en todos los controles de icono, 2 regiones live declaradas y ningún input sin etiqueta. Responsive 3 y theming 3 son lo mejor: tres anchos de cromo con cajón y velo por debajo de 860px, la vista maestro-detalle se apila en 1024px con la bandeja acotada a 38vh, y los dos temas están declarados y medidos (0 fallos de contraste en claro y en oscuro). Lo que impide subir de 2 es que el contenido escrito, que es la mayor virtud de la pantalla —los textos de ticket son creíbles y el estado de error enumera lo que no cambió—, se publica en bloques de 400 caracteres en componentes que el sistema limita a una frase, y que el semáforo se usa a la vez para la prioridad y para el plazo.",
+    "evidencia": [
+      "getComputedStyle: .pr-crit = rgb(176,58,49)/rgb(244,232,231) y .plazo.rojo = rgb(176,58,49); .pr-alta = rgb(126,91,14)/rgb(241,236,222), .plazo.ambar = rgb(126,91,14) y .pill.p-warn = rgb(126,91,14)/rgb(241,236,222)",
+      "getComputedStyle: .caja-plazo y .banda.b-warn computan el mismo background rgb(241,236,222), el mismo borde rgb(126,91,14) y el mismo radio de 10px",
+      "getBoundingClientRect: dx del <use> del isotipo = −32,5px; .search es un DIV de 347×33 con un input de 296×15",
+      "innerText: siete bloques siempre visibles por encima de 140 caracteres; el mayor, 422 caracteres y 4 frases",
+      "6 addEventListener en todo el <script>, ninguno sobre .seg, .tk ni .detalle .acciones",
+      "19 barras .skel con texto; captura --loading: el esqueleto cubre ~420px de los ~810px del contenido real",
+      "Brief: 0 fallos de contraste en claro y oscuro; 1 destino bajo 24px de 34; tablas = 0, th = 0"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+  },
+  "cobertura": [
+    {
+      "patron": "Bandeja maestro-detalle en una sola pantalla: una lista de tarjetas a la izquierda (<ol> de seis tickets, cada uno con folio, prioridad, plazo, asunto en dos líneas, quién reporta y cuándo se abrió) y el expediente completo del seleccionado a la derecha, en una rejilla que se apila por debajo de 1024px. Es el arquetipo de listado del módulo y no hay tabla: brief confirma tablas = 0 y th = 0. El sistema no lo cubre. §6.11 da por supuesto que el arquetipo de listado es una <table> dentro de .tabla-caja, y con ella viajan reglas que aquí quedan huérfanas sin sustituto: <caption> siempre, <th scope=\"row\">, aria-sort, «ninguna columna desaparece en silencio», densidad cómoda/compacta y el selector de 10/25/50/100. §6.20 (.cab, ficha de detalle) describe una pantalla de detalle entera, no un panel que convive con su lista. §6.12 pone el resumen de estatus y los filtros «encima de una tabla densa», y aquí la cuenta vive dentro de la cabecera de la bandeja («6 tickets · ordenados por lo que queda de plazo, de menos a más»).",
+      "propuesta_de_regla": "§6.30 Bandeja maestro-detalle — `.split` + `.bandeja` + `.detalle`. Cuándo: un listado cuyo trabajo normal es resolver un elemento tras otro sin salir de la lista (mesa de ayuda, conversaciones, revisión en cola). Sustituye a la tabla densa de §6.11 solo si se cumplen las tres condiciones: el elemento tiene un cuerpo de texto libre que no cabe en una celda, el trabajo es secuencial, y la lista no se ordena ni se exporta por columnas. Requisitos: (1) la lista es un `<ol>` y cada elemento un `<button>` con `aria-current=\"true\"` en el activo, nunca un `<a href=\"#\">` —seleccionar no es navegar—; (2) el criterio de orden se declara en texto al principio de la lista y es el único, porque sin cabeceras no hay dónde ordenar; (3) el panel de detalle lleva `aria-live=\"polite\"` únicamente sobre la cabecera del elemento (folio y asunto), no sobre el panel entero, y al seleccionar mueve el foco al encabezado del detalle con `tabindex=\"-1\"`; (4) por debajo del punto de ruptura la lista se acota en alto y el detalle queda debajo, con un enlace de vuelta a la lista; (5) la cuenta de elementos y el filtro de bandeja (`Abiertos / Míos / Todos`) van en la cabecera de pantalla, no dentro de la lista, y siguen las nueve reglas de §6.12 que no dependen de la tabla —en particular la 8: si no filtran, no llevan `aria-pressed`."
+    },
+    {
+      "patron": "Etiqueta de plazo con semáforo y segundo canal (.plazo con un <i class=\"luz\"> de 8px: relleno sólido para rojo/ámbar/verde y un anillo discontinuo de 9px para el caso «sin plazo registrado»), y etiqueta de prioridad con cuatro formas distintas en ::before (triángulo para Crítica, círculo relleno para Alta, raya para Media, anillo hueco para Baja). El segundo canal está bien resuelto y es más de lo que el sistema pide: §1.4 solo exige segundo canal en gráficas, y §6.10 dice «o las tres llevan punto, o ninguna», que leído a la letra prohibiría las cuatro formas distintas. No hay regla que cubra el segundo canal en una etiqueta de estado.",
+      "propuesta_de_regla": "Ampliación de §6.10: una familia de etiquetas puede llevar formas distintas en lugar de un punto común cuando la familia es ordinal (prioridad, severidad, nivel) y las formas siguen el orden —de más masa a menos: triángulo, disco, raya, anillo—. La exigencia de §6.10 («o las tres llevan punto, o ninguna») se reformula así: *todas las de una familia llevan marca, del mismo tamaño y en la misma posición; si la familia es ordinal, la marca puede cambiar de forma, y entonces el orden de las formas es fijo y se declara en el sistema*. Una familia que no es ordinal (tipo de cliente, plaza) sigue con punto idéntico para todas. Motivo: en una lista escaneada, una forma ordinal se lee sin color y sin leyenda, que es exactamente lo que el suelo de ΔE de §1.4 intenta garantizar por la vía del color."
+    },
+    {
+      "patron": "Un valor de estado que no es ninguno de los cinco del semáforo sino la ausencia del dato que lo determina: «Sin plazo registrado», pintado con --text-3 y un anillo discontinuo. §1.3 define cinco estados y los cinco afirman algo sobre la cosa (está bien, le falta algo, le falta lo que impide operar, está bloqueada, está en pausa). Ninguno significa «no sabemos». §6.22 tiene la intuición correcta para las cifras —«un cero afirma que se midió»— pero no la extiende a las etiquetas de estado.",
+      "propuesta_de_regla": "§1.3.1 El dato que falta no es un estado. Cuando el valor que decide el estado de un registro no existe, la etiqueta no toma ninguno de los cinco colores del semáforo: va en tinta de texto `--text-3`, sin fondo, con su marca gráfica **hueca o discontinua** y el texto diciendo qué falta, no qué pasa («Sin plazo registrado», no «Sin vencer»). Corolario de §6.22: igual que un cero afirma que se midió, un color de semáforo afirma que se evaluó. Un registro así se cuenta aparte en el resumen de estatus y nunca se suma al grupo «en tiempo»."
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática, sin backend que perfilar",
+    "§6.11 reglas 1, 2, 3, 6 y 9 (caption, th scope=row, aria-sort, densidad, registros por página): no_evaluado — la pantalla no tiene ninguna tabla (brief: tablas = 0, th = 0); el listado es un <ol> de tarjetas. La ausencia de patrón documentado para este arquetipo está en cobertura, no como incumplimiento.",
+    "§6.18 Diálogo modal: no_evaluado — la pantalla no tiene diálogo (brief: dialogNativo = 0, divDialog = 0) y ninguna de sus acciones llega a abrir uno, porque no hay lógica."
+  ]
+}

@@ -1,0 +1,169 @@
+{
+ "pantalla": "14_app_checado_oficina",
+ "ruta_zip": "03-icev-instalacion-de-cargadores/14_app_checado_oficina.html",
+ "carpeta": "03-icev-instalacion-de-cargadores",
+ "area": "ICEV",
+ "arquetipo": "app movil",
+ "modo": "cobertura",
+ "estados_auditados": [
+  "antes de checar",
+  "entrada puntual",
+  "retardo",
+  "fuera de zona",
+  "claro",
+  "oscuro",
+  "prefers-reduced-motion"
+ ],
+ "capturas": [
+  "14_app_checado_oficina--ok.png",
+  "14_app_checado_oficina--m-antes.png",
+  "14_app_checado_oficina--m-retardo.png",
+  "14_app_checado_oficina--m-fuera.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-14app-01",
+    "severidad": "alta",
+    "regla": "§11 «un control con pinta de interactivo tiene que interactuar» / §6.12 regla 8 / §6.18 «el nombre del boton y el contenido coinciden»",
+    "dice_el_sistema": "El nombre del boton coincide con lo que hace el dialogo que abre. Un control con pinta de interactivo tiene que interactuar. Sin logica real se presenta como cifra de lectura.",
+    "hay_en_el_build": "<button class=\"checkbtn\" id=\"btnCheck\">…<b>Registrar entrada</b><span>Toma foto en vivo + ubicacion exacta</span>… y en el script: $('btnCheck').addEventListener('click', () => apply('puntual'));",
+    "selector": "button.checkbtn#btnCheck",
+    "evidencia": "La misma accion en 12_app_checado_asistencia abre una vista de captura con foto obligatoria y espera de ubicacion (#v-captura, tres requisitos, boton de confirmar deshabilitado hasta tener los dos datos). Aqui el manejador salta directamente al escenario 'puntual': no hay camara, no hay peticion de ubicacion y no hay paso intermedio. La subetiqueta del boton promete literalmente 'Toma foto en vivo + ubicacion exacta'.",
+    "por_que_importa": "Dos pantallas del mismo modulo, el mismo boton y la misma promesa escrita, con dos contratos distintos: una captura y la otra no. Quien revise la especificacion a partir de las maquetas no puede saber cual es la verdadera. Y si la de oficina es la correcta, entonces el texto del boton esta mintiendo sobre lo que va a pasar al pulsarlo."
+   },
+   {
+    "id": "f1-14app-02",
+    "severidad": "alta",
+    "regla": "§6.4 A11y regla 1 — el cambio se anuncia y mueve el foco",
+    "dice_el_sistema": "El cambio se anuncia (aria-live=\"polite\") y mueve el foco (main.focus() con tabindex=\"-1\").",
+    "hay_en_el_build": "apply(name) cambia .result, .regrow, .note y el boton visible, y termina con $('body').scrollTop = 0;",
+    "selector": "section.result#result, #noteRetardos, #btnJustificar",
+    "evidencia": "El brief mide ariaLive=1 en toda la pantalla, y ese unico aria-live es la pastilla de sincronizacion de la cabecera (span.sync, role=status). El bloque de resultado —que es lo que cambia— no esta dentro de ninguna region viva, y apply() no llama a focus() en ningun punto. Lo unico que mueve es el scroll.",
+    "por_que_importa": "El resultado del checado es la respuesta a la unica accion de la pantalla: si salio puntual, con retardo o fuera de zona. Un lector de pantalla no recibe nada: el foco se queda donde estaba, el aviso de 'Llevas 2 retardos' aparece en silencio y el boton 'Adjuntar justificacion' se materializa sin anunciarse. En 12 hay dos regiones vivas; aqui, ninguna sobre lo que cambia."
+   },
+   {
+    "id": "f1-14app-03",
+    "severidad": "alta",
+    "regla": "§2 Tipografia — autoalojado (D116)",
+    "dice_el_sistema": "Las fuentes se autoalojan (D116). Prohibido el <link> a Google Fonts para las fuentes de interfaz: un CDN caido falla en silencio (incidencia real de 4 dias sin deteccion).",
+    "hay_en_el_build": "<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Michroma&display=swap\" rel=\"stylesheet\">",
+    "selector": "head > link[href*='fonts.googleapis.com']",
+    "evidencia": "Lineas 8-10 del archivo. No hay ningun @font-face declarado.",
+    "por_que_importa": "Misma dependencia externa que en 11 y 12, en las tres pantallas de la app. Un unico CDN caido degrada toda la familia a la vez, y la incidencia que §2 cita duro cuatro dias sin que nadie lo notara."
+   },
+   {
+    "id": "f1-14app-04",
+    "severidad": "media",
+    "regla": "§6.4 regla 2 — cada estado lleva encabezado real",
+    "dice_el_sistema": "Cada estado lleva encabezado real, no un <b>. Los estados de vacio y error van en tarjeta, con su medallon, no sueltos sobre el fondo.",
+    "hay_en_el_build": "<section class=\"result\" id=\"result\"><span class=\"ic\">…</span><span class=\"rt\"><b id=\"resT\">Entrada registrada</b><p id=\"resP\">…</p></span></section>",
+    "selector": "section.result#result > .rt > b#resT, #regVacio b",
+    "evidencia": "Los tres resultados ('Entrada registrada', 'Entrada con retardo', 'Checado fuera de la zona') y el vacio de la lista ('Sin movimientos todavia') abren con un <b>. Los unicos encabezados del documento son el <h1> oculto y los dos <h2> de seccion.",
+    "por_que_importa": "El estado 'Checado fuera de la zona' es el error de la pantalla y queda fuera del esquema de encabezados: no se puede llegar a el navegando por titulos ni se distingue estructuralmente del texto que lo rodea. Es la regla 2 de §6.4 al pie de la letra."
+   },
+   {
+    "id": "f1-14app-05",
+    "severidad": "media",
+    "regla": "§2.1 Suelo tipografico",
+    "dice_el_sistema": "El suelo son 12px. «Nada baja de ahi.» Si un dato se lee todos los dias, va a 12-13px como minimo. Unica excepcion: 10,5px en mayusculas con letter-spacing para rotulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+    "hay_en_el_build": ".tabbar a{font-size:10px}; .badge y .wlegend span y .saldo .lb a 10,5px; .sync, small y los subtextos a 11px; .sub y .zt span a 11,5px",
+    "selector": "nav.tabbar a, span.badge, p.wlegend span, .saldo p.lb, .zone span",
+    "evidencia": "Estilo calculado a 390x844: 20 nodos de texto por debajo de 12px en el escenario 'antes de checar'. La barra de navegacion a 10,00px; la leyenda de la ventana de entrada ('Puntual hasta 09:00', 'Tolerancia hasta 09:10', 'Retardo') a 10,50px sin mayusculas; las pastillas de resultado a 10,50px; los rotulos de saldos a 10,50px.",
+    "por_que_importa": "La leyenda de 10,5px es lo unico que da significado a la barra tricolor de la ventana de entrada: sin ella, la barra es solo tres franjas de color, y §6.10 prohibe comunicar un estado solo con color. Dejarla por debajo del suelo convierte el texto obligatorio en texto que no se lee."
+   },
+   {
+    "id": "f1-14app-06",
+    "severidad": "media",
+    "regla": "§1.7 Ratios de contraste / §1.4.1 Tinta sobre relleno de color",
+    "dice_el_sistema": "Texto normal: 4,5:1. Glifo o texto sobre relleno solido de color usa --on-state, no un gris de texto. Cada color nuevo se mide contra los fondos donde va a aparecer, en los dos temas.",
+    "hay_en_el_build": ".av{background:linear-gradient(135deg,var(--chrome),var(--accent));color:var(--chrome-ink);font-size:12.5px;font-weight:800}",
+    "selector": "span.av",
+    "evidencia": "Calculado sobre las dos paradas reales del gradiente: en oscuro, --chrome-ink #E7ECF2 da 12,72:1 sobre --chrome #122740 y 3,29:1 sobre --accent #4A8F5A, por debajo del 4,5:1 de un texto de 12,5px. En claro los dos extremos pasan (7,92:1 y 4,69:1). CORRECCION AL BRIEF: el 'span.av ratio 1' del brief es un falso positivo — .av no declara background-color, solo background-image, y la medicion compuso contra el fondo de pagina.",
+    "por_que_importa": "Identico a 12: el mismo componente con el mismo defecto en las dos pantallas de checado. Se corrige una vez, en el token del relleno, y queda resuelto en las dos."
+   },
+   {
+    "id": "f1-14app-07",
+    "severidad": "media",
+    "regla": "§5 Movimiento — prefers-reduced-motion",
+    "dice_el_sistema": "No es «cero animacion»: se conservan opacidad y color, se elimina todo desplazamiento y escala.",
+    "hay_en_el_build": "@media (prefers-reduced-motion: reduce){:root{--dur-micro:1ms;--dur-base:120ms;--dur-enter:120ms;--ease-spring:linear;--stagger:0ms}} — y nada mas",
+    "selector": "button:active",
+    "evidencia": "Cargada con reducedMotion:'reduce': el unico bloque @media remapea duraciones. button:active{transform:scale(.97)} sigue vigente; la unica excepcion declarada es button[disabled]:active{transform:none}, ajena al ajuste del sistema.",
+    "por_que_importa": "Mismo patron que en 11 y 12: se acorta el movimiento en vez de retirarlo. §5 es explicito en que lo que se elimina es el desplazamiento y la escala, no la duracion."
+   },
+   {
+    "id": "f1-14app-08",
+    "severidad": "media",
+    "regla": "§8 Voz de producto / §6.9 .note",
+    "dice_el_sistema": "Ningun bloque de texto siempre visible pasa de ~140 caracteres. .nota y .banda llevan como maximo UNA frase, sin punto y coma ni raya explicativa despues del primer punto.",
+    "hay_en_el_build": "#noteRetardos: «Llevas 2 retardos en los ultimos 30 dias. Al tercero, el reglamento de la empresa lo considera falta de asistencia. Si este retardo tiene una causa justificada, subela ahora y Recursos Humanos la revisa.» · #noteAntes: «Te quedan 18 minutos antes de que la entrada cuente como retardo. La hora que vale es la del servidor al recibir el checado, no la del telefono.»",
+    "selector": "div.note.n-warn#noteRetardos, div.note.n-info#noteAntes",
+    "evidencia": "innerText medido: #noteRetardos = 202 caracteres y 3 frases; #noteAntes = 144 caracteres y 2 frases. Hay dos .note mas de 2 frases cada una (hora de comida, plazo de permisos) siempre visibles mas abajo.",
+    "por_que_importa": "#noteRetardos mezcla los tres niveles de §8 en un solo bloque: la consecuencia que bloquea (al tercero es falta), la aclaracion de regla y la instruccion de que hacer. Lo que se recuerda del bloque es lo primero; lo accionable queda al final. §8 pide una frase visible y el resto en toggletip (§6.23), que esta pantalla no usa en ningun sitio."
+   },
+   {
+    "id": "f1-14app-09",
+    "severidad": "media",
+    "regla": "§9 Andamiaje de maqueta (Anexo A)",
+    "dice_el_sistema": "Se marca siempre con data-andamio, va visualmente separado del producto y rotulado. Todo lo que lleve data-andamio se retira en la version real. Un solo selector lo encuentra.",
+    "hay_en_el_build": "<aside class=\"cap\"><div class=\"demo\"> con el conmutador 'Escenario' de cuatro botones [data-sc], y <header class=\"topbar\" aria-label=\"Barra de la demostracion\">",
+    "selector": "aside.cap, div.demo, [data-sc], header.topbar",
+    "evidencia": "Busqueda de 'data-andamio' en el archivo: 0 resultados. La barra superior se rotula a si misma como 'Barra de la demostracion' pero tampoco lleva la marca. Para auditar a 390x844 tuve que ocultar las tres piezas con un selector por clase.",
+    "por_que_importa": "Aqui el andamio no solo acompana: apply() ES toda la logica de la pantalla. Los cuatro botones [data-sc] son el unico motor de estado que existe, asi que separar maqueta de producto no es un detalle de limpieza — es lo que distingue una especificacion de una demostracion."
+   },
+   {
+    "id": "f1-14app-10",
+    "severidad": "media",
+    "regla": "§1.1 Valor canonico de --text-3",
+    "dice_el_sistema": "--text-3 es #5C6675, no el antiguo #66717F (que caia a 4,21:1 sobre --surface-2).",
+    "hay_en_el_build": "--text-3: #66717F",
+    "selector": ":root (bloque de tema claro)",
+    "evidencia": "Declaracion del <style>, confirmada por el brief (text_3_declarado). El barrido de contraste da 0 fallos reales en claro y 0 en oscuro, asi que hoy no produce dano medible.",
+    "por_que_importa": "Riesgo latente, igual que en 12: --text-3 es el color de la barra de pestanas y de los subtextos, y basta con que alguno caiga sobre --surface-2 para reproducir el 4,21:1 documentado. Corregir el token lo cierra."
+   }
+  ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "Es la pantalla mejor resuelta del trio en lo tactil: medidos los once destinos interactivos a 390x844, ninguno baja de 44px, asi que §7.3 se cumple en su exigencia de campo. Theming y responsive estan a la par de 12: dos temas completos, 0 fallos de contraste reales en ambos y scrollWidth 390 = innerWidth 390 en los cuatro escenarios. Accesibilidad se queda en 2 porque lo que cambia —el resultado del checado— no se anuncia ni mueve el foco, los tres estados abren con <b> y la leyenda que da significado a la barra tricolor va a 10,5px. Integridad es 2 por el hueco mas serio: el boton principal promete una captura que no existe, mientras la pantalla hermana si la tiene, y la zona declara una distancia exacta sin que la app haya pedido nunca el permiso que la produce.",
+  "evidencia": [
+   "Playwright 390x844: scrollWidth 390 / innerWidth 390 en los cuatro escenarios",
+   "0 destinos interactivos por debajo de 44px en antes / retardo / fuera de zona",
+   "0 fallos de contraste reales en claro y en oscuro tras descartar el falso positivo de span.av",
+   "span.av: 12,72:1 sobre la parada --chrome y 3,29:1 sobre la parada --accent en oscuro",
+   "20 nodos de texto bajo 12px en 'antes de checar'; nav.tabbar a a 10,00px; p.wlegend span a 10,50px",
+   "#noteRetardos 202 caracteres / 3 frases; #noteAntes 144 caracteres",
+   "brief: ariaLive=1 (la pastilla de sincronizacion), ninguna region viva sobre #result; apply() no llama a focus()"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+ },
+ "cobertura": [
+  {
+   "patron": "Dos modalidades del mismo registro con contratos distintos: en campo (12) no hay zona y vale cualquier punto; en oficina (14) hay un centro de trabajo asignado y la pantalla declara la distancia ('Estas a 24 m del centro — dentro de la zona permitida' / 'Estas a 340 m — fuera de la zona permitida'), pero fuera de zona no bloquea: el registro se guarda y pasa a revision manual. El sistema no tiene ninguna regla para una validacion geografica ni para la diferencia entre las dos modalidades.",
+   "propuesta_de_regla": "§6.26 Checado con validacion de zona — .zona. Cuando: una accion que se acepta o se marca segun donde se hace. La condicion se ve ANTES de la accion, no en el acuse: la tarjeta de zona va encima del boton de registrar y dice las tres cosas en una linea —el centro asignado, la distancia medida y el veredicto—, porque es lo unico que la persona puede corregir moviendose. El veredicto es una .pill del semaforo (§6.10) con color, icono y texto: dentro de zona en --ok, fuera en --warn. Nunca en --err, porque fuera de zona no impide operar: el registro se guarda igual y §1.3 reserva --err a «falta lo que impide operar». En la modalidad sin zona, la ausencia de zona se declara con .ambito (§6.22) —es un dato sobre el alcance del dato, no un juicio— y por tanto sin color de estado y sin relleno. La misma accion tiene el mismo numero de pasos en las dos modalidades: si una captura foto y ubicacion, la otra tambien; lo que cambia es contra que se valida el resultado, no lo que se le pide a la persona. Y la distancia solo se muestra cuando el permiso de ubicacion esta concedido y hay fix: si no, el estado es el de §6.25, nunca una cifra inventada."
+  },
+  {
+   "patron": "Una regla de negocio acumulativa que se avisa en la propia pantalla de la accion: 'Llevas 2 retardos en los ultimos 30 dias. Al tercero, el reglamento de la empresa lo considera falta de asistencia', con el boton de justificar aparecido en el mismo momento. El sistema cubre avisos (§6.9) y estados (§6.10) pero no tiene nada para un contador que se acerca a un umbral con consecuencia.",
+   "propuesta_de_regla": "§6.28 Aviso de umbral — .umbral. Cuando: una cuenta acumulada que, al llegar a un limite, cambia la situacion de la persona (retardos, faltas, dias de viatico sin comprobar, documentos vencidos). Se compone de tres piezas y ninguna sobra: la cuenta actual frente al limite —en cifras, '2 de 3', no en prosa—, la consecuencia de llegar al limite en una sola frase bajo ~140 caracteres (§8), y la accion que lo evita, como boton junto al aviso y no mas abajo. Variante por cercania al limite siguiendo §1.3: --pause mientras sobre margen, --warn en el ultimo escalon antes del limite, --err solo una vez alcanzado, cuando la consecuencia ya es un hecho. El aviso aparece en el momento en que la cuenta sube, no a fin de periodo, y se anuncia con aria-live=\"polite\" (§6.4). Lo que explica el reglamento por que es asi es nivel 3 de §8 y va a toggletip (§6.23) o fuera de la pantalla: en el aviso solo va lo que la persona puede hacer ahora."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estatica sin backend que perfilar",
+  "f4_nielsen y f5_investigacion: fuera del subconjunto de este lote",
+  "Confirma, sin repetirla, la §6.17.1 de evidencia fotografica ya propuesta en un lote anterior: el boton principal declara 'foto en vivo + ubicacion exacta' como requisito del registro",
+  "La rama de permiso de ubicacion no se puede evaluar aqui: a diferencia de 12, esta pantalla no tiene flujo de captura, asi que la peticion de permiso no existe ni para acertar ni para fallar. El hueco de regla queda recogido en la §6.25 propuesta desde 12"
+ ]
+}

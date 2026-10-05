@@ -1,0 +1,205 @@
+{
+  "pantalla": "40_usuarios",
+  "ruta_zip": "05-direccion-y-administracion/40_usuarios.html",
+  "carpeta": "05-direccion-y-administracion",
+  "area": "dirección/sistema",
+  "arquetipo": "panel de administración",
+  "modo": "cumplimiento",
+  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
+  "capturas": [
+    "40_usuarios--ok.png",
+    "40_usuarios--loading.png",
+    "40_usuarios--empty.png",
+    "40_usuarios--error.png",
+    "40_usuarios--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-40usuarios-01",
+        "severidad": "alta",
+        "regla": "§6.10 Etiqueta de estado .pill + §11 Estados y jerarquía",
+        "dice_el_sistema": "Lleva color + icono + texto, nunca color a secas · un estado se comunica con color + icono + texto, nunca con color solo",
+        "hay_en_el_build": "<span class=\"pill p-ok\">Activo</span> y <span class=\"pill p-neutro\">De baja</span>",
+        "selector": ".pill.p-ok, .pill.p-neutro",
+        "evidencia": "Medido en el navegador: las 7 pastillas de la columna Estado devuelven querySelector('svg') == null. Ninguna lleva icono. La única distinción entre «Activo» y «De baja» es el color: #22705A sobre #E2EFEC frente a --text-2 sobre --surface-2.",
+        "por_que_importa": "Es la columna que dice si una persona puede entrar al sistema o no. Quien no distingue el verde del gris —o quien imprime la tabla— no tiene ninguna otra señal: el texto «Activo»/«De baja» cambia, sí, pero el sistema pide las tres señales juntas precisamente porque la pastilla se escanea por color antes de leerse."
+      },
+      {
+        "id": "f1-40usuarios-02",
+        "severidad": "alta",
+        "regla": "§11 Interacción + §6.12 regla 8",
+        "dice_el_sistema": "toda acción destructiva confirma, dice a cuántos afecta y se puede deshacer · un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero",
+        "hay_en_el_build": "<button class=\"btn mini\" type=\"button\">Dar de baja</button> en las 6 filas activas, sin manejador alguno; los tres .schip de filtro y el .seg de densidad llevan aria-pressed y tampoco tienen manejador",
+        "selector": ".acciones .btn.mini, .p4-f .schip, .p4-f .seg button",
+        "evidencia": "El <script> del archivo contiene exactamente 6 addEventListener: tema, cambio de prefers-color-scheme, los botones del andamiaje .demo, el botón de menú, el velo y la tecla Escape. Ninguno toca .schip, .seg, «Cambiar rol», «Dar de baja», «Reactivar», «Invitar usuario», «Exportar» ni «Columnas». El brief confirma dialogNativo=0 y divDialog=0: no existe ningún diálogo de confirmación en la pantalla.",
+        "por_que_importa": "Esta es la pantalla donde se quita el acceso a una persona. «Dar de baja» no está protegido por nada: ni confirmación, ni diálogo, ni mensaje de deshacer. Y los tres contadores de arriba («1 sin ciudades», «6 activos», «1 de baja») anuncian con aria-pressed que son filtros conmutables y no filtran: quien pulse «1 sin ciudades» creerá que está viendo solo a Sandra y seguirá viendo a los siete."
+      },
+      {
+        "id": "f1-40usuarios-03",
+        "severidad": "alta",
+        "regla": "§10 trampa 5 — isotipo",
+        "dice_el_sistema": "Un <symbol> ya trae su viewBox; repetirlo en el <svg> que lo invoca descoloca la marca. Correcto: medidas en el <use> y sin viewBox en el envoltorio. Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal",
+        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>",
+        "selector": ".side .logo svg",
+        "evidencia": "Medido con getBoundingClientRect en el navegador: el <use> cae en dx = −32,5px respecto a su <svg> de 44×42. En la captura 40_usuarios--ok.png el isotipo de la barra lateral aparece como una astilla verde vertical sobre el azul del cromo. Para comparar, las otras dos pantallas de este lote que escriben el patrón correcto (13_panel_asistencia_rhl y 10_dprimi_asistente, con las medidas en el <use>) miden dx = +0,9px y +0,5px.",
+        "por_que_importa": "Es la marca de la empresa en el sitio más visible de la aplicación, rota del mismo modo exacto que §10 trampa 5 describe. Y hay dentro del propio producto dos archivos que lo escriben bien, así que no hace falta inventar la corrección."
+      },
+      {
+        "id": "f1-40usuarios-04",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto — valor de --text-3",
+        "dice_el_sistema": "--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)",
+        "hay_en_el_build": "--text-3: #66717F",
+        "selector": ":root",
+        "evidencia": "Brief medido: tokens.text_3_declarado = \"#66717F\". La pantalla usa --surface-2 en .p-neutro, .pr-media, los .cd de ciudades y el fondo de la cabecera de tabla.",
+        "por_que_importa": "Hecho ya establecido en 51 de las 52 maquetas: sobre --surface-2 el valor obsoleto queda en 4,21:1, por debajo del mínimo AA de 4,5:1."
+      },
+      {
+        "id": "f1-40usuarios-05",
+        "severidad": "alta",
+        "regla": "§7.3 Objetivos táctiles + §10 trampa 4",
+        "dice_el_sistema": "Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8) · un campo de búsqueda dentro de un <div> con forma de pastilla no cumple, porque pulsar la pastilla no hace nada. El contenedor tiene que ser una <label for=\"…\">",
+        "hay_en_el_build": "<div class=\"search\"><svg …><input id=\"buscar\" type=\"search\" aria-label=\"Buscar usuarios\"></div>",
+        "selector": ".p4-b .search",
+        "evidencia": "Medido en el navegador: el contenedor .search es un DIV de 380×33px sin atributo for; el <input> de dentro mide 329×15px. El brief lo trae como el único destino por debajo de 24px de los 47 interactivos de la pantalla.",
+        "por_que_importa": "Es literalmente la trampa 4 del documento, con el mismo componente que la nombra. El destino real son 15px de alto: pulsar en el icono de lupa o en el relleno de la pastilla no enfoca el campo."
+      },
+      {
+        "id": "f1-40usuarios-06",
+        "severidad": "alta",
+        "regla": "§6.7 Esqueleto de carga — A11y",
+        "dice_el_sistema": "sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad) · prefers-reduced-motion aplana el fondo, no solo detiene la animación · el esqueleto mide lo mismo de alto que el contenido que sustituye",
+        "hay_en_el_build": "35 barras <span class=\"skel\">nombre y correo</span> / «rol» / «ciudades que ve» / «último acceso» / «estado», y @media (prefers-reduced-motion:reduce){.skel{animation:none}}",
+        "selector": ".state-loading .skel",
+        "evidencia": "Medido: 35 .skel con textContent no vacío. Leído con document.styleSheets, la única regla de reduced-motion sobre .skel es animation:none, sin background:var(--surface-2) que aplane el degradado.",
+        "por_que_importa": "Dos fallos de la misma regla. El texto dentro de las barras hace que un lector de pantalla lea «nombre y correo, rol, ciudades que ve» siete veces seguidas mientras carga; y con reducción de movimiento activada el degradado se congela en la posición 0 y parece un error de pintado. Es menos grave que en 13_panel_asistencia_rhl porque aquí los rótulos son genéricos, no datos reales."
+      },
+      {
+        "id": "f1-40usuarios-07",
+        "severidad": "media",
+        "regla": "§8 Voz de producto, límites 1, 2 y 3 (ANEXO B) + §6.9",
+        "dice_el_sistema": ".nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto. Una segunda oración se borra o pasa a toggletip. «No hay excepción por importancia del contenido.» · Ningún bloque de texto siempre visible pasa de ~140 caracteres · .nota no es un componente de explicación general — solo nivel 1",
+        "hay_en_el_build": ".nota al pie de la tabla: «Cambiar el rol cierra todas las sesiones de esa persona al instante. Es lo correcto —un rol nuevo con una sesión vieja seguiría viendo lo de antes— pero si está capturando algo, se queda fuera a media captura. Por eso el aviso sale antes de confirmar, no después.<br>«Dar de baja» no borra nada. El registro queda, su historial sigue consultable y se puede reactivar. Por eso ningún botón de esta pantalla dice «eliminar».»",
+        "selector": "p.nota span, .banda.b-err p",
+        "evidencia": "Medido con innerText: la .nota tiene 419 caracteres y 6 frases a 11,5px, con un <br> que mete dos párrafos distintos en el mismo componente. La .banda b-err de arriba tiene 233 caracteres y 4 frases a 13px.",
+        "por_que_importa": "Triple incumplimiento del mismo componente: tres veces el tope de caracteres, seis frases donde cabe una, y contenido de nivel 3 («Por eso el aviso sale antes de confirmar, no después», «Por eso ningún botón de esta pantalla dice eliminar») que explica decisiones de diseño a quien solo quiere dar de baja a alguien. El agravante: el aviso que la .nota promete («el aviso sale antes de confirmar») no existe en la pantalla, porque no hay confirmación ninguna."
+      },
+      {
+        "id": "f1-40usuarios-08",
+        "severidad": "media",
+        "regla": "§6.11 Tabla densa + §3 Filas de tabla",
+        "dice_el_sistema": "tbody th,td{padding:0 var(--sp-3);height:var(--row-comfy)} · --row-comfy = 40px · Una celda no lleva un párrafo",
+        "hay_en_el_build": "Filas reales de 74,5–75px porque la celda de Acciones apila «Cambiar rol» y «Dar de baja» en dos renglones",
+        "selector": "tbody tr, td[data-et=\"Acciones\"] .acciones",
+        "evidencia": "Medido con getBoundingClientRect: alturas de fila [74.5, 75, 75, 75, 75, 75, 51.4] frente al --row-comfy declarado de 40px. .acciones{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap} y dos .btn.mini no caben en la columna, así que envuelven.",
+        "por_que_importa": "La fila mide casi el doble de lo que el token promete, así que en la primera pantalla caben la mitad de usuarios de los que cabrían. Es además la contradicción que §6.11 nombra: si la columna de acciones no cabe, sobran columnas o sobran acciones escritas —el sistema ya tiene el componente para eso, el .iconbtn de §6.19 o el menú ⋯ de §6.14."
+      },
+      {
+        "id": "f1-40usuarios-09",
+        "severidad": "media",
+        "regla": "§6.10 .p-type de clasificación + §1.3 Semáforo",
+        "dice_el_sistema": "Cuándo .p-type = clasificación: «lo que la cosa es»… usa las series de §1.4, no el semáforo. Punto de color y peso visual más bajo (font-weight:600, color:var(--text-2), ::before de 7px) · Clases del estado: .p-ok, .p-warn, .p-err, .p-block, .p-pause",
+        "hay_en_el_build": ".rolchip2{…font-size:10.5px;font-weight:700;background:color-mix(in srgb,var(--serie-1) 16%,var(--surface));color:var(--text-2)} con un icono de escudo dentro; y .p-neutro{background:var(--surface-2);color:var(--text-2)} para «De baja»",
+        "selector": ".rolchip2, .pill.p-neutro",
+        "evidencia": "Medido: .rolchip2 computa color rgb(76,90,107) sobre color(srgb .851 .898 .939) a 10,5px/700. Es la receta de color exacta de .p-s1 (§6.10), pero con el peso 700 de .pill en vez del 600 de .p-type y con un icono en lugar del punto de 7px. «De baja» usa .p-neutro mientras --pause, --pause-fill y --pause-ink están declarados y sin usar (brief, declarados_sin_usar).",
+        "por_que_importa": "Dos clases inventadas donde el sistema ya tiene las dos piezas. El efecto visible es el que §6.10 quiere evitar: el rol (lo que la persona es) pesa 700 igual que el estado (lo que puede cambiar solo), así que las dos columnas compiten por la misma atención. Nota sobre el brief: el fallo de contraste que reporta para span.rolchip2 (2,97:1 sobre rgb(1,1,1)) es un artefacto de medición — el fondo es un color-mix() que el medidor no resolvió. Medido en el navegador, el fondo real es ≈#D9E5EF y el par pasa holgadamente."
+      },
+      {
+        "id": "f1-40usuarios-10",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado — regla 2 + §11 Estructura",
+        "dice_el_sistema": "cada estado lleva encabezado real, no un <b> · los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo · .tarjeta-estado{…border-radius:var(--r-modal);box-shadow:var(--sh-modal)}, .estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}",
+        "hay_en_el_build": "<div class=\"state state-empty\"><svg class=\"ico\">…<b>Ningún usuario coincide con la búsqueda</b>… y <b>No se pudo cargar el listado de usuarios</b>",
+        "selector": ".state b, .state .ico",
+        "evidencia": "Los dos estados titulan con <b>. El brief confirma --r-modal entre los tokens declarados_sin_usar: la receta de .tarjeta-estado no se aplica en ningún sitio del archivo. El icono es un trazo suelto en --text-3, no un medallón de 52px.",
+        "por_que_importa": "El título del estado no aparece en el índice de encabezados, y el estado se lee como un párrafo centrado sobre el fondo en vez de como la respuesta de la pantalla. Lo compensa en parte que el texto de ambos estados está muy bien escrito: el de error enumera correctamente las tres cosas de §6.4 regla 3 (qué pasó, qué no se ha perdido, la referencia USR-20260821-1122)."
+      },
+      {
+        "id": "f1-40usuarios-11",
+        "severidad": "media",
+        "regla": "§6.11 regla 3 y regla 9",
+        "dice_el_sistema": "aria-sort en todas las columnas ordenables, incluidas las que aún no ordenan (aria-sort=\"none\") · Registros por página elegibles: selector de 10 / 25 / 50 / 100, recordado entre sesiones",
+        "hay_en_el_build": "Seis <th scope=\"col\"> sin aria-sort y sin botón de orden, mientras el CSS declara thead th[aria-sort=\"ascending\"] .sort{…} y thead th[aria-sort=\"descending\"] .sort{transform:rotate(180deg)}; y un .tfoot con «‹ Anteriores · 1 · 2 · Siguientes ›» sin selector de tamaño de página",
+        "selector": "thead th, .tfoot .pag",
+        "evidencia": "Medido: los 6 th de cabecera devuelven aria-sort = null y querySelector('button') = false. El brief lo confirma: thAriaSort = 0 con th = 13. Las reglas CSS de las líneas 377-378 esperan un atributo que nunca se escribe.",
+        "por_que_importa": "El CSS de ordenación existe, así que la ordenación estaba prevista y se quedó a medias: ni funciona ni se anuncia. Y sin selector de registros por página, una lista de 23 usuarios se recorre en páginas de 7 sin forma de verla entera."
+      },
+      {
+        "id": "f1-40usuarios-12",
+        "severidad": "baja",
+        "regla": "§7.3 Objetivos táctiles — «el :root es lo que hace ganar la regla»",
+        "dice_el_sistema": "El :root es lo que hace ganar la regla: con :root suma (0,3,0); sin él (0,2,0) y lo empata cualquier variante de tamaño del componente que, por ir después, gana. Se comprueba midiendo con data-tacto=\"dedo\" puesto",
+        "hay_en_el_build": "[data-tacto=\"dedo\"] .it / .iconbtn / .cromo-prof / .cromo-av / .seg button / .btn — las seis sin :root",
+        "selector": "[data-tacto=\"dedo\"] .iconbtn",
+        "evidencia": "Brief: regla_data_tacto_sin_root = 6 (líneas 279-284). Comprobado midiendo con data-tacto=\"dedo\" puesto: la única variante de tamaño que podría empatar es .acciones .iconbtn{width:28px;height:28px} (línea 389, posterior), y esta pantalla no dibuja ningún .iconbtn dentro de .acciones — las acciones de fila son .btn.mini. Los .schip se quedan en 29px porque ninguna regla táctil los cubre, pero 29 > 24 y cumplen igual.",
+        "por_que_importa": "El bug es latente, no activo: en esta pantalla concreta el modo dedo funciona. Queda como deuda, porque en cuanto alguien meta un .iconbtn en la columna de acciones —que es justo lo que §6.11 recomienda para arreglar el hallazgo 08— la regla táctil deja de ganar en silencio."
+      },
+      {
+        "id": "f1-40usuarios-13",
+        "severidad": "baja",
+        "regla": "§6.9 Avisos — nomenclatura de variantes",
+        "dice_el_sistema": "Cuatro variantes: .banda-info (--surface-2/--text-2/--border), .banda-warn (--warn-bg/--warn-ink), .banda-err (--err-bg/--err-ink), .banda-ok (--ok-bg/--ok-ink)",
+        "hay_en_el_build": ".banda.b-err",
+        "selector": ".banda.b-err",
+        "evidencia": "El archivo escribe las variantes como .b-err / .b-info / .b-warn en vez de .banda-err / .banda-info / .banda-warn.",
+        "por_que_importa": "Solo nomenclatura: los colores son los correctos y el icono (i-alertc) coincide con la variante. Lo anoto porque los nombres cortos de una letra son exactamente los que §10 trampa 10 señala como los que más se repiten sin querer entre componentes."
+      },
+      {
+        "id": "f1-40usuarios-14",
+        "severidad": "baja",
+        "regla": "§6.5 Iconos — .msi",
+        "dice_el_sistema": "Cuándo: todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1)",
+        "hay_en_el_build": "Sprite SVG propio de 38 <symbol> con iconos de trazo (.ico{stroke:currentColor;fill:none})",
+        "selector": ".ico",
+        "evidencia": "grep 'msi' y grep 'Material+Symbols' devuelven 0. Hallazgo transversal a las cuatro pantallas del lote.",
+        "por_que_importa": "Divergencia de familia visual, no de función: los iconos llevan aria-hidden, no dependen de una fuente remota y no sufren el problema de ligadura que §6.5 documenta."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 2,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 3,
+      "integridad": 1
+    },
+    "justificacion": "Integridad 1: es la dimensión que hunde la nota. La pantalla gestiona permisos y no ejecuta nada —seis addEventListener en todo el archivo, todos de cromo y de andamiaje—, así que «Dar de baja», «Cambiar rol», «Invitar usuario», los tres contadores con aria-pressed y el conmutador de densidad son promesas vacías; el isotipo de la marca está roto 32,5px; las filas miden 75px donde el token dice 40; y hay dos clases inventadas (.rolchip2, .p-neutro) con sus equivalentes del sistema sin estrenar. Accesibilidad 2: las pastillas de estado van sin icono, el buscador es un <div> con un input de 15px, el esqueleto lleva texto dentro y se congela con reducción de movimiento, los estados titulan con <b> y no hay aria-sort; a cambio hay skip link, un solo h1, tabla con <caption> y <th scope=\"row\"> en las siete filas, aria-label en todos los controles de icono, y main[tabindex=\"-1\"]. Responsive 3 y theming 3 son lo mejor del archivo: los tres anchos del cromo están implementados (hamburguesa + cajón con velo por debajo de 860px, con Escape y foco gestionado), la tabla tiene modo tarjeta con data-et en cada celda, y los dos temas están declarados completos y medidos en captura. Lo escrito es notable: el aviso sobre Sandra Elizalde identifica un fallo real de permisos («sin ciudades no es acceso sin restricción, es el conjunto vacío») y el texto de error enumera correctamente lo que no se perdió.",
+    "evidencia": [
+      "getBoundingClientRect: dx del <use> del isotipo = −32,5px sobre un <svg> de 44×42",
+      "getBoundingClientRect: alturas de fila [74.5, 75, 75, 75, 75, 75, 51.4] frente a --row-comfy = 40px",
+      "7 de 7 .pill con querySelector('svg') == null",
+      ".search es un DIV de 380×33 sin for; su <input> mide 329×15 (brief: único destino <24px de 47)",
+      "6 addEventListener en todo el <script>, ninguno sobre .schip, .seg, .btn.mini ni .acciones",
+      "35 barras .skel con texto; única regla de reduced-motion sobre .skel = animation:none",
+      "innerText: .nota = 419 caracteres / 6 frases; .banda b-err = 233 caracteres / 4 frases",
+      "Capturas --oscuro, --loading, --empty y --error revisadas; brief: tema_oscuro_medido = true, 0 fallos de contraste en oscuro"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+  },
+  "cobertura": [
+    {
+      "patron": "Pantalla de gestión de permisos: una tabla donde cada fila es una persona y la columna de acciones contiene operaciones irreversibles o de alto impacto (revocar el acceso, cambiar el rol —que cierra todas las sesiones de esa persona al instante—, reactivar). El sistema documenta la acción destructiva en dos sitios parciales y en ninguno completo: §6.13 regla 2 («la acción destructiva se separa del grupo, a la derecha y con espacio») solo rige dentro de .barra-sel, es decir sobre una selección múltiple; §6.19 («lo frecuente y reversible primero, lo destructivo al final») solo rige el orden dentro de un grupo de .iconbtn; y §11 pide que «toda acción destructiva confirma, dice a cuántos afecta y se puede deshacer» sin decir con qué componente ni cómo se distingue a simple vista. Resultado: «Cambiar rol» y «Dar de baja» salen con exactamente el mismo .btn.mini neutro, uno encima del otro, sin separación ni diferencia de color, y «Cambiar rol» —que es el de mayor consecuencia según el propio texto de la pantalla— se lee como el más inocente de los dos.",
+      "propuesta_de_regla": "§6.2.1 Acción de consecuencia alta en una fila. Cuándo: una acción por fila que retira acceso, cierra sesiones, cambia permisos o no se puede deshacer desde la propia pantalla. Tres requisitos, los tres comprobables: (1) **se distingue** — variante `.btn.riesgo` con `color:var(--err-ink);border-color:var(--err)` y fondo de superficie normal; nunca relleno macizo en rojo, que compite con la acción principal; (2) **se separa** — dentro de `.acciones` la acción de consecuencia alta va la última y con `margin-left:var(--sp-3)` o un separador, nunca pegada a la ordinaria; y si las acciones no caben en la columna sin envolver, pasan a menú ⋯ (§6.14) en vez de romper la altura de fila; (3) **confirma en un `<dialog>` nativo (§6.18) que nombra a quién afecta y enuncia la consecuencia en una línea** («Rubén Beltrán perderá el acceso. Su historial se conserva y puede reactivarse.»), con el botón de confirmación nombrado por lo que hace, no «Aceptar». Corolario: la consecuencia se enuncia dentro de la confirmación, no en una `.nota` al pie de la tabla —§8 regla 1 impide que quepa ahí—."
+    },
+    {
+      "patron": "Etiqueta de rol/permiso como dato de una tabla (.rolchip2: «ICEV · coordinación», «Instalador externo», «Administración de sistemas»). Es una clasificación, así que §6.10 la manda a .p-type con las series de §1.4; pero §1.4 solo define cuatro slots de serie y aquí hay siete roles distintos, por encima del techo. La regla de §1.4 dice que «una quinta serie se agrupa en Otras o se separa en gráficos pequeños», lo cual tiene sentido en una gráfica y ninguno en una columna de tabla donde los siete valores conviven. El archivo lo resuelve pintando los siete con la misma --serie-1, que es lo correcto pero no está escrito en ningún sitio.",
+      "propuesta_de_regla": "Aclaración a §6.10 y §1.4: cuando una dimensión categórica tiene más valores que slots de serie (más de cuatro) y todos conviven en la misma columna, el color deja de distinguir y se retira: todas las etiquetas de esa dimensión comparten una sola serie —la que le toque a la dimensión, no al valor— y lo que distingue es el texto. La etiqueta sigue siendo `.p-type` (peso 600, `--text-2`, punto de 7px) y conserva su punto de color, que ahí solo dice «esto es una clasificación», no «esta clasificación en concreto». Nunca se reparten los siete valores entre las cuatro series ciclando, porque entonces dos roles distintos comparten color y el lector asume que están emparentados."
+    },
+    {
+      "patron": "Un dato de la tabla que no es un estado ni una clasificación sino la ausencia de una configuración, y que además es la alerta principal de la pantalla: «Sin ciudades · no ve nada» en la columna «Ciudades que ve», pintado con una caja de borde y tinta de error dentro de la celda, mientras la columna Estado de esa misma fila dice «Activo» en verde. El sistema no cubre el caso: §6.12 regla 9 dice que «la razón de un estado va al detalle del registro, no a la celda», pero aquí no es la razón de un estado, es una condición que contradice al estado de la fila de al lado.",
+      "propuesta_de_regla": "§6.10.1 Condición que contradice al estado. Cuando una fila está en un estado nominalmente correcto («Activo») pero una condición la deja sin efecto («sin ciudades asignadas, no ve nada»), la contradicción no se resuelve pintando de rojo la celda de la condición: la pastilla de estado de esa fila pasa a `.p-warn` o `.p-block` según corresponda y dice lo que de verdad ocurre («Activo sin alcance»), y la celda de la condición queda en texto normal. La razón concreta va al detalle del registro. Motivo: dos señales contradictorias en la misma fila —verde a la derecha, rojo a la izquierda— obligan a quien escanea la tabla a leerla entera para saber cuál manda, que es justo lo que las pastillas de estado existen para evitar."
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática, sin backend que perfilar",
+    "§6.18 Diálogo modal: no_evaluado — la pantalla no tiene ningún diálogo (brief: dialogNativo = 0, divDialog = 0). Su ausencia sí se reporta como parte del hallazgo f1-40usuarios-02, porque las acciones destructivas la exigen; pero no hay implementación de diálogo que contrastar contra §6.18."
+  ]
+}

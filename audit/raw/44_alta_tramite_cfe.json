@@ -1,0 +1,262 @@
+{
+  "pantalla": "44_alta_tramite_cfe",
+  "ruta_zip": "04-tramites-vehiculares-y-cfe/44_alta_tramite_cfe.html",
+  "carpeta": "04-tramites-vehiculares-y-cfe",
+  "area": "admin vehicular",
+  "arquetipo": "formulario",
+  "modo": "cumplimiento",
+  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
+  "capturas": [
+    "44_alta_tramite_cfe--ok.png",
+    "44_alta_tramite_cfe--loading.png",
+    "44_alta_tramite_cfe--empty.png",
+    "44_alta_tramite_cfe--error.png",
+    "44_alta_tramite_cfe--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-44cfe-01",
+        "severidad": "alta",
+        "regla": "§6.16 Formulario — regla 3",
+        "dice_el_sistema": "(3) **`required` y `aria-required` de verdad**, no asteriscos decorativos",
+        "hay_en_el_build": "5 `<span class=\"req\">*</span>` y cero atributos. Ejemplo literal: `<label for=\"dob\">Domicilio de la obra <span class=\"req\">*</span></label><input type=\"text\" id=\"dob\" value=\"\" placeholder=\"Calle, número, colonia, ciudad y estado\">`",
+        "selector": ".ctrl > label .req",
+        "evidencia": "grep -c 'required' en el archivo = 0 y grep -c 'aria-required' = 0. Comprobado además en el navegador campo por campo: los 9 controles devuelven hasAttribute('required') = false y getAttribute('aria-required') = null, incluidos los cinco que llevan asterisco (Ciudad de la obra, Plaza, Cliente, Domicilio de la obra, Tipo de solicitud). El documento tampoco tiene ningún `<form>` (0 elementos), así que no hay contexto de validación.",
+        "por_que_importa": "El asterisco es el antipatrón que la regla nombra por su nombre. Un lector de pantalla no anuncia ningún campo como obligatorio y el navegador no impide enviar el expediente incompleto: la obligatoriedad existe solo como adorno rojo."
+      },
+      {
+        "id": "f1-44cfe-02",
+        "severidad": "alta",
+        "regla": "§6.16 Formulario — regla 5",
+        "dice_el_sistema": "(5) **el error se vincula**: `aria-invalid=\"true\"` + `aria-describedby` al `id` del mensaje",
+        "hay_en_el_build": "`<div class=\"ctrl ancho error\">` con `<input type=\"text\" id=\"dob\">` y `<span class=\"mal\">…Obligatorio mientras no haya orden ligada.</span>`",
+        "selector": ".ctrl.error #dob / .ctrl.error .mal",
+        "evidencia": "Medido en el navegador: #dob.getAttribute('aria-invalid') = null, getAttribute('aria-describedby') = null; el `.mal` no tiene `id` («(sin id)»). Los 5 `.ayuda` de la pantalla tampoco tienen `id`, así que ningún campo puede apuntar a su ayuda.",
+        "por_que_importa": "El único campo en error de la pantalla se ve rojo, pero para quien usa lector de pantalla es un campo de texto normal sin mensaje asociado: el motivo del rechazo no llega."
+      },
+      {
+        "id": "f1-44cfe-03",
+        "severidad": "alta",
+        "regla": "§7.3 Objetivos táctiles — casillas",
+        "dice_el_sistema": "Dos casos que el bloque dejaba fuera: **casillas de 15×15px** → `.selfila{display:flex;align-items:center;min-height:24px;padding:4px;margin:-4px}` + `input[type=\"checkbox\"]{width:16px;height:16px;accent-color:var(--accent)}`. (…) §10 trampa 4: el destino táctil es **la región que acepta la pulsación**.",
+        "hay_en_el_build": "`<label style=\"display:flex;gap:8px;align-items:center;font-size:var(--fs-dense);font-weight:400\"><input type=\"checkbox\" checked> Solicitud de factibilidad</label>` — sin `min-height` y sin tamaño declarado para la casilla.",
+        "selector": ".ctrl.ancho label > input[type=checkbox]",
+        "evidencia": "Medido a 1440×960: las 5 casillas miden 15×15px y las 5 `<label>` que las envuelven miden 15px de alto. Coincide con brief.tactil_24px.casillas_bajo_24 = 5. Aquí la etiqueta sí es el destino (envuelve texto y casilla), pero la etiqueta tampoco llega a 24px, así que la excepción de §10 trampa 4 no salva el caso.",
+        "por_que_importa": "La lista de documentos listos para ventanilla es lo que decide si el expediente se ingresa completo, y sus cinco casillas incumplen WCAG 2.5.8 por 9px, con el arreglo ya escrito en el sistema."
+      },
+      {
+        "id": "f1-44cfe-04",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto — valor de --text-3",
+        "dice_el_sistema": "`--text-3` **es `#5C6675`**, no el antiguo `#66717F`",
+        "hay_en_el_build": "--text-3: #66717F",
+        "selector": ":root",
+        "evidencia": "brief.MEDIDO_por_el_orquestador.tokens.text_3_declarado = '#66717F'. Lo usan `.ctrl .ayuda`, `.barra-form .izq` y `.p4-t .resumen`.",
+        "por_que_importa": "Todas las ayudas de campo del formulario van con esa tinta; sobre `--surface-2` el valor obsoleto cae a 4,21:1, bajo el mínimo AA."
+      },
+      {
+        "id": "f1-44cfe-05",
+        "severidad": "alta",
+        "regla": "§10 trampa 5 — isotipo con viewBox repetido",
+        "dice_el_sistema": "medidas en el `<use>` y **sin `viewBox` en el envoltorio**. Se comprueba midiendo la caja del `<use>` contra la del `<svg>`: si el desplazamiento no es ~0, está mal.",
+        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> y <svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\"> en el .fab",
+        "selector": ".side .logo svg, .fab svg",
+        "evidencia": "Medido con getBoundingClientRect: dx = -32,5px en el logotipo de 44px y dx = -16,2px en la marca del .fab de 22px.",
+        "por_que_importa": "La marca sale recortada en todas las pantallas del lote."
+      },
+      {
+        "id": "f1-44cfe-06",
+        "severidad": "alta",
+        "regla": "§7.2 Cromo de aplicación — modo colapsado",
+        "dice_el_sistema": "En modo colapsado **el rótulo se convierte en etiqueta emergente; no desaparece**.",
+        "hay_en_el_build": "@media (min-width:860.02px) and (max-width:1100px){.side .et,.grp,.side .wordmark{display:none}} con `<a class=\"it\" href=\"#\">` sin `title` ni `aria-label`.",
+        "selector": ".side .it",
+        "evidencia": "Medido a 1000px: .side = 64px, .it .et display:none, .it title = null.",
+        "por_que_importa": "Entre 860 y 1100px la navegación queda en iconos anónimos, sin nombre visible ni accesible."
+      },
+      {
+        "id": "f1-44cfe-07",
+        "severidad": "alta",
+        "regla": "§8 Voz de producto (ANEXO B, límites 1 y 2)",
+        "dice_el_sistema": "**`.nota` y `.banda` llevan como máximo UNA frase**, sin punto y coma ni raya explicativa después del primer punto. (…) **Ningún bloque de texto siempre visible pasa de ~140 caracteres.** «No hay excepción por importancia del contenido.»",
+        "hay_en_el_build": "`.banda.b-warn`: «Quitaste la orden de instalación, así que hay que decir dónde está la obra. Un trámite CFE puede existir sin orden —hay obras que se tramitan antes— pero un expediente sin orden y sin domicilio es un trámite que nadie puede ir a ver. El domicilio pasó a obligatorio.»",
+        "selector": ".banda.b-warn",
+        "evidencia": "Medido con innerText.length a 1440px: 266 caracteres y 3 frases — 1,9 veces el tope. Además la `.ayuda` de «Documentos listos para ventanilla» mide 139 caracteres y la de «Plaza» 126, las dos en el límite y con dos frases. La banda superior «Propuesta TRAZO con componentes de Studio — pendiente de revisión de Studio» (75 caracteres) habla del entregable, no del trámite, y no lleva `data-andamio`, así que §9 no la retira en la versión real.",
+        "por_que_importa": "El aviso que condiciona lo que hay debajo ocupa tres líneas y la frase que de verdad importa («el domicilio pasó a obligatorio») queda al final, después de dos frases de contexto."
+      },
+      {
+        "id": "f1-44cfe-08",
+        "severidad": "alta",
+        "regla": "§10 trampa 2 — selectores por exclusión, no por enumeración + §6.16 valores",
+        "dice_el_sistema": "Lo que aplica a todos los campos se escribe `.ctrl input:not([type=\"file\"]):not([type=\"checkbox\"]):not([type=\"radio\"])`. (…) `input/select/textarea{min-height:38px;…}`",
+        "hay_en_el_build": "`.ctrl input[type=\"text\"],.ctrl input[type=\"date\"],.ctrl input[type=\"number\"],.ctrl select,.ctrl textarea{border:…;padding:9px 12px;font:400 var(--fs-dense) var(--font-ui);width:100%}` — enumerado, y sin `min-height` en ninguna parte de la regla.",
+        "selector": ".ctrl input[type=\"text\"], .ctrl select",
+        "evidencia": "Es literalmente el selector que §10 trampa 2 pone como ejemplo del fallo. Medido: los `input[type=text]` computan 35px de alto y los `select` 37px, los dos por debajo de los 38px que §6.16 exige, y el suelo no está declarado con `min-height` (§6.2: «el suelo se declara con `min-height`, no se confía al relleno — medido 35px»). Daño ya materializado: las 5 casillas quedan fuera de la regla y se quedan a 15px (hallazgo f1-44cfe-03).",
+        "por_que_importa": "El día que se aplique §6.16 regla 6 y «Número de servicio» pase a `inputmode`/`type` correcto, o se añada un `type=\"email\"`, ese campo se saldrá del selector y colapsará, exactamente como describe la trampa."
+      },
+      {
+        "id": "f1-44cfe-09",
+        "severidad": "alta",
+        "regla": "§2.1 Suelo tipográfico",
+        "dice_el_sistema": "**El suelo son 12px. «Nada baja de ahí.»** Regla práctica: «si un dato se lee todos los días, va a **12–13px** como mínimo».",
+        "hay_en_el_build": "`.ctrl .ayuda{font-size:11px}` y `.ctrl .mal{font-size:11px}`",
+        "selector": ".ctrl .ayuda, .ctrl .mal, .seccion > header .idx",
+        "evidencia": "Medido con getComputedStyle a 1440×960: 17 nodos con texto propio por debajo de 12px, de ellos las 5 ayudas de campo y el mensaje de error del domicilio a 11px, y los 3 índices de sección a 11px.",
+        "por_que_importa": "La ayuda de campo y el mensaje de error son justo el texto que alguien necesita leer cuando se queda atascado capturando, y son los más pequeños de la pantalla."
+      },
+      {
+        "id": "f1-44cfe-10",
+        "severidad": "media",
+        "regla": "§6.16 Formulario — regla 2",
+        "dice_el_sistema": "(2) **dos niveles de obligatoriedad con palabras distintas** — «obligatorio para dar de alta» vs «necesario para facturar o programar»",
+        "hay_en_el_build": "Un solo nivel y una sola marca: el asterisco `*` en cinco etiquetas. Ninguna palabra distingue entre lo que impide crear el expediente y lo que hará falta más adelante.",
+        "selector": ".ctrl > label .req",
+        "evidencia": "5 `.req` en el documento, todos idénticos. Los contadores de sección («2 de 5 capturados») cuentan campos, no niveles. El estado vacío sí distingue dos grupos («Hacen falta cliente, capacidad y tipo de solicitud; y si no ligas una orden, también el domicilio…»), pero esa distinción no aparece en el formulario.",
+        "por_que_importa": "Quien captura no puede saber si puede guardar y seguir, o si el campo que le falta bloquea el alta. El sistema pide decirlo con palabras precisamente para que no haya que adivinarlo."
+      },
+      {
+        "id": "f1-44cfe-11",
+        "severidad": "media",
+        "regla": "§6.16 Formulario — regla 7",
+        "dice_el_sistema": "(7) el contador de sección **habla en español, no en aritmética, y si cuenta, cuenta bien**",
+        "hay_en_el_build": "Sección 1 «Dónde va la obra»: `<span class=\"est\">2 de 5 capturados</span>`",
+        "selector": ".seccion > header .est",
+        "evidencia": "La sección 1 tiene 6 controles (Ciudad, Plaza, Cliente, Orden de instalación, Domicilio, Referencia). Comprobado el valor de cada uno en el navegador: Ciudad=«Querétaro», Plaza=«Bajío norte», Cliente=«Refaccionaria del Altiplano» están capturados; Orden=«— sin orden ligada —», Domicilio=«» y Referencia=«» no. Son 3 de 6, no 2 de 5. Las secciones 2 («1 de 2 capturados») y 3 («3 de 5 marcados») sí cuadran.",
+        "por_que_importa": "El contador es lo que dice cuánto falta para poder ingresar el trámite. Si miente en el denominador y en el numerador, deja de ser información."
+      },
+      {
+        "id": "f1-44cfe-12",
+        "severidad": "media",
+        "regla": "§6.16 Formulario — regla 4",
+        "dice_el_sistema": "(4) **no hay error antes de la interacción**",
+        "hay_en_el_build": "`<div class=\"ctrl ancho error\">` con el input vacío y el mensaje «Obligatorio mientras no haya orden ligada.» visibles en el primer pintado, sin que nadie haya tocado nada.",
+        "selector": ".ctrl.ancho.error",
+        "evidencia": "Medido al cargar la URL sin ninguna interacción: el `.ctrl` ya tiene la clase `error`, el borde computa `--err` y el `.mal` está visible. Es coherente con que no haya ninguna lógica de validación en el archivo (el único `<script>` maneja el andamio, el tema y el menú), así que el error no puede desaparecer al rellenar el campo.",
+        "por_que_importa": "La pantalla recibe a quien va a capturar con un campo ya marcado en rojo y un reproche, antes de que haya escrito una letra; y como no hay lógica, el reproche no se va aunque rellene el domicilio."
+      },
+      {
+        "id": "f1-44cfe-13",
+        "severidad": "media",
+        "regla": "§6.16 Formulario — regla 6",
+        "dice_el_sistema": "(6) **el tipo de campo es el tipo del dato** (`type=\"email\"`, `type=\"tel\"`, `inputmode=\"numeric\"`) + `autocomplete`",
+        "hay_en_el_build": "«Número de servicio», cuyo marcador de posición es «12 dígitos», es `<input type=\"text\" id=\"ns\">`. Ningún control del formulario declara `autocomplete` ni `inputmode`.",
+        "selector": "#ns, .ctrl input, .ctrl select",
+        "evidencia": "Medido campo por campo: los 9 controles devuelven getAttribute('autocomplete') = null y getAttribute('inputmode') = null. #ns es type=\"text\" pese a pedir 12 dígitos.",
+        "por_que_importa": "En tableta, un campo numérico con teclado alfanumérico obliga a cambiar de teclado para capturar doce dígitos, que es el dato que más se teclea en esta pantalla."
+      },
+      {
+        "id": "f1-44cfe-14",
+        "severidad": "media",
+        "regla": "§6.7 Esqueleto de carga — barras mudas y aplanado",
+        "dice_el_sistema": "**sin texto real dentro de las barras** (`color:transparent` sigue en el árbol de accesibilidad). `prefers-reduced-motion` **aplana el fondo**, no solo detiene la animación.",
+        "hay_en_el_build": "<span class=\"skel\" style=\"width:92%;height:38px\">cliente</span> … y @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin `background`.",
+        "selector": ".state-loading .skel",
+        "evidencia": "Las 8 barras del estado «cargando» llevan texto real. Medido con reducedMotion:'reduce' (mismo bloque CSS compartido por las 5 maquetas del lote): el `.skel` conserva el linear-gradient con background-size 200% 100% congelado en background-position 0% 0% y background-color transparente.",
+        "por_que_importa": "El lector de pantalla lee «cliente, orden ligada, domicilio de la obra» como si el formulario ya estuviera, y quien pide movimiento reducido ve un degradado fijo a medio camino en vez de una superficie plana."
+      },
+      {
+        "id": "f1-44cfe-15",
+        "severidad": "media",
+        "regla": "§6.5 Iconos — `.msi`",
+        "dice_el_sistema": "todo icono del sistema: Material Symbols Rounded, variante **rellena (`FILL@1`)**, carga por subconjunto con **un solo `<link>`**",
+        "hay_en_el_build": "0 ocurrencias de 'Material Symbols' y de class=\"msi\"; sprite SVG propio (`<symbol id=\"i-*\">` + `.ico`).",
+        "selector": ".ico",
+        "evidencia": "grep -c 'Material Symbols\\|class=\"msi\"' = 0.",
+        "por_que_importa": "Los requisitos de §6.5 (nombres exactos, cuatro ejes, regeneración de `icon_names`) no se pueden verificar contra este archivo y los iconos no coincidirán con los de una pantalla que sí los siga."
+      },
+      {
+        "id": "f1-44cfe-16",
+        "severidad": "media",
+        "regla": "§1.4 Series de gráfica (paleta categórica)",
+        "dice_el_sistema": "`--serie-1` `#2a78d6` · `--serie-2` `#eb6834` · `--serie-3` `#4a3aa7` · `--serie-4` `#e87ba4`",
+        "hay_en_el_build": "--serie-1: #2C6CA8; --serie-2: #7A5FA8; y no existen --serie-3 ni --serie-4.",
+        "selector": ":root",
+        "evidencia": "Leído del bloque :root. Ni los valores ni el número de ranuras coinciden con §1.4.",
+        "por_que_importa": "Las comprobaciones de separación cromática de §1.4 están calculadas sobre los hex publicados; con otros valores dejan de ser válidas."
+      },
+      {
+        "id": "f1-44cfe-17",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado — regla 1",
+        "dice_el_sistema": "(1) el cambio **se anuncia (`aria-live=\"polite\"`) y mueve el foco**",
+        "hay_en_el_build": "El JS cambia `data-state` en <main>; no hay `aria-live` en el documento ni ninguna llamada a focus() sobre el contenedor.",
+        "selector": "main#contenido",
+        "evidencia": "grep de 'aria-live' en el archivo → 0 ocurrencias (el ariaLive:1 del brief corresponde al `role=\"status\"` del esqueleto). El <main> lleva `tabindex=\"-1\"` pero nada lo enfoca.",
+        "por_que_importa": "Al pasar a «error» tras intentar ingresar el trámite, quien usa lector de pantalla no recibe ningún aviso y el foco se queda en el botón que ya no existe."
+      },
+      {
+        "id": "f1-44cfe-18",
+        "severidad": "baja",
+        "regla": "§7.3 — la regla táctil lleva `:root`",
+        "dice_el_sistema": "**El `:root` es lo que hace ganar la regla** (…) **Se comprueba midiendo con `data-tacto=\"dedo\"` puesto**.",
+        "hay_en_el_build": "Las 6 reglas de modo dedo escritas sin `:root`: [data-tacto=\"dedo\"] .it / .iconbtn / .cromo-prof / .cromo-av / .seg button / .btn.",
+        "selector": "[data-tacto=\"dedo\"] .it, .iconbtn, .btn",
+        "evidencia": "Medido con data-tacto=\"dedo\" puesto en <html>: .it = 46px ×3, .iconbtn = 46px ×2, .btn = 46px ×3. La pantalla no dibuja `.acciones .iconbtn` (0 elementos), que es la variante de 28px que empataría la especificidad, así que la regla gana igual. Nota aparte: las casillas de 15px no las cubre ningún bloque de modo dedo (hallazgo f1-44cfe-03).",
+        "por_que_importa": "Bug latente: hoy funciona porque falta la variante que lo rompe; al añadir una fila de acciones densa dejará de aplicarse sin aviso."
+      },
+      {
+        "id": "f1-44cfe-19",
+        "severidad": "baja",
+        "regla": "§6.9 Avisos — nomenclatura de las variantes de `.banda`",
+        "dice_el_sistema": "Cuatro variantes: `.banda-info`, `.banda-warn`, `.banda-err`, `.banda-ok`.",
+        "hay_en_el_build": "class=\"banda b-info\" y class=\"banda b-warn\"; `.b-warn{background:var(--warn-bg);color:var(--warn-ink)}`.",
+        "selector": ".banda.b-info, .banda.b-warn",
+        "evidencia": "Los valores de token son los correctos; solo diverge el nombre del modificador.",
+        "por_que_importa": "Buscar el componente por su nombre documentado no lo encuentra; la divergencia está en las 52 maquetas."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 1,
+      "rendimiento": "no_evaluado",
+      "theming": 2,
+      "responsive": 3,
+      "integridad": 1
+    },
+    "justificacion": "Accesibilidad 1: es un formulario sin obligatoriedad programática (0 `required`, 0 `aria-required`, 0 `<form>`), con el único error visible sin `aria-invalid` ni `aria-describedby`, cinco casillas de 15px, ayudas y mensajes de error a 11px y el cromo colapsado sin rótulos. Sostienen el 1 en vez de 0: las 13 entradas tienen etiqueta (brief.inputsSinEtiqueta = 0), hay skip link, h1 único, 7 landmarks, anillo de foco canónico con `--focus-w:2px`/`--focus-offset:2px` y la excepción correcta del cromo, y está el bloque `@media (pointer:coarse){input,select,textarea{font-size:max(16px,var(--fs-dense))}}` que §6.16 pide. Theming 2: dos temas resueltos y el oscuro medido sin fallos de contraste (brief: 0 claro / 0 oscuro), pero `--text-3` obsoleto y las series fuera de §1.4. Responsive 3: `.rejilla{repeat(auto-fit,minmax(230px,1fr))}` y `.ctrl.ancho{grid-column:1/-1}` se comportan bien de 1440 a 820px; lo que baja la nota es el cromo colapsado. Integridad 1: el contador de la sección 1 dice «2 de 5» sobre 3 de 6, el campo en error ya está en error al cargar y no hay lógica que lo quite, el estado vacío menciona «capacidad» y «coordenadas» —dos campos que el formulario no tiene—, el selector de campos está enumerado en vez de por exclusión y el esqueleto lleva texto dentro de las barras.",
+    "evidencia": [
+      "Campo por campo en el navegador: 9 controles, todos con required=false, aria-required=null, aria-invalid=null, aria-describedby=null, autocomplete=null, inputmode=null.",
+      "Alturas medidas: input[type=text] 35px, select 37px, checkbox 15×15px y su <label> 15px (el sistema pide 38px y 24px).",
+      "getComputedStyle: 17 nodos con texto propio < 12px (5 ayudas y 1 mensaje de error a 11px).",
+      "innerText.length: .banda.b-warn = 266 caracteres y 3 frases.",
+      "A 1000px: .side = 64px, .it .et display:none, .it title = null.",
+      "44_alta_tramite_cfe--oscuro.png y brief.contraste.fallos_oscuro = 0."
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+  },
+  "cobertura": [
+    {
+      "patron": "Toda la interacción de producto es inerte. El único <script> del archivo maneja el andamio de demo (`data-set`), el conmutador de tema y el cajón del menú. Los selects, los inputs, las cinco casillas y los tres botones de la barra inferior (Cancelar, Guardar borrador, Ingresar a CFE) no tienen ningún manejador, y no hay `<form>`. Lo digo una sola vez para toda la pantalla: no es un hallazgo por control.",
+      "propuesta_de_regla": "§9 (andamiaje) — añadir: «En una maqueta, todo control de producto que no tenga lógica detrás se declara una sola vez dentro del bloque `data-andamio`. No se admite un control que prometa un comportamiento —un contador que dice cuánto falta, un campo marcado en error, un botón primario— y que al usarse no cambie nada: §6.12 regla 8 ya lo prohíbe para los contadores de filtro y aquí se generaliza a cualquier control de captura.»"
+    },
+    {
+      "patron": "La sección 3 «Documentación a ingresar» no pide archivos: pide marcar con casillas qué documentos están listos para llevar físicamente a ventanilla («Ingresar con documentación incompleta es válido: la dependencia observará lo que falte»). El sistema solo documenta `.subida` (§6.17) para un documento que se adjunta, y no tiene ningún patrón para una lista de verificación de documentos que viajan en papel. Por eso aquí no hay ni debe haber `input[type=file]` (0 en el archivo), pero tampoco hay regla que diga cómo se escribe esta lista.",
+      "propuesta_de_regla": "§6.17 — añadir una variante hermana: «**Lista de documentos (`.docs-check`)**. Cuándo: cuando el documento no se adjunta al sistema sino que se entrega fuera de él (ventanilla, notaría, mensajería) y lo que se registra es si está listo, no el archivo. Es una lista de casillas reales (`<input type=\"checkbox\">`) dentro de una `<label>` de 24px mínimo (§7.3), con un rótulo de grupo y, por cada documento, quién lo exige. No se usa `.subida` para esto: `.subida` significa “el sistema guarda el archivo”, y prometerlo cuando el papel va aparte es el mismo error que pedir un adjunto en una caja de texto. Si un documento se adjunta y además se marca, van los dos componentes, nunca el casillero solo.»"
+    },
+    {
+      "patron": "El archivo declara `--text-3-fuerte: #5D6774` con el comentario «defecto de tanda 2: se citaba sin definir». Es un token que el sistema no tiene, y su valor está a un dígito del `--text-3` canónico (#5C6675): en la práctica es el valor correcto de `--text-3` añadido con otro nombre en vez de corregir el token original.",
+      "propuesta_de_regla": "§1.1 — añadir: «No se crea un token paralelo para arreglar el valor de otro. Si un token publicado tiene mal el valor, se corrige el token; un nombre nuevo deja los dos conviviendo. Antes de añadir un token a la tabla se comprueba que el que ya existe no sea el mismo con otro valor.»"
+    },
+    {
+      "patron": "`--focus-w: 2px` y `--focus-offset: 2px` están declarados y usados correctamente, pero el documento los marca como «no documentado»: la maqueta es hoy la única fuente de esos dos valores.",
+      "propuesta_de_regla": "§1.7 — publicar los dos valores: «`--focus-w` = 2px, `--focus-offset` = 2px. El anillo mide 2px y se separa 2px del control; iguales en los dos temas, con la única excepción del color dentro del cromo (§1.5).»"
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática, sin backend que perfilar.",
+    "f2_tokens: lo inyecta el orquestador desde la medición mecánica; no se escribe aquí.",
+    "§6.16 regla 1 (dato calculado como dato, `.dato-calc`): la pantalla no tiene ningún dato calculado (0 `.dato-calc` y ningún campo derivado de otros), así que la regla no se ejerce.",
+    "§6.16 regla 8 (guardado automático o botón de guardar, no los dos): la barra inferior ofrece «Guardar borrador» y su texto de la izquierda es «El semáforo empezará a contar cuando CFE fije su fecha compromiso, no antes» — no declara guardado automático, así que no hay conflicto. Se cumple.",
+    "§6.11 tabla densa: la pantalla no tiene tablas (brief.estructura.tablas = 0).",
+    "§6.18 diálogo modal: no hay diálogo en la pantalla (0 `<dialog>` y 0 `div[role=dialog]`).",
+    "Incoherencia entre el estado vacío y el formulario: el vacío dice que hacen falta «cliente, capacidad y tipo de solicitud» y «el domicilio de la obra y sus coordenadas», pero el formulario no tiene ningún campo de capacidad ni de coordenadas. No lo registro como hallazgo F1 porque no encuentro § que lo cubra; queda como evidencia de la dimensión integridad de F3."
+  ]
+}

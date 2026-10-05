@@ -1,0 +1,170 @@
+{
+ "pantalla": "12_app_checado_asistencia",
+ "ruta_zip": "03-icev-instalacion-de-cargadores/12_app_checado_asistencia.html",
+ "carpeta": "03-icev-instalacion-de-cargadores",
+ "area": "ICEV",
+ "arquetipo": "app movil",
+ "modo": "cobertura",
+ "estados_auditados": [
+  "dia",
+  "captura",
+  "confirmado",
+  "sin conexion",
+  "claro",
+  "oscuro",
+  "prefers-reduced-motion"
+ ],
+ "capturas": [
+  "12_app_checado_asistencia--ok.png",
+  "12_app_checado_asistencia--m-dia.png",
+  "12_app_checado_asistencia--m-captura.png",
+  "12_app_checado_asistencia--m-ok.png",
+  "12_app_checado_asistencia--m-sinconexion.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-12app-01",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado de una pantalla",
+    "dice_el_sistema": "Toda pantalla que pida datos — cuatro formas: con datos, cargando, vacia, con error. «No son un extra: son la pantalla.» El error dice tres cosas en orden — que paso, que no se ha perdido, que hacer — mas una referencia.",
+    "hay_en_el_build": "startCapture() pone 'Obteniendo ubicacion…' y a los 900ms escribe siempre 'Ubicacion capturada' con setTimeout; no existe ninguna rama de fallo",
+    "selector": "#reqGps, #gpsT, #gpsS",
+    "evidencia": "Leido el script: la unica transicion de #reqGps es setTimeout(..., 900) -> S.gps=true. No hay estado de permiso denegado, ni de GPS apagado, ni de precision insuficiente, ni de tiempo agotado. Comprobado tambien en pantalla: la captura 12_app_checado_asistencia--m-captura.png muestra 'Ubicacion capturada · precision ±8 m' sin que la app haya pedido nada.",
+    "por_que_importa": "La ubicacion es uno de los dos datos sin los cuales, dice la propia pantalla, «el registro no se guarda». El fallo mas probable de todo el flujo —que la persona haya negado el permiso de ubicacion, o este en un sotano sin fix— es el unico que la pantalla no sabe contar. Hoy quedaria colgada en 'Obteniendo ubicacion…' indefinidamente, con el boton de confirmar deshabilitado y sin decir por que ni como salir."
+   },
+   {
+    "id": "f1-12app-02",
+    "severidad": "alta",
+    "regla": "§2 Tipografia — autoalojado (D116)",
+    "dice_el_sistema": "Las fuentes se autoalojan (D116). Prohibido el <link> a Google Fonts para las fuentes de interfaz: un CDN caido falla en silencio (incidencia real de 4 dias sin deteccion).",
+    "hay_en_el_build": "<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Michroma&display=swap\" rel=\"stylesheet\">",
+    "selector": "head > link[href*='fonts.googleapis.com']",
+    "evidencia": "Lineas 8-10 del archivo. No hay ningun @font-face declarado.",
+    "por_que_importa": "La pantalla esta hecha para funcionar sin senal —tiene vista 'Sin conexion', cola de envio y un aviso de 'guardado en el telefono'— y aun asi su tipografia depende de una peticion a un dominio externo. Con la red caida, la unica parte del producto que no degrada con elegancia es la que mas se mira."
+   },
+   {
+    "id": "f1-12app-03",
+    "severidad": "media",
+    "regla": "§7.3 Objetivos tactiles",
+    "dice_el_sistema": "Todo destino interactivo mide 24x24px como minimo. 44px si es la accion principal de la pantalla, o si el uso es en campo o tableta.",
+    "hay_en_el_build": ".modeswitch button y .backbtn resueltos a 40px de alto",
+    "selector": "#tab-sede, #tab-campo, button.backbtn#btnBack",
+    "evidencia": "Medido con Playwright a 390x844, andamio excluido: #tab-sede y #tab-campo salen 173,0x40,0px en las vistas 'dia' y 'sin conexion'; #btnBack sale 73,7x40,0px en la vista de captura. Pasan el suelo absoluto de 24px pero no llegan a los 44px que §7.3 exige por uso en campo. El resto de los destinos de la pantalla si llega.",
+    "por_que_importa": "El par Sede/Campo decide contra que se valida el checado: equivocarse de pestana cambia el resultado del registro, y es ademas el control que mas se toca al empezar el dia. 'Volver' es la salida de un flujo que ya empezo a capturar. Los tres se pulsan con el telefono en una mano y a menudo con guante."
+   },
+   {
+    "id": "f1-12app-04",
+    "severidad": "media",
+    "regla": "§2.1 Suelo tipografico",
+    "dice_el_sistema": "El suelo son 12px. «Nada baja de ahi.» Si un dato se lee todos los dias, va a 12-13px como minimo. Unica excepcion: 10,5px en mayusculas con letter-spacing para rotulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+    "hay_en_el_build": ".tabbar a{font-size:10px}; .badge{font-size:10.5px}; .sync, small y los subtextos de .regrow/.tinfo a 11px; .sub y los subtitulos de boton a 11,5px",
+    "selector": "nav.tabbar a, span.badge, .hdr small, .sync, .tinfo span, .regrow .rt span",
+    "evidencia": "Estilo calculado a 390x844: 17 nodos de texto por debajo de 12px en la vista 'dia' y 19 en la de sin conexion. La barra de navegacion permanente va a 10,00px con text-transform:none; las pastillas de estado ('Puntual', 'Registro correcto', 'Por enviar') a 10,50px, tambien sin mayusculas. Ninguno encaja en la excepcion documentada.",
+    "por_que_importa": "Los 10px de la barra de pestanas son la navegacion permanente de la app, y las pastillas de 10,5px son el resultado del checado: si el registro salio puntual o quedo por enviar. Son exactamente los dos datos que §2.1 describe como «se leen todos los dias», y estan los dos por debajo del suelo."
+   },
+   {
+    "id": "f1-12app-05",
+    "severidad": "media",
+    "regla": "§1.7 Ratios de contraste / §1.4.1 Tinta sobre relleno de color",
+    "dice_el_sistema": "Texto normal: 4,5:1. Glifo o texto sobre relleno solido de color usa --on-state, no un gris de texto. Cada color nuevo se mide contra los fondos donde va a aparecer, en los dos temas.",
+    "hay_en_el_build": ".av{background:linear-gradient(135deg,var(--chrome),var(--accent));color:var(--chrome-ink);font-size:12.5px;font-weight:800}",
+    "selector": "span.av",
+    "evidencia": "Calculado sobre las dos paradas reales del gradiente: en tema oscuro, --chrome-ink #E7ECF2 da 12,72:1 sobre --chrome #122740 pero solo 3,29:1 sobre --accent #4A8F5A, por debajo del 4,5:1 que exige un texto de 12,5px. En claro los dos extremos pasan (7,92:1 y 4,69:1). CORRECCION AL BRIEF: el fallo que el brief reporta como 'span.av, ratio 1' es un falso positivo — .av no tiene background-color, solo background-image, y la medicion compuso contra el fondo de pagina. El fallo real es el otro, y solo en oscuro.",
+    "por_que_importa": "Las iniciales se desvanecen justo en la mitad inferior derecha del medallon, que es donde cae la parada --accent. No es un dato critico, pero es el unico sitio de la cabecera donde el sistema admite texto sobre color y la regla que lo cubre (--on-state) no se esta usando."
+   },
+   {
+    "id": "f1-12app-06",
+    "severidad": "media",
+    "regla": "§5 Movimiento — prefers-reduced-motion",
+    "dice_el_sistema": "No es «cero animacion»: se conservan opacidad y color, se elimina todo desplazamiento y escala.",
+    "hay_en_el_build": "@media (prefers-reduced-motion: reduce){:root{--dur-micro:1ms;--dur-base:120ms;--dur-enter:120ms;--ease-spring:linear;--stagger:0ms}} — y nada mas",
+    "selector": "button:active",
+    "evidencia": "Cargada con reducedMotion:'reduce' y leidas las reglas: el unico bloque de reduced-motion remapea duraciones. button:active{transform:scale(.97)} sigue vigente; la unica excepcion escrita es button[disabled]:active{transform:none}, que no tiene que ver con el ajuste del sistema.",
+    "por_que_importa": "Quien activa el ajuste de movimiento reducido sigue viendo encogerse cada boton que toca —y en esta pantalla se toca todo con el pulgar—. §5 pide retirar la escala, no acortarla."
+   },
+   {
+    "id": "f1-12app-07",
+    "severidad": "media",
+    "regla": "§8 Voz de producto / §6.9 .note",
+    "dice_el_sistema": "Ningun bloque de texto siempre visible pasa de ~140 caracteres. .nota y .banda llevan como maximo UNA frase, sin punto y coma ni raya explicativa despues del primer punto. «No hay excepcion por importancia del contenido.»",
+    "hay_en_el_build": "#noteCampo: «Modo campo — cualquier ubicacion es valida. No hay zona que cumplir: el checado se acepta desde donde estes, siempre que la app capture tu punto exacto y una foto en vivo. Sin esos dos datos, el registro no se guarda.»",
+    "selector": "div.note.n-block#noteCampo, div.note.n-warn#queuebanner",
+    "evidencia": "innerText medido: #noteCampo = 216 caracteres y 3 frases, siempre visible en la vista principal; #queuebanner = 144 caracteres y 2 frases. Ambos por encima del tope de ~140 y de la frase unica.",
+    "por_que_importa": "La unica frase que bloquea la accion inmediata —«sin esos dos datos, el registro no se guarda»— es la tercera y la mas corta, detras de dos que solo contextualizan. §8 pide exactamente lo contrario: esa frase sola y visible, y el resto a toggletip (§6.23) o fuera."
+   },
+   {
+    "id": "f1-12app-08",
+    "severidad": "media",
+    "regla": "§6.4 regla 2 — cada estado lleva encabezado real",
+    "dice_el_sistema": "Cada estado lleva encabezado real, no un <b>. Cada pantalla o vista tiene encabezado real, no texto en negrita (§11).",
+    "hay_en_el_build": "<b id=\"okTitle\">Fin de comida registrado</b> dentro de .okhero; <b id=\"capTitle\">Fin de comida</b> en .captitle",
+    "selector": "#okTitle, #capTitle",
+    "evidencia": "Las vistas 'captura' y 'confirmado' abren con un <b>, no con un encabezado. El unico <h1> del documento es el .sr de la app y los <h2> son los rotulos de seccion ('Registros de hoy'), asi que el titulo de cada vista no aparece en el esquema de encabezados.",
+    "por_que_importa": "Quien navega por encabezados no tiene forma de saber en que paso del checado esta: salta de 'Registros de hoy' a 'Registros de hoy'. El cambio de vista tampoco mueve el foco, asi que el unico aviso de que la pantalla cambio es visual."
+   },
+   {
+    "id": "f1-12app-09",
+    "severidad": "media",
+    "regla": "§9 Andamiaje de maqueta (Anexo A)",
+    "dice_el_sistema": "Se marca siempre con data-andamio, va visualmente separado del producto y rotulado. Todo lo que lleve data-andamio se retira en la version real. Un solo selector lo encuentra.",
+    "hay_en_el_build": "<aside class=\"cap\"><div class=\"demo\"> con los conmutadores 'Pantalla' y 'Conexion'",
+    "selector": "aside.cap, div.demo, [data-go], [data-net]",
+    "evidencia": "Busqueda de 'data-andamio' en el archivo: 0 resultados. Para auditar a 390x844 tuve que ocultar el panel con un selector por clase, no con el selector unico de §9.",
+    "por_que_importa": "Los conmutadores [data-go] y [data-net] cambian el estado interno del producto (S.sent, S.online) desde fuera de el. Sin la marca, no hay garantia mecanica de que no viajen al build, y lo que viaja es un control que falsea la conectividad."
+   },
+   {
+    "id": "f1-12app-10",
+    "severidad": "media",
+    "regla": "§1.1 Valor canonico de --text-3",
+    "dice_el_sistema": "--text-3 es #5C6675, no el antiguo #66717F (que caia a 4,21:1 sobre --surface-2).",
+    "hay_en_el_build": "--text-3: #66717F",
+    "selector": ":root (bloque de tema claro)",
+    "evidencia": "Declaracion del <style>, confirmada por el brief (text_3_declarado). En esta pantalla no produce ningun fallo medido —el barrido de contraste da 0 fallos reales en claro y 0 en oscuro—, pero el valor es el obsoleto.",
+    "por_que_importa": "Aqui el dano es latente, no actual: ningun texto en --text-3 cae hoy sobre --surface-2. Basta con que una fila de .regrow pase a fondo secundario para que reaparezca el 4,21:1. Corregir el token cierra el riesgo sin tocar nada mas."
+   }
+  ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "Responsive y theming estan bien resueltos para el formato: a 390x844 no hay desbordamiento horizontal en ninguna de las cuatro vistas (scrollWidth 390 = innerWidth 390), los dos temas estan completos y el barrido de contraste no da ni un fallo real en oscuro. Accesibilidad sube por encima del minimo porque hay trabajo hecho —aria-live en la lista de requisitos, role=status en la pastilla de sincronizacion, aria-label en el grupo de modalidad, aria-current en la pestana activa, translate=no en los folios— pero se queda en 2 por el suelo de 12px roto en la navegacion permanente (10px) y en las pastillas de resultado (10,5px), por los titulos de vista en <b> y por los 40px de los controles de modalidad. Integridad baja a 2 por lo que no esta: el flujo de captura no tiene rama de fallo de ubicacion, y el andamio no lleva data-andamio, asi que no hay forma mecanica de separar maqueta y producto.",
+  "evidencia": [
+   "Playwright 390x844: scrollWidth 390 / innerWidth 390 en dia, captura, confirmado y sin conexion",
+   "#tab-sede y #tab-campo 173,0x40,0px; #btnBack 73,7x40,0px",
+   "0 fallos de contraste reales en claro y en oscuro tras descartar el falso positivo de span.av (fondo de gradiente)",
+   "span.av: 12,72:1 sobre la parada --chrome y 3,29:1 sobre la parada --accent en tema oscuro",
+   "17 nodos de texto bajo 12px en la vista 'dia'; nav.tabbar a a 10,00px",
+   "#noteCampo 216 caracteres / 3 frases; #queuebanner 144 caracteres",
+   "startCapture(): unica transicion de #reqGps es setTimeout(900) -> exito; cero ramas de error"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+ },
+ "cobertura": [
+  {
+   "patron": "Un dato que la app no puede obtener sola porque depende de un permiso del sistema operativo: la ubicacion exacta (y, al lado, la camara). La pantalla lo trata como un dato que siempre llega: 'Obteniendo ubicacion…' -> 'Ubicacion capturada · precision ±8 m'. §6.4 documenta cuatro estados de pantalla (con datos, cargando, vacia, con error) pensados para una peticion a servidor; ninguno describe el estado 'el permiso no se ha pedido todavia', 'se ha denegado' o 'esta concedido pero el dato no se puede obtener'.",
+   "propuesta_de_regla": "§6.25 Dato que depende de un permiso del dispositivo — .permiso. Cuando: la pantalla necesita ubicacion, camara, microfono o notificaciones para completar una accion. Extiende §6.4 con cinco estados, no cuatro: (1) sin pedir — se explica para que se va a usar antes de abrir el dialogo del sistema, en una frase bajo ~140 caracteres (§8), y la peticion la dispara una accion del usuario, nunca la carga de la pantalla; (2) pidiendo — vista de cargando de §6.4, con salida a error pasados unos segundos, igual que el esqueleto; (3) concedido — el dato con su calidad declarada (para la ubicacion, la precision en metros; si no alcanza el umbral de la operacion, es un estado de error, no un dato); (4) denegado — vista de error de §6.4 con sus tres cosas en orden: que paso, que no se ha perdido («lo que ya capturaste sigue aqui») y que hacer, y ese «que hacer» son los pasos reales para reactivarlo en los ajustes del telefono, no un «reintentar» que vuelve a fallar en silencio porque el sistema ya no vuelve a preguntar; (5) imposible ahora — concedido pero sin dato (sin cobertura, sin fix): se ofrece la via degradada que la operacion admita, o se dice claramente que no la hay. El estado se anuncia con aria-live=\"polite\" y mueve el foco (§6.4). Ningun permiso denegado deja la pantalla en cargando indefinido, y ninguno bloquea una accion sin decir cual es la alternativa."
+  },
+  {
+   "patron": "Un checado que no se puede editar nunca: 'Este registro ya no cambia. Si algo quedo mal, no se edita: se solicita una correccion y Recursos Humanos la revisa.' Toda la escritura de la app desemboca en registros inmutables cuya hora la fija el servidor, con una via de correccion por tercero. §6.16 regla 8 habla de guardado automatico o boton de guardar, y §6.13 de deshacer una accion destructiva, pero el sistema no tiene ninguna regla para un registro que se cierra al nacer.",
+   "propuesta_de_regla": "§6.27 Registro inmutable — .congelado. Cuando: un dato que, una vez enviado, ya no lo cambia quien lo creo (un checado, una firma de cierre, una evidencia fechada). Se declara antes de enviar, no despues: la pantalla de confirmacion dice en una frase que el registro no se va a poder editar, y esa frase va junto al boton de envio, no en el acuse. En el acuse se repite como .note (§6.9), nunca como caja roja: no es un error, es una propiedad del dato. Si la interfaz dice que algo no se edita, tiene que existir la via alterna y estar en la misma pantalla —el corolario de §6.16 («si la interfaz dice retira uno, tiene que existir la forma de retirarlo»)—, con el nombre de quien la resuelve y en que plazo. La hora que vale y el reloj que la fija se dicen una sola vez, en el momento de capturar, y no se repiten en cada acuse. El registro congelado se distingue de uno en cola: 'confirmado' y 'por enviar' son dos pastillas distintas de §6.10, con icono propio, y nunca el mismo verde."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estatica sin backend que perfilar",
+  "f4_nielsen y f5_investigacion: fuera del subconjunto de este lote",
+  "Confirma, sin repetirla, la §6.17.1 de evidencia fotografica ya propuesta en un lote anterior: la pantalla exige foto en vivo y bloquea la galeria ('Solo camara — no se pueden subir fotos de la galeria')",
+  "Confirma, sin repetirla, la §14 de comportamiento sin conexion ya propuesta: el checado se guarda con su hora real y se envia al recuperar senal, con contador de pendientes"
+ ]
+}
