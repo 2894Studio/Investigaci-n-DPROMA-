@@ -1,371 +1,632 @@
 {
-  "pantalla": "20_tablero",
-  "ruta_zip": "01-principal/20_tablero.html",
-  "carpeta": "01-principal",
-  "area": "direccion",
-  "arquetipo": "tablero/KPIs",
-  "modo": "cumplimiento",
-  "estados_auditados": [
-    "ok",
-    "loading",
-    "empty",
-    "error",
-    "oscuro"
-  ],
-  "capturas": [
-    "20_tablero--ok.png",
-    "20_tablero--loading.png",
-    "20_tablero--empty.png",
-    "20_tablero--error.png",
-    "20_tablero--oscuro.png"
-  ],
-  "f1_cumplimiento": {
-    "veredicto": "no_cumple",
-    "hallazgos": [
-      {
-        "id": "f1-20tablero-01",
-        "severidad": "alta",
-        "regla": "§12.4 Las piezas del dashboard / §12.3 Tabla equivalente",
-        "dice_el_sistema": "Dona, Ranking horizontal, Tendencia y Sparkline son «canvas», Chart.js (§12.1), y cada uno «Abre su tabla equivalente»; §12.3: «cada gráfico lleva su tabla equivalente y esa tabla es la fuente de verdad del dato», con <caption> en .sr y total en <tfoot>.",
-        "hay_en_el_build": "0 elementos <canvas>, ningún <script src> de Chart.js y 0 elementos <table> en toda la pantalla. Las cuatro visualizaciones son HTML/CSS: barras de ranking (.barras > .barra > .pista > i), columnas apiladas por semana (.semanas > .sem > .pila > i) y dos sparklines como <svg><polyline class=\"spark\">. Toda la accesibilidad del dato se delega a role=\"img\" + aria-label.",
-        "selector": ".barras, .semanas, svg > polyline.spark",
-        "evidencia": "Medido con Playwright sobre http://127.0.0.1:8731/01-principal/20_tablero.html: canvas=0, tablasTotal=0. El aria-label de la gráfica de 12 semanas es «Doce semanas de trámites admitidos y órdenes cerradas; la última semana, 18 trámites y 7 órdenes»: de 12 semanas × 2 series = 24 valores, solo 2 son recuperables.",
-        "por_que_importa": "La dirección es el usuario de esta pantalla y el dato de las gráficas no se puede leer con lector de pantalla, ni copiar, ni verificar. 22 de los 24 valores de la gráfica de tendencia solo existen como altura de un <i> en píxeles."
-      },
-      {
-        "id": "f1-20tablero-02",
-        "severidad": "alta",
-        "regla": "§6.4 Vistas de estado / §11 Estructura",
-        "dice_el_sistema": "§6.4: «cada estado lleva encabezado real, no un <b>»; .tarjeta-estado{max-width:480px;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)} y .estado-ico{52px;border-radius:50%;background:var(--accent)}. §11: «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo».",
-        "hay_en_el_build": "<div class=\"state state-empty\"><svg class=\"ico\">…</svg><b>No hay nada en tu alcance todavía</b><p>…</p></div>. No existe .tarjeta-estado ni .estado-ico en el archivo; el icono es un .ico de 30px sin medallón y el título es un <b> a var(--fs-base).",
-        "selector": ".state.state-empty, .state.state-error, .state b",
-        "evidencia": "CSS líneas 605-613 de la maqueta servida: «.state b{font-size:var(--fs-base)}», «.state .ico{width:30px;height:30px;color:var(--text-3)}». grep de «tarjeta-estado» y «estado-ico» en el archivo: 0 coincidencias. Las otras tres maquetas del lote (52, 53, 43) sí traen .tarjeta-estado + .estado-ico + <h2>.",
-        "por_que_importa": "Vacío y error son las dos vistas en las que alguien necesita saber dónde está; sin encabezado real el lector de pantalla no las anuncia como sección y el salto por encabezados no llega a ellas."
-      },
-      {
-        "id": "f1-20tablero-03",
-        "severidad": "alta",
-        "regla": "§2.1 Suelo tipográfico / §10 trampa 1",
-        "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta. §10 trampa 1: la forma abreviada font: esconde el tamaño; se comprueba con el estilo calculado.",
-        "hay_en_el_build": "18 selectores distintos con texto visible por debajo de 12px, ~50 elementos. Los peores: span.et del eje de la gráfica de 12 semanas a 9,5px; .tope a 10px; .eje y .tag a 10,5px; .cromo-av a 11px escrito como «font:700 11px var(--font-ui)» — la forma abreviada que §10 trampa 1 nombra; .hero .pie, .mini .pie, .aparte .porque, .al .when, .leyenda, .cromo-quien small a 11px; .rolchip, .slaleg, .mini .lbl, .panel .sub, .pie-nota a 11,5px.",
-        "selector": ".sem .et (9,5px), .tope (10px), .eje/.tag/.et-g (10,5px), .cromo-av/.pie/.porque/.when (11px), .rolchip/.slaleg/.lbl/.sub (11,5px)",
-        "evidencia": "Medición propia con Playwright sobre el estilo calculado, ocultando [data-andamio]: {\"span.et @9.5\":2, \"span.tope @10\", \"span.et-g @10.5\":1, \"span.tag.t-warn @10.5\":1, \"span.cromo-av @11\":1, \"p.pie @11\":1, \"span.pie @11\":5, \"span.porque @11\":1, \"b @11\":10, \"span.when @11\":4, \"p.sub @11.5\":3, \"span.lbl @11.5\":6, \"span @11.5\":5, \"b @11.5\":8}. El brief del orquestador ya reportaba span.cromo-av a 11px y span.et-g a 10,5px.",
-        "por_que_importa": "Casi todo el texto explicativo del tablero —las notas que dicen qué significa cada cifra— está por debajo del suelo. §2.1 añade: «si un dato se lee todos los días, va a 12–13px como mínimo», y este es el tablero de la dirección."
-      },
-      {
-        "id": "f1-20tablero-04",
-        "severidad": "alta",
-        "regla": "§1 Decisión previa a elegir color / §6.22 Ámbito de datos / §1.3 Semáforo",
-        "dice_el_sistema": "§1: «si el dato tiene juicio → semáforo §1.3; si solo distingue → paleta categórica §1.4; si es un dato sobre el dato → sin color propio, tinta de texto §6.22… Un color de estado no se reutiliza para una categoría, ni al revés». §6.22: el ámbito «Nunca es un juicio → prohibido pintarlo con --warn».",
-        "hay_en_el_build": "La tarjeta «Viáticos por autorizar» lleva .aparte{border-left:3px solid var(--warn);background:var(--warn-bg)} y .aparte .lbl{color:var(--warn-ink)}, .aparte .porque{color:var(--warn-ink)}. Lo que el color está marcando es, textualmente, un ámbito: «Estos 14 son de toda la organización, no de tus plazas». El 14 no es ni tarde ni incompleto.",
-        "selector": ".mini.aparte, .aparte .porque",
-        "evidencia": "CSS de la maqueta servida: «.aparte{border-left:3px solid var(--warn);background:var(--warn-bg)}». Captura 20_tablero--ok.png, bloque «ASIGNACIÓN NOMINAL — NO VA POR PLAZA»: la tarjeta es la única ámbar de la pantalla. --block y --block-fill están declarados y sin usar en toda la maqueta (brief: declarados_sin_usar).",
-        "por_que_importa": "Es el mismo fallo de gobierno de color que la columna «Tipo» pintada con --block, con el semáforo cambiado: quien mira el tablero lee «14 viáticos en problemas» cuando lo que dice el texto es «14 de otro conjunto». El semáforo deja de significar lo que significa en el resto del sistema."
-      },
-      {
-        "id": "f1-20tablero-05",
-        "severidad": "alta",
-        "regla": "§1.1 Superficies y texto — valor de --text-3",
-        "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)… si el elemento puede caer sobre --surface-2, se mide también ahí».",
-        "hay_en_el_build": "--text-3: #66717F en :root (tema claro). La maqueta usa --surface-2 (#E7EDF3) como fondo de cabeceras y de .seg.",
-        "selector": ":root{--text-3}",
-        "evidencia": "Brief del orquestador: text_3_declarado = «#66717F». Fallo de contraste medido por el orquestador: span.et-g «VIENDO COMO», color rgb(102,113,127) sobre rgb(231,237,243), ratio 4,21:1, mínimo 4,5. A diferencia de 52 y 53, esta maqueta no declara el token paralelo --text-3-fuerte, así que el valor obsoleto gobierna todo el texto auxiliar.",
-        "por_que_importa": "Hecho ya establecido para 51 de 52 maquetas; aquí sin paliativo, porque todas las notas de método del tablero (.pie, .sub, .upd, .ref) van en --text-3."
-      },
-      {
-        "id": "f1-20tablero-06",
-        "severidad": "alta",
-        "regla": "§9 Andamiaje de maqueta / §8 Voz de producto",
-        "dice_el_sistema": "§9: «Se marca siempre con data-andamio, va visualmente separado del producto y rotulado… Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra.» §8: «si el texto explica una decisión, no va en pantalla».",
-        "hay_en_el_build": "Sólo el conmutador de estados lleva data-andamio (1 ocurrencia). Dentro del producto, sin marcar: (a) el selector «VIENDO COMO · Dirección / Coordinación ICEV / Gestoría / Instalador» en .seg, cuyo propio texto admite «el selector es de esta maqueta, no del sistema»; (b) tres tarjetas .mini.hueco con texto en primera persona del autor —«La cifra que había aquí —$3.08 M— me la inventé», «el circuito de autorización sólo consta en un documento mío»—; (c) dos .mini.sin-destino con el rótulo «aquí se acaba — el detalle no está construido»; (d) la .nota de cierre de 329 caracteres que explica por qué se diseñó el selector así.",
-        "selector": ".seg[role=group], .mini.hueco, .mini.sin-destino .tope, main > .nota",
-        "evidencia": "grep data-andamio en la maqueta servida: 1 ocurrencia, el <aside class=\"demo\">. Captura 20_tablero--ok.png: las tres tarjetas de borde discontinuo «Por cobrar», «Compras por autorizar» y «Rentabilidad por centro de costo» ocupan una fila entera del tablero con texto de proceso interno.",
-        "por_que_importa": "Un solo selector ya no retira el andamiaje: con [data-andamio] fuera, el tablero de producción seguiría mostrando el selector de rol y el texto en primera persona del autor. Y en pantalla, casi la mitad del área del tablero de dirección la ocupan explicaciones de por qué no hay dato."
-      },
-      {
-        "id": "f1-20tablero-07",
-        "severidad": "media",
-        "regla": "§12.4 Rejilla y tarjeta de widget",
-        "dice_el_sistema": "Rejilla «.dash»: doce columnas; cada widget declara cuántas ocupa (.w-3, .w-4, .w-6, .w-8). Tarjeta de widget «.widget»: el contenedor común. §12.6: align-items:start por omisión, .dash.pares → stretch.",
-        "hay_en_el_build": "No existen .dash, .widget, .w-3, .w-4, .w-6, .w-8, .cifras ni .progreso en el archivo. El reparto lo hacen cuatro rejillas ad-hoc: .kpi{grid-template-columns:minmax(300px,1.1fr) 2.5fr}, .minis{repeat(3,1fr)}, .row2{1.55fr 1fr} y .graficas{1fr 1fr}. La tarjeta es .card, con la receta de superficie correcta de §6.3.",
-        "selector": ".kpi, .minis, .row2, .graficas, .card",
-        "evidencia": "Recuento de clases en la maqueta servida: dash=0, widget=0, w-3/w-4/w-6/w-8=0, cifras=0, progreso=0. De las once piezas de §12.4 solo .barra (13), .leyenda (1) y .kpi (2) aparecen por nombre, y las dos primeras con otro significado (ver hallazgo 08).",
-        "por_que_importa": "El tablero no se puede recomponer con el vocabulario del sistema: cada ancho está codificado a mano, así que añadir un widget obliga a editar una regla de rejilla en vez de poner una clase."
-      },
-      {
-        "id": "f1-20tablero-08",
-        "severidad": "media",
-        "regla": "§12.4 (.kpi, .barra) / §10 trampa 10",
-        "dice_el_sistema": "§12.4: «.kpi» = KPI con variación, «Cifra en --fs-kpi (30px) y su delta debajo, no al lado. Una por widget». «.barra» = Barra apilada de estado, «Reparto de un total entre estados del semáforo». §10 trampa 10: «Un nombre de clase corto no se declara dos veces… y no se comparte entre dos componentes sin relación».",
-        "hay_en_el_build": ".kpi{display:grid;grid-template-columns:minmax(300px,1.1fr) 2.5fr;gap:var(--sp-3);align-items:stretch} — es una rejilla de dos columnas que contiene dos tarjetas, no una cifra. .barra{display:grid;grid-template-columns:minmax(96px,150px) 1fr auto} — es una fila de ranking horizontal (rótulo + pista + cifra), no una barra apilada. La barra apilada de estado existe pero se llama .slabar.",
-        "selector": ".kpi, .barra, .slabar",
-        "evidencia": "CSS de la maqueta servida, líneas 659 y 707. Ninguna de las dos reglas contiene --fs-kpi ni los estados del semáforo; --fs-kpi se usa en .hero .v y .mini .v, que son los que de verdad hacen de KPI.",
-        "por_que_importa": "Dos nombres del sistema significan aquí otra cosa. Quien traiga una regla escrita contra §12.4 (por ejemplo «.barra span + span{border-left:2px solid var(--surface)}» de §12.6) la aplicará al componente equivocado y el fallo será silencioso."
-      },
-      {
-        "id": "f1-20tablero-09",
-        "severidad": "media",
-        "regla": "§4 Sombra y superficie translúcida",
-        "dice_el_sistema": "«.glass lleva backdrop-filter:blur(16px) + -webkit-backdrop-filter y respaldo sólido obligatorio: @supports not (backdrop-filter:blur(1px)){.glass{background:var(--surface)}}». «El translúcido es de la pantalla de entrada. En el dashboard las superficies son opacas.»",
-        "hay_en_el_build": ".hero{…background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-color:var(--border-2)} en las dos tarjetas destacadas del tablero. Sin bloque @supports en ninguna parte del archivo, y con blur(10px) en vez de 16px.",
-        "selector": ".card.hero",
-        "evidencia": "Medición propia con Playwright: dos elementos con backdropFilter distinto de «none», ambos «card hero | blur(10px)». grep «@supports not (backdrop» en el archivo: 0 coincidencias.",
-        "por_que_importa": "Es la superficie de la cifra principal del tablero (182 expedientes). En un navegador sin backdrop-filter se pinta --glass, rgba(250,252,253,.66), directamente sobre --bg, sin el respaldo que §4 declara obligatorio."
-      },
-      {
-        "id": "f1-20tablero-10",
-        "severidad": "media",
-        "regla": "§6.7 Esqueleto de carga — prefers-reduced-motion y texto real",
-        "dice_el_sistema": "«prefers-reduced-motion aplana el fondo, no solo detiene la animación»: @media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}. Y: «role=\"status\" + aria-label en el contenedor y sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)».",
-        "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}} — sin reponer el fondo. Y las barras llevan texto real: <span class=\"skel\" style=\"width:56%\">Trámites con el reloj corriendo</span>, …>182<, …>barra de plazo<, …>barra<, …>gráfica de barras<, ocultos solo con color:transparent, dentro de un contenedor con role=\"status\".",
-        "selector": ".skel, .state-loading.sk[role=status]",
-        "evidencia": "CSS líneas 600-604 de la maqueta servida: «.skel{…animation:shimmer 1.4s linear infinite;color:transparent}» y «@media (prefers-reduced-motion:reduce){.skel{animation:none}}». Markup del estado cargando: 12 .skel, 12 con texto.",
-        "por_que_importa": "Dos fallos que §6.7 ya documenta. Con movimiento reducido el degradado se congela en la posición 0 y queda una franja oscura fija; y el role=\"status\" anuncia «Trámites con el reloj corriendo 182 barra de plazo barra barra barra barra Órdenes abiertas 47 gráfica de barras» como si fuera contenido."
-      },
-      {
-        "id": "f1-20tablero-11",
-        "severidad": "media",
-        "regla": "§6.22 Ámbito de datos — .ambito",
-        "dice_el_sistema": "«.ambito: display:inline-flex;gap:5px;font-size:var(--fs-meta);font-weight:600;color:var(--text-3). Sin relleno y sin borde.» «Se descartó darle relleno --surface-2: 1,08:1 del fondo de página.»",
-        "hay_en_el_build": ".rolchip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);border-radius:var(--r-pill);padding:4px 11px;font-size:11.5px;color:var(--text-2)} para «Ves todas las plazas», que es literalmente el ámbito de todas las cifras de la pantalla.",
-        "selector": ".rolchip",
-        "evidencia": "CSS línea 642 de la maqueta servida; captura 20_tablero--ok.png, pastilla con borde bajo el título. .ambito no existe en el archivo.",
-        "por_que_importa": "El ámbito con forma de pastilla se lee como un filtro puesto, no como una aclaración; y a 11,5px queda además bajo el suelo de §2.1."
-      },
-      {
-        "id": "f1-20tablero-12",
-        "severidad": "media",
-        "regla": "§6.4 regla 1 — el cambio de vista se anuncia y mueve el foco",
-        "dice_el_sistema": "«(1) el cambio se anuncia (aria-live=\"polite\") y mueve el foco» (main.focus() con tabindex=\"-1\").",
-        "hay_en_el_build": "El <main id=\"contenido\" tabindex=\"-1\"> existe, pero el único JS que cambia data-state es el del andamiaje y no anuncia nada ni llama a focus(): cont.setAttribute('data-state', b.dataset.set) y nada más. No hay región aria-live de estado (el único role=\"status\" es el del esqueleto).",
-        "selector": "main#contenido[data-state], .demo [data-set]",
-        "evidencia": "Script final de la maqueta servida. Brief: ariaLive = 1 (el contenedor del esqueleto). Las otras tres maquetas del lote sí traen <p id=\"anuncio-estado\" role=\"status\" aria-live=\"polite\" class=\"sr\">, un diccionario VISTAS_ESTADO y cont.focus().",
-        "por_que_importa": "Es el único mecanismo de cambio de vista que la maqueta tiene; tal como está, pasar de «cargando» a «error» no se anuncia ni mueve el foco."
-      },
-      {
-        "id": "f1-20tablero-13",
-        "severidad": "media",
-        "regla": "§10 trampa 5 — <symbol> y viewBox repetido",
-        "dice_el_sistema": "«Correcto: <svg width=\"44\" height=\"42\" aria-hidden=\"true\"><use href=\"#dproma-mark\" width=\"44\" height=\"42\"/></svg> — medidas en el <use> y sin viewBox en el envoltorio… se pinta 32,5px a la izquierda de su caja… Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal.»",
-        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg> en el logotipo de la barra lateral, y <svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el botón flotante del asistente: viewBox repetido en el envoltorio y <use> sin medidas, exactamente al revés de lo documentado.",
-        "selector": ".logo > svg > use[href=\"#dproma-mark\"], .fab > svg > use",
-        "evidencia": "Medición propia con getBoundingClientRect(): logo → svg 44×42, use 43×42, desplazamiento dx = −32px, dy = 0. Botón flotante → svg 22×21, use 21×21, dx = −16px. El mismo defecto aparece en las cuatro maquetas del lote. Visible en 20_tablero--ok.png: el isotipo es una astilla verde en vez de la marca completa.",
-        "por_que_importa": "El logotipo de la aplicación se pinta recortado en todas las pantallas. Es el caso medido que §10 trampa 5 describe, reproducido con el mismo desplazamiento."
-      },
-      {
-        "id": "f1-20tablero-14",
-        "severidad": "media",
-        "regla": "§7.3 Objetivos táctiles — la regla lleva :root",
-        "dice_el_sistema": "«:root[data-tacto=\"dedo\"] .it, :root[data-tacto=\"dedo\"] .iconbtn, :root[data-tacto=\"dedo\"] .btn{min-height:46px}. El :root es lo que hace ganar la regla: con :root suma (0,3,0); sin él (0,2,0) y lo empata cualquier variante de tamaño del componente.»",
-        "hay_en_el_build": "Las seis reglas van escritas sin :root: «[data-tacto=\"dedo\"] .it{min-height:46px}», «[data-tacto=\"dedo\"] .iconbtn{width:46px;height:46px}», y así hasta .btn. Además data-tacto no aparece ni en el markup ni en el JS, así que el modo dedo no se puede activar desde el producto.",
-        "selector": "[data-tacto=\"dedo\"] .it/.iconbtn/.cromo-prof/.cromo-av/.seg button/.btn",
-        "evidencia": "Líneas 279-284 de la maqueta servida; brief del orquestador: regla_data_tacto_sin_root = 6. Medición propia poniendo data-tacto=\"dedo\" a mano: .iconbtn sí llega a 46px, porque en esta pantalla no hay ninguna variante de tamaño que la empate. El defecto está presente pero latente.",
-        "por_que_importa": "Es el bug de especificidad que §7.3 documenta, escrito tal cual. En cuanto esta hoja reciba un .acciones .iconbtn{width:28px} —que es lo normal en una pantalla con filas— el modo dedo dejará de aplicar sin aviso."
-      },
-      {
-        "id": "f1-20tablero-15",
-        "severidad": "media",
-        "regla": "§8 Voz de producto — límites medibles",
-        "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto… No hay excepción por importancia del contenido.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres.»",
-        "hay_en_el_build": "Seis bloques siempre visibles por encima de 140 caracteres, medidos: .nota de cierre 329 caracteres y 3 frases; .pie de «Compras por autorizar» 200/3; .pie de «Por cobrar» 172/3; .porque 171/2; .sub de «Tiempo de admisión» 163/2; .sub de «Trámites por estado» 162/2.",
-        "selector": "main > .nota, .mini.hueco .pie, .aparte .porque, .panel .sub",
-        "evidencia": "Medición propia con textContent.length sobre .nota/.note/.banda/.sub/.pie/.porque: [329, 200, 172, 171, 163, 162].",
-        "por_que_importa": "El tablero tiene más texto de método que cifras. §8 fija el límite «con el contador de caracteres, no a ojo», y aquí la .nota lo dobla dos veces."
-      },
-      {
-        "id": "f1-20tablero-16",
-        "severidad": "media",
-        "regla": "§2 Tipografía — las fuentes se autoalojan (D116)",
-        "dice_el_sistema": "«Las fuentes se autoalojan (D116). Prohibido el <link> a Google Fonts para las fuentes de interfaz… @font-face con font-display:swap sobre /fuentes/inter-variable.woff2 y /fuentes/michroma.woff2. La comprobación es que la fuente aparezca cargada en las herramientas de red, no la declaración de --font-ui.»",
-        "hay_en_el_build": "Cero @font-face y cero elementos <link> en el documento. --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif y --font-brand: 'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif, sin ninguna declaración que las cargue.",
-        "selector": ":root{--font-ui}, head",
-        "evidencia": "grep «@font-face» = 0, grep «<link» = 0 en la maqueta servida. La pantalla se pinta con el respaldo del sistema, no con Inter ni con Michroma.",
-        "por_que_importa": "Se evita el riesgo del CDN, pero no se cumple la otra mitad de la regla: la fuente de interfaz y la de marca no están declaradas en ningún sitio, así que la tipografía del sistema no es la que se ve."
-      },
-      {
-        "id": "f1-20tablero-17",
-        "severidad": "baja",
-        "regla": "§6.5 Iconos — .msi",
-        "dice_el_sistema": "«Todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1)… Siempre aria-hidden=\"true\" y translate=\"no\".»",
-        "hay_en_el_build": "Sistema de iconos propio: un sprite <svg><defs> con 38 <symbol> de trazo (stroke:currentColor;stroke-width:1.6;fill:none), invocados como <svg class=\"ico\"><use href=\"#i-…\"/></svg>. 0 ocurrencias de .msi. Los iconos llevan aria-hidden=\"true\" pero no translate=\"no\" (a diferencia de 52 y 53, que sí lo ponen).",
-        "selector": ".ico, svg symbol[id^=\"i-\"]",
-        "evidencia": "CSS línea 208: «.ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;…}». grep «msi» = 0; grep «translate=\"no\"» solo en .wordmark y .ref.",
-        "por_que_importa": "El dibujo de los iconos no coincide con el del resto del sistema (trazo contra relleno). Como contrapartida, este sprite elimina el riesgo de la lista icon_names y el 400 que deja la página sin iconos — ver el apartado de cobertura."
-      },
-      {
-        "id": "f1-20tablero-18",
-        "severidad": "baja",
-        "regla": "§6.2 Botones — el suelo se declara con min-height",
-        "dice_el_sistema": "«.btn{min-height:36px;padding:8px 14px;gap:8px;font:600 var(--fs-dense)}… el suelo se declara con min-height, no se confía al relleno (medido: 35px y 27px sin él).»",
-        "hay_en_el_build": ".btn{…padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);…} — sin min-height. Mismo defecto en las cuatro maquetas del lote.",
-        "selector": ".btn",
-        "evidencia": "CSS línea 317 de la maqueta servida. Medido en 52 y 53, donde hay .btn visibles en el estado «ok»: altura real 33px, por debajo de los 36px del sistema. En 20_tablero los .btn solo salen en las vistas vacío y error.",
-        "por_que_importa": "Es el caso exacto que §6.2 documenta. Sigue por encima del mínimo táctil de 24px, pero el botón no llega al suelo del sistema y la altura depende del tamaño de fuente heredado."
-      }
-    ]
-  },
-  "f3_boost_ui": {
-    "puntuacion": 2,
-    "dimensiones": {
-      "accesibilidad": 1,
-      "rendimiento": "no_evaluado",
-      "theming": 3,
-      "responsive": 3,
-      "integridad": 2
-    },
-    "justificacion": "Accesibilidad 1: 0 tablas equivalentes para cuatro visualizaciones (§12.3), vistas de vacío y error con <b> en lugar de encabezado, ~50 elementos de texto bajo 12px con 9,5px en el eje de una gráfica, --text-3 obsoleto y esqueleto con texto real dentro de un role=\"status\". Theming 3: los dos temas se pintan correctamente (captura --oscuro), el conmutador es independiente de cualquier librería y data-theme fuerza bien; baja solo por --text-3. Responsive 3: hay puntos de ruptura reales y coherentes (1180/960/860/820/760/620) y la barra lateral tiene los tres anchos de §7.2; no se comprobó por debajo de 620px. Integridad 2: ningún token usado sin declarar y los dos temas completos, pero el vocabulario de §12.4 está ausente, dos nombres del sistema (.kpi, .barra) significan otra cosa, el isotipo se pinta desplazado −32px y casi la mitad del tablero es andamiaje sin marcar. Rendimiento no evaluado: maqueta estática sin backend, y sin librería de gráficas que perfilar.",
-    "evidencia": [
-      "Playwright: canvas=0, tablasTotal=0, dialog=0, idsDuplicados=[], ariaRotos=[]",
-      "Playwright, estilo calculado: 18 selectores con texto visible <12px, mínimo 9,5px en span.et del eje de la gráfica de 12 semanas",
-      "Playwright: backdropFilter «blur(10px)» en 2 elementos .card.hero; grep «@supports not (backdrop» = 0",
-      "Playwright: isotipo dx = −32px (44×42) y −16px (22×21)",
-      "Capturas 20_tablero--ok.png y 20_tablero--oscuro.png: los dos temas completos y legibles"
-    ]
-  },
-  "f4_nielsen": [
-    {
-      "n": 1,
-      "heuristica": "Visibilidad del estado del sistema",
-      "severidad": 2,
-      "hallazgo": "El tablero dice «Actualizado hace 2 min» y ofrece un botón de recarga, pero el cambio de vista (cargando/vacío/error) no se anuncia ni mueve el foco, y el esqueleto no es del mismo alto que lo que sustituye: cuatro .sk-caja contra una rejilla de ocho tarjetas, dos gráficas y una lista.",
-      "selector": "main#contenido[data-state], .state-loading.sk"
-    },
-    {
-      "n": 2,
-      "heuristica": "Correspondencia entre el sistema y el mundo real",
-      "severidad": 1,
-      "hallazgo": "El lenguaje es el del negocio y está bien elegido («el reloj corriendo», «Recibido · sin admitir», «el plazo es de la dependencia, no nuestro»). Resta solo que el rótulo del grupo «ASIGNACIÓN NOMINAL — NO VA POR PLAZA» use una negación como título de sección.",
-      "selector": ".rot h2#b-nom"
-    },
-    {
-      "n": 3,
-      "heuristica": "Control y libertad del usuario",
-      "severidad": 2,
-      "hallazgo": "El selector «VIENDO COMO» cambia el tablero entero sin confirmación ni rastro de que se está viendo otro rol más allá del botón presionado, y no existe «volver a mi tablero». Es además un control de maqueta que no existirá en producción.",
-      "selector": ".seg[role=group] button[data-rol]"
-    },
-    {
-      "n": 4,
-      "heuristica": "Consistencia y estándares",
-      "severidad": 3,
-      "hallazgo": "La pantalla reusa dos nombres del sistema con otro significado (.kpi como rejilla, .barra como ranking), sustituye .widget por .card y .ambito por .rolchip, y pinta un ámbito con el semáforo de advertencia. Nada de esto es legible desde el sistema de diseño.",
-      "selector": ".kpi, .barra, .card, .rolchip, .mini.aparte"
-    },
-    {
-      "n": 5,
-      "heuristica": "Prevención de errores",
-      "severidad": 1,
-      "hallazgo": "Bien resuelto: los estados ausentes no se pintan como cero y se dice por qué («un estado ausente puede ser cero o no medido»), y la nota del semáforo aclara que los 24 sin admitir no entran en el cálculo. Es el punto más fuerte de la pantalla.",
-      "selector": ".panel .sub, .hero .pie"
-    },
-    {
-      "n": 6,
-      "heuristica": "Reconocer antes que recordar",
-      "severidad": 2,
-      "hallazgo": "Las cuatro visualizaciones no traen tabla equivalente ni valores en el eje salvo los extremos (0 y 80): para saber cuántos trámites hubo hace seis semanas hay que estimar la altura de una barra.",
-      "selector": ".semanas, .graficas .gr svg"
-    },
-    {
-      "n": 7,
-      "heuristica": "Flexibilidad y eficiencia de uso",
-      "severidad": 2,
-      "hallazgo": "Ninguna cifra es pulsable: ni los conteos por estado, ni las barras, ni las cifras de las tarjetas llevan a la lista filtrada. Sólo los cuatro avisos de «Necesita a alguien hoy» son enlaces.",
-      "selector": ".barras .barra, .mini .v"
-    },
-    {
-      "n": 8,
-      "heuristica": "Diseño estético y minimalista",
-      "severidad": 3,
-      "hallazgo": "Seis bloques de texto siempre visible superan los 140 caracteres de §8 (hasta 329) y tres tarjetas enteras no contienen dato sino la explicación de por qué no lo hay. En la primera pantalla hay más prosa que cifras.",
-      "selector": "main > .nota, .mini.hueco, .panel .sub"
-    },
-    {
-      "n": 9,
-      "heuristica": "Ayudar a reconocer y recuperarse de errores",
-      "severidad": 1,
-      "hallazgo": "La vista de error dice qué pasó, qué no se ha perdido, qué hacer y da referencia (TAB-20260821-0904), como pide §6.4. Pierde un punto porque va suelta sobre el fondo, sin tarjeta ni medallón, y su título es un <b>.",
-      "selector": ".state.state-error"
-    },
-    {
-      "n": 10,
-      "heuristica": "Ayuda y documentación",
-      "severidad": 2,
-      "hallazgo": "Hay abundante explicación, pero toda a 11-11,5px y siempre visible, cuando §8 la mandaría a toggletip (§6.23) por ser aclaración de consecuencia y no bloqueo inmediato. No existe ningún .infob en la pantalla.",
-      "selector": ".panel .sub, .pie-nota"
-    }
-  ],
-  "f5_investigacion": {
-    "pain_points_evaluados": [
-      {
-        "pp": "pp-063",
-        "documento": "data/insights/2026-07-31_direccion-general-supervision-operativa.json",
-        "cobertura": "contradice",
-        "evidencia": "pp-063 (severidad alta) pide un tablero único que consolide «información financiera, de facturación, cuentas por cobrar, inventario». La pantalla existe y es ese tablero, pero las tres tarjetas que cubrirían esa parte —«Por cobrar», «Compras por autorizar» y «Rentabilidad por centro de costo»— son .mini.hueco de borde discontinuo cuyo contenido es la declaración de que no hay fuente de dato: «El hueco se reserva; no se rellena». No hay ninguna cifra de inventario ni de almacén en el tablero, aunque el menú lateral sí lleva «Compras de almacén»."
-      },
-      {
-        "pp": "pp-071",
-        "documento": "data/insights/2026-07-31_direccion-general-supervision-operativa.json",
-        "cobertura": "cubre",
-        "evidencia": "pp-071 («los reportes actuales no son visuales ni gráficos») queda cubierto: barra apilada de plazo con los tres estados, ranking horizontal de trámites por estado y de carga por instalador, doce semanas en columnas apiladas y dos sparklines. Lo visual está resuelto; lo que falta es que el dato sea recuperable (§12.3)."
-      },
-      {
-        "pp": "pp-069",
-        "documento": "data/insights/2026-07-31_direccion-general-supervision-operativa.json",
-        "cobertura": "cubre",
-        "evidencia": "pp-069 pide alertas automáticas. El panel «Necesita a alguien hoy», «ordenado por lo que se rompe antes», lista plazo vencido, orden sin instalador, trámites CFE por vencer y viáticos sin autorizar con su antigüedad. No cubre el caso literal de «cliente no contactado en 24 horas», que no aparece en ninguna tarjeta."
-      },
-      {
-        "pp": "pp-067",
-        "documento": "data/insights/2026-07-31_direccion-general-supervision-operativa.json",
-        "cobertura": "cubre",
-        "evidencia": "pp-067 (la dirección debe pedir reportes y evidencias manualmente) queda parcialmente resuelto: los cuatro avisos de «Necesita a alguien hoy» son enlaces al expediente. No hay acceso a evidencia fotográfica desde el tablero, que es la mitad del dolor descrito."
-      },
-      {
-        "pp": "pp-065",
-        "documento": "data/insights/2026-07-31_direccion-general-supervision-operativa.json",
-        "cobertura": "ignora",
-        "evidencia": "pp-065 (severidad alta: faltante de inventario no detectado a tiempo) no tiene ninguna representación en el tablero. Ni widget de existencias, ni de material despachado y sin consumir a nivel organización — sólo «Material en tu poder» dentro del tablero del instalador, y marcado como .sin-destino, «aquí se acaba — el detalle no está construido»."
-      },
-      {
-        "pp": "pp-058",
-        "documento": "data/insights/2026-07-23_direccion-proyectos-especiales.json",
-        "cobertura": "ignora",
-        "evidencia": "pp-058 pide «una base de datos y un panel de seguimiento visible del estado de los proyectos» de expansión. El selector «VIENDO COMO» ofrece Dirección, Coordinación ICEV, Gestoría e Instalador; ninguno contiene proyectos, y el menú lateral tampoco tiene entrada de proyectos especiales. El área que comparte esta pantalla como candidata no aparece en ella."
-      },
-      {
-        "pp": "pp-053",
-        "documento": "data/insights/2026-07-23_direccion-proyectos-especiales.json",
-        "cobertura": "ignora",
-        "evidencia": "pp-053 (no hay etapas definidas ni flujos documentados para los proyectos de expansión) no se toca: el tablero no modela ninguna etapa de proyecto ni ningún hito de viabilidad."
-      }
-    ],
-    "usabilidad_para_el_area": "Para la dirección general el tablero acierta en lo que pp-071 pide —por fin hay lectura visual— y en la honestidad del dato: declarar «no medido» en vez de pintar un cero es exactamente lo que evita el tipo de decisión equivocada que pp-065 describe. Pero no cumple pp-063, que es el dolor de severidad alta: las tres piezas financieras y de inventario que justifican un tablero único están reservadas y vacías, con texto de proceso interno en su lugar, de modo que la dirección seguiría pidiendo esos números por otro canal. Para proyectos especiales la pantalla no sirve todavía: pp-058 y pp-053 no tienen ningún punto de entrada aquí. Y en el uso diario el coste es la densidad de prosa: media pantalla de explicaciones a 11px para cinco cifras accionables, cuando quien entra necesita ver qué se rompe hoy en los primeros tres segundos."
-  },
-  "cobertura": [
-    {
-      "patron": "Tablero completo sin librería de gráficas: ranking, barra apilada, columnas apiladas y sparkline resueltos con rejilla CSS y <svg><polyline> en línea, sin canvas, con role=\"img\" + aria-label como única vía accesible al dato.",
-      "propuesta_de_regla": "§12.1 bis — Gráfica sin librería. Una pieza de §12.4 puede dibujarse en CSS o en SVG en línea cuando no necesita ejes, escalas ni interacción, y entonces §12.2 (envoltura de librería) no aplica. Lo que no cambia es §12.3: la tabla equivalente sigue siendo obligatoria y sigue siendo la fuente de verdad del dato, porque un role=\"img\" con aria-label resume el gráfico pero no lo hace consultable. Regla de decisión: si la pieza tiene más de cuatro valores por serie, la tabla no puede sustituirse por el aria-label. Ventaja que el sistema debe reconocer: sin librería desaparecen la ruta .aviso-cdn y la regla de repintado por tema."
-    },
-    {
-      "patron": "Widget que declara un hueco: tarjeta de borde discontinuo (.mini.hueco) que ocupa el sitio de una cifra y dice por qué no hay dato, en vez de mostrar un cero o un dato inventado.",
-      "propuesta_de_regla": "§12.4 bis — Hueco reservado. Cuando el tablero tiene que enseñar una cifra cuya fuente todavía no existe, se reserva su sitio con un widget de hueco en vez de ocultarlo: borde discontinuo, rótulo en --text-3 y una sola frase que diga de dónde vendrá el dato (§8, ~140 caracteres). Nunca un cero: «un cero afirma que se midió» (§6.22). El texto del hueco habla del sistema, no del proceso interno de quien lo construyó, y el widget lleva aria-label que lo nombre como pendiente."
-    },
-    {
-      "patron": "Sistema de iconos propio: sprite <svg><defs> con <symbol> de trazo invocados por <use href=\"#i-…\">, en lugar de la fuente Material Symbols de §6.5.",
-      "propuesta_de_regla": "§6.5 bis — Sprite SVG como alternativa a la fuente de iconos. Se admite un sprite en línea cuando el conjunto de iconos está cerrado, y entonces decaen las reglas de icon_names, de ligadura y de text-transform de §6.5. A cambio: un solo <defs> por documento, el <symbol> lleva su viewBox y el <use> sus medidas (§10 trampa 5), el trazo se fija en una sola regla (.ico) y el relleno frente al trazo se elige una vez para todo el sistema, no por pantalla. Siguen vigentes aria-hidden=\"true\", translate=\"no\" y la prohibición de dimensionar por width/height cuando el icono venga de fuente."
-    },
-    {
-      "patron": "Selector de rol de maqueta integrado en la cabecera de la pantalla, con su propio texto admitiendo que no es una función del sistema.",
-      "propuesta_de_regla": "§9 bis — Conmutador de rol de maqueta. Cualquier control que sirva para enseñar varias versiones de la misma pantalla es andamiaje y lleva data-andamio, aunque esté en la cabecera y aunque su texto ya lo aclare: el criterio es que un solo selector lo retire. Si el conmutador quedara dentro del producto por decisión de alcance, deja de ser andamiaje y pasa a §6.12 como filtro, con su estado reflejado en la URL y su forma de volver."
-    }
-  ],
-  "sin_datos": [
-    "f3.rendimiento: maqueta estática, sin backend que perfilar y sin librería de gráficas que medir",
-    "§12.4 .progreso: la pantalla no muestra ningún avance contra una meta declarada; la pieza no aparece y no hay nada que auditar",
-    "§12.4 .cifras: no existe en el archivo; las cifras compactas van como .card.mini independientes, lo que es una lectura defendible de «ninguna merece widget propio» y no se puede juzgar como incumplimiento sin saber si cada cifra merecía su tarjeta",
-    "§12.6 .plaza2, .desglose, .alerta, .nota-reloj: ninguna de las cuatro composiciones aparece en la pantalla",
-    "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (dialog=0, [role=dialog]=0), no evaluado",
-    "Contraste de span.et «Tablero» (1,09:1) y span.cromo-av «AR» (3,05:1) del brief: el medidor comparó el texto contra el color rgba sin componer con la superficie de debajo. Compuestos a mano dan 5,98:1 sobre --chrome y 13,5:1 sobre --surface; no los cuento como fallo de contraste. Lo que sí es un hallazgo real de esos dos elementos es el tamaño de letra (11px), recogido en f1-20tablero-03",
-    "Comportamiento por debajo de 620px: no medido, solo se auditó a 1440×900 y con las capturas del orquestador"
+ "pantalla": "20_tablero",
+ "ruta_zip": "01-principal/20_tablero.html",
+ "carpeta": "01-principal",
+ "area": "direccion",
+ "arquetipo": "tablero/KPIs",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "20_tablero--ok.png",
+  "20_tablero--loading.png",
+  "20_tablero--empty.png",
+  "20_tablero--error.png",
+  "20_tablero--oscuro.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-20tablero-01",
+    "severidad": "alta",
+    "regla": "§12.4 Las piezas del dashboard / §12.3 Tabla equivalente",
+    "dice_el_sistema": "Dona, Ranking horizontal, Tendencia y Sparkline son «canvas», Chart.js (§12.1), y cada uno «Abre su tabla equivalente»; §12.3: «cada gráfico lleva su tabla equivalente y esa tabla es la fuente de verdad del dato», con <caption> en .sr y total en <tfoot>.",
+    "hay_en_el_build": "0 elementos <canvas>, ningún <script src> de Chart.js y 0 elementos <table> en toda la pantalla. Las cuatro visualizaciones son HTML/CSS: barras de ranking (.barras > .barra > .pista > i), columnas apiladas por semana (.semanas > .sem > .pila > i) y dos sparklines como <svg><polyline class=\"spark\">. Toda la accesibilidad del dato se delega a role=\"img\" + aria-label.",
+    "selector": ".barras, .semanas, svg > polyline.spark",
+    "evidencia": "Medido con Playwright sobre http://127.0.0.1:8731/01-principal/20_tablero.html: canvas=0, tablasTotal=0. El aria-label de la gráfica de 12 semanas es «Doce semanas de trámites admitidos y órdenes cerradas; la última semana, 18 trámites y 7 órdenes»: de 12 semanas × 2 series = 24 valores, solo 2 son recuperables.",
+    "por_que_importa": "La dirección es el usuario de esta pantalla y el dato de las gráficas no se puede leer con lector de pantalla, ni copiar, ni verificar. 22 de los 24 valores de la gráfica de tendencia solo existen como altura de un <i> en píxeles."
+   },
+   {
+    "id": "f1-20tablero-02",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado / §11 Estructura",
+    "dice_el_sistema": "§6.4: «cada estado lleva encabezado real, no un <b>»; .tarjeta-estado{max-width:480px;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)} y .estado-ico{52px;border-radius:50%;background:var(--accent)}. §11: «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo».",
+    "hay_en_el_build": "<div class=\"state state-empty\"><svg class=\"ico\">…</svg><b>No hay nada en tu alcance todavía</b><p>…</p></div>. No existe .tarjeta-estado ni .estado-ico en el archivo; el icono es un .ico de 30px sin medallón y el título es un <b> a var(--fs-base).",
+    "selector": ".state.state-empty, .state.state-error, .state b",
+    "evidencia": "CSS líneas 605-613 de la maqueta servida: «.state b{font-size:var(--fs-base)}», «.state .ico{width:30px;height:30px;color:var(--text-3)}». grep de «tarjeta-estado» y «estado-ico» en el archivo: 0 coincidencias. Las otras tres maquetas del lote (52, 53, 43) sí traen .tarjeta-estado + .estado-ico + <h2>.",
+    "por_que_importa": "Vacío y error son las dos vistas en las que alguien necesita saber dónde está; sin encabezado real el lector de pantalla no las anuncia como sección y el salto por encabezados no llega a ellas."
+   },
+   {
+    "id": "f1-20tablero-03",
+    "severidad": "alta",
+    "regla": "§2.1 Suelo tipográfico / §10 trampa 1",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta. §10 trampa 1: la forma abreviada font: esconde el tamaño; se comprueba con el estilo calculado.",
+    "hay_en_el_build": "18 selectores distintos con texto visible por debajo de 12px, ~50 elementos. Los peores: span.et del eje de la gráfica de 12 semanas a 9,5px; .tope a 10px; .eje y .tag a 10,5px; .cromo-av a 11px escrito como «font:700 11px var(--font-ui)» — la forma abreviada que §10 trampa 1 nombra; .hero .pie, .mini .pie, .aparte .porque, .al .when, .leyenda, .cromo-quien small a 11px; .rolchip, .slaleg, .mini .lbl, .panel .sub, .pie-nota a 11,5px.",
+    "selector": ".sem .et (9,5px), .tope (10px), .eje/.tag/.et-g (10,5px), .cromo-av/.pie/.porque/.when (11px), .rolchip/.slaleg/.lbl/.sub (11,5px)",
+    "evidencia": "Medición propia con Playwright sobre el estilo calculado, ocultando [data-andamio]: {\"span.et @9.5\":2, \"span.tope @10\", \"span.et-g @10.5\":1, \"span.tag.t-warn @10.5\":1, \"span.cromo-av @11\":1, \"p.pie @11\":1, \"span.pie @11\":5, \"span.porque @11\":1, \"b @11\":10, \"span.when @11\":4, \"p.sub @11.5\":3, \"span.lbl @11.5\":6, \"span @11.5\":5, \"b @11.5\":8}. El brief del orquestador ya reportaba span.cromo-av a 11px y span.et-g a 10,5px.",
+    "por_que_importa": "Casi todo el texto explicativo del tablero —las notas que dicen qué significa cada cifra— está por debajo del suelo. §2.1 añade: «si un dato se lee todos los días, va a 12–13px como mínimo», y este es el tablero de la dirección."
+   },
+   {
+    "id": "f1-20tablero-04",
+    "severidad": "alta",
+    "regla": "§1 Decisión previa a elegir color / §6.22 Ámbito de datos / §1.3 Semáforo",
+    "dice_el_sistema": "§1: «si el dato tiene juicio → semáforo §1.3; si solo distingue → paleta categórica §1.4; si es un dato sobre el dato → sin color propio, tinta de texto §6.22… Un color de estado no se reutiliza para una categoría, ni al revés». §6.22: el ámbito «Nunca es un juicio → prohibido pintarlo con --warn».",
+    "hay_en_el_build": "La tarjeta «Viáticos por autorizar» lleva .aparte{border-left:3px solid var(--warn);background:var(--warn-bg)} y .aparte .lbl{color:var(--warn-ink)}, .aparte .porque{color:var(--warn-ink)}. Lo que el color está marcando es, textualmente, un ámbito: «Estos 14 son de toda la organización, no de tus plazas». El 14 no es ni tarde ni incompleto.",
+    "selector": ".mini.aparte, .aparte .porque",
+    "evidencia": "CSS de la maqueta servida: «.aparte{border-left:3px solid var(--warn);background:var(--warn-bg)}». Captura 20_tablero--ok.png, bloque «ASIGNACIÓN NOMINAL — NO VA POR PLAZA»: la tarjeta es la única ámbar de la pantalla. --block y --block-fill están declarados y sin usar en toda la maqueta (brief: declarados_sin_usar).",
+    "por_que_importa": "Es el mismo fallo de gobierno de color que la columna «Tipo» pintada con --block, con el semáforo cambiado: quien mira el tablero lee «14 viáticos en problemas» cuando lo que dice el texto es «14 de otro conjunto». El semáforo deja de significar lo que significa en el resto del sistema."
+   },
+   {
+    "id": "f1-20tablero-05",
+    "severidad": "alta",
+    "regla": "§1.1 Superficies y texto — valor de --text-3",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)… si el elemento puede caer sobre --surface-2, se mide también ahí».",
+    "hay_en_el_build": "--text-3: #66717F en :root (tema claro). La maqueta usa --surface-2 (#E7EDF3) como fondo de cabeceras y de .seg.",
+    "selector": ":root{--text-3}",
+    "evidencia": "Brief del orquestador: text_3_declarado = «#66717F». Fallo de contraste medido por el orquestador: span.et-g «VIENDO COMO», color rgb(102,113,127) sobre rgb(231,237,243), ratio 4,21:1, mínimo 4,5. A diferencia de 52 y 53, esta maqueta no declara el token paralelo --text-3-fuerte, así que el valor obsoleto gobierna todo el texto auxiliar.",
+    "por_que_importa": "Hecho ya establecido para 51 de 52 maquetas; aquí sin paliativo, porque todas las notas de método del tablero (.pie, .sub, .upd, .ref) van en --text-3."
+   },
+   {
+    "id": "f1-20tablero-06",
+    "severidad": "alta",
+    "regla": "§9 Andamiaje de maqueta / §8 Voz de producto",
+    "dice_el_sistema": "§9: «Se marca siempre con data-andamio, va visualmente separado del producto y rotulado… Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra.» §8: «si el texto explica una decisión, no va en pantalla».",
+    "hay_en_el_build": "Sólo el conmutador de estados lleva data-andamio (1 ocurrencia). Dentro del producto, sin marcar: (a) el selector «VIENDO COMO · Dirección / Coordinación ICEV / Gestoría / Instalador» en .seg, cuyo propio texto admite «el selector es de esta maqueta, no del sistema»; (b) tres tarjetas .mini.hueco con texto en primera persona del autor —«La cifra que había aquí —$3.08 M— me la inventé», «el circuito de autorización sólo consta en un documento mío»—; (c) dos .mini.sin-destino con el rótulo «aquí se acaba — el detalle no está construido»; (d) la .nota de cierre de 329 caracteres que explica por qué se diseñó el selector así.",
+    "selector": ".seg[role=group], .mini.hueco, .mini.sin-destino .tope, main > .nota",
+    "evidencia": "grep data-andamio en la maqueta servida: 1 ocurrencia, el <aside class=\"demo\">. Captura 20_tablero--ok.png: las tres tarjetas de borde discontinuo «Por cobrar», «Compras por autorizar» y «Rentabilidad por centro de costo» ocupan una fila entera del tablero con texto de proceso interno.",
+    "por_que_importa": "Un solo selector ya no retira el andamiaje: con [data-andamio] fuera, el tablero de producción seguiría mostrando el selector de rol y el texto en primera persona del autor. Y en pantalla, casi la mitad del área del tablero de dirección la ocupan explicaciones de por qué no hay dato."
+   },
+   {
+    "id": "f1-20tablero-07",
+    "severidad": "media",
+    "regla": "§12.4 Rejilla y tarjeta de widget",
+    "dice_el_sistema": "Rejilla «.dash»: doce columnas; cada widget declara cuántas ocupa (.w-3, .w-4, .w-6, .w-8). Tarjeta de widget «.widget»: el contenedor común. §12.6: align-items:start por omisión, .dash.pares → stretch.",
+    "hay_en_el_build": "No existen .dash, .widget, .w-3, .w-4, .w-6, .w-8, .cifras ni .progreso en el archivo. El reparto lo hacen cuatro rejillas ad-hoc: .kpi{grid-template-columns:minmax(300px,1.1fr) 2.5fr}, .minis{repeat(3,1fr)}, .row2{1.55fr 1fr} y .graficas{1fr 1fr}. La tarjeta es .card, con la receta de superficie correcta de §6.3.",
+    "selector": ".kpi, .minis, .row2, .graficas, .card",
+    "evidencia": "Recuento de clases en la maqueta servida: dash=0, widget=0, w-3/w-4/w-6/w-8=0, cifras=0, progreso=0. De las once piezas de §12.4 solo .barra (13), .leyenda (1) y .kpi (2) aparecen por nombre, y las dos primeras con otro significado (ver hallazgo 08).",
+    "por_que_importa": "El tablero no se puede recomponer con el vocabulario del sistema: cada ancho está codificado a mano, así que añadir un widget obliga a editar una regla de rejilla en vez de poner una clase."
+   },
+   {
+    "id": "f1-20tablero-08",
+    "severidad": "media",
+    "regla": "§12.4 (.kpi, .barra) / §10 trampa 10",
+    "dice_el_sistema": "§12.4: «.kpi» = KPI con variación, «Cifra en --fs-kpi (30px) y su delta debajo, no al lado. Una por widget». «.barra» = Barra apilada de estado, «Reparto de un total entre estados del semáforo». §10 trampa 10: «Un nombre de clase corto no se declara dos veces… y no se comparte entre dos componentes sin relación».",
+    "hay_en_el_build": ".kpi{display:grid;grid-template-columns:minmax(300px,1.1fr) 2.5fr;gap:var(--sp-3);align-items:stretch} — es una rejilla de dos columnas que contiene dos tarjetas, no una cifra. .barra{display:grid;grid-template-columns:minmax(96px,150px) 1fr auto} — es una fila de ranking horizontal (rótulo + pista + cifra), no una barra apilada. La barra apilada de estado existe pero se llama .slabar.",
+    "selector": ".kpi, .barra, .slabar",
+    "evidencia": "CSS de la maqueta servida, líneas 659 y 707. Ninguna de las dos reglas contiene --fs-kpi ni los estados del semáforo; --fs-kpi se usa en .hero .v y .mini .v, que son los que de verdad hacen de KPI.",
+    "por_que_importa": "Dos nombres del sistema significan aquí otra cosa. Quien traiga una regla escrita contra §12.4 (por ejemplo «.barra span + span{border-left:2px solid var(--surface)}» de §12.6) la aplicará al componente equivocado y el fallo será silencioso."
+   },
+   {
+    "id": "f1-20tablero-09",
+    "severidad": "media",
+    "regla": "§4 Sombra y superficie translúcida",
+    "dice_el_sistema": "«.glass lleva backdrop-filter:blur(16px) + -webkit-backdrop-filter y respaldo sólido obligatorio: @supports not (backdrop-filter:blur(1px)){.glass{background:var(--surface)}}». «El translúcido es de la pantalla de entrada. En el dashboard las superficies son opacas.»",
+    "hay_en_el_build": ".hero{…background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-color:var(--border-2)} en las dos tarjetas destacadas del tablero. Sin bloque @supports en ninguna parte del archivo, y con blur(10px) en vez de 16px.",
+    "selector": ".card.hero",
+    "evidencia": "Medición propia con Playwright: dos elementos con backdropFilter distinto de «none», ambos «card hero | blur(10px)». grep «@supports not (backdrop» en el archivo: 0 coincidencias.",
+    "por_que_importa": "Es la superficie de la cifra principal del tablero (182 expedientes). En un navegador sin backdrop-filter se pinta --glass, rgba(250,252,253,.66), directamente sobre --bg, sin el respaldo que §4 declara obligatorio."
+   },
+   {
+    "id": "f1-20tablero-10",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga — prefers-reduced-motion y texto real",
+    "dice_el_sistema": "«prefers-reduced-motion aplana el fondo, no solo detiene la animación»: @media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}. Y: «role=\"status\" + aria-label en el contenedor y sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)».",
+    "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}} — sin reponer el fondo. Y las barras llevan texto real: <span class=\"skel\" style=\"width:56%\">Trámites con el reloj corriendo</span>, …>182<, …>barra de plazo<, …>barra<, …>gráfica de barras<, ocultos solo con color:transparent, dentro de un contenedor con role=\"status\".",
+    "selector": ".skel, .state-loading.sk[role=status]",
+    "evidencia": "CSS líneas 600-604 de la maqueta servida: «.skel{…animation:shimmer 1.4s linear infinite;color:transparent}» y «@media (prefers-reduced-motion:reduce){.skel{animation:none}}». Markup del estado cargando: 12 .skel, 12 con texto.",
+    "por_que_importa": "Dos fallos que §6.7 ya documenta. Con movimiento reducido el degradado se congela en la posición 0 y queda una franja oscura fija; y el role=\"status\" anuncia «Trámites con el reloj corriendo 182 barra de plazo barra barra barra barra Órdenes abiertas 47 gráfica de barras» como si fuera contenido."
+   },
+   {
+    "id": "f1-20tablero-11",
+    "severidad": "media",
+    "regla": "§6.22 Ámbito de datos — .ambito",
+    "dice_el_sistema": "«.ambito: display:inline-flex;gap:5px;font-size:var(--fs-meta);font-weight:600;color:var(--text-3). Sin relleno y sin borde.» «Se descartó darle relleno --surface-2: 1,08:1 del fondo de página.»",
+    "hay_en_el_build": ".rolchip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);border-radius:var(--r-pill);padding:4px 11px;font-size:11.5px;color:var(--text-2)} para «Ves todas las plazas», que es literalmente el ámbito de todas las cifras de la pantalla.",
+    "selector": ".rolchip",
+    "evidencia": "CSS línea 642 de la maqueta servida; captura 20_tablero--ok.png, pastilla con borde bajo el título. .ambito no existe en el archivo.",
+    "por_que_importa": "El ámbito con forma de pastilla se lee como un filtro puesto, no como una aclaración; y a 11,5px queda además bajo el suelo de §2.1."
+   },
+   {
+    "id": "f1-20tablero-12",
+    "severidad": "media",
+    "regla": "§6.4 regla 1 — el cambio de vista se anuncia y mueve el foco",
+    "dice_el_sistema": "«(1) el cambio se anuncia (aria-live=\"polite\") y mueve el foco» (main.focus() con tabindex=\"-1\").",
+    "hay_en_el_build": "El <main id=\"contenido\" tabindex=\"-1\"> existe, pero el único JS que cambia data-state es el del andamiaje y no anuncia nada ni llama a focus(): cont.setAttribute('data-state', b.dataset.set) y nada más. No hay región aria-live de estado (el único role=\"status\" es el del esqueleto).",
+    "selector": "main#contenido[data-state], .demo [data-set]",
+    "evidencia": "Script final de la maqueta servida. Brief: ariaLive = 1 (el contenedor del esqueleto). Las otras tres maquetas del lote sí traen <p id=\"anuncio-estado\" role=\"status\" aria-live=\"polite\" class=\"sr\">, un diccionario VISTAS_ESTADO y cont.focus().",
+    "por_que_importa": "Es el único mecanismo de cambio de vista que la maqueta tiene; tal como está, pasar de «cargando» a «error» no se anuncia ni mueve el foco."
+   },
+   {
+    "id": "f1-20tablero-13",
+    "severidad": "media",
+    "regla": "§10 trampa 5 — <symbol> y viewBox repetido",
+    "dice_el_sistema": "«Correcto: <svg width=\"44\" height=\"42\" aria-hidden=\"true\"><use href=\"#dproma-mark\" width=\"44\" height=\"42\"/></svg> — medidas en el <use> y sin viewBox en el envoltorio… se pinta 32,5px a la izquierda de su caja… Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal.»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg> en el logotipo de la barra lateral, y <svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el botón flotante del asistente: viewBox repetido en el envoltorio y <use> sin medidas, exactamente al revés de lo documentado.",
+    "selector": ".logo > svg > use[href=\"#dproma-mark\"], .fab > svg > use",
+    "evidencia": "Medición propia con getBoundingClientRect(): logo → svg 44×42, use 43×42, desplazamiento dx = −32px, dy = 0. Botón flotante → svg 22×21, use 21×21, dx = −16px. El mismo defecto aparece en las cuatro maquetas del lote. Visible en 20_tablero--ok.png: el isotipo es una astilla verde en vez de la marca completa.",
+    "por_que_importa": "El logotipo de la aplicación se pinta recortado en todas las pantallas. Es el caso medido que §10 trampa 5 describe, reproducido con el mismo desplazamiento."
+   },
+   {
+    "id": "f1-20tablero-14",
+    "severidad": "media",
+    "regla": "§7.3 Objetivos táctiles — la regla lleva :root",
+    "dice_el_sistema": "«:root[data-tacto=\"dedo\"] .it, :root[data-tacto=\"dedo\"] .iconbtn, :root[data-tacto=\"dedo\"] .btn{min-height:46px}. El :root es lo que hace ganar la regla: con :root suma (0,3,0); sin él (0,2,0) y lo empata cualquier variante de tamaño del componente.»",
+    "hay_en_el_build": "Las seis reglas van escritas sin :root: «[data-tacto=\"dedo\"] .it{min-height:46px}», «[data-tacto=\"dedo\"] .iconbtn{width:46px;height:46px}», y así hasta .btn. Además data-tacto no aparece ni en el markup ni en el JS, así que el modo dedo no se puede activar desde el producto.",
+    "selector": "[data-tacto=\"dedo\"] .it/.iconbtn/.cromo-prof/.cromo-av/.seg button/.btn",
+    "evidencia": "Líneas 279-284 de la maqueta servida; brief del orquestador: regla_data_tacto_sin_root = 6. Medición propia poniendo data-tacto=\"dedo\" a mano: .iconbtn sí llega a 46px, porque en esta pantalla no hay ninguna variante de tamaño que la empate. El defecto está presente pero latente.",
+    "por_que_importa": "Es el bug de especificidad que §7.3 documenta, escrito tal cual. En cuanto esta hoja reciba un .acciones .iconbtn{width:28px} —que es lo normal en una pantalla con filas— el modo dedo dejará de aplicar sin aviso."
+   },
+   {
+    "id": "f1-20tablero-15",
+    "severidad": "media",
+    "regla": "§8 Voz de producto — límites medibles",
+    "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto… No hay excepción por importancia del contenido.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres.»",
+    "hay_en_el_build": "Seis bloques siempre visibles por encima de 140 caracteres, medidos: .nota de cierre 329 caracteres y 3 frases; .pie de «Compras por autorizar» 200/3; .pie de «Por cobrar» 172/3; .porque 171/2; .sub de «Tiempo de admisión» 163/2; .sub de «Trámites por estado» 162/2.",
+    "selector": "main > .nota, .mini.hueco .pie, .aparte .porque, .panel .sub",
+    "evidencia": "Medición propia con textContent.length sobre .nota/.note/.banda/.sub/.pie/.porque: [329, 200, 172, 171, 163, 162].",
+    "por_que_importa": "El tablero tiene más texto de método que cifras. §8 fija el límite «con el contador de caracteres, no a ojo», y aquí la .nota lo dobla dos veces."
+   },
+   {
+    "id": "f1-20tablero-16",
+    "severidad": "media",
+    "regla": "§2 Tipografía — las fuentes se autoalojan (D116)",
+    "dice_el_sistema": "«Las fuentes se autoalojan (D116). Prohibido el <link> a Google Fonts para las fuentes de interfaz… @font-face con font-display:swap sobre /fuentes/inter-variable.woff2 y /fuentes/michroma.woff2. La comprobación es que la fuente aparezca cargada en las herramientas de red, no la declaración de --font-ui.»",
+    "hay_en_el_build": "Cero @font-face y cero elementos <link> en el documento. --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif y --font-brand: 'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif, sin ninguna declaración que las cargue.",
+    "selector": ":root{--font-ui}, head",
+    "evidencia": "grep «@font-face» = 0, grep «<link» = 0 en la maqueta servida. La pantalla se pinta con el respaldo del sistema, no con Inter ni con Michroma.",
+    "por_que_importa": "Se evita el riesgo del CDN, pero no se cumple la otra mitad de la regla: la fuente de interfaz y la de marca no están declaradas en ningún sitio, así que la tipografía del sistema no es la que se ve."
+   },
+   {
+    "id": "f1-20tablero-17",
+    "severidad": "baja",
+    "regla": "§6.5 Iconos — .msi",
+    "dice_el_sistema": "«Todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1)… Siempre aria-hidden=\"true\" y translate=\"no\".»",
+    "hay_en_el_build": "Sistema de iconos propio: un sprite <svg><defs> con 38 <symbol> de trazo (stroke:currentColor;stroke-width:1.6;fill:none), invocados como <svg class=\"ico\"><use href=\"#i-…\"/></svg>. 0 ocurrencias de .msi. Los iconos llevan aria-hidden=\"true\" pero no translate=\"no\" (a diferencia de 52 y 53, que sí lo ponen).",
+    "selector": ".ico, svg symbol[id^=\"i-\"]",
+    "evidencia": "CSS línea 208: «.ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;…}». grep «msi» = 0; grep «translate=\"no\"» solo en .wordmark y .ref.",
+    "por_que_importa": "El dibujo de los iconos no coincide con el del resto del sistema (trazo contra relleno). Como contrapartida, este sprite elimina el riesgo de la lista icon_names y el 400 que deja la página sin iconos — ver el apartado de cobertura."
+   },
+   {
+    "id": "f1-20tablero-18",
+    "severidad": "baja",
+    "regla": "§6.2 Botones — el suelo se declara con min-height",
+    "dice_el_sistema": "«.btn{min-height:36px;padding:8px 14px;gap:8px;font:600 var(--fs-dense)}… el suelo se declara con min-height, no se confía al relleno (medido: 35px y 27px sin él).»",
+    "hay_en_el_build": ".btn{…padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);…} — sin min-height. Mismo defecto en las cuatro maquetas del lote.",
+    "selector": ".btn",
+    "evidencia": "CSS línea 317 de la maqueta servida. Medido en 52 y 53, donde hay .btn visibles en el estado «ok»: altura real 33px, por debajo de los 36px del sistema. En 20_tablero los .btn solo salen en las vistas vacío y error.",
+    "por_que_importa": "Es el caso exacto que §6.2 documenta. Sigue por encima del mínimo táctil de 24px, pero el botón no llega al suelo del sistema y la altura depende del tamaño de fuente heredado."
+   }
   ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "Accesibilidad 1: 0 tablas equivalentes para cuatro visualizaciones (§12.3), vistas de vacío y error con <b> en lugar de encabezado, ~50 elementos de texto bajo 12px con 9,5px en el eje de una gráfica, --text-3 obsoleto y esqueleto con texto real dentro de un role=\"status\". Theming 3: los dos temas se pintan correctamente (captura --oscuro), el conmutador es independiente de cualquier librería y data-theme fuerza bien; baja solo por --text-3. Responsive 3: hay puntos de ruptura reales y coherentes (1180/960/860/820/760/620) y la barra lateral tiene los tres anchos de §7.2; no se comprobó por debajo de 620px. Integridad 2: ningún token usado sin declarar y los dos temas completos, pero el vocabulario de §12.4 está ausente, dos nombres del sistema (.kpi, .barra) significan otra cosa, el isotipo se pinta desplazado −32px y casi la mitad del tablero es andamiaje sin marcar. Rendimiento no evaluado: maqueta estática sin backend, y sin librería de gráficas que perfilar.",
+  "evidencia": [
+   "Playwright: canvas=0, tablasTotal=0, dialog=0, idsDuplicados=[], ariaRotos=[]",
+   "Playwright, estilo calculado: 18 selectores con texto visible <12px, mínimo 9,5px en span.et del eje de la gráfica de 12 semanas",
+   "Playwright: backdropFilter «blur(10px)» en 2 elementos .card.hero; grep «@supports not (backdrop» = 0",
+   "Playwright: isotipo dx = −32px (44×42) y −16px (22×21)",
+   "Capturas 20_tablero--ok.png y 20_tablero--oscuro.png: los dos temas completos y legibles"
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 2,
+   "hallazgo": "El tablero dice «Actualizado hace 2 min» y ofrece un botón de recarga, pero el cambio de vista (cargando/vacío/error) no se anuncia ni mueve el foco, y el esqueleto no es del mismo alto que lo que sustituye: cuatro .sk-caja contra una rejilla de ocho tarjetas, dos gráficas y una lista.",
+   "selector": "main#contenido[data-state], .state-loading.sk"
+  },
+  {
+   "n": 2,
+   "heuristica": "Correspondencia entre el sistema y el mundo real",
+   "severidad": 1,
+   "hallazgo": "El lenguaje es el del negocio y está bien elegido («el reloj corriendo», «Recibido · sin admitir», «el plazo es de la dependencia, no nuestro»). Resta solo que el rótulo del grupo «ASIGNACIÓN NOMINAL — NO VA POR PLAZA» use una negación como título de sección.",
+   "selector": ".rot h2#b-nom"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 2,
+   "hallazgo": "El selector «VIENDO COMO» cambia el tablero entero sin confirmación ni rastro de que se está viendo otro rol más allá del botón presionado, y no existe «volver a mi tablero». Es además un control de maqueta que no existirá en producción.",
+   "selector": ".seg[role=group] button[data-rol]"
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 3,
+   "hallazgo": "La pantalla reusa dos nombres del sistema con otro significado (.kpi como rejilla, .barra como ranking), sustituye .widget por .card y .ambito por .rolchip, y pinta un ámbito con el semáforo de advertencia. Nada de esto es legible desde el sistema de diseño.",
+   "selector": ".kpi, .barra, .card, .rolchip, .mini.aparte"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 1,
+   "hallazgo": "Bien resuelto: los estados ausentes no se pintan como cero y se dice por qué («un estado ausente puede ser cero o no medido»), y la nota del semáforo aclara que los 24 sin admitir no entran en el cálculo. Es el punto más fuerte de la pantalla.",
+   "selector": ".panel .sub, .hero .pie"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocer antes que recordar",
+   "severidad": 2,
+   "hallazgo": "Las cuatro visualizaciones no traen tabla equivalente ni valores en el eje salvo los extremos (0 y 80): para saber cuántos trámites hubo hace seis semanas hay que estimar la altura de una barra.",
+   "selector": ".semanas, .graficas .gr svg"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 2,
+   "hallazgo": "Ninguna cifra es pulsable: ni los conteos por estado, ni las barras, ni las cifras de las tarjetas llevan a la lista filtrada. Sólo los cuatro avisos de «Necesita a alguien hoy» son enlaces.",
+   "selector": ".barras .barra, .mini .v"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 3,
+   "hallazgo": "Seis bloques de texto siempre visible superan los 140 caracteres de §8 (hasta 329) y tres tarjetas enteras no contienen dato sino la explicación de por qué no lo hay. En la primera pantalla hay más prosa que cifras.",
+   "selector": "main > .nota, .mini.hueco, .panel .sub"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer y recuperarse de errores",
+   "severidad": 1,
+   "hallazgo": "La vista de error dice qué pasó, qué no se ha perdido, qué hacer y da referencia (TAB-20260821-0904), como pide §6.4. Pierde un punto porque va suelta sobre el fondo, sin tarjeta ni medallón, y su título es un <b>.",
+   "selector": ".state.state-error"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 2,
+   "hallazgo": "Hay abundante explicación, pero toda a 11-11,5px y siempre visible, cuando §8 la mandaría a toggletip (§6.23) por ser aclaración de consecuencia y no bloqueo inmediato. No existe ningún .infob en la pantalla.",
+   "selector": ".panel .sub, .pie-nota"
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-063",
+    "documento": "data/insights/2026-07-31_direccion-general-supervision-operativa.json",
+    "cobertura": "contradice",
+    "evidencia": "pp-063 (severidad alta) pide un tablero único que consolide «información financiera, de facturación, cuentas por cobrar, inventario». La pantalla existe y es ese tablero, pero las tres tarjetas que cubrirían esa parte —«Por cobrar», «Compras por autorizar» y «Rentabilidad por centro de costo»— son .mini.hueco de borde discontinuo cuyo contenido es la declaración de que no hay fuente de dato: «El hueco se reserva; no se rellena». No hay ninguna cifra de inventario ni de almacén en el tablero, aunque el menú lateral sí lleva «Compras de almacén»."
+   },
+   {
+    "pp": "pp-071",
+    "documento": "data/insights/2026-07-31_direccion-general-supervision-operativa.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-071 («los reportes actuales no son visuales ni gráficos») queda cubierto: barra apilada de plazo con los tres estados, ranking horizontal de trámites por estado y de carga por instalador, doce semanas en columnas apiladas y dos sparklines. Lo visual está resuelto; lo que falta es que el dato sea recuperable (§12.3)."
+   },
+   {
+    "pp": "pp-069",
+    "documento": "data/insights/2026-07-31_direccion-general-supervision-operativa.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-069 pide alertas automáticas. El panel «Necesita a alguien hoy», «ordenado por lo que se rompe antes», lista plazo vencido, orden sin instalador, trámites CFE por vencer y viáticos sin autorizar con su antigüedad. No cubre el caso literal de «cliente no contactado en 24 horas», que no aparece en ninguna tarjeta."
+   },
+   {
+    "pp": "pp-067",
+    "documento": "data/insights/2026-07-31_direccion-general-supervision-operativa.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-067 (la dirección debe pedir reportes y evidencias manualmente) queda parcialmente resuelto: los cuatro avisos de «Necesita a alguien hoy» son enlaces al expediente. No hay acceso a evidencia fotográfica desde el tablero, que es la mitad del dolor descrito."
+   },
+   {
+    "pp": "pp-065",
+    "documento": "data/insights/2026-07-31_direccion-general-supervision-operativa.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-065 (severidad alta: faltante de inventario no detectado a tiempo) no tiene ninguna representación en el tablero. Ni widget de existencias, ni de material despachado y sin consumir a nivel organización — sólo «Material en tu poder» dentro del tablero del instalador, y marcado como .sin-destino, «aquí se acaba — el detalle no está construido»."
+   },
+   {
+    "pp": "pp-058",
+    "documento": "data/insights/2026-07-23_direccion-proyectos-especiales.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-058 pide «una base de datos y un panel de seguimiento visible del estado de los proyectos» de expansión. El selector «VIENDO COMO» ofrece Dirección, Coordinación ICEV, Gestoría e Instalador; ninguno contiene proyectos, y el menú lateral tampoco tiene entrada de proyectos especiales. El área que comparte esta pantalla como candidata no aparece en ella."
+   },
+   {
+    "pp": "pp-053",
+    "documento": "data/insights/2026-07-23_direccion-proyectos-especiales.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-053 (no hay etapas definidas ni flujos documentados para los proyectos de expansión) no se toca: el tablero no modela ninguna etapa de proyecto ni ningún hito de viabilidad."
+   }
+  ],
+  "usabilidad_para_el_area": "Para la dirección general el tablero acierta en lo que pp-071 pide —por fin hay lectura visual— y en la honestidad del dato: declarar «no medido» en vez de pintar un cero es exactamente lo que evita el tipo de decisión equivocada que pp-065 describe. Pero no cumple pp-063, que es el dolor de severidad alta: las tres piezas financieras y de inventario que justifican un tablero único están reservadas y vacías, con texto de proceso interno en su lugar, de modo que la dirección seguiría pidiendo esos números por otro canal. Para proyectos especiales la pantalla no sirve todavía: pp-058 y pp-053 no tienen ningún punto de entrada aquí. Y en el uso diario el coste es la densidad de prosa: media pantalla de explicaciones a 11px para cinco cifras accionables, cuando quien entra necesita ver qué se rompe hoy en los primeros tres segundos."
+ },
+ "cobertura": [
+  {
+   "patron": "Tablero completo sin librería de gráficas: ranking, barra apilada, columnas apiladas y sparkline resueltos con rejilla CSS y <svg><polyline> en línea, sin canvas, con role=\"img\" + aria-label como única vía accesible al dato.",
+   "propuesta_de_regla": "§12.1 bis — Gráfica sin librería. Una pieza de §12.4 puede dibujarse en CSS o en SVG en línea cuando no necesita ejes, escalas ni interacción, y entonces §12.2 (envoltura de librería) no aplica. Lo que no cambia es §12.3: la tabla equivalente sigue siendo obligatoria y sigue siendo la fuente de verdad del dato, porque un role=\"img\" con aria-label resume el gráfico pero no lo hace consultable. Regla de decisión: si la pieza tiene más de cuatro valores por serie, la tabla no puede sustituirse por el aria-label. Ventaja que el sistema debe reconocer: sin librería desaparecen la ruta .aviso-cdn y la regla de repintado por tema."
+  },
+  {
+   "patron": "Widget que declara un hueco: tarjeta de borde discontinuo (.mini.hueco) que ocupa el sitio de una cifra y dice por qué no hay dato, en vez de mostrar un cero o un dato inventado.",
+   "propuesta_de_regla": "§12.4 bis — Hueco reservado. Cuando el tablero tiene que enseñar una cifra cuya fuente todavía no existe, se reserva su sitio con un widget de hueco en vez de ocultarlo: borde discontinuo, rótulo en --text-3 y una sola frase que diga de dónde vendrá el dato (§8, ~140 caracteres). Nunca un cero: «un cero afirma que se midió» (§6.22). El texto del hueco habla del sistema, no del proceso interno de quien lo construyó, y el widget lleva aria-label que lo nombre como pendiente."
+  },
+  {
+   "patron": "Sistema de iconos propio: sprite <svg><defs> con <symbol> de trazo invocados por <use href=\"#i-…\">, en lugar de la fuente Material Symbols de §6.5.",
+   "propuesta_de_regla": "§6.5 bis — Sprite SVG como alternativa a la fuente de iconos. Se admite un sprite en línea cuando el conjunto de iconos está cerrado, y entonces decaen las reglas de icon_names, de ligadura y de text-transform de §6.5. A cambio: un solo <defs> por documento, el <symbol> lleva su viewBox y el <use> sus medidas (§10 trampa 5), el trazo se fija en una sola regla (.ico) y el relleno frente al trazo se elige una vez para todo el sistema, no por pantalla. Siguen vigentes aria-hidden=\"true\", translate=\"no\" y la prohibición de dimensionar por width/height cuando el icono venga de fuente."
+  },
+  {
+   "patron": "Selector de rol de maqueta integrado en la cabecera de la pantalla, con su propio texto admitiendo que no es una función del sistema.",
+   "propuesta_de_regla": "§9 bis — Conmutador de rol de maqueta. Cualquier control que sirva para enseñar varias versiones de la misma pantalla es andamiaje y lleva data-andamio, aunque esté en la cabecera y aunque su texto ya lo aclare: el criterio es que un solo selector lo retire. Si el conmutador quedara dentro del producto por decisión de alcance, deja de ser andamiaje y pasa a §6.12 como filtro, con su estado reflejado en la URL y su forma de volver."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática, sin backend que perfilar y sin librería de gráficas que medir",
+  "§12.4 .progreso: la pantalla no muestra ningún avance contra una meta declarada; la pieza no aparece y no hay nada que auditar",
+  "§12.4 .cifras: no existe en el archivo; las cifras compactas van como .card.mini independientes, lo que es una lectura defendible de «ninguna merece widget propio» y no se puede juzgar como incumplimiento sin saber si cada cifra merecía su tarjeta",
+  "§12.6 .plaza2, .desglose, .alerta, .nota-reloj: ninguna de las cuatro composiciones aparece en la pantalla",
+  "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (dialog=0, [role=dialog]=0), no evaluado",
+  "Contraste de span.et «Tablero» (1,09:1) y span.cromo-av «AR» (3,05:1) del brief: el medidor comparó el texto contra el color rgba sin componer con la superficie de debajo. Compuestos a mano dan 5,98:1 sobre --chrome y 13,5:1 sobre --surface; no los cuento como fallo de contraste. Lo que sí es un hallazgo real de esos dos elementos es el tamaño de letra (11px), recogido en f1-20tablero-03",
+  "Comportamiento por debajo de 620px: no medido, solo se auditó a 1440×900 y con las capturas del orquestador"
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [],
+  "declarados_no_usados": [
+   "--block",
+   "--block-fill",
+   "--border-fuerte",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--r-modal",
+   "--sp-12",
+   "--stagger",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 83,
+  "n_usados": 70,
+  "n_divergentes": 15,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": true,
+   "filas": 0,
+   "nodosText3": 0
+  }
+ }
 }

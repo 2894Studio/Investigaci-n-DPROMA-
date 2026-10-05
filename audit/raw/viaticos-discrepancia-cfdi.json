@@ -1,213 +1,474 @@
 {
-  "pantalla": "viaticos-discrepancia-cfdi",
-  "ruta_zip": "05-direccion-y-administracion/viaticos-discrepancia-cfdi.html",
-  "carpeta": "05-direccion-y-administracion",
-  "area": "finanzas",
-  "arquetipo": "caso de excepción",
-  "modo": "cumplimiento",
-  "estados_auditados": [
-    "ok",
-    "loading",
-    "empty",
-    "error",
-    "oscuro"
-  ],
-  "capturas": [
-    "viaticos-discrepancia-cfdi--ok.png",
-    "viaticos-discrepancia-cfdi--oscuro.png"
-  ],
-  "f1_cumplimiento": {
-    "veredicto": "no_cumple",
-    "hallazgos": [
-      {
-        "id": "f1-dis-00",
-        "severidad": "alta",
-        "regla": "§6.10 + §1.3 + §13 (composición) — consistencia de la familia de viáticos",
-        "dice_el_sistema": "§6.10: «todas las de una familia se ven como una familia — o las tres llevan punto, o ninguna». §1.3: el semáforo tiene cinco estados con significado fijo (--pause = «Inactivo, en pausa — no es un fallo»). §13.1: orden fijo lectura → control → objeto; §13.2: la columna que fluye se acota con minmax.",
-        "hay_en_el_build": "Cinco variantes del mismo flujo que nombran, pintan y colocan de forma distinta el estado, el importe y el folio (detalle en la evidencia).",
-        "selector": ".pill, .campo .vl, .cg .v, .comps .monto, td.num, .folio, .lnk, .p4-t .resumen",
-        "evidencia": "Inventario medido sobre las cinco maquetas de la familia (más las dos hermanas ya auditadas, sólo como referencia):\n(a) ETIQUETAS DE ESTADO. La misma palabra cambia de color: «Aprobado» es .pill.p-ok en 23_viaticos (3 veces) y en 39_viatico_detalle, y .pill.p-neutro en viaticos-reembolso. La misma situación —falta que alguien actúe— se pinta de tres formas: p-neutro («Por aprobar», «Sin comprobar», «Pendiente»), p-warn («En revisión», «Pendiente de validar») y sin etiqueta ninguna (viaticos-adeudos-nomina la escribe como texto plano en celda: «Sin declarar», «Declarado el 2 sep 2026 · pendiente de validar»). Cinco nombres para un concepto.\n(b) UNA SEXTA CLASE FUERA DEL SEMÁFORO. .p-neutro{background:var(--surface-2);color:var(--text-2)} no está en §6.10, que enumera .p-ok/.p-warn/.p-err/.p-block/.p-pause, y se solapa con --pause. En viaticos-reembolso «Suspendido» va en p-pause pese a que el propio texto de la pantalla dice «un reembolso improcedente queda suspendido indefinidamente»: §1.3 reserva --pause para lo que «no es un fallo».\n(c) EL IMPORTE. Mismo dato, cuatro tratamientos medidos con getComputedStyle: .cg .v a 16px/700 en tarjeta con borde (39), .comps .monto a 14px/700 alineado a la derecha de la fila (39, en la misma pantalla), .campo .vl a 13px/400 como un campo más (remanente, reembolso, discrepancia) y td.num a 13px/400 en columna de tabla (adeudos). Formato distinto además: «$2,100» y «$160» sin decimales en 39; «$150.00», «$850.00» con decimales; «$350.00 MXN» con divisa sólo en reembolso.\n(d) EL FOLIO DEL VIÁTICO. VI-2026-0715 es <span> no pulsable en 39 y en remanente, <a class=\"lnk\"> de 98,1×15px en reembolso, <a> desnudo de 90,5×14px en discrepancia y <a class=\"folio\"> en --link dentro de tabla en adeudos. Cuatro clases para el mismo enlace.\n(e) LA CABECERA. El estado va en <b> dentro de .p4-t .resumen en 39 y reembolso, en texto plano en remanente y adeudos, y no aparece en discrepancia. En viaticos-reembolso la cabecera dice «Pendiente» mientras la tarjeta dice «Suspendido», en la misma pantalla.\n(f) LA REJILLA. 39 y reembolso usan .dosc{grid-template-columns:1.6fr 1fr}; remanente y discrepancia apilan a una columna; adeudos es tabla a ancho completo. El bloque que decide la urgencia (La cuenta, El reloj de pago) va en un 1fr sin acotar, no en el minmax que §6.20/§13.2 fijan.",
-        "por_que_importa": "Las cinco pantallas son el mismo expediente visto en cinco momentos: la misma persona recorre solicitud → comprobante con discrepancia → remanente → reembolso → adeudo en la misma jornada. Al cambiar de pantalla tiene que volver a aprender dónde está el importe, de qué color es «falta que alguien lo valide» y si el folio se puede pulsar. El coste no es estético: «Aprobado» en verde en una pantalla y en gris en otra enseña que el color no significa nada, y a partir de ahí el semáforo deja de leerse en todo el módulo. Es el hallazgo de mayor alcance del lote, porque cualquier arreglo pantalla a pantalla lo deja intacto."
-      },
-      {
-        "id": "f1-dis-01",
-        "severidad": "alta",
-        "regla": "§6.10 Etiqueta de estado .pill",
-        "dice_el_sistema": "Lleva color + icono + texto, nunca color a secas. Valores: border-radius:var(--r-ctrl);padding:3px 9px;font-size:var(--fs-meta) … con .msi{font-size:15px}",
-        "hay_en_el_build": ".pill{font-size:11px;font-weight:700;gap:5px} y en el markup <span class=\"pill p-ok\">Aprobado</span> sin ningún glifo dentro",
-        "selector": ".pill",
-        "evidencia": "Medido con getComputedStyle: la única .pill («En revisión», p-warn) tiene 0 <svg> dentro y font-size 11px.",
-        "por_que_importa": "El estado queda codificado sólo por color y palabra: quien no distingue el verde del ámbar pierde el primer nivel de lectura, y el gap:5px reservado para un icono que nunca llega. Además 11px queda bajo el suelo de 12px de §2.1 y bajo el var(--fs-meta)=12px que §6.10 fija."
-      },
-      {
-        "id": "f1-dis-02",
-        "severidad": "alta",
-        "regla": "§7.2 Cromo de aplicación — modo colapsado",
-        "dice_el_sistema": "Tres anchos: completa ≥1100px, colapsada a solo iconos 860–1100px… En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
-        "hay_en_el_build": "@media (min-width:860.02px) and (max-width:1100px){.side .et,.grp,.side .wordmark{display:none}} y ningún title ni aria-label en los <a class=\"it\">",
-        "selector": ".side .it",
-        "evidencia": "Medido con Playwright a 1000px de ancho: los tres primeros .it devuelven innerText vacío, title=null, aria-label=null; a 1440px devuelven «Tablero», «Padrón de clientes», «Viáticos». En la franja 860–1100px los 13 enlaces del menú quedan sin nombre accesible.",
-        "por_que_importa": "En portátil de 1024–1100px (medida habitual de oficina) el menú entero deja de tener nombre: un lector de pantalla anuncia trece «enlace» sin destino, y a la vista quedan trece iconos sin rótulo ni emergente."
-      },
-      {
-        "id": "f1-dis-03",
-        "severidad": "media",
-        "regla": "§10 trampa 5 — isotipo recortado",
-        "dice_el_sistema": "Un <symbol> ya trae su viewBox; repetirlo en el <svg> que lo invoca descoloca la marca. Correcto: medidas en el <use> y sin viewBox en el envoltorio.",
-        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el logo del menú y <svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\"> en el botón flotante",
-        "selector": ".side .logo svg, .fab svg",
-        "evidencia": "Medido con getBoundingClientRect() del <use> contra el del <svg>: desplazamiento de −32,5px en el logo (44×42) y −16,2px en el FAB (22×21). §10 exige que ese desplazamiento sea ~0. En la captura --ok la marca aparece como una astilla verde.",
-        "por_que_importa": "La marca de la empresa se ve rota en todas las pantallas de la familia, en el sitio más visible del cromo. 01_login escribe el patrón correcto, así que la corrección ya existe en el repositorio."
-      },
-      {
-        "id": "f1-dis-04",
-        "severidad": "alta",
-        "regla": "§6.4 Vistas de estado — reglas 1 y 2",
-        "dice_el_sistema": "El cambio se anuncia (aria-live=\"polite\") y mueve el foco; cada estado lleva encabezado real, no un <b>. Los estados de vacío y error van en tarjeta, con su medallón.",
-        "hay_en_el_build": ".state{padding:56px 16px} suelto sobre el fondo, sin .tarjeta-estado; .state .ico{width:30px;height:30px;color:var(--text-3)} en vez del medallón de 52px; el título de cada estado es un <b>; y el único <script> sólo hace cont.setAttribute('data-state', …)",
-        "selector": "main#contenido > .state-empty, main#contenido > .state-error",
-        "evidencia": "Medido en el DOM: .state-empty y .state-error tienen 0 encabezados y 1 <b> directo cada uno; el <script> sólo cambia data-state.",
-        "por_que_importa": "El error no se anuncia, no mueve el foco y no entra en el índice de encabezados: quien navega con lector de pantalla puede seguir leyendo el contenido anterior sin enterarse de que la pantalla cambió. (Hallazgo ya establecido en 23_viaticos y viaticos-alta-solicitud; aquí se repite con el mismo código.)"
-      },
-      {
-        "id": "f1-dis-05",
-        "severidad": "media",
-        "regla": "§6.7 Esqueleto de carga — prefers-reduced-motion y barras mudas",
-        "dice_el_sistema": "Hay que aplanar el fondo, no solo parar la animación. animation:none a secas congela el degradado. Correcto: {.skel{animation:none;background:var(--surface-2)}}. Y sin texto real dentro de las barras.",
-        "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer background; y las barras llevan texto: «Comprobante», «categoría y montos», «folio fiscal», «Discrepancia», «aviso»",
-        "selector": ".skel",
-        "evidencia": "Medido con reducedMotion:'reduce': animation-name:none con el degradado intacto en 0% 0%. 5 de 5 barras llevan texto.",
-        "por_que_importa": "Con movimiento reducido el esqueleto queda con un degradado congelado a tres franjas (gris-borde-gris), que se lee como contenido real y no como espera. Y el texto dentro de las barras sigue en el árbol de accesibilidad pese a color:transparent: un lector de pantalla lee «Solicitud, quién y departamento…» como si ya hubiera datos."
-      },
-      {
-        "id": "f1-dis-06",
-        "severidad": "media",
-        "regla": "§2.1 Suelo tipográfico",
-        "dice_el_sistema": "El suelo son 12px. «Nada baja de ahí.» Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
-        "hay_en_el_build": ".pill a 11px; .campo .et a 10,5px (4); .p-propuesto a 10,5px; .a-quien a 11px; el párrafo sobre la lectura del XML a 11px",
-        "selector": ".pill, .campo .et, .p-propuesto, .a-quien",
-        "evidencia": "Medido con getComputedStyle: 10,5px|p.grp ×6, 10,5px|span.et ×4, 10,5px|span.p-propuesto ×1, 11px|span.pill.p-warn ×1, 11px|p ×1, 11px|p.a-quien ×1, 11px|code ×1.",
-        "por_que_importa": "Son datos que se leen todos los días (estado, importes de apoyo, fechas, motivos de rechazo) por debajo del suelo que el propio sistema fija; §2.1 añade la regla práctica de 12–13px mínimo para ese caso."
-      },
-      {
-        "id": "f1-dis-07",
-        "severidad": "media",
-        "regla": "§7.3 Objetivos táctiles — enlaces primarios de su fila",
-        "dice_el_sistema": "Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8). Enlaces que son el elemento primario de su fila (folio, miga, «Ver en Maps») no son texto en prosa, llevan padding hasta llegar a 24px.",
-        "hay_en_el_build": ".migas a{color:var(--link);text-decoration:none;font-weight:600;border-radius:4px} sin padding ni min-height",
-        "selector": ".migas a",
-        "evidencia": "Brief tactil_24px: 2 de 23 destinos por debajo de 24px — <a> «Viáticos» de 53,6×14px y <a> «VI-2026-0715» de 90,5×14px en la miga.",
-        "por_que_importa": "La miga y el folio son la única salida de la pantalla hacia la lista y hacia el expediente; con 14–15px de alto fallan 2.5.8 y se erran con el dedo o con el ratón impreciso."
-      },
-      {
-        "id": "f1-dis-08",
-        "severidad": "alta",
-        "regla": "§1.1 Superficies y texto — --text-3",
-        "dice_el_sistema": "--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2).",
-        "hay_en_el_build": "--text-3: #66717F en el :root claro",
-        "selector": ":root",
-        "evidencia": "Brief MEDIDO_por_el_orquestador.tokens.text_3_declarado = \"#66717F\". Hecho ya establecido: está en 51 de las 52 maquetas; sobre --surface-2 cae a 4,21:1, bajo el mínimo AA de §1.7. Se marca por aplicar aquí, no se vuelve a analizar.",
-        "por_que_importa": "Todo el texto auxiliar de la pantalla (fechas de bitácora, rótulos de campo, pies) queda por debajo del mínimo AA en cuanto cae sobre una cabecera o fila con --surface-2."
-      },
-      {
-        "id": "f1-dis-09",
-        "severidad": "baja",
-        "regla": "§7.3 / §6.19 — la regla táctil lleva :root",
-        "dice_el_sistema": "El :root es lo que hace ganar la regla: con :root suma (0,3,0); sin él (0,2,0) y lo empata cualquier variante de tamaño del componente. Se comprueba midiendo con data-tacto=\"dedo\" puesto.",
-        "hay_en_el_build": "Seis reglas [data-tacto=\"dedo\"] … escritas sin :root (.it, .iconbtn, .cromo-prof, .cromo-av, .seg button, .btn)",
-        "selector": "[data-tacto=\"dedo\"] .iconbtn",
-        "evidencia": "Medido con data-tacto=\"dedo\": .iconbtn llega a 46×46 y el .btn a 46 de alto; .acciones .iconbtn no se dibuja. Bug latente.",
-        "por_que_importa": "El bug de especificidad que §7.3 documenta está presente, pero latente en esta pantalla: queda como deuda que se activará en cuanto se dibuje .acciones .iconbtn, no como fallo visible hoy."
-      },
-      {
-        "id": "f1-dis-10",
-        "severidad": "media",
-        "regla": "§6.5 Iconos — .msi",
-        "dice_el_sistema": "Todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1). Carga por subconjunto, con un solo <link>… Cuatro ejes fijos: opsz,wght,FILL,GRAD@24,500,1,0.",
-        "hay_en_el_build": "Ningún .msi ni <link> a Material Symbols; la pantalla dibuja un juego propio de <symbol> SVG de trazo: .ico{stroke:currentColor;stroke-width:1.6;fill:none}",
-        "selector": ".ico",
-        "evidencia": "grep -ci \"material symbols\" devuelve 0 en las cinco maquetas de este lote; en el conjunto del zip sólo 4 de 60 archivos cargan la fuente. El juego propio es de trazo (fill:none), lo contrario de la variante rellena que §6.5 fija.",
-        "por_que_importa": "Dos familias de iconos conviven en el producto: las pantallas que sí cargan Material Symbols y éstas. El mismo concepto (reloj, alerta, recibo) se dibuja con dos pesos y dos estilos según la pantalla."
-      },
-      {
-        "id": "f1-dis-11",
-        "severidad": "alta",
-        "regla": "§9 Andamiaje de maqueta",
-        "dice_el_sistema": "Se marca siempre con data-andamio, va visualmente separado del producto y rotulado. Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra.",
-        "hay_en_el_build": "Banda «Propuesta — sin backend. uuidCfdi se captura hoy sin validar…», insignia <span class=\"p-propuesto\">propuesto</span> dentro de la etiqueta de un campo, y pie «(mockup sin sesión: atenuada)» — ninguno con data-andamio",
-        "selector": ".banda.b-warn, .p-propuesto, .a-quien",
-        "evidencia": "Medido: document.querySelectorAll('[data-andamio]').length = 1, y ese único elemento es el conmutador de estados del pie. La insignia «PROPUESTO» va dentro de <span class=\"et\">Monto del CFDI (leído del XML)</span>, es decir dentro del producto, no fuera; la pantalla tiene además 5 elementos <code> con nombres de campo y de archivo.",
-        "por_que_importa": "Tres marcas de madurez de maqueta están escritas como si fueran interfaz: el selector único que §9 promete no las encuentra, y la insignia «propuesto» se leerá como un estado del comprobante."
-      },
-      {
-        "id": "f1-dis-12",
-        "severidad": "media",
-        "regla": "§13.4 Comparar exige igualar",
-        "dice_el_sistema": "Defecto align-items:start; stretch sólo cuando las tarjetas se comparan entre sí.",
-        "hay_en_el_build": ".campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:var(--sp-3)} con la insignia .p-propuesto dentro de una de las cuatro etiquetas",
-        "selector": ".campos .campo .vl",
-        "evidencia": "La insignia «PROPUESTO» hace que la etiqueta «Monto del CFDI (leído del XML)» ocupe dos líneas, así que $1,450 cae ~20px por debajo de $1,300 (medido: y=296 para «Monto capturado» y y=316 para «Monto del CFDI»). Visible en las capturas --ok y --oscuro: las dos cifras que la pantalla existe para comparar no comparten línea base.",
-        "por_que_importa": "Toda la pantalla trata de una diferencia de $150 entre dos cifras, y las dos cifras están desalineadas. Además la diferencia nunca se muestra como cifra: sólo aparece dentro de un párrafo."
-      },
-      {
-        "id": "f1-dis-13",
-        "severidad": "media",
-        "regla": "§6.9 Avisos — variante e icono",
-        "dice_el_sistema": "Cuatro variantes: .banda-info (--surface-2/--text-2/--border), .banda-warn (--warn-bg/--warn-ink)… El icono tiene que coincidir con la variante. Un aviso que cambia cómo se interpreta lo de abajo va antes del título de esa sección, con role=\"status\".",
-        "hay_en_el_build": "<div class=\"banda b-info\"><use href=\"#i-scale\"/><p><b>Discrepancia de $150 entre el monto capturado y el CFDI.</b> No se rechaza… Administración lo revisa.</p></div>, colocada después de la tarjeta del comprobante y sin role=\"status\"",
-        "selector": ".banda.b-info",
-        "evidencia": "El dato central de la pantalla —la discrepancia— va en la variante neutra, con un icono de balanza, debajo de los datos que califica. Medido: 176 caracteres y 3 frases, por encima del tope de ~140 y de la frase única de §8. La banda ámbar que sí está arriba no habla de la discrepancia, habla del backend.",
-        "por_que_importa": "El aviso que explica para qué existe la pantalla llega tarde y en gris, mientras el aviso ámbar de arriba, el que atrae la mirada, habla de código."
-      },
-      {
-        "id": "f1-dis-14",
-        "severidad": "media",
-        "regla": "§6.16 A11y extra — botón deshabilitado",
-        "dice_el_sistema": "Un botón deshabilitado no recibe el foco → aria-disabled=\"true\" + aria-describedby con el motivo, y al pulsarlo se explica.",
-        "hay_en_el_build": "<button class=\"btn p\" type=\"button\" disabled>Marcar como revisado</button> con el motivo en un <p class=\"a-quien\"> hermano, sin id ni aria-describedby",
-        "selector": ".tarjeta .interior button[disabled]",
-        "evidencia": "La única acción de la pantalla usa el atributo disabled: no es enfocable, no declara aria-disabled y no enlaza su motivo, que además es de maqueta («mockup sin sesión: atenuada») y no de producto («no tienes el rol FACTURACION»).",
-        "por_que_importa": "La pantalla tiene una sola salida y está apagada sin explicación alcanzable por teclado."
-      }
-    ]
-  },
-  "f3_boost_ui": {
-    "puntuacion": 2,
-    "dimensiones": {
-      "accesibilidad": 2,
-      "rendimiento": "no_evaluado",
-      "theming": 3,
-      "responsive": 3,
-      "integridad": 2
-    },
-    "justificacion": "La pantalla más corta del lote y la que peor sirve a su propio propósito. Técnicamente limpia (0 fallos de contraste en los dos temas, tokens completos, sin desbordamiento), pero la comparación que justifica su existencia está mal compuesta: las dos cifras enfrentadas no comparten línea base porque una insignia de madurez de maqueta empuja la segunda, y la diferencia de $150 nunca se muestra como cifra, sólo dentro de un párrafo en una banda neutra colocada por debajo de lo que califica. Accesibilidad 2: pill sin icono a 11px, estados sin encabezado ni anuncio, menú sin nombre entre 860 y 1100px, botón único disabled sin motivo alcanzable. Integridad 2: tres marcas de andamiaje (banda, insignia «propuesto», pie «mockup sin sesión») escritas como producto.",
-    "evidencia": [
-      "Medición de posición: «Monto capturado» en y=296 y «Monto del CFDI» en y=316 — 20px de desfase; capturas --ok y --oscuro",
-      "innerText.length: banda ámbar 202 / 3 frases; banda neutra 176 / 3",
-      "[data-andamio] = 1; 5 elementos <code>",
-      "1 de 1 .pill con 0 <svg> y 11px; .p-propuesto a 10,5px",
-      "Brief: 0 fallos de contraste; 2 de 23 destinos bajo 24px"
-    ]
-  },
-  "f4_nielsen": [],
-  "f5_investigacion": {
-    "pain_points_evaluados": [],
-    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
-  },
-  "cobertura": [
-    {
-      "patron": "Insignia de madurez de la maqueta («propuesto») colocada dentro de la etiqueta de un campo, para decir que ese dato todavía no existe en el backend.",
-      "propuesta_de_regla": "§9 bis — marcas de madurez. Una marca que habla del estado de construcción, no del dato, es andamiaje: lleva data-andamio, va fuera del flujo del producto —en el conmutador de maqueta o en una franja propia rotulada— y nunca dentro de una etiqueta, una celda o un título. El criterio es el mismo de §9: un solo selector tiene que poder retirarlas todas."
-    },
-    {
-      "patron": "Pantalla cuyo contenido es la comparación de dos cifras y la diferencia entre ellas. El build muestra las dos cifras como dos campos más de una rejilla auto-fit y la diferencia sólo dentro de un párrafo.",
-      "propuesta_de_regla": "§13.4 bis — pareja comparada. Dos cifras que la pantalla existe para comparar no van en una rejilla auto-fit: van en una pareja declarada (grid-template-columns:1fr 1fr o 1fr auto 1fr), alineadas por la línea base, con la diferencia como tercera cifra explícita y con el mismo tamaño y peso tipográfico. Ningún adorno de una de las dos etiquetas puede desplazar su valor respecto al otro."
-    }
-  ],
-  "sin_datos": [
-    "f3.rendimiento: maqueta estática, sin backend que perfilar",
-    "f4_nielsen: fuera del subconjunto de este lote (sólo F1 y F3)",
-    "f5_investigacion: fuera del subconjunto por arquetipo",
-    "§6.16 reglas 2 y 3 (required/aria-required reales, no asteriscos de adorno): no aplica en esta pantalla. grep -c required = 0, pero el brief mide inputs = 0 y el markup no tiene ningún campo de formulario; .ctrl > label .req queda declarado en el CSS compartido sin usarse. El hallazgo establecido en viaticos-alta-solicitud no se reproduce aquí porque no hay formulario que auditar."
+ "pantalla": "viaticos-discrepancia-cfdi",
+ "ruta_zip": "05-direccion-y-administracion/viaticos-discrepancia-cfdi.html",
+ "carpeta": "05-direccion-y-administracion",
+ "area": "finanzas",
+ "arquetipo": "caso de excepción",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "viaticos-discrepancia-cfdi--ok.png",
+  "viaticos-discrepancia-cfdi--oscuro.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-dis-00",
+    "severidad": "alta",
+    "regla": "§6.10 + §1.3 + §13 (composición) — consistencia de la familia de viáticos",
+    "dice_el_sistema": "§6.10: «todas las de una familia se ven como una familia — o las tres llevan punto, o ninguna». §1.3: el semáforo tiene cinco estados con significado fijo (--pause = «Inactivo, en pausa — no es un fallo»). §13.1: orden fijo lectura → control → objeto; §13.2: la columna que fluye se acota con minmax.",
+    "hay_en_el_build": "Cinco variantes del mismo flujo que nombran, pintan y colocan de forma distinta el estado, el importe y el folio (detalle en la evidencia).",
+    "selector": ".pill, .campo .vl, .cg .v, .comps .monto, td.num, .folio, .lnk, .p4-t .resumen",
+    "evidencia": "Inventario medido sobre las cinco maquetas de la familia (más las dos hermanas ya auditadas, sólo como referencia):\n(a) ETIQUETAS DE ESTADO. La misma palabra cambia de color: «Aprobado» es .pill.p-ok en 23_viaticos (3 veces) y en 39_viatico_detalle, y .pill.p-neutro en viaticos-reembolso. La misma situación —falta que alguien actúe— se pinta de tres formas: p-neutro («Por aprobar», «Sin comprobar», «Pendiente»), p-warn («En revisión», «Pendiente de validar») y sin etiqueta ninguna (viaticos-adeudos-nomina la escribe como texto plano en celda: «Sin declarar», «Declarado el 2 sep 2026 · pendiente de validar»). Cinco nombres para un concepto.\n(b) UNA SEXTA CLASE FUERA DEL SEMÁFORO. .p-neutro{background:var(--surface-2);color:var(--text-2)} no está en §6.10, que enumera .p-ok/.p-warn/.p-err/.p-block/.p-pause, y se solapa con --pause. En viaticos-reembolso «Suspendido» va en p-pause pese a que el propio texto de la pantalla dice «un reembolso improcedente queda suspendido indefinidamente»: §1.3 reserva --pause para lo que «no es un fallo».\n(c) EL IMPORTE. Mismo dato, cuatro tratamientos medidos con getComputedStyle: .cg .v a 16px/700 en tarjeta con borde (39), .comps .monto a 14px/700 alineado a la derecha de la fila (39, en la misma pantalla), .campo .vl a 13px/400 como un campo más (remanente, reembolso, discrepancia) y td.num a 13px/400 en columna de tabla (adeudos). Formato distinto además: «$2,100» y «$160» sin decimales en 39; «$150.00», «$850.00» con decimales; «$350.00 MXN» con divisa sólo en reembolso.\n(d) EL FOLIO DEL VIÁTICO. VI-2026-0715 es <span> no pulsable en 39 y en remanente, <a class=\"lnk\"> de 98,1×15px en reembolso, <a> desnudo de 90,5×14px en discrepancia y <a class=\"folio\"> en --link dentro de tabla en adeudos. Cuatro clases para el mismo enlace.\n(e) LA CABECERA. El estado va en <b> dentro de .p4-t .resumen en 39 y reembolso, en texto plano en remanente y adeudos, y no aparece en discrepancia. En viaticos-reembolso la cabecera dice «Pendiente» mientras la tarjeta dice «Suspendido», en la misma pantalla.\n(f) LA REJILLA. 39 y reembolso usan .dosc{grid-template-columns:1.6fr 1fr}; remanente y discrepancia apilan a una columna; adeudos es tabla a ancho completo. El bloque que decide la urgencia (La cuenta, El reloj de pago) va en un 1fr sin acotar, no en el minmax que §6.20/§13.2 fijan.",
+    "por_que_importa": "Las cinco pantallas son el mismo expediente visto en cinco momentos: la misma persona recorre solicitud → comprobante con discrepancia → remanente → reembolso → adeudo en la misma jornada. Al cambiar de pantalla tiene que volver a aprender dónde está el importe, de qué color es «falta que alguien lo valide» y si el folio se puede pulsar. El coste no es estético: «Aprobado» en verde en una pantalla y en gris en otra enseña que el color no significa nada, y a partir de ahí el semáforo deja de leerse en todo el módulo. Es el hallazgo de mayor alcance del lote, porque cualquier arreglo pantalla a pantalla lo deja intacto."
+   },
+   {
+    "id": "f1-dis-01",
+    "severidad": "alta",
+    "regla": "§6.10 Etiqueta de estado .pill",
+    "dice_el_sistema": "Lleva color + icono + texto, nunca color a secas. Valores: border-radius:var(--r-ctrl);padding:3px 9px;font-size:var(--fs-meta) … con .msi{font-size:15px}",
+    "hay_en_el_build": ".pill{font-size:11px;font-weight:700;gap:5px} y en el markup <span class=\"pill p-ok\">Aprobado</span> sin ningún glifo dentro",
+    "selector": ".pill",
+    "evidencia": "Medido con getComputedStyle: la única .pill («En revisión», p-warn) tiene 0 <svg> dentro y font-size 11px.",
+    "por_que_importa": "El estado queda codificado sólo por color y palabra: quien no distingue el verde del ámbar pierde el primer nivel de lectura, y el gap:5px reservado para un icono que nunca llega. Además 11px queda bajo el suelo de 12px de §2.1 y bajo el var(--fs-meta)=12px que §6.10 fija."
+   },
+   {
+    "id": "f1-dis-02",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación — modo colapsado",
+    "dice_el_sistema": "Tres anchos: completa ≥1100px, colapsada a solo iconos 860–1100px… En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+    "hay_en_el_build": "@media (min-width:860.02px) and (max-width:1100px){.side .et,.grp,.side .wordmark{display:none}} y ningún title ni aria-label en los <a class=\"it\">",
+    "selector": ".side .it",
+    "evidencia": "Medido con Playwright a 1000px de ancho: los tres primeros .it devuelven innerText vacío, title=null, aria-label=null; a 1440px devuelven «Tablero», «Padrón de clientes», «Viáticos». En la franja 860–1100px los 13 enlaces del menú quedan sin nombre accesible.",
+    "por_que_importa": "En portátil de 1024–1100px (medida habitual de oficina) el menú entero deja de tener nombre: un lector de pantalla anuncia trece «enlace» sin destino, y a la vista quedan trece iconos sin rótulo ni emergente."
+   },
+   {
+    "id": "f1-dis-03",
+    "severidad": "media",
+    "regla": "§10 trampa 5 — isotipo recortado",
+    "dice_el_sistema": "Un <symbol> ya trae su viewBox; repetirlo en el <svg> que lo invoca descoloca la marca. Correcto: medidas en el <use> y sin viewBox en el envoltorio.",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el logo del menú y <svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\"> en el botón flotante",
+    "selector": ".side .logo svg, .fab svg",
+    "evidencia": "Medido con getBoundingClientRect() del <use> contra el del <svg>: desplazamiento de −32,5px en el logo (44×42) y −16,2px en el FAB (22×21). §10 exige que ese desplazamiento sea ~0. En la captura --ok la marca aparece como una astilla verde.",
+    "por_que_importa": "La marca de la empresa se ve rota en todas las pantallas de la familia, en el sitio más visible del cromo. 01_login escribe el patrón correcto, así que la corrección ya existe en el repositorio."
+   },
+   {
+    "id": "f1-dis-04",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado — reglas 1 y 2",
+    "dice_el_sistema": "El cambio se anuncia (aria-live=\"polite\") y mueve el foco; cada estado lleva encabezado real, no un <b>. Los estados de vacío y error van en tarjeta, con su medallón.",
+    "hay_en_el_build": ".state{padding:56px 16px} suelto sobre el fondo, sin .tarjeta-estado; .state .ico{width:30px;height:30px;color:var(--text-3)} en vez del medallón de 52px; el título de cada estado es un <b>; y el único <script> sólo hace cont.setAttribute('data-state', …)",
+    "selector": "main#contenido > .state-empty, main#contenido > .state-error",
+    "evidencia": "Medido en el DOM: .state-empty y .state-error tienen 0 encabezados y 1 <b> directo cada uno; el <script> sólo cambia data-state.",
+    "por_que_importa": "El error no se anuncia, no mueve el foco y no entra en el índice de encabezados: quien navega con lector de pantalla puede seguir leyendo el contenido anterior sin enterarse de que la pantalla cambió. (Hallazgo ya establecido en 23_viaticos y viaticos-alta-solicitud; aquí se repite con el mismo código.)"
+   },
+   {
+    "id": "f1-dis-05",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga — prefers-reduced-motion y barras mudas",
+    "dice_el_sistema": "Hay que aplanar el fondo, no solo parar la animación. animation:none a secas congela el degradado. Correcto: {.skel{animation:none;background:var(--surface-2)}}. Y sin texto real dentro de las barras.",
+    "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer background; y las barras llevan texto: «Comprobante», «categoría y montos», «folio fiscal», «Discrepancia», «aviso»",
+    "selector": ".skel",
+    "evidencia": "Medido con reducedMotion:'reduce': animation-name:none con el degradado intacto en 0% 0%. 5 de 5 barras llevan texto.",
+    "por_que_importa": "Con movimiento reducido el esqueleto queda con un degradado congelado a tres franjas (gris-borde-gris), que se lee como contenido real y no como espera. Y el texto dentro de las barras sigue en el árbol de accesibilidad pese a color:transparent: un lector de pantalla lee «Solicitud, quién y departamento…» como si ya hubiera datos."
+   },
+   {
+    "id": "f1-dis-06",
+    "severidad": "media",
+    "regla": "§2.1 Suelo tipográfico",
+    "dice_el_sistema": "El suelo son 12px. «Nada baja de ahí.» Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+    "hay_en_el_build": ".pill a 11px; .campo .et a 10,5px (4); .p-propuesto a 10,5px; .a-quien a 11px; el párrafo sobre la lectura del XML a 11px",
+    "selector": ".pill, .campo .et, .p-propuesto, .a-quien",
+    "evidencia": "Medido con getComputedStyle: 10,5px|p.grp ×6, 10,5px|span.et ×4, 10,5px|span.p-propuesto ×1, 11px|span.pill.p-warn ×1, 11px|p ×1, 11px|p.a-quien ×1, 11px|code ×1.",
+    "por_que_importa": "Son datos que se leen todos los días (estado, importes de apoyo, fechas, motivos de rechazo) por debajo del suelo que el propio sistema fija; §2.1 añade la regla práctica de 12–13px mínimo para ese caso."
+   },
+   {
+    "id": "f1-dis-07",
+    "severidad": "media",
+    "regla": "§7.3 Objetivos táctiles — enlaces primarios de su fila",
+    "dice_el_sistema": "Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8). Enlaces que son el elemento primario de su fila (folio, miga, «Ver en Maps») no son texto en prosa, llevan padding hasta llegar a 24px.",
+    "hay_en_el_build": ".migas a{color:var(--link);text-decoration:none;font-weight:600;border-radius:4px} sin padding ni min-height",
+    "selector": ".migas a",
+    "evidencia": "Brief tactil_24px: 2 de 23 destinos por debajo de 24px — <a> «Viáticos» de 53,6×14px y <a> «VI-2026-0715» de 90,5×14px en la miga.",
+    "por_que_importa": "La miga y el folio son la única salida de la pantalla hacia la lista y hacia el expediente; con 14–15px de alto fallan 2.5.8 y se erran con el dedo o con el ratón impreciso."
+   },
+   {
+    "id": "f1-dis-08",
+    "severidad": "alta",
+    "regla": "§1.1 Superficies y texto — --text-3",
+    "dice_el_sistema": "--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2).",
+    "hay_en_el_build": "--text-3: #66717F en el :root claro",
+    "selector": ":root",
+    "evidencia": "Brief MEDIDO_por_el_orquestador.tokens.text_3_declarado = \"#66717F\". Hecho ya establecido: está en 51 de las 52 maquetas; sobre --surface-2 cae a 4,21:1, bajo el mínimo AA de §1.7. Se marca por aplicar aquí, no se vuelve a analizar.",
+    "por_que_importa": "Todo el texto auxiliar de la pantalla (fechas de bitácora, rótulos de campo, pies) queda por debajo del mínimo AA en cuanto cae sobre una cabecera o fila con --surface-2."
+   },
+   {
+    "id": "f1-dis-09",
+    "severidad": "baja",
+    "regla": "§7.3 / §6.19 — la regla táctil lleva :root",
+    "dice_el_sistema": "El :root es lo que hace ganar la regla: con :root suma (0,3,0); sin él (0,2,0) y lo empata cualquier variante de tamaño del componente. Se comprueba midiendo con data-tacto=\"dedo\" puesto.",
+    "hay_en_el_build": "Seis reglas [data-tacto=\"dedo\"] … escritas sin :root (.it, .iconbtn, .cromo-prof, .cromo-av, .seg button, .btn)",
+    "selector": "[data-tacto=\"dedo\"] .iconbtn",
+    "evidencia": "Medido con data-tacto=\"dedo\": .iconbtn llega a 46×46 y el .btn a 46 de alto; .acciones .iconbtn no se dibuja. Bug latente.",
+    "por_que_importa": "El bug de especificidad que §7.3 documenta está presente, pero latente en esta pantalla: queda como deuda que se activará en cuanto se dibuje .acciones .iconbtn, no como fallo visible hoy."
+   },
+   {
+    "id": "f1-dis-10",
+    "severidad": "media",
+    "regla": "§6.5 Iconos — .msi",
+    "dice_el_sistema": "Todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1). Carga por subconjunto, con un solo <link>… Cuatro ejes fijos: opsz,wght,FILL,GRAD@24,500,1,0.",
+    "hay_en_el_build": "Ningún .msi ni <link> a Material Symbols; la pantalla dibuja un juego propio de <symbol> SVG de trazo: .ico{stroke:currentColor;stroke-width:1.6;fill:none}",
+    "selector": ".ico",
+    "evidencia": "grep -ci \"material symbols\" devuelve 0 en las cinco maquetas de este lote; en el conjunto del zip sólo 4 de 60 archivos cargan la fuente. El juego propio es de trazo (fill:none), lo contrario de la variante rellena que §6.5 fija.",
+    "por_que_importa": "Dos familias de iconos conviven en el producto: las pantallas que sí cargan Material Symbols y éstas. El mismo concepto (reloj, alerta, recibo) se dibuja con dos pesos y dos estilos según la pantalla."
+   },
+   {
+    "id": "f1-dis-11",
+    "severidad": "alta",
+    "regla": "§9 Andamiaje de maqueta",
+    "dice_el_sistema": "Se marca siempre con data-andamio, va visualmente separado del producto y rotulado. Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra.",
+    "hay_en_el_build": "Banda «Propuesta — sin backend. uuidCfdi se captura hoy sin validar…», insignia <span class=\"p-propuesto\">propuesto</span> dentro de la etiqueta de un campo, y pie «(mockup sin sesión: atenuada)» — ninguno con data-andamio",
+    "selector": ".banda.b-warn, .p-propuesto, .a-quien",
+    "evidencia": "Medido: document.querySelectorAll('[data-andamio]').length = 1, y ese único elemento es el conmutador de estados del pie. La insignia «PROPUESTO» va dentro de <span class=\"et\">Monto del CFDI (leído del XML)</span>, es decir dentro del producto, no fuera; la pantalla tiene además 5 elementos <code> con nombres de campo y de archivo.",
+    "por_que_importa": "Tres marcas de madurez de maqueta están escritas como si fueran interfaz: el selector único que §9 promete no las encuentra, y la insignia «propuesto» se leerá como un estado del comprobante."
+   },
+   {
+    "id": "f1-dis-12",
+    "severidad": "media",
+    "regla": "§13.4 Comparar exige igualar",
+    "dice_el_sistema": "Defecto align-items:start; stretch sólo cuando las tarjetas se comparan entre sí.",
+    "hay_en_el_build": ".campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:var(--sp-3)} con la insignia .p-propuesto dentro de una de las cuatro etiquetas",
+    "selector": ".campos .campo .vl",
+    "evidencia": "La insignia «PROPUESTO» hace que la etiqueta «Monto del CFDI (leído del XML)» ocupe dos líneas, así que $1,450 cae ~20px por debajo de $1,300 (medido: y=296 para «Monto capturado» y y=316 para «Monto del CFDI»). Visible en las capturas --ok y --oscuro: las dos cifras que la pantalla existe para comparar no comparten línea base.",
+    "por_que_importa": "Toda la pantalla trata de una diferencia de $150 entre dos cifras, y las dos cifras están desalineadas. Además la diferencia nunca se muestra como cifra: sólo aparece dentro de un párrafo."
+   },
+   {
+    "id": "f1-dis-13",
+    "severidad": "media",
+    "regla": "§6.9 Avisos — variante e icono",
+    "dice_el_sistema": "Cuatro variantes: .banda-info (--surface-2/--text-2/--border), .banda-warn (--warn-bg/--warn-ink)… El icono tiene que coincidir con la variante. Un aviso que cambia cómo se interpreta lo de abajo va antes del título de esa sección, con role=\"status\".",
+    "hay_en_el_build": "<div class=\"banda b-info\"><use href=\"#i-scale\"/><p><b>Discrepancia de $150 entre el monto capturado y el CFDI.</b> No se rechaza… Administración lo revisa.</p></div>, colocada después de la tarjeta del comprobante y sin role=\"status\"",
+    "selector": ".banda.b-info",
+    "evidencia": "El dato central de la pantalla —la discrepancia— va en la variante neutra, con un icono de balanza, debajo de los datos que califica. Medido: 176 caracteres y 3 frases, por encima del tope de ~140 y de la frase única de §8. La banda ámbar que sí está arriba no habla de la discrepancia, habla del backend.",
+    "por_que_importa": "El aviso que explica para qué existe la pantalla llega tarde y en gris, mientras el aviso ámbar de arriba, el que atrae la mirada, habla de código."
+   },
+   {
+    "id": "f1-dis-14",
+    "severidad": "media",
+    "regla": "§6.16 A11y extra — botón deshabilitado",
+    "dice_el_sistema": "Un botón deshabilitado no recibe el foco → aria-disabled=\"true\" + aria-describedby con el motivo, y al pulsarlo se explica.",
+    "hay_en_el_build": "<button class=\"btn p\" type=\"button\" disabled>Marcar como revisado</button> con el motivo en un <p class=\"a-quien\"> hermano, sin id ni aria-describedby",
+    "selector": ".tarjeta .interior button[disabled]",
+    "evidencia": "La única acción de la pantalla usa el atributo disabled: no es enfocable, no declara aria-disabled y no enlaza su motivo, que además es de maqueta («mockup sin sesión: atenuada») y no de producto («no tienes el rol FACTURACION»).",
+    "por_que_importa": "La pantalla tiene una sola salida y está apagada sin explicación alcanzable por teclado."
+   }
   ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "La pantalla más corta del lote y la que peor sirve a su propio propósito. Técnicamente limpia (0 fallos de contraste en los dos temas, tokens completos, sin desbordamiento), pero la comparación que justifica su existencia está mal compuesta: las dos cifras enfrentadas no comparten línea base porque una insignia de madurez de maqueta empuja la segunda, y la diferencia de $150 nunca se muestra como cifra, sólo dentro de un párrafo en una banda neutra colocada por debajo de lo que califica. Accesibilidad 2: pill sin icono a 11px, estados sin encabezado ni anuncio, menú sin nombre entre 860 y 1100px, botón único disabled sin motivo alcanzable. Integridad 2: tres marcas de andamiaje (banda, insignia «propuesto», pie «mockup sin sesión») escritas como producto.",
+  "evidencia": [
+   "Medición de posición: «Monto capturado» en y=296 y «Monto del CFDI» en y=316 — 20px de desfase; capturas --ok y --oscuro",
+   "innerText.length: banda ámbar 202 / 3 frases; banda neutra 176 / 3",
+   "[data-andamio] = 1; 5 elementos <code>",
+   "1 de 1 .pill con 0 <svg> y 11px; .p-propuesto a 10,5px",
+   "Brief: 0 fallos de contraste; 2 de 23 destinos bajo 24px"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+ },
+ "cobertura": [
+  {
+   "patron": "Insignia de madurez de la maqueta («propuesto») colocada dentro de la etiqueta de un campo, para decir que ese dato todavía no existe en el backend.",
+   "propuesta_de_regla": "§9 bis — marcas de madurez. Una marca que habla del estado de construcción, no del dato, es andamiaje: lleva data-andamio, va fuera del flujo del producto —en el conmutador de maqueta o en una franja propia rotulada— y nunca dentro de una etiqueta, una celda o un título. El criterio es el mismo de §9: un solo selector tiene que poder retirarlas todas."
+  },
+  {
+   "patron": "Pantalla cuyo contenido es la comparación de dos cifras y la diferencia entre ellas. El build muestra las dos cifras como dos campos más de una rejilla auto-fit y la diferencia sólo dentro de un párrafo.",
+   "propuesta_de_regla": "§13.4 bis — pareja comparada. Dos cifras que la pantalla existe para comparar no van en una rejilla auto-fit: van en una pareja declarada (grid-template-columns:1fr 1fr o 1fr auto 1fr), alineadas por la línea base, con la diferencia como tercera cifra explícita y con el mismo tamaño y peso tipográfico. Ningún adorno de una de las dos etiquetas puede desplazar su valor respecto al otro."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática, sin backend que perfilar",
+  "f4_nielsen: fuera del subconjunto de este lote (sólo F1 y F3)",
+  "f5_investigacion: fuera del subconjunto por arquetipo",
+  "§6.16 reglas 2 y 3 (required/aria-required reales, no asteriscos de adorno): no aplica en esta pantalla. grep -c required = 0, pero el brief mide inputs = 0 y el markup no tiene ningún campo de formulario; .ctrl > label .req queda declarado en el CSS compartido sin usarse. El hallazgo establecido en viaticos-alta-solicitud no se reproduce aquí porque no hay formulario que auditar."
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [],
+  "declarados_no_usados": [
+   "--block",
+   "--block-fill",
+   "--border-fuerte",
+   "--dur-enter",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--fs-kpi",
+   "--glass",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--r-modal",
+   "--sp-12",
+   "--stagger",
+   "--velo-trama",
+   "--warn",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 83,
+  "n_usados": 65,
+  "n_divergentes": 15,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": true,
+   "filas": 0,
+   "nodosText3": 0
+  }
+ }
 }

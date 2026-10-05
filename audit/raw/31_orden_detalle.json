@@ -1,364 +1,638 @@
 {
-  "pantalla": "31_orden_detalle",
-  "ruta_zip": "03-icev-instalacion-de-cargadores/31_orden_detalle.html",
-  "carpeta": "03-icev-instalacion-de-cargadores",
-  "area": "ICEV/operaciones",
-  "arquetipo": "detalle",
-  "modo": "cumplimiento",
-  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
-  "capturas": [
-    "31_orden_detalle--ok.png",
-    "31_orden_detalle--loading.png",
-    "31_orden_detalle--empty.png",
-    "31_orden_detalle--error.png",
-    "31_orden_detalle--oscuro.png"
-  ],
-  "f1_cumplimiento": {
-    "veredicto": "cumple_parcialmente",
-    "hallazgos": [
-      {
-        "id": "f1-31orden-01",
-        "severidad": "alta",
-        "regla": "§6.17 Subida de archivo — .subida",
-        "dice_el_sistema": "«Un documento no se pide en una caja de texto. Sustituye a cualquier <input type=\"text\"> que pida un adjunto.» Markup: <input type=\"file\" accept=\".pdf,.jpg,.jpeg,.png\" aria-describedby=\"…\">, data-estado=\"vacio\". «Indica formatos y peso admitidos, muestra el archivo cargado con su nombre y fecha, y permite reemplazarlo o quitarlo.»",
-        "hay_en_el_build": "<div class=\"soltar\"><svg…><b>Arrastra aquí un archivo, o escógelo del equipo</b><button class=\"btn\" type=\"button\">Escoger archivo</button><span class=\"limites\">…</span></div> — no hay ningún <input type=\"file\"> en la pantalla, ni atributo accept, ni data-estado, ni aria-describedby. El archivo ya subido (.revisando) muestra nombre, peso y estado, pero no fecha, y no ofrece ni reemplazarlo ni quitarlo.",
-        "selector": ".soltar, .revisando",
-        "evidencia": "Medido en el navegador: document.querySelectorAll('input[type=file]').length = 0 (el brief lo confirma: inputs = 0 en toda la pantalla). El botón «Escoger archivo» es un <button type=\"button\"> sin manejador: el único querySelectorAll del <script> es querySelectorAll('.demo [data-set]').",
-        "por_que_importa": "Subir el acuse firmado es una de las dos condiciones que la propia pantalla declara para poder cerrar la orden. La zona de arrastre existe visualmente, anuncia formatos y pesos, y no hay forma de soltar ni de elegir nada: el botón que bloquea la orden no tiene su contrapartida."
-      },
-      {
-        "id": "f1-31orden-02",
-        "severidad": "alta",
-        "regla": "§3 — «un token que no existe falla en silencio»",
-        "dice_el_sistema": "«Un var() que no resuelve invalida la declaración entera (los tres paddings del diálogo computaban a 0). Cuando un espaciado se vea raro, lo primero es comprobar que su token está definido.» §11: «todo token var(--x) que usa el archivo está declarado en ese mismo archivo».",
-        "hay_en_el_build": ".soltar{…padding:var(--sp-5);…} con --sp-5 sin declarar: el :root del archivo trae --sp-1, --sp-2, --sp-3, --sp-4, --sp-6, --sp-8 y --sp-12, y salta el 5.",
-        "selector": ".soltar",
-        "evidencia": "Medido con getComputedStyle: padding calculado de .soltar = «0px». El brief lo registra como el único token usado sin declarar de la pantalla (tokens.usados_sin_declarar: [\"--sp-5\"]). Líneas 21-22 del <style> para la escala declarada; línea 674 para el uso.",
-        "por_que_importa": "La zona de arrastre se queda sin relleno interior, de modo que su texto y su botón tocan el borde discontinuo. Es el caso exacto que §3 documenta y el motivo por el que §11 incluye la comprobación usados − declarados = vacío. Es además un hecho ya establecido para 8 maquetas."
-      },
-      {
-        "id": "f1-31orden-03",
-        "severidad": "alta",
-        "regla": "§1.7 Contraste mínimo (texto normal 4,5:1) y §6.10 .p-type",
-        "dice_el_sistema": "«Texto normal: 4,5:1.» «Cada color nuevo se mide contra los fondos donde va a aparecer, en los dos temas, antes de darlo por bueno.» §6.10: .p-type{background:color-mix(in srgb,var(--serie-N) 16%,var(--surface));color:var(--text-2)}.",
-        "hay_en_el_build": "<span class=\"p-type p-s2\" style=\"margin-left:6px\">3 SKU</span> con color rgb(76,90,107) (--text-2) sobre color(srgb 0.900078 0.889726 0.938824), a 11px.",
-        "selector": "tbody th .p-type.p-s2",
-        "evidencia": "Brief, contraste: ratio medido 2,97:1 frente al mínimo de 4,5:1. Es uno de los tres fallos de contraste de la pantalla.",
-        "por_que_importa": "El contraste falla por dos motivos acumulados: el fondo de la etiqueta se calcula con --serie-2, que en esta maqueta vale #7A5FA8 (violeta) y no el #eb6834 documentado en §1.4, y el texto va a 11px, por debajo del suelo de §2.1. Y hay un tercer problema de fondo: «3 SKU» es un conteo, un dato sobre el dato, y el preámbulo de §1 dice que eso va «sin color propio, tinta de texto §6.22» — no en una etiqueta de clasificación con color de serie."
-      },
-      {
-        "id": "f1-31orden-04",
-        "severidad": "media",
-        "regla": "§6.20 Ficha de detalle — .cab, .idt e indicador lateral",
-        "dice_el_sistema": "«Abre con bloque de identidad (folio, nombre del expediente, marcas de estado) y a su derecha el indicador que decide la urgencia.» .cab{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,360px);gap:var(--sp-6);align-items:center;padding:var(--sp-5) var(--sp-6)}. «El indicador de la derecha declara su ancho; no se queda con lo que sobre (rejilla, no flex con min-width:250px;max-width:330px frente a flex:1).»",
-        "hay_en_el_build": "No existe .cab ni .idt en el archivo. La pantalla reutiliza el .p4-t de las bandejas (flex con .acc al final) y el indicador de urgencia es un <span class=\"resumen\" id=\"pq-cerrar\" style=\"max-width:22ch\">Faltan el acuse firmado y el consumo capturado.</span> colgado del grupo de botones.",
-        "selector": ".p4-t > .acc > .resumen#pq-cerrar",
-        "evidencia": "grep '.cab' y '.idt' sobre el archivo: 0 coincidencias. 31_orden_detalle--ok.png: el indicador queda a la derecha de «Cerrar la orden», en dos líneas, con un max-width en línea de 22ch en vez de una columna de rejilla declarada.",
-        "por_que_importa": "Es el componente que define el arquetipo de esta pantalla y no está. La consecuencia es la que §6.20 y §13.3 anticipan: el indicador no declara su ancho, se queda con lo que sobra del flex y se parte en dos líneas de 11px junto al borde derecho, cuando es el dato que decide si la orden se puede cerrar."
-      },
-      {
-        "id": "f1-31orden-05",
-        "severidad": "media",
-        "regla": "§6.20 — «quién es el cliente va junto al expediente, a ancho completo y con los datos en fila»",
-        "dice_el_sistema": "«Quién es el cliente va junto al expediente, a ancho completo y con los datos en fila, antes de la bitácora y de los documentos — ese orden es también el del recorrido con teclado.»",
-        "hay_en_el_build": "La tarjeta «Datos de la orden» ocupa la columna izquierda de una rejilla de dos columnas (.dosc), no el ancho completo, y sus ocho campos van en rejilla de tres columnas dentro de ella. En el recorrido con teclado, los documentos (Evidencia, acta, zona de subida) de la columna derecha vienen después de las tres tarjetas de la izquierda, incluido el material.",
-        "selector": ".dosc > div:first-child .tarjeta:first-of-type, .campos",
-        "evidencia": "31_orden_detalle--ok.png: el domicilio de la obra se parte en tres líneas dentro de una columna de la rejilla interior; la bitácora queda al final de la columna derecha, debajo de la subida de archivos.",
-        "por_que_importa": "El domicilio y el contacto en sitio son los dos datos que alguien lee con prisa antes de llamar al cliente, y quedan comprimidos en un tercio del ancho. El orden del teclado tampoco es el que la regla fija."
-      },
-      {
-        "id": "f1-31orden-06",
-        "severidad": "media",
-        "regla": "§2.1 El suelo son 12px",
-        "dice_el_sistema": "«Nada baja de ahí»; la única excepción es 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
-        "hay_en_el_build": "15 declaraciones font-size:11px, 7 de 10,5px, 2 de 11,5px y una de 10px. En zona de producto: los seis rótulos de miniatura de evidencia a 10px («Antes», «Tablero», «Canalización»…), .limites a 10,5px (formatos y pesos admitidos), .meta a 10,5px («1.2 MB · revisando»), .expl a 11px, las marcas de tiempo del checklist y de la bitácora a 11/11,5px, thead th a 11px y el indicador #pq-cerrar a 11px.",
-        "selector": ".evid .ph span, .soltar .limites, .revisando .meta, .revisando .expl, .bitacora .cuando",
-        "evidencia": "Estilo calculado a 1440×900: 15 agrupaciones por debajo de 12px, incluida una a 10px, que es el valor más bajo de todo el lote. --fs-meta vale 12px en :root (línea 13): todos son literales que se saltan el token.",
-        "por_que_importa": "Los 10px de los rótulos de evidencia son lo único que distingue una foto de otra (no hay imagen, sólo el rótulo), y los 10,5px de .limites llevan los formatos y pesos admitidos, que es la información sin la cual una subida falla. Ninguno de los dos entra en la excepción de 10,5px, que exige mayúsculas y letter-spacing."
-      },
-      {
-        "id": "f1-31orden-07",
-        "severidad": "media",
-        "regla": "§11 Interacción — «lo que ejecuta es un <button> y lo que navega un <a>»",
-        "dice_el_sistema": "«¿Lo que ejecuta es un <button> y lo que navega un <a>?» §6.5: «un icono nunca es la única forma de entender un control»; «si va sin texto visible lleva como mínimo etiqueta emergente (title) y aria-label».",
-        "hay_en_el_build": "Las seis miniaturas de evidencia son <div class=\"ph\"> con un icono de ojo y un rótulo: no son ni botón ni enlace, no reciben foco y no se pueden abrir. El checklist es una <ul> de <li> estáticos sin ningún control: siete puntos marcables que no se pueden marcar.",
-        "selector": ".evid .ph, .checklist > li",
-        "evidencia": "Medido: [...document.querySelectorAll('.ph')].map(e=>e.tagName) devuelve DIV. La cabecera anuncia «6 fotos» y no hay forma de ver ninguna; el checklist dice «5 de 7» y los dos pendientes no tienen control.",
-        "por_que_importa": "La evidencia fotográfica es la prueba de la instalación y el checklist es el que decide el cierre. Presentarlos con forma de cosa pulsable (icono de ojo, marcas de verificación) sin que lo sean obliga a buscar la foto fuera del sistema, que es el circuito de WhatsApp que esta pantalla venía a sustituir."
-      },
-      {
-        "id": "f1-31orden-08",
-        "severidad": "media",
-        "regla": "§6.16 — botón deshabilitado",
-        "dice_el_sistema": "«Un botón deshabilitado no recibe el foco → aria-disabled=\"true\" + aria-describedby con el motivo, y al pulsarlo se explica. Ese id tiene que ser único.»",
-        "hay_en_el_build": "<button class=\"btn p\" type=\"button\" disabled aria-describedby=\"pq-cerrar\">Cerrar la orden</button>.",
-        "selector": ".p4-t .btn.p[disabled]",
-        "evidencia": "El aria-describedby sí apunta a un id que existe (#pq-cerrar), que es lo que §11 pide, y el motivo está escrito. Pero el atributo usado es disabled, no aria-disabled, de modo que el botón queda fuera del recorrido de teclado y la descripción vinculada nunca se lee.",
-        "por_que_importa": "Media regla cumplida y la mitad que falta es la que la regla existe para arreglar: quien navega con teclado recorre Exportar PDF y Reagendar, salta «Cerrar la orden» y nunca oye por qué no puede cerrarla."
-      },
-      {
-        "id": "f1-31orden-09",
-        "severidad": "media",
-        "regla": "§8 Anexo B — límites de voz, y §9 Andamiaje",
-        "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres.» «Si el texto explica una decisión, no va en pantalla.» §9: «todo lo que lleve data-andamio se retira en la versión real».",
-        "hay_en_el_build": "Banda .b-info: «Propuesta con componentes de Studio — pendiente de revisión de Studio.» (estado interno del proyecto, sin data-andamio). .revisando .expl: «Subido. Falta que el servidor lo revise. Abre el archivo y comprueba que su contenido es de verdad lo que dice ser antes de aceptarlo — por eso este paso existe y por eso tarda unos segundos. Hasta que termine, este documento no cuenta para el cierre.» (254 caracteres, 3 frases). .soltar .limites: «…Desde el teléfono, el instalador toma la foto con la cámara; aquí se escoge un archivo que ya existe. Son dos formas distintas de traer lo mismo, y por eso no se ven igual.» (2 frases añadidas tras los formatos admitidos).",
-        "selector": ".banda.b-info > p, .revisando .expl, .soltar .limites",
-        "evidencia": "Conteo de caracteres sobre el texto de los nodos: 254 y 268. Las dos últimas frases de .expl y de .limites explican por qué se diseñó así —el nivel 3 de §8, que «no va en la interfaz»—. La banda de «componentes de Studio» es metadato de proceso y no lleva data-andamio.",
-        "por_que_importa": "De lo que dice .expl, lo único que le importa a quien mira es la primera frase y la última («no cuenta para el cierre»); lo de en medio es la justificación del paso. §8 lo resuelve: la frase que bloquea queda, el resto al toggletip de §6.23 — y la pantalla no tiene ningún .infob."
-      },
-      {
-        "id": "f1-31orden-10",
-        "severidad": "media",
-        "regla": "§6.9 — el icono coincide con la variante",
-        "dice_el_sistema": "«El icono tiene que coincidir con la variante (triángulo de advertencia sobre banda neutra = señal mixta).»",
-        "hay_en_el_build": "<div class=\"banda b-info\"><svg class=\"ico\"><use href=\"#i-badge\"/></svg> — una estrella sobre la banda informativa.",
-        "selector": ".banda.b-info > svg use[href=\"#i-badge\"]",
-        "evidencia": "31_orden_detalle--ok.png: el aviso «Propuesta con componentes de Studio» lleva una estrella. La segunda banda de la pantalla sí acierta: .b-ok con #i-check.",
-        "por_que_importa": "La estrella no significa «información» en ningún otro sitio del producto; §6.5 exige que el significado de un icono no cambie de contexto."
-      },
-      {
-        "id": "f1-31orden-11",
-        "severidad": "media",
-        "regla": "§6.7 Esqueleto de carga",
-        "dice_el_sistema": "«Sin texto real dentro de las barras.» prefers-reduced-motion «aplana el fondo»: {.skel{animation:none;background:var(--surface-2)}}. «El punto de ruptura del esqueleto es el de la tabla (860px, no 900px).»",
-        "hay_en_el_build": "Las barras contienen «Datos de la orden», «cliente y sucursal», «domicilio de la obra», «punto del checklist», «renglón de material». @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer el fondo. @media (max-width:900px){.sk-fila{…}}.",
-        "selector": ".state-loading .skel, .sk-fila",
-        "evidencia": "Con reducedMotion:'reduce' emulado: animation-name «none» y background-image sigue siendo el linear-gradient(90deg, rgb(231,237,243) 25%, …) congelado en la posición 0 — el fallo literal de §6.7. Las tres primeras .skel devuelven textContent no vacío. Líneas 610 y 627 del <style>.",
-        "por_que_importa": "Quien pide movimiento reducido ve un degradado detenido en vez de una superficie limpia, y un lector de pantalla lee la estructura de la ficha como si ya tuviera datos. A favor del esqueleto: sus tres bloques (118/118/94px) imitan razonablemente las tres tarjetas de la columna izquierda."
-      },
-      {
-        "id": "f1-31orden-12",
-        "severidad": "media",
-        "regla": "§10 trampa 5 — isotipo",
-        "dice_el_sistema": "Correcto: <svg width=\"44\" height=\"42\"><use href=\"#dproma-mark\" width=\"44\" height=\"42\"/></svg> — medidas en el <use> y sin viewBox en el envoltorio. «Si el desplazamiento no es ~0, está mal.»",
-        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>.",
-        "selector": ".logo svg > use",
-        "evidencia": "getBoundingClientRect(): <svg> en x=96, <use> en x=63,5 → desplazamiento −32,5px, el valor documentado en §10. 31_orden_detalle--ok.png y --oscuro.png: en la barra lateral se ve una astilla verde.",
-        "por_que_importa": "Afecta a las cuatro pantallas del lote y a los dos temas."
-      },
-      {
-        "id": "f1-31orden-13",
-        "severidad": "media",
-        "regla": "§1.1 — valor de --text-3",
-        "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2).»",
-        "hay_en_el_build": "--text-3: #66717F.",
-        "selector": ":root",
-        "evidencia": "Brief, tokens.text_3_declarado: «#66717F». La pantalla usa --surface-2 en la cabecera de cada .tarjeta, en el fondo de .soltar y en el de las miniaturas .ph.",
-        "por_que_importa": "Hecho ya establecido; se marca porque aquí --text-3 pinta .limites y .meta directamente sobre --surface-2, que es la combinación que el sistema midió a 4,21:1 — y además a 10,5px."
-      },
-      {
-        "id": "f1-31orden-14",
-        "severidad": "media",
-        "regla": "§6.11 regla 3 — aria-sort",
-        "dice_el_sistema": "«aria-sort en todas las columnas ordenables, incluidas las que aún no ordenan (aria-sort=\"none\").»",
-        "hay_en_el_build": "Ningún <th> de la tabla «Material despachado» declara aria-sort (brief: thAriaSort 0 sobre 7 th), pese a que el <style> incluye thead th[aria-sort=\"ascending\"] .sort y thead th[aria-sort=\"descending\"] .sort.",
-        "selector": ".mat thead th",
-        "evidencia": "grep: 'aria-sort' aparece sólo en dos selectores CSS y en ninguna etiqueta. El <caption class> de la tabla sí está presente y el <th scope=\"row\"> de cada fila también, que son las reglas 1 y 2 de §6.11.",
-        "por_que_importa": "Con cuatro renglones el impacto es bajo, pero la hoja de estilos está escrita para una tabla ordenable que el markup no construye, que es el mismo patrón de las otras tres pantallas del lote."
-      },
-      {
-        "id": "f1-31orden-15",
-        "severidad": "media",
-        "regla": "§7.3 Objetivos táctiles",
-        "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo.» «Enlaces que son el elemento primario de su fila (folio, miga, “Ver en Maps”): no son texto en prosa, llevan padding hasta llegar a 24px.»",
-        "hay_en_el_build": "La miga «Órdenes de instalación» mide 155,6×14px y el enlace al trámite ligado <a class=\"lnk\">CFE-2026-00219</a> mide 119,5×15px.",
-        "selector": ".migas > a, .campos a.lnk",
-        "evidencia": "Brief, tactil_24px: 2 de 27 destinos por debajo de 24px, los dos listados. Verificado con data-tacto=\"dedo\" puesto: sin cambios, porque las seis reglas [data-tacto=\"dedo\"] del archivo se escriben sin :root (§7.3).",
-        "por_que_importa": "El enlace al trámite CFE es la única vía desde la orden hacia la dependencia externa de la que depende su ejecución, y la miga es la única salida de la ficha. Son los dos destinos nombrados por §7.3 y los dos que no llegan."
-      },
-      {
-        "id": "f1-31orden-16",
-        "severidad": "baja",
-        "regla": "§6.9 nomenclatura de .banda",
-        "dice_el_sistema": "Cuatro variantes: .banda-info, .banda-warn, .banda-err, .banda-ok.",
-        "hay_en_el_build": ".banda.b-info, .banda.b-ok, .banda.b-warn, .banda.b-err.",
-        "selector": ".banda.b-info, .banda.b-ok",
-        "evidencia": "Líneas del <style> con las cuatro variantes; los tokens de fondo y tinta sí son los documentados.",
-        "por_que_importa": "Sólo diverge del nombre; complica el grep de auditoría entre maquetas."
-      },
-      {
-        "id": "f1-31orden-17",
-        "severidad": "baja",
-        "regla": "§13.3 — un contenedor no cede el ancho a un descendiente",
-        "dice_el_sistema": "«Un contenedor no cede el ancho a un descendiente. flex:1 en el hijo, nunca un max-width heredado del layout anterior.»",
-        "hay_en_el_build": "<span class=\"resumen\" id=\"pq-cerrar\" style=\"max-width:22ch\"> dentro del grupo .acc, en línea.",
-        "selector": ".p4-t .acc .resumen#pq-cerrar",
-        "evidencia": "Estilo en línea en el markup de la cabecera. Es el mismo nodo del hallazgo f1-31orden-04, señalado aquí por la regla de composición.",
-        "por_que_importa": "El max-width en línea es el síntoma de que la cabecera es un flex donde §6.20 pide una rejilla de dos columnas con el indicador declarando su ancho."
-      }
-    ]
-  },
-  "f3_boost_ui": {
-    "puntuacion": 3,
-    "dimensiones": {
-      "accesibilidad": 2,
-      "rendimiento": "no_evaluado",
-      "theming": 3,
-      "responsive": 3,
-      "integridad": 2
-    },
-    "justificacion": "Es la mejor construida del lote, y la única cuyos estados de vacío y error cumplen §6.4: .tarjeta-estado con max-width calculado de 480px, medallón .estado-ico de 52px, encabezado <h2> real y el texto del error diciendo las tres cosas en orden con su referencia ORD-20260821-1104. También acierta en lo estructural: nueve landmarks, migas, tarjetas con <h2> en su cabecera, tabla con <caption> y <th scope=\"row\">, y un layout de dos columnas que reflúye sin romperse. Accesibilidad se queda en 2 por tres cosas concretas: un fallo de contraste medido (.p-type a 2,97:1), quince agrupaciones de texto por debajo de 12px —una de ellas a 10px, el valor más bajo del lote— y elementos con forma de control que no lo son (las seis miniaturas de evidencia son <div>, el checklist no tiene controles). Integridad a 2 por lo mismo más dos fallos silenciosos verificados en el navegador: --sp-5 sin declarar deja el relleno de la zona de arrastre en 0px, y no existe ningún <input type=\"file\"> detrás de la subida. Theming y responsive sostienen el 3.",
-    "evidencia": [
-      "Medido: .tarjeta-estado con max-width 480px, .estado-ico de 52×52px, encabezado <h2> real — único caso del lote.",
-      "Medido: padding calculado de .soltar = «0px» por --sp-5 sin declarar; brief: tokens.usados_sin_declarar = [\"--sp-5\"].",
-      "Medido: document.querySelectorAll('input[type=file]').length = 0; las seis .ph son DIV.",
-      "Brief, contraste: span.p-type «3 SKU» a 2,97:1 frente al mínimo de 4,5:1.",
-      "Estilo calculado: 15 agrupaciones con font-size < 12px, incluida una a 10px (rótulos de miniatura de evidencia).",
-      "Esqueleto: bloques de 118/118/94px coherentes con las tarjetas reales (bien), pero con texto real dentro y sin aplanar el fondo bajo prefers-reduced-motion.",
-      "Isotipo: desplazamiento del <use> respecto al <svg> = −32,5px.",
-      "31_orden_detalle--oscuro.png: los dos temas se resuelven con juegos de tokens completos."
-    ]
-  },
-  "f4_nielsen": [
-    {
-      "n": 1,
-      "heuristica": "Visibilidad del estado del sistema",
-      "severidad": 2,
-      "hallazgo": "Es lo mejor de la pantalla: el estado de la orden («En sitio»), el avance del checklist («5 de 7»), lo que falta para cerrar, el estado del acta («revisando») y una bitácora con cuatro asientos fechados y firmados. Resta un punto que el cambio de vista se haga con data-state sin aria-live y sin mover el foco (§6.4 regla 1), y que no se diga desde cuándo el acta lleva en revisión.",
-      "selector": "main#contenido[data-state], .revisando .meta"
-    },
-    {
-      "n": 2,
-      "heuristica": "Correspondencia entre el sistema y el mundo real",
-      "severidad": 1,
-      "hallazgo": "El vocabulario es el de campo y es preciso: vale de salida, mini-almacén del instalador, acuse firmado, kardex, SKU, trámite CFE ligado. La única fricción es la banda de cabecera, que habla de «componentes de Studio» y de revisiones del proyecto, no de la orden.",
-      "selector": ".banda.b-info > p"
-    },
-    {
-      "n": 3,
-      "heuristica": "Control y libertad del usuario",
-      "severidad": 3,
-      "hallazgo": "La pantalla dice exactamente qué falta para cerrar y luego no ofrece la vía: el checklist no se puede marcar, el consumo no se puede capturar y no hay <input type=\"file\"> para subir el acuse. Es el espíritu de la regla de §6.16 «si la interfaz dice “retira uno”, tiene que existir la forma de retirarlo».",
-      "selector": ".checklist, .soltar, .mat tbody td"
-    },
-    {
-      "n": 4,
-      "heuristica": "Consistencia y estándares",
-      "severidad": 2,
-      "hallazgo": "El arquetipo de detalle del sistema (§6.20: .cab + .idt + indicador que declara su ancho) no se usa; en su lugar se reutiliza el .p4-t de las bandejas y el indicador de urgencia se resuelve con un max-width en línea. Además .b-info lleva una estrella y «3 SKU» va en una etiqueta de clasificación con color de serie cuando es un conteo.",
-      "selector": ".p4-t, .banda.b-info, .p-type.p-s2"
-    },
-    {
-      "n": 5,
-      "heuristica": "Prevención de errores",
-      "severidad": 1,
-      "hallazgo": "Muy bien resuelta: «Cerrar la orden» está bloqueado mientras falten las dos condiciones, el motivo está escrito y vinculado por aria-describedby a un id que existe, y el acta subida avisa de que «no cuenta para el cierre» hasta que el servidor la revise. Lo único que la lastra es que el bloqueo use disabled en vez de aria-disabled, con lo que el teclado nunca llega al motivo.",
-      "selector": ".btn.p[disabled][aria-describedby=\"pq-cerrar\"]"
-    },
-    {
-      "n": 6,
-      "heuristica": "Reconocer antes que recordar",
-      "severidad": 1,
-      "hallazgo": "La ficha reúne en una pantalla lo que hoy está repartido entre un Word de rutas, un Excel de clientes y WhatsApp: domicilio, contacto en sitio, cita, instalador, equipo y el trámite CFE ligado, cada punto del checklist con quién lo marcó y a qué hora. No hace falta recordar ni buscar fuera nada de lo que la orden necesita.",
-      "selector": ".campos, .checklist, .bitacora"
-    },
-    {
-      "n": 7,
-      "heuristica": "Flexibilidad y eficiencia de uso",
-      "severidad": 2,
-      "hallazgo": "«Exportar PDF» y «Reagendar» son los dos atajos correctos para el trabajo de coordinación, pero ninguno tiene manejador, y la tabla de material no ordena (ningún aria-sort). La zona de subida contempla arrastrar y elegir, que es la flexibilidad adecuada para campo, y luego no hace ninguna de las dos.",
-      "selector": ".p4-t .acc .btn, .soltar, .mat thead th"
-    },
-    {
-      "n": 8,
-      "heuristica": "Diseño estético y minimalista",
-      "severidad": 2,
-      "hallazgo": "El cuerpo de la ficha está bien medido, pero la columna derecha acumula 520 caracteres de explicación entre .expl y .limites, con dos frases que justifican por qué se diseñó así —el nivel 3 de §8, que no va en la interfaz—. Y están escritas a 10,5 y 11px, de modo que ocupan mucho y se leen mal a la vez.",
-      "selector": ".revisando .expl, .soltar .limites"
-    },
-    {
-      "n": 9,
-      "heuristica": "Ayudar a reconocer y recuperarse de los errores",
-      "severidad": 1,
-      "hallazgo": "La mejor vista de error del lote y la única que cumple el envase de §6.4: tarjeta de 480px con medallón de 52px, <h2> real, el texto diciendo qué pasó, qué no se ha perdido («nada se cerró ni se modificó: ni el checklist, ni la evidencia, ni la cita») y qué hacer, con referencia ORD-20260821-1104. Es una ficha de sólo lectura, así que no aplica la regla de no llevarse por delante el trabajo del usuario.",
-      "selector": ".state-error .tarjeta-estado.es-err"
-    },
-    {
-      "n": 10,
-      "heuristica": "Ayuda y documentación",
-      "severidad": 2,
-      "hallazgo": "La pantalla explica bien lo que hace falta explicar (por qué el acta tarda, qué pasa si falta el consumo) pero lo deja todo siempre visible en prosa, cuando §8 reserva ese nivel al toggletip de §6.23. No hay ningún .infob en la pantalla, y es un caso de libro: una ficha de detalle con dt/dd es el ejemplo que §6.23 usa para enunciar el componente.",
-      "selector": ".revisando .expl, .soltar .limites, .campos"
-    }
-  ],
-  "f5_investigacion": {
-    "pain_points_evaluados": [
-      {
-        "pp": "pp-026",
-        "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
-        "cobertura": "contradice",
-        "evidencia": "«Las hojas de servicio se registran en papel; la conciliación de materiales entre estas hojas y los totales de almacén se realiza como un cruce manual posterior». La pantalla acierta de pleno en el planteamiento: pone despachado y consumido en la misma tabla, nombra la consecuencia exacta («Consumo de material capturado · Pendiente. Sin esto el kardex no descuenta lo que salió») y bloquea el cierre de la orden hasta que se capture. Pero no da ninguna forma de capturarlo: los cuatro renglones dicen «por capturar» en texto plano, las celdas no son editables, el checklist es una <ul> de <li> estáticos sin un solo control, y no hay <input type=\"file\"> en toda la pantalla para subir la hoja de servicio. El resultado es que la orden queda bloqueada dentro del sistema esperando un dato que sólo se puede producir fuera: la conciliación manual que pp-026 describe sigue siendo obligatoria, y ahora además con una orden abierta encima."
-      },
-      {
-        "pp": "pp-028",
-        "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
-        "cobertura": "cubre",
-        "evidencia": "«La ejecución de instalaciones depende de aprobaciones y recursos de áreas externas; cuando esos vistos buenos se retrasan, la operación queda completamente detenida». La ficha enlaza la dependencia externa desde el cuerpo de datos: «Trámite CFE ligado: CFE-2026-00219». Es el único dolor de severidad alta del área de campo y la pantalla lo reconoce estructuralmente. Cobertura parcial: el enlace no trae ni el estado del trámite ni desde cuándo espera, así que dice de qué depende la orden pero no si esa dependencia es la que la está deteniendo."
-      },
-      {
-        "pp": "pp-024",
-        "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
-        "cobertura": "cubre",
-        "evidencia": "«La validación y despacho de materiales depende de la disponibilidad simultánea de dos personas; cuando alguna no está disponible, los materiales salen sin las firmas». La banda .b-ok deja rastro fechado del despacho —«El material salió completo del almacén el 24 de agosto»— con enlace «Ver vale de salida», y la bitácora lo repite como asiento («Almacén despachó el material · 24 ago 2026 · 16:20»). Cobertura parcial: no dice quién firmó ni si firmaron los dos, que es exactamente el punto del dolor."
-      },
-      {
-        "pp": "pp-022",
-        "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
-        "cobertura": "cubre",
-        "evidencia": "«La programación y las rutas de instalación se elaboran en un Word manejado aparte, desconectado de la base de datos de clientes en Excel». La ficha une las dos mitades: cita con franja horaria, domicilio de la obra y contacto en sitio junto al cliente y la sucursal, en el mismo registro. Y ofrece «Reagendar» desde la propia orden, aunque el botón no tenga manejador en la maqueta."
-      },
-      {
-        "pp": "pp-030",
-        "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
-        "cobertura": "cubre",
-        "evidencia": "«Las herramientas de trabajo diarias del equipo de operaciones se limitan a WhatsApp, Excel y correo electrónico, sin una plataforma centralizada que unifique la gestión». La ficha es el registro único que falta: datos, checklist, material, evidencia, documento firmado y bitácora en una sola pantalla con folio. Es la cobertura más amplia de la pantalla, aunque hoy sea de sólo lectura."
-      },
-      {
-        "pp": "pp-025",
-        "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
-        "cobertura": "ignora",
-        "evidencia": "«No existe un proceso formal de devolución o registro de materiales sobrantes al almacén; el ajuste se comunica por WhatsApp y se descuenta manualmente del siguiente pedido». La tabla de material tiene exactamente dos columnas, despachado y consumido, y no hay una tercera para sobrante ni acción de devolver. Con sólo esas dos, la diferencia queda implícita y sin destino: es el hueco por el que vuelve el WhatsApp."
-      },
-      {
-        "pp": "pp-029",
-        "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
-        "cobertura": "ignora",
-        "evidencia": "«La cotización de materiales para venta al cliente recae exclusivamente en el mismo rol técnico que supervisa instalaciones; el equipo comercial copia manualmente esos números». La ficha lleva cantidades (20.000 m, 1.000 pza) y ningún importe, de modo que el dato que comercial necesita copiar no está aquí y hay que volver a pedírselo al técnico."
-      },
-      {
-        "pp": "pp-020",
-        "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
-        "cobertura": "ignora",
-        "evidencia": "«Las solicitudes de instalación ingresan casi exclusivamente por grupos de WhatsApp de agencias o directamente de clientes; no existe un formulario o canal centralizado». Es una pantalla de detalle y el alta no le corresponde, pero la ficha tampoco deja rastro del origen de la orden: la bitácora dice «Mesa de Control creó la orden» sin decir por qué canal entró, que sería la medida de si el canal centralizado se está usando."
-      },
-      {
-        "pp": "pp-094",
-        "documento": "data/insights/2026-07-31_finanzas-cobranza-almacen.json",
-        "cobertura": "cubre",
-        "evidencia": "«Para confirmar que un servicio fue ejecutado, especialmente ante reclamos de clientes, finanzas debe revisar manualmente múltiples fuentes dispersas sin un repositorio único». Esta ficha es ese repositorio: checklist con hora y responsable, seis fotos de evidencia por fase, acta de entrega firmada y bitácora. Es la pantalla del lote que más ayuda a un área que no es la suya. Cobertura parcial en la práctica: las miniaturas de evidencia son <div> y no se pueden abrir, así que la prueba está anunciada pero no consultable."
-      }
-    ],
-    "usabilidad_para_el_area": "Para coordinación técnica es la pieza que mejor entiende el trabajo de campo: reúne en un folio lo que hoy vive repartido entre un Word de rutas, un Excel de clientes, hojas de servicio en papel y WhatsApp, y lo hace con el detalle que delata la entrevista —el mini-almacén del instalador, el vale de salida, el kardex, el acuse firmado como condición de cierre—. Sobre pp-030, pp-022, pp-024 y pp-028 la cobertura es real, y de rebote resuelve pp-094 para finanzas, que es quien hoy tiene que reconstruir a mano si un servicio se ejecutó. El problema es que la ficha sólo sabe leer. Declara con precisión las dos condiciones que faltan para cerrar la orden y no ofrece ninguna de las dos vías: el consumo no se captura, el checklist no se marca, el acuse no se sube porque no hay ningún input de archivo, y la zona de arrastre además se queda sin relleno porque --sp-5 no está declarado. Así, pp-026 no sólo queda sin resolver: la pantalla formaliza el bloqueo y deja fuera la única forma de levantarlo, con lo que el cruce manual sigue siendo obligatorio y ahora con una orden abierta esperándolo. Faltan también la devolución de sobrantes (pp-025), que es por donde el ajuste vuelve al WhatsApp, y cualquier importe (pp-029)."
-  },
-  "cobertura": [
-    {
-      "patron": "Rejilla de miniaturas de evidencia fotográfica por fase de un trabajo (.evid + .ph: seis celdas con icono, rótulo de fase y fondo --surface-2). El sistema no documenta ninguna pieza de galería ni de adjunto visual; §6.17 cubre la subida y §6.20 la ficha, pero entre las dos queda sin regla el sitio donde viven las fotos ya subidas, que en operaciones de campo es la prueba del trabajo.",
-      "propuesta_de_regla": "§6.17.1 Rejilla de evidencia — .evid + .ph. Cuándo: las fotos o documentos ya subidos de un expediente, agrupados por la fase que documentan. Cada celda es un <button type=\"button\"> —abre el visor, luego ejecuta— con aria-label que nombra la fase y el expediente («Ver la foto de Canalización de ORD-202608-0417»), nunca un <div>. Relación 4:3, radio --r-ctrl, fondo --surface-2 mientras carga la miniatura. El rótulo de fase va dentro de la celda a --fs-meta (12px), nunca por debajo del suelo de §2.1, con la miniatura oscurecida detrás por --velo-suave para que el texto conserve sus 4,5:1 sobre cualquier fotografía. Una fase sin foto se muestra igual pero vacía y con su rótulo, porque el hueco es información: dice qué prueba falta. El contador de la cabecera cuenta fotos existentes, no fases."
-    },
-    {
-      "patron": "Documento adjunto en revisión automática antes de darse por válido (.revisando: nombre de archivo, peso, estado «revisando» y explicación de por qué no cuenta todavía). §6.17 documenta el archivo cargado —nombre y fecha, reemplazar o quitar— pero no contempla un estado intermedio entre «subido» y «aceptado», que es el que decide si la orden se puede cerrar.",
-      "propuesta_de_regla": "§6.17 (ampliación) — estados del archivo cargado. Al data-estado=\"vacio\" y «cargado» se añaden «revisando» y «rechazado». «Revisando» se marca con .pill.p-pause (§6.10: color + icono + texto), nunca con --warn: la revisión no es un fallo. Muestra siempre nombre, peso y hora de subida, y mantiene disponibles «reemplazar» y «quitar» durante la revisión. La consecuencia se dice en una frase visible («no cuenta para el cierre») y el porqué va al toggletip de §6.23 (§8, nivel 2). «Rechazado» usa .pill.p-err, dice el motivo en una frase y deja el archivo descargable para que se pueda comprobar qué se envió."
-    },
-    {
-      "patron": "Checklist de ejecución con autoría y hora por punto (.checklist: marca de estado, enunciado y «Marcado por J. Olvera · 25 ago 09:14»), y bitácora de expediente (.bitacora: punto de color, quién, qué y cuándo). Son dos piezas distintas con la misma materia —quién hizo qué y cuándo— y ninguna de las dos está documentada; §6.20 nombra la bitácora al fijar el orden de la ficha, pero no la especifica.",
-      "propuesta_de_regla": "§6.20.1 Bitácora y checklist de expediente — .bitacora, .checklist. La bitácora es un <ol> en orden inverso (lo último arriba) de asientos inmutables: quién, qué y cuándo, con la hora a --fs-meta en --text-3 y el punto de color sólo en dos variantes, --accent para lo que hizo una persona y --border-fuerte para lo automático; nunca el semáforo, porque un asiento registrado no es un juicio. El checklist es una <ul> de puntos accionables: cada punto lleva su propio control real (casilla de §7.3 o botón), y el punto marcado muestra autor y hora con el mismo formato que la bitácora. Si el checklist es de sólo lectura para el rol que mira, se dice en una frase en la cabecera de la tarjeta, y las marcas se dibujan sin forma de control. Regla dura: un punto que bloquea el cierre del expediente lleva, en el propio punto, la vía de resolverlo o el enlace a dónde se resuelve."
-    }
-  ],
-  "sin_datos": [
-    "f3.rendimiento: maqueta estática servida por un servidor de ficheros, sin backend, sin librerías externas y sin red que perfilar.",
-    "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (0 <dialog> y 0 div[role=dialog] según el brief).",
-    "§12 Gráficas: no hay ningún <canvas> ni ninguna gráfica en la pantalla.",
-    "§6.23 Toggletip: no evaluado como incumplimiento porque la pantalla no declara ningún .infob; su ausencia se recoge en F4 heurística 10 como la causa de que las explicaciones vayan siempre visibles.",
-    "Estado «vacío»: auditado el envase (cumple §6.4: .tarjeta-estado, medallón de 52px, <h2> real). No se audita si «orden sin nada capturado» es un estado alcanzable del producto, porque eso depende del backend que la maqueta no tiene."
+ "pantalla": "31_orden_detalle",
+ "ruta_zip": "03-icev-instalacion-de-cargadores/31_orden_detalle.html",
+ "carpeta": "03-icev-instalacion-de-cargadores",
+ "area": "ICEV/operaciones",
+ "arquetipo": "detalle",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "31_orden_detalle--ok.png",
+  "31_orden_detalle--loading.png",
+  "31_orden_detalle--empty.png",
+  "31_orden_detalle--error.png",
+  "31_orden_detalle--oscuro.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "f1-31orden-01",
+    "severidad": "alta",
+    "regla": "§6.17 Subida de archivo — .subida",
+    "dice_el_sistema": "«Un documento no se pide en una caja de texto. Sustituye a cualquier <input type=\"text\"> que pida un adjunto.» Markup: <input type=\"file\" accept=\".pdf,.jpg,.jpeg,.png\" aria-describedby=\"…\">, data-estado=\"vacio\". «Indica formatos y peso admitidos, muestra el archivo cargado con su nombre y fecha, y permite reemplazarlo o quitarlo.»",
+    "hay_en_el_build": "<div class=\"soltar\"><svg…><b>Arrastra aquí un archivo, o escógelo del equipo</b><button class=\"btn\" type=\"button\">Escoger archivo</button><span class=\"limites\">…</span></div> — no hay ningún <input type=\"file\"> en la pantalla, ni atributo accept, ni data-estado, ni aria-describedby. El archivo ya subido (.revisando) muestra nombre, peso y estado, pero no fecha, y no ofrece ni reemplazarlo ni quitarlo.",
+    "selector": ".soltar, .revisando",
+    "evidencia": "Medido en el navegador: document.querySelectorAll('input[type=file]').length = 0 (el brief lo confirma: inputs = 0 en toda la pantalla). El botón «Escoger archivo» es un <button type=\"button\"> sin manejador: el único querySelectorAll del <script> es querySelectorAll('.demo [data-set]').",
+    "por_que_importa": "Subir el acuse firmado es una de las dos condiciones que la propia pantalla declara para poder cerrar la orden. La zona de arrastre existe visualmente, anuncia formatos y pesos, y no hay forma de soltar ni de elegir nada: el botón que bloquea la orden no tiene su contrapartida."
+   },
+   {
+    "id": "f1-31orden-02",
+    "severidad": "alta",
+    "regla": "§3 — «un token que no existe falla en silencio»",
+    "dice_el_sistema": "«Un var() que no resuelve invalida la declaración entera (los tres paddings del diálogo computaban a 0). Cuando un espaciado se vea raro, lo primero es comprobar que su token está definido.» §11: «todo token var(--x) que usa el archivo está declarado en ese mismo archivo».",
+    "hay_en_el_build": ".soltar{…padding:var(--sp-5);…} con --sp-5 sin declarar: el :root del archivo trae --sp-1, --sp-2, --sp-3, --sp-4, --sp-6, --sp-8 y --sp-12, y salta el 5.",
+    "selector": ".soltar",
+    "evidencia": "Medido con getComputedStyle: padding calculado de .soltar = «0px». El brief lo registra como el único token usado sin declarar de la pantalla (tokens.usados_sin_declarar: [\"--sp-5\"]). Líneas 21-22 del <style> para la escala declarada; línea 674 para el uso.",
+    "por_que_importa": "La zona de arrastre se queda sin relleno interior, de modo que su texto y su botón tocan el borde discontinuo. Es el caso exacto que §3 documenta y el motivo por el que §11 incluye la comprobación usados − declarados = vacío. Es además un hecho ya establecido para 8 maquetas."
+   },
+   {
+    "id": "f1-31orden-03",
+    "severidad": "alta",
+    "regla": "§1.7 Contraste mínimo (texto normal 4,5:1) y §6.10 .p-type",
+    "dice_el_sistema": "«Texto normal: 4,5:1.» «Cada color nuevo se mide contra los fondos donde va a aparecer, en los dos temas, antes de darlo por bueno.» §6.10: .p-type{background:color-mix(in srgb,var(--serie-N) 16%,var(--surface));color:var(--text-2)}.",
+    "hay_en_el_build": "<span class=\"p-type p-s2\" style=\"margin-left:6px\">3 SKU</span> con color rgb(76,90,107) (--text-2) sobre color(srgb 0.900078 0.889726 0.938824), a 11px.",
+    "selector": "tbody th .p-type.p-s2",
+    "evidencia": "Brief, contraste: ratio medido 2,97:1 frente al mínimo de 4,5:1. Es uno de los tres fallos de contraste de la pantalla.",
+    "por_que_importa": "El contraste falla por dos motivos acumulados: el fondo de la etiqueta se calcula con --serie-2, que en esta maqueta vale #7A5FA8 (violeta) y no el #eb6834 documentado en §1.4, y el texto va a 11px, por debajo del suelo de §2.1. Y hay un tercer problema de fondo: «3 SKU» es un conteo, un dato sobre el dato, y el preámbulo de §1 dice que eso va «sin color propio, tinta de texto §6.22» — no en una etiqueta de clasificación con color de serie."
+   },
+   {
+    "id": "f1-31orden-04",
+    "severidad": "media",
+    "regla": "§6.20 Ficha de detalle — .cab, .idt e indicador lateral",
+    "dice_el_sistema": "«Abre con bloque de identidad (folio, nombre del expediente, marcas de estado) y a su derecha el indicador que decide la urgencia.» .cab{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,360px);gap:var(--sp-6);align-items:center;padding:var(--sp-5) var(--sp-6)}. «El indicador de la derecha declara su ancho; no se queda con lo que sobre (rejilla, no flex con min-width:250px;max-width:330px frente a flex:1).»",
+    "hay_en_el_build": "No existe .cab ni .idt en el archivo. La pantalla reutiliza el .p4-t de las bandejas (flex con .acc al final) y el indicador de urgencia es un <span class=\"resumen\" id=\"pq-cerrar\" style=\"max-width:22ch\">Faltan el acuse firmado y el consumo capturado.</span> colgado del grupo de botones.",
+    "selector": ".p4-t > .acc > .resumen#pq-cerrar",
+    "evidencia": "grep '.cab' y '.idt' sobre el archivo: 0 coincidencias. 31_orden_detalle--ok.png: el indicador queda a la derecha de «Cerrar la orden», en dos líneas, con un max-width en línea de 22ch en vez de una columna de rejilla declarada.",
+    "por_que_importa": "Es el componente que define el arquetipo de esta pantalla y no está. La consecuencia es la que §6.20 y §13.3 anticipan: el indicador no declara su ancho, se queda con lo que sobra del flex y se parte en dos líneas de 11px junto al borde derecho, cuando es el dato que decide si la orden se puede cerrar."
+   },
+   {
+    "id": "f1-31orden-05",
+    "severidad": "media",
+    "regla": "§6.20 — «quién es el cliente va junto al expediente, a ancho completo y con los datos en fila»",
+    "dice_el_sistema": "«Quién es el cliente va junto al expediente, a ancho completo y con los datos en fila, antes de la bitácora y de los documentos — ese orden es también el del recorrido con teclado.»",
+    "hay_en_el_build": "La tarjeta «Datos de la orden» ocupa la columna izquierda de una rejilla de dos columnas (.dosc), no el ancho completo, y sus ocho campos van en rejilla de tres columnas dentro de ella. En el recorrido con teclado, los documentos (Evidencia, acta, zona de subida) de la columna derecha vienen después de las tres tarjetas de la izquierda, incluido el material.",
+    "selector": ".dosc > div:first-child .tarjeta:first-of-type, .campos",
+    "evidencia": "31_orden_detalle--ok.png: el domicilio de la obra se parte en tres líneas dentro de una columna de la rejilla interior; la bitácora queda al final de la columna derecha, debajo de la subida de archivos.",
+    "por_que_importa": "El domicilio y el contacto en sitio son los dos datos que alguien lee con prisa antes de llamar al cliente, y quedan comprimidos en un tercio del ancho. El orden del teclado tampoco es el que la regla fija."
+   },
+   {
+    "id": "f1-31orden-06",
+    "severidad": "media",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "«Nada baja de ahí»; la única excepción es 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+    "hay_en_el_build": "15 declaraciones font-size:11px, 7 de 10,5px, 2 de 11,5px y una de 10px. En zona de producto: los seis rótulos de miniatura de evidencia a 10px («Antes», «Tablero», «Canalización»…), .limites a 10,5px (formatos y pesos admitidos), .meta a 10,5px («1.2 MB · revisando»), .expl a 11px, las marcas de tiempo del checklist y de la bitácora a 11/11,5px, thead th a 11px y el indicador #pq-cerrar a 11px.",
+    "selector": ".evid .ph span, .soltar .limites, .revisando .meta, .revisando .expl, .bitacora .cuando",
+    "evidencia": "Estilo calculado a 1440×900: 15 agrupaciones por debajo de 12px, incluida una a 10px, que es el valor más bajo de todo el lote. --fs-meta vale 12px en :root (línea 13): todos son literales que se saltan el token.",
+    "por_que_importa": "Los 10px de los rótulos de evidencia son lo único que distingue una foto de otra (no hay imagen, sólo el rótulo), y los 10,5px de .limites llevan los formatos y pesos admitidos, que es la información sin la cual una subida falla. Ninguno de los dos entra en la excepción de 10,5px, que exige mayúsculas y letter-spacing."
+   },
+   {
+    "id": "f1-31orden-07",
+    "severidad": "media",
+    "regla": "§11 Interacción — «lo que ejecuta es un <button> y lo que navega un <a>»",
+    "dice_el_sistema": "«¿Lo que ejecuta es un <button> y lo que navega un <a>?» §6.5: «un icono nunca es la única forma de entender un control»; «si va sin texto visible lleva como mínimo etiqueta emergente (title) y aria-label».",
+    "hay_en_el_build": "Las seis miniaturas de evidencia son <div class=\"ph\"> con un icono de ojo y un rótulo: no son ni botón ni enlace, no reciben foco y no se pueden abrir. El checklist es una <ul> de <li> estáticos sin ningún control: siete puntos marcables que no se pueden marcar.",
+    "selector": ".evid .ph, .checklist > li",
+    "evidencia": "Medido: [...document.querySelectorAll('.ph')].map(e=>e.tagName) devuelve DIV. La cabecera anuncia «6 fotos» y no hay forma de ver ninguna; el checklist dice «5 de 7» y los dos pendientes no tienen control.",
+    "por_que_importa": "La evidencia fotográfica es la prueba de la instalación y el checklist es el que decide el cierre. Presentarlos con forma de cosa pulsable (icono de ojo, marcas de verificación) sin que lo sean obliga a buscar la foto fuera del sistema, que es el circuito de WhatsApp que esta pantalla venía a sustituir."
+   },
+   {
+    "id": "f1-31orden-08",
+    "severidad": "media",
+    "regla": "§6.16 — botón deshabilitado",
+    "dice_el_sistema": "«Un botón deshabilitado no recibe el foco → aria-disabled=\"true\" + aria-describedby con el motivo, y al pulsarlo se explica. Ese id tiene que ser único.»",
+    "hay_en_el_build": "<button class=\"btn p\" type=\"button\" disabled aria-describedby=\"pq-cerrar\">Cerrar la orden</button>.",
+    "selector": ".p4-t .btn.p[disabled]",
+    "evidencia": "El aria-describedby sí apunta a un id que existe (#pq-cerrar), que es lo que §11 pide, y el motivo está escrito. Pero el atributo usado es disabled, no aria-disabled, de modo que el botón queda fuera del recorrido de teclado y la descripción vinculada nunca se lee.",
+    "por_que_importa": "Media regla cumplida y la mitad que falta es la que la regla existe para arreglar: quien navega con teclado recorre Exportar PDF y Reagendar, salta «Cerrar la orden» y nunca oye por qué no puede cerrarla."
+   },
+   {
+    "id": "f1-31orden-09",
+    "severidad": "media",
+    "regla": "§8 Anexo B — límites de voz, y §9 Andamiaje",
+    "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres.» «Si el texto explica una decisión, no va en pantalla.» §9: «todo lo que lleve data-andamio se retira en la versión real».",
+    "hay_en_el_build": "Banda .b-info: «Propuesta con componentes de Studio — pendiente de revisión de Studio.» (estado interno del proyecto, sin data-andamio). .revisando .expl: «Subido. Falta que el servidor lo revise. Abre el archivo y comprueba que su contenido es de verdad lo que dice ser antes de aceptarlo — por eso este paso existe y por eso tarda unos segundos. Hasta que termine, este documento no cuenta para el cierre.» (254 caracteres, 3 frases). .soltar .limites: «…Desde el teléfono, el instalador toma la foto con la cámara; aquí se escoge un archivo que ya existe. Son dos formas distintas de traer lo mismo, y por eso no se ven igual.» (2 frases añadidas tras los formatos admitidos).",
+    "selector": ".banda.b-info > p, .revisando .expl, .soltar .limites",
+    "evidencia": "Conteo de caracteres sobre el texto de los nodos: 254 y 268. Las dos últimas frases de .expl y de .limites explican por qué se diseñó así —el nivel 3 de §8, que «no va en la interfaz»—. La banda de «componentes de Studio» es metadato de proceso y no lleva data-andamio.",
+    "por_que_importa": "De lo que dice .expl, lo único que le importa a quien mira es la primera frase y la última («no cuenta para el cierre»); lo de en medio es la justificación del paso. §8 lo resuelve: la frase que bloquea queda, el resto al toggletip de §6.23 — y la pantalla no tiene ningún .infob."
+   },
+   {
+    "id": "f1-31orden-10",
+    "severidad": "media",
+    "regla": "§6.9 — el icono coincide con la variante",
+    "dice_el_sistema": "«El icono tiene que coincidir con la variante (triángulo de advertencia sobre banda neutra = señal mixta).»",
+    "hay_en_el_build": "<div class=\"banda b-info\"><svg class=\"ico\"><use href=\"#i-badge\"/></svg> — una estrella sobre la banda informativa.",
+    "selector": ".banda.b-info > svg use[href=\"#i-badge\"]",
+    "evidencia": "31_orden_detalle--ok.png: el aviso «Propuesta con componentes de Studio» lleva una estrella. La segunda banda de la pantalla sí acierta: .b-ok con #i-check.",
+    "por_que_importa": "La estrella no significa «información» en ningún otro sitio del producto; §6.5 exige que el significado de un icono no cambie de contexto."
+   },
+   {
+    "id": "f1-31orden-11",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga",
+    "dice_el_sistema": "«Sin texto real dentro de las barras.» prefers-reduced-motion «aplana el fondo»: {.skel{animation:none;background:var(--surface-2)}}. «El punto de ruptura del esqueleto es el de la tabla (860px, no 900px).»",
+    "hay_en_el_build": "Las barras contienen «Datos de la orden», «cliente y sucursal», «domicilio de la obra», «punto del checklist», «renglón de material». @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer el fondo. @media (max-width:900px){.sk-fila{…}}.",
+    "selector": ".state-loading .skel, .sk-fila",
+    "evidencia": "Con reducedMotion:'reduce' emulado: animation-name «none» y background-image sigue siendo el linear-gradient(90deg, rgb(231,237,243) 25%, …) congelado en la posición 0 — el fallo literal de §6.7. Las tres primeras .skel devuelven textContent no vacío. Líneas 610 y 627 del <style>.",
+    "por_que_importa": "Quien pide movimiento reducido ve un degradado detenido en vez de una superficie limpia, y un lector de pantalla lee la estructura de la ficha como si ya tuviera datos. A favor del esqueleto: sus tres bloques (118/118/94px) imitan razonablemente las tres tarjetas de la columna izquierda."
+   },
+   {
+    "id": "f1-31orden-12",
+    "severidad": "media",
+    "regla": "§10 trampa 5 — isotipo",
+    "dice_el_sistema": "Correcto: <svg width=\"44\" height=\"42\"><use href=\"#dproma-mark\" width=\"44\" height=\"42\"/></svg> — medidas en el <use> y sin viewBox en el envoltorio. «Si el desplazamiento no es ~0, está mal.»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>.",
+    "selector": ".logo svg > use",
+    "evidencia": "getBoundingClientRect(): <svg> en x=96, <use> en x=63,5 → desplazamiento −32,5px, el valor documentado en §10. 31_orden_detalle--ok.png y --oscuro.png: en la barra lateral se ve una astilla verde.",
+    "por_que_importa": "Afecta a las cuatro pantallas del lote y a los dos temas."
+   },
+   {
+    "id": "f1-31orden-13",
+    "severidad": "media",
+    "regla": "§1.1 — valor de --text-3",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2).»",
+    "hay_en_el_build": "--text-3: #66717F.",
+    "selector": ":root",
+    "evidencia": "Brief, tokens.text_3_declarado: «#66717F». La pantalla usa --surface-2 en la cabecera de cada .tarjeta, en el fondo de .soltar y en el de las miniaturas .ph.",
+    "por_que_importa": "Hecho ya establecido; se marca porque aquí --text-3 pinta .limites y .meta directamente sobre --surface-2, que es la combinación que el sistema midió a 4,21:1 — y además a 10,5px."
+   },
+   {
+    "id": "f1-31orden-14",
+    "severidad": "media",
+    "regla": "§6.11 regla 3 — aria-sort",
+    "dice_el_sistema": "«aria-sort en todas las columnas ordenables, incluidas las que aún no ordenan (aria-sort=\"none\").»",
+    "hay_en_el_build": "Ningún <th> de la tabla «Material despachado» declara aria-sort (brief: thAriaSort 0 sobre 7 th), pese a que el <style> incluye thead th[aria-sort=\"ascending\"] .sort y thead th[aria-sort=\"descending\"] .sort.",
+    "selector": ".mat thead th",
+    "evidencia": "grep: 'aria-sort' aparece sólo en dos selectores CSS y en ninguna etiqueta. El <caption class> de la tabla sí está presente y el <th scope=\"row\"> de cada fila también, que son las reglas 1 y 2 de §6.11.",
+    "por_que_importa": "Con cuatro renglones el impacto es bajo, pero la hoja de estilos está escrita para una tabla ordenable que el markup no construye, que es el mismo patrón de las otras tres pantallas del lote."
+   },
+   {
+    "id": "f1-31orden-15",
+    "severidad": "media",
+    "regla": "§7.3 Objetivos táctiles",
+    "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo.» «Enlaces que son el elemento primario de su fila (folio, miga, “Ver en Maps”): no son texto en prosa, llevan padding hasta llegar a 24px.»",
+    "hay_en_el_build": "La miga «Órdenes de instalación» mide 155,6×14px y el enlace al trámite ligado <a class=\"lnk\">CFE-2026-00219</a> mide 119,5×15px.",
+    "selector": ".migas > a, .campos a.lnk",
+    "evidencia": "Brief, tactil_24px: 2 de 27 destinos por debajo de 24px, los dos listados. Verificado con data-tacto=\"dedo\" puesto: sin cambios, porque las seis reglas [data-tacto=\"dedo\"] del archivo se escriben sin :root (§7.3).",
+    "por_que_importa": "El enlace al trámite CFE es la única vía desde la orden hacia la dependencia externa de la que depende su ejecución, y la miga es la única salida de la ficha. Son los dos destinos nombrados por §7.3 y los dos que no llegan."
+   },
+   {
+    "id": "f1-31orden-16",
+    "severidad": "baja",
+    "regla": "§6.9 nomenclatura de .banda",
+    "dice_el_sistema": "Cuatro variantes: .banda-info, .banda-warn, .banda-err, .banda-ok.",
+    "hay_en_el_build": ".banda.b-info, .banda.b-ok, .banda.b-warn, .banda.b-err.",
+    "selector": ".banda.b-info, .banda.b-ok",
+    "evidencia": "Líneas del <style> con las cuatro variantes; los tokens de fondo y tinta sí son los documentados.",
+    "por_que_importa": "Sólo diverge del nombre; complica el grep de auditoría entre maquetas."
+   },
+   {
+    "id": "f1-31orden-17",
+    "severidad": "baja",
+    "regla": "§13.3 — un contenedor no cede el ancho a un descendiente",
+    "dice_el_sistema": "«Un contenedor no cede el ancho a un descendiente. flex:1 en el hijo, nunca un max-width heredado del layout anterior.»",
+    "hay_en_el_build": "<span class=\"resumen\" id=\"pq-cerrar\" style=\"max-width:22ch\"> dentro del grupo .acc, en línea.",
+    "selector": ".p4-t .acc .resumen#pq-cerrar",
+    "evidencia": "Estilo en línea en el markup de la cabecera. Es el mismo nodo del hallazgo f1-31orden-04, señalado aquí por la regla de composición.",
+    "por_que_importa": "El max-width en línea es el síntoma de que la cabecera es un flex donde §6.20 pide una rejilla de dos columnas con el indicador declarando su ancho."
+   }
   ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "Es la mejor construida del lote, y la única cuyos estados de vacío y error cumplen §6.4: .tarjeta-estado con max-width calculado de 480px, medallón .estado-ico de 52px, encabezado <h2> real y el texto del error diciendo las tres cosas en orden con su referencia ORD-20260821-1104. También acierta en lo estructural: nueve landmarks, migas, tarjetas con <h2> en su cabecera, tabla con <caption> y <th scope=\"row\">, y un layout de dos columnas que reflúye sin romperse. Accesibilidad se queda en 2 por tres cosas concretas: un fallo de contraste medido (.p-type a 2,97:1), quince agrupaciones de texto por debajo de 12px —una de ellas a 10px, el valor más bajo del lote— y elementos con forma de control que no lo son (las seis miniaturas de evidencia son <div>, el checklist no tiene controles). Integridad a 2 por lo mismo más dos fallos silenciosos verificados en el navegador: --sp-5 sin declarar deja el relleno de la zona de arrastre en 0px, y no existe ningún <input type=\"file\"> detrás de la subida. Theming y responsive sostienen el 3.",
+  "evidencia": [
+   "Medido: .tarjeta-estado con max-width 480px, .estado-ico de 52×52px, encabezado <h2> real — único caso del lote.",
+   "Medido: padding calculado de .soltar = «0px» por --sp-5 sin declarar; brief: tokens.usados_sin_declarar = [\"--sp-5\"].",
+   "Medido: document.querySelectorAll('input[type=file]').length = 0; las seis .ph son DIV.",
+   "Brief, contraste: span.p-type «3 SKU» a 2,97:1 frente al mínimo de 4,5:1.",
+   "Estilo calculado: 15 agrupaciones con font-size < 12px, incluida una a 10px (rótulos de miniatura de evidencia).",
+   "Esqueleto: bloques de 118/118/94px coherentes con las tarjetas reales (bien), pero con texto real dentro y sin aplanar el fondo bajo prefers-reduced-motion.",
+   "Isotipo: desplazamiento del <use> respecto al <svg> = −32,5px.",
+   "31_orden_detalle--oscuro.png: los dos temas se resuelven con juegos de tokens completos."
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 2,
+   "hallazgo": "Es lo mejor de la pantalla: el estado de la orden («En sitio»), el avance del checklist («5 de 7»), lo que falta para cerrar, el estado del acta («revisando») y una bitácora con cuatro asientos fechados y firmados. Resta un punto que el cambio de vista se haga con data-state sin aria-live y sin mover el foco (§6.4 regla 1), y que no se diga desde cuándo el acta lleva en revisión.",
+   "selector": "main#contenido[data-state], .revisando .meta"
+  },
+  {
+   "n": 2,
+   "heuristica": "Correspondencia entre el sistema y el mundo real",
+   "severidad": 1,
+   "hallazgo": "El vocabulario es el de campo y es preciso: vale de salida, mini-almacén del instalador, acuse firmado, kardex, SKU, trámite CFE ligado. La única fricción es la banda de cabecera, que habla de «componentes de Studio» y de revisiones del proyecto, no de la orden.",
+   "selector": ".banda.b-info > p"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 3,
+   "hallazgo": "La pantalla dice exactamente qué falta para cerrar y luego no ofrece la vía: el checklist no se puede marcar, el consumo no se puede capturar y no hay <input type=\"file\"> para subir el acuse. Es el espíritu de la regla de §6.16 «si la interfaz dice “retira uno”, tiene que existir la forma de retirarlo».",
+   "selector": ".checklist, .soltar, .mat tbody td"
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 2,
+   "hallazgo": "El arquetipo de detalle del sistema (§6.20: .cab + .idt + indicador que declara su ancho) no se usa; en su lugar se reutiliza el .p4-t de las bandejas y el indicador de urgencia se resuelve con un max-width en línea. Además .b-info lleva una estrella y «3 SKU» va en una etiqueta de clasificación con color de serie cuando es un conteo.",
+   "selector": ".p4-t, .banda.b-info, .p-type.p-s2"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 1,
+   "hallazgo": "Muy bien resuelta: «Cerrar la orden» está bloqueado mientras falten las dos condiciones, el motivo está escrito y vinculado por aria-describedby a un id que existe, y el acta subida avisa de que «no cuenta para el cierre» hasta que el servidor la revise. Lo único que la lastra es que el bloqueo use disabled en vez de aria-disabled, con lo que el teclado nunca llega al motivo.",
+   "selector": ".btn.p[disabled][aria-describedby=\"pq-cerrar\"]"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocer antes que recordar",
+   "severidad": 1,
+   "hallazgo": "La ficha reúne en una pantalla lo que hoy está repartido entre un Word de rutas, un Excel de clientes y WhatsApp: domicilio, contacto en sitio, cita, instalador, equipo y el trámite CFE ligado, cada punto del checklist con quién lo marcó y a qué hora. No hace falta recordar ni buscar fuera nada de lo que la orden necesita.",
+   "selector": ".campos, .checklist, .bitacora"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 2,
+   "hallazgo": "«Exportar PDF» y «Reagendar» son los dos atajos correctos para el trabajo de coordinación, pero ninguno tiene manejador, y la tabla de material no ordena (ningún aria-sort). La zona de subida contempla arrastrar y elegir, que es la flexibilidad adecuada para campo, y luego no hace ninguna de las dos.",
+   "selector": ".p4-t .acc .btn, .soltar, .mat thead th"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 2,
+   "hallazgo": "El cuerpo de la ficha está bien medido, pero la columna derecha acumula 520 caracteres de explicación entre .expl y .limites, con dos frases que justifican por qué se diseñó así —el nivel 3 de §8, que no va en la interfaz—. Y están escritas a 10,5 y 11px, de modo que ocupan mucho y se leen mal a la vez.",
+   "selector": ".revisando .expl, .soltar .limites"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer y recuperarse de los errores",
+   "severidad": 1,
+   "hallazgo": "La mejor vista de error del lote y la única que cumple el envase de §6.4: tarjeta de 480px con medallón de 52px, <h2> real, el texto diciendo qué pasó, qué no se ha perdido («nada se cerró ni se modificó: ni el checklist, ni la evidencia, ni la cita») y qué hacer, con referencia ORD-20260821-1104. Es una ficha de sólo lectura, así que no aplica la regla de no llevarse por delante el trabajo del usuario.",
+   "selector": ".state-error .tarjeta-estado.es-err"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 2,
+   "hallazgo": "La pantalla explica bien lo que hace falta explicar (por qué el acta tarda, qué pasa si falta el consumo) pero lo deja todo siempre visible en prosa, cuando §8 reserva ese nivel al toggletip de §6.23. No hay ningún .infob en la pantalla, y es un caso de libro: una ficha de detalle con dt/dd es el ejemplo que §6.23 usa para enunciar el componente.",
+   "selector": ".revisando .expl, .soltar .limites, .campos"
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-026",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "contradice",
+    "evidencia": "«Las hojas de servicio se registran en papel; la conciliación de materiales entre estas hojas y los totales de almacén se realiza como un cruce manual posterior». La pantalla acierta de pleno en el planteamiento: pone despachado y consumido en la misma tabla, nombra la consecuencia exacta («Consumo de material capturado · Pendiente. Sin esto el kardex no descuenta lo que salió») y bloquea el cierre de la orden hasta que se capture. Pero no da ninguna forma de capturarlo: los cuatro renglones dicen «por capturar» en texto plano, las celdas no son editables, el checklist es una <ul> de <li> estáticos sin un solo control, y no hay <input type=\"file\"> en toda la pantalla para subir la hoja de servicio. El resultado es que la orden queda bloqueada dentro del sistema esperando un dato que sólo se puede producir fuera: la conciliación manual que pp-026 describe sigue siendo obligatoria, y ahora además con una orden abierta encima."
+   },
+   {
+    "pp": "pp-028",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "«La ejecución de instalaciones depende de aprobaciones y recursos de áreas externas; cuando esos vistos buenos se retrasan, la operación queda completamente detenida». La ficha enlaza la dependencia externa desde el cuerpo de datos: «Trámite CFE ligado: CFE-2026-00219». Es el único dolor de severidad alta del área de campo y la pantalla lo reconoce estructuralmente. Cobertura parcial: el enlace no trae ni el estado del trámite ni desde cuándo espera, así que dice de qué depende la orden pero no si esa dependencia es la que la está deteniendo."
+   },
+   {
+    "pp": "pp-024",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "«La validación y despacho de materiales depende de la disponibilidad simultánea de dos personas; cuando alguna no está disponible, los materiales salen sin las firmas». La banda .b-ok deja rastro fechado del despacho —«El material salió completo del almacén el 24 de agosto»— con enlace «Ver vale de salida», y la bitácora lo repite como asiento («Almacén despachó el material · 24 ago 2026 · 16:20»). Cobertura parcial: no dice quién firmó ni si firmaron los dos, que es exactamente el punto del dolor."
+   },
+   {
+    "pp": "pp-022",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "«La programación y las rutas de instalación se elaboran en un Word manejado aparte, desconectado de la base de datos de clientes en Excel». La ficha une las dos mitades: cita con franja horaria, domicilio de la obra y contacto en sitio junto al cliente y la sucursal, en el mismo registro. Y ofrece «Reagendar» desde la propia orden, aunque el botón no tenga manejador en la maqueta."
+   },
+   {
+    "pp": "pp-030",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "«Las herramientas de trabajo diarias del equipo de operaciones se limitan a WhatsApp, Excel y correo electrónico, sin una plataforma centralizada que unifique la gestión». La ficha es el registro único que falta: datos, checklist, material, evidencia, documento firmado y bitácora en una sola pantalla con folio. Es la cobertura más amplia de la pantalla, aunque hoy sea de sólo lectura."
+   },
+   {
+    "pp": "pp-025",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "ignora",
+    "evidencia": "«No existe un proceso formal de devolución o registro de materiales sobrantes al almacén; el ajuste se comunica por WhatsApp y se descuenta manualmente del siguiente pedido». La tabla de material tiene exactamente dos columnas, despachado y consumido, y no hay una tercera para sobrante ni acción de devolver. Con sólo esas dos, la diferencia queda implícita y sin destino: es el hueco por el que vuelve el WhatsApp."
+   },
+   {
+    "pp": "pp-029",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "ignora",
+    "evidencia": "«La cotización de materiales para venta al cliente recae exclusivamente en el mismo rol técnico que supervisa instalaciones; el equipo comercial copia manualmente esos números». La ficha lleva cantidades (20.000 m, 1.000 pza) y ningún importe, de modo que el dato que comercial necesita copiar no está aquí y hay que volver a pedírselo al técnico."
+   },
+   {
+    "pp": "pp-020",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "ignora",
+    "evidencia": "«Las solicitudes de instalación ingresan casi exclusivamente por grupos de WhatsApp de agencias o directamente de clientes; no existe un formulario o canal centralizado». Es una pantalla de detalle y el alta no le corresponde, pero la ficha tampoco deja rastro del origen de la orden: la bitácora dice «Mesa de Control creó la orden» sin decir por qué canal entró, que sería la medida de si el canal centralizado se está usando."
+   },
+   {
+    "pp": "pp-094",
+    "documento": "data/insights/2026-07-31_finanzas-cobranza-almacen.json",
+    "cobertura": "cubre",
+    "evidencia": "«Para confirmar que un servicio fue ejecutado, especialmente ante reclamos de clientes, finanzas debe revisar manualmente múltiples fuentes dispersas sin un repositorio único». Esta ficha es ese repositorio: checklist con hora y responsable, seis fotos de evidencia por fase, acta de entrega firmada y bitácora. Es la pantalla del lote que más ayuda a un área que no es la suya. Cobertura parcial en la práctica: las miniaturas de evidencia son <div> y no se pueden abrir, así que la prueba está anunciada pero no consultable."
+   }
+  ],
+  "usabilidad_para_el_area": "Para coordinación técnica es la pieza que mejor entiende el trabajo de campo: reúne en un folio lo que hoy vive repartido entre un Word de rutas, un Excel de clientes, hojas de servicio en papel y WhatsApp, y lo hace con el detalle que delata la entrevista —el mini-almacén del instalador, el vale de salida, el kardex, el acuse firmado como condición de cierre—. Sobre pp-030, pp-022, pp-024 y pp-028 la cobertura es real, y de rebote resuelve pp-094 para finanzas, que es quien hoy tiene que reconstruir a mano si un servicio se ejecutó. El problema es que la ficha sólo sabe leer. Declara con precisión las dos condiciones que faltan para cerrar la orden y no ofrece ninguna de las dos vías: el consumo no se captura, el checklist no se marca, el acuse no se sube porque no hay ningún input de archivo, y la zona de arrastre además se queda sin relleno porque --sp-5 no está declarado. Así, pp-026 no sólo queda sin resolver: la pantalla formaliza el bloqueo y deja fuera la única forma de levantarlo, con lo que el cruce manual sigue siendo obligatorio y ahora con una orden abierta esperándolo. Faltan también la devolución de sobrantes (pp-025), que es por donde el ajuste vuelve al WhatsApp, y cualquier importe (pp-029)."
+ },
+ "cobertura": [
+  {
+   "patron": "Rejilla de miniaturas de evidencia fotográfica por fase de un trabajo (.evid + .ph: seis celdas con icono, rótulo de fase y fondo --surface-2). El sistema no documenta ninguna pieza de galería ni de adjunto visual; §6.17 cubre la subida y §6.20 la ficha, pero entre las dos queda sin regla el sitio donde viven las fotos ya subidas, que en operaciones de campo es la prueba del trabajo.",
+   "propuesta_de_regla": "§6.17.1 Rejilla de evidencia — .evid + .ph. Cuándo: las fotos o documentos ya subidos de un expediente, agrupados por la fase que documentan. Cada celda es un <button type=\"button\"> —abre el visor, luego ejecuta— con aria-label que nombra la fase y el expediente («Ver la foto de Canalización de ORD-202608-0417»), nunca un <div>. Relación 4:3, radio --r-ctrl, fondo --surface-2 mientras carga la miniatura. El rótulo de fase va dentro de la celda a --fs-meta (12px), nunca por debajo del suelo de §2.1, con la miniatura oscurecida detrás por --velo-suave para que el texto conserve sus 4,5:1 sobre cualquier fotografía. Una fase sin foto se muestra igual pero vacía y con su rótulo, porque el hueco es información: dice qué prueba falta. El contador de la cabecera cuenta fotos existentes, no fases."
+  },
+  {
+   "patron": "Documento adjunto en revisión automática antes de darse por válido (.revisando: nombre de archivo, peso, estado «revisando» y explicación de por qué no cuenta todavía). §6.17 documenta el archivo cargado —nombre y fecha, reemplazar o quitar— pero no contempla un estado intermedio entre «subido» y «aceptado», que es el que decide si la orden se puede cerrar.",
+   "propuesta_de_regla": "§6.17 (ampliación) — estados del archivo cargado. Al data-estado=\"vacio\" y «cargado» se añaden «revisando» y «rechazado». «Revisando» se marca con .pill.p-pause (§6.10: color + icono + texto), nunca con --warn: la revisión no es un fallo. Muestra siempre nombre, peso y hora de subida, y mantiene disponibles «reemplazar» y «quitar» durante la revisión. La consecuencia se dice en una frase visible («no cuenta para el cierre») y el porqué va al toggletip de §6.23 (§8, nivel 2). «Rechazado» usa .pill.p-err, dice el motivo en una frase y deja el archivo descargable para que se pueda comprobar qué se envió."
+  },
+  {
+   "patron": "Checklist de ejecución con autoría y hora por punto (.checklist: marca de estado, enunciado y «Marcado por J. Olvera · 25 ago 09:14»), y bitácora de expediente (.bitacora: punto de color, quién, qué y cuándo). Son dos piezas distintas con la misma materia —quién hizo qué y cuándo— y ninguna de las dos está documentada; §6.20 nombra la bitácora al fijar el orden de la ficha, pero no la especifica.",
+   "propuesta_de_regla": "§6.20.1 Bitácora y checklist de expediente — .bitacora, .checklist. La bitácora es un <ol> en orden inverso (lo último arriba) de asientos inmutables: quién, qué y cuándo, con la hora a --fs-meta en --text-3 y el punto de color sólo en dos variantes, --accent para lo que hizo una persona y --border-fuerte para lo automático; nunca el semáforo, porque un asiento registrado no es un juicio. El checklist es una <ul> de puntos accionables: cada punto lleva su propio control real (casilla de §7.3 o botón), y el punto marcado muestra autor y hora con el mismo formato que la bitácora. Si el checklist es de sólo lectura para el rol que mira, se dice en una frase en la cabecera de la tarjeta, y las marcas se dibujan sin forma de control. Regla dura: un punto que bloquea el cierre del expediente lleva, en el propio punto, la vía de resolverlo o el enlace a dónde se resuelve."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática servida por un servidor de ficheros, sin backend, sin librerías externas y sin red que perfilar.",
+  "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (0 <dialog> y 0 div[role=dialog] según el brief).",
+  "§12 Gráficas: no hay ningún <canvas> ni ninguna gráfica en la pantalla.",
+  "§6.23 Toggletip: no evaluado como incumplimiento porque la pantalla no declara ningún .infob; su ausencia se recoge en F4 heurística 10 como la causa de que las explicaciones vayan siempre visibles.",
+  "Estado «vacío»: auditado el envase (cumple §6.4: .tarjeta-estado, medallón de 52px, <h2> real). No se audita si «orden sin nada capturado» es un estado alcanzable del producto, porque eso depende del backend que la maqueta no tiene."
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--on-state",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--text-3-fuerte",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--on-state",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-5",
+   "--sp-6",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--text-3-fuerte",
+   "--velo-modal",
+   "--velo-suave",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [
+   "--sp-5"
+  ],
+  "declarados_no_usados": [
+   "--block",
+   "--block-fill",
+   "--border-fuerte",
+   "--dur-enter",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--fs-kpi",
+   "--glass",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--sp-12",
+   "--stagger",
+   "--velo-trama",
+   "--warn",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 85,
+  "n_usados": 69,
+  "n_divergentes": 15,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": true,
+   "filas": 4,
+   "nodosText3": 4
+  }
+ }
 }

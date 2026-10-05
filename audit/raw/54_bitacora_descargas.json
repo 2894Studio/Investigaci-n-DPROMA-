@@ -1,200 +1,461 @@
 {
-  "pantalla": "54_bitacora_descargas",
-  "ruta_zip": "05-direccion-y-administracion/54_bitacora_descargas.html",
-  "carpeta": "05-direccion-y-administracion",
-  "area": "jurídico/legal",
-  "arquetipo": "bitácora/auditoría",
-  "modo": "cumplimiento",
-  "estados_auditados": [
-    "ok",
-    "loading",
-    "empty",
-    "error",
-    "oscuro"
-  ],
-  "capturas": [
-    "54_bitacora_descargas--ok.png",
-    "54_bitacora_descargas--loading.png",
-    "54_bitacora_descargas--empty.png",
-    "54_bitacora_descargas--error.png",
-    "54_bitacora_descargas--oscuro.png"
-  ],
-  "f1_cumplimiento": {
-    "veredicto": "no_cumple",
-    "hallazgos": [
-      {
-        "id": "f1-54bit-01",
-        "severidad": "alta",
-        "regla": "§2.1 Suelo tipográfico + §10 trampa 1",
-        "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí» y «si un dato se lee todos los días, va a 12–13px como mínimo». Únicas excepciones admitidas: rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
-        "hay_en_el_build": "16 declaraciones font-size:11px, 8 de 10,5px, 1 de 11,5px y un font:700 11px abreviado.",
-        "selector": ".f-chip, .fmt, .quien small, .cuando2 small, thead th, .nota",
-        "evidencia": "Barrido con getComputedStyle sobre #contenido y .p4, andamio oculto: .f-chip a 10,5px ×12 (los chips de filtro, incluidos los tres .f-chip.pers), .fmt a 10,5px ×5 (la columna FORMATO entera), .av a 10,5px ×5, small a 11px ×15 (el área de cada persona —Dirección, Facturación, Gestoría— y la hora de cada descarga: 11:42, 09:15, 18:03, 14:20, 16:57), thead th a 11px ×5, .nota a 11,5px ×3. Los tokens están bien declarados (--fs-meta:12px): los valores son literales escritos fuera de la escala.",
-        "por_que_importa": "Es un registro legal y lo que baja del suelo es precisamente lo que acredita: la hora exacta de cada descarga, el área desde la que se descargó, el formato que salió del sistema y los filtros aplicados. La propia pantalla dice que los filtros «son la mitad de lo que hay que poder reconstruir» — y los pinta a 10,5px, el tamaño que §2.1 reserva para rótulos de grupo en mayúsculas."
-      },
-      {
-        "id": "f1-54bit-02",
-        "severidad": "alta",
-        "regla": "§6.21 Barra de filtros con desplegable + §6.12 reglas 2 y 7 + §11 Interacción",
-        "dice_el_sistema": "§6.21: «es el único componente para filtrar por un campo categórico con más de un valor posible». §11: «si la interfaz dice «retira uno», existe la forma de retirarlo».",
-        "hay_en_el_build": "La pantalla no tiene ningún control de filtro: solo un buscador de texto libre y tres .schip de conteo. No existe ningún selector de rango de fechas, de persona, de reporte ni de formato. Y sin embargo la vista vacía dice: «La bitácora está vacía para las fechas que estás mirando… comprueba el rango de fechas — por omisión se enseña el mes en curso», con el botón «Ampliar a los últimos 12 meses».",
-        "selector": ".p4-f, .state-empty",
-        "evidencia": "grep de '.fwrap', 'class=\"f\"' y '.pop' en el archivo: 0 coincidencias. Los únicos controles de la cabecera son el <input type=\"search\">, tres <button class=\"schip\"> de conteo y el control de densidad. El propio texto del estado vacío se refiere a un «rango de fechas» que no está en pantalla en ninguna de las cinco vistas auditadas (capturas --ok, --empty, --error, --loading, --oscuro).",
-        "por_que_importa": "Es el fallo que inhabilita la pantalla para su función. Un registro de auditoría se usa para responder una pregunta acotada —«qué se descargó entre el 1 y el 15 de agosto», «qué se llevó Fulano»— y aquí hay 318 renglones paginados de 5 en 5, ordenados por fecha descendente y sin forma de acotar por periodo, persona ni formato. Encima la vista vacía le dice a quien la lee que compruebe un control que no existe."
-      },
-      {
-        "id": "f1-54bit-03",
-        "severidad": "alta",
-        "regla": "§1 Decisión previa a elegir color + §1.3 Semáforo",
-        "dice_el_sistema": "«si el dato tiene juicio → semáforo §1.3; si solo distingue una cosa de otra → paleta categórica §1.4… Un color de estado no se reutiliza para una categoría, ni al revés.» §1.3: --warn significa «Falta algo, o vence pronto».",
-        "hay_en_el_build": ".f-chip.pers{border-color:var(--warn);background:var(--warn-bg);color:var(--warn-ink)} — los chips «incluye razón social y RFC», «incluye domicilio fiscal» e «incluye VIN y titular» se pintan con el ámbar del semáforo.",
-        "selector": ".f-chip.pers",
-        "evidencia": "Línea 653 de la hoja de estilos. La propia pantalla, en su .nota de más abajo, dice literalmente: «Los filtros que arrastran dato personal van marcados en ámbar, y no para culpar a nadie: entregar esos reportes está permitido.» Es decir, el texto declara que no hay juicio y el color dice que sí lo hay.",
-        "por_que_importa": "El ámbar de --warn significa «falta algo o vence pronto» en todo el sistema; aquí marca una categoría —qué campos llevaba el reporte— que la propia pantalla declara legítima. Es el caso que §1 prohíbe por su nombre: un color de estado reutilizado para una categoría. Y obliga a escribir 298 caracteres de nota para desmentir lo que el color afirma."
-      },
-      {
-        "id": "f1-54bit-04",
-        "severidad": "alta",
-        "regla": "§1.1 Superficies y texto",
-        "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)»",
-        "hay_en_el_build": "--text-3: #66717F",
-        "selector": ":root",
-        "evidencia": "brief tokens.text_3_declarado = \"#66717F\"; confirmado con getComputedStyle del documento. La tabla usa --surface-2 en el sobrevuelo de fila y en el esqueleto, y la banda .b-info de la cabecera también.",
-        "por_que_importa": "Sobre --surface-2 cae a 4,21:1, bajo el mínimo AA de 4,5:1. En un registro que existe para acreditar, el texto auxiliar que no se lee es una entrada de la bitácora que no se puede citar."
-      },
-      {
-        "id": "f1-54bit-05",
-        "severidad": "alta",
-        "regla": "§6.4 Vistas de estado, regla 1",
-        "dice_el_sistema": "«el cambio se anuncia (aria-live=\"polite\") y mueve el foco» (main.focus() con tabindex=\"-1\")",
-        "hay_en_el_build": "<main id=\"contenido\" data-state=\"ok\" tabindex=\"-1\"> sin aria-live; el <script> solo escribe cont.setAttribute('data-state', …) y nunca llama a focus().",
-        "selector": "main#contenido",
-        "evidencia": "grep de aria-live en el archivo: 0 coincidencias; el único role=\"status\" es el del esqueleto (línea 739). grep de focus(): 0 coincidencias.",
-        "por_que_importa": "Al buscar o paginar en un registro de 318 renglones, el cambio de vista no se anuncia ni mueve el foco: con lector de pantalla no hay forma de saber si la consulta devolvió algo, nada o un error — y en una bitácora, confundir «no hubo descargas» con «no cargó» es exactamente lo que no puede pasar."
-      },
-      {
-        "id": "f1-54bit-06",
-        "severidad": "alta",
-        "regla": "§6.4 Vistas de estado (valores y regla 2) + §11 Estructura",
-        "dice_el_sistema": "«.tarjeta-estado{max-width:480px;…border-radius:var(--r-modal);box-shadow:var(--sh-modal)}… .estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}» y «cada estado lleva encabezado real, no un <b>»",
-        "hay_en_el_build": ".state sin fondo ni sombra; .state .ico{width:30px;height:30px;color:var(--text-3)}; títulos en <b>: <b>Nadie ha descargado ningún reporte en este periodo</b>, <b>No se pudo cargar la bitácora de descargas</b>.",
-        "selector": ".state, .state .ico, .state b",
-        "evidencia": "getComputedStyle(.state-empty): backgroundColor rgba(0,0,0,0), boxShadow none, borderRadius 0px, maxWidth none; su .ico mide 30×30px, sin fondo ni radio. Capturas --empty.png y --error.png.",
-        "por_que_importa": "La distinción entre «no hubo descargas» y «no se pudo cargar» es la más delicada de esta pantalla, y las dos vistas se presentan igual: un glifo gris de 30px y una línea en negrita flotando sobre el fondo. Sin encabezado real tampoco entran en el índice de encabezados."
-      },
-      {
-        "id": "f1-54bit-07",
-        "severidad": "alta",
-        "regla": "§6.7 Esqueleto de carga (a11y) + §5 prefers-reduced-motion",
-        "dice_el_sistema": "«sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)» y «prefers-reduced-motion aplana el fondo, no solo detiene la animación»: «.skel{animation:none;background:var(--surface-2)}»",
-        "hay_en_el_build": "Cinco .sk-fila de seis barras cada una, todas con texto real: <span class=\"skel\">quién lo descargó</span>…<span class=\"skel\">00 ago 2026</span>… y @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer el fondo.",
-        "selector": ".state-loading .skel",
-        "evidencia": "30 barras con texto dentro de un contenedor con role=\"status\" aria-label=\"Cargando\". Con reducedMotion:'reduce': animationName \"none\" pero backgroundImage sigue siendo el degradado de tres paradas en backgroundPosition \"0% 0%\" — congelado, no aplanado. textContent de la primera barra: \"quién lo descargó\".",
-        "por_que_importa": "El contenedor es role=\"status\", así que un lector de pantalla recita 30 cadenas de relleno, entre ellas fechas inventadas («00 ago 2026») anunciadas con la misma voz con la que después se leerán las reales. En un registro legal, inyectar fechas falsas en el árbol de accesibilidad es peor que en cualquier otra pantalla."
-      },
-      {
-        "id": "f1-54bit-08",
-        "severidad": "media",
-        "regla": "§7.3 Objetivos táctiles + §10 trampa 4",
-        "dice_el_sistema": "§7.3: «Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8)». §10 trampa 4: «un <input> de búsqueda dentro de un <div> con forma de pastilla no cumple, porque pulsar la pastilla no hace nada. El contenedor tiene que ser una <label for=\"…\">.»",
-        "hay_en_el_build": "<div class=\"search\"><svg…/><input id=\"buscar\" type=\"search\" placeholder=\"Buscar por persona, reporte o filtro…\" aria-label=\"Buscar en la bitácora de descargas\"></div> — el <input> mide 329×15px.",
-        "selector": ".search > input#buscar",
-        "evidencia": "brief tactil_24px: 1 de 38 interactivos bajo 24px, y es exactamente ese input (329×15). Reproducido: tagName del contenedor DIV, sin atributo for, altura 33px; el input a 15px.",
-        "por_que_importa": "El buscador es el único control de acotación que la pantalla ofrece y su destino real mide 15px de alto. Pulsar el icono de lupa o el borde de la pastilla no enfoca el campo, que es el caso que §10 nombra."
-      },
-      {
-        "id": "f1-54bit-09",
-        "severidad": "media",
-        "regla": "§6.12 Resumen y barra de filtros, reglas 7 y 8 + §13.1",
-        "dice_el_sistema": "regla 7: «Orden fijo: resumen → buscador + filtros en una sola fila → tabla»; regla 8: «un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero»; §13.1: «Lectura → control → objeto.»",
-        "hay_en_el_build": "Orden del render: .p4-t (título) → .p4-b (solo el buscador) → .p4-f (los tres .schip de resumen y el control de densidad) → tabla. Y los tres .schip llevan aria-pressed=\"false\", el .seg dos aria-pressed y la paginación cinco <button> con aria-current=\"page\", sin ningún manejador.",
-        "selector": ".p4-b, .p4-f, .schip, .seg button, .pag button",
-        "evidencia": "Líneas 681-683: .p4-t, .p4-b con el único .search, .p4-f con los schip. Es el orden inverso al de §6.12 regla 7, y el buscador no comparte fila con filtro alguno. El <script> completo del archivo contiene solo el conmutador de tema, el conmutador de estados de demo y el menú lateral: no hay listener sobre .schip, .seg, .pag ni sobre el buscador.",
-        "por_que_importa": "Diez controles anuncian estado («no pulsado», «página actual») y ninguno responde, en la pantalla cuya única forma de acotar sería precisamente filtrar. Y el orden invertido hace que lo primero que se lea sea un campo vacío en vez de las cifras que resumen el mes."
-      },
-      {
-        "id": "f1-54bit-10",
-        "severidad": "media",
-        "regla": "§8 Voz de producto, límites 1 y 2 + §6.9",
-        "dice_el_sistema": "§8: «.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto» y «Ningún bloque de texto siempre visible pasa de ~140 caracteres. Se mide con el contador de caracteres, no a ojo». §6.9: «.nota no es un componente de explicación general — solo nivel 1.»",
-        "hay_en_el_build": "Una .banda.b-info en cabecera y tres .nota al pie de la tabla, todas de varias oraciones.",
-        "selector": ".banda.b-info, .nota",
-        "evidencia": "innerText medido con el andamio oculto: .nota «Los filtros no son un adorno…» 336 caracteres; .nota «Los filtros que arrastran dato personal…» 298; .banda.b-info «Los reportes no se guardan en ninguna parte…» 253; .nota «Un renglón de esta bitácora no se edita ni se borra…» 155. Tope del sistema: ~140, una frase. Suman 1.042 caracteres de explicación siempre visible, más que los datos de las cinco filas.",
-        "por_que_importa": "Los cuatro bloques explican por qué la bitácora está diseñada así —nivel 3 de §8, que «no va en la interfaz»— y ocupan en pantalla casi tanto como el registro. Dos de ellos existen para desmentir decisiones visuales de la propia pantalla: el ámbar que parece culpa y los filtros que parecen adorno. Si el color y la columna dijeran lo correcto, las notas sobrarían."
-      },
-      {
-        "id": "f1-54bit-11",
-        "severidad": "media",
-        "regla": "§10 trampa 5 — isotipo recortado",
-        "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio… Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal.»",
-        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg> y el mismo patrón a 22×21 en el botón flotante.",
-        "selector": ".side .logo svg, .fab svg",
-        "evidencia": "getBoundingClientRect medido: <svg> en x=96, <use> en x=63,5 → −32,5px. En las capturas --ok.png y --oscuro.png la marca sale como una astilla a la izquierda del rótulo.",
-        "por_que_importa": "La marca aparece recortada en todas las vistas. 01_login tiene el patrón correcto en el mismo repositorio."
-      },
-      {
-        "id": "f1-54bit-12",
-        "severidad": "media",
-        "regla": "§6.19 Botón-icono — .iconbtn",
-        "dice_el_sistema": "«Nunca viaja solo: title + aria-label, y el aria-label nombra el dato concreto, no la acción a secas.»",
-        "hay_en_el_build": "<button class=\"iconbtn\" type=\"button\" aria-label=\"Exportar\"> — sin title, con la acción a secas, y sin lógica detrás.",
-        "selector": ".p4-t .acc .iconbtn",
-        "evidencia": "grep de '<button class=\"iconbtn\"' en el archivo: el conmutador de tema (con aria-label descriptivo actualizado por JS) y este. No hay title. El <script> no lleva ningún manejador para él.",
-        "por_que_importa": "Es la única salida de la bitácora hacia un archivo, que es como se entrega un registro a quien lo pide. No dice qué exporta —los 5 renglones visibles o los 318—, ni en qué formato, ni al pasar el cursor ni al lector de pantalla. Y exportar una bitácora de descargas deja a su vez un rastro: la acción menos explicada de la pantalla es la que más consecuencias tiene."
-      },
-      {
-        "id": "f1-54bit-13",
-        "severidad": "baja",
-        "regla": "§6.5 Iconos — .msi",
-        "dice_el_sistema": "«Fuente: Material Symbols Rounded, variante rellena (FILL@1)… Carga por subconjunto, con un solo <link>»",
-        "hay_en_el_build": "Sprite propio de <symbol> SVG inline invocado con <svg class=\"ico\"><use href=\"#i-…\"/></svg>; no hay .msi ni <link> de Material Symbols.",
-        "selector": "svg.ico > use",
-        "evidencia": "grep de 'msi' y de 'Material+Symbols' en el archivo: 0 coincidencias.",
-        "por_que_importa": "Funciona y esquiva las trampas de ligadura y de subconjunto que el documento registra, pero es una familia distinta de la declarada: los glifos no coinciden con los de las pantallas que sí usan Material Symbols."
-      }
-    ]
-  },
-  "f3_boost_ui": {
-    "puntuacion": 2,
-    "dimensiones": {
-      "accesibilidad": 1,
-      "rendimiento": "no_evaluado",
-      "theming": 3,
-      "responsive": 3,
-      "integridad": 2
-    },
-    "justificacion": "Accesibilidad 1: 41 elementos con texto quedan por debajo del suelo de 12px de §2.1 y no son adorno —son la hora de cada descarga (11px), el área de quien la hizo (11px), la columna FORMATO entera y los doce chips de filtro (10,5px)—, el único control de acotación es un input de 15px dentro de un <div> en vez de una <label for> (§10 trampa 4), el cambio de vista no se anuncia ni mueve el foco, los dos estados que hay que poder distinguir («no hubo descargas» / «no cargó») se presentan igual, sin tarjeta ni medallón y titulados con <b>, y el esqueleto recita 30 cadenas de relleno con fechas inventadas dentro de un role=\"status\". Theming 3: los dos temas se pintan bien (captura --oscuro correcta), 83 tokens declarados y ninguno usado sin declarar, pero arrastra --text-3 obsoleto, escribe 25 tamaños de letra como literales fuera de la escala y usa el ámbar del semáforo para una categoría que la propia pantalla declara sin juicio. Responsive 3: modo tarjeta por debajo de 860px con data-et en todas las celdas, colgroup con seis anchos declarados y el esqueleto a una columna a 900px. Integridad 2: la tabla está bien construida —caption descriptiva, colgroup, th scope=row en la persona, tfoot con la cuenta y el orden declarado— pero como registro de auditoría no cumple su función: no hay forma de acotar por periodo, persona, reporte ni formato, la vista vacía remite a un control de fechas que no existe, diez controles anuncian estado sin tenerlo, y 1.042 caracteres de nota siempre visible explican decisiones de diseño bajo la tabla. Rendimiento no evaluado: maqueta estática sin backend.",
-    "evidencia": [
-      "Barrido de estilo calculado sobre #contenido y .p4: 41 elementos con texto a 10,5 / 11 / 11,5px — .f-chip ×12, .fmt ×5, .av ×5, small ×15, thead th ×5, .nota ×3 (contando los nodos de texto directos)",
-      "brief tactil_24px: 1 de 38 interactivos bajo 24px — el <input type=search> a 329×15; contenedor .search medido con tagName DIV, sin atributo for",
-      "Con reducedMotion:'reduce': .skel animationName \"none\" y backgroundImage aún el degradado de tres paradas en backgroundPosition \"0% 0%\"; textContent \"quién lo descargó\"",
-      "getComputedStyle(.state-empty): background rgba(0,0,0,0), box-shadow none, border-radius 0px, max-width none; icono 30×30px sin fondo ni radio",
-      "getBoundingClientRect del <use> del isotipo contra su <svg>: −32,5px",
-      "innerText de los bloques siempre visibles: 336, 298, 253 y 155 caracteres frente al tope de ~140 de §8",
-      "grep de '.fwrap' / 'class=\"f\"' / '.pop' en el archivo: 0 coincidencias — no hay ningún componente de filtro de §6.21",
-      "capturas 54_bitacora_descargas--ok.png, --loading.png, --empty.png, --error.png, --oscuro.png"
-    ]
-  },
-  "f4_nielsen": [],
-  "f5_investigacion": {
-    "pain_points_evaluados": [],
-    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
-  },
-  "cobertura": [
-    {
-      "patron": "Registro de auditoría inmutable. La pantalla es una bitácora legal —quién descargó, qué reporte, con qué filtros, en qué formato y cuándo— y el sistema no tiene ninguna regla para este arquetipo: §6.11 cubre la tabla densa y §6.21 los filtros, pero nada dice de acotar por periodo, de exportar el registro, de la inmutabilidad del renglón ni de cómo se marca una entrega que arrastra dato personal. La maqueta lo resuelve con tres .schip de conteo, un .f-chip que no está en el sistema y 1.042 caracteres de nota.",
-      "propuesta_de_regla": "§6.27 Bitácora de auditoría — `.bitacora-tabla`. **Cuándo:** una tabla cuyo contenido es prueba de lo que pasó y no se puede editar ni borrar. Reusa `.tabla-caja` de §6.11 y añade: (1) **el periodo es un control, no una suposición** — un selector de rango de fechas **siempre visible** junto al buscador, con el valor vigente escrito («1 – 31 ago 2026»), porque un registro que no se puede acotar no sirve como registro; (2) **quién y cuándo son la primera y la última columna, y nunca bajan del suelo de §2.1**: la fecha a `--fs-dense` en `--text` y la hora debajo a `--fs-meta`, nunca a 11px; (3) **la exportación es una acción con nombre, no un icono suelto** (§6.19) y declara **el alcance exacto** de lo que se lleva — «Exportar los 318 renglones del periodo»; (4) **la inmutabilidad se dice una vez y en un sitio**: en el `.ambito` (§6.22) de la cabecera, no en una `.nota` al pie; (5) **la marca de dato sensible es una clasificación, no un estado**: usa la paleta categórica de §1.4 vía `.p-type` (§6.10), **nunca `--warn`**, porque entregar el reporte está permitido y el ámbar afirma lo contrario; (6) el orden por omisión —lo más reciente primero— **se declara en el `tfoot`** y las columnas de persona y fecha son ordenables con `aria-sort` (§6.11 regla 3)."
-    },
-    {
-      "patron": "Chip de filtro aplicado dentro de una celda de tabla (`.f-chip`: «marca todas», «corte 31 jul 2026», «incluye razón social y RFC»). §6.21 documenta las pastillas de filtro aplicado, pero en su propia fila sobre la tabla y como control que se puede quitar con una «×». Aquí son dato histórico de solo lectura dentro de una celda, que es un uso distinto y sin regla.",
-      "propuesta_de_regla": "§6.21.1 Chip de filtro histórico. Un filtro que se **registra** (lo que se aplicó en su momento) no es el mismo componente que un filtro que se **aplica** (lo que está puesto ahora). El histórico va en la celda, **sin «×», sin `aria-pressed` y sin cursor de puntero** (§6.12 regla 8), con el nombre de la dimensión en `--text-2` y su valor en `--text` con peso, a `--fs-meta` **como mínimo** (§2.1). Si no caben todos, se muestran los tres primeros y «+N más» abre el detalle del renglón — nunca se recortan con elipsis, porque el filtro omitido es justo el que se buscaba. El fondo es `--surface-2`; el color solo entra si la dimensión está clasificada, y entonces vía §1.4, no vía semáforo."
-    }
-  ],
-  "sin_datos": [
-    "f3.rendimiento: maqueta estática servida como archivo, sin backend que perfilar",
-    "f4_nielsen: fuera del subconjunto de este lote (solo F1 y F3)",
-    "f5_investigacion: fuera del subconjunto por arquetipo",
-    "f1 §6.11 regla 3 (aria-sort): no evaluado como incumplimiento — la tabla no declara ninguna columna ordenable (no hay <button data-col> en el <thead>), así que la regla no tiene a qué aplicarse; los tres aria-sort del archivo están solo en selectores CSS. El hueco real está recogido como cobertura (§6.27 punto 6)",
-    "f1: no se evaluó el recorrido completo con teclado ni el comportamiento real con lector de pantalla; las conclusiones de a11y se apoyan en el markup y en el estilo calculado"
+ "pantalla": "54_bitacora_descargas",
+ "ruta_zip": "05-direccion-y-administracion/54_bitacora_descargas.html",
+ "carpeta": "05-direccion-y-administracion",
+ "area": "jurídico/legal",
+ "arquetipo": "bitácora/auditoría",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "54_bitacora_descargas--ok.png",
+  "54_bitacora_descargas--loading.png",
+  "54_bitacora_descargas--empty.png",
+  "54_bitacora_descargas--error.png",
+  "54_bitacora_descargas--oscuro.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-54bit-01",
+    "severidad": "alta",
+    "regla": "§2.1 Suelo tipográfico + §10 trampa 1",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí» y «si un dato se lee todos los días, va a 12–13px como mínimo». Únicas excepciones admitidas: rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+    "hay_en_el_build": "16 declaraciones font-size:11px, 8 de 10,5px, 1 de 11,5px y un font:700 11px abreviado.",
+    "selector": ".f-chip, .fmt, .quien small, .cuando2 small, thead th, .nota",
+    "evidencia": "Barrido con getComputedStyle sobre #contenido y .p4, andamio oculto: .f-chip a 10,5px ×12 (los chips de filtro, incluidos los tres .f-chip.pers), .fmt a 10,5px ×5 (la columna FORMATO entera), .av a 10,5px ×5, small a 11px ×15 (el área de cada persona —Dirección, Facturación, Gestoría— y la hora de cada descarga: 11:42, 09:15, 18:03, 14:20, 16:57), thead th a 11px ×5, .nota a 11,5px ×3. Los tokens están bien declarados (--fs-meta:12px): los valores son literales escritos fuera de la escala.",
+    "por_que_importa": "Es un registro legal y lo que baja del suelo es precisamente lo que acredita: la hora exacta de cada descarga, el área desde la que se descargó, el formato que salió del sistema y los filtros aplicados. La propia pantalla dice que los filtros «son la mitad de lo que hay que poder reconstruir» — y los pinta a 10,5px, el tamaño que §2.1 reserva para rótulos de grupo en mayúsculas."
+   },
+   {
+    "id": "f1-54bit-02",
+    "severidad": "alta",
+    "regla": "§6.21 Barra de filtros con desplegable + §6.12 reglas 2 y 7 + §11 Interacción",
+    "dice_el_sistema": "§6.21: «es el único componente para filtrar por un campo categórico con más de un valor posible». §11: «si la interfaz dice «retira uno», existe la forma de retirarlo».",
+    "hay_en_el_build": "La pantalla no tiene ningún control de filtro: solo un buscador de texto libre y tres .schip de conteo. No existe ningún selector de rango de fechas, de persona, de reporte ni de formato. Y sin embargo la vista vacía dice: «La bitácora está vacía para las fechas que estás mirando… comprueba el rango de fechas — por omisión se enseña el mes en curso», con el botón «Ampliar a los últimos 12 meses».",
+    "selector": ".p4-f, .state-empty",
+    "evidencia": "grep de '.fwrap', 'class=\"f\"' y '.pop' en el archivo: 0 coincidencias. Los únicos controles de la cabecera son el <input type=\"search\">, tres <button class=\"schip\"> de conteo y el control de densidad. El propio texto del estado vacío se refiere a un «rango de fechas» que no está en pantalla en ninguna de las cinco vistas auditadas (capturas --ok, --empty, --error, --loading, --oscuro).",
+    "por_que_importa": "Es el fallo que inhabilita la pantalla para su función. Un registro de auditoría se usa para responder una pregunta acotada —«qué se descargó entre el 1 y el 15 de agosto», «qué se llevó Fulano»— y aquí hay 318 renglones paginados de 5 en 5, ordenados por fecha descendente y sin forma de acotar por periodo, persona ni formato. Encima la vista vacía le dice a quien la lee que compruebe un control que no existe."
+   },
+   {
+    "id": "f1-54bit-03",
+    "severidad": "alta",
+    "regla": "§1 Decisión previa a elegir color + §1.3 Semáforo",
+    "dice_el_sistema": "«si el dato tiene juicio → semáforo §1.3; si solo distingue una cosa de otra → paleta categórica §1.4… Un color de estado no se reutiliza para una categoría, ni al revés.» §1.3: --warn significa «Falta algo, o vence pronto».",
+    "hay_en_el_build": ".f-chip.pers{border-color:var(--warn);background:var(--warn-bg);color:var(--warn-ink)} — los chips «incluye razón social y RFC», «incluye domicilio fiscal» e «incluye VIN y titular» se pintan con el ámbar del semáforo.",
+    "selector": ".f-chip.pers",
+    "evidencia": "Línea 653 de la hoja de estilos. La propia pantalla, en su .nota de más abajo, dice literalmente: «Los filtros que arrastran dato personal van marcados en ámbar, y no para culpar a nadie: entregar esos reportes está permitido.» Es decir, el texto declara que no hay juicio y el color dice que sí lo hay.",
+    "por_que_importa": "El ámbar de --warn significa «falta algo o vence pronto» en todo el sistema; aquí marca una categoría —qué campos llevaba el reporte— que la propia pantalla declara legítima. Es el caso que §1 prohíbe por su nombre: un color de estado reutilizado para una categoría. Y obliga a escribir 298 caracteres de nota para desmentir lo que el color afirma."
+   },
+   {
+    "id": "f1-54bit-04",
+    "severidad": "alta",
+    "regla": "§1.1 Superficies y texto",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)»",
+    "hay_en_el_build": "--text-3: #66717F",
+    "selector": ":root",
+    "evidencia": "brief tokens.text_3_declarado = \"#66717F\"; confirmado con getComputedStyle del documento. La tabla usa --surface-2 en el sobrevuelo de fila y en el esqueleto, y la banda .b-info de la cabecera también.",
+    "por_que_importa": "Sobre --surface-2 cae a 4,21:1, bajo el mínimo AA de 4,5:1. En un registro que existe para acreditar, el texto auxiliar que no se lee es una entrada de la bitácora que no se puede citar."
+   },
+   {
+    "id": "f1-54bit-05",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado, regla 1",
+    "dice_el_sistema": "«el cambio se anuncia (aria-live=\"polite\") y mueve el foco» (main.focus() con tabindex=\"-1\")",
+    "hay_en_el_build": "<main id=\"contenido\" data-state=\"ok\" tabindex=\"-1\"> sin aria-live; el <script> solo escribe cont.setAttribute('data-state', …) y nunca llama a focus().",
+    "selector": "main#contenido",
+    "evidencia": "grep de aria-live en el archivo: 0 coincidencias; el único role=\"status\" es el del esqueleto (línea 739). grep de focus(): 0 coincidencias.",
+    "por_que_importa": "Al buscar o paginar en un registro de 318 renglones, el cambio de vista no se anuncia ni mueve el foco: con lector de pantalla no hay forma de saber si la consulta devolvió algo, nada o un error — y en una bitácora, confundir «no hubo descargas» con «no cargó» es exactamente lo que no puede pasar."
+   },
+   {
+    "id": "f1-54bit-06",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado (valores y regla 2) + §11 Estructura",
+    "dice_el_sistema": "«.tarjeta-estado{max-width:480px;…border-radius:var(--r-modal);box-shadow:var(--sh-modal)}… .estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}» y «cada estado lleva encabezado real, no un <b>»",
+    "hay_en_el_build": ".state sin fondo ni sombra; .state .ico{width:30px;height:30px;color:var(--text-3)}; títulos en <b>: <b>Nadie ha descargado ningún reporte en este periodo</b>, <b>No se pudo cargar la bitácora de descargas</b>.",
+    "selector": ".state, .state .ico, .state b",
+    "evidencia": "getComputedStyle(.state-empty): backgroundColor rgba(0,0,0,0), boxShadow none, borderRadius 0px, maxWidth none; su .ico mide 30×30px, sin fondo ni radio. Capturas --empty.png y --error.png.",
+    "por_que_importa": "La distinción entre «no hubo descargas» y «no se pudo cargar» es la más delicada de esta pantalla, y las dos vistas se presentan igual: un glifo gris de 30px y una línea en negrita flotando sobre el fondo. Sin encabezado real tampoco entran en el índice de encabezados."
+   },
+   {
+    "id": "f1-54bit-07",
+    "severidad": "alta",
+    "regla": "§6.7 Esqueleto de carga (a11y) + §5 prefers-reduced-motion",
+    "dice_el_sistema": "«sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)» y «prefers-reduced-motion aplana el fondo, no solo detiene la animación»: «.skel{animation:none;background:var(--surface-2)}»",
+    "hay_en_el_build": "Cinco .sk-fila de seis barras cada una, todas con texto real: <span class=\"skel\">quién lo descargó</span>…<span class=\"skel\">00 ago 2026</span>… y @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer el fondo.",
+    "selector": ".state-loading .skel",
+    "evidencia": "30 barras con texto dentro de un contenedor con role=\"status\" aria-label=\"Cargando\". Con reducedMotion:'reduce': animationName \"none\" pero backgroundImage sigue siendo el degradado de tres paradas en backgroundPosition \"0% 0%\" — congelado, no aplanado. textContent de la primera barra: \"quién lo descargó\".",
+    "por_que_importa": "El contenedor es role=\"status\", así que un lector de pantalla recita 30 cadenas de relleno, entre ellas fechas inventadas («00 ago 2026») anunciadas con la misma voz con la que después se leerán las reales. En un registro legal, inyectar fechas falsas en el árbol de accesibilidad es peor que en cualquier otra pantalla."
+   },
+   {
+    "id": "f1-54bit-08",
+    "severidad": "media",
+    "regla": "§7.3 Objetivos táctiles + §10 trampa 4",
+    "dice_el_sistema": "§7.3: «Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8)». §10 trampa 4: «un <input> de búsqueda dentro de un <div> con forma de pastilla no cumple, porque pulsar la pastilla no hace nada. El contenedor tiene que ser una <label for=\"…\">.»",
+    "hay_en_el_build": "<div class=\"search\"><svg…/><input id=\"buscar\" type=\"search\" placeholder=\"Buscar por persona, reporte o filtro…\" aria-label=\"Buscar en la bitácora de descargas\"></div> — el <input> mide 329×15px.",
+    "selector": ".search > input#buscar",
+    "evidencia": "brief tactil_24px: 1 de 38 interactivos bajo 24px, y es exactamente ese input (329×15). Reproducido: tagName del contenedor DIV, sin atributo for, altura 33px; el input a 15px.",
+    "por_que_importa": "El buscador es el único control de acotación que la pantalla ofrece y su destino real mide 15px de alto. Pulsar el icono de lupa o el borde de la pastilla no enfoca el campo, que es el caso que §10 nombra."
+   },
+   {
+    "id": "f1-54bit-09",
+    "severidad": "media",
+    "regla": "§6.12 Resumen y barra de filtros, reglas 7 y 8 + §13.1",
+    "dice_el_sistema": "regla 7: «Orden fijo: resumen → buscador + filtros en una sola fila → tabla»; regla 8: «un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero»; §13.1: «Lectura → control → objeto.»",
+    "hay_en_el_build": "Orden del render: .p4-t (título) → .p4-b (solo el buscador) → .p4-f (los tres .schip de resumen y el control de densidad) → tabla. Y los tres .schip llevan aria-pressed=\"false\", el .seg dos aria-pressed y la paginación cinco <button> con aria-current=\"page\", sin ningún manejador.",
+    "selector": ".p4-b, .p4-f, .schip, .seg button, .pag button",
+    "evidencia": "Líneas 681-683: .p4-t, .p4-b con el único .search, .p4-f con los schip. Es el orden inverso al de §6.12 regla 7, y el buscador no comparte fila con filtro alguno. El <script> completo del archivo contiene solo el conmutador de tema, el conmutador de estados de demo y el menú lateral: no hay listener sobre .schip, .seg, .pag ni sobre el buscador.",
+    "por_que_importa": "Diez controles anuncian estado («no pulsado», «página actual») y ninguno responde, en la pantalla cuya única forma de acotar sería precisamente filtrar. Y el orden invertido hace que lo primero que se lea sea un campo vacío en vez de las cifras que resumen el mes."
+   },
+   {
+    "id": "f1-54bit-10",
+    "severidad": "media",
+    "regla": "§8 Voz de producto, límites 1 y 2 + §6.9",
+    "dice_el_sistema": "§8: «.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto» y «Ningún bloque de texto siempre visible pasa de ~140 caracteres. Se mide con el contador de caracteres, no a ojo». §6.9: «.nota no es un componente de explicación general — solo nivel 1.»",
+    "hay_en_el_build": "Una .banda.b-info en cabecera y tres .nota al pie de la tabla, todas de varias oraciones.",
+    "selector": ".banda.b-info, .nota",
+    "evidencia": "innerText medido con el andamio oculto: .nota «Los filtros no son un adorno…» 336 caracteres; .nota «Los filtros que arrastran dato personal…» 298; .banda.b-info «Los reportes no se guardan en ninguna parte…» 253; .nota «Un renglón de esta bitácora no se edita ni se borra…» 155. Tope del sistema: ~140, una frase. Suman 1.042 caracteres de explicación siempre visible, más que los datos de las cinco filas.",
+    "por_que_importa": "Los cuatro bloques explican por qué la bitácora está diseñada así —nivel 3 de §8, que «no va en la interfaz»— y ocupan en pantalla casi tanto como el registro. Dos de ellos existen para desmentir decisiones visuales de la propia pantalla: el ámbar que parece culpa y los filtros que parecen adorno. Si el color y la columna dijeran lo correcto, las notas sobrarían."
+   },
+   {
+    "id": "f1-54bit-11",
+    "severidad": "media",
+    "regla": "§10 trampa 5 — isotipo recortado",
+    "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio… Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal.»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg> y el mismo patrón a 22×21 en el botón flotante.",
+    "selector": ".side .logo svg, .fab svg",
+    "evidencia": "getBoundingClientRect medido: <svg> en x=96, <use> en x=63,5 → −32,5px. En las capturas --ok.png y --oscuro.png la marca sale como una astilla a la izquierda del rótulo.",
+    "por_que_importa": "La marca aparece recortada en todas las vistas. 01_login tiene el patrón correcto en el mismo repositorio."
+   },
+   {
+    "id": "f1-54bit-12",
+    "severidad": "media",
+    "regla": "§6.19 Botón-icono — .iconbtn",
+    "dice_el_sistema": "«Nunca viaja solo: title + aria-label, y el aria-label nombra el dato concreto, no la acción a secas.»",
+    "hay_en_el_build": "<button class=\"iconbtn\" type=\"button\" aria-label=\"Exportar\"> — sin title, con la acción a secas, y sin lógica detrás.",
+    "selector": ".p4-t .acc .iconbtn",
+    "evidencia": "grep de '<button class=\"iconbtn\"' en el archivo: el conmutador de tema (con aria-label descriptivo actualizado por JS) y este. No hay title. El <script> no lleva ningún manejador para él.",
+    "por_que_importa": "Es la única salida de la bitácora hacia un archivo, que es como se entrega un registro a quien lo pide. No dice qué exporta —los 5 renglones visibles o los 318—, ni en qué formato, ni al pasar el cursor ni al lector de pantalla. Y exportar una bitácora de descargas deja a su vez un rastro: la acción menos explicada de la pantalla es la que más consecuencias tiene."
+   },
+   {
+    "id": "f1-54bit-13",
+    "severidad": "baja",
+    "regla": "§6.5 Iconos — .msi",
+    "dice_el_sistema": "«Fuente: Material Symbols Rounded, variante rellena (FILL@1)… Carga por subconjunto, con un solo <link>»",
+    "hay_en_el_build": "Sprite propio de <symbol> SVG inline invocado con <svg class=\"ico\"><use href=\"#i-…\"/></svg>; no hay .msi ni <link> de Material Symbols.",
+    "selector": "svg.ico > use",
+    "evidencia": "grep de 'msi' y de 'Material+Symbols' en el archivo: 0 coincidencias.",
+    "por_que_importa": "Funciona y esquiva las trampas de ligadura y de subconjunto que el documento registra, pero es una familia distinta de la declarada: los glifos no coinciden con los de las pantallas que sí usan Material Symbols."
+   }
   ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "Accesibilidad 1: 41 elementos con texto quedan por debajo del suelo de 12px de §2.1 y no son adorno —son la hora de cada descarga (11px), el área de quien la hizo (11px), la columna FORMATO entera y los doce chips de filtro (10,5px)—, el único control de acotación es un input de 15px dentro de un <div> en vez de una <label for> (§10 trampa 4), el cambio de vista no se anuncia ni mueve el foco, los dos estados que hay que poder distinguir («no hubo descargas» / «no cargó») se presentan igual, sin tarjeta ni medallón y titulados con <b>, y el esqueleto recita 30 cadenas de relleno con fechas inventadas dentro de un role=\"status\". Theming 3: los dos temas se pintan bien (captura --oscuro correcta), 83 tokens declarados y ninguno usado sin declarar, pero arrastra --text-3 obsoleto, escribe 25 tamaños de letra como literales fuera de la escala y usa el ámbar del semáforo para una categoría que la propia pantalla declara sin juicio. Responsive 3: modo tarjeta por debajo de 860px con data-et en todas las celdas, colgroup con seis anchos declarados y el esqueleto a una columna a 900px. Integridad 2: la tabla está bien construida —caption descriptiva, colgroup, th scope=row en la persona, tfoot con la cuenta y el orden declarado— pero como registro de auditoría no cumple su función: no hay forma de acotar por periodo, persona, reporte ni formato, la vista vacía remite a un control de fechas que no existe, diez controles anuncian estado sin tenerlo, y 1.042 caracteres de nota siempre visible explican decisiones de diseño bajo la tabla. Rendimiento no evaluado: maqueta estática sin backend.",
+  "evidencia": [
+   "Barrido de estilo calculado sobre #contenido y .p4: 41 elementos con texto a 10,5 / 11 / 11,5px — .f-chip ×12, .fmt ×5, .av ×5, small ×15, thead th ×5, .nota ×3 (contando los nodos de texto directos)",
+   "brief tactil_24px: 1 de 38 interactivos bajo 24px — el <input type=search> a 329×15; contenedor .search medido con tagName DIV, sin atributo for",
+   "Con reducedMotion:'reduce': .skel animationName \"none\" y backgroundImage aún el degradado de tres paradas en backgroundPosition \"0% 0%\"; textContent \"quién lo descargó\"",
+   "getComputedStyle(.state-empty): background rgba(0,0,0,0), box-shadow none, border-radius 0px, max-width none; icono 30×30px sin fondo ni radio",
+   "getBoundingClientRect del <use> del isotipo contra su <svg>: −32,5px",
+   "innerText de los bloques siempre visibles: 336, 298, 253 y 155 caracteres frente al tope de ~140 de §8",
+   "grep de '.fwrap' / 'class=\"f\"' / '.pop' en el archivo: 0 coincidencias — no hay ningún componente de filtro de §6.21",
+   "capturas 54_bitacora_descargas--ok.png, --loading.png, --empty.png, --error.png, --oscuro.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+ },
+ "cobertura": [
+  {
+   "patron": "Registro de auditoría inmutable. La pantalla es una bitácora legal —quién descargó, qué reporte, con qué filtros, en qué formato y cuándo— y el sistema no tiene ninguna regla para este arquetipo: §6.11 cubre la tabla densa y §6.21 los filtros, pero nada dice de acotar por periodo, de exportar el registro, de la inmutabilidad del renglón ni de cómo se marca una entrega que arrastra dato personal. La maqueta lo resuelve con tres .schip de conteo, un .f-chip que no está en el sistema y 1.042 caracteres de nota.",
+   "propuesta_de_regla": "§6.27 Bitácora de auditoría — `.bitacora-tabla`. **Cuándo:** una tabla cuyo contenido es prueba de lo que pasó y no se puede editar ni borrar. Reusa `.tabla-caja` de §6.11 y añade: (1) **el periodo es un control, no una suposición** — un selector de rango de fechas **siempre visible** junto al buscador, con el valor vigente escrito («1 – 31 ago 2026»), porque un registro que no se puede acotar no sirve como registro; (2) **quién y cuándo son la primera y la última columna, y nunca bajan del suelo de §2.1**: la fecha a `--fs-dense` en `--text` y la hora debajo a `--fs-meta`, nunca a 11px; (3) **la exportación es una acción con nombre, no un icono suelto** (§6.19) y declara **el alcance exacto** de lo que se lleva — «Exportar los 318 renglones del periodo»; (4) **la inmutabilidad se dice una vez y en un sitio**: en el `.ambito` (§6.22) de la cabecera, no en una `.nota` al pie; (5) **la marca de dato sensible es una clasificación, no un estado**: usa la paleta categórica de §1.4 vía `.p-type` (§6.10), **nunca `--warn`**, porque entregar el reporte está permitido y el ámbar afirma lo contrario; (6) el orden por omisión —lo más reciente primero— **se declara en el `tfoot`** y las columnas de persona y fecha son ordenables con `aria-sort` (§6.11 regla 3)."
+  },
+  {
+   "patron": "Chip de filtro aplicado dentro de una celda de tabla (`.f-chip`: «marca todas», «corte 31 jul 2026», «incluye razón social y RFC»). §6.21 documenta las pastillas de filtro aplicado, pero en su propia fila sobre la tabla y como control que se puede quitar con una «×». Aquí son dato histórico de solo lectura dentro de una celda, que es un uso distinto y sin regla.",
+   "propuesta_de_regla": "§6.21.1 Chip de filtro histórico. Un filtro que se **registra** (lo que se aplicó en su momento) no es el mismo componente que un filtro que se **aplica** (lo que está puesto ahora). El histórico va en la celda, **sin «×», sin `aria-pressed` y sin cursor de puntero** (§6.12 regla 8), con el nombre de la dimensión en `--text-2` y su valor en `--text` con peso, a `--fs-meta` **como mínimo** (§2.1). Si no caben todos, se muestran los tres primeros y «+N más» abre el detalle del renglón — nunca se recortan con elipsis, porque el filtro omitido es justo el que se buscaba. El fondo es `--surface-2`; el color solo entra si la dimensión está clasificada, y entonces vía §1.4, no vía semáforo."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática servida como archivo, sin backend que perfilar",
+  "f4_nielsen: fuera del subconjunto de este lote (solo F1 y F3)",
+  "f5_investigacion: fuera del subconjunto por arquetipo",
+  "f1 §6.11 regla 3 (aria-sort): no evaluado como incumplimiento — la tabla no declara ninguna columna ordenable (no hay <button data-col> en el <thead>), así que la regla no tiene a qué aplicarse; los tres aria-sort del archivo están solo en selectores CSS. El hueco real está recogido como cobertura (§6.27 punto 6)",
+  "f1: no se evaluó el recorrido completo con teclado ni el comportamiento real con lector de pantalla; las conclusiones de a11y se apoyan en el markup y en el estilo calculado"
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--warn",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [],
+  "declarados_no_usados": [
+   "--block",
+   "--block-fill",
+   "--border-fuerte",
+   "--dur-enter",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--fs-kpi",
+   "--glass",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--r-modal",
+   "--sp-12",
+   "--stagger",
+   "--velo-trama",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 83,
+  "n_usados": 66,
+  "n_divergentes": 15,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": true,
+   "filas": 5,
+   "nodosText3": 15
+  }
+ }
 }

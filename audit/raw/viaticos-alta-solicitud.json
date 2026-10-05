@@ -1,341 +1,608 @@
 {
-  "pantalla": "viaticos-alta-solicitud",
-  "ruta_zip": "05-direccion-y-administracion/viaticos-alta-solicitud.html",
-  "carpeta": "05-direccion-y-administracion",
-  "area": "finanzas",
-  "arquetipo": "formulario",
-  "modo": "cumplimiento",
-  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
-  "capturas": [
-    "viaticos-alta-solicitud--ok.png",
-    "viaticos-alta-solicitud--loading.png",
-    "viaticos-alta-solicitud--empty.png",
-    "viaticos-alta-solicitud--error.png",
-    "viaticos-alta-solicitud--oscuro.png"
-  ],
-  "f1_cumplimiento": {
-    "veredicto": "no_cumple",
-    "hallazgos": [
-      {
-        "id": "f1-viaticosalta-01",
-        "severidad": "alta",
-        "regla": "§6.16 regla 3 — obligatoriedad real",
-        "dice_el_sistema": "«required y aria-required de verdad, no asteriscos decorativos.»",
-        "hay_en_el_build": "Cinco campos marcados sólo con <span class=\"req\">*</span>: Departamento, Jefe directo, Motivo, Destino, Fecha de ida, Fecha de vuelta. Ni un solo required ni aria-required en todo el archivo.",
-        "selector": ".ctrl > label .req",
-        "evidencia": "grep -c 'required' sobre el archivo completo: 0. El <style> declara .ctrl > label .req{color:var(--err-ink)} (línea 582), es decir, el asterisco está estilado pero no implementado.",
-        "por_que_importa": "El asterisco rojo no llega al árbol de accesibilidad: un lector de pantalla anuncia «Departamento, cuadro combinado» sin decir que es obligatorio, y el navegador no impide enviar el formulario vacío. El formulario existe precisamente para que la solicitud no llegue incompleta (pp-107)."
-      },
-      {
-        "id": "f1-viaticosalta-02",
-        "severidad": "alta",
-        "regla": "§6.16 regla 2 — dos niveles de obligatoriedad",
-        "dice_el_sistema": "«Dos niveles de obligatoriedad con palabras distintas — “obligatorio para dar de alta” vs “necesario para facturar o programar”.»",
-        "hay_en_el_build": "Un único nivel, expresado con un símbolo y sin palabras: el asterisco. Los campos que son necesarios para programar el viaje pero no para abrir el borrador (servicios solicitados: Vuelo / Uber programado / Renta de vehículo) no llevan ninguna marca y quedan indistinguibles de lo opcional.",
-        "selector": ".ctrl > label .req, .ctrl.ancho label",
-        "evidencia": "viaticos-alta-solicitud--ok.png: seis campos con asterisco rojo, el grupo de servicios sin ninguna marca y el campo «Quién solicita» deshabilitado sin marca. No hay ningún texto en la pantalla que explique qué significa el asterisco.",
-        "por_que_importa": "Es el requisito del sistema que esta pantalla existía para cumplir. Sin el segundo nivel, quien captura no sabe que sin los servicios la solicitud entra pero no se puede programar, y la solicitud vuelve a llegar a medias — el circuito que pp-107 describe."
-      },
-      {
-        "id": "f1-viaticosalta-03",
-        "severidad": "alta",
-        "regla": "§6.4 regla 4 — el error no se lleva por delante lo que había",
-        "dice_el_sistema": "«El error no se lleva por delante lo que había — con trabajo del usuario en pantalla el error va encima, como aviso, con los campos visibles y rellenos.» §11: «el error deja a la vista el trabajo que la persona ya había hecho».",
-        "hay_en_el_build": "La vista de error sustituye el formulario completo: <div class=\"state state-error\"> ocupa toda la zona de contenido y las tres secciones con los datos capturados desaparecen.",
-        "selector": "main#contenido[data-state=\"error\"] .state-error",
-        "evidencia": "viaticos-alta-solicitud--error.png: donde estaban los ocho campos rellenos sólo queda el mensaje «No se pudo enviar la solicitud» centrado sobre el fondo. El texto del error afirma «lo que capturaste sigue en el borrador» mientras lo que capturó ya no se ve en la pantalla.",
-        "por_que_importa": "Es el caso exacto que la regla nombra: un formulario con trabajo del usuario dentro. El mensaje promete que no se perdió nada y a la vez lo borra de la vista, que es la forma más rápida de que alguien vuelva a teclearlo todo o abandone."
-      },
-      {
-        "id": "f1-viaticosalta-04",
-        "severidad": "alta",
-        "regla": "§6.4 — .tarjeta-estado y encabezado real",
-        "dice_el_sistema": ".tarjeta-estado{max-width:480px;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)} opaca, con .estado-ico de 52px. «Cada estado lleva encabezado real, no un <b>.»",
-        "hay_en_el_build": "<div class=\"state state-error\"><svg class=\"ico\">…<b>No se pudo enviar la solicitud</b>…",
-        "selector": ".state.state-error, .state.state-empty",
-        "evidencia": "Estilo calculado: max-width «none», border-radius «0px», box-shadow «none», fondo transparente; hijos svg,B,P,P,DIV sin ningún h1-h4; icono de 30×30px en vez del medallón de 52px.",
-        "por_que_importa": "Mismo patrón que en 23_viaticos. Sin encabezado real el estado no aparece en la navegación por encabezados, y sin tarjeta el mensaje flota sobre el mismo fondo que acaba de vaciarse."
-      },
-      {
-        "id": "f1-viaticosalta-05",
-        "severidad": "media",
-        "regla": "§7.3 + §10 trampa 4 — casillas",
-        "dice_el_sistema": "«Casillas de 15×15px → .selfila{display:flex;align-items:center;min-height:24px;padding:4px;margin:-4px} + input[type=\"checkbox\"]{width:16px;height:16px;accent-color:var(--accent)}.» «El destino táctil es la región que acepta la pulsación»; la <label> tiene que llegar a 24px.",
-        "hay_en_el_build": "<label style=\"display:flex;gap:8px;align-items:center;font-size:var(--fs-dense);font-weight:400\"><input type=\"checkbox\"> Vuelo</label> — tres veces, con estilo en línea, sin min-height, sin padding y sin tamaño declarado para la casilla.",
-        "selector": ".ctrl.ancho label > input[type=\"checkbox\"]",
-        "evidencia": "Brief, tactil_24px: casillas_bajo_24 = 3, las tres de 15×15px. Con data-tacto=\"dedo\" puesto siguen igual: las seis reglas [data-tacto=\"dedo\"] del archivo se escriben sin :root (§7.3) y ninguna de ellas cubre input[type=\"checkbox\"].",
-        "por_que_importa": "El sistema ya tenía la receta escrita, con nombre (.selfila) y medidas, precisamente por este caso. Aquí se resolvió con estilo en línea y el destino se quedó en 15px."
-      },
-      {
-        "id": "f1-viaticosalta-06",
-        "severidad": "media",
-        "regla": "§6.9 — el icono coincide con la variante",
-        "dice_el_sistema": "«El icono tiene que coincidir con la variante (triángulo de advertencia sobre banda neutra = señal mixta).»",
-        "hay_en_el_build": "<div class=\"banda b-info\"><svg class=\"ico\"><use href=\"#i-alert\"/></svg> — triángulo de advertencia sobre la banda informativa (--surface-2/--text-2).",
-        "selector": ".banda.b-info > svg use[href=\"#i-alert\"]",
-        "evidencia": "viaticos-alta-solicitud--ok.png: el aviso «Construida a medias, sin maqueta» lleva triángulo de advertencia sobre fondo gris neutro. Es el ejemplo literal que el sistema usa para enunciar la regla.",
-        "por_que_importa": "La señal mixta hace que el aviso se lea como un problema del formulario cuando es una nota de contexto, y es lo primero que ve quien abre la pantalla."
-      },
-      {
-        "id": "f1-viaticosalta-07",
-        "severidad": "media",
-        "regla": "§8 Anexo B — voz de producto",
-        "dice_el_sistema": "«Si el texto explica una decisión, no va en pantalla. Si explica una consecuencia para quien está mirando, sí — y en una frase.» «.nota y .banda llevan como máximo UNA frase.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres.»",
-        "hay_en_el_build": "Banda: «Construida a medias, sin maqueta. No existe pantalla ni endpoint de creación con formulario propio para una nueva solicitud de viático (censo VADO, piezas 50/75). Esta es la primera vez que se dibuja el flujo de alta.» (3 frases, 219 caracteres). Ayuda de «Fecha de vuelta»: «El monto estándar lo calcula el servidor según el catálogo vigente (EstandarViatico); no se captura aquí (CLAUDE.md #12: las agregaciones y cálculos de negocio no se hacen a mano en pantalla).» (190 caracteres).",
-        "selector": ".banda.b-info > p, .ctrl .ayuda",
-        "evidencia": "Conteo de caracteres sobre el texto de los nodos: 219 y 190. Ambos citan artefactos internos del proyecto —«censo VADO, piezas 50/75», «CLAUDE.md #12», el nombre de clase EstandarViatico— que no existen para quien pide un viático.",
-        "por_que_importa": "Son decisiones de construcción, no consecuencias para quien mira. Y si fueran andamiaje legítimo, §9 obliga a marcarlo con data-andamio y a rotularlo; aquí van dentro del producto, sin marca, con lo que se publicarían tal cual."
-      },
-      {
-        "id": "f1-viaticosalta-08",
-        "severidad": "media",
-        "regla": "§6.16 regla 7 — el contador de sección",
-        "dice_el_sistema": "«El contador de sección habla en español, no en aritmética, y si cuenta, cuenta bien.»",
-        "hay_en_el_build": "«3 de 3 capturados», «2 de 2 capturados», «1 de 3 servicios · 2 de 2 fechas».",
-        "selector": ".seccion > header > .est",
-        "evidencia": "viaticos-alta-solicitud--ok.png. El tercer contador cuenta como incompleto un grupo de casillas opcionales: marcar «Renta de vehículo» y no marcar las otras dos es la respuesta completa, y la pantalla la presenta como «1 de 3».",
-        "por_que_importa": "Un contador que marca como pendiente algo ya terminado empuja a seleccionar servicios que no se necesitan — y cada servicio de más es dinero de más en la solicitud que luego alguien tiene que aprobar."
-      },
-      {
-        "id": "f1-viaticosalta-09",
-        "severidad": "media",
-        "regla": "§6.16 regla 1 + §6.18 — dato de sólo lectura",
-        "dice_el_sistema": "«Un dato calculado se muestra como dato, no como campo» (.dato-calc). «Un campo de solo lectura se muestra como dato, no como campo — pero conservando el motivo.»",
-        "hay_en_el_build": "<input type=\"text\" id=\"quien\" value=\"Jonathan Olvera Sandoval\" disabled> con ayuda «Fijo: el usuario en sesión.»",
-        "selector": ".ctrl > input#quien[disabled]",
-        "evidencia": "viaticos-alta-solicitud--ok.png: «Quién solicita» se dibuja con la misma caja, borde y altura que los campos editables, sólo que apagada. El motivo sí se conserva, pero la forma es la de un campo.",
-        "por_que_importa": "disabled saca el dato del recorrido de teclado, así que quien revisa su solicitud con Tab nunca oye quién figura como solicitante. El sistema ya tiene el componente para esto (.dato-calc), que además no se puede confundir con un campo roto."
-      },
-      {
-        "id": "f1-viaticosalta-10",
-        "severidad": "media",
-        "regla": "§6.7 Esqueleto de carga",
-        "dice_el_sistema": "«Sin texto real dentro de las barras» (color:transparent sigue en el árbol de accesibilidad). prefers-reduced-motion aplana el fondo: {.skel{animation:none;background:var(--surface-2)}}. «El punto de ruptura del esqueleto es el de la tabla (860px, no 900px).»",
-        "hay_en_el_build": "Las barras contienen el texto «Quién solicita», «departamento», «jefe directo», «motivo», «destino», «servicios», «fecha de ida», «fecha de vuelta». @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer el fondo. @media (max-width:900px){.sk-fila{…}}.",
-        "selector": ".state-loading .skel",
-        "evidencia": "Con reducedMotion:'reduce' emulado: animation-name «none», background-image sigue siendo el linear-gradient(90deg, rgb(231,237,243) 25%, …) congelado en la posición 0 — el fallo exacto que §6.7 documenta. Las tres primeras .skel devuelven textContent no vacío.",
-        "por_que_importa": "Un lector de pantalla lee «Quién solicita departamento jefe directo» mientras la pantalla todavía no tiene nada, y quien pidió movimiento reducido ve un degradado detenido en vez de una superficie limpia. A favor del esqueleto: sus alturas (38px y 76px) sí imitan las de los campos reales, que es lo que §6.7 pide."
-      },
-      {
-        "id": "f1-viaticosalta-11",
-        "severidad": "media",
-        "regla": "§10 trampa 5 — isotipo",
-        "dice_el_sistema": "Medidas en el <use> y sin viewBox en el envoltorio; «si el desplazamiento no es ~0, está mal».",
-        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>.",
-        "selector": ".logo svg > use",
-        "evidencia": "getBoundingClientRect(): <svg> en x=96, <use> en x=63,5 → desplazamiento −32,5px, el valor documentado. La marca se pinta recortada en la barra lateral.",
-        "por_que_importa": "Afecta a las cuatro pantallas del lote y a los dos temas."
-      },
-      {
-        "id": "f1-viaticosalta-12",
-        "severidad": "media",
-        "regla": "§1.1 — valor de --text-3",
-        "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2).»",
-        "hay_en_el_build": "--text-3: #66717F.",
-        "selector": ":root",
-        "evidencia": "Brief, tokens.text_3_declarado: «#66717F». La cabecera de cada .seccion usa --surface-2 (§6.3) y es ahí donde cae el contador .est.",
-        "por_que_importa": "Hecho ya establecido; se marca porque aquí --text-3 pinta las tres ayudas de campo, que son el único sitio donde el formulario explica qué se espera."
-      },
-      {
-        "id": "f1-viaticosalta-13",
-        "severidad": "media",
-        "regla": "§2.1 El suelo son 12px",
-        "dice_el_sistema": "«Nada baja de ahí»; la única excepción es 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
-        "hay_en_el_build": "15 declaraciones font-size:11px, 3 de 11,5px y 6 de 10,5px. En la zona de producto: .ayuda a 11px (las tres ayudas de campo), .idx a 11px (el índice numerado de cada sección), <code>EstandarViatico</code> a 11px, .ref a 11px, y los seis .grp a 10,5px en caja mixta.",
-        "selector": ".ctrl .ayuda, .seccion header .idx, .side .grp",
-        "evidencia": "Estilo calculado a 1440×900: 7 agrupaciones por debajo de 12px. --fs-meta vale 12px en :root (línea 13), de modo que los 11px son literales que se saltan el token.",
-        "por_que_importa": "Las ayudas de campo son el texto que decide cómo se rellena cada campo («Es quien aprueba la solicitud», «Fijo: el usuario en sesión»). Es el peor sitio para bajar del suelo."
-      },
-      {
-        "id": "f1-viaticosalta-14",
-        "severidad": "media",
-        "regla": "§11 Estructura — etiquetas y grupos",
-        "dice_el_sistema": "«Todos los id únicos y cada aria-describedby/aria-controls apunta a algo que existe»; cada control lleva su etiqueta.",
-        "hay_en_el_build": "<label>Servicios solicitados</label> sin atributo for y sin control asociado, seguida de un <div> con las tres casillas. El grupo no es un <fieldset>/<legend> ni lleva role=\"group\" + aria-labelledby. Las tres ayudas .ayuda tampoco se enlazan por aria-describedby a su campo.",
-        "selector": ".ctrl.ancho > label (sin for), .ctrl .ayuda",
-        "evidencia": "Markup de la sección 3. El brief cuenta inputsSinEtiqueta = 0 porque las casillas sí van envueltas en su propia <label>, pero el rótulo del grupo queda huérfano y las ayudas quedan desconectadas de su campo.",
-        "por_que_importa": "Un lector de pantalla recorre «Vuelo», «Uber programado», «Renta de vehículo» sin saber que son tres respuestas a la misma pregunta, y nunca lee «Es quien aprueba la solicitud» al llegar a «Jefe directo»."
-      },
-      {
-        "id": "f1-viaticosalta-15",
-        "severidad": "baja",
-        "regla": "§6.16 regla 6 — tipo de campo y autocompletado",
-        "dice_el_sistema": "«El tipo de campo es el tipo del dato (type=\"email\", type=\"tel\", inputmode=\"numeric\") + autocomplete.»",
-        "hay_en_el_build": "Los tipos son correctos (type=\"date\" en las dos fechas, <select> en departamento, <textarea> en motivo) pero no hay ni un solo atributo autocomplete en el formulario.",
-        "selector": ".ctrl input, .ctrl select",
-        "evidencia": "grep 'autocomplete' sobre el archivo: 0 coincidencias.",
-        "por_que_importa": "Media regla cumplida. El coste es pequeño en este formulario corto, pero el jefe directo y el destino son datos que se repiten viaje tras viaje."
-      },
-      {
-        "id": "f1-viaticosalta-16",
-        "severidad": "baja",
-        "regla": "§6.9 nomenclatura de .banda",
-        "dice_el_sistema": "Cuatro variantes: .banda-info, .banda-warn, .banda-err, .banda-ok.",
-        "hay_en_el_build": ".banda.b-info, .banda.b-warn, .banda.b-err, .banda.b-ok.",
-        "selector": ".banda.b-info",
-        "evidencia": "Líneas 521-523 del <style>; los tokens de fondo y tinta sí son los documentados.",
-        "por_que_importa": "Sólo diverge del nombre; complica el grep de auditoría entre maquetas."
-      }
-    ]
-  },
-  "f3_boost_ui": {
-    "puntuacion": 2,
-    "dimensiones": {
-      "accesibilidad": 1,
-      "rendimiento": "no_evaluado",
-      "theming": 3,
-      "responsive": 3,
-      "integridad": 2
-    },
-    "justificacion": "La estructura del formulario es la correcta: tres .seccion numeradas con índice en vez de icono, rejilla auto-fit de 230px que reflúye bien, barra de acciones fija abajo con una sola vía de guardado («Guardar borrador» + «Enviar a aprobación», sin autoguardado paralelo, §6.16 regla 8), y el monto calculado correctamente excluido como campo. Pero el formulario no es un formulario: sin un solo required ni aria-required, los seis asteriscos son adorno y no existe el segundo nivel de obligatoriedad que §6.16 regla 2 exige. Y el error destruye el trabajo capturado, que es la regla de §6.4 escrita precisamente para esta pantalla. Accesibilidad a 1 por la suma de eso con las casillas de 15px, el rótulo de grupo huérfano, las ayudas sin aria-describedby y las siete agrupaciones de texto por debajo de 12px. Theming y responsive sostienen el 3: los dos temas resuelven con juegos de tokens completos y la rejilla no se rompe. Integridad a 2 y no 1 porque aquí el inventario de CSS muerto es menor que en la bandeja, aunque el contador de la sección 3 cuente mal.",
-    "evidencia": [
-      "grep -c 'required' = 0 sobre el archivo completo; .ctrl > label .req declarado en la línea 582 (el asterisco está estilado, no implementado).",
-      "viaticos-alta-solicitud--error.png: el formulario relleno desaparece y lo sustituye la vista de error.",
-      ".state-error calculado: max-width none, border-radius 0px, box-shadow none, fondo transparente, título en <b>, icono de 30px.",
-      "Brief, tactil_24px: 3 casillas de 15×15px; 6 reglas [data-tacto=\"dedo\"] escritas sin :root.",
-      "Estilo calculado: 7 agrupaciones con font-size < 12px, entre ellas las tres .ayuda a 11px.",
-      "Esqueleto: alturas 38px/76px coherentes con los campos reales (bien), pero con texto real dentro de las barras y sin aplanar el fondo bajo prefers-reduced-motion.",
-      "Isotipo: desplazamiento del <use> respecto al <svg> = −32,5px."
-    ]
-  },
-  "f4_nielsen": [
-    {
-      "n": 1,
-      "heuristica": "Visibilidad del estado del sistema",
-      "severidad": 2,
-      "hallazgo": "Lo visible está bien resuelto: «Borrador — sin enviar» junto al título, contador por sección y la línea fija «La solicitud se creará en borrador, sin enviar» pegada a los botones. Lo que falla es lo anunciado: el cambio de vista se hace con data-state en <main> sin aria-live y sin mover el foco (§6.4 regla 1); no hay ningún aria-live en el archivo y el <script> no llama a focus().",
-      "selector": "main#contenido[data-state], .barra-form .izq"
-    },
-    {
-      "n": 2,
-      "heuristica": "Correspondencia entre el sistema y el mundo real",
-      "severidad": 2,
-      "hallazgo": "Los campos son los del viaje real y en el orden en que se piensa (quién → por qué y a dónde → qué servicios y cuándo). Rompe la correspondencia el texto que habla el idioma del repositorio y no el del área: «censo VADO, piezas 50/75», «CLAUDE.md #12», «EstandarViatico».",
-      "selector": ".banda.b-info > p, .ctrl .ayuda"
-    },
-    {
-      "n": 3,
-      "heuristica": "Control y libertad del usuario",
-      "severidad": 3,
-      "hallazgo": "Hay Cancelar y Guardar borrador, que es la salida correcta. Pero si el envío falla, la pantalla se lleva por delante todo lo capturado (§6.4 regla 4) y la única salida ofrecida es «Reintentar»: no hay «volver al borrador» ni los campos a la vista.",
-      "selector": ".state-error, .barra-form .der"
-    },
-    {
-      "n": 4,
-      "heuristica": "Consistencia y estándares",
-      "severidad": 3,
-      "hallazgo": "El asterisco en vez de required/aria-required es la divergencia más cara, porque es el estándar del propio sistema y el de la plataforma a la vez. A ella se suman .banda renombrada a .b-*, el campo de sólo lectura resuelto con disabled en vez de .dato-calc y las casillas resueltas con estilo en línea en vez de .selfila.",
-      "selector": ".req, input#quien[disabled], .ctrl.ancho label"
-    },
-    {
-      "n": 5,
-      "heuristica": "Prevención de errores",
-      "severidad": 4,
-      "hallazgo": "Es la heurística peor servida y es la razón de ser de la pantalla. Nada impide enviar: sin required, sin aria-required, sin validación de que la fecha de vuelta sea posterior a la de ida, sin tope de duración y sin ninguna comprobación contra el estándar. Un formulario de alta que no puede rechazar una captura incompleta deja el trabajo donde estaba, en quien recibe la solicitud.",
-      "selector": ".ctrl input, .ctrl select, .ctrl textarea"
-    },
-    {
-      "n": 6,
-      "heuristica": "Reconocer antes que recordar",
-      "severidad": 2,
-      "hallazgo": "Bien en dos puntos: el jefe directo viene propuesto y se dice para qué sirve, y el solicitante viene fijo. Mal en el que decide: no se muestra en ningún momento el monto estándar del destino ni el importe estimado del viaje, de modo que quien captura y quien aprueba tienen que recordarlo o buscarlo fuera.",
-      "selector": ".ctrl .ayuda, .seccion:nth-of-type(3)"
-    },
-    {
-      "n": 7,
-      "heuristica": "Flexibilidad y eficiencia de uso",
-      "severidad": 2,
-      "hallazgo": "Ocho campos para un viaje es razonable y la rejilla aprovecha el ancho. No hay plantilla ni «repetir el viaje anterior» para el destino recurrente, ni autocomplete en ningún campo, que es lo que haría barato capturar el décimo viaje del mes a la misma agencia.",
-      "selector": ".rejilla, .ctrl input"
-    },
-    {
-      "n": 8,
-      "heuristica": "Diseño estético y minimalista",
-      "severidad": 2,
-      "hallazgo": "El formulario en sí es limpio. Lo que sobra está en los bordes: una banda de 219 caracteres sobre el estado de construcción del proyecto y una ayuda de campo de 190 que cita un fichero interno. §8 fija el techo en una frase y ~140 caracteres, sin excepción por importancia.",
-      "selector": ".banda.b-info > p, .ctrl .ayuda"
-    },
-    {
-      "n": 9,
-      "heuristica": "Ayudar a reconocer y recuperarse de los errores",
-      "severidad": 4,
-      "hallazgo": "No existe la capa de error de campo: ningún aria-invalid, ningún aria-describedby a un mensaje, y aunque el <style> trae .ctrl .mal y .ctrl.error (líneas 592-593), el markup no los usa en ninguna parte. Y el error de envío, que sí existe, viola la regla que lo gobierna llevándose los datos por delante.",
-      "selector": ".ctrl.error, .ctrl .mal, .state-error"
-    },
-    {
-      "n": 10,
-      "heuristica": "Ayuda y documentación",
-      "severidad": 2,
-      "hallazgo": "Las ayudas de campo son breves y útiles donde están, pero van siempre visibles a 11px en vez de usar el toggletip de §6.23 para el nivel 2 de §8, y la más larga explica una decisión de arquitectura en vez de una consecuencia. No hay ningún .infob en la pantalla.",
-      "selector": ".ctrl .ayuda"
-    }
-  ],
-  "f5_investigacion": {
-    "pain_points_evaluados": [
-      {
-        "pp": "pp-107",
-        "documento": "data/insights/2026-09-10_administracion-finanzas.json",
-        "cobertura": "cubre",
-        "evidencia": "«La solicitud de viáticos no recoge los datos mínimos del viaje: no dice quién viaja, qué necesita ni cuánto tiempo estará fuera. Sin esos campos no se puede presupuestar». El formulario recoge las tres cosas y en ese orden: quién solicita con departamento y jefe directo (sección 1), motivo y destino (sección 2), servicios solicitados y fechas de ida y vuelta (sección 3). Es la respuesta directa al pain point de severidad alta con mejor relación impacto/esfuerzo del área (op-095, alto/bajo)."
-      },
-      {
-        "pp": "pp-091",
-        "documento": "data/insights/2026-07-31_finanzas-cobranza-almacen.json",
-        "cobertura": "cubre",
-        "evidencia": "«Otras áreas no envían información previa ni utilizan formatos específicos y estandarizados al solicitar aprobaciones, generando situaciones imprevistas al gestionar autorizaciones». El formulario estandarizado es exactamente el formato común que falta, y nombra al jefe directo como aprobador dentro de la propia captura, de modo que la solicitud llega con su ruta de autorización ya puesta."
-      },
-      {
-        "pp": "pp-027",
-        "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
-        "cobertura": "cubre",
-        "evidencia": "«La solicitud y aprobación de viáticos y recursos financieros para desplazamientos se gestiona a través de un grupo de WhatsApp, sin un flujo estructurado de solicitud-revisión». Esta pantalla es la entrada de ese flujo y sustituye el mensaje de WhatsApp por un borrador con folio que después aparece en 23_viaticos. Cobertura conceptual completa; en la maqueta los botones no envían nada."
-      },
-      {
-        "pp": "pp-117",
-        "documento": "data/insights/2026-09-10_administracion-finanzas.json",
-        "cobertura": "contradice",
-        "evidencia": "«Ninguna área tiene presupuesto mensual ni semanal asignado, de modo que no hay techo de gasto contra el que contrastar una solicitud ni forma de estimar cuánto cuesta». La pantalla toma la decisión expresa de no mostrar ninguna cifra: la ayuda de «Fecha de vuelta» dice que el monto estándar «lo calcula el servidor según el catálogo vigente (EstandarViatico); no se captura aquí». Excluirlo como campo es correcto (§6.16 regla 1), pero la regla continúa: un dato calculado se muestra como dato, con .dato-calc. Aquí no se muestra en absoluto. El resultado es que la solicitud sale a aprobación sin un número, y quien aprueba —el jefe directo que la propia pantalla nombra— decide sin importe, sin estándar y sin consumo acumulado del área. La pantalla no sólo deja el dolor sin tocar: fija por diseño el momento en que todavía se podía contrastar contra un techo, y pasa de largo."
-      },
-      {
-        "pp": "pp-108",
-        "documento": "data/insights/2026-09-10_administracion-finanzas.json",
-        "cobertura": "ignora",
-        "evidencia": "«Las áreas operativas piden dinero a cualquier hora y sin planificación previa, lo que convierte cada solicitud en una urgencia y deja a dirección gestionando el flujo de caja». El formulario no pide ni muestra la antelación: no hay fecha de solicitud, ni aviso cuando la fecha de ida está demasiado cerca, ni min en el <input type=\"date\">. Se puede abrir un borrador para un viaje que empieza mañana sin que nada lo señale."
-      },
-      {
-        "pp": "pp-114",
-        "documento": "data/insights/2026-09-10_administracion-finanzas.json",
-        "cobertura": "ignora",
-        "evidencia": "«La evidencia de gasto llega como fotografía de un recibo o nota simple, que no es fiscalizable. La deducción exige el par completo de archivos del comprobante fiscal». La pantalla no tiene ningún componente de subida (§6.17): el brief cuenta 10 inputs y ninguno de tipo file. Es defendible —la comprobación es posterior a la solicitud— pero el momento de la captura era el sitio barato para anunciar qué par de archivos se va a exigir después y en qué plazo."
-      },
-      {
-        "pp": "pp-112",
-        "documento": "data/insights/2026-09-10_administracion-finanzas.json",
-        "cobertura": "ignora",
-        "evidencia": "«Se contrata a instaladores y proveedores sin verificar que puedan emitir factura, de modo que el gasto operativo no es deducible. No hay catálogo depurado ni tope de costo». Los tres servicios se piden como casillas libres (Vuelo, Uber programado, Renta de vehículo) sin proveedor, sin catálogo y sin tope: la solicitud se abre sin saber si lo que se va a contratar factura."
-      }
-    ],
-    "usabilidad_para_el_area": "Para administración y finanzas esta pantalla resuelve el dolor más barato de todo el estudio —pp-107, la solicitud que no trae los datos mínimos— y lo resuelve con la estructura correcta: tres pasos, jefe directo nombrado como aprobador, fechas y servicios. Si se implementara tal cual, la primera mitad del problema desaparecería. La segunda mitad no: la pantalla decide no enseñar dinero, de modo que ni quien captura ni quien aprueba ve un importe, un estándar o un acumulado, y pp-117 y pp-108 —dos de los ocho dolores de severidad alta de la entrevista de administración y finanzas— quedan como estaban o peor. Y en lo que ya está dibujado, el formulario no se comporta como formulario: sin required ni aria-required los seis asteriscos no obligan a nada, no existe el segundo nivel de obligatoriedad que distinguiría «hace falta para abrir el borrador» de «hace falta para programar el viaje», y si el envío falla el trabajo capturado desaparece de la pantalla. Es decir: el área recibiría el formato común que pedía, pero seguiría recibiendo solicitudes incompletas y sin cifra."
-  },
-  "cobertura": [
-    {
-      "patron": "Grupo de casillas que responden a una misma pregunta («Servicios solicitados»: Vuelo / Uber programado / Renta de vehículo) dentro de una .rejilla de §6.16. El sistema documenta .ctrl para un campo con su <label>, y §7.3 documenta .selfila para que la casilla llegue a 24px, pero no dice cómo se agrupa un conjunto de casillas ni cómo se rotula el grupo. La maqueta lo resolvió con una <label> sin for y un <div> con estilo en línea.",
-      "propuesta_de_regla": "§6.16 (ampliación) — .ctrl.grupo. Cuándo: dos o más casillas o botones de opción que responden a la misma pregunta. Se escribe como <fieldset class=\"ctrl grupo\"> con <legend> a --fs-meta, peso 600 y --text-2, igual que un <label> de campo, y sin borde ni relleno de fábrica (fieldset{border:0;padding:0;margin:0}). Dentro, cada opción es una .selfila (§7.3), nunca una <label> con estilo en línea. El contador de sección (regla 7) no cuenta las opciones marcadas de un grupo opcional: cuenta el grupo como capturado en cuanto la pregunta tiene respuesta, incluida «ninguna»."
-    },
-    {
-      "patron": "Barra de acciones fija al pie de un formulario largo (.barra-form: texto de consecuencia a la izquierda, Cancelar / Guardar borrador / Enviar a aprobación a la derecha, pegada al borde inferior de la zona de contenido). El sistema documenta .barra-sel (§6.13) para la selección de una tabla y el <footer> de .modal (§6.18), pero no esta pieza, que es la que decide el final de todo formulario del módulo.",
-      "propuesta_de_regla": "§6.16.1 Barra de acciones de formulario — .barra-form. Cuándo: un formulario cuyo contenido supera el alto de la ventana. Queda fija al pie de la zona de contenido (position:sticky;bottom:0), con --velo-suave como sombra superior y fondo --surface opaco, padding var(--sp-3) var(--sp-6), y una sola frase de consecuencia a la izquierda a --fs-meta en --text-3 («La solicitud se creará en borrador, sin enviar»). A la derecha, el orden es: salir sin guardar, guardar sin enviar, acción principal (.btn.p). La acción principal nunca se estira (§6.2) y la destructiva o de salida nunca va pegada a ella: media entre ambas un --sp-2 como mínimo. Si el formulario tiene guardado automático, la barra no lleva botón de guardar (§6.16 regla 8)."
-    },
-    {
-      "patron": "Índice numerado de sección (.idx: un círculo de 22px con el número del paso, a 11px) en la cabecera de .seccion. §6.16 dice «.seccion agrupa los campos de un paso, con índice numerado en vez de icono en la cabecera (§6.3)», pero no fija el tamaño del círculo, ni el tamaño de texto, ni si el número es decorativo o parte del encabezado accesible — y a 11px incumple §2.1 sin que ninguna excepción lo cubra.",
-      "propuesta_de_regla": "§6.16 (ampliación) — .idx. El índice es un círculo de 24px con fondo --accent y tinta --on-state (§1.4.1), con el número a --fs-meta (12px) y peso 700; nunca por debajo del suelo de 12px. Es decorativo: va con aria-hidden=\"true\", porque el orden ya lo da el DOM y el encabezado real de la sección es el <h2>. Si el paso está completo, el número no se sustituye por una marca de verificación: el estado del paso se dice con palabras en el contador de la derecha (regla 7)."
-    }
-  ],
-  "sin_datos": [
-    "f3.rendimiento: maqueta estática servida por un servidor de ficheros, sin backend, sin librerías externas y sin red que perfilar.",
-    "§6.17 Subida de archivo: no se evalúa como incumplimiento porque la pantalla no pide ningún adjunto ni sustituye ningún <input type=\"text\"> por un archivo (0 input[type=file] en el archivo). Su ausencia se recoge en F5 frente a pp-114, no como hallazgo de F1.",
-    "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (0 <dialog> y 0 div[role=dialog] según el brief).",
-    "§12 Gráficas: no hay ningún <canvas> ni ninguna gráfica en la pantalla.",
-    "Estado «vacío»: el conmutador del andamio lo ofrece, pero en una pantalla de alta no corresponde a ninguna situación real del producto; se audita el envase (mismas carencias de §6.4 que el error) y no su contenido."
+ "pantalla": "viaticos-alta-solicitud",
+ "ruta_zip": "05-direccion-y-administracion/viaticos-alta-solicitud.html",
+ "carpeta": "05-direccion-y-administracion",
+ "area": "finanzas",
+ "arquetipo": "formulario",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "viaticos-alta-solicitud--ok.png",
+  "viaticos-alta-solicitud--loading.png",
+  "viaticos-alta-solicitud--empty.png",
+  "viaticos-alta-solicitud--error.png",
+  "viaticos-alta-solicitud--oscuro.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-viaticosalta-01",
+    "severidad": "alta",
+    "regla": "§6.16 regla 3 — obligatoriedad real",
+    "dice_el_sistema": "«required y aria-required de verdad, no asteriscos decorativos.»",
+    "hay_en_el_build": "Cinco campos marcados sólo con <span class=\"req\">*</span>: Departamento, Jefe directo, Motivo, Destino, Fecha de ida, Fecha de vuelta. Ni un solo required ni aria-required en todo el archivo.",
+    "selector": ".ctrl > label .req",
+    "evidencia": "grep -c 'required' sobre el archivo completo: 0. El <style> declara .ctrl > label .req{color:var(--err-ink)} (línea 582), es decir, el asterisco está estilado pero no implementado.",
+    "por_que_importa": "El asterisco rojo no llega al árbol de accesibilidad: un lector de pantalla anuncia «Departamento, cuadro combinado» sin decir que es obligatorio, y el navegador no impide enviar el formulario vacío. El formulario existe precisamente para que la solicitud no llegue incompleta (pp-107)."
+   },
+   {
+    "id": "f1-viaticosalta-02",
+    "severidad": "alta",
+    "regla": "§6.16 regla 2 — dos niveles de obligatoriedad",
+    "dice_el_sistema": "«Dos niveles de obligatoriedad con palabras distintas — “obligatorio para dar de alta” vs “necesario para facturar o programar”.»",
+    "hay_en_el_build": "Un único nivel, expresado con un símbolo y sin palabras: el asterisco. Los campos que son necesarios para programar el viaje pero no para abrir el borrador (servicios solicitados: Vuelo / Uber programado / Renta de vehículo) no llevan ninguna marca y quedan indistinguibles de lo opcional.",
+    "selector": ".ctrl > label .req, .ctrl.ancho label",
+    "evidencia": "viaticos-alta-solicitud--ok.png: seis campos con asterisco rojo, el grupo de servicios sin ninguna marca y el campo «Quién solicita» deshabilitado sin marca. No hay ningún texto en la pantalla que explique qué significa el asterisco.",
+    "por_que_importa": "Es el requisito del sistema que esta pantalla existía para cumplir. Sin el segundo nivel, quien captura no sabe que sin los servicios la solicitud entra pero no se puede programar, y la solicitud vuelve a llegar a medias — el circuito que pp-107 describe."
+   },
+   {
+    "id": "f1-viaticosalta-03",
+    "severidad": "alta",
+    "regla": "§6.4 regla 4 — el error no se lleva por delante lo que había",
+    "dice_el_sistema": "«El error no se lleva por delante lo que había — con trabajo del usuario en pantalla el error va encima, como aviso, con los campos visibles y rellenos.» §11: «el error deja a la vista el trabajo que la persona ya había hecho».",
+    "hay_en_el_build": "La vista de error sustituye el formulario completo: <div class=\"state state-error\"> ocupa toda la zona de contenido y las tres secciones con los datos capturados desaparecen.",
+    "selector": "main#contenido[data-state=\"error\"] .state-error",
+    "evidencia": "viaticos-alta-solicitud--error.png: donde estaban los ocho campos rellenos sólo queda el mensaje «No se pudo enviar la solicitud» centrado sobre el fondo. El texto del error afirma «lo que capturaste sigue en el borrador» mientras lo que capturó ya no se ve en la pantalla.",
+    "por_que_importa": "Es el caso exacto que la regla nombra: un formulario con trabajo del usuario dentro. El mensaje promete que no se perdió nada y a la vez lo borra de la vista, que es la forma más rápida de que alguien vuelva a teclearlo todo o abandone."
+   },
+   {
+    "id": "f1-viaticosalta-04",
+    "severidad": "alta",
+    "regla": "§6.4 — .tarjeta-estado y encabezado real",
+    "dice_el_sistema": ".tarjeta-estado{max-width:480px;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)} opaca, con .estado-ico de 52px. «Cada estado lleva encabezado real, no un <b>.»",
+    "hay_en_el_build": "<div class=\"state state-error\"><svg class=\"ico\">…<b>No se pudo enviar la solicitud</b>…",
+    "selector": ".state.state-error, .state.state-empty",
+    "evidencia": "Estilo calculado: max-width «none», border-radius «0px», box-shadow «none», fondo transparente; hijos svg,B,P,P,DIV sin ningún h1-h4; icono de 30×30px en vez del medallón de 52px.",
+    "por_que_importa": "Mismo patrón que en 23_viaticos. Sin encabezado real el estado no aparece en la navegación por encabezados, y sin tarjeta el mensaje flota sobre el mismo fondo que acaba de vaciarse."
+   },
+   {
+    "id": "f1-viaticosalta-05",
+    "severidad": "media",
+    "regla": "§7.3 + §10 trampa 4 — casillas",
+    "dice_el_sistema": "«Casillas de 15×15px → .selfila{display:flex;align-items:center;min-height:24px;padding:4px;margin:-4px} + input[type=\"checkbox\"]{width:16px;height:16px;accent-color:var(--accent)}.» «El destino táctil es la región que acepta la pulsación»; la <label> tiene que llegar a 24px.",
+    "hay_en_el_build": "<label style=\"display:flex;gap:8px;align-items:center;font-size:var(--fs-dense);font-weight:400\"><input type=\"checkbox\"> Vuelo</label> — tres veces, con estilo en línea, sin min-height, sin padding y sin tamaño declarado para la casilla.",
+    "selector": ".ctrl.ancho label > input[type=\"checkbox\"]",
+    "evidencia": "Brief, tactil_24px: casillas_bajo_24 = 3, las tres de 15×15px. Con data-tacto=\"dedo\" puesto siguen igual: las seis reglas [data-tacto=\"dedo\"] del archivo se escriben sin :root (§7.3) y ninguna de ellas cubre input[type=\"checkbox\"].",
+    "por_que_importa": "El sistema ya tenía la receta escrita, con nombre (.selfila) y medidas, precisamente por este caso. Aquí se resolvió con estilo en línea y el destino se quedó en 15px."
+   },
+   {
+    "id": "f1-viaticosalta-06",
+    "severidad": "media",
+    "regla": "§6.9 — el icono coincide con la variante",
+    "dice_el_sistema": "«El icono tiene que coincidir con la variante (triángulo de advertencia sobre banda neutra = señal mixta).»",
+    "hay_en_el_build": "<div class=\"banda b-info\"><svg class=\"ico\"><use href=\"#i-alert\"/></svg> — triángulo de advertencia sobre la banda informativa (--surface-2/--text-2).",
+    "selector": ".banda.b-info > svg use[href=\"#i-alert\"]",
+    "evidencia": "viaticos-alta-solicitud--ok.png: el aviso «Construida a medias, sin maqueta» lleva triángulo de advertencia sobre fondo gris neutro. Es el ejemplo literal que el sistema usa para enunciar la regla.",
+    "por_que_importa": "La señal mixta hace que el aviso se lea como un problema del formulario cuando es una nota de contexto, y es lo primero que ve quien abre la pantalla."
+   },
+   {
+    "id": "f1-viaticosalta-07",
+    "severidad": "media",
+    "regla": "§8 Anexo B — voz de producto",
+    "dice_el_sistema": "«Si el texto explica una decisión, no va en pantalla. Si explica una consecuencia para quien está mirando, sí — y en una frase.» «.nota y .banda llevan como máximo UNA frase.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres.»",
+    "hay_en_el_build": "Banda: «Construida a medias, sin maqueta. No existe pantalla ni endpoint de creación con formulario propio para una nueva solicitud de viático (censo VADO, piezas 50/75). Esta es la primera vez que se dibuja el flujo de alta.» (3 frases, 219 caracteres). Ayuda de «Fecha de vuelta»: «El monto estándar lo calcula el servidor según el catálogo vigente (EstandarViatico); no se captura aquí (CLAUDE.md #12: las agregaciones y cálculos de negocio no se hacen a mano en pantalla).» (190 caracteres).",
+    "selector": ".banda.b-info > p, .ctrl .ayuda",
+    "evidencia": "Conteo de caracteres sobre el texto de los nodos: 219 y 190. Ambos citan artefactos internos del proyecto —«censo VADO, piezas 50/75», «CLAUDE.md #12», el nombre de clase EstandarViatico— que no existen para quien pide un viático.",
+    "por_que_importa": "Son decisiones de construcción, no consecuencias para quien mira. Y si fueran andamiaje legítimo, §9 obliga a marcarlo con data-andamio y a rotularlo; aquí van dentro del producto, sin marca, con lo que se publicarían tal cual."
+   },
+   {
+    "id": "f1-viaticosalta-08",
+    "severidad": "media",
+    "regla": "§6.16 regla 7 — el contador de sección",
+    "dice_el_sistema": "«El contador de sección habla en español, no en aritmética, y si cuenta, cuenta bien.»",
+    "hay_en_el_build": "«3 de 3 capturados», «2 de 2 capturados», «1 de 3 servicios · 2 de 2 fechas».",
+    "selector": ".seccion > header > .est",
+    "evidencia": "viaticos-alta-solicitud--ok.png. El tercer contador cuenta como incompleto un grupo de casillas opcionales: marcar «Renta de vehículo» y no marcar las otras dos es la respuesta completa, y la pantalla la presenta como «1 de 3».",
+    "por_que_importa": "Un contador que marca como pendiente algo ya terminado empuja a seleccionar servicios que no se necesitan — y cada servicio de más es dinero de más en la solicitud que luego alguien tiene que aprobar."
+   },
+   {
+    "id": "f1-viaticosalta-09",
+    "severidad": "media",
+    "regla": "§6.16 regla 1 + §6.18 — dato de sólo lectura",
+    "dice_el_sistema": "«Un dato calculado se muestra como dato, no como campo» (.dato-calc). «Un campo de solo lectura se muestra como dato, no como campo — pero conservando el motivo.»",
+    "hay_en_el_build": "<input type=\"text\" id=\"quien\" value=\"Jonathan Olvera Sandoval\" disabled> con ayuda «Fijo: el usuario en sesión.»",
+    "selector": ".ctrl > input#quien[disabled]",
+    "evidencia": "viaticos-alta-solicitud--ok.png: «Quién solicita» se dibuja con la misma caja, borde y altura que los campos editables, sólo que apagada. El motivo sí se conserva, pero la forma es la de un campo.",
+    "por_que_importa": "disabled saca el dato del recorrido de teclado, así que quien revisa su solicitud con Tab nunca oye quién figura como solicitante. El sistema ya tiene el componente para esto (.dato-calc), que además no se puede confundir con un campo roto."
+   },
+   {
+    "id": "f1-viaticosalta-10",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga",
+    "dice_el_sistema": "«Sin texto real dentro de las barras» (color:transparent sigue en el árbol de accesibilidad). prefers-reduced-motion aplana el fondo: {.skel{animation:none;background:var(--surface-2)}}. «El punto de ruptura del esqueleto es el de la tabla (860px, no 900px).»",
+    "hay_en_el_build": "Las barras contienen el texto «Quién solicita», «departamento», «jefe directo», «motivo», «destino», «servicios», «fecha de ida», «fecha de vuelta». @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer el fondo. @media (max-width:900px){.sk-fila{…}}.",
+    "selector": ".state-loading .skel",
+    "evidencia": "Con reducedMotion:'reduce' emulado: animation-name «none», background-image sigue siendo el linear-gradient(90deg, rgb(231,237,243) 25%, …) congelado en la posición 0 — el fallo exacto que §6.7 documenta. Las tres primeras .skel devuelven textContent no vacío.",
+    "por_que_importa": "Un lector de pantalla lee «Quién solicita departamento jefe directo» mientras la pantalla todavía no tiene nada, y quien pidió movimiento reducido ve un degradado detenido en vez de una superficie limpia. A favor del esqueleto: sus alturas (38px y 76px) sí imitan las de los campos reales, que es lo que §6.7 pide."
+   },
+   {
+    "id": "f1-viaticosalta-11",
+    "severidad": "media",
+    "regla": "§10 trampa 5 — isotipo",
+    "dice_el_sistema": "Medidas en el <use> y sin viewBox en el envoltorio; «si el desplazamiento no es ~0, está mal».",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>.",
+    "selector": ".logo svg > use",
+    "evidencia": "getBoundingClientRect(): <svg> en x=96, <use> en x=63,5 → desplazamiento −32,5px, el valor documentado. La marca se pinta recortada en la barra lateral.",
+    "por_que_importa": "Afecta a las cuatro pantallas del lote y a los dos temas."
+   },
+   {
+    "id": "f1-viaticosalta-12",
+    "severidad": "media",
+    "regla": "§1.1 — valor de --text-3",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2).»",
+    "hay_en_el_build": "--text-3: #66717F.",
+    "selector": ":root",
+    "evidencia": "Brief, tokens.text_3_declarado: «#66717F». La cabecera de cada .seccion usa --surface-2 (§6.3) y es ahí donde cae el contador .est.",
+    "por_que_importa": "Hecho ya establecido; se marca porque aquí --text-3 pinta las tres ayudas de campo, que son el único sitio donde el formulario explica qué se espera."
+   },
+   {
+    "id": "f1-viaticosalta-13",
+    "severidad": "media",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "«Nada baja de ahí»; la única excepción es 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+    "hay_en_el_build": "15 declaraciones font-size:11px, 3 de 11,5px y 6 de 10,5px. En la zona de producto: .ayuda a 11px (las tres ayudas de campo), .idx a 11px (el índice numerado de cada sección), <code>EstandarViatico</code> a 11px, .ref a 11px, y los seis .grp a 10,5px en caja mixta.",
+    "selector": ".ctrl .ayuda, .seccion header .idx, .side .grp",
+    "evidencia": "Estilo calculado a 1440×900: 7 agrupaciones por debajo de 12px. --fs-meta vale 12px en :root (línea 13), de modo que los 11px son literales que se saltan el token.",
+    "por_que_importa": "Las ayudas de campo son el texto que decide cómo se rellena cada campo («Es quien aprueba la solicitud», «Fijo: el usuario en sesión»). Es el peor sitio para bajar del suelo."
+   },
+   {
+    "id": "f1-viaticosalta-14",
+    "severidad": "media",
+    "regla": "§11 Estructura — etiquetas y grupos",
+    "dice_el_sistema": "«Todos los id únicos y cada aria-describedby/aria-controls apunta a algo que existe»; cada control lleva su etiqueta.",
+    "hay_en_el_build": "<label>Servicios solicitados</label> sin atributo for y sin control asociado, seguida de un <div> con las tres casillas. El grupo no es un <fieldset>/<legend> ni lleva role=\"group\" + aria-labelledby. Las tres ayudas .ayuda tampoco se enlazan por aria-describedby a su campo.",
+    "selector": ".ctrl.ancho > label (sin for), .ctrl .ayuda",
+    "evidencia": "Markup de la sección 3. El brief cuenta inputsSinEtiqueta = 0 porque las casillas sí van envueltas en su propia <label>, pero el rótulo del grupo queda huérfano y las ayudas quedan desconectadas de su campo.",
+    "por_que_importa": "Un lector de pantalla recorre «Vuelo», «Uber programado», «Renta de vehículo» sin saber que son tres respuestas a la misma pregunta, y nunca lee «Es quien aprueba la solicitud» al llegar a «Jefe directo»."
+   },
+   {
+    "id": "f1-viaticosalta-15",
+    "severidad": "baja",
+    "regla": "§6.16 regla 6 — tipo de campo y autocompletado",
+    "dice_el_sistema": "«El tipo de campo es el tipo del dato (type=\"email\", type=\"tel\", inputmode=\"numeric\") + autocomplete.»",
+    "hay_en_el_build": "Los tipos son correctos (type=\"date\" en las dos fechas, <select> en departamento, <textarea> en motivo) pero no hay ni un solo atributo autocomplete en el formulario.",
+    "selector": ".ctrl input, .ctrl select",
+    "evidencia": "grep 'autocomplete' sobre el archivo: 0 coincidencias.",
+    "por_que_importa": "Media regla cumplida. El coste es pequeño en este formulario corto, pero el jefe directo y el destino son datos que se repiten viaje tras viaje."
+   },
+   {
+    "id": "f1-viaticosalta-16",
+    "severidad": "baja",
+    "regla": "§6.9 nomenclatura de .banda",
+    "dice_el_sistema": "Cuatro variantes: .banda-info, .banda-warn, .banda-err, .banda-ok.",
+    "hay_en_el_build": ".banda.b-info, .banda.b-warn, .banda.b-err, .banda.b-ok.",
+    "selector": ".banda.b-info",
+    "evidencia": "Líneas 521-523 del <style>; los tokens de fondo y tinta sí son los documentados.",
+    "por_que_importa": "Sólo diverge del nombre; complica el grep de auditoría entre maquetas."
+   }
   ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "La estructura del formulario es la correcta: tres .seccion numeradas con índice en vez de icono, rejilla auto-fit de 230px que reflúye bien, barra de acciones fija abajo con una sola vía de guardado («Guardar borrador» + «Enviar a aprobación», sin autoguardado paralelo, §6.16 regla 8), y el monto calculado correctamente excluido como campo. Pero el formulario no es un formulario: sin un solo required ni aria-required, los seis asteriscos son adorno y no existe el segundo nivel de obligatoriedad que §6.16 regla 2 exige. Y el error destruye el trabajo capturado, que es la regla de §6.4 escrita precisamente para esta pantalla. Accesibilidad a 1 por la suma de eso con las casillas de 15px, el rótulo de grupo huérfano, las ayudas sin aria-describedby y las siete agrupaciones de texto por debajo de 12px. Theming y responsive sostienen el 3: los dos temas resuelven con juegos de tokens completos y la rejilla no se rompe. Integridad a 2 y no 1 porque aquí el inventario de CSS muerto es menor que en la bandeja, aunque el contador de la sección 3 cuente mal.",
+  "evidencia": [
+   "grep -c 'required' = 0 sobre el archivo completo; .ctrl > label .req declarado en la línea 582 (el asterisco está estilado, no implementado).",
+   "viaticos-alta-solicitud--error.png: el formulario relleno desaparece y lo sustituye la vista de error.",
+   ".state-error calculado: max-width none, border-radius 0px, box-shadow none, fondo transparente, título en <b>, icono de 30px.",
+   "Brief, tactil_24px: 3 casillas de 15×15px; 6 reglas [data-tacto=\"dedo\"] escritas sin :root.",
+   "Estilo calculado: 7 agrupaciones con font-size < 12px, entre ellas las tres .ayuda a 11px.",
+   "Esqueleto: alturas 38px/76px coherentes con los campos reales (bien), pero con texto real dentro de las barras y sin aplanar el fondo bajo prefers-reduced-motion.",
+   "Isotipo: desplazamiento del <use> respecto al <svg> = −32,5px."
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 2,
+   "hallazgo": "Lo visible está bien resuelto: «Borrador — sin enviar» junto al título, contador por sección y la línea fija «La solicitud se creará en borrador, sin enviar» pegada a los botones. Lo que falla es lo anunciado: el cambio de vista se hace con data-state en <main> sin aria-live y sin mover el foco (§6.4 regla 1); no hay ningún aria-live en el archivo y el <script> no llama a focus().",
+   "selector": "main#contenido[data-state], .barra-form .izq"
+  },
+  {
+   "n": 2,
+   "heuristica": "Correspondencia entre el sistema y el mundo real",
+   "severidad": 2,
+   "hallazgo": "Los campos son los del viaje real y en el orden en que se piensa (quién → por qué y a dónde → qué servicios y cuándo). Rompe la correspondencia el texto que habla el idioma del repositorio y no el del área: «censo VADO, piezas 50/75», «CLAUDE.md #12», «EstandarViatico».",
+   "selector": ".banda.b-info > p, .ctrl .ayuda"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 3,
+   "hallazgo": "Hay Cancelar y Guardar borrador, que es la salida correcta. Pero si el envío falla, la pantalla se lleva por delante todo lo capturado (§6.4 regla 4) y la única salida ofrecida es «Reintentar»: no hay «volver al borrador» ni los campos a la vista.",
+   "selector": ".state-error, .barra-form .der"
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 3,
+   "hallazgo": "El asterisco en vez de required/aria-required es la divergencia más cara, porque es el estándar del propio sistema y el de la plataforma a la vez. A ella se suman .banda renombrada a .b-*, el campo de sólo lectura resuelto con disabled en vez de .dato-calc y las casillas resueltas con estilo en línea en vez de .selfila.",
+   "selector": ".req, input#quien[disabled], .ctrl.ancho label"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 4,
+   "hallazgo": "Es la heurística peor servida y es la razón de ser de la pantalla. Nada impide enviar: sin required, sin aria-required, sin validación de que la fecha de vuelta sea posterior a la de ida, sin tope de duración y sin ninguna comprobación contra el estándar. Un formulario de alta que no puede rechazar una captura incompleta deja el trabajo donde estaba, en quien recibe la solicitud.",
+   "selector": ".ctrl input, .ctrl select, .ctrl textarea"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocer antes que recordar",
+   "severidad": 2,
+   "hallazgo": "Bien en dos puntos: el jefe directo viene propuesto y se dice para qué sirve, y el solicitante viene fijo. Mal en el que decide: no se muestra en ningún momento el monto estándar del destino ni el importe estimado del viaje, de modo que quien captura y quien aprueba tienen que recordarlo o buscarlo fuera.",
+   "selector": ".ctrl .ayuda, .seccion:nth-of-type(3)"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 2,
+   "hallazgo": "Ocho campos para un viaje es razonable y la rejilla aprovecha el ancho. No hay plantilla ni «repetir el viaje anterior» para el destino recurrente, ni autocomplete en ningún campo, que es lo que haría barato capturar el décimo viaje del mes a la misma agencia.",
+   "selector": ".rejilla, .ctrl input"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 2,
+   "hallazgo": "El formulario en sí es limpio. Lo que sobra está en los bordes: una banda de 219 caracteres sobre el estado de construcción del proyecto y una ayuda de campo de 190 que cita un fichero interno. §8 fija el techo en una frase y ~140 caracteres, sin excepción por importancia.",
+   "selector": ".banda.b-info > p, .ctrl .ayuda"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer y recuperarse de los errores",
+   "severidad": 4,
+   "hallazgo": "No existe la capa de error de campo: ningún aria-invalid, ningún aria-describedby a un mensaje, y aunque el <style> trae .ctrl .mal y .ctrl.error (líneas 592-593), el markup no los usa en ninguna parte. Y el error de envío, que sí existe, viola la regla que lo gobierna llevándose los datos por delante.",
+   "selector": ".ctrl.error, .ctrl .mal, .state-error"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 2,
+   "hallazgo": "Las ayudas de campo son breves y útiles donde están, pero van siempre visibles a 11px en vez de usar el toggletip de §6.23 para el nivel 2 de §8, y la más larga explica una decisión de arquitectura en vez de una consecuencia. No hay ningún .infob en la pantalla.",
+   "selector": ".ctrl .ayuda"
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-107",
+    "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+    "cobertura": "cubre",
+    "evidencia": "«La solicitud de viáticos no recoge los datos mínimos del viaje: no dice quién viaja, qué necesita ni cuánto tiempo estará fuera. Sin esos campos no se puede presupuestar». El formulario recoge las tres cosas y en ese orden: quién solicita con departamento y jefe directo (sección 1), motivo y destino (sección 2), servicios solicitados y fechas de ida y vuelta (sección 3). Es la respuesta directa al pain point de severidad alta con mejor relación impacto/esfuerzo del área (op-095, alto/bajo)."
+   },
+   {
+    "pp": "pp-091",
+    "documento": "data/insights/2026-07-31_finanzas-cobranza-almacen.json",
+    "cobertura": "cubre",
+    "evidencia": "«Otras áreas no envían información previa ni utilizan formatos específicos y estandarizados al solicitar aprobaciones, generando situaciones imprevistas al gestionar autorizaciones». El formulario estandarizado es exactamente el formato común que falta, y nombra al jefe directo como aprobador dentro de la propia captura, de modo que la solicitud llega con su ruta de autorización ya puesta."
+   },
+   {
+    "pp": "pp-027",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "«La solicitud y aprobación de viáticos y recursos financieros para desplazamientos se gestiona a través de un grupo de WhatsApp, sin un flujo estructurado de solicitud-revisión». Esta pantalla es la entrada de ese flujo y sustituye el mensaje de WhatsApp por un borrador con folio que después aparece en 23_viaticos. Cobertura conceptual completa; en la maqueta los botones no envían nada."
+   },
+   {
+    "pp": "pp-117",
+    "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+    "cobertura": "contradice",
+    "evidencia": "«Ninguna área tiene presupuesto mensual ni semanal asignado, de modo que no hay techo de gasto contra el que contrastar una solicitud ni forma de estimar cuánto cuesta». La pantalla toma la decisión expresa de no mostrar ninguna cifra: la ayuda de «Fecha de vuelta» dice que el monto estándar «lo calcula el servidor según el catálogo vigente (EstandarViatico); no se captura aquí». Excluirlo como campo es correcto (§6.16 regla 1), pero la regla continúa: un dato calculado se muestra como dato, con .dato-calc. Aquí no se muestra en absoluto. El resultado es que la solicitud sale a aprobación sin un número, y quien aprueba —el jefe directo que la propia pantalla nombra— decide sin importe, sin estándar y sin consumo acumulado del área. La pantalla no sólo deja el dolor sin tocar: fija por diseño el momento en que todavía se podía contrastar contra un techo, y pasa de largo."
+   },
+   {
+    "pp": "pp-108",
+    "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+    "cobertura": "ignora",
+    "evidencia": "«Las áreas operativas piden dinero a cualquier hora y sin planificación previa, lo que convierte cada solicitud en una urgencia y deja a dirección gestionando el flujo de caja». El formulario no pide ni muestra la antelación: no hay fecha de solicitud, ni aviso cuando la fecha de ida está demasiado cerca, ni min en el <input type=\"date\">. Se puede abrir un borrador para un viaje que empieza mañana sin que nada lo señale."
+   },
+   {
+    "pp": "pp-114",
+    "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+    "cobertura": "ignora",
+    "evidencia": "«La evidencia de gasto llega como fotografía de un recibo o nota simple, que no es fiscalizable. La deducción exige el par completo de archivos del comprobante fiscal». La pantalla no tiene ningún componente de subida (§6.17): el brief cuenta 10 inputs y ninguno de tipo file. Es defendible —la comprobación es posterior a la solicitud— pero el momento de la captura era el sitio barato para anunciar qué par de archivos se va a exigir después y en qué plazo."
+   },
+   {
+    "pp": "pp-112",
+    "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+    "cobertura": "ignora",
+    "evidencia": "«Se contrata a instaladores y proveedores sin verificar que puedan emitir factura, de modo que el gasto operativo no es deducible. No hay catálogo depurado ni tope de costo». Los tres servicios se piden como casillas libres (Vuelo, Uber programado, Renta de vehículo) sin proveedor, sin catálogo y sin tope: la solicitud se abre sin saber si lo que se va a contratar factura."
+   }
+  ],
+  "usabilidad_para_el_area": "Para administración y finanzas esta pantalla resuelve el dolor más barato de todo el estudio —pp-107, la solicitud que no trae los datos mínimos— y lo resuelve con la estructura correcta: tres pasos, jefe directo nombrado como aprobador, fechas y servicios. Si se implementara tal cual, la primera mitad del problema desaparecería. La segunda mitad no: la pantalla decide no enseñar dinero, de modo que ni quien captura ni quien aprueba ve un importe, un estándar o un acumulado, y pp-117 y pp-108 —dos de los ocho dolores de severidad alta de la entrevista de administración y finanzas— quedan como estaban o peor. Y en lo que ya está dibujado, el formulario no se comporta como formulario: sin required ni aria-required los seis asteriscos no obligan a nada, no existe el segundo nivel de obligatoriedad que distinguiría «hace falta para abrir el borrador» de «hace falta para programar el viaje», y si el envío falla el trabajo capturado desaparece de la pantalla. Es decir: el área recibiría el formato común que pedía, pero seguiría recibiendo solicitudes incompletas y sin cifra."
+ },
+ "cobertura": [
+  {
+   "patron": "Grupo de casillas que responden a una misma pregunta («Servicios solicitados»: Vuelo / Uber programado / Renta de vehículo) dentro de una .rejilla de §6.16. El sistema documenta .ctrl para un campo con su <label>, y §7.3 documenta .selfila para que la casilla llegue a 24px, pero no dice cómo se agrupa un conjunto de casillas ni cómo se rotula el grupo. La maqueta lo resolvió con una <label> sin for y un <div> con estilo en línea.",
+   "propuesta_de_regla": "§6.16 (ampliación) — .ctrl.grupo. Cuándo: dos o más casillas o botones de opción que responden a la misma pregunta. Se escribe como <fieldset class=\"ctrl grupo\"> con <legend> a --fs-meta, peso 600 y --text-2, igual que un <label> de campo, y sin borde ni relleno de fábrica (fieldset{border:0;padding:0;margin:0}). Dentro, cada opción es una .selfila (§7.3), nunca una <label> con estilo en línea. El contador de sección (regla 7) no cuenta las opciones marcadas de un grupo opcional: cuenta el grupo como capturado en cuanto la pregunta tiene respuesta, incluida «ninguna»."
+  },
+  {
+   "patron": "Barra de acciones fija al pie de un formulario largo (.barra-form: texto de consecuencia a la izquierda, Cancelar / Guardar borrador / Enviar a aprobación a la derecha, pegada al borde inferior de la zona de contenido). El sistema documenta .barra-sel (§6.13) para la selección de una tabla y el <footer> de .modal (§6.18), pero no esta pieza, que es la que decide el final de todo formulario del módulo.",
+   "propuesta_de_regla": "§6.16.1 Barra de acciones de formulario — .barra-form. Cuándo: un formulario cuyo contenido supera el alto de la ventana. Queda fija al pie de la zona de contenido (position:sticky;bottom:0), con --velo-suave como sombra superior y fondo --surface opaco, padding var(--sp-3) var(--sp-6), y una sola frase de consecuencia a la izquierda a --fs-meta en --text-3 («La solicitud se creará en borrador, sin enviar»). A la derecha, el orden es: salir sin guardar, guardar sin enviar, acción principal (.btn.p). La acción principal nunca se estira (§6.2) y la destructiva o de salida nunca va pegada a ella: media entre ambas un --sp-2 como mínimo. Si el formulario tiene guardado automático, la barra no lleva botón de guardar (§6.16 regla 8)."
+  },
+  {
+   "patron": "Índice numerado de sección (.idx: un círculo de 22px con el número del paso, a 11px) en la cabecera de .seccion. §6.16 dice «.seccion agrupa los campos de un paso, con índice numerado en vez de icono en la cabecera (§6.3)», pero no fija el tamaño del círculo, ni el tamaño de texto, ni si el número es decorativo o parte del encabezado accesible — y a 11px incumple §2.1 sin que ninguna excepción lo cubra.",
+   "propuesta_de_regla": "§6.16 (ampliación) — .idx. El índice es un círculo de 24px con fondo --accent y tinta --on-state (§1.4.1), con el número a --fs-meta (12px) y peso 700; nunca por debajo del suelo de 12px. Es decorativo: va con aria-hidden=\"true\", porque el orden ya lo da el DOM y el encabezado real de la sección es el <h2>. Si el paso está completo, el número no se sustituye por una marca de verificación: el estado del paso se dice con palabras en el contador de la derecha (regla 7)."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática servida por un servidor de ficheros, sin backend, sin librerías externas y sin red que perfilar.",
+  "§6.17 Subida de archivo: no se evalúa como incumplimiento porque la pantalla no pide ningún adjunto ni sustituye ningún <input type=\"text\"> por un archivo (0 input[type=file] en el archivo). Su ausencia se recoge en F5 frente a pp-114, no como hallazgo de F1.",
+  "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (0 <dialog> y 0 div[role=dialog] según el brief).",
+  "§12 Gráficas: no hay ningún <canvas> ni ninguna gráfica en la pantalla.",
+  "Estado «vacío»: el conmutador del andamio lo ofrece, pero en una pantalla de alta no corresponde a ninguna situación real del producto; se audita el envase (mismas carencias de §6.4 que el error) y no su contenido."
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [],
+  "declarados_no_usados": [
+   "--block",
+   "--block-fill",
+   "--border-fuerte",
+   "--dur-enter",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--fs-kpi",
+   "--glass",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--r-modal",
+   "--sp-12",
+   "--stagger",
+   "--velo-trama",
+   "--warn",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 83,
+  "n_usados": 65,
+  "n_divergentes": 15,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": true,
+   "filas": 0,
+   "nodosText3": 0
+  }
+ }
 }

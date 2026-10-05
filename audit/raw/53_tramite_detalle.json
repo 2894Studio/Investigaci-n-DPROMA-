@@ -1,296 +1,570 @@
 {
-  "pantalla": "53_tramite_detalle",
-  "ruta_zip": "04-tramites-vehiculares-y-cfe/53_tramite_detalle.html",
-  "carpeta": "04-tramites-vehiculares-y-cfe",
-  "area": "administracion vehicular",
-  "arquetipo": "detalle",
-  "modo": "cumplimiento",
-  "estados_auditados": [
-    "ok",
-    "loading",
-    "empty",
-    "error",
-    "oscuro"
-  ],
-  "capturas": [
-    "53_tramite_detalle--ok.png",
-    "53_tramite_detalle--loading.png",
-    "53_tramite_detalle--empty.png",
-    "53_tramite_detalle--error.png",
-    "53_tramite_detalle--oscuro.png"
-  ],
-  "f1_cumplimiento": {
-    "veredicto": "cumple_parcialmente",
-    "hallazgos": [
-      {
-        "id": "f1-53detalle-01",
-        "severidad": "alta",
-        "regla": "§1 Decisión previa a elegir color / §1.3 Semáforo (--block)",
-        "dice_el_sistema": "§1: «si el dato tiene juicio → semáforo §1.3; si solo distingue → paleta categórica §1.4; si es un dato sobre el dato → sin color propio, tinta de texto §6.22. Un color de estado no se reutiliza para una categoría, ni al revés.» §1.3: --block = «Bloqueado por una condición externa».",
-        "hay_en_el_build": "Dos componentes pintados con el estado «bloqueado» sin que nada esté bloqueado: (a) .aviso-pd{border-left:4px solid var(--block-ink);background:var(--block-bg);color:var(--block-ink)} para el texto «Estos documentos son datos personales…»; (b) .docs .cu .quien{color:var(--block-ink);background:var(--block-bg);…} para la marca «lo ven: Administración Vehicular y Dirección» que acompaña a cada documento. En la misma pantalla, --block sí se usa correctamente en el estatus «Observado» (.pill.p-block).",
-        "selector": ".aviso-pd, .docs .cu .quien",
-        "evidencia": "CSS líneas 771-778 de la maqueta servida. Captura 53_tramite_detalle--ok.png: el bloque violeta de aviso y las cuatro marcas violetas bajo cada documento conviven con la pastilla violeta «Observado» de la cabecera, que sí es un estado.",
-        "por_que_importa": "Es el mismo fallo de gobierno de color que la columna «Tipo» pintada con --block, aquí en la pantalla de detalle: quién puede ver un documento es un dato sobre el dato, y pintarlo del color de «bloqueado» hace que el ojo lo cuente como una cuarta cosa parada. Y como el único estado realmente bloqueado de la ficha —«Observado»— lleva exactamente el mismo violeta, el estado deja de distinguirse de la metadata."
-      },
-      {
-        "id": "f1-53detalle-02",
-        "severidad": "alta",
-        "regla": "§6.19 Botón-icono — variante que confirma en el sitio / §11 Interacción",
-        "dice_el_sistema": "«Variante que confirma en el sitio: confirma tres cosas — el icono cambia (content_copy → check_circle), el aria-label cambia («Copiado: …»), y se anuncia por aria-live. Vuelve al estado inicial en ~1,6s. Si falla, se dice (respaldo por textarea para file://).» §11: «una acción que confirma en el sitio cambia el icono y la etiqueta y lo anuncia por aria-live».",
-        "hay_en_el_build": "Los dos botones «Copiar» del bloque de contacto están bien rotulados —aria-label=\"Copiar r.mendieta@centronorte.example\" y aria-label=\"Copiar +52 442 000 0001\", que es exactamente lo que §6.19 pide del aria-label— pero no tienen manejador: el único <script> del documento contiene tema, menú lateral y conmutador de estados de maqueta, nada más. No existe .copiar.hecho en el CSS, ni región aria-live de copiado, ni respaldo por textarea.",
-        "selector": ".idt-contacto .copiar",
-        "evidencia": "La maqueta servida tiene un solo bloque <script>; su contenido completo (leído de principio a fin) no menciona copiar, clipboard, hecho, 1600 ni textarea. grep «.copiar.hecho» en el CSS: 0. Los botones existen, se ven pulsables y no hacen nada.",
-        "por_que_importa": "Sacar el correo y el teléfono del cliente del expediente es la acción que pp-082 y pp-083 piden formalizar para dejar de depender de WhatsApp. El botón que existe para eso es el único que no funciona, y al pulsarlo no se dice ni que falló."
-      },
-      {
-        "id": "f1-53detalle-03",
-        "severidad": "alta",
-        "regla": "§1.1 Superficies y texto — valor de --text-3",
-        "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)… si el elemento puede caer sobre --surface-2, se mide también ahí.»",
-        "hay_en_el_build": "--text-3: #66717F en el tema claro, con un token paralelo no documentado --text-3-fuerte: #5D6774 usado en .idt-ct, .idt-contacto .dato .et y .docs .cu .prop. El valor obsoleto sigue activo para el resto del texto auxiliar de la ficha.",
-        "selector": ":root{--text-3}",
-        "evidencia": "Brief del orquestador: text_3_declarado = «#66717F». Medición propia sobre el archivo servido: «--text-3: #66717F» y «--text-3-fuerte: #5D6774» coexisten en el mismo :root; en oscuro ambos valen #8B96A6.",
-        "por_que_importa": "Hecho ya establecido para 51 de 52 maquetas. El agravante es el mismo que en 52: el problema se diagnosticó y se resolvió con un token hermano, de modo que el valor malo sigue siendo el que hereda cualquier componente nuevo."
-      },
-      {
-        "id": "f1-53detalle-04",
-        "severidad": "media",
-        "regla": "§6.9 Avisos — verificar si .banda ya lo cubre",
-        "dice_el_sistema": "«Antes de escribir una clase nueva, verificar si .banda + una de sus cuatro variantes ya lo cubre.» Trampa adicional de §6.9: «.bloqueado en Autorización de compra era .banda.b-info con otro nombre: no solo se repiten nombres de clase por accidente, también se reinventan componentes enteros por no buscar primero si ya existen.»",
-        "hay_en_el_build": ".aviso-pd, una banda de ancho completo con icono + texto, padding var(--sp-3) var(--sp-4) y font-size var(--fs-dense) — es decir, los valores de .banda de §6.9 con otro nombre y otro color. .banda está declarada en la hoja de esta misma maqueta y no se usa ni una vez en el markup.",
-        "selector": ".aviso-pd",
-        "evidencia": "CSS línea 776 de la maqueta servida: «.aviso-pd{display:flex;gap:var(--sp-3);align-items:flex-start;margin-bottom:var(--sp-4);border-left:4px solid var(--block-ink);background:var(--block-bg);…padding:var(--sp-3) var(--sp-4);font-size:var(--fs-dense)}». grep de «.banda{» en el archivo: 1 declaración; recuento de class=\"…banda…\" en el markup: 0.",
-        "por_que_importa": "Es el caso que §6.9 nombra. El componente correcto (.banda-info) está en el archivo, sin usar, y en su lugar hay uno nuevo que además trae el problema de color del hallazgo 01."
-      },
-      {
-        "id": "f1-53detalle-05",
-        "severidad": "media",
-        "regla": "§8 Voz de producto — una frase, ~140 caracteres",
-        "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto. Una segunda oración se borra o pasa a toggletip. No hay excepción por importancia del contenido.»",
-        "hay_en_el_build": "«Estos documentos son datos personales. Cada uno declara su propósito y quién puede abrirlo; el resto de la organización ve que existe, no su contenido.» — dos oraciones, con punto y coma dentro de la segunda, 151 caracteres.",
-        "selector": ".aviso-pd > span",
-        "evidencia": "Texto literal del markup de la maqueta servida, contado carácter a carácter.",
-        "por_que_importa": "La segunda oración explica cómo está diseñado el control de acceso, no una consecuencia inmediata para quien mira; §8 la manda a toggletip (§6.23) o a borrarla. Y el bloque va antes de la lista de documentos, que es el contenido que la persona viene a ver."
-      },
-      {
-        "id": "f1-53detalle-06",
-        "severidad": "media",
-        "regla": "§6.2 Botones — el suelo se declara con min-height",
-        "dice_el_sistema": "«.btn{min-height:36px;padding:8px 14px;gap:8px;font:600 var(--fs-dense)}… el suelo se declara con min-height, no se confía al relleno (medido: 35px y 27px sin él). .btn.mini{min-height:28px}»",
-        "hay_en_el_build": ".btn{…padding:8px 13px;font:600 var(--fs-dense) var(--font-ui)…} sin min-height.",
-        "selector": ".btn, .btn.mini",
-        "evidencia": "Medición propia con Playwright: altura real del primer .btn de la pantalla = 33px, tres por debajo del suelo de 36px. CSS línea 335 de la maqueta servida. Es el fallo que §6.2 documenta con sus propias cifras.",
-        "por_que_importa": "«Registrar avance» es la acción primaria de la ficha y no llega al suelo del sistema; su altura la decide el relleno y el tamaño de fuente heredado, no una declaración."
-      },
-      {
-        "id": "f1-53detalle-07",
-        "severidad": "media",
-        "regla": "§7.3 Objetivos táctiles — el modo dedo se comprueba midiendo",
-        "dice_el_sistema": "«:root[data-tacto=\"dedo\"] .it, .iconbtn, .btn{min-height:46px}… Se comprueba midiendo con data-tacto=\"dedo\" puesto, no leyendo el archivo.»",
-        "hay_en_el_build": "Las seis reglas llevan :root correctamente, pero van dentro de @media (pointer:coarse){…}, que el sistema no incluye. El documento declara data-tacto=\"dedo\" en <html> desde el arranque, así que el modo está puesto y es inerte en un equipo con ratón.",
-        "selector": "@media (pointer:coarse){ :root[data-tacto=\"dedo\"] .iconbtn }, html[data-tacto=\"dedo\"]",
-        "evidencia": "Medición propia con el data-tacto=\"dedo\" que el propio documento trae: .iconbtn mide 36px y .btn 33px, no 46px. Líneas 294-301 de la maqueta servida. Brief: regla_data_tacto_sin_root = 0.",
-        "por_que_importa": "El modo dedo queda atado al tipo de puntero del dispositivo en vez de a la preferencia declarada: no se puede verificar como §7.3 exige, ni activar en una tableta con ratón, que es el escenario de campo."
-      },
-      {
-        "id": "f1-53detalle-08",
-        "severidad": "media",
-        "regla": "§6.7 Esqueleto — prefers-reduced-motion aplana el fondo",
-        "dice_el_sistema": "«animation:none a secas congela el degradado en la posición 0. Correcto: @media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}»",
-        "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}} — sin reponer el fondo. Presente igual en las cuatro maquetas del lote.",
-        "selector": ".skel",
-        "evidencia": "Línea 629 de la maqueta servida; el degradado de .skel es linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%) con background-size:200% 100%.",
-        "por_que_importa": "Con movimiento reducido el esqueleto queda con una franja oscura fija que se lee como contenido en vez de como espera."
-      },
-      {
-        "id": "f1-53detalle-09",
-        "severidad": "media",
-        "regla": "§10 trampa 5 — <symbol> y viewBox repetido",
-        "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio… se pinta 32,5px a la izquierda de su caja… si el desplazamiento no es ~0, está mal.»",
-        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el logotipo y <svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el botón flotante.",
-        "selector": ".logo > svg > use[href=\"#dproma-mark\"]",
-        "evidencia": "Medición propia con getBoundingClientRect(): svg 44×42, use 43×42, dx = −32px, dy = 0; botón flotante dx = −16px. Visible en 53_tramite_detalle--ok.png.",
-        "por_que_importa": "La marca aparece recortada en la cabecera. Es el caso medido de §10 trampa 5, reproducido con el mismo desplazamiento en las cuatro maquetas del lote."
-      },
-      {
-        "id": "f1-53detalle-10",
-        "severidad": "baja",
-        "regla": "§6.20 Ficha de detalle — valores de .cab",
-        "dice_el_sistema": "«.cab{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,360px);gap:var(--sp-6);align-items:center;padding:var(--sp-5) var(--sp-6)}; @media (max-width:1080px){.cab{grid-template-columns:1fr;align-items:start}}»",
-        "hay_en_el_build": "Todo correcto salvo la alineación: .cab{…grid-template-columns:minmax(0,1.6fr) minmax(300px,360px);gap:var(--sp-6);padding:var(--sp-5) var(--sp-6);align-items:start} — el sistema pide center en el ancho completo y start sólo por debajo de 1080px.",
-        "selector": ".cab",
-        "evidencia": "CSS líneas 756-759 de la maqueta servida. El punto de ruptura de 1080px sí está y sí pasa a una columna.",
-        "por_que_importa": "Divergencia pequeña y defendible —con el bloque de contacto dentro de .idt la columna izquierda es más alta y centrar dejaría el indicador flotando— pero es una divergencia de un valor literal del sistema, que conviene o adoptar o documentar."
-      },
-      {
-        "id": "f1-53detalle-11",
-        "severidad": "baja",
-        "regla": "§6.5 Iconos — el icono tiene que corresponder con lo que hace",
-        "dice_el_sistema": "§6.19 fija el par de glifos de la acción de copiar: content_copy en reposo, check_circle al confirmar. §6.5: el icono «se sostiene solo cuando es universal y su significado no cambia de contexto».",
-        "hay_en_el_build": "Los dos botones «Copiar» usan <use href=\"#m-content_paste\"/> — el glifo de pegar, no el de copiar.",
-        "selector": ".idt-contacto .copiar > svg > use",
-        "evidencia": "Markup del bloque .idt-contacto en la maqueta servida; el sprite declara el símbolo con id «m-content_paste».",
-        "por_que_importa": "El texto «Copiar» salva la comprensión, pero el icono dice lo contrario que la etiqueta, y es el mismo par de glifos que §6.19 fija para esta acción concreta."
-      },
-      {
-        "id": "f1-53detalle-12",
-        "severidad": "baja",
-        "regla": "§6.5 Iconos / §6.10 .p-type",
-        "dice_el_sistema": "§6.10: «.p-type = clasificación… usa las series de §1.4, no el semáforo. Punto de color y peso visual más bajo (font-weight:600, color:var(--text-2), ::before de 7px)». §6.5: «siempre aria-hidden=\"true\" y translate=\"no\"».",
-        "hay_en_el_build": "Las dos .p-type de la cabecera (plaza y vehículo) llevan icono en vez del ::before de 7px y no toman color de serie. Internamente son coherentes entre sí —ninguna lleva punto, que es lo que §6.10 exige de una familia— y aria-hidden/translate=\"no\" sí están puestos en todos los iconos.",
-        "selector": ".cab .marcas .p-type",
-        "evidencia": "Markup de .marcas en la maqueta servida y captura 53_tramite_detalle--ok.png: «Querétaro Centro» y «EJ-2287-B» con icono gris, junto a la pastilla «Observado» con color de estado.",
-        "por_que_importa": "La diferencia entre clasificación y estado sí se ve a simple vista —que es lo que §11 pide—, pero por otro recurso (icono/sin color) que el documentado. Conviene fijar cuál de los dos es el canónico."
-      }
-    ]
-  },
-  "f3_boost_ui": {
-    "puntuacion": 3,
-    "dimensiones": {
-      "accesibilidad": 3,
-      "rendimiento": "no_evaluado",
-      "theming": 3,
-      "responsive": 3,
-      "integridad": 2
-    },
-    "justificacion": "Accesibilidad 3: la ficha está bien construida —h1 único, 6 landmarks, skip link, lang es-MX, <p id=\"anuncio-estado\" role=\"status\" aria-live=\"polite\"> con diccionario de mensajes y cont.focus() en cada cambio de vista, estados con .tarjeta-estado y <h2>, 0 destinos bajo 24px, 0 ids duplicados y 0 aria-controls/aria-describedby rotos, <dl> real en el indicador de plazo y aria-label que nombran el dato concreto— y baja sobre todo por --text-3 obsoleto y por los dos «Copiar» que anuncian una acción que no ocurre. Theming 3: dos temas completos con las variantes -bg/-ink por estado, conmutador propio, color-scheme declarado. Responsive 3: el punto de ruptura de 1080px de §6.20 está puesto y la rejilla de contacto es auto-fit minmax(210px,1fr); no se midió por debajo de 620px. Integridad 2: ningún token usado sin declarar, pero dos componentes pintados con el semáforo equivocado, un .banda reinventado teniendo el original en el archivo, los botones de copiar sin manejador, el isotipo desplazado −32px y el .btn tres píxeles por debajo de su suelo. Rendimiento no evaluado: maqueta estática sin backend.",
-    "evidencia": [
-      "Playwright: 0 destinos bajo 24px, idsDuplicados=[], ariaRotos=[], dialog=0, divDialog=0",
-      "Playwright: altura real de .btn = 33px (suelo del sistema 36px); .iconbtn 36px con data-tacto=\"dedo\" puesto",
-      "Playwright: isotipo dx = −32px (44×42) y −16px (22×21)",
-      "Lectura completa del único <script> del documento: no contiene manejador de copiado",
-      "CSS línea 776: .aviso-pd con var(--block-bg)/var(--block-ink); CSS línea 771: .docs .cu .quien igual",
-      "Capturas 53_tramite_detalle--ok.png y --oscuro.png: los dos temas completos"
-    ]
-  },
-  "f4_nielsen": [
-    {
-      "n": 1,
-      "heuristica": "Visibilidad del estado del sistema",
-      "severidad": 0,
-      "hallazgo": "Sin problema. El indicador de plazo dice de una vez la cifra («−1 d»), el juicio («vencido»), la causa («Observado, y el reloj sigue corriendo») y las fechas de referencia en un <dl>. La bitácora fecha cada movimiento con hora y autor, y el paso entre fichas nombra su conjunto: <span class=\"paso\" role=\"group\" aria-label=\"Paso entre trámites del filtro\"> con «3 de 18» y la miga «Plaza: Querétaro Centro».",
-      "selector": ".reloj[role=group], .bit, .paso[role=group]"
-    },
-    {
-      "n": 2,
-      "heuristica": "Correspondencia entre el sistema y el mundo real",
-      "severidad": 0,
-      "hallazgo": "Sin problema. «Trámite admitido, arranca el plazo», «La dependencia observó el trámite», «5 días hábiles (lun–sáb)»: es el vocabulario de la gestoría, con el detalle de que el sábado cuenta.",
-      "selector": ".bit li, .reloj dl"
-    },
-    {
-      "n": 3,
-      "heuristica": "Control y libertad del usuario",
-      "severidad": 2,
-      "hallazgo": "No hay forma de deshacer nada ni de volver al conjunto filtrado del que viene el expediente más allá de la miga, que lleva a la bandeja sin filtros. Y los dos «Copiar» no se pueden cancelar porque no hacen nada.",
-      "selector": ".migas, .copiar"
-    },
-    {
-      "n": 4,
-      "heuristica": "Consistencia y estándares",
-      "severidad": 3,
-      "hallazgo": "El violeta de --block identifica a la vez el estatus «Observado» (estado real) y la metadata de visibilidad de cada documento y el aviso de datos personales (no son estados). Dentro de la misma pantalla el mismo color significa tres cosas.",
-      "selector": ".pill.p-block, .docs .cu .quien, .aviso-pd"
-    },
-    {
-      "n": 5,
-      "heuristica": "Prevención de errores",
-      "severidad": 1,
-      "hallazgo": "Bien resuelto: el indicador dice exactamente qué falta («Falta la ficha técnica del vehículo») y pone a su lado el botón que lo arregla, y la cabecera de Documentos lleva la pastilla «falta 1». No hay confirmación para «Registrar avance», que es una acción que cambia el estado del expediente.",
-      "selector": ".reloj .subir, .bloque header .pill"
-    },
-    {
-      "n": 6,
-      "heuristica": "Reconocer antes que recordar",
-      "severidad": 0,
-      "hallazgo": "Sin problema. Todo lo que hace falta para decidir está en la primera pantalla: folio, trámite, cliente, estatus, plaza, placa, contacto, plazo, fechas, lo que falta y la bitácora. No hay que recordar nada de la bandeja.",
-      "selector": ".cab, .bit"
-    },
-    {
-      "n": 7,
-      "heuristica": "Flexibilidad y eficiencia de uso",
-      "severidad": 2,
-      "hallazgo": "Existe el paso «3 de 18» con flechas para recorrer el conjunto filtrado sin volver a la lista, que es el atajo correcto y está bien rotulado. En cambio los dos atajos de contacto —copiar correo y copiar teléfono— no funcionan, que es justo el camino rápido que la pantalla ofrecía.",
-      "selector": ".copiar, .paso[role=group] .iconbtn"
-    },
-    {
-      "n": 8,
-      "heuristica": "Diseño estético y minimalista",
-      "severidad": 1,
-      "hallazgo": "Ningún bloque supera los 140 caracteres salvo el aviso de datos personales (154, dos oraciones), y la jerarquía es nítida: identidad, plazo, bitácora, documentos. Es la pantalla mejor compuesta del lote.",
-      "selector": ".aviso-pd"
-    },
-    {
-      "n": 9,
-      "heuristica": "Ayudar a reconocer y recuperarse de errores",
-      "severidad": 0,
-      "hallazgo": "Sin problema. La vista de error dice qué pasó, qué no se ha perdido, qué hacer y da referencia, dentro de .tarjeta-estado con medallón y <h2> real, y el cambio se anuncia por aria-live y mueve el foco a main.",
-      "selector": ".state-error .tarjeta-estado, #anuncio-estado"
-    },
-    {
-      "n": 10,
-      "heuristica": "Ayuda y documentación",
-      "severidad": 1,
-      "hallazgo": "Las explicaciones están donde hacen falta («observar no detiene el reloj», «Todavía sin plazo: el reloj arranca al admitirse»). No hay ningún toggletip (§6.23), que es donde §8 mandaría la segunda oración del aviso de datos personales y la definición de «días hábiles (lun–sáb)».",
-      "selector": ".bit li p, .reloj dl"
-    }
-  ],
-  "f5_investigacion": {
-    "pain_points_evaluados": [
-      {
-        "pp": "pp-082",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "cubre",
-        "evidencia": "pp-082 (la comunicación depende de grupos de WhatsApp, con ambigüedad sobre quién responde) queda atendido por la bitácora: cada movimiento lleva fecha, hora y quién o qué módulo lo hizo («31 ago 2026 · 11:20 · Módulo Querétaro», «27 ago 2026 · 16:05 · N. Cruz»). El quién responde deja de ser una conversación y pasa a ser un registro del expediente."
-      },
-      {
-        "pp": "pp-083",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "cubre",
-        "evidencia": "pp-083 (clientes que contactan directa e informalmente a integrantes concretos del equipo, evadiendo un canal único) se atiende con el bloque «Contacto del cliente» dentro del expediente: persona, correo y teléfono junto al trámite, en lugar de en la agenda personal de quien lo lleve. La cobertura es sin embargo nominal: los dos botones «Copiar» que harían operativo ese bloque no tienen manejador (hallazgo f1-53detalle-02)."
-      },
-      {
-        "pp": "pp-084",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "cubre",
-        "evidencia": "pp-084 (severidad alta: se pierde al menos un día antes de iniciar el trámite cuando llega por un canal sin alerta) se hace explícito en la bitácora: «Recibido, sin admitir — Capturado desde la plataforma. Todavía sin plazo: el reloj arranca al admitirse», con su hora, seguido de «Trámite admitido, arranca el plazo» con la suya. La distancia entre las dos marcas es exactamente el día perdido que pp-084 describe, y ahora está medido y fechado."
-      },
-      {
-        "pp": "pp-081",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "cubre",
-        "evidencia": "pp-081 (la operación en hojas de Excel con macros y semáforos) encuentra aquí el historial que una celda de Excel no puede guardar: cuatro movimientos con causa, autor y hora, más la lista de documentos con su propósito y su fecha de subida. Es la parte del dolor que el Excel compartido no resolvía de ninguna manera."
-      },
-      {
-        "pp": "pp-085",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "ignora",
-        "evidencia": "pp-085 pide un panel donde el cliente consulte en tiempo real el estatus de su trámite, con esperas de hasta una hora. Esta ficha es íntegramente interna: no hay enlace compartible, ni vista reducida para el cliente, ni forma de notificarle el cambio de estatus. Al contrario, el aviso de datos personales declara que «el resto de la organización ve que existe, no su contenido», lo que confirma que el alcance es interno por diseño."
-      }
-    ],
-    "usabilidad_para_el_area": "Es la pantalla del lote que mejor responde a lo que el área pidió. Resuelve en una sola vista la pregunta que hoy se contesta por WhatsApp —en qué va el trámite, de quién es, cuánto queda y qué falta— y la bitácora con autor y hora ataca de raíz pp-082 y pp-083, además de dejar medido el día perdido de pp-084. El orden de la información cumple §6.20 al pie: identidad del expediente, indicador de plazo con ancho declarado a su derecha, el cliente a ancho completo dentro del bloque de identidad y sólo después bitácora y documentos; ese orden es también el del recorrido con teclado. Los dos defectos que pesan en el uso real son concretos: los botones de copiar el correo y el teléfono —el atajo que sustituiría al mensaje de WhatsApp— no están implementados, y el violeta de «bloqueado» marca a la vez el estatus «Observado» y la metadata de privacidad, de modo que el color que debería gritar «esto está parado» aparece cuatro veces más en la pantalla sin querer decir eso. Para el cliente final (pp-085) esta pantalla no aporta nada: sigue siendo interna."
-  },
-  "cobertura": [
-    {
-      "patron": "Marca de visibilidad por documento: cada archivo de la ficha declara en línea quién puede abrirlo («lo ven: Administración Vehicular y Dirección»), junto a su nombre de fichero, formato y fecha.",
-      "propuesta_de_regla": "§6.20 bis — Visibilidad declarada de un documento. Cuando un expediente guarda documentos con distinto alcance de lectura, cada uno declara su alcance junto al nombre, no en una ayuda. Es un dato sobre el dato: va en tinta de texto según §6.22 —sin relleno, sin borde y en --text-3— y nunca con un color del semáforo, porque «quién lo ve» no es un estado del trámite. El aviso general de que los documentos son datos personales se escribe como .banda-info de §6.9 en una sola frase (§8), no como componente nuevo."
-    },
-    {
-      "patron": "Indicador de plazo que combina magnitud y juicio: cifra firmada («−1 d»), rótulo del estado («vencido»), causa en una frase, el botón que resuelve la causa, y las fechas de referencia en un <dl>, todo dentro de una columna de ancho declarado.",
-      "propuesta_de_regla": "§6.20 bis — Indicador de urgencia de la ficha. El indicador de la derecha lleva, en este orden: cifra firmada en 30px, rótulo del estado en mayúsculas, una frase con la causa, la acción que la resuelve y las fechas que permiten reconstruir el cálculo en <dl>/<dt>/<dd>. Toma del semáforo el par -bg/-ink completo (fondo y tinta, no sólo el borde) y declara su ancho con minmax(300px,360px) según §6.20; no se queda con lo que sobre."
-    },
-    {
-      "patron": "Paso entre fichas del mismo conjunto desde el detalle: <span class=\"paso\" role=\"group\" aria-label=\"Paso entre trámites del filtro\"> con la posición «3 de 18» y dos .iconbtn de anterior/siguiente, más una miga que conserva el filtro de origen («Trámites vehiculares / Plaza: Querétaro Centro»).",
-      "propuesta_de_regla": "§6.20 bis — Paso entre fichas del mismo conjunto. Una ficha abierta desde un listado conserva el conjunto del que viene y ofrece paso al anterior y al siguiente dentro de un role=\"group\" cuyo aria-label nombre ese conjunto, con la posición escrita («3 de 18»). La miga conserva el filtro de origen, de modo que volver atrás devuelve la misma lista, no la lista sin filtrar. Los dos controles son <button> con aria-label que nombre el destino y viven con las demás acciones de la cabecera, no en la barra de migas, para que su tamaño táctil no estire toda la fila."
-    }
-  ],
-  "sin_datos": [
-    "f3.rendimiento: maqueta estática, sin backend que perfilar",
-    "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (dialog=0, [role=dialog]=0); el botón «Registrar avance» no tiene manejador, así que no se puede comprobar si abriría uno",
-    "§6.23 Toggletip (.infob + .tip): no existe ninguno en la pantalla (0 .infob, 0 .tip). §6.23 lo propone para el caso dt/dd de la ficha §6.20 pero no lo exige, así que no lo cuento como incumplimiento; sí como oportunidad (F4 heurística 10)",
-    "§6.15 Fila desplegable: no hay tablas ni filas desplegables en esta pantalla (tablas = 0)",
-    "§6.17 Subida de archivo (.subida): el botón «Subir la ficha técnica» existe pero no abre nada y no hay ningún <input type=\"file\"> en el documento; no hay componente que medir contra los requisitos de §6.17",
-    "Contraste de span.et «Trámites vehiculares» (1,09:1) y span.cromo-av «AR» (3,05:1) del brief: el medidor comparó contra el color rgba sin componerlo con la superficie de debajo. Compuestos dan 5,98:1 sobre --chrome y 13,5:1 sobre --surface; no los cuento como fallo de contraste",
-    "Comportamiento por debajo de 620px: sólo se midió a 1440×900 y con las capturas del orquestador"
+ "pantalla": "53_tramite_detalle",
+ "ruta_zip": "04-tramites-vehiculares-y-cfe/53_tramite_detalle.html",
+ "carpeta": "04-tramites-vehiculares-y-cfe",
+ "area": "administracion vehicular",
+ "arquetipo": "detalle",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "53_tramite_detalle--ok.png",
+  "53_tramite_detalle--loading.png",
+  "53_tramite_detalle--empty.png",
+  "53_tramite_detalle--error.png",
+  "53_tramite_detalle--oscuro.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "f1-53detalle-01",
+    "severidad": "alta",
+    "regla": "§1 Decisión previa a elegir color / §1.3 Semáforo (--block)",
+    "dice_el_sistema": "§1: «si el dato tiene juicio → semáforo §1.3; si solo distingue → paleta categórica §1.4; si es un dato sobre el dato → sin color propio, tinta de texto §6.22. Un color de estado no se reutiliza para una categoría, ni al revés.» §1.3: --block = «Bloqueado por una condición externa».",
+    "hay_en_el_build": "Dos componentes pintados con el estado «bloqueado» sin que nada esté bloqueado: (a) .aviso-pd{border-left:4px solid var(--block-ink);background:var(--block-bg);color:var(--block-ink)} para el texto «Estos documentos son datos personales…»; (b) .docs .cu .quien{color:var(--block-ink);background:var(--block-bg);…} para la marca «lo ven: Administración Vehicular y Dirección» que acompaña a cada documento. En la misma pantalla, --block sí se usa correctamente en el estatus «Observado» (.pill.p-block).",
+    "selector": ".aviso-pd, .docs .cu .quien",
+    "evidencia": "CSS líneas 771-778 de la maqueta servida. Captura 53_tramite_detalle--ok.png: el bloque violeta de aviso y las cuatro marcas violetas bajo cada documento conviven con la pastilla violeta «Observado» de la cabecera, que sí es un estado.",
+    "por_que_importa": "Es el mismo fallo de gobierno de color que la columna «Tipo» pintada con --block, aquí en la pantalla de detalle: quién puede ver un documento es un dato sobre el dato, y pintarlo del color de «bloqueado» hace que el ojo lo cuente como una cuarta cosa parada. Y como el único estado realmente bloqueado de la ficha —«Observado»— lleva exactamente el mismo violeta, el estado deja de distinguirse de la metadata."
+   },
+   {
+    "id": "f1-53detalle-02",
+    "severidad": "alta",
+    "regla": "§6.19 Botón-icono — variante que confirma en el sitio / §11 Interacción",
+    "dice_el_sistema": "«Variante que confirma en el sitio: confirma tres cosas — el icono cambia (content_copy → check_circle), el aria-label cambia («Copiado: …»), y se anuncia por aria-live. Vuelve al estado inicial en ~1,6s. Si falla, se dice (respaldo por textarea para file://).» §11: «una acción que confirma en el sitio cambia el icono y la etiqueta y lo anuncia por aria-live».",
+    "hay_en_el_build": "Los dos botones «Copiar» del bloque de contacto están bien rotulados —aria-label=\"Copiar r.mendieta@centronorte.example\" y aria-label=\"Copiar +52 442 000 0001\", que es exactamente lo que §6.19 pide del aria-label— pero no tienen manejador: el único <script> del documento contiene tema, menú lateral y conmutador de estados de maqueta, nada más. No existe .copiar.hecho en el CSS, ni región aria-live de copiado, ni respaldo por textarea.",
+    "selector": ".idt-contacto .copiar",
+    "evidencia": "La maqueta servida tiene un solo bloque <script>; su contenido completo (leído de principio a fin) no menciona copiar, clipboard, hecho, 1600 ni textarea. grep «.copiar.hecho» en el CSS: 0. Los botones existen, se ven pulsables y no hacen nada.",
+    "por_que_importa": "Sacar el correo y el teléfono del cliente del expediente es la acción que pp-082 y pp-083 piden formalizar para dejar de depender de WhatsApp. El botón que existe para eso es el único que no funciona, y al pulsarlo no se dice ni que falló."
+   },
+   {
+    "id": "f1-53detalle-03",
+    "severidad": "alta",
+    "regla": "§1.1 Superficies y texto — valor de --text-3",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)… si el elemento puede caer sobre --surface-2, se mide también ahí.»",
+    "hay_en_el_build": "--text-3: #66717F en el tema claro, con un token paralelo no documentado --text-3-fuerte: #5D6774 usado en .idt-ct, .idt-contacto .dato .et y .docs .cu .prop. El valor obsoleto sigue activo para el resto del texto auxiliar de la ficha.",
+    "selector": ":root{--text-3}",
+    "evidencia": "Brief del orquestador: text_3_declarado = «#66717F». Medición propia sobre el archivo servido: «--text-3: #66717F» y «--text-3-fuerte: #5D6774» coexisten en el mismo :root; en oscuro ambos valen #8B96A6.",
+    "por_que_importa": "Hecho ya establecido para 51 de 52 maquetas. El agravante es el mismo que en 52: el problema se diagnosticó y se resolvió con un token hermano, de modo que el valor malo sigue siendo el que hereda cualquier componente nuevo."
+   },
+   {
+    "id": "f1-53detalle-04",
+    "severidad": "media",
+    "regla": "§6.9 Avisos — verificar si .banda ya lo cubre",
+    "dice_el_sistema": "«Antes de escribir una clase nueva, verificar si .banda + una de sus cuatro variantes ya lo cubre.» Trampa adicional de §6.9: «.bloqueado en Autorización de compra era .banda.b-info con otro nombre: no solo se repiten nombres de clase por accidente, también se reinventan componentes enteros por no buscar primero si ya existen.»",
+    "hay_en_el_build": ".aviso-pd, una banda de ancho completo con icono + texto, padding var(--sp-3) var(--sp-4) y font-size var(--fs-dense) — es decir, los valores de .banda de §6.9 con otro nombre y otro color. .banda está declarada en la hoja de esta misma maqueta y no se usa ni una vez en el markup.",
+    "selector": ".aviso-pd",
+    "evidencia": "CSS línea 776 de la maqueta servida: «.aviso-pd{display:flex;gap:var(--sp-3);align-items:flex-start;margin-bottom:var(--sp-4);border-left:4px solid var(--block-ink);background:var(--block-bg);…padding:var(--sp-3) var(--sp-4);font-size:var(--fs-dense)}». grep de «.banda{» en el archivo: 1 declaración; recuento de class=\"…banda…\" en el markup: 0.",
+    "por_que_importa": "Es el caso que §6.9 nombra. El componente correcto (.banda-info) está en el archivo, sin usar, y en su lugar hay uno nuevo que además trae el problema de color del hallazgo 01."
+   },
+   {
+    "id": "f1-53detalle-05",
+    "severidad": "media",
+    "regla": "§8 Voz de producto — una frase, ~140 caracteres",
+    "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto. Una segunda oración se borra o pasa a toggletip. No hay excepción por importancia del contenido.»",
+    "hay_en_el_build": "«Estos documentos son datos personales. Cada uno declara su propósito y quién puede abrirlo; el resto de la organización ve que existe, no su contenido.» — dos oraciones, con punto y coma dentro de la segunda, 151 caracteres.",
+    "selector": ".aviso-pd > span",
+    "evidencia": "Texto literal del markup de la maqueta servida, contado carácter a carácter.",
+    "por_que_importa": "La segunda oración explica cómo está diseñado el control de acceso, no una consecuencia inmediata para quien mira; §8 la manda a toggletip (§6.23) o a borrarla. Y el bloque va antes de la lista de documentos, que es el contenido que la persona viene a ver."
+   },
+   {
+    "id": "f1-53detalle-06",
+    "severidad": "media",
+    "regla": "§6.2 Botones — el suelo se declara con min-height",
+    "dice_el_sistema": "«.btn{min-height:36px;padding:8px 14px;gap:8px;font:600 var(--fs-dense)}… el suelo se declara con min-height, no se confía al relleno (medido: 35px y 27px sin él). .btn.mini{min-height:28px}»",
+    "hay_en_el_build": ".btn{…padding:8px 13px;font:600 var(--fs-dense) var(--font-ui)…} sin min-height.",
+    "selector": ".btn, .btn.mini",
+    "evidencia": "Medición propia con Playwright: altura real del primer .btn de la pantalla = 33px, tres por debajo del suelo de 36px. CSS línea 335 de la maqueta servida. Es el fallo que §6.2 documenta con sus propias cifras.",
+    "por_que_importa": "«Registrar avance» es la acción primaria de la ficha y no llega al suelo del sistema; su altura la decide el relleno y el tamaño de fuente heredado, no una declaración."
+   },
+   {
+    "id": "f1-53detalle-07",
+    "severidad": "media",
+    "regla": "§7.3 Objetivos táctiles — el modo dedo se comprueba midiendo",
+    "dice_el_sistema": "«:root[data-tacto=\"dedo\"] .it, .iconbtn, .btn{min-height:46px}… Se comprueba midiendo con data-tacto=\"dedo\" puesto, no leyendo el archivo.»",
+    "hay_en_el_build": "Las seis reglas llevan :root correctamente, pero van dentro de @media (pointer:coarse){…}, que el sistema no incluye. El documento declara data-tacto=\"dedo\" en <html> desde el arranque, así que el modo está puesto y es inerte en un equipo con ratón.",
+    "selector": "@media (pointer:coarse){ :root[data-tacto=\"dedo\"] .iconbtn }, html[data-tacto=\"dedo\"]",
+    "evidencia": "Medición propia con el data-tacto=\"dedo\" que el propio documento trae: .iconbtn mide 36px y .btn 33px, no 46px. Líneas 294-301 de la maqueta servida. Brief: regla_data_tacto_sin_root = 0.",
+    "por_que_importa": "El modo dedo queda atado al tipo de puntero del dispositivo en vez de a la preferencia declarada: no se puede verificar como §7.3 exige, ni activar en una tableta con ratón, que es el escenario de campo."
+   },
+   {
+    "id": "f1-53detalle-08",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto — prefers-reduced-motion aplana el fondo",
+    "dice_el_sistema": "«animation:none a secas congela el degradado en la posición 0. Correcto: @media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}»",
+    "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}} — sin reponer el fondo. Presente igual en las cuatro maquetas del lote.",
+    "selector": ".skel",
+    "evidencia": "Línea 629 de la maqueta servida; el degradado de .skel es linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%) con background-size:200% 100%.",
+    "por_que_importa": "Con movimiento reducido el esqueleto queda con una franja oscura fija que se lee como contenido en vez de como espera."
+   },
+   {
+    "id": "f1-53detalle-09",
+    "severidad": "media",
+    "regla": "§10 trampa 5 — <symbol> y viewBox repetido",
+    "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio… se pinta 32,5px a la izquierda de su caja… si el desplazamiento no es ~0, está mal.»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el logotipo y <svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el botón flotante.",
+    "selector": ".logo > svg > use[href=\"#dproma-mark\"]",
+    "evidencia": "Medición propia con getBoundingClientRect(): svg 44×42, use 43×42, dx = −32px, dy = 0; botón flotante dx = −16px. Visible en 53_tramite_detalle--ok.png.",
+    "por_que_importa": "La marca aparece recortada en la cabecera. Es el caso medido de §10 trampa 5, reproducido con el mismo desplazamiento en las cuatro maquetas del lote."
+   },
+   {
+    "id": "f1-53detalle-10",
+    "severidad": "baja",
+    "regla": "§6.20 Ficha de detalle — valores de .cab",
+    "dice_el_sistema": "«.cab{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,360px);gap:var(--sp-6);align-items:center;padding:var(--sp-5) var(--sp-6)}; @media (max-width:1080px){.cab{grid-template-columns:1fr;align-items:start}}»",
+    "hay_en_el_build": "Todo correcto salvo la alineación: .cab{…grid-template-columns:minmax(0,1.6fr) minmax(300px,360px);gap:var(--sp-6);padding:var(--sp-5) var(--sp-6);align-items:start} — el sistema pide center en el ancho completo y start sólo por debajo de 1080px.",
+    "selector": ".cab",
+    "evidencia": "CSS líneas 756-759 de la maqueta servida. El punto de ruptura de 1080px sí está y sí pasa a una columna.",
+    "por_que_importa": "Divergencia pequeña y defendible —con el bloque de contacto dentro de .idt la columna izquierda es más alta y centrar dejaría el indicador flotando— pero es una divergencia de un valor literal del sistema, que conviene o adoptar o documentar."
+   },
+   {
+    "id": "f1-53detalle-11",
+    "severidad": "baja",
+    "regla": "§6.5 Iconos — el icono tiene que corresponder con lo que hace",
+    "dice_el_sistema": "§6.19 fija el par de glifos de la acción de copiar: content_copy en reposo, check_circle al confirmar. §6.5: el icono «se sostiene solo cuando es universal y su significado no cambia de contexto».",
+    "hay_en_el_build": "Los dos botones «Copiar» usan <use href=\"#m-content_paste\"/> — el glifo de pegar, no el de copiar.",
+    "selector": ".idt-contacto .copiar > svg > use",
+    "evidencia": "Markup del bloque .idt-contacto en la maqueta servida; el sprite declara el símbolo con id «m-content_paste».",
+    "por_que_importa": "El texto «Copiar» salva la comprensión, pero el icono dice lo contrario que la etiqueta, y es el mismo par de glifos que §6.19 fija para esta acción concreta."
+   },
+   {
+    "id": "f1-53detalle-12",
+    "severidad": "baja",
+    "regla": "§6.5 Iconos / §6.10 .p-type",
+    "dice_el_sistema": "§6.10: «.p-type = clasificación… usa las series de §1.4, no el semáforo. Punto de color y peso visual más bajo (font-weight:600, color:var(--text-2), ::before de 7px)». §6.5: «siempre aria-hidden=\"true\" y translate=\"no\"».",
+    "hay_en_el_build": "Las dos .p-type de la cabecera (plaza y vehículo) llevan icono en vez del ::before de 7px y no toman color de serie. Internamente son coherentes entre sí —ninguna lleva punto, que es lo que §6.10 exige de una familia— y aria-hidden/translate=\"no\" sí están puestos en todos los iconos.",
+    "selector": ".cab .marcas .p-type",
+    "evidencia": "Markup de .marcas en la maqueta servida y captura 53_tramite_detalle--ok.png: «Querétaro Centro» y «EJ-2287-B» con icono gris, junto a la pastilla «Observado» con color de estado.",
+    "por_que_importa": "La diferencia entre clasificación y estado sí se ve a simple vista —que es lo que §11 pide—, pero por otro recurso (icono/sin color) que el documentado. Conviene fijar cuál de los dos es el canónico."
+   }
   ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 3,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "Accesibilidad 3: la ficha está bien construida —h1 único, 6 landmarks, skip link, lang es-MX, <p id=\"anuncio-estado\" role=\"status\" aria-live=\"polite\"> con diccionario de mensajes y cont.focus() en cada cambio de vista, estados con .tarjeta-estado y <h2>, 0 destinos bajo 24px, 0 ids duplicados y 0 aria-controls/aria-describedby rotos, <dl> real en el indicador de plazo y aria-label que nombran el dato concreto— y baja sobre todo por --text-3 obsoleto y por los dos «Copiar» que anuncian una acción que no ocurre. Theming 3: dos temas completos con las variantes -bg/-ink por estado, conmutador propio, color-scheme declarado. Responsive 3: el punto de ruptura de 1080px de §6.20 está puesto y la rejilla de contacto es auto-fit minmax(210px,1fr); no se midió por debajo de 620px. Integridad 2: ningún token usado sin declarar, pero dos componentes pintados con el semáforo equivocado, un .banda reinventado teniendo el original en el archivo, los botones de copiar sin manejador, el isotipo desplazado −32px y el .btn tres píxeles por debajo de su suelo. Rendimiento no evaluado: maqueta estática sin backend.",
+  "evidencia": [
+   "Playwright: 0 destinos bajo 24px, idsDuplicados=[], ariaRotos=[], dialog=0, divDialog=0",
+   "Playwright: altura real de .btn = 33px (suelo del sistema 36px); .iconbtn 36px con data-tacto=\"dedo\" puesto",
+   "Playwright: isotipo dx = −32px (44×42) y −16px (22×21)",
+   "Lectura completa del único <script> del documento: no contiene manejador de copiado",
+   "CSS línea 776: .aviso-pd con var(--block-bg)/var(--block-ink); CSS línea 771: .docs .cu .quien igual",
+   "Capturas 53_tramite_detalle--ok.png y --oscuro.png: los dos temas completos"
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 0,
+   "hallazgo": "Sin problema. El indicador de plazo dice de una vez la cifra («−1 d»), el juicio («vencido»), la causa («Observado, y el reloj sigue corriendo») y las fechas de referencia en un <dl>. La bitácora fecha cada movimiento con hora y autor, y el paso entre fichas nombra su conjunto: <span class=\"paso\" role=\"group\" aria-label=\"Paso entre trámites del filtro\"> con «3 de 18» y la miga «Plaza: Querétaro Centro».",
+   "selector": ".reloj[role=group], .bit, .paso[role=group]"
+  },
+  {
+   "n": 2,
+   "heuristica": "Correspondencia entre el sistema y el mundo real",
+   "severidad": 0,
+   "hallazgo": "Sin problema. «Trámite admitido, arranca el plazo», «La dependencia observó el trámite», «5 días hábiles (lun–sáb)»: es el vocabulario de la gestoría, con el detalle de que el sábado cuenta.",
+   "selector": ".bit li, .reloj dl"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 2,
+   "hallazgo": "No hay forma de deshacer nada ni de volver al conjunto filtrado del que viene el expediente más allá de la miga, que lleva a la bandeja sin filtros. Y los dos «Copiar» no se pueden cancelar porque no hacen nada.",
+   "selector": ".migas, .copiar"
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 3,
+   "hallazgo": "El violeta de --block identifica a la vez el estatus «Observado» (estado real) y la metadata de visibilidad de cada documento y el aviso de datos personales (no son estados). Dentro de la misma pantalla el mismo color significa tres cosas.",
+   "selector": ".pill.p-block, .docs .cu .quien, .aviso-pd"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 1,
+   "hallazgo": "Bien resuelto: el indicador dice exactamente qué falta («Falta la ficha técnica del vehículo») y pone a su lado el botón que lo arregla, y la cabecera de Documentos lleva la pastilla «falta 1». No hay confirmación para «Registrar avance», que es una acción que cambia el estado del expediente.",
+   "selector": ".reloj .subir, .bloque header .pill"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocer antes que recordar",
+   "severidad": 0,
+   "hallazgo": "Sin problema. Todo lo que hace falta para decidir está en la primera pantalla: folio, trámite, cliente, estatus, plaza, placa, contacto, plazo, fechas, lo que falta y la bitácora. No hay que recordar nada de la bandeja.",
+   "selector": ".cab, .bit"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 2,
+   "hallazgo": "Existe el paso «3 de 18» con flechas para recorrer el conjunto filtrado sin volver a la lista, que es el atajo correcto y está bien rotulado. En cambio los dos atajos de contacto —copiar correo y copiar teléfono— no funcionan, que es justo el camino rápido que la pantalla ofrecía.",
+   "selector": ".copiar, .paso[role=group] .iconbtn"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 1,
+   "hallazgo": "Ningún bloque supera los 140 caracteres salvo el aviso de datos personales (154, dos oraciones), y la jerarquía es nítida: identidad, plazo, bitácora, documentos. Es la pantalla mejor compuesta del lote.",
+   "selector": ".aviso-pd"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer y recuperarse de errores",
+   "severidad": 0,
+   "hallazgo": "Sin problema. La vista de error dice qué pasó, qué no se ha perdido, qué hacer y da referencia, dentro de .tarjeta-estado con medallón y <h2> real, y el cambio se anuncia por aria-live y mueve el foco a main.",
+   "selector": ".state-error .tarjeta-estado, #anuncio-estado"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 1,
+   "hallazgo": "Las explicaciones están donde hacen falta («observar no detiene el reloj», «Todavía sin plazo: el reloj arranca al admitirse»). No hay ningún toggletip (§6.23), que es donde §8 mandaría la segunda oración del aviso de datos personales y la definición de «días hábiles (lun–sáb)».",
+   "selector": ".bit li p, .reloj dl"
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-082",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-082 (la comunicación depende de grupos de WhatsApp, con ambigüedad sobre quién responde) queda atendido por la bitácora: cada movimiento lleva fecha, hora y quién o qué módulo lo hizo («31 ago 2026 · 11:20 · Módulo Querétaro», «27 ago 2026 · 16:05 · N. Cruz»). El quién responde deja de ser una conversación y pasa a ser un registro del expediente."
+   },
+   {
+    "pp": "pp-083",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-083 (clientes que contactan directa e informalmente a integrantes concretos del equipo, evadiendo un canal único) se atiende con el bloque «Contacto del cliente» dentro del expediente: persona, correo y teléfono junto al trámite, en lugar de en la agenda personal de quien lo lleve. La cobertura es sin embargo nominal: los dos botones «Copiar» que harían operativo ese bloque no tienen manejador (hallazgo f1-53detalle-02)."
+   },
+   {
+    "pp": "pp-084",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-084 (severidad alta: se pierde al menos un día antes de iniciar el trámite cuando llega por un canal sin alerta) se hace explícito en la bitácora: «Recibido, sin admitir — Capturado desde la plataforma. Todavía sin plazo: el reloj arranca al admitirse», con su hora, seguido de «Trámite admitido, arranca el plazo» con la suya. La distancia entre las dos marcas es exactamente el día perdido que pp-084 describe, y ahora está medido y fechado."
+   },
+   {
+    "pp": "pp-081",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-081 (la operación en hojas de Excel con macros y semáforos) encuentra aquí el historial que una celda de Excel no puede guardar: cuatro movimientos con causa, autor y hora, más la lista de documentos con su propósito y su fecha de subida. Es la parte del dolor que el Excel compartido no resolvía de ninguna manera."
+   },
+   {
+    "pp": "pp-085",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-085 pide un panel donde el cliente consulte en tiempo real el estatus de su trámite, con esperas de hasta una hora. Esta ficha es íntegramente interna: no hay enlace compartible, ni vista reducida para el cliente, ni forma de notificarle el cambio de estatus. Al contrario, el aviso de datos personales declara que «el resto de la organización ve que existe, no su contenido», lo que confirma que el alcance es interno por diseño."
+   }
+  ],
+  "usabilidad_para_el_area": "Es la pantalla del lote que mejor responde a lo que el área pidió. Resuelve en una sola vista la pregunta que hoy se contesta por WhatsApp —en qué va el trámite, de quién es, cuánto queda y qué falta— y la bitácora con autor y hora ataca de raíz pp-082 y pp-083, además de dejar medido el día perdido de pp-084. El orden de la información cumple §6.20 al pie: identidad del expediente, indicador de plazo con ancho declarado a su derecha, el cliente a ancho completo dentro del bloque de identidad y sólo después bitácora y documentos; ese orden es también el del recorrido con teclado. Los dos defectos que pesan en el uso real son concretos: los botones de copiar el correo y el teléfono —el atajo que sustituiría al mensaje de WhatsApp— no están implementados, y el violeta de «bloqueado» marca a la vez el estatus «Observado» y la metadata de privacidad, de modo que el color que debería gritar «esto está parado» aparece cuatro veces más en la pantalla sin querer decir eso. Para el cliente final (pp-085) esta pantalla no aporta nada: sigue siendo interna."
+ },
+ "cobertura": [
+  {
+   "patron": "Marca de visibilidad por documento: cada archivo de la ficha declara en línea quién puede abrirlo («lo ven: Administración Vehicular y Dirección»), junto a su nombre de fichero, formato y fecha.",
+   "propuesta_de_regla": "§6.20 bis — Visibilidad declarada de un documento. Cuando un expediente guarda documentos con distinto alcance de lectura, cada uno declara su alcance junto al nombre, no en una ayuda. Es un dato sobre el dato: va en tinta de texto según §6.22 —sin relleno, sin borde y en --text-3— y nunca con un color del semáforo, porque «quién lo ve» no es un estado del trámite. El aviso general de que los documentos son datos personales se escribe como .banda-info de §6.9 en una sola frase (§8), no como componente nuevo."
+  },
+  {
+   "patron": "Indicador de plazo que combina magnitud y juicio: cifra firmada («−1 d»), rótulo del estado («vencido»), causa en una frase, el botón que resuelve la causa, y las fechas de referencia en un <dl>, todo dentro de una columna de ancho declarado.",
+   "propuesta_de_regla": "§6.20 bis — Indicador de urgencia de la ficha. El indicador de la derecha lleva, en este orden: cifra firmada en 30px, rótulo del estado en mayúsculas, una frase con la causa, la acción que la resuelve y las fechas que permiten reconstruir el cálculo en <dl>/<dt>/<dd>. Toma del semáforo el par -bg/-ink completo (fondo y tinta, no sólo el borde) y declara su ancho con minmax(300px,360px) según §6.20; no se queda con lo que sobre."
+  },
+  {
+   "patron": "Paso entre fichas del mismo conjunto desde el detalle: <span class=\"paso\" role=\"group\" aria-label=\"Paso entre trámites del filtro\"> con la posición «3 de 18» y dos .iconbtn de anterior/siguiente, más una miga que conserva el filtro de origen («Trámites vehiculares / Plaza: Querétaro Centro»).",
+   "propuesta_de_regla": "§6.20 bis — Paso entre fichas del mismo conjunto. Una ficha abierta desde un listado conserva el conjunto del que viene y ofrece paso al anterior y al siguiente dentro de un role=\"group\" cuyo aria-label nombre ese conjunto, con la posición escrita («3 de 18»). La miga conserva el filtro de origen, de modo que volver atrás devuelve la misma lista, no la lista sin filtrar. Los dos controles son <button> con aria-label que nombre el destino y viven con las demás acciones de la cabecera, no en la barra de migas, para que su tamaño táctil no estire toda la fila."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática, sin backend que perfilar",
+  "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (dialog=0, [role=dialog]=0); el botón «Registrar avance» no tiene manejador, así que no se puede comprobar si abriría uno",
+  "§6.23 Toggletip (.infob + .tip): no existe ninguno en la pantalla (0 .infob, 0 .tip). §6.23 lo propone para el caso dt/dd de la ficha §6.20 pero no lo exige, así que no lo cuento como incumplimiento; sí como oportunidad (F4 heurística 10)",
+  "§6.15 Fila desplegable: no hay tablas ni filas desplegables en esta pantalla (tablas = 0)",
+  "§6.17 Subida de archivo (.subida): el botón «Subir la ficha técnica» existe pero no abre nada y no hay ningún <input type=\"file\"> en el documento; no hay componente que medir contra los requisitos de §6.17",
+  "Contraste de span.et «Trámites vehiculares» (1,09:1) y span.cromo-av «AR» (3,05:1) del brief: el medidor comparó contra el color rgba sin componerlo con la superficie de debajo. Compuestos dan 5,98:1 sobre --chrome y 13,5:1 sobre --surface; no los cuento como fallo de contraste",
+  "Comportamiento por debajo de 620px: sólo se midió a 1440×900 y con las capturas del orquestador"
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-ctrl",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--on-state",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-5",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--text-3-fuerte",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-ctrl",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--on-state",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-5",
+   "--sp-6",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--text-3-fuerte",
+   "--velo-modal",
+   "--velo-suave",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [],
+  "declarados_no_usados": [
+   "--block",
+   "--block-fill",
+   "--border-fuerte",
+   "--dur-enter",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--fs-kpi",
+   "--glass",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--sp-12",
+   "--stagger",
+   "--velo-trama",
+   "--warn",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--border-ctrl",
+    "canonico": "rgba(27,36,48,.5)",
+    "declara": "rgba(27,36,48,.50)"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 87,
+  "n_usados": 70,
+  "n_divergentes": 16,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": true,
+   "filas": 0,
+   "nodosText3": 0
+  }
+ }
 }

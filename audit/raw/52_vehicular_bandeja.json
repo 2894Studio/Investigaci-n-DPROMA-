@@ -1,326 +1,600 @@
 {
-  "pantalla": "52_vehicular_bandeja",
-  "ruta_zip": "04-tramites-vehiculares-y-cfe/52_vehicular_bandeja.html",
-  "carpeta": "04-tramites-vehiculares-y-cfe",
-  "area": "administracion vehicular",
-  "arquetipo": "bandeja",
-  "modo": "cumplimiento",
-  "estados_auditados": [
-    "ok",
-    "loading",
-    "empty",
-    "error",
-    "oscuro"
-  ],
-  "capturas": [
-    "52_vehicular_bandeja--ok.png",
-    "52_vehicular_bandeja--loading.png",
-    "52_vehicular_bandeja--empty.png",
-    "52_vehicular_bandeja--error.png",
-    "52_vehicular_bandeja--oscuro.png"
-  ],
-  "f1_cumplimiento": {
-    "veredicto": "cumple_parcialmente",
-    "hallazgos": [
-      {
-        "id": "f1-52bandeja-01",
-        "severidad": "alta",
-        "regla": "§7.3 Objetivos táctiles / §10 trampa 4",
-        "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8).» §10 trampa 4: «un <input> de búsqueda dentro de un <div> con forma de pastilla no cumple, porque pulsar la pastilla no hace nada. El contenedor tiene que ser una <label for=\"…\">.»",
-        "hay_en_el_build": "<div class=\"search\"><svg class=\"ico ico-sm\">…</svg><input id=\"buscar\" type=\"search\" placeholder=\"Buscar por folio, cliente, placas o VIN…\" aria-label=\"Buscar trámites vehiculares\"></div>. El envoltorio es un <div>, no una <label for=\"buscar\">.",
-        "selector": ".search > input#buscar",
-        "evidencia": "Brief del orquestador: 1 destino bajo 24px — input type=search, 329×15px. Medición propia: el input mide 15px de alto y el .search que lo rodea 33px, pero el envoltorio es un DIV, así que pulsar la pastilla fuera del campo no enfoca nada. Es el caso textual de §10 trampa 4.",
-        "por_que_importa": "El buscador es la primera acción de la pantalla más usada del módulo (300-900 trámites al mes, pp-081) y su destino real de pulsación mide 15px de alto: por debajo del mínimo de WCAG 2.2 2.5.8 que el sistema fija como regla dura."
-      },
-      {
-        "id": "f1-52bandeja-02",
-        "severidad": "alta",
-        "regla": "§6.21 Barra de filtros — «lo no negociable del teclado»",
-        "dice_el_sistema": "«A11y (lo no negociable del teclado): aria-expanded + aria-controls en el botón; al abrir el foco entra en el buscador; Escape cierra y devuelve el foco al botón, no al principio de la página.»",
-        "hay_en_el_build": "Al marcar una casilla del panel, el manejador llama a pinta(), que hace barra.textContent='' y reconstruye la barra entera, incluido el panel abierto. Los nodos originales desaparecen y el foco cae al <body>.",
-        "selector": "#filtros .fwrap .pop input[type=checkbox]",
-        "evidencia": "Medición propia con Playwright: tras p.click en el botón «Plaza», document.activeElement = INPUT/search (correcto). Tras p.check de la primera casilla, document.activeElement = BODY, con el panel todavía abierto y la pastilla «Plaza: Querétaro Centro ×» ya creada. Escape sí devuelve el foco al BUTTON.f (correcto).",
-        "por_que_importa": "Filtrar por más de un valor es el uso normal de este panel. Con teclado, después de marcar la primera casilla hay que volver a tabular desde el principio del documento para marcar la segunda."
-      },
-      {
-        "id": "f1-52bandeja-03",
-        "severidad": "alta",
-        "regla": "§6.21 Estructura del panel / §11 «lo que ejecuta es un <button>»",
-        "dice_el_sistema": "§6.21: «el resto tras un botón + Añadir filtro de borde discontinuo; el añadido queda con su panel ya abierto». §11: «¿Lo que ejecuta es un <button> y lo que navega un <a>?»",
-        "hay_en_el_build": "Las opciones del panel «+ Añadir filtro» se construyen como <label style=\"cursor:pointer\"> con un addEventListener('click'), sin control de formulario dentro y sin tabindex. Al abrir el panel el código hace pop.querySelector('label').focus(), que sobre una <label> no hace nada.",
-        "selector": "#pop-mas .pop-l.pop-menu li > label",
-        "evidencia": "Medición propia con Playwright tras abrir #filtros button.fmas: el panel contiene 2 <label> con tabIndex = −1 y 0 elementos enfocables (button/a/input/[tabindex]); document.activeElement sigue siendo BUTTON.f.fmas.",
-        "por_que_importa": "Las dos dimensiones que no están a la vista —Trámite y Plazo— sólo se pueden añadir con ratón. «Plazo» es justamente la dimensión que separa lo vencido de lo que está en plazo."
-      },
-      {
-        "id": "f1-52bandeja-04",
-        "severidad": "alta",
-        "regla": "§1.1 Superficies y texto — valor de --text-3",
-        "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)… No basta con medirlo sobre --surface: si el elemento puede caer sobre --surface-2, se mide también ahí.»",
-        "hay_en_el_build": "--text-3: #66717F en el tema claro, y además un token paralelo no documentado, --text-3-fuerte: #5D6774, usado en los sitios donde el equipo detectó el problema. El valor obsoleto sigue gobernando .p4-t .resumen, .tfoot, .sin-reloj y la pastilla neutra.",
-        "selector": ":root{--text-3}, .p4-t .resumen, .tfoot",
-        "evidencia": "Brief del orquestador: text_3_declarado = «#66717F». Medición propia sobre el archivo servido: coexisten «--text-3: #66717F» y «--text-3-fuerte: #5D6774» en el mismo :root; en oscuro los dos valen #8B96A6.",
-        "por_que_importa": "Hecho ya establecido para 51 de 52 maquetas. Aquí con el agravante de que el equipo diagnosticó el fallo y lo resolvió duplicando el token en vez de corregir el valor canónico, así que el token obsoleto sigue activo y es el que heredará cualquier componente nuevo."
-      },
-      {
-        "id": "f1-52bandeja-05",
-        "severidad": "media",
-        "regla": "§6.11 Tabla densa — regla 3, aria-sort",
-        "dice_el_sistema": "«aria-sort en todas las columnas ordenables, incluidas las que aún no ordenan (aria-sort=\"none\").» El markup canónico lleva <th scope=\"col\" aria-sort=\"none\"><button data-col=\"…\">…<span class=\"msi sort\">arrow_downward</span></button></th>.",
-        "hay_en_el_build": "Los siete <th scope=\"col\"> son texto plano: <th scope=\"col\">Folio</th>, <th scope=\"col\">Cliente y trámite</th>… Ningún aria-sort y ningún botón de orden. El orden está fijado en el pie («los vencidos primero, después por lo que queda de plazo») y no se puede cambiar.",
-        "selector": "table thead th[scope=col]",
-        "evidencia": "Brief del orquestador: th = 13, thAriaSort = 0. Medición propia: thCol = 7, ariaSort = 0, thRow (scope=row) = 6.",
-        "por_que_importa": "Una bandeja de 36 registros en 2 páginas sin ninguna columna ordenable obliga a usar los filtros para todo. Y aunque se decidiera no ordenar, §6.11 pide declarar aria-sort=\"none\" para que el lector de pantalla no anuncie una tabla ordenable que no lo es."
-      },
-      {
-        "id": "f1-52bandeja-06",
-        "severidad": "media",
-        "regla": "§6.11 Tabla densa — regla 10, el identificador de fila no lleva color de enlace",
-        "dice_el_sistema": "«El identificador de fila no lleva color de enlace. --link es para navegación fuera de tabla (migas, «Ver en Maps»). El folio va en --text; lo pulsable lo indica tbody tr:hover td{background:var(--surface-2)}.»",
-        "hay_en_el_build": ".folio{font-variant-numeric:tabular-nums;font-weight:600;color:var(--link);text-decoration:none;white-space:nowrap} y .folio:hover{text-decoration:underline}.",
-        "selector": "tbody th[scope=row] > a.folio",
-        "evidencia": "Medición propia: getComputedStyle(.folio).color = rgb(47, 107, 60), que es exactamente --link (#2F6B3C); el resto de celdas está en rgb(27, 36, 48) = --text. Visible en 52_vehicular_bandeja--ok.png: la columna FOLIO es la única verde de la tabla. El hover de fila (tbody tr:hover td{background:var(--surface-2)}) sí está implementado.",
-        "por_que_importa": "La regla existe porque el verde de enlace dentro de la tabla compite con el verde de --ok de las pastillas de estado y con el de la acción primaria; aquí las tres cosas conviven en la misma vista."
-      },
-      {
-        "id": "f1-52bandeja-07",
-        "severidad": "media",
-        "regla": "§6.11 Tabla densa — regla 9, registros por página",
-        "dice_el_sistema": "«Registros por página elegibles: selector de 10 / 25 / 50 / 100, recordado entre sesiones.»",
-        "hay_en_el_build": "<nav class=\"pag\" aria-label=\"Paginación\"> con «‹ Anteriores», «1» (aria-current=\"page\"), «2» y «Siguientes ›». No hay selector de tamaño de página. Además el pie dice «Mostrando 6 de 36 que pasan los filtros» con sólo dos páginas, lo que no cuadra con seis registros por página.",
-        "selector": "nav.pag, .tfoot",
-        "evidencia": "Markup del pie de la maqueta servida; captura 52_vehicular_bandeja--ok.png, esquina inferior derecha.",
-        "por_que_importa": "Con 300-900 trámites al mes (pp-081) y seis filas por página, revisar la bandeja completa son decenas de clics. El selector de tamaño de página es la forma que el sistema da para eso."
-      },
-      {
-        "id": "f1-52bandeja-08",
-        "severidad": "media",
-        "regla": "§6.7 Esqueleto de carga — imita la forma de lo que va a llegar",
-        "dice_el_sistema": "«Imita la forma de lo que va a llegar: mismas columnas, mismos anchos (en fr) y el mismo alto.»",
-        "hay_en_el_build": "Las seis .sk-fila declaran ocho columnas: style=\"grid-template-columns:140px 22% 150px 16% 15% 15% 110px 110px\" con ocho .skel dentro. La tabla real tiene siete columnas. El <colgroup> de la tabla también declara ocho <col> (el último, width:110px, sin cabecera ni celda que lo ocupe).",
-        "selector": ".state-loading .sk-fila, table > colgroup",
-        "evidencia": "Medición propia con Playwright: colgroup col = 8, thead th = 7, celdas de la primera fila del tbody = 7. El esqueleto reproduce las ocho anchuras del colgroup, no las siete reales. Altura de fila real medida: 74px; el sistema fija --row-comfy en 40px y la hoja declara height:var(--row-comfy) en tbody th,td, que el contenido de dos líneas desborda.",
-        "por_que_importa": "El esqueleto promete una columna que nunca llega, y el <col> huérfano reparte el ancho entre ocho columnas para siete, así que las anchuras declaradas no son las que se aplican. Es un resto de una columna retirada que quedó en dos sitios."
-      },
-      {
-        "id": "f1-52bandeja-09",
-        "severidad": "media",
-        "regla": "§7.3 Objetivos táctiles — el modo dedo se comprueba midiendo",
-        "dice_el_sistema": "«:root[data-tacto=\"dedo\"] .it, :root[data-tacto=\"dedo\"] .iconbtn, :root[data-tacto=\"dedo\"] .btn{min-height:46px}… Se comprueba midiendo con data-tacto=\"dedo\" puesto, no leyendo el archivo.»",
-        "hay_en_el_build": "Las seis reglas sí llevan :root —correcto, a diferencia de 20_tablero y 43— pero van encerradas en @media (pointer:coarse){…}, que el sistema no pone. El documento declara data-tacto=\"dedo\" en <html> desde el inicio, así que el modo está puesto y no hace nada en un equipo con ratón.",
-        "selector": "@media (pointer:coarse){ :root[data-tacto=\"dedo\"] .iconbtn }, html[data-tacto=\"dedo\"]",
-        "evidencia": "Medición propia con data-tacto=\"dedo\" ya presente en el markup: .iconbtn mide 36px y .btn 33px, no 46px. Líneas 294-301 de la maqueta servida: el bloque está dentro de @media (pointer:coarse). Brief: regla_data_tacto_sin_root = 0 (la especificidad sí es correcta).",
-        "por_que_importa": "El modo dedo queda atado al tipo de puntero del dispositivo en vez de a la preferencia declarada, así que no se puede verificar en el navegador tal como §7.3 exige, ni activar en una tableta conectada a ratón."
-      },
-      {
-        "id": "f1-52bandeja-10",
-        "severidad": "media",
-        "regla": "§6.2 Botones — el suelo se declara con min-height",
-        "dice_el_sistema": "«.btn{min-height:36px;padding:8px 14px;gap:8px;font:600 var(--fs-dense)}… el suelo se declara con min-height, no se confía al relleno (medido: 35px y 27px sin él). .btn.mini{min-height:28px;padding:5px 10px}»",
-        "hay_en_el_build": ".btn{…padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);…} sin min-height, y .btn.mini{padding:5px 10px;font-size:var(--fs-meta);min-height:24px} con 24 en vez de 28.",
-        "selector": ".btn, .btn.mini",
-        "evidencia": "Medición propia: altura real de .btn = 33px, tres por debajo del suelo de 36px. CSS líneas 336-342 de la maqueta servida. Es el fallo que §6.2 documenta con sus propias cifras.",
-        "por_que_importa": "«Nuevo trámite» es la acción primaria de la pantalla y no llega al suelo del sistema; su altura depende del relleno y del tamaño de fuente heredado, no de una declaración."
-      },
-      {
-        "id": "f1-52bandeja-11",
-        "severidad": "media",
-        "regla": "§6.7 Esqueleto — prefers-reduced-motion aplana el fondo",
-        "dice_el_sistema": "«animation:none a secas congela el degradado en la posición 0. Correcto: @media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}»",
-        "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}} — sin reponer el fondo. Aparece así en las cuatro maquetas del lote.",
-        "selector": ".skel",
-        "evidencia": "Línea 627 de la maqueta servida; el degradado de .skel es linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%) con background-size:200% 100%.",
-        "por_que_importa": "Con movimiento reducido las seis filas del esqueleto quedan con una banda oscura fija, que se lee como contenido en vez de como espera. Es el fallo que §6.7 documenta."
-      },
-      {
-        "id": "f1-52bandeja-12",
-        "severidad": "media",
-        "regla": "§10 trampa 5 — <symbol> y viewBox repetido",
-        "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio… se pinta 32,5px a la izquierda de su caja… Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal.»",
-        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el logotipo y <svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el botón flotante.",
-        "selector": ".logo > svg > use[href=\"#dproma-mark\"]",
-        "evidencia": "Medición propia con getBoundingClientRect(): svg 44×42, use 43×42, desplazamiento dx = −32px, dy = 0; en el botón flotante dx = −16px. Visible en 52_vehicular_bandeja--ok.png: el isotipo es una astilla verde.",
-        "por_que_importa": "La marca aparece recortada en la cabecera de todas las pantallas del lote. Es el caso medido de §10 trampa 5 reproducido con el mismo desplazamiento."
-      },
-      {
-        "id": "f1-52bandeja-13",
-        "severidad": "baja",
-        "regla": "§6.21 A11y del panel — el panel es role=\"group\", no un menú",
-        "dice_el_sistema": "«El panel es role=\"group\" con su etiqueta, no role=\"dialog\": no atrapa el foco ni oscurece la pantalla.» En §6.14, el menú de acciones sí lleva aria-haspopup=\"menu\".",
-        "hay_en_el_build": "El botón de cada dimensión declara btn.setAttribute('aria-haspopup','true'), que en ARIA equivale a «menu», mientras el panel que abre es un role=\"group\" con una lista de casillas.",
-        "selector": "#filtros .fwrap > button.f[aria-haspopup]",
-        "evidencia": "JS de la barra de filtros de la maqueta servida, función control(); el panel se crea con pop.setAttribute('role','group') y pop.setAttribute('aria-label', d.etiqueta).",
-        "por_que_importa": "El lector de pantalla anuncia «tiene menú» y la persona espera flechas y Escape de menú; lo que encuentra es un grupo de casillas. Debería ser aria-haspopup=\"dialog\" omitido o, mejor, sólo aria-expanded + aria-controls, que es lo que §6.21 pide."
-      },
-      {
-        "id": "f1-52bandeja-14",
-        "severidad": "baja",
-        "regla": "§6.5 Iconos — .msi, Material Symbols Rounded",
-        "dice_el_sistema": "«Todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1)… Siempre aria-hidden=\"true\" y translate=\"no\".»",
-        "hay_en_el_build": "Sprite SVG propio con <symbol id=\"m-…\"> invocado como <svg class=\"ico\" aria-hidden=\"true\" translate=\"no\"><use href=\"#m-schedule\"/></svg>. Los nombres copian los de Material (m-schedule, m-error, m-inbox) pero el dibujo es propio. 0 ocurrencias de .msi; sin <link> a la fuente de iconos.",
-        "selector": ".ico, svg symbol[id^=\"m-\"]",
-        "evidencia": "grep «msi» = 0 y grep «<link» = 0 en la maqueta servida. aria-hidden=\"true\" y translate=\"no\" sí están puestos en todos los iconos de esta pantalla.",
-        "por_que_importa": "Divergencia de familia tipográfica de iconos frente al resto del sistema; a cambio desaparece el riesgo de icon_names que §6.5 documenta. Ver el apartado de cobertura."
-      },
-      {
-        "id": "f1-52bandeja-15",
-        "severidad": "baja",
-        "regla": "§3 Filas de tabla / §6.11 regla 6",
-        "dice_el_sistema": "«--row-comfy = 40px, --row-compact = 32px: son las dos alturas de fila de una tabla densa.» §6.11 regla 6: «Si se ofrece densidad, la compacta reduce contenido, no solo espacio… Y la primera pregunta es si hace falta ofrecerla.»",
-        "hay_en_el_build": "<html data-density=\"comfy\"> está puesto, pero no hay ninguna regla [data-density=\"compact\"] en la hoja ni control para cambiarla. La altura real de fila es 74px, no 40, porque cuatro de las siete celdas llevan dos líneas (cliente+trámite, placa+VIN, plaza+ciudad).",
-        "selector": "html[data-density], tbody th, tbody td",
-        "evidencia": "Medición propia: altura de la primera fila del tbody = 74px. grep «data-density=\"compact\"» en la hoja: 0 reglas. La declaración «tbody th,td{…height:var(--row-comfy)…}» sí está, pero el contenido la desborda.",
-        "por_que_importa": "El atributo data-density queda como declaración muerta, y la tabla «densa» rinde la mitad de filas por pantalla que las que su token de altura promete."
-      }
-    ]
-  },
-  "f3_boost_ui": {
-    "puntuacion": 3,
-    "dimensiones": {
-      "accesibilidad": 2,
-      "rendimiento": "no_evaluado",
-      "theming": 3,
-      "responsive": 3,
-      "integridad": 3
-    },
-    "justificacion": "Accesibilidad 2: la base semántica es buena —caption oculto con position:absolute, th scope=row en las seis filas, landmarks, skip link, lang es-MX, tres regiones aria-live, estados con .tarjeta-estado y <h2> real, Escape que devuelve el foco— pero tiene tres fallos duros que afectan al uso diario: el buscador de 15px dentro de un <div>, el foco que cae al <body> al marcar una casilla de filtro y el panel «Añadir filtro» sin un solo elemento enfocable. Más 0 aria-sort y --text-3 obsoleto. Theming 3: los dos temas completos, conmutador independiente, variantes -bg/-ink por estado bien separadas; baja por --text-3 y por el token paralelo --text-3-fuerte. Responsive 3: modo tarjeta por debajo de 860px con data-et, los tres anchos de barra lateral de §7.2 y la fila de filtros que envuelve; no se midió por debajo de 620px. Integridad 3: ningún token usado sin declarar, sin ids duplicados, sin aria-controls rotos y la barra de filtros de §6.21 implementada casi entera; resta el colgroup de 8 columnas para una tabla de 7 y el esqueleto que copia ese error. Rendimiento no evaluado: maqueta estática sin backend.",
-    "evidencia": [
-      "Playwright: colgroup col=8, thead th=7, celdas de fila=7, ariaSort=0, thRow=6, altura de fila 74px",
-      "Playwright: input#buscar 329×15px dentro de un DIV.search de 33px",
-      "Playwright: tras marcar una casilla del filtro, document.activeElement = BODY",
-      "Playwright: #pop-mas con 2 <label tabindex=-1> y 0 elementos enfocables",
-      "Playwright: idsDuplicados = [], ariaRotos = []; brief: usados_sin_declarar = []",
-      "Playwright con data-tacto=\"dedo\" puesto: .iconbtn 36px, .btn 33px"
-    ]
-  },
-  "f4_nielsen": [
-    {
-      "n": 1,
-      "heuristica": "Visibilidad del estado del sistema",
-      "severidad": 1,
-      "hallazgo": "Muy bien resuelto: «36 trámites en tus plazas, sin filtrar» en la cabecera, «Mostrando 6 de 36 que pasan los filtros», criterio de orden declarado, leyenda de plazo y una región aria-live que anuncia «N filtros aplicados. La lista se ha actualizado.». Resta que el recuento de páginas (2) no cuadre con 36 registros de 6 en 6.",
-      "selector": ".p4-t .resumen, .tfoot, #anuncio-filtros"
-    },
-    {
-      "n": 2,
-      "heuristica": "Correspondencia entre el sistema y el mundo real",
-      "severidad": 0,
-      "hallazgo": "Sin problema. Los estatus son los del trámite real («Recibido, sin admitir», «Ingresado en la dependencia», «Observado») y el plazo se expresa como lo diría la gestora: «−2 d», «queda 1 d», «sin plazo, aún sin admitir».",
-      "selector": "td[data-et=Estatus] .pill, td[data-et=Plazo] .sla"
-    },
-    {
-      "n": 3,
-      "heuristica": "Control y libertad del usuario",
-      "severidad": 1,
-      "hallazgo": "Cada filtro se quita uno a uno con su «×» rotulada, hay «Quitar todos los filtros» y «Limpiar» acotado a su dimensión. Lo que falta es poder deshacer la última acción tras una navegación: el folio sale de la bandeja y no hay forma de volver al mismo conjunto filtrado desde el detalle salvo la miga.",
-      "selector": "#aplicados .fchip .fx, .fquitar"
-    },
-    {
-      "n": 4,
-      "heuristica": "Consistencia y estándares",
-      "severidad": 2,
-      "hallazgo": "El folio va en --link, que el sistema reserva para navegación fuera de tabla, y aria-haspopup=\"true\" anuncia un menú donde hay un grupo de casillas. El resto del vocabulario (.pill, .fwrap, .pop, .tarjeta-estado) sí coincide con el sistema.",
-      "selector": "a.folio, button.f[aria-haspopup]"
-    },
-    {
-      "n": 5,
-      "heuristica": "Prevención de errores",
-      "severidad": 2,
-      "hallazgo": "No hay selección múltiple ni acciones por lote, así que no hay acciones destructivas que prevenir; pero tampoco hay confirmación ni deshacer para nada, y la pantalla no avisa de que el orden fijo por plazo puede esconder registros de otra plaza al final de la segunda página.",
-      "selector": "table, nav.pag"
-    },
-    {
-      "n": 6,
-      "heuristica": "Reconocer antes que recordar",
-      "severidad": 1,
-      "hallazgo": "Cada opción de filtro trae su conteo a la derecha y el estatus viaja al filtro con su misma pastilla, así que no hay que recordar qué significaba cada color. Pierde un punto porque las dimensiones «Trámite» y «Plazo» están escondidas tras «+ Añadir filtro» y no se ve que existen.",
-      "selector": ".pop-l li label .n, button.f.fmas"
-    },
-    {
-      "n": 7,
-      "heuristica": "Flexibilidad y eficiencia de uso",
-      "severidad": 3,
-      "hallazgo": "Ninguna columna se puede ordenar, no hay selección de filas ni acciones por lote, no hay selector de registros por página y no hay ninguna acción por fila: todo trabajo pasa por abrir el expediente uno a uno. Para un volumen de 300-900 trámites al mes es el límite más caro de la pantalla.",
-      "selector": "thead th, nav.pag, tbody tr"
-    },
-    {
-      "n": 8,
-      "heuristica": "Diseño estético y minimalista",
-      "severidad": 0,
-      "hallazgo": "Sin problema. La tabla muestra siete columnas, ningún bloque de texto supera los 140 caracteres y el pie resume en una línea. Es la pantalla más contenida del lote.",
-      "selector": ".lst, .tfoot"
-    },
-    {
-      "n": 9,
-      "heuristica": "Ayudar a reconocer y recuperarse de errores",
-      "severidad": 1,
-      "hallazgo": "La vista de error cumple §6.4 entera: qué pasó, qué no se ha perdido («Ningún trámite cambió de estatus ni se admitió solo»), qué hacer y referencia AV-20260901-1105. La vista vacía distingue «no hay nada» de «los filtros no dejan pasar nada» y ofrece quitarlos.",
-      "selector": ".state-error .tarjeta-estado, .state-empty .tarjeta-estado"
-    },
-    {
-      "n": 10,
-      "heuristica": "Ayuda y documentación",
-      "severidad": 1,
-      "hallazgo": "La leyenda de plazo en el pie explica los cuatro colores, y el panel vacío dice «Ningún valor coincide.». No hay ninguna explicación de qué significa «Observado» frente a «Recibido, sin admitir», que es la distinción que más cuesta; §6.12 regla 9 manda esa razón al detalle, y allí sí está.",
-      "selector": ".leyenda-sla, .pop-vacio"
-    }
-  ],
-  "f5_investigacion": {
-    "pain_points_evaluados": [
-      {
-        "pp": "pp-081",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "cubre",
-        "evidencia": "pp-081 describe 300-900 trámites al mes en hojas de Excel con macros y semáforos compartidas entre usuarios internos y del cliente. La bandeja sustituye el núcleo de ese Excel: semáforo de plazo por fila (.sla verde/amarillo/rojo/gris), estatus con pastilla, plaza, responsable y filtros multidimensionales con conteo por opción. Lo que no sustituye es la parte operativa del Excel: no hay selección de filas, ni edición en lote, ni orden por columna, ni exportación, ni selector de registros por página — con seis filas por página, revisar el mes completo son decenas de pasos."
-      },
-      {
-        "pp": "pp-089",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "cubre",
-        "evidencia": "pp-089 recoge que los dos responsables del área discrepan sobre si la asignación debe ser por persona o por localidad. La bandeja no elige: ofrece «Plaza» y «Responsable» como dos de las tres dimensiones fijas, con «Sin asignar (3)» entre las opciones de responsable. Las dos visiones se pueden trabajar sobre la misma lista."
-      },
-      {
-        "pp": "pp-084",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "cubre",
-        "evidencia": "pp-084 (severidad alta) describe que se pierde al menos un día completo cuando el trámite llega por un canal distinto sin alerta centralizada. La bandeja lo hace visible: el estatus «Recibido, sin admitir» tiene 10 registros y el filtro de Plazo trae «Sin plazo (aún sin admitir) · 10», que es exactamente la cola de días perdidos. Lo que falta para cerrar el dolor es la alerta: nada en la pantalla avisa de cuánto llevan ahí, porque el reloj aún no ha arrancado."
-      },
-      {
-        "pp": "pp-086",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "cubre",
-        "evidencia": "pp-086 (más de 400 grupos de WhatsApp, riesgo de que una solicitud pase desapercibida) queda parcialmente atendido: la bandeja es un canal único donde todo trámite tiene folio, responsable y plazo, y «Sin asignar» es un valor filtrable. No hay, en cambio, ningún indicador de «sin tocar desde hace N días» ni acuse de recepción, que es lo que el grupo de WhatsApp hoy sí da."
-      },
-      {
-        "pp": "pp-085",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "ignora",
-        "evidencia": "pp-085 pide un panel para que el cliente consulte en tiempo real el estatus de sus trámites, con esperas de hasta una hora sin respuesta. La bandeja es estrictamente interna: el ámbito declarado es «tus plazas», no hay vista de cliente, ni enlace compartible, ni columna de cliente filtrable (el cliente aparece como texto dentro de la celda «Cliente y trámite», pero no es una dimensión de filtro)."
-      }
-    ],
-    "usabilidad_para_el_area": "Para administración vehicular esta es la pantalla que más dolor quita del lote: convierte el Excel con semáforos de pp-081 en una lista con estado, plazo y responsable, y mantiene a la vez las dos formas de asignar que pp-089 dice que conviven. La barra de filtros está muy bien resuelta —tres dimensiones a la vista, conteos por opción, pastillas aplicadas con su «×», anuncio por aria-live— y es, de hecho, la implementación más fiel de §6.21 que he visto en el lote. El coste está en el volumen: sin orden por columna, sin selección ni acción por lote, sin registros por página y con seis filas visibles, un equipo que mueve 300-900 trámites al mes trabajará más lento que con su hoja de cálculo para todo lo que no sea consultar un caso. Y tres de los accesos más usados fallan con teclado: el buscador, marcar un segundo valor de filtro y añadir las dimensiones Trámite y Plazo. Nada de esto cubre pp-085, que exige una superficie para el cliente que esta pantalla no es."
-  },
-  "cobertura": [
-    {
-      "patron": "Pastilla de plazo con cuenta atrás firmada (.sla con «−2 d», «queda 1 d», «sin plazo, aún sin admitir»), distinta de la pastilla de estado (.pill) y con una cuarta forma —.sin-reloj, borde discontinuo y sin color— para el registro cuyo plazo no ha arrancado.",
-      "propuesta_de_regla": "§6.10 bis — Marca de plazo. Un plazo es un estado del semáforo pero con magnitud, así que no se expresa con .pill: lleva su propia marca con el signo delante del número («−2 d» vencido, «queda 1 d» por vencer) y hereda del semáforo el fondo -bg y la tinta -ink. El registro sin plazo no se pinta de gris de pausa: se marca con borde discontinuo y sin relleno, porque «sin plazo» no es un estado inactivo sino un reloj que no ha arrancado. La leyenda de las cuatro formas va una sola vez, en el pie de la tabla."
-    },
-    {
-      "patron": "La barra de filtros de §6.21 implementada como un bloque de datos (array FILTROS con id, etiqueta, vacio, fija y opciones con conteo y clase de pastilla) más un constructor genérico, en vez de markup escrito a mano por pantalla.",
-      "propuesta_de_regla": "§6.21 bis — Declaración de la barra de filtros. La barra se declara como datos, no como markup: cada dimensión aporta id, etiqueta, texto del valor por omisión, si es de las tres fijas y sus opciones con conteo y, si procede, la clase de pastilla de §6.10. El constructor es común a todas las pantallas de listado. Dos requisitos que el constructor tiene que cumplir y que esta implementación incumple: repintar la barra sin destruir el nodo que tiene el foco, y que cada opción del panel «+ Añadir filtro» sea un <button>, no una <label> con manejador."
-    },
-    {
-      "patron": "Recuperación del texto truncado: un MutationObserver que compara scrollWidth con clientWidth en cada celda y le pone title con el valor completo sólo cuando de verdad está cortado.",
-      "propuesta_de_regla": "§6.11 bis — Texto cortado con elipsis. La regla 8 de §6.11 exige que «el nombre completo sea accesible al pasar el cursor»; se fija cómo: el title se pone sólo cuando scrollWidth supera clientWidth, se retira cuando deja de haber corte, y se recalcula al redimensionar y al cambiar el contenido. Un title puesto siempre convierte cada celda en una etiqueta emergente que estorba, y uno puesto nunca pierde el dato."
-    }
-  ],
-  "sin_datos": [
-    "f3.rendimiento: maqueta estática, sin backend que perfilar",
-    "§6.13 Barra de selección (.barra-sel): la pantalla no tiene selección de filas —0 casillas en el tbody, 0 .barra-sel, 0 .selfila— así que el componente no aparece y no hay nada que medir contra sus cuatro reglas. Que no exista es un hallazgo de F4 (heurística 7) y de F5 (pp-081), no de cumplimiento de §6.13",
-    "§6.14 Menú de acciones por fila (.iconbtn + .menu): no hay ninguna acción por fila; los dos .iconbtn de la pantalla son el hamburguesa y el conmutador de tema, ambos del cromo. Sin componente que auditar",
-    "§6.12 Resumen de estatus (.resumen + .schip): el CSS de .schip está declarado pero no se usa en el markup. No lo marco como incumplimiento porque §6.12 regla 6 dice literalmente que «el resumen no sobrevive a su propio filtro — si ya hay desplegable de ese campo, la fila de contadores se retira», y la dimensión Estatus sí es uno de los tres filtros fijos. La decisión es correcta; lo que queda es CSS muerto",
-    "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (dialog=0, [role=dialog]=0)",
-    "Contraste de span.et «Trámites vehiculares» (1,09:1) y span.cromo-av «AR» (3,05:1) del brief: el medidor comparó contra el color rgba sin componerlo con la superficie de debajo. Compuestos dan 5,98:1 sobre --chrome y 13,5:1 sobre --surface; no los cuento como fallo de contraste",
-    "Comportamiento por debajo de 620px y del modo tarjeta de 860px: las reglas están escritas y son las canónicas de §6.11, pero sólo se midió a 1440×900"
+ "pantalla": "52_vehicular_bandeja",
+ "ruta_zip": "04-tramites-vehiculares-y-cfe/52_vehicular_bandeja.html",
+ "carpeta": "04-tramites-vehiculares-y-cfe",
+ "area": "administracion vehicular",
+ "arquetipo": "bandeja",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "52_vehicular_bandeja--ok.png",
+  "52_vehicular_bandeja--loading.png",
+  "52_vehicular_bandeja--empty.png",
+  "52_vehicular_bandeja--error.png",
+  "52_vehicular_bandeja--oscuro.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "f1-52bandeja-01",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles / §10 trampa 4",
+    "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8).» §10 trampa 4: «un <input> de búsqueda dentro de un <div> con forma de pastilla no cumple, porque pulsar la pastilla no hace nada. El contenedor tiene que ser una <label for=\"…\">.»",
+    "hay_en_el_build": "<div class=\"search\"><svg class=\"ico ico-sm\">…</svg><input id=\"buscar\" type=\"search\" placeholder=\"Buscar por folio, cliente, placas o VIN…\" aria-label=\"Buscar trámites vehiculares\"></div>. El envoltorio es un <div>, no una <label for=\"buscar\">.",
+    "selector": ".search > input#buscar",
+    "evidencia": "Brief del orquestador: 1 destino bajo 24px — input type=search, 329×15px. Medición propia: el input mide 15px de alto y el .search que lo rodea 33px, pero el envoltorio es un DIV, así que pulsar la pastilla fuera del campo no enfoca nada. Es el caso textual de §10 trampa 4.",
+    "por_que_importa": "El buscador es la primera acción de la pantalla más usada del módulo (300-900 trámites al mes, pp-081) y su destino real de pulsación mide 15px de alto: por debajo del mínimo de WCAG 2.2 2.5.8 que el sistema fija como regla dura."
+   },
+   {
+    "id": "f1-52bandeja-02",
+    "severidad": "alta",
+    "regla": "§6.21 Barra de filtros — «lo no negociable del teclado»",
+    "dice_el_sistema": "«A11y (lo no negociable del teclado): aria-expanded + aria-controls en el botón; al abrir el foco entra en el buscador; Escape cierra y devuelve el foco al botón, no al principio de la página.»",
+    "hay_en_el_build": "Al marcar una casilla del panel, el manejador llama a pinta(), que hace barra.textContent='' y reconstruye la barra entera, incluido el panel abierto. Los nodos originales desaparecen y el foco cae al <body>.",
+    "selector": "#filtros .fwrap .pop input[type=checkbox]",
+    "evidencia": "Medición propia con Playwright: tras p.click en el botón «Plaza», document.activeElement = INPUT/search (correcto). Tras p.check de la primera casilla, document.activeElement = BODY, con el panel todavía abierto y la pastilla «Plaza: Querétaro Centro ×» ya creada. Escape sí devuelve el foco al BUTTON.f (correcto).",
+    "por_que_importa": "Filtrar por más de un valor es el uso normal de este panel. Con teclado, después de marcar la primera casilla hay que volver a tabular desde el principio del documento para marcar la segunda."
+   },
+   {
+    "id": "f1-52bandeja-03",
+    "severidad": "alta",
+    "regla": "§6.21 Estructura del panel / §11 «lo que ejecuta es un <button>»",
+    "dice_el_sistema": "§6.21: «el resto tras un botón + Añadir filtro de borde discontinuo; el añadido queda con su panel ya abierto». §11: «¿Lo que ejecuta es un <button> y lo que navega un <a>?»",
+    "hay_en_el_build": "Las opciones del panel «+ Añadir filtro» se construyen como <label style=\"cursor:pointer\"> con un addEventListener('click'), sin control de formulario dentro y sin tabindex. Al abrir el panel el código hace pop.querySelector('label').focus(), que sobre una <label> no hace nada.",
+    "selector": "#pop-mas .pop-l.pop-menu li > label",
+    "evidencia": "Medición propia con Playwright tras abrir #filtros button.fmas: el panel contiene 2 <label> con tabIndex = −1 y 0 elementos enfocables (button/a/input/[tabindex]); document.activeElement sigue siendo BUTTON.f.fmas.",
+    "por_que_importa": "Las dos dimensiones que no están a la vista —Trámite y Plazo— sólo se pueden añadir con ratón. «Plazo» es justamente la dimensión que separa lo vencido de lo que está en plazo."
+   },
+   {
+    "id": "f1-52bandeja-04",
+    "severidad": "alta",
+    "regla": "§1.1 Superficies y texto — valor de --text-3",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)… No basta con medirlo sobre --surface: si el elemento puede caer sobre --surface-2, se mide también ahí.»",
+    "hay_en_el_build": "--text-3: #66717F en el tema claro, y además un token paralelo no documentado, --text-3-fuerte: #5D6774, usado en los sitios donde el equipo detectó el problema. El valor obsoleto sigue gobernando .p4-t .resumen, .tfoot, .sin-reloj y la pastilla neutra.",
+    "selector": ":root{--text-3}, .p4-t .resumen, .tfoot",
+    "evidencia": "Brief del orquestador: text_3_declarado = «#66717F». Medición propia sobre el archivo servido: coexisten «--text-3: #66717F» y «--text-3-fuerte: #5D6774» en el mismo :root; en oscuro los dos valen #8B96A6.",
+    "por_que_importa": "Hecho ya establecido para 51 de 52 maquetas. Aquí con el agravante de que el equipo diagnosticó el fallo y lo resolvió duplicando el token en vez de corregir el valor canónico, así que el token obsoleto sigue activo y es el que heredará cualquier componente nuevo."
+   },
+   {
+    "id": "f1-52bandeja-05",
+    "severidad": "media",
+    "regla": "§6.11 Tabla densa — regla 3, aria-sort",
+    "dice_el_sistema": "«aria-sort en todas las columnas ordenables, incluidas las que aún no ordenan (aria-sort=\"none\").» El markup canónico lleva <th scope=\"col\" aria-sort=\"none\"><button data-col=\"…\">…<span class=\"msi sort\">arrow_downward</span></button></th>.",
+    "hay_en_el_build": "Los siete <th scope=\"col\"> son texto plano: <th scope=\"col\">Folio</th>, <th scope=\"col\">Cliente y trámite</th>… Ningún aria-sort y ningún botón de orden. El orden está fijado en el pie («los vencidos primero, después por lo que queda de plazo») y no se puede cambiar.",
+    "selector": "table thead th[scope=col]",
+    "evidencia": "Brief del orquestador: th = 13, thAriaSort = 0. Medición propia: thCol = 7, ariaSort = 0, thRow (scope=row) = 6.",
+    "por_que_importa": "Una bandeja de 36 registros en 2 páginas sin ninguna columna ordenable obliga a usar los filtros para todo. Y aunque se decidiera no ordenar, §6.11 pide declarar aria-sort=\"none\" para que el lector de pantalla no anuncie una tabla ordenable que no lo es."
+   },
+   {
+    "id": "f1-52bandeja-06",
+    "severidad": "media",
+    "regla": "§6.11 Tabla densa — regla 10, el identificador de fila no lleva color de enlace",
+    "dice_el_sistema": "«El identificador de fila no lleva color de enlace. --link es para navegación fuera de tabla (migas, «Ver en Maps»). El folio va en --text; lo pulsable lo indica tbody tr:hover td{background:var(--surface-2)}.»",
+    "hay_en_el_build": ".folio{font-variant-numeric:tabular-nums;font-weight:600;color:var(--link);text-decoration:none;white-space:nowrap} y .folio:hover{text-decoration:underline}.",
+    "selector": "tbody th[scope=row] > a.folio",
+    "evidencia": "Medición propia: getComputedStyle(.folio).color = rgb(47, 107, 60), que es exactamente --link (#2F6B3C); el resto de celdas está en rgb(27, 36, 48) = --text. Visible en 52_vehicular_bandeja--ok.png: la columna FOLIO es la única verde de la tabla. El hover de fila (tbody tr:hover td{background:var(--surface-2)}) sí está implementado.",
+    "por_que_importa": "La regla existe porque el verde de enlace dentro de la tabla compite con el verde de --ok de las pastillas de estado y con el de la acción primaria; aquí las tres cosas conviven en la misma vista."
+   },
+   {
+    "id": "f1-52bandeja-07",
+    "severidad": "media",
+    "regla": "§6.11 Tabla densa — regla 9, registros por página",
+    "dice_el_sistema": "«Registros por página elegibles: selector de 10 / 25 / 50 / 100, recordado entre sesiones.»",
+    "hay_en_el_build": "<nav class=\"pag\" aria-label=\"Paginación\"> con «‹ Anteriores», «1» (aria-current=\"page\"), «2» y «Siguientes ›». No hay selector de tamaño de página. Además el pie dice «Mostrando 6 de 36 que pasan los filtros» con sólo dos páginas, lo que no cuadra con seis registros por página.",
+    "selector": "nav.pag, .tfoot",
+    "evidencia": "Markup del pie de la maqueta servida; captura 52_vehicular_bandeja--ok.png, esquina inferior derecha.",
+    "por_que_importa": "Con 300-900 trámites al mes (pp-081) y seis filas por página, revisar la bandeja completa son decenas de clics. El selector de tamaño de página es la forma que el sistema da para eso."
+   },
+   {
+    "id": "f1-52bandeja-08",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga — imita la forma de lo que va a llegar",
+    "dice_el_sistema": "«Imita la forma de lo que va a llegar: mismas columnas, mismos anchos (en fr) y el mismo alto.»",
+    "hay_en_el_build": "Las seis .sk-fila declaran ocho columnas: style=\"grid-template-columns:140px 22% 150px 16% 15% 15% 110px 110px\" con ocho .skel dentro. La tabla real tiene siete columnas. El <colgroup> de la tabla también declara ocho <col> (el último, width:110px, sin cabecera ni celda que lo ocupe).",
+    "selector": ".state-loading .sk-fila, table > colgroup",
+    "evidencia": "Medición propia con Playwright: colgroup col = 8, thead th = 7, celdas de la primera fila del tbody = 7. El esqueleto reproduce las ocho anchuras del colgroup, no las siete reales. Altura de fila real medida: 74px; el sistema fija --row-comfy en 40px y la hoja declara height:var(--row-comfy) en tbody th,td, que el contenido de dos líneas desborda.",
+    "por_que_importa": "El esqueleto promete una columna que nunca llega, y el <col> huérfano reparte el ancho entre ocho columnas para siete, así que las anchuras declaradas no son las que se aplican. Es un resto de una columna retirada que quedó en dos sitios."
+   },
+   {
+    "id": "f1-52bandeja-09",
+    "severidad": "media",
+    "regla": "§7.3 Objetivos táctiles — el modo dedo se comprueba midiendo",
+    "dice_el_sistema": "«:root[data-tacto=\"dedo\"] .it, :root[data-tacto=\"dedo\"] .iconbtn, :root[data-tacto=\"dedo\"] .btn{min-height:46px}… Se comprueba midiendo con data-tacto=\"dedo\" puesto, no leyendo el archivo.»",
+    "hay_en_el_build": "Las seis reglas sí llevan :root —correcto, a diferencia de 20_tablero y 43— pero van encerradas en @media (pointer:coarse){…}, que el sistema no pone. El documento declara data-tacto=\"dedo\" en <html> desde el inicio, así que el modo está puesto y no hace nada en un equipo con ratón.",
+    "selector": "@media (pointer:coarse){ :root[data-tacto=\"dedo\"] .iconbtn }, html[data-tacto=\"dedo\"]",
+    "evidencia": "Medición propia con data-tacto=\"dedo\" ya presente en el markup: .iconbtn mide 36px y .btn 33px, no 46px. Líneas 294-301 de la maqueta servida: el bloque está dentro de @media (pointer:coarse). Brief: regla_data_tacto_sin_root = 0 (la especificidad sí es correcta).",
+    "por_que_importa": "El modo dedo queda atado al tipo de puntero del dispositivo en vez de a la preferencia declarada, así que no se puede verificar en el navegador tal como §7.3 exige, ni activar en una tableta conectada a ratón."
+   },
+   {
+    "id": "f1-52bandeja-10",
+    "severidad": "media",
+    "regla": "§6.2 Botones — el suelo se declara con min-height",
+    "dice_el_sistema": "«.btn{min-height:36px;padding:8px 14px;gap:8px;font:600 var(--fs-dense)}… el suelo se declara con min-height, no se confía al relleno (medido: 35px y 27px sin él). .btn.mini{min-height:28px;padding:5px 10px}»",
+    "hay_en_el_build": ".btn{…padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);…} sin min-height, y .btn.mini{padding:5px 10px;font-size:var(--fs-meta);min-height:24px} con 24 en vez de 28.",
+    "selector": ".btn, .btn.mini",
+    "evidencia": "Medición propia: altura real de .btn = 33px, tres por debajo del suelo de 36px. CSS líneas 336-342 de la maqueta servida. Es el fallo que §6.2 documenta con sus propias cifras.",
+    "por_que_importa": "«Nuevo trámite» es la acción primaria de la pantalla y no llega al suelo del sistema; su altura depende del relleno y del tamaño de fuente heredado, no de una declaración."
+   },
+   {
+    "id": "f1-52bandeja-11",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto — prefers-reduced-motion aplana el fondo",
+    "dice_el_sistema": "«animation:none a secas congela el degradado en la posición 0. Correcto: @media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}»",
+    "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}} — sin reponer el fondo. Aparece así en las cuatro maquetas del lote.",
+    "selector": ".skel",
+    "evidencia": "Línea 627 de la maqueta servida; el degradado de .skel es linear-gradient(90deg,var(--surface-2) 25%,var(--border) 50%,var(--surface-2) 75%) con background-size:200% 100%.",
+    "por_que_importa": "Con movimiento reducido las seis filas del esqueleto quedan con una banda oscura fija, que se lee como contenido en vez de como espera. Es el fallo que §6.7 documenta."
+   },
+   {
+    "id": "f1-52bandeja-12",
+    "severidad": "media",
+    "regla": "§10 trampa 5 — <symbol> y viewBox repetido",
+    "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio… se pinta 32,5px a la izquierda de su caja… Se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal.»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el logotipo y <svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el botón flotante.",
+    "selector": ".logo > svg > use[href=\"#dproma-mark\"]",
+    "evidencia": "Medición propia con getBoundingClientRect(): svg 44×42, use 43×42, desplazamiento dx = −32px, dy = 0; en el botón flotante dx = −16px. Visible en 52_vehicular_bandeja--ok.png: el isotipo es una astilla verde.",
+    "por_que_importa": "La marca aparece recortada en la cabecera de todas las pantallas del lote. Es el caso medido de §10 trampa 5 reproducido con el mismo desplazamiento."
+   },
+   {
+    "id": "f1-52bandeja-13",
+    "severidad": "baja",
+    "regla": "§6.21 A11y del panel — el panel es role=\"group\", no un menú",
+    "dice_el_sistema": "«El panel es role=\"group\" con su etiqueta, no role=\"dialog\": no atrapa el foco ni oscurece la pantalla.» En §6.14, el menú de acciones sí lleva aria-haspopup=\"menu\".",
+    "hay_en_el_build": "El botón de cada dimensión declara btn.setAttribute('aria-haspopup','true'), que en ARIA equivale a «menu», mientras el panel que abre es un role=\"group\" con una lista de casillas.",
+    "selector": "#filtros .fwrap > button.f[aria-haspopup]",
+    "evidencia": "JS de la barra de filtros de la maqueta servida, función control(); el panel se crea con pop.setAttribute('role','group') y pop.setAttribute('aria-label', d.etiqueta).",
+    "por_que_importa": "El lector de pantalla anuncia «tiene menú» y la persona espera flechas y Escape de menú; lo que encuentra es un grupo de casillas. Debería ser aria-haspopup=\"dialog\" omitido o, mejor, sólo aria-expanded + aria-controls, que es lo que §6.21 pide."
+   },
+   {
+    "id": "f1-52bandeja-14",
+    "severidad": "baja",
+    "regla": "§6.5 Iconos — .msi, Material Symbols Rounded",
+    "dice_el_sistema": "«Todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1)… Siempre aria-hidden=\"true\" y translate=\"no\".»",
+    "hay_en_el_build": "Sprite SVG propio con <symbol id=\"m-…\"> invocado como <svg class=\"ico\" aria-hidden=\"true\" translate=\"no\"><use href=\"#m-schedule\"/></svg>. Los nombres copian los de Material (m-schedule, m-error, m-inbox) pero el dibujo es propio. 0 ocurrencias de .msi; sin <link> a la fuente de iconos.",
+    "selector": ".ico, svg symbol[id^=\"m-\"]",
+    "evidencia": "grep «msi» = 0 y grep «<link» = 0 en la maqueta servida. aria-hidden=\"true\" y translate=\"no\" sí están puestos en todos los iconos de esta pantalla.",
+    "por_que_importa": "Divergencia de familia tipográfica de iconos frente al resto del sistema; a cambio desaparece el riesgo de icon_names que §6.5 documenta. Ver el apartado de cobertura."
+   },
+   {
+    "id": "f1-52bandeja-15",
+    "severidad": "baja",
+    "regla": "§3 Filas de tabla / §6.11 regla 6",
+    "dice_el_sistema": "«--row-comfy = 40px, --row-compact = 32px: son las dos alturas de fila de una tabla densa.» §6.11 regla 6: «Si se ofrece densidad, la compacta reduce contenido, no solo espacio… Y la primera pregunta es si hace falta ofrecerla.»",
+    "hay_en_el_build": "<html data-density=\"comfy\"> está puesto, pero no hay ninguna regla [data-density=\"compact\"] en la hoja ni control para cambiarla. La altura real de fila es 74px, no 40, porque cuatro de las siete celdas llevan dos líneas (cliente+trámite, placa+VIN, plaza+ciudad).",
+    "selector": "html[data-density], tbody th, tbody td",
+    "evidencia": "Medición propia: altura de la primera fila del tbody = 74px. grep «data-density=\"compact\"» en la hoja: 0 reglas. La declaración «tbody th,td{…height:var(--row-comfy)…}» sí está, pero el contenido la desborda.",
+    "por_que_importa": "El atributo data-density queda como declaración muerta, y la tabla «densa» rinde la mitad de filas por pantalla que las que su token de altura promete."
+   }
   ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 3
+  },
+  "justificacion": "Accesibilidad 2: la base semántica es buena —caption oculto con position:absolute, th scope=row en las seis filas, landmarks, skip link, lang es-MX, tres regiones aria-live, estados con .tarjeta-estado y <h2> real, Escape que devuelve el foco— pero tiene tres fallos duros que afectan al uso diario: el buscador de 15px dentro de un <div>, el foco que cae al <body> al marcar una casilla de filtro y el panel «Añadir filtro» sin un solo elemento enfocable. Más 0 aria-sort y --text-3 obsoleto. Theming 3: los dos temas completos, conmutador independiente, variantes -bg/-ink por estado bien separadas; baja por --text-3 y por el token paralelo --text-3-fuerte. Responsive 3: modo tarjeta por debajo de 860px con data-et, los tres anchos de barra lateral de §7.2 y la fila de filtros que envuelve; no se midió por debajo de 620px. Integridad 3: ningún token usado sin declarar, sin ids duplicados, sin aria-controls rotos y la barra de filtros de §6.21 implementada casi entera; resta el colgroup de 8 columnas para una tabla de 7 y el esqueleto que copia ese error. Rendimiento no evaluado: maqueta estática sin backend.",
+  "evidencia": [
+   "Playwright: colgroup col=8, thead th=7, celdas de fila=7, ariaSort=0, thRow=6, altura de fila 74px",
+   "Playwright: input#buscar 329×15px dentro de un DIV.search de 33px",
+   "Playwright: tras marcar una casilla del filtro, document.activeElement = BODY",
+   "Playwright: #pop-mas con 2 <label tabindex=-1> y 0 elementos enfocables",
+   "Playwright: idsDuplicados = [], ariaRotos = []; brief: usados_sin_declarar = []",
+   "Playwright con data-tacto=\"dedo\" puesto: .iconbtn 36px, .btn 33px"
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 1,
+   "hallazgo": "Muy bien resuelto: «36 trámites en tus plazas, sin filtrar» en la cabecera, «Mostrando 6 de 36 que pasan los filtros», criterio de orden declarado, leyenda de plazo y una región aria-live que anuncia «N filtros aplicados. La lista se ha actualizado.». Resta que el recuento de páginas (2) no cuadre con 36 registros de 6 en 6.",
+   "selector": ".p4-t .resumen, .tfoot, #anuncio-filtros"
+  },
+  {
+   "n": 2,
+   "heuristica": "Correspondencia entre el sistema y el mundo real",
+   "severidad": 0,
+   "hallazgo": "Sin problema. Los estatus son los del trámite real («Recibido, sin admitir», «Ingresado en la dependencia», «Observado») y el plazo se expresa como lo diría la gestora: «−2 d», «queda 1 d», «sin plazo, aún sin admitir».",
+   "selector": "td[data-et=Estatus] .pill, td[data-et=Plazo] .sla"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 1,
+   "hallazgo": "Cada filtro se quita uno a uno con su «×» rotulada, hay «Quitar todos los filtros» y «Limpiar» acotado a su dimensión. Lo que falta es poder deshacer la última acción tras una navegación: el folio sale de la bandeja y no hay forma de volver al mismo conjunto filtrado desde el detalle salvo la miga.",
+   "selector": "#aplicados .fchip .fx, .fquitar"
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 2,
+   "hallazgo": "El folio va en --link, que el sistema reserva para navegación fuera de tabla, y aria-haspopup=\"true\" anuncia un menú donde hay un grupo de casillas. El resto del vocabulario (.pill, .fwrap, .pop, .tarjeta-estado) sí coincide con el sistema.",
+   "selector": "a.folio, button.f[aria-haspopup]"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 2,
+   "hallazgo": "No hay selección múltiple ni acciones por lote, así que no hay acciones destructivas que prevenir; pero tampoco hay confirmación ni deshacer para nada, y la pantalla no avisa de que el orden fijo por plazo puede esconder registros de otra plaza al final de la segunda página.",
+   "selector": "table, nav.pag"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocer antes que recordar",
+   "severidad": 1,
+   "hallazgo": "Cada opción de filtro trae su conteo a la derecha y el estatus viaja al filtro con su misma pastilla, así que no hay que recordar qué significaba cada color. Pierde un punto porque las dimensiones «Trámite» y «Plazo» están escondidas tras «+ Añadir filtro» y no se ve que existen.",
+   "selector": ".pop-l li label .n, button.f.fmas"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 3,
+   "hallazgo": "Ninguna columna se puede ordenar, no hay selección de filas ni acciones por lote, no hay selector de registros por página y no hay ninguna acción por fila: todo trabajo pasa por abrir el expediente uno a uno. Para un volumen de 300-900 trámites al mes es el límite más caro de la pantalla.",
+   "selector": "thead th, nav.pag, tbody tr"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 0,
+   "hallazgo": "Sin problema. La tabla muestra siete columnas, ningún bloque de texto supera los 140 caracteres y el pie resume en una línea. Es la pantalla más contenida del lote.",
+   "selector": ".lst, .tfoot"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer y recuperarse de errores",
+   "severidad": 1,
+   "hallazgo": "La vista de error cumple §6.4 entera: qué pasó, qué no se ha perdido («Ningún trámite cambió de estatus ni se admitió solo»), qué hacer y referencia AV-20260901-1105. La vista vacía distingue «no hay nada» de «los filtros no dejan pasar nada» y ofrece quitarlos.",
+   "selector": ".state-error .tarjeta-estado, .state-empty .tarjeta-estado"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 1,
+   "hallazgo": "La leyenda de plazo en el pie explica los cuatro colores, y el panel vacío dice «Ningún valor coincide.». No hay ninguna explicación de qué significa «Observado» frente a «Recibido, sin admitir», que es la distinción que más cuesta; §6.12 regla 9 manda esa razón al detalle, y allí sí está.",
+   "selector": ".leyenda-sla, .pop-vacio"
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-081",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-081 describe 300-900 trámites al mes en hojas de Excel con macros y semáforos compartidas entre usuarios internos y del cliente. La bandeja sustituye el núcleo de ese Excel: semáforo de plazo por fila (.sla verde/amarillo/rojo/gris), estatus con pastilla, plaza, responsable y filtros multidimensionales con conteo por opción. Lo que no sustituye es la parte operativa del Excel: no hay selección de filas, ni edición en lote, ni orden por columna, ni exportación, ni selector de registros por página — con seis filas por página, revisar el mes completo son decenas de pasos."
+   },
+   {
+    "pp": "pp-089",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-089 recoge que los dos responsables del área discrepan sobre si la asignación debe ser por persona o por localidad. La bandeja no elige: ofrece «Plaza» y «Responsable» como dos de las tres dimensiones fijas, con «Sin asignar (3)» entre las opciones de responsable. Las dos visiones se pueden trabajar sobre la misma lista."
+   },
+   {
+    "pp": "pp-084",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-084 (severidad alta) describe que se pierde al menos un día completo cuando el trámite llega por un canal distinto sin alerta centralizada. La bandeja lo hace visible: el estatus «Recibido, sin admitir» tiene 10 registros y el filtro de Plazo trae «Sin plazo (aún sin admitir) · 10», que es exactamente la cola de días perdidos. Lo que falta para cerrar el dolor es la alerta: nada en la pantalla avisa de cuánto llevan ahí, porque el reloj aún no ha arrancado."
+   },
+   {
+    "pp": "pp-086",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-086 (más de 400 grupos de WhatsApp, riesgo de que una solicitud pase desapercibida) queda parcialmente atendido: la bandeja es un canal único donde todo trámite tiene folio, responsable y plazo, y «Sin asignar» es un valor filtrable. No hay, en cambio, ningún indicador de «sin tocar desde hace N días» ni acuse de recepción, que es lo que el grupo de WhatsApp hoy sí da."
+   },
+   {
+    "pp": "pp-085",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-085 pide un panel para que el cliente consulte en tiempo real el estatus de sus trámites, con esperas de hasta una hora sin respuesta. La bandeja es estrictamente interna: el ámbito declarado es «tus plazas», no hay vista de cliente, ni enlace compartible, ni columna de cliente filtrable (el cliente aparece como texto dentro de la celda «Cliente y trámite», pero no es una dimensión de filtro)."
+   }
+  ],
+  "usabilidad_para_el_area": "Para administración vehicular esta es la pantalla que más dolor quita del lote: convierte el Excel con semáforos de pp-081 en una lista con estado, plazo y responsable, y mantiene a la vez las dos formas de asignar que pp-089 dice que conviven. La barra de filtros está muy bien resuelta —tres dimensiones a la vista, conteos por opción, pastillas aplicadas con su «×», anuncio por aria-live— y es, de hecho, la implementación más fiel de §6.21 que he visto en el lote. El coste está en el volumen: sin orden por columna, sin selección ni acción por lote, sin registros por página y con seis filas visibles, un equipo que mueve 300-900 trámites al mes trabajará más lento que con su hoja de cálculo para todo lo que no sea consultar un caso. Y tres de los accesos más usados fallan con teclado: el buscador, marcar un segundo valor de filtro y añadir las dimensiones Trámite y Plazo. Nada de esto cubre pp-085, que exige una superficie para el cliente que esta pantalla no es."
+ },
+ "cobertura": [
+  {
+   "patron": "Pastilla de plazo con cuenta atrás firmada (.sla con «−2 d», «queda 1 d», «sin plazo, aún sin admitir»), distinta de la pastilla de estado (.pill) y con una cuarta forma —.sin-reloj, borde discontinuo y sin color— para el registro cuyo plazo no ha arrancado.",
+   "propuesta_de_regla": "§6.10 bis — Marca de plazo. Un plazo es un estado del semáforo pero con magnitud, así que no se expresa con .pill: lleva su propia marca con el signo delante del número («−2 d» vencido, «queda 1 d» por vencer) y hereda del semáforo el fondo -bg y la tinta -ink. El registro sin plazo no se pinta de gris de pausa: se marca con borde discontinuo y sin relleno, porque «sin plazo» no es un estado inactivo sino un reloj que no ha arrancado. La leyenda de las cuatro formas va una sola vez, en el pie de la tabla."
+  },
+  {
+   "patron": "La barra de filtros de §6.21 implementada como un bloque de datos (array FILTROS con id, etiqueta, vacio, fija y opciones con conteo y clase de pastilla) más un constructor genérico, en vez de markup escrito a mano por pantalla.",
+   "propuesta_de_regla": "§6.21 bis — Declaración de la barra de filtros. La barra se declara como datos, no como markup: cada dimensión aporta id, etiqueta, texto del valor por omisión, si es de las tres fijas y sus opciones con conteo y, si procede, la clase de pastilla de §6.10. El constructor es común a todas las pantallas de listado. Dos requisitos que el constructor tiene que cumplir y que esta implementación incumple: repintar la barra sin destruir el nodo que tiene el foco, y que cada opción del panel «+ Añadir filtro» sea un <button>, no una <label> con manejador."
+  },
+  {
+   "patron": "Recuperación del texto truncado: un MutationObserver que compara scrollWidth con clientWidth en cada celda y le pone title con el valor completo sólo cuando de verdad está cortado.",
+   "propuesta_de_regla": "§6.11 bis — Texto cortado con elipsis. La regla 8 de §6.11 exige que «el nombre completo sea accesible al pasar el cursor»; se fija cómo: el title se pone sólo cuando scrollWidth supera clientWidth, se retira cuando deja de haber corte, y se recalcula al redimensionar y al cambiar el contenido. Un title puesto siempre convierte cada celda en una etiqueta emergente que estorba, y uno puesto nunca pierde el dato."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática, sin backend que perfilar",
+  "§6.13 Barra de selección (.barra-sel): la pantalla no tiene selección de filas —0 casillas en el tbody, 0 .barra-sel, 0 .selfila— así que el componente no aparece y no hay nada que medir contra sus cuatro reglas. Que no exista es un hallazgo de F4 (heurística 7) y de F5 (pp-081), no de cumplimiento de §6.13",
+  "§6.14 Menú de acciones por fila (.iconbtn + .menu): no hay ninguna acción por fila; los dos .iconbtn de la pantalla son el hamburguesa y el conmutador de tema, ambos del cromo. Sin componente que auditar",
+  "§6.12 Resumen de estatus (.resumen + .schip): el CSS de .schip está declarado pero no se usa en el markup. No lo marco como incumplimiento porque §6.12 regla 6 dice literalmente que «el resumen no sobrevive a su propio filtro — si ya hay desplegable de ese campo, la fila de contadores se retira», y la dimensión Estatus sí es uno de los tres filtros fijos. La decisión es correcta; lo que queda es CSS muerto",
+  "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (dialog=0, [role=dialog]=0)",
+  "Contraste de span.et «Trámites vehiculares» (1,09:1) y span.cromo-av «AR» (3,05:1) del brief: el medidor comparó contra el color rgba sin componerlo con la superficie de debajo. Compuestos dan 5,98:1 sobre --chrome y 13,5:1 sobre --surface; no los cuento como fallo de contraste",
+  "Comportamiento por debajo de 620px y del modo tarjeta de 860px: las reglas están escritas y son las canónicas de §6.11, pero sólo se midió a 1440×900"
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-ctrl",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--on-state",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-5",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--text-3-fuerte",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-ctrl",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--on-state",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--text-3-fuerte",
+   "--velo-modal",
+   "--velo-suave",
+   "--warn",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [],
+  "declarados_no_usados": [
+   "--block",
+   "--block-fill",
+   "--border-fuerte",
+   "--dur-enter",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--fs-kpi",
+   "--glass",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--sp-12",
+   "--sp-5",
+   "--stagger",
+   "--velo-trama",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--border-ctrl",
+    "canonico": "rgba(27,36,48,.5)",
+    "declara": "rgba(27,36,48,.50)"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 87,
+  "n_usados": 70,
+  "n_divergentes": 16,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": true,
+   "filas": 6,
+   "nodosText3": 0
+  }
+ }
 }

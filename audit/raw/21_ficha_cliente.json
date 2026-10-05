@@ -1,306 +1,573 @@
 {
-  "pantalla": "21_ficha_cliente",
-  "ruta_zip": "02-padron-de-clientes/21_ficha_cliente.html",
-  "carpeta": "02-padron-de-clientes",
-  "area": "comercial",
-  "arquetipo": "detalle",
-  "modo": "cumplimiento",
-  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
-  "capturas": [
-    "21_ficha_cliente--ok.png",
-    "21_ficha_cliente--loading.png",
-    "21_ficha_cliente--empty.png",
-    "21_ficha_cliente--error.png",
-    "21_ficha_cliente--oscuro.png"
-  ],
-  "f1_cumplimiento": {
-    "veredicto": "no_cumple",
-    "hallazgos": [
-      {
-        "id": "f1-21ficha-01",
-        "severidad": "alta",
-        "regla": "§7.3 Objetivos táctiles — enlaces primarios de fila",
-        "dice_el_sistema": "Enlaces que son el elemento primario de su fila (folio, miga, «Ver en Maps»): no son texto en prosa, llevan padding hasta llegar a 24px.",
-        "hay_en_el_build": "`.folio{font-variant-numeric:tabular-nums;font-weight:600;color:var(--link);text-decoration:none;white-space:nowrap}`, `.maps{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-meta);color:var(--link);…}` y `.migas a{color:var(--link);text-decoration:none;font-weight:600;border-radius:4px}` — ninguno declara `padding` ni `min-height`.",
-        "selector": "a.folio, a.maps, .migas a",
-        "evidencia": "Brief MEDIDO: 8 de 61 destinos por debajo de 24px, y son exactamente los tres casos que §7.3 nombra: la miga «Padrón de clientes» a 126×14, tres «Ver en Maps» a 101,5×14 y cuatro folios (`TV-2026-01188`, `TV-2026-01204`, `TV-2026-01251`, `ORD-202608-0417`) a 110-133×15.",
-        "por_que_importa": "§7.3 escribe esta excepción con estos tres ejemplos porque son los que se pulsan para salir de la ficha: la miga para volver al padrón, el folio para abrir el trámite, «Ver en Maps» para ir a la dirección. Los tres miden 14-15px de alto, poco más de la mitad del mínimo de WCAG 2.5.8."
-      },
-      {
-        "id": "f1-21ficha-02",
-        "severidad": "alta",
-        "regla": "§6.4 Vistas de estado de una pantalla",
-        "dice_el_sistema": "(1) el cambio se anuncia (`aria-live=\"polite\"`) y mueve el foco; (2) cada estado lleva encabezado real, no un `<b>`; §11: los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo. `.tarjeta-estado{max-width:480px;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)}`, `.estado-ico{52px;border-radius:50%}`.",
-        "hay_en_el_build": "`.state{display:none;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-2);padding:56px 16px}`, `.state .ico{width:30px;height:30px;color:var(--text-3)}` y `.state b{font-size:var(--fs-base)}`. El manejador de cambio de vista solo escribe `data-state` y, para el estado inactivo, `data-ficha`.",
-        "selector": ".state.state-error, .state.state-empty, main#contenido",
-        "evidencia": "Medición propia: 0 ocurrencias de `tarjeta-estado` o `estado-ico`; 0 atributos `aria-live` en todo el documento (los dos `role=\"status\"` que hay están en los contenedores del esqueleto); el manejador no llama a `focus()` ni escribe texto en ninguna región viva. `--r-modal` figura entre los declarados y no usados (brief). Capturas --empty.png y --error.png.",
-        "por_que_importa": "La ficha es la pantalla desde la que se decide si un cliente puede facturar; si el servidor falla, quien usa lector de pantalla no recibe ningún aviso y el foco se queda sobre un botón que ya no existe."
-      },
-      {
-        "id": "f1-21ficha-03",
-        "severidad": "alta",
-        "regla": "§11 — todos los `id` únicos",
-        "dice_el_sistema": "Todos los `id` únicos, y cada `aria-describedby`/`aria-controls` apunta a algo que existe.",
-        "hay_en_el_build": "Cuatro `id` repetidos dos veces cada uno, porque el bloque de listas del contacto se duplica para el segundo contacto sin renumerar: `tope-CORREO` (líneas 841 y 894), `tope-TELEFONO` (852 y 901), `l-DIRECCION-16` (854 y 903) y `tope-DIRECCION` (859 y 908).",
-        "selector": "#tope-CORREO, #tope-TELEFONO, #l-DIRECCION-16, #tope-DIRECCION",
-        "evidencia": "Medición propia recorriendo todos los `[id]` del documento: los cuatro aparecen con cuenta 2. `l-DIRECCION-16` es además el destino de un `aria-labelledby` de `<section class=\"lista\">`, que por tanto nombra las dos secciones con el mismo elemento.",
-        "por_que_importa": "La segunda lista de direcciones toma el nombre accesible de la primera: en el árbol de accesibilidad los dos contactos tienen secciones con idéntico rótulo y el cupo «Hasta 4» queda referido al bloque equivocado."
-      },
-      {
-        "id": "f1-21ficha-04",
-        "severidad": "alta",
-        "regla": "§7.3 Objetivos táctiles — modo dedo",
-        "dice_el_sistema": "El `:root` es lo que hace ganar la regla: sin él, la empata cualquier variante de tamaño del componente que vaya después. Se comprueba midiendo con `data-tacto=\"dedo\"` puesto.",
-        "hay_en_el_build": "Las seis reglas `[data-tacto=\"dedo\"] …` se escriben sin `:root`, y `.acciones .iconbtn{width:28px;height:28px}` va después.",
-        "selector": "[data-tacto=\"dedo\"] .iconbtn vs .acciones .iconbtn",
-        "evidencia": "Medición propia con Playwright: con `data-tacto=\"dedo\"` puesto en el `<html>`, 14 de los 17 `.iconbtn` siguen midiendo 28px (mínimo medido 28px). Brief: regla_data_tacto_sin_root = 6.",
-        "por_que_importa": "Los botones de editar de cada correo, teléfono y dirección —que son casi todos los `.iconbtn` de la ficha— no crecen en modo dedo."
-      },
-      {
-        "id": "f1-21ficha-05",
-        "severidad": "media",
-        "regla": "§6.19 Botón-icono / §6.5 Iconos",
-        "dice_el_sistema": "Nunca viaja solo: `title` + `aria-label`. §6.5: si va sin texto visible, lleva como mínimo etiqueta emergente y `aria-label`.",
-        "hay_en_el_build": "Los 17 `.iconbtn` llevan `aria-label` que nombra el dato concreto («Editar rosalia.mq@verticebajio.example»), pero ninguno lleva `title`.",
-        "selector": ".iconbtn",
-        "evidencia": "Medición propia: 17 `.iconbtn`, 17 sin `title`, 0 sin `aria-label`.",
-        "por_que_importa": "La ficha tiene un lápiz por cada correo, teléfono y dirección; sin etiqueta emergente, quien usa ratón no distingue el lápiz de «editar este correo» del de «editar datos fiscales»."
-      },
-      {
-        "id": "f1-21ficha-06",
-        "severidad": "alta",
-        "regla": "§2.1 Suelo tipográfico / §6.10 Etiquetas",
-        "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» Única excepción: 10,5px en mayúsculas con `letter-spacing` para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta. §6.10: `.pill` y `.p-type` a `font-size:var(--fs-meta)` (12px).",
-        "hay_en_el_build": "28 declaraciones de tamaño bajo 12px, entre ellas `.pill`/`.p-type` a 11px, `.ctrl .ayuda{font-size:11px}`, `.ctrl .mal{font-size:11px}` (el mensaje de error de campo), `.state .ref{font-size:11px}` (la referencia del error), `.princ .et{font-size:10.5px}` y la forma abreviada `font:700 11px var(--font-ui)` del avatar.",
-        "selector": ".pill, .p-type, .ctrl .ayuda, .ctrl .mal, .state .ref, .princ .et",
-        "evidencia": "Medición propia con el estilo calculado (§10 trampa 1): 46 nodos de texto bajo 12px en la vista con datos; 28 declaraciones `font-size:1[01](.5)?px` / `font:… 11px` en el `<style>`. `--fs-meta` está correctamente declarado a 12px y simplemente no se usa en esos componentes.",
-        "por_que_importa": "Dos de los textos bajo el suelo son el mensaje de error de un campo (`.mal`) y la referencia del fallo (`.ref`): justo lo que hay que poder leer cuando algo va mal."
-      },
-      {
-        "id": "f1-21ficha-07",
-        "severidad": "alta",
-        "regla": "§1.7 Ratios de contraste mínimos / §6.10 `.p-type`",
-        "dice_el_sistema": "Texto normal: 4,5:1, medido contra los fondos donde va a aparecer, en los dos temas.",
-        "hay_en_el_build": "`.p-type` con `color:var(--text-2)` (#4C5A6B) sobre `color-mix(in srgb,var(--serie-N) 16%,var(--surface))`.",
-        "selector": "span.p-type.p-s1 («Empresa»), span.p-type.p-s2 («Grupo Automotriz Vértice»)",
-        "evidencia": "Brief MEDIDO: ambas a 2,97:1, mínimo 4,5. Mi barrido propio, compositando el alfa de toda la cadena de ancestros, confirma estas dos como los únicos fallos reales de contraste de la pantalla en tema claro: los otros seis que el brief lista (`span.et` del cromo, `span.cromo-av`, `.et`/`.quien`/`.rol`/`.av` de la tarjeta de contacto principal) salen de medir el `rgba` de `--accent-soft` sin componerlo sobre `--surface`; compuestos dan 13,38:1 (`.quien`, `.av`, `.cromo-av`) y 6,02:1 (`.rol`, `.princ .et`) en claro, y 11,44:1 / 6,40:1 en oscuro.",
-        "por_que_importa": "Las dos etiquetas que dicen qué es el cliente —empresa y a qué grupo pertenece— están bajo el mínimo, y en la ficha son la primera línea de identidad del expediente."
-      },
-      {
-        "id": "f1-21ficha-08",
-        "severidad": "alta",
-        "regla": "§1.1 Superficies y texto — `--text-3`",
-        "dice_el_sistema": "`--text-3` es `#5C6675`, no el antiguo `#66717F` (que caía a 4,21:1 sobre `--surface-2`).",
-        "hay_en_el_build": "`--text-3: #66717F` en el `:root` del tema claro.",
-        "selector": ":root{--text-3}",
-        "evidencia": "Brief MEDIDO: `text_3_declarado = \"#66717F\"`. La ficha usa `--surface-2` en las cabeceras de las tarjetas y en el esqueleto, y pinta con `--text-3` el icono de los estados y la referencia de error.",
-        "por_que_importa": "Hecho ya establecido para 51 de 52; se marca porque esta pantalla sí hace caer `--text-3` sobre `--surface-2`."
-      },
-      {
-        "id": "f1-21ficha-09",
-        "severidad": "media",
-        "regla": "§6.7 Esqueleto de carga",
-        "dice_el_sistema": "Imita la forma de lo que va a llegar: mismas columnas, mismos anchos y el mismo alto (`.sk-fila{min-height:67px}`, `.sk-cab{min-height:35px}`). El punto de ruptura del esqueleto es el de la tabla (860px, no 900px). Bajo `prefers-reduced-motion` hay que aplanar el fondo: `.skel{animation:none;background:var(--surface-2)}`.",
-        "hay_en_el_build": "`.skel{display:block;height:12px;…}`, `.sk-fila{display:grid;gap:var(--sp-4);align-items:center}` sin `min-height`, `@media (max-width:900px){.sk-fila{grid-template-columns:1fr !important}}` y `@media (prefers-reduced-motion:reduce){.skel{animation:none}}` sin reponer el fondo.",
-        "selector": ".skel, .sk-fila",
-        "evidencia": "Medición propia: en el archivo, el único punto de ruptura a 900px es el del esqueleto mientras el cromo y la tabla rompen a 860px (líneas 192, 275, 304 y 637); la regla de movimiento reducido solo apaga la animación. Captura 21_ficha_cliente--loading.png.",
-        "por_que_importa": "El esqueleto de la ficha anticipa bloques de texto de varias líneas con barras de 12px: al cargar, el contenido empuja la página hacia abajo. Y con movimiento reducido el degradado queda congelado en vez de aplanado."
-      },
-      {
-        "id": "f1-21ficha-10",
-        "severidad": "media",
-        "regla": "§6.4 regla 1 — el cambio de vista se anuncia y mueve el foco",
-        "dice_el_sistema": "Todo cambio de vista se anuncia (`aria-live=\"polite\"`) y mueve el foco (`main.focus()` con `tabindex=\"-1\"`).",
-        "hay_en_el_build": "El manejador hace `cont.setAttribute('data-state', b.dataset.set)` y, en el caso inactivo, `raiz.setAttribute('data-ficha','inactivo')`. No hay región viva ni `focus()`.",
-        "selector": "main#contenido[data-state]",
-        "evidencia": "Medición propia: 0 `aria-live` en el documento; el `<script>` (53 líneas) solo mueve el foco en la edición de datos fiscales, no en el cambio de vista.",
-        "por_que_importa": "Se señala aparte de f1-21ficha-02 porque aquí sí existe una implementación correcta de referencia en la misma pantalla —la edición fiscal mueve el foco al primer campo al abrir y lo devuelve al botón al cerrar—, lo que hace la omisión del cambio de vista más fácil de corregir."
-      },
-      {
-        "id": "f1-21ficha-11",
-        "severidad": "media",
-        "regla": "§10 trampa 5 — `<symbol>` y `viewBox` repetido",
-        "dice_el_sistema": "Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca. Medidas en el `<use>` y sin `viewBox` en el envoltorio; se comprueba midiendo la caja del `<use>` contra la del `<svg>`.",
-        "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>` en el logotipo y `<svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\">` en el botón flotante.",
-        "selector": ".logo > svg, .fab > svg",
-        "evidencia": "Medición propia: el `<symbol id=\"dproma-mark\">` declara `viewBox=\"740 0 970 932\"`; el `<use>` queda a −32,5px del borde de su `<svg>` en el logotipo y a −16,2px en el botón flotante.",
-        "por_que_importa": "El isotipo se recorta casi entero en la cabecera del menú: queda una astilla verde en lugar de la marca."
-      },
-      {
-        "id": "f1-21ficha-12",
-        "severidad": "baja",
-        "regla": "§6.20 Ficha de detalle — el indicador declara su ancho",
-        "dice_el_sistema": "`.cab{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,360px);gap:var(--sp-6);align-items:center;padding:var(--sp-5) var(--sp-6)}`; `@media (max-width:1080px){.cab{grid-template-columns:1fr;align-items:start}}`. El indicador de la derecha declara su ancho; no se queda con lo que sobre.",
-        "hay_en_el_build": "`.identidad{display:grid;grid-template-columns:1fr auto;gap:var(--sp-4);align-items:start}` con el ancho gobernado desde el hijo: `.princ{min-width:260px;max-width:360px}`; y el apilado ocurre en `@media (max-width:960px)`, no en 1080px.",
-        "selector": ".identidad, .princ",
-        "evidencia": "Medición propia del archivo, líneas 654-663: la columna derecha es `auto` y quien fija el rango es el `min-width`/`max-width` del hijo, que es el patrón que §6.20 y §13.2 rechazan a favor de `minmax(300px,360px)` en la propia rejilla.",
-        "por_que_importa": "Es el patrón que el sistema documenta como causa de que el indicador de urgencia se encoja cuando el nombre del cliente es largo; aquí el riesgo es menor porque hay `min-width`, pero el criterio de §13.2 («fr acotado» en la rejilla, no en el hijo) no se cumple."
-      },
-      {
-        "id": "f1-21ficha-13",
-        "severidad": "baja",
-        "regla": "§8 Voz de producto — límites medibles",
-        "dice_el_sistema": "Ningún bloque de texto siempre visible pasa de ~140 caracteres. «Se mide con el contador de caracteres, no a ojo.»",
-        "hay_en_el_build": "El párrafo introductorio de la sección «Contactos» ocupa seis líneas: «El cliente tiene un contacto principal, uno solo. Es la persona con la que se trata, y sus datos son los que el sistema usa por omisión para avisos y acuses. Designar a otro libera al anterior. Un contacto puede ser de una sucursal o de la empresa entera, sin sucursal. Cada contacto guarda sus propios datos en cuatro listas —correos, teléfonos, direcciones y domicilios de agencia— con hasta cuatro registros cada una y una etiqueta libre por renglón.»",
-        "selector": "section de Contactos > p",
-        "evidencia": "Conteo sobre el texto literal de la captura 21_ficha_cliente--ok.png: 463 caracteres y cinco oraciones de texto siempre visible, frente al límite de ~140 y una frase.",
-        "por_que_importa": "Según los tres niveles de §8, «designar a otro libera al anterior» es nivel 2 (aclara una consecuencia) y debería ir a toggletip §6.23; el resto es explicación del diseño, nivel 3, que no va en la interfaz. Hoy empuja hacia abajo los datos del contacto, que son el protagonista."
-      },
-      {
-        "id": "f1-21ficha-14",
-        "severidad": "baja",
-        "regla": "§6.23 Toggletip de información — `.infob` + `.tip`",
-        "dice_el_sistema": "Cuándo: una aclaración corta que no cabe como texto siempre visible sin desordenar la fila (caso de la ficha §6.20, `dt`/`dd`). Es un toggletip, no un tooltip nativo.",
-        "hay_en_el_build": "Ningún `.infob` ni `.tip` en la pantalla; toda la aclaración va en párrafos siempre visibles.",
-        "selector": "(ausente)",
-        "evidencia": "Medición propia: 0 ocurrencias de `class=\"infob\"` en el archivo. §6.23 cita la ficha como su caso de uso canónico.",
-        "por_que_importa": "El componente que el sistema creó precisamente para esta pantalla no se usa, y su contenido acaba como prosa permanente (f1-21ficha-13)."
-      }
-    ]
-  },
-  "f3_boost_ui": {
-    "puntuacion": 3,
-    "dimensiones": {
-      "accesibilidad": 2,
-      "rendimiento": "no_evaluado",
-      "theming": 3,
-      "responsive": 3,
-      "integridad": 3
-    },
-    "justificacion": "Es la pantalla mejor construida de las cinco después de 41: la edición de datos fiscales se hace en la propia ficha, mueve el foco al primer campo al abrir y lo devuelve al botón al cerrar, y los `aria-label` nombran siempre el dato concreto. Accesibilidad 2: la pierden los ocho enlaces de 14-15px que §7.3 nombra por su nombre, los cuatro `id` duplicados que rompen el rótulo de la segunda lista de contacto, la ausencia total de `aria-live` y las etiquetas de clasificación a 2,97:1 y 11px. Integridad 3: lo que hay funciona y la estructura es sólida (20 landmarks, `<caption>` y `th scope=\"row\"` en la tabla de vehículos), pero falta el toggletip que §6.23 diseñó para esta pantalla y el esqueleto no mide lo que sustituye. Theming 3: dos temas completos y verificados, penalizado por `--text-3` obsoleto. Responsive 3: `.split` acotado con `minmax(320px,380px) 1fr` y modo tarjeta a 860px, con la salvedad del esqueleto a 900px y del apilado de la identidad a 960px en vez de 1080px.",
-    "evidencia": [
-      "Brief MEDIDO: 8/61 destinos bajo 24px (miga 126×14, tres «Ver en Maps» 101,5×14, cuatro folios 110-133×15), 8 fallos de contraste declarados, th 6 / thAriaSort 0, landmarks 20, ariaLive 2, dialogNativo 0.",
-      "Medición propia: 4 `id` duplicados (`tope-CORREO`, `tope-TELEFONO`, `l-DIRECCION-16`, `tope-DIRECCION`); 0 `aria-live` reales (los dos `role=\"status\"` son del esqueleto); 17/17 `.iconbtn` sin `title`; 14/17 `.iconbtn` siguen a 28px con `data-tacto=\"dedo\"`; 28 declaraciones de tipografía bajo 12px; `<use>` del isotipo a −32,5px; contraste compositado: solo `.p-type` falla (2,97:1), el resto del listado del brief pasa al componer el alfa (13,38 / 6,02 en claro; 11,44 / 6,40 en oscuro).",
-      "Capturas 21_ficha_cliente--ok.png, --loading.png, --error.png, --oscuro.png."
-    ]
-  },
-  "f4_nielsen": [
-    {
-      "n": 1,
-      "heuristica": "Visibilidad del estado del sistema",
-      "severidad": 2,
-      "hallazgo": "La cabecera dice «cliente desde 2024 · último movimiento hace 3 días» y «Falta 1 de 2 documentos» está a la vista desde la primera línea, pero el cambio entre vistas no se anuncia por `aria-live` ni mueve el foco, y el esqueleto no tiene la forma del contenido.",
-      "selector": "main#contenido[data-state], .sk-fila"
-    },
-    {
-      "n": 2,
-      "heuristica": "Coincidencia entre el sistema y el mundo real",
-      "severidad": 0,
-      "hallazgo": "«Sin domicilio fiscal no se puede timbrar una factura a este cliente» dice la consecuencia en el idioma del negocio, no el nombre del campo que falta.",
-      "selector": "section de Datos fiscales > p"
-    },
-    {
-      "n": 3,
-      "heuristica": "Control y libertad del usuario",
-      "severidad": 1,
-      "hallazgo": "La edición fiscal tiene Cancelar y devuelve el foco al botón que la abrió. No se declara, en cambio, cómo se deshace «Designar a otro contacto principal», que el propio texto advierte que libera al anterior.",
-      "selector": "#fiscal-form, .princ"
-    },
-    {
-      "n": 4,
-      "heuristica": "Consistencia y estándares",
-      "severidad": 2,
-      "hallazgo": "`.pill` y `.p-type` comparten peso 700 cuando §6.10 pide que la clasificación vaya más baja; el apilado de la identidad rompe a 960px y §6.20 fija 1080px; el esqueleto a 900px y la tabla a 860px; el isotipo repite el `viewBox` del `<symbol>`.",
-      "selector": ".pill, .p-type, .identidad, .sk-fila, .logo > svg"
-    },
-    {
-      "n": 5,
-      "heuristica": "Prevención de errores",
-      "severidad": 1,
-      "hallazgo": "El RFC se declara no editable aquí y el motivo está escrito. En contra, los cuatro `id` duplicados hacen que el cupo «Hasta 4» de la segunda lista quede asociado a la primera, lo que puede llevar a añadir donde no corresponde con lector de pantalla.",
-      "selector": "#tope-CORREO, #tope-DIRECCION"
-    },
-    {
-      "n": 6,
-      "heuristica": "Reconocer antes que recordar",
-      "severidad": 1,
-      "hallazgo": "Los lápices de cada correo, teléfono y dirección son iconos sin texto ni etiqueta emergente; su `aria-label` es correcto pero no llega a quien ve la pantalla.",
-      "selector": ".acciones .iconbtn"
-    },
-    {
-      "n": 7,
-      "heuristica": "Flexibilidad y eficiencia",
-      "severidad": 1,
-      "hallazgo": "Corregir los datos fiscales sin salir de la ficha es el atajo correcto. Los folios de trámite y órdenes llevan al detalle, pero con un destino de 15px de alto que obliga a apuntar.",
-      "selector": "#fiscal-editar, a.folio"
-    },
-    {
-      "n": 8,
-      "heuristica": "Diseño estético y minimalista",
-      "severidad": 2,
-      "hallazgo": "El párrafo de «Contactos» tiene 463 caracteres y cinco oraciones siempre visibles, frente al límite de ~140 y una frase de §8; empuja los datos del contacto fuera de la primera pantalla.",
-      "selector": "section de Contactos > p"
-    },
-    {
-      "n": 9,
-      "heuristica": "Ayudar a reconocer y recuperarse de errores",
-      "severidad": 2,
-      "hallazgo": "El estado de error no va en tarjeta con medallón, su título es un `<b>`, su referencia se imprime a 11px y el cambio no se anuncia.",
-      "selector": ".state.state-error, .state .ref"
-    },
-    {
-      "n": 10,
-      "heuristica": "Ayuda y documentación",
-      "severidad": 1,
-      "hallazgo": "La ayuda está, y es buena, pero toda en prosa permanente: el toggletip de §6.23, creado para esta pantalla, no se usa en ningún sitio.",
-      "selector": "(ausencia de .infob)"
-    }
-  ],
-  "f5_investigacion": {
-    "pain_points_evaluados": [
-      {
-        "pp": "pp-040",
-        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
-        "cobertura": "cubre",
-        "evidencia": "«El seguimiento de más de 20 clientes activos depende de la memoria del vendedor, sin registro estructurado.» La ficha 360° reúne en una pantalla identidad, datos fiscales, contactos con sus cuatro listas, trámites vehiculares con folio y estado, y órdenes de instalación: es el expediente que sustituye a la memoria."
-      },
-      {
-        "pp": "pp-077",
-        "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
-        "cobertura": "cubre",
-        "evidencia": "«Cada grupo automotriz exige campos de validación distintos (TOT, VIN) no estandarizados para facturar, generando un cuello de botella financiero de casi 2 millones de pesos.» El bloque «Datos fiscales» dice en una frase qué impide timbrar («Falta capturarlo» en Domicilio fiscal) y deja corregirlo sin salir de la ficha; la tabla de vehículos con VIN y placas está en la misma pantalla."
-      },
-      {
-        "pp": "pp-047",
-        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
-        "cobertura": "cubre",
-        "evidencia": "«Ante retrasos de facturación o trámites, los clientes contactan directamente al vendedor en lugar del área responsable.» La lista de trámites con folio, descripción y pastilla de estado («En plazo», «Por vencer», «Recibido · sin admitir») permite al vendedor responder en el momento en vez de reenviar la pregunta."
-      },
-      {
-        "pp": "pp-041",
-        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
-        "cobertura": "cubre",
-        "evidencia": "«Al cerrar un cliente, no existe un formato o procedimiento estándar para transferir la información y responsabilidad del caso hacia operaciones.» La ficha es ese formato: el mismo expediente que ve comercial es el que ve operaciones, con contacto principal designado y con las órdenes de instalación enlazadas."
-      },
-      {
-        "pp": "pp-044",
-        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
-        "cobertura": "ignora",
-        "evidencia": "«La documentación de clientes se envía por WhatsApp o se guarda en Drive personal, sin estructura de carpetas compartidas por cliente.» La ficha dice que faltan documentos y permite editar datos fiscales, pero no muestra los documentos del cliente ni da sitio donde vivan; el expediente documental sigue fuera del sistema."
-      },
-      {
-        "pp": "pp-074",
-        "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
-        "cobertura": "ignora",
-        "evidencia": "«No existe un espacio donde el cliente pueda consultar por sí mismo el estatus de sus trámites (placas), generando disputas sobre a quién corresponde la responsabilidad de informar.» La ficha es interna; nada en ella contempla una vista para el cliente ni un envío de estado, de modo que la consulta sigue pasando por una persona."
-      }
-    ],
-    "usabilidad_para_el_area": "Para el vendedor es la pantalla que más dolor quita del lote: reúne en un sitio lo que hoy vive en su memoria y en cuatro Excel (pp-040, pp-041), y pone el bloqueo de facturación —el domicilio fiscal que falta— con su consecuencia escrita y su corrección a un clic, que es exactamente el cuello de botella de pp-077. Lo que falla es el detalle fino de manejo: los enlaces que sacan de la ficha (la miga, los folios de trámite, «Ver en Maps») miden 14-15px de alto, y en una pantalla que se usa con el cliente al teléfono eso se paga en segundos y en fallos de clic. Y queda fuera el expediente documental de pp-044: la ficha dice que faltan documentos pero no es donde viven, así que el Drive personal y el WhatsApp siguen haciendo falta."
-  },
-  "cobertura": [
-    {
-      "patron": "Lista de datos de contacto con cupo declarado (`<section class=\"lista\">` con cabecera, contador «2 de 4», una fila por dato con su etiqueta libre —«trabajo», «alterno», «móvil», «conmutador»—, botón «Añadir» en el pie y el motivo del tope escrito al lado: «Hasta 4»). Se repite cuatro veces por contacto (correos, teléfonos, direcciones, domicilios de agencia). El sistema no tiene regla para esta pieza: no es `.tarjeta` (anida dentro de la tarjeta del contacto, lo que §6.3 prohíbe), no es `.tabla-caja`, y la etiqueta libre por renglón no es ni `.pill` (§6.10, estado) ni `.p-type` (clasificación cerrada).",
-      "propuesta_de_regla": "§6.26 Lista de valores con cupo — `.lista`. **Cuándo:** un campo que admite varios valores del mismo tipo con un tope declarado (correos, teléfonos, direcciones de un contacto). **No es una tarjeta:** vive dentro de la tarjeta de su entidad como `<section>` con encabezado real, sin superficie ni sombra propias, para no incumplir §6.3 («no se anidan tarjetas dentro de tarjetas»). **Estructura fija:** cabecera con icono, rótulo y el cupo consumido a la derecha en formato «N de M»; una fila por valor con el dato en `--text` y, debajo, su etiqueta libre; pie con el botón «Añadir» (`.btn.mini`, §6.2) y el motivo del tope a su lado. **Cuando se llena el cupo, el botón se deshabilita con `aria-disabled=\"true\"` y `aria-describedby` al motivo** (§6.16), nunca desaparece. **La etiqueta libre es un tercer tipo de marca**, distinto de `.pill` y `.p-type`: su valor lo escribe quien captura, así que va sin punto de color, en `--surface-2` con `--text-2`, peso 500 y `var(--fs-meta)` — y así las tres familias se siguen distinguiendo a simple vista (§11). **A11y:** cada sección lleva `aria-labelledby` a su propio encabezado, con `id` único por contacto; repetir el `id` entre dos contactos es el fallo registrado en esta maqueta."
-    },
-    {
-      "patron": "Edición en el sitio de un bloque de la ficha: «Editar datos fiscales» sustituye el bloque de lectura por una rejilla de campos con Guardar y Cancelar, sin abrir diálogo, conservando el resto de la ficha. El `aria-expanded` del botón, el intercambio de `hidden` entre `#fiscal-ver` y `#fiscal-form` y el viaje del foco (al primer campo al abrir, de vuelta al botón al cerrar) están implementados correctamente, pero el sistema no documenta este patrón en ninguna parte: §6.18 cubre el diálogo y §6.15 la fila desplegable de una tabla, no la edición en sitio de una sección de ficha.",
-      "propuesta_de_regla": "§6.27 Edición en el sitio — `.bloque-editable`. **Cuándo:** corregir un grupo pequeño de campos de una ficha sin sacar a nadie de ella; es la opción por defecto frente al diálogo cuando los campos caben sin desplazamiento y el resto de la ficha da el contexto que hace falta para decidir. Si no caben, se usa `dialog.modal` (§6.18). **Estructura:** dos hermanos, `.bloque-ver` y `.bloque-form`, dentro del mismo contenedor, alternados por `hidden`; el botón que los conmuta lleva `aria-expanded` y `aria-controls` al `id` del formulario. **Foco, tres reglas:** al abrir, al primer campo editable —no al contenedor, no al botón de cerrar—; al cancelar, de vuelta al botón que abrió; al guardar, al bloque de lectura actualizado con `tabindex=\"-1\"`, y el cambio se anuncia por `aria-live` (§6.4). **Mientras guarda, el bloque no se cierra** ni por Escape ni por Cancelar, igual que el diálogo. **Los campos de solo lectura se muestran como dato con su motivo al lado**, nunca como campo deshabilitado (§6.18)."
-    }
-  ],
-  "sin_datos": [
-    "f3.rendimiento: maqueta estática servida desde disco, sin backend ni librería que perfilar; el documento tampoco fija umbrales de rendimiento auditables.",
-    "§6.11 regla 3 (`aria-sort`): no evaluado como incumplimiento — la única tabla de la pantalla es la de vehículos (VIN / Placas / Descripción, 3 filas) y no ofrece ordenación, de modo que `aria-sort` no es exigible. Sí lleva `<caption>` y `<th scope=\"row\">`.",
-    "§6.18 Diálogo modal: no aplica — la pantalla no abre ningún diálogo (brief: dialogNativo 0, divDialog 0).",
-    "Contraste en tema oscuro de `.p-type`: no evaluado con cifra propia fiable. El brief declara el tema oscuro medido, pero mi barrido no pudo componer el `color-mix` que devuelve el navegador en formato `color(srgb …)`; la cifra citada (2,97:1) es la del brief, en tema claro."
+ "pantalla": "21_ficha_cliente",
+ "ruta_zip": "02-padron-de-clientes/21_ficha_cliente.html",
+ "carpeta": "02-padron-de-clientes",
+ "area": "comercial",
+ "arquetipo": "detalle",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "21_ficha_cliente--ok.png",
+  "21_ficha_cliente--loading.png",
+  "21_ficha_cliente--empty.png",
+  "21_ficha_cliente--error.png",
+  "21_ficha_cliente--oscuro.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-21ficha-01",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles — enlaces primarios de fila",
+    "dice_el_sistema": "Enlaces que son el elemento primario de su fila (folio, miga, «Ver en Maps»): no son texto en prosa, llevan padding hasta llegar a 24px.",
+    "hay_en_el_build": "`.folio{font-variant-numeric:tabular-nums;font-weight:600;color:var(--link);text-decoration:none;white-space:nowrap}`, `.maps{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-meta);color:var(--link);…}` y `.migas a{color:var(--link);text-decoration:none;font-weight:600;border-radius:4px}` — ninguno declara `padding` ni `min-height`.",
+    "selector": "a.folio, a.maps, .migas a",
+    "evidencia": "Brief MEDIDO: 8 de 61 destinos por debajo de 24px, y son exactamente los tres casos que §7.3 nombra: la miga «Padrón de clientes» a 126×14, tres «Ver en Maps» a 101,5×14 y cuatro folios (`TV-2026-01188`, `TV-2026-01204`, `TV-2026-01251`, `ORD-202608-0417`) a 110-133×15.",
+    "por_que_importa": "§7.3 escribe esta excepción con estos tres ejemplos porque son los que se pulsan para salir de la ficha: la miga para volver al padrón, el folio para abrir el trámite, «Ver en Maps» para ir a la dirección. Los tres miden 14-15px de alto, poco más de la mitad del mínimo de WCAG 2.5.8."
+   },
+   {
+    "id": "f1-21ficha-02",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado de una pantalla",
+    "dice_el_sistema": "(1) el cambio se anuncia (`aria-live=\"polite\"`) y mueve el foco; (2) cada estado lleva encabezado real, no un `<b>`; §11: los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo. `.tarjeta-estado{max-width:480px;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)}`, `.estado-ico{52px;border-radius:50%}`.",
+    "hay_en_el_build": "`.state{display:none;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-2);padding:56px 16px}`, `.state .ico{width:30px;height:30px;color:var(--text-3)}` y `.state b{font-size:var(--fs-base)}`. El manejador de cambio de vista solo escribe `data-state` y, para el estado inactivo, `data-ficha`.",
+    "selector": ".state.state-error, .state.state-empty, main#contenido",
+    "evidencia": "Medición propia: 0 ocurrencias de `tarjeta-estado` o `estado-ico`; 0 atributos `aria-live` en todo el documento (los dos `role=\"status\"` que hay están en los contenedores del esqueleto); el manejador no llama a `focus()` ni escribe texto en ninguna región viva. `--r-modal` figura entre los declarados y no usados (brief). Capturas --empty.png y --error.png.",
+    "por_que_importa": "La ficha es la pantalla desde la que se decide si un cliente puede facturar; si el servidor falla, quien usa lector de pantalla no recibe ningún aviso y el foco se queda sobre un botón que ya no existe."
+   },
+   {
+    "id": "f1-21ficha-03",
+    "severidad": "alta",
+    "regla": "§11 — todos los `id` únicos",
+    "dice_el_sistema": "Todos los `id` únicos, y cada `aria-describedby`/`aria-controls` apunta a algo que existe.",
+    "hay_en_el_build": "Cuatro `id` repetidos dos veces cada uno, porque el bloque de listas del contacto se duplica para el segundo contacto sin renumerar: `tope-CORREO` (líneas 841 y 894), `tope-TELEFONO` (852 y 901), `l-DIRECCION-16` (854 y 903) y `tope-DIRECCION` (859 y 908).",
+    "selector": "#tope-CORREO, #tope-TELEFONO, #l-DIRECCION-16, #tope-DIRECCION",
+    "evidencia": "Medición propia recorriendo todos los `[id]` del documento: los cuatro aparecen con cuenta 2. `l-DIRECCION-16` es además el destino de un `aria-labelledby` de `<section class=\"lista\">`, que por tanto nombra las dos secciones con el mismo elemento.",
+    "por_que_importa": "La segunda lista de direcciones toma el nombre accesible de la primera: en el árbol de accesibilidad los dos contactos tienen secciones con idéntico rótulo y el cupo «Hasta 4» queda referido al bloque equivocado."
+   },
+   {
+    "id": "f1-21ficha-04",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles — modo dedo",
+    "dice_el_sistema": "El `:root` es lo que hace ganar la regla: sin él, la empata cualquier variante de tamaño del componente que vaya después. Se comprueba midiendo con `data-tacto=\"dedo\"` puesto.",
+    "hay_en_el_build": "Las seis reglas `[data-tacto=\"dedo\"] …` se escriben sin `:root`, y `.acciones .iconbtn{width:28px;height:28px}` va después.",
+    "selector": "[data-tacto=\"dedo\"] .iconbtn vs .acciones .iconbtn",
+    "evidencia": "Medición propia con Playwright: con `data-tacto=\"dedo\"` puesto en el `<html>`, 14 de los 17 `.iconbtn` siguen midiendo 28px (mínimo medido 28px). Brief: regla_data_tacto_sin_root = 6.",
+    "por_que_importa": "Los botones de editar de cada correo, teléfono y dirección —que son casi todos los `.iconbtn` de la ficha— no crecen en modo dedo."
+   },
+   {
+    "id": "f1-21ficha-05",
+    "severidad": "media",
+    "regla": "§6.19 Botón-icono / §6.5 Iconos",
+    "dice_el_sistema": "Nunca viaja solo: `title` + `aria-label`. §6.5: si va sin texto visible, lleva como mínimo etiqueta emergente y `aria-label`.",
+    "hay_en_el_build": "Los 17 `.iconbtn` llevan `aria-label` que nombra el dato concreto («Editar rosalia.mq@verticebajio.example»), pero ninguno lleva `title`.",
+    "selector": ".iconbtn",
+    "evidencia": "Medición propia: 17 `.iconbtn`, 17 sin `title`, 0 sin `aria-label`.",
+    "por_que_importa": "La ficha tiene un lápiz por cada correo, teléfono y dirección; sin etiqueta emergente, quien usa ratón no distingue el lápiz de «editar este correo» del de «editar datos fiscales»."
+   },
+   {
+    "id": "f1-21ficha-06",
+    "severidad": "alta",
+    "regla": "§2.1 Suelo tipográfico / §6.10 Etiquetas",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» Única excepción: 10,5px en mayúsculas con `letter-spacing` para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta. §6.10: `.pill` y `.p-type` a `font-size:var(--fs-meta)` (12px).",
+    "hay_en_el_build": "28 declaraciones de tamaño bajo 12px, entre ellas `.pill`/`.p-type` a 11px, `.ctrl .ayuda{font-size:11px}`, `.ctrl .mal{font-size:11px}` (el mensaje de error de campo), `.state .ref{font-size:11px}` (la referencia del error), `.princ .et{font-size:10.5px}` y la forma abreviada `font:700 11px var(--font-ui)` del avatar.",
+    "selector": ".pill, .p-type, .ctrl .ayuda, .ctrl .mal, .state .ref, .princ .et",
+    "evidencia": "Medición propia con el estilo calculado (§10 trampa 1): 46 nodos de texto bajo 12px en la vista con datos; 28 declaraciones `font-size:1[01](.5)?px` / `font:… 11px` en el `<style>`. `--fs-meta` está correctamente declarado a 12px y simplemente no se usa en esos componentes.",
+    "por_que_importa": "Dos de los textos bajo el suelo son el mensaje de error de un campo (`.mal`) y la referencia del fallo (`.ref`): justo lo que hay que poder leer cuando algo va mal."
+   },
+   {
+    "id": "f1-21ficha-07",
+    "severidad": "alta",
+    "regla": "§1.7 Ratios de contraste mínimos / §6.10 `.p-type`",
+    "dice_el_sistema": "Texto normal: 4,5:1, medido contra los fondos donde va a aparecer, en los dos temas.",
+    "hay_en_el_build": "`.p-type` con `color:var(--text-2)` (#4C5A6B) sobre `color-mix(in srgb,var(--serie-N) 16%,var(--surface))`.",
+    "selector": "span.p-type.p-s1 («Empresa»), span.p-type.p-s2 («Grupo Automotriz Vértice»)",
+    "evidencia": "Brief MEDIDO: ambas a 2,97:1, mínimo 4,5. Mi barrido propio, compositando el alfa de toda la cadena de ancestros, confirma estas dos como los únicos fallos reales de contraste de la pantalla en tema claro: los otros seis que el brief lista (`span.et` del cromo, `span.cromo-av`, `.et`/`.quien`/`.rol`/`.av` de la tarjeta de contacto principal) salen de medir el `rgba` de `--accent-soft` sin componerlo sobre `--surface`; compuestos dan 13,38:1 (`.quien`, `.av`, `.cromo-av`) y 6,02:1 (`.rol`, `.princ .et`) en claro, y 11,44:1 / 6,40:1 en oscuro.",
+    "por_que_importa": "Las dos etiquetas que dicen qué es el cliente —empresa y a qué grupo pertenece— están bajo el mínimo, y en la ficha son la primera línea de identidad del expediente."
+   },
+   {
+    "id": "f1-21ficha-08",
+    "severidad": "alta",
+    "regla": "§1.1 Superficies y texto — `--text-3`",
+    "dice_el_sistema": "`--text-3` es `#5C6675`, no el antiguo `#66717F` (que caía a 4,21:1 sobre `--surface-2`).",
+    "hay_en_el_build": "`--text-3: #66717F` en el `:root` del tema claro.",
+    "selector": ":root{--text-3}",
+    "evidencia": "Brief MEDIDO: `text_3_declarado = \"#66717F\"`. La ficha usa `--surface-2` en las cabeceras de las tarjetas y en el esqueleto, y pinta con `--text-3` el icono de los estados y la referencia de error.",
+    "por_que_importa": "Hecho ya establecido para 51 de 52; se marca porque esta pantalla sí hace caer `--text-3` sobre `--surface-2`."
+   },
+   {
+    "id": "f1-21ficha-09",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga",
+    "dice_el_sistema": "Imita la forma de lo que va a llegar: mismas columnas, mismos anchos y el mismo alto (`.sk-fila{min-height:67px}`, `.sk-cab{min-height:35px}`). El punto de ruptura del esqueleto es el de la tabla (860px, no 900px). Bajo `prefers-reduced-motion` hay que aplanar el fondo: `.skel{animation:none;background:var(--surface-2)}`.",
+    "hay_en_el_build": "`.skel{display:block;height:12px;…}`, `.sk-fila{display:grid;gap:var(--sp-4);align-items:center}` sin `min-height`, `@media (max-width:900px){.sk-fila{grid-template-columns:1fr !important}}` y `@media (prefers-reduced-motion:reduce){.skel{animation:none}}` sin reponer el fondo.",
+    "selector": ".skel, .sk-fila",
+    "evidencia": "Medición propia: en el archivo, el único punto de ruptura a 900px es el del esqueleto mientras el cromo y la tabla rompen a 860px (líneas 192, 275, 304 y 637); la regla de movimiento reducido solo apaga la animación. Captura 21_ficha_cliente--loading.png.",
+    "por_que_importa": "El esqueleto de la ficha anticipa bloques de texto de varias líneas con barras de 12px: al cargar, el contenido empuja la página hacia abajo. Y con movimiento reducido el degradado queda congelado en vez de aplanado."
+   },
+   {
+    "id": "f1-21ficha-10",
+    "severidad": "media",
+    "regla": "§6.4 regla 1 — el cambio de vista se anuncia y mueve el foco",
+    "dice_el_sistema": "Todo cambio de vista se anuncia (`aria-live=\"polite\"`) y mueve el foco (`main.focus()` con `tabindex=\"-1\"`).",
+    "hay_en_el_build": "El manejador hace `cont.setAttribute('data-state', b.dataset.set)` y, en el caso inactivo, `raiz.setAttribute('data-ficha','inactivo')`. No hay región viva ni `focus()`.",
+    "selector": "main#contenido[data-state]",
+    "evidencia": "Medición propia: 0 `aria-live` en el documento; el `<script>` (53 líneas) solo mueve el foco en la edición de datos fiscales, no en el cambio de vista.",
+    "por_que_importa": "Se señala aparte de f1-21ficha-02 porque aquí sí existe una implementación correcta de referencia en la misma pantalla —la edición fiscal mueve el foco al primer campo al abrir y lo devuelve al botón al cerrar—, lo que hace la omisión del cambio de vista más fácil de corregir."
+   },
+   {
+    "id": "f1-21ficha-11",
+    "severidad": "media",
+    "regla": "§10 trampa 5 — `<symbol>` y `viewBox` repetido",
+    "dice_el_sistema": "Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca. Medidas en el `<use>` y sin `viewBox` en el envoltorio; se comprueba midiendo la caja del `<use>` contra la del `<svg>`.",
+    "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>` en el logotipo y `<svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\">` en el botón flotante.",
+    "selector": ".logo > svg, .fab > svg",
+    "evidencia": "Medición propia: el `<symbol id=\"dproma-mark\">` declara `viewBox=\"740 0 970 932\"`; el `<use>` queda a −32,5px del borde de su `<svg>` en el logotipo y a −16,2px en el botón flotante.",
+    "por_que_importa": "El isotipo se recorta casi entero en la cabecera del menú: queda una astilla verde en lugar de la marca."
+   },
+   {
+    "id": "f1-21ficha-12",
+    "severidad": "baja",
+    "regla": "§6.20 Ficha de detalle — el indicador declara su ancho",
+    "dice_el_sistema": "`.cab{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,360px);gap:var(--sp-6);align-items:center;padding:var(--sp-5) var(--sp-6)}`; `@media (max-width:1080px){.cab{grid-template-columns:1fr;align-items:start}}`. El indicador de la derecha declara su ancho; no se queda con lo que sobre.",
+    "hay_en_el_build": "`.identidad{display:grid;grid-template-columns:1fr auto;gap:var(--sp-4);align-items:start}` con el ancho gobernado desde el hijo: `.princ{min-width:260px;max-width:360px}`; y el apilado ocurre en `@media (max-width:960px)`, no en 1080px.",
+    "selector": ".identidad, .princ",
+    "evidencia": "Medición propia del archivo, líneas 654-663: la columna derecha es `auto` y quien fija el rango es el `min-width`/`max-width` del hijo, que es el patrón que §6.20 y §13.2 rechazan a favor de `minmax(300px,360px)` en la propia rejilla.",
+    "por_que_importa": "Es el patrón que el sistema documenta como causa de que el indicador de urgencia se encoja cuando el nombre del cliente es largo; aquí el riesgo es menor porque hay `min-width`, pero el criterio de §13.2 («fr acotado» en la rejilla, no en el hijo) no se cumple."
+   },
+   {
+    "id": "f1-21ficha-13",
+    "severidad": "baja",
+    "regla": "§8 Voz de producto — límites medibles",
+    "dice_el_sistema": "Ningún bloque de texto siempre visible pasa de ~140 caracteres. «Se mide con el contador de caracteres, no a ojo.»",
+    "hay_en_el_build": "El párrafo introductorio de la sección «Contactos» ocupa seis líneas: «El cliente tiene un contacto principal, uno solo. Es la persona con la que se trata, y sus datos son los que el sistema usa por omisión para avisos y acuses. Designar a otro libera al anterior. Un contacto puede ser de una sucursal o de la empresa entera, sin sucursal. Cada contacto guarda sus propios datos en cuatro listas —correos, teléfonos, direcciones y domicilios de agencia— con hasta cuatro registros cada una y una etiqueta libre por renglón.»",
+    "selector": "section de Contactos > p",
+    "evidencia": "Conteo sobre el texto literal de la captura 21_ficha_cliente--ok.png: 463 caracteres y cinco oraciones de texto siempre visible, frente al límite de ~140 y una frase.",
+    "por_que_importa": "Según los tres niveles de §8, «designar a otro libera al anterior» es nivel 2 (aclara una consecuencia) y debería ir a toggletip §6.23; el resto es explicación del diseño, nivel 3, que no va en la interfaz. Hoy empuja hacia abajo los datos del contacto, que son el protagonista."
+   },
+   {
+    "id": "f1-21ficha-14",
+    "severidad": "baja",
+    "regla": "§6.23 Toggletip de información — `.infob` + `.tip`",
+    "dice_el_sistema": "Cuándo: una aclaración corta que no cabe como texto siempre visible sin desordenar la fila (caso de la ficha §6.20, `dt`/`dd`). Es un toggletip, no un tooltip nativo.",
+    "hay_en_el_build": "Ningún `.infob` ni `.tip` en la pantalla; toda la aclaración va en párrafos siempre visibles.",
+    "selector": "(ausente)",
+    "evidencia": "Medición propia: 0 ocurrencias de `class=\"infob\"` en el archivo. §6.23 cita la ficha como su caso de uso canónico.",
+    "por_que_importa": "El componente que el sistema creó precisamente para esta pantalla no se usa, y su contenido acaba como prosa permanente (f1-21ficha-13)."
+   }
   ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 3
+  },
+  "justificacion": "Es la pantalla mejor construida de las cinco después de 41: la edición de datos fiscales se hace en la propia ficha, mueve el foco al primer campo al abrir y lo devuelve al botón al cerrar, y los `aria-label` nombran siempre el dato concreto. Accesibilidad 2: la pierden los ocho enlaces de 14-15px que §7.3 nombra por su nombre, los cuatro `id` duplicados que rompen el rótulo de la segunda lista de contacto, la ausencia total de `aria-live` y las etiquetas de clasificación a 2,97:1 y 11px. Integridad 3: lo que hay funciona y la estructura es sólida (20 landmarks, `<caption>` y `th scope=\"row\"` en la tabla de vehículos), pero falta el toggletip que §6.23 diseñó para esta pantalla y el esqueleto no mide lo que sustituye. Theming 3: dos temas completos y verificados, penalizado por `--text-3` obsoleto. Responsive 3: `.split` acotado con `minmax(320px,380px) 1fr` y modo tarjeta a 860px, con la salvedad del esqueleto a 900px y del apilado de la identidad a 960px en vez de 1080px.",
+  "evidencia": [
+   "Brief MEDIDO: 8/61 destinos bajo 24px (miga 126×14, tres «Ver en Maps» 101,5×14, cuatro folios 110-133×15), 8 fallos de contraste declarados, th 6 / thAriaSort 0, landmarks 20, ariaLive 2, dialogNativo 0.",
+   "Medición propia: 4 `id` duplicados (`tope-CORREO`, `tope-TELEFONO`, `l-DIRECCION-16`, `tope-DIRECCION`); 0 `aria-live` reales (los dos `role=\"status\"` son del esqueleto); 17/17 `.iconbtn` sin `title`; 14/17 `.iconbtn` siguen a 28px con `data-tacto=\"dedo\"`; 28 declaraciones de tipografía bajo 12px; `<use>` del isotipo a −32,5px; contraste compositado: solo `.p-type` falla (2,97:1), el resto del listado del brief pasa al componer el alfa (13,38 / 6,02 en claro; 11,44 / 6,40 en oscuro).",
+   "Capturas 21_ficha_cliente--ok.png, --loading.png, --error.png, --oscuro.png."
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 2,
+   "hallazgo": "La cabecera dice «cliente desde 2024 · último movimiento hace 3 días» y «Falta 1 de 2 documentos» está a la vista desde la primera línea, pero el cambio entre vistas no se anuncia por `aria-live` ni mueve el foco, y el esqueleto no tiene la forma del contenido.",
+   "selector": "main#contenido[data-state], .sk-fila"
+  },
+  {
+   "n": 2,
+   "heuristica": "Coincidencia entre el sistema y el mundo real",
+   "severidad": 0,
+   "hallazgo": "«Sin domicilio fiscal no se puede timbrar una factura a este cliente» dice la consecuencia en el idioma del negocio, no el nombre del campo que falta.",
+   "selector": "section de Datos fiscales > p"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 1,
+   "hallazgo": "La edición fiscal tiene Cancelar y devuelve el foco al botón que la abrió. No se declara, en cambio, cómo se deshace «Designar a otro contacto principal», que el propio texto advierte que libera al anterior.",
+   "selector": "#fiscal-form, .princ"
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 2,
+   "hallazgo": "`.pill` y `.p-type` comparten peso 700 cuando §6.10 pide que la clasificación vaya más baja; el apilado de la identidad rompe a 960px y §6.20 fija 1080px; el esqueleto a 900px y la tabla a 860px; el isotipo repite el `viewBox` del `<symbol>`.",
+   "selector": ".pill, .p-type, .identidad, .sk-fila, .logo > svg"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 1,
+   "hallazgo": "El RFC se declara no editable aquí y el motivo está escrito. En contra, los cuatro `id` duplicados hacen que el cupo «Hasta 4» de la segunda lista quede asociado a la primera, lo que puede llevar a añadir donde no corresponde con lector de pantalla.",
+   "selector": "#tope-CORREO, #tope-DIRECCION"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocer antes que recordar",
+   "severidad": 1,
+   "hallazgo": "Los lápices de cada correo, teléfono y dirección son iconos sin texto ni etiqueta emergente; su `aria-label` es correcto pero no llega a quien ve la pantalla.",
+   "selector": ".acciones .iconbtn"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia",
+   "severidad": 1,
+   "hallazgo": "Corregir los datos fiscales sin salir de la ficha es el atajo correcto. Los folios de trámite y órdenes llevan al detalle, pero con un destino de 15px de alto que obliga a apuntar.",
+   "selector": "#fiscal-editar, a.folio"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 2,
+   "hallazgo": "El párrafo de «Contactos» tiene 463 caracteres y cinco oraciones siempre visibles, frente al límite de ~140 y una frase de §8; empuja los datos del contacto fuera de la primera pantalla.",
+   "selector": "section de Contactos > p"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer y recuperarse de errores",
+   "severidad": 2,
+   "hallazgo": "El estado de error no va en tarjeta con medallón, su título es un `<b>`, su referencia se imprime a 11px y el cambio no se anuncia.",
+   "selector": ".state.state-error, .state .ref"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 1,
+   "hallazgo": "La ayuda está, y es buena, pero toda en prosa permanente: el toggletip de §6.23, creado para esta pantalla, no se usa en ningún sitio.",
+   "selector": "(ausencia de .infob)"
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-040",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "cubre",
+    "evidencia": "«El seguimiento de más de 20 clientes activos depende de la memoria del vendedor, sin registro estructurado.» La ficha 360° reúne en una pantalla identidad, datos fiscales, contactos con sus cuatro listas, trámites vehiculares con folio y estado, y órdenes de instalación: es el expediente que sustituye a la memoria."
+   },
+   {
+    "pp": "pp-077",
+    "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
+    "cobertura": "cubre",
+    "evidencia": "«Cada grupo automotriz exige campos de validación distintos (TOT, VIN) no estandarizados para facturar, generando un cuello de botella financiero de casi 2 millones de pesos.» El bloque «Datos fiscales» dice en una frase qué impide timbrar («Falta capturarlo» en Domicilio fiscal) y deja corregirlo sin salir de la ficha; la tabla de vehículos con VIN y placas está en la misma pantalla."
+   },
+   {
+    "pp": "pp-047",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "cubre",
+    "evidencia": "«Ante retrasos de facturación o trámites, los clientes contactan directamente al vendedor en lugar del área responsable.» La lista de trámites con folio, descripción y pastilla de estado («En plazo», «Por vencer», «Recibido · sin admitir») permite al vendedor responder en el momento en vez de reenviar la pregunta."
+   },
+   {
+    "pp": "pp-041",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "cubre",
+    "evidencia": "«Al cerrar un cliente, no existe un formato o procedimiento estándar para transferir la información y responsabilidad del caso hacia operaciones.» La ficha es ese formato: el mismo expediente que ve comercial es el que ve operaciones, con contacto principal designado y con las órdenes de instalación enlazadas."
+   },
+   {
+    "pp": "pp-044",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "ignora",
+    "evidencia": "«La documentación de clientes se envía por WhatsApp o se guarda en Drive personal, sin estructura de carpetas compartidas por cliente.» La ficha dice que faltan documentos y permite editar datos fiscales, pero no muestra los documentos del cliente ni da sitio donde vivan; el expediente documental sigue fuera del sistema."
+   },
+   {
+    "pp": "pp-074",
+    "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
+    "cobertura": "ignora",
+    "evidencia": "«No existe un espacio donde el cliente pueda consultar por sí mismo el estatus de sus trámites (placas), generando disputas sobre a quién corresponde la responsabilidad de informar.» La ficha es interna; nada en ella contempla una vista para el cliente ni un envío de estado, de modo que la consulta sigue pasando por una persona."
+   }
+  ],
+  "usabilidad_para_el_area": "Para el vendedor es la pantalla que más dolor quita del lote: reúne en un sitio lo que hoy vive en su memoria y en cuatro Excel (pp-040, pp-041), y pone el bloqueo de facturación —el domicilio fiscal que falta— con su consecuencia escrita y su corrección a un clic, que es exactamente el cuello de botella de pp-077. Lo que falla es el detalle fino de manejo: los enlaces que sacan de la ficha (la miga, los folios de trámite, «Ver en Maps») miden 14-15px de alto, y en una pantalla que se usa con el cliente al teléfono eso se paga en segundos y en fallos de clic. Y queda fuera el expediente documental de pp-044: la ficha dice que faltan documentos pero no es donde viven, así que el Drive personal y el WhatsApp siguen haciendo falta."
+ },
+ "cobertura": [
+  {
+   "patron": "Lista de datos de contacto con cupo declarado (`<section class=\"lista\">` con cabecera, contador «2 de 4», una fila por dato con su etiqueta libre —«trabajo», «alterno», «móvil», «conmutador»—, botón «Añadir» en el pie y el motivo del tope escrito al lado: «Hasta 4»). Se repite cuatro veces por contacto (correos, teléfonos, direcciones, domicilios de agencia). El sistema no tiene regla para esta pieza: no es `.tarjeta` (anida dentro de la tarjeta del contacto, lo que §6.3 prohíbe), no es `.tabla-caja`, y la etiqueta libre por renglón no es ni `.pill` (§6.10, estado) ni `.p-type` (clasificación cerrada).",
+   "propuesta_de_regla": "§6.26 Lista de valores con cupo — `.lista`. **Cuándo:** un campo que admite varios valores del mismo tipo con un tope declarado (correos, teléfonos, direcciones de un contacto). **No es una tarjeta:** vive dentro de la tarjeta de su entidad como `<section>` con encabezado real, sin superficie ni sombra propias, para no incumplir §6.3 («no se anidan tarjetas dentro de tarjetas»). **Estructura fija:** cabecera con icono, rótulo y el cupo consumido a la derecha en formato «N de M»; una fila por valor con el dato en `--text` y, debajo, su etiqueta libre; pie con el botón «Añadir» (`.btn.mini`, §6.2) y el motivo del tope a su lado. **Cuando se llena el cupo, el botón se deshabilita con `aria-disabled=\"true\"` y `aria-describedby` al motivo** (§6.16), nunca desaparece. **La etiqueta libre es un tercer tipo de marca**, distinto de `.pill` y `.p-type`: su valor lo escribe quien captura, así que va sin punto de color, en `--surface-2` con `--text-2`, peso 500 y `var(--fs-meta)` — y así las tres familias se siguen distinguiendo a simple vista (§11). **A11y:** cada sección lleva `aria-labelledby` a su propio encabezado, con `id` único por contacto; repetir el `id` entre dos contactos es el fallo registrado en esta maqueta."
+  },
+  {
+   "patron": "Edición en el sitio de un bloque de la ficha: «Editar datos fiscales» sustituye el bloque de lectura por una rejilla de campos con Guardar y Cancelar, sin abrir diálogo, conservando el resto de la ficha. El `aria-expanded` del botón, el intercambio de `hidden` entre `#fiscal-ver` y `#fiscal-form` y el viaje del foco (al primer campo al abrir, de vuelta al botón al cerrar) están implementados correctamente, pero el sistema no documenta este patrón en ninguna parte: §6.18 cubre el diálogo y §6.15 la fila desplegable de una tabla, no la edición en sitio de una sección de ficha.",
+   "propuesta_de_regla": "§6.27 Edición en el sitio — `.bloque-editable`. **Cuándo:** corregir un grupo pequeño de campos de una ficha sin sacar a nadie de ella; es la opción por defecto frente al diálogo cuando los campos caben sin desplazamiento y el resto de la ficha da el contexto que hace falta para decidir. Si no caben, se usa `dialog.modal` (§6.18). **Estructura:** dos hermanos, `.bloque-ver` y `.bloque-form`, dentro del mismo contenedor, alternados por `hidden`; el botón que los conmuta lleva `aria-expanded` y `aria-controls` al `id` del formulario. **Foco, tres reglas:** al abrir, al primer campo editable —no al contenedor, no al botón de cerrar—; al cancelar, de vuelta al botón que abrió; al guardar, al bloque de lectura actualizado con `tabindex=\"-1\"`, y el cambio se anuncia por `aria-live` (§6.4). **Mientras guarda, el bloque no se cierra** ni por Escape ni por Cancelar, igual que el diálogo. **Los campos de solo lectura se muestran como dato con su motivo al lado**, nunca como campo deshabilitado (§6.18)."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática servida desde disco, sin backend ni librería que perfilar; el documento tampoco fija umbrales de rendimiento auditables.",
+  "§6.11 regla 3 (`aria-sort`): no evaluado como incumplimiento — la única tabla de la pantalla es la de vehículos (VIN / Placas / Descripción, 3 filas) y no ofrece ordenación, de modo que `aria-sort` no es exigible. Sí lleva `<caption>` y `<th scope=\"row\">`.",
+  "§6.18 Diálogo modal: no aplica — la pantalla no abre ningún diálogo (brief: dialogNativo 0, divDialog 0).",
+  "Contraste en tema oscuro de `.p-type`: no evaluado con cifra propia fiable. El brief declara el tema oscuro medido, pero mi barrido no pudo componer el `color-mix` que devuelve el navegador en formato `color(srgb …)`; la cifra citada (2,97:1) es la del brief, en tema claro."
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [],
+  "declarados_no_usados": [
+   "--block",
+   "--block-fill",
+   "--border-fuerte",
+   "--dur-enter",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--fs-kpi",
+   "--glass",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--r-modal",
+   "--sp-12",
+   "--stagger",
+   "--velo-trama",
+   "--warn",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 83,
+  "n_usados": 65,
+  "n_divergentes": 15,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": true,
+   "filas": 3,
+   "nodosText3": 2
+  }
+ }
 }

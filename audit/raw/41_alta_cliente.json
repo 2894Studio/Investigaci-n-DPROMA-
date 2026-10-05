@@ -1,274 +1,541 @@
 {
-  "pantalla": "41_alta_cliente",
-  "ruta_zip": "02-padron-de-clientes/41_alta_cliente.html",
-  "carpeta": "02-padron-de-clientes",
-  "area": "comercial",
-  "arquetipo": "formulario",
-  "modo": "cumplimiento",
-  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
-  "capturas": [
-    "41_alta_cliente--ok.png",
-    "41_alta_cliente--loading.png",
-    "41_alta_cliente--empty.png",
-    "41_alta_cliente--error.png",
-    "41_alta_cliente--oscuro.png"
-  ],
-  "f1_cumplimiento": {
-    "veredicto": "cumple_parcialmente",
-    "hallazgos": [
-      {
-        "id": "f1-41alta-01",
-        "severidad": "alta",
-        "regla": "§2.1 Suelo tipográfico",
-        "dice_el_sistema": "El suelo son 12px. «Nada baja de ahí.» Regla práctica: «si un dato se lee todos los días, va a 12-13px como mínimo». Única excepción admitida: 10,5px en mayúsculas con `letter-spacing` para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta. §2 fija además `--fs-dense` (13px) como «ayuda de campo».",
-        "hay_en_el_build": "25 declaraciones de tamaño por debajo de 12px, entre ellas `.ctrl .ayuda{font-size:11px}` (la ayuda que hay bajo cada campo), `.nivel{font-size:10.5px}` (las marcas «PARA DAR DE ALTA» / «PARA FACTURAR»), `.idx{font-size:11px}` (el índice numerado de cada sección) y la forma abreviada `font:600 11.5px var(--font-ui)`.",
-        "selector": ".ctrl .ayuda, .nivel, .idx",
-        "evidencia": "Medición propia con el estilo calculado (§10 trampa 1): 32 nodos de texto por debajo de 12px en la vista con datos, con `.ayuda` a 11px y `.nivel` a 10,5px; 25 declaraciones `font-size:1[01](.5)?px` / `font:… 11.5px` en el `<style>`. `--fs-meta` está declarado a 12px y `--fs-dense` a 13px, y simplemente no se usan ahí.",
-        "por_que_importa": "La ayuda de campo («12 caracteres para persona moral, 13 para física», «Como aparece en la constancia de situación fiscal») es lo que evita capturar mal el RFC, que es la clave única del cliente. §2 le asigna 13px y aquí va a 11. Y `.nivel` a 10,5px no es ninguna de las dos excepciones que §2.1 admite: no es rótulo de grupo de la barra lateral ni etiqueta de campo del modo tarjeta."
-      },
-      {
-        "id": "f1-41alta-02",
-        "severidad": "media",
-        "regla": "§6.9 Avisos — el icono coincide con la variante",
-        "dice_el_sistema": "El icono tiene que coincidir con la variante (triángulo de advertencia sobre banda neutra = señal mixta).",
-        "hay_en_el_build": "Las tres `.banda b-info` —neutras, `background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)`— llevan `<use href=\"#i-alert\">`, el triángulo de advertencia.",
-        "selector": ".banda.b-info > svg use[href=\"#i-alert\"]",
-        "evidencia": "Medición propia del markup: tres bloques `<div class=\"banda b-info\"><svg …><use href=\"#i-alert\"/></svg>`; `.b-info{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}` (línea 521). Captura 41_alta_cliente--ok.png: triángulo sobre banda gris.",
-        "por_que_importa": "Es exactamente la señal mixta que §6.9 nombra: el color dice «información» y el icono dice «advertencia». Quien repasa el formulario no sabe si las tres bandas bloquean algo o solo informan."
-      },
-      {
-        "id": "f1-41alta-03",
-        "severidad": "media",
-        "regla": "§8 Voz de producto — límites medibles / §6.9",
-        "dice_el_sistema": "`.nota` y `.banda` llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto. Una segunda oración se borra o pasa a toggletip. «No hay excepción por importancia del contenido.» Ningún bloque de texto siempre visible pasa de ~140 caracteres; se mide con el contador de caracteres, no a ojo.",
-        "hay_en_el_build": "Banda de cabecera: «Para dar de alta bastan la razón social y el RFC. El resto se puede completar después, pero sin datos fiscales y documentos no se le podrá programar una orden de instalación ni facturar; y sin sucursal tampoco.» Banda de la sección 3: «Sin sucursal no se le puede programar una orden; se puede añadir después desde la ficha. Si capturas cualquier dato de la sucursal, el nombre, el municipio y la dirección pasan a ser obligatorios.»",
-        "selector": ".detalle .banda.b-info, .seccion > .banda.b-info",
-        "evidencia": "Conteo de caracteres propio sobre el texto literal del markup: 210 caracteres y dos oraciones en la primera (con punto y coma después del primer punto, que §8 prohíbe expresamente); 196 caracteres y dos oraciones en la segunda. El límite es ~140 y una frase. La tercera banda («El contacto no necesita sucursal: sin ella queda como contacto de la empresa.», 76 caracteres, una frase) sí cumple.",
-        "por_que_importa": "Las dos bandas largas son lo primero que se lee antes de capturar; al doblar el límite se saltan, y con ellas se salta la única explicación de por qué «Dar de alta» funciona con dos campos pero el cliente queda sin poder facturar."
-      },
-      {
-        "id": "f1-41alta-04",
-        "severidad": "media",
-        "regla": "§6.4 Vistas de estado — `.tarjeta-estado`",
-        "dice_el_sistema": "`.tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)}` — es `--r-modal` y `--sh-modal`, no los de `.tarjeta`, y va opaca. `.estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}`, glifo a 28px; `.es-err` cambia solo el fondo a `--err`.",
-        "hay_en_el_build": "`.tarjeta-estado{display:flex;flex-direction:column;align-items:center;gap:var(--sp-2)}` y `.tarjeta-estado h2{font-size:var(--fs-base);font-weight:600}` — sin `max-width`, sin relleno, sin radio, sin sombra. No existe `.estado-ico`: el icono es un `.ico` de 30px en contorno sobre `--text-3`.",
-        "selector": ".tarjeta-estado, .state .ico",
-        "evidencia": "Medición propia: tres ocurrencias de `tarjeta-estado` en el archivo (dos reglas CSS y un uso en `.state-empty`), ninguna de `estado-ico`. `--r-modal` figura entre los tokens declarados y no usados (brief). Captura 41_alta_cliente--empty.png.",
-        "por_que_importa": "El nombre del componente está y la receta no: el estado vacío queda suelto sobre el fondo en vez de en la tarjeta con medallón que §11 exige. Es el único punto donde §6.4 no se cumple en esta pantalla, que por lo demás la aplica bien (encabezado real `<h2>`, anuncio por `aria-live`, foco al contenido)."
-      },
-      {
-        "id": "f1-41alta-05",
-        "severidad": "media",
-        "regla": "§6.7 / §5 `prefers-reduced-motion` y punto de ruptura del esqueleto",
-        "dice_el_sistema": "Hay que aplanar el fondo, no solo parar la animación: `@media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}`. Y: «El punto de ruptura del esqueleto es el de la tabla (860px, no 900px)».",
-        "hay_en_el_build": "`@media (prefers-reduced-motion:reduce){.skel{animation:none}}` (línea 662), sin reponer el fondo; y `@media (max-width:900px){.sk-fila{grid-template-columns:1fr !important}}` (línea 680) mientras el resto de la pantalla rompe a 860px (líneas 192, 275, 304).",
-        "selector": ".skel bajo @media (prefers-reduced-motion:reduce), @media (max-width:900px) .sk-fila",
-        "evidencia": "Medición propia en contexto `reducedMotion:'reduce'` sobre esta familia de maquetas: `animation-name` queda en `none` pero `background-image` sigue siendo el `linear-gradient` y `background-color` es `rgba(0,0,0,0)`. Es el fallo que §6.7 describe palabra por palabra.",
-        "por_que_importa": "Quien pide movimiento reducido ve el degradado congelado a medio recorrido en lugar de una superficie plana; se lee como un error de pintado."
-      },
-      {
-        "id": "f1-41alta-06",
-        "severidad": "alta",
-        "regla": "§1.1 Superficies y texto — `--text-3`",
-        "dice_el_sistema": "`--text-3` es `#5C6675`, no el antiguo `#66717F` (que caía a 4,21:1 sobre `--surface-2`).",
-        "hay_en_el_build": "`--text-3: #66717F` en el `:root` del tema claro.",
-        "selector": ":root{--text-3}",
-        "evidencia": "Brief MEDIDO: `text_3_declarado = \"#66717F\"`. El formulario pinta con `--text-3` la ayuda de campo y usa `--surface-2` en las cabeceras de `.seccion` y en el esqueleto.",
-        "por_que_importa": "Hecho ya establecido para 51 de 52; se marca porque la ayuda de campo en `--text-3` cae sobre la cabecera `--surface-2` de la sección en el modo compacto."
-      },
-      {
-        "id": "f1-41alta-07",
-        "severidad": "media",
-        "regla": "§7.3 Objetivos táctiles — modo dedo",
-        "dice_el_sistema": "Toda regla táctil lleva `:root` y se comprueba midiendo con `data-tacto=\"dedo\"` puesto.",
-        "hay_en_el_build": "Las seis reglas `[data-tacto=\"dedo\"] …` se escriben sin `:root`.",
-        "selector": "[data-tacto=\"dedo\"] .it, [data-tacto=\"dedo\"] .iconbtn, [data-tacto=\"dedo\"] .cromo-prof",
-        "evidencia": "Brief MEDIDO: regla_data_tacto_sin_root = 6, y 0 destinos por debajo de 24px en la pantalla. Medición propia con `data-tacto=\"dedo\"` puesto: los 2 `.iconbtn` de la pantalla sí llegan a 46px y los `.it` del menú también, porque aquí no hay ninguna variante de tamaño posterior que empate la especificidad.",
-        "por_que_importa": "Hoy no muerde —esta pantalla no tiene `.acciones .iconbtn{width:28px}`— pero el bug de especificidad está presente y basta añadir una variante de tamaño para que el modo dedo deje de aplicarse sin que nada avise. Se registra como deuda, no como fallo visible."
-      },
-      {
-        "id": "f1-41alta-08",
-        "severidad": "media",
-        "regla": "§10 trampa 5 — `<symbol>` y `viewBox` repetido",
-        "dice_el_sistema": "Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca. Medidas en el `<use>`, sin `viewBox` en el envoltorio. Se comprueba midiendo la caja del `<use>` contra la del `<svg>`.",
-        "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>` en el logotipo y `<svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\">` en el botón flotante.",
-        "selector": ".logo > svg, .fab > svg",
-        "evidencia": "Medición propia: el `<symbol id=\"dproma-mark\">` declara `viewBox=\"740 0 970 932\"`; el `<use>` del logotipo queda a −32,5px de su `<svg>` y el del botón flotante a −16,2px.",
-        "por_que_importa": "El isotipo se recorta casi entero en la cabecera del menú lateral, en las cinco pantallas del módulo."
-      },
-      {
-        "id": "f1-41alta-09",
-        "severidad": "baja",
-        "regla": "§6.9 Avisos — nombres de las variantes de `.banda`",
-        "dice_el_sistema": "Cuatro variantes: `.banda-info` (`--surface-2`/`--text-2`/`--border`), `.banda-warn` (`--warn-bg`/`--warn-ink`), `.banda-err` (`--err-bg`/`--err-ink`), `.banda-ok` (`--ok-bg`/`--ok-ink`).",
-        "hay_en_el_build": "`.b-info`, `.b-warn`, `.b-err` (líneas 518-521), con los valores correctos pero con nombre abreviado, y sin `.banda-ok`.",
-        "selector": ".b-info, .b-warn, .b-err",
-        "evidencia": "Medición propia del archivo: las tres clases existen con los tokens que el sistema fija; la nomenclatura es la única divergencia.",
-        "por_que_importa": "Funciona igual, pero `b-` es el prefijo de una sola letra que §10 trampa 10 señala como el que más se repite sin querer entre componentes; `banda-` deja el componente de origen escrito en el nombre."
-      },
-      {
-        "id": "f1-41alta-10",
-        "severidad": "baja",
-        "regla": "§6.19 Botón-icono / §6.5 Iconos",
-        "dice_el_sistema": "Nunca viaja solo: `title` + `aria-label`.",
-        "hay_en_el_build": "Los 2 `.iconbtn` de la pantalla (exportar del cromo y conmutador de tema) llevan `aria-label` y ninguno `title`.",
-        "selector": ".iconbtn",
-        "evidencia": "Medición propia: 2 `.iconbtn`, 2 sin `title`, 0 sin `aria-label`.",
-        "por_que_importa": "Impacto bajo en esta pantalla porque solo hay dos y están en el cromo, pero es la misma omisión que en toda la carpeta."
-      }
-    ]
-  },
-  "f3_boost_ui": {
-    "puntuacion": 4,
-    "dimensiones": {
-      "accesibilidad": 3,
-      "rendimiento": "no_evaluado",
-      "theming": 3,
-      "responsive": 3,
-      "integridad": 4
-    },
-    "justificacion": "Es la pantalla más completa del lote y la única que aplica §6.16 de principio a fin: los dos campos que dan de alta llevan `required` y `aria-required` de verdad (regla 3) y los demás se marcan con palabras distintas —«PARA DAR DE ALTA» frente a «PARA FACTURAR»— que es exactamente la regla 2; la validación del domicilio aparece en `blur` y no antes (regla 4) y se vincula con `aria-invalid` más `aria-describedby` al `id` del mensaje (regla 5); los tipos de campo son los del dato, con `type=\"email\"`, `type=\"tel\"`, `inputmode=\"numeric\"` y `pattern=\"[0-9]{5}\"` en el código postal (regla 6); el contador de sección habla en español y cuenta bien, «Completa» / «Falta: domicilio fiscal» / «Faltan N campos» (regla 7); y el tipo de cliente se muestra como dato calculado con su motivo, no como campo (regla 1). §6.17 se cumple entera: `accept` declarado, formatos y peso escritos, `aria-describedby` a la ayuda, y el archivo cargado se dibuja con su nombre, su fecha y un botón «Quitar». §6.4 se cumple salvo la receta visual de la tarjeta: hay `aria-live`, el foco viaja al contenido, cada estado lleva `<h2>` real, y el error va encima como aviso con los campos rellenos a la vista y su referencia `PAD-20260821-1401`. Lo que baja la nota a 4: 25 declaraciones de tipografía bajo el suelo de 12px —entre ellas la ayuda de campo—, el triángulo de advertencia sobre banda neutra, dos bandas que doblan el límite de §8, la tarjeta de estado sin su receta, `--text-3` obsoleto y el esqueleto que no aplana el fondo con movimiento reducido.",
-    "evidencia": [
-      "Brief MEDIDO: 0 de 41 destinos interactivos por debajo de 24px, 0 inputs sin etiqueta, ariaLive 4, h1 1, landmarks 9, skipLink 1, 0 tokens usados sin declarar.",
-      "Medición propia: 2 inputs con `required` + `aria-required` (`#rs`, `#rfc`) y ninguno decorativo; 2 `input[type=file]` con `accept` y `aria-describedby` (`a-car`, `a-ide`); manejadores de `blur`/`input` que ponen y quitan `aria-invalid` y reescriben `aria-describedby`; `role=\"alert\"` en el aviso de error y `aria-live=\"polite\"` en la región de anuncios; 0 `id` duplicados y 0 `aria-controls` huérfanos.",
-      "Medición propia de lo que falla: 32 nodos de texto bajo 12px (`.ayuda` 11px, `.nivel` 10,5px); `.b-info` neutra con `#i-alert`; bandas de 210 y 196 caracteres; `.tarjeta-estado` sin `max-width`/`padding`/`--r-modal`/`--sh-modal`; `<use>` del isotipo a −32,5px; `.skel` con `animation:none` y el degradado sin aplanar.",
-      "Capturas 41_alta_cliente--ok.png, --empty.png, --error.png, --oscuro.png."
-    ]
-  },
-  "f4_nielsen": [
-    {
-      "n": 1,
-      "heuristica": "Visibilidad del estado del sistema",
-      "severidad": 1,
-      "hallazgo": "Cada sección lleva su estado escrito en el encabezado («Completa», «Falta: domicilio fiscal») y el pie dice «Borrador guardado hace 1 min. Puedes salir y volver», que resuelve la duda de si lo capturado está a salvo. El cambio de vista se anuncia por `aria-live` y mueve el foco. Lo único que no se ve es que el esqueleto de carga no tiene la forma del formulario que va a llegar.",
-      "selector": ".seccion .est, .pie-form, .sk-fila"
-    },
-    {
-      "n": 2,
-      "heuristica": "Coincidencia entre el sistema y el mundo real",
-      "severidad": 0,
-      "hallazgo": "«Como aparece en la constancia de situación fiscal», «Un RFC de 13 posiciones es persona física; de 12, empresa. Si el cliente tiene agencia, agencia manda sobre el RFC»: el formulario habla del documento que la persona tiene delante, no del modelo de datos.",
-      "selector": ".ctrl .ayuda, .dato-calc"
-    },
-    {
-      "n": 3,
-      "heuristica": "Control y libertad del usuario",
-      "severidad": 1,
-      "hallazgo": "Hay «Cancelar», borrador guardado y archivo que se puede quitar una vez subido. No se declara, en cambio, qué pasa con el borrador al cancelar, ni hay confirmación antes de descartarlo.",
-      "selector": ".pie-form .btn, .quitar-archivo"
-    },
-    {
-      "n": 4,
-      "heuristica": "Consistencia y estándares",
-      "severidad": 2,
-      "hallazgo": "Las variantes de `.banda` se llaman `.b-info`/`.b-warn`/`.b-err` en vez de `.banda-*`; la banda neutra lleva icono de advertencia; `.tarjeta-estado` conserva el nombre pero no la receta; la ayuda de campo va a 11px donde §2 fija 13.",
-      "selector": ".b-info, .tarjeta-estado, .ctrl .ayuda"
-    },
-    {
-      "n": 5,
-      "heuristica": "Prevención de errores",
-      "severidad": 0,
-      "hallazgo": "`required` y `aria-required` reales en los dos campos que dan de alta, `pattern` y `maxlength` en el código postal, tipos de campo correctos, dos niveles de obligatoriedad con palabras distintas, y el tipo de cliente deducido del RFC se muestra como dato con su regla escrita en vez de como campo que se pueda contradecir.",
-      "selector": "#rs, #rfc, #cp, .dato-calc"
-    },
-    {
-      "n": 6,
-      "heuristica": "Reconocer antes que recordar",
-      "severidad": 1,
-      "hallazgo": "Las secciones van numeradas y con su estado a la derecha, y la subida dice formatos y peso antes de pulsar. En contra, las marcas «PARA DAR DE ALTA» / «PARA FACTURAR», que son la clave para saber qué se puede dejar para después, están a 10,5px.",
-      "selector": ".seccion header, .subida-caja, .nivel"
-    },
-    {
-      "n": 7,
-      "heuristica": "Flexibilidad y eficiencia",
-      "severidad": 0,
-      "hallazgo": "Se puede dar de alta con dos campos y completar el resto más tarde desde la ficha; el borrador permite salir y volver. Es el camino corto que pide un alta que hoy empieza en WhatsApp.",
-      "selector": ".pie-form, .detalle .banda"
-    },
-    {
-      "n": 8,
-      "heuristica": "Diseño estético y minimalista",
-      "severidad": 2,
-      "hallazgo": "Dos de las tres bandas informativas doblan el límite de ~140 caracteres y una frase de §8, y una de ellas usa punto y coma después del primer punto, que el documento prohíbe expresamente.",
-      "selector": ".detalle .banda.b-info, .seccion > .banda.b-info"
-    },
-    {
-      "n": 9,
-      "heuristica": "Ayudar a reconocer y recuperarse de errores",
-      "severidad": 0,
-      "hallazgo": "El error de guardado es el ejemplo literal de §6.4 regla 3 y 4: dice qué pasó, qué no se ha perdido («El cliente no se creó, pero lo que capturaste sigue aquí») y qué hacer, con referencia `PAD-20260821-1401`, va encima como aviso con `role=\"alert\"` y deja todos los campos visibles y rellenos.",
-      "selector": "#aviso-error"
-    },
-    {
-      "n": 10,
-      "heuristica": "Ayuda y documentación",
-      "severidad": 1,
-      "hallazgo": "Hay ayuda bajo cada campo y un «Ver el detalle» que despliega la explicación larga con `aria-expanded`/`aria-controls`. El problema no es que falte sino que la que está siempre visible excede el límite de §8 y se lee a 11px.",
-      "selector": ".mas-ayuda, .ctrl .ayuda"
-    }
-  ],
-  "f5_investigacion": {
-    "pain_points_evaluados": [
-      {
-        "pp": "pp-097",
-        "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
-        "cobertura": "cubre",
-        "evidencia": "«El alta de clientes se inicia en WhatsApp, sigue por correo y se captura manualmente en Excel; no existen formularios digitales automatizados.» Esta pantalla es precisamente ese formulario digital: cuatro secciones numeradas, con qué es obligatorio para dar de alta y qué para facturar separado con palabras distintas, y borrador guardado para poder interrumpir la captura."
-      },
-      {
-        "pp": "pp-077",
-        "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
-        "cobertura": "cubre",
-        "evidencia": "«Cada grupo automotriz exige campos de validación distintos (TOT, VIN) no estandarizados para facturar, generando un cuello de botella financiero de casi 2 millones de pesos.» La sección 2 agrupa código postal, régimen, domicilio fiscal y los dos documentos, y marca cada uno con «PARA FACTURAR»: el alta deja explícito, desde el primer día, qué falta para poder cobrar."
-      },
-      {
-        "pp": "pp-045",
-        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
-        "cobertura": "cubre",
-        "evidencia": "«Las bases de datos de clientes se comparten como Excel adjuntos por correo; los cambios de una parte no se reflejan para la otra.» El alta escribe en el padrón único en lugar de en una copia; el borrador («Puedes salir y volver») sustituye al archivo que se guardaba a medias en el escritorio."
-      },
-      {
-        "pp": "pp-044",
-        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
-        "cobertura": "cubre",
-        "evidencia": "«La documentación de clientes se envía por WhatsApp o se guarda en Drive personal, sin estructura de carpetas compartidas por cliente.» Los dos `.subida` —constancia de situación fiscal e identificación— hacen que el documento entre por el expediente del cliente y no por un chat, con formatos y peso declarados y con el archivo cargado mostrado con nombre y fecha."
-      },
-      {
-        "pp": "pp-076",
-        "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
-        "cobertura": "cubre",
-        "evidencia": "«La recepción de datos de clientes finales para instalaciones se realiza de forma informal por WhatsApp o correo, sin formato estandarizado, y algunos registros se pierden.» La sección 4 captura la primera persona de contacto con rol, correo y teléfono en campos con su tipo correcto, dentro del mismo alta."
-      },
-      {
-        "pp": "pp-041",
-        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
-        "cobertura": "cubre",
-        "evidencia": "«Al cerrar un cliente, no existe un formato o procedimiento estándar para transferir la información y responsabilidad del caso hacia operaciones.» La sección 3 (sucursal) declara en banda que sin sucursal no se puede programar una orden: el alta obliga a dejar listo justo lo que operaciones necesita recibir."
-      },
-      {
-        "pp": "pp-042",
-        "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
-        "cobertura": "ignora",
-        "evidencia": "«No existe un cuestionario o formato digital para perfilar a un cliente potencial antes de una visita comercial.» El formulario da de alta a un cliente ya cerrado: no contempla el estado previo de prospecto ni ningún campo de perfilado, así que la visita comercial sigue preparándose fuera del sistema."
-      }
-    ],
-    "usabilidad_para_el_area": "Es la pantalla del lote que más trabajo manual retira al área comercial. Convierte en formulario con reglas lo que hoy va de WhatsApp a correo a Excel (pp-097, pp-045), y hace algo que ninguna otra hace: separa con palabras —no con asteriscos— lo que basta para dar de alta de lo que hace falta para facturar, que es el cuello de botella de casi dos millones de pesos que describe pp-077. Las dos subidas de documento meten la constancia y la identificación en el expediente del cliente en vez de en un Drive personal (pp-044). Las pegas son de lectura, no de flujo: la ayuda que evita capturar mal el RFC va a 11px y las marcas «PARA FACTURAR» a 10,5px, justo los textos de los que depende que el alta salga bien a la primera; y las dos bandas largas de cabecera se saltan por tamaño. Para el vendedor que da de alta desde una agencia, con prisa, eso significa releer o equivocarse."
-  },
-  "cobertura": [
-    {
-      "patron": "Contador de completitud en la cabecera de cada `.seccion`, escrito en español y calculado en vivo: «Completa», «Falta: domicilio fiscal», «Faltan N campos», con las secciones opcionales excluidas del recuento. §6.16 regla 7 exige que «el contador de sección hable en español, no en aritmética, y si cuenta, cuente bien», pero no documenta su forma: ni la clase, ni dónde va, ni qué hace cuando la sección es opcional, ni cómo se anuncia el cambio.",
-      "propuesta_de_regla": "§6.16.1 Estado de sección — `.est`. **Cuándo:** toda `.seccion` de un formulario largo cuyo contenido pueda quedar incompleto. Va en la cabecera de la sección, alineado a la derecha, frente al índice numerado. **Tres formas y solo tres:** «Completa» con el glifo de verificación cuando no falta nada; «Falta: <el rótulo del campo en minúsculas>» cuando falta exactamente uno —nombrarlo ahorra el viaje de buscarlo—; «Faltan N campos» a partir de dos. **Una sección opcional no lleva contador**, porque un «Faltan 3 campos» en algo que no bloquea nada se lee como un error. **Qué cuenta:** solo los controles con `aria-required` de verdad; los asteriscos decorativos no cuentan porque no existen (§6.16 regla 3). **Se recalcula en `blur` y en `input`**, nunca en `keypress`, para que el rótulo no parpadee mientras se escribe. **A11y:** el contador es texto, no `aria-label`, y su cambio **no** se anuncia por `aria-live` —anunciar cada recuento interrumpe la captura—; lo que sí se anuncia es el error del campo, por `aria-describedby` (§6.16 regla 5)."
-    },
-    {
-      "patron": "Marca de nivel de obligatoriedad junto al rótulo del campo (`.nivel`): una píldora en mayúsculas que dice «PARA DAR DE ALTA» o «PARA FACTURAR», con su propio color de fondo. §6.16 regla 2 exige «dos niveles de obligatoriedad con palabras distintas» y da esas dos palabras, pero no documenta la pieza que las lleva: ni su tamaño —aquí 10,5px, bajo el suelo de §2.1 y fuera de las dos excepciones admitidas—, ni su color, ni su relación con `.pill` y `.p-type`, con las que convive en la misma pantalla.",
-      "propuesta_de_regla": "§6.16.2 Marca de obligatoriedad — `.nivel`. **Cuándo:** un formulario con dos niveles de exigencia reales, donde una parte de los campos bloquea el alta y otra bloquea una operación posterior. **Nunca sustituye a `required`/`aria-required`**: es la versión legible de lo que el `<input>` ya declara. **Dos valores cerrados**, el texto exacto que §6.16 regla 2 fija, en mayúsculas y pegados al rótulo del campo. **Tamaño:** `var(--fs-meta)` (12px), no 10,5 — la excepción de §2.1 cubre los rótulos de grupo de la barra lateral y las etiquetas de campo del modo tarjeta, y esta no es ninguna de las dos. **Color:** es un dato sobre el dato, no un juicio (§1 y §6.22), así que va en `--text-2` sobre `--surface-2`; nunca en semáforo, porque «falta para facturar» no es un error mientras no se intente facturar. **Relación con las otras marcas:** `.pill` lleva punto o icono y peso 700; `.p-type`, punto y peso 600; `.nivel`, ni punto ni icono y peso 700 en mayúsculas con `letter-spacing` — las tres se distinguen a simple vista, como pide §11."
-    }
-  ],
-  "sin_datos": [
-    "f3.rendimiento: maqueta estática servida desde disco, sin backend ni librería que perfilar; el documento tampoco fija umbrales de rendimiento auditables.",
-    "§6.18 Diálogo modal: no aplica — el alta es una pantalla completa y no abre ningún diálogo (brief: dialogNativo 0, divDialog 0). La variante en diálogo de este mismo formulario se audita en 58_altas_como_modal.",
-    "§6.11 Tabla densa: no aplica — la pantalla no tiene tabla (brief: tablas 0).",
-    "§6.16 A11y extra (botón deshabilitado con `aria-disabled` + motivo): no evaluado — no hay ningún control deshabilitado en la pantalla (0 `aria-disabled`, 0 `disabled`), así que no hay implementación que comprobar.",
-    "§6.16 regla 8 (guardado automático o botón de guardar, no los dos): no se marca como incumplimiento. Conviven el borrador automático y «Dar de alta», pero son cosas distintas —guardar el trabajo a medias frente a crear el registro— y el pie lo dice sin ambigüedad: «Borrador guardado hace 1 min. Puedes salir y volver». El documento no distingue borrador de envío, así que el caso queda fuera de lo que la regla resuelve."
+ "pantalla": "41_alta_cliente",
+ "ruta_zip": "02-padron-de-clientes/41_alta_cliente.html",
+ "carpeta": "02-padron-de-clientes",
+ "area": "comercial",
+ "arquetipo": "formulario",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "41_alta_cliente--ok.png",
+  "41_alta_cliente--loading.png",
+  "41_alta_cliente--empty.png",
+  "41_alta_cliente--error.png",
+  "41_alta_cliente--oscuro.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "f1-41alta-01",
+    "severidad": "alta",
+    "regla": "§2.1 Suelo tipográfico",
+    "dice_el_sistema": "El suelo son 12px. «Nada baja de ahí.» Regla práctica: «si un dato se lee todos los días, va a 12-13px como mínimo». Única excepción admitida: 10,5px en mayúsculas con `letter-spacing` para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta. §2 fija además `--fs-dense` (13px) como «ayuda de campo».",
+    "hay_en_el_build": "25 declaraciones de tamaño por debajo de 12px, entre ellas `.ctrl .ayuda{font-size:11px}` (la ayuda que hay bajo cada campo), `.nivel{font-size:10.5px}` (las marcas «PARA DAR DE ALTA» / «PARA FACTURAR»), `.idx{font-size:11px}` (el índice numerado de cada sección) y la forma abreviada `font:600 11.5px var(--font-ui)`.",
+    "selector": ".ctrl .ayuda, .nivel, .idx",
+    "evidencia": "Medición propia con el estilo calculado (§10 trampa 1): 32 nodos de texto por debajo de 12px en la vista con datos, con `.ayuda` a 11px y `.nivel` a 10,5px; 25 declaraciones `font-size:1[01](.5)?px` / `font:… 11.5px` en el `<style>`. `--fs-meta` está declarado a 12px y `--fs-dense` a 13px, y simplemente no se usan ahí.",
+    "por_que_importa": "La ayuda de campo («12 caracteres para persona moral, 13 para física», «Como aparece en la constancia de situación fiscal») es lo que evita capturar mal el RFC, que es la clave única del cliente. §2 le asigna 13px y aquí va a 11. Y `.nivel` a 10,5px no es ninguna de las dos excepciones que §2.1 admite: no es rótulo de grupo de la barra lateral ni etiqueta de campo del modo tarjeta."
+   },
+   {
+    "id": "f1-41alta-02",
+    "severidad": "media",
+    "regla": "§6.9 Avisos — el icono coincide con la variante",
+    "dice_el_sistema": "El icono tiene que coincidir con la variante (triángulo de advertencia sobre banda neutra = señal mixta).",
+    "hay_en_el_build": "Las tres `.banda b-info` —neutras, `background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)`— llevan `<use href=\"#i-alert\">`, el triángulo de advertencia.",
+    "selector": ".banda.b-info > svg use[href=\"#i-alert\"]",
+    "evidencia": "Medición propia del markup: tres bloques `<div class=\"banda b-info\"><svg …><use href=\"#i-alert\"/></svg>`; `.b-info{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}` (línea 521). Captura 41_alta_cliente--ok.png: triángulo sobre banda gris.",
+    "por_que_importa": "Es exactamente la señal mixta que §6.9 nombra: el color dice «información» y el icono dice «advertencia». Quien repasa el formulario no sabe si las tres bandas bloquean algo o solo informan."
+   },
+   {
+    "id": "f1-41alta-03",
+    "severidad": "media",
+    "regla": "§8 Voz de producto — límites medibles / §6.9",
+    "dice_el_sistema": "`.nota` y `.banda` llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto. Una segunda oración se borra o pasa a toggletip. «No hay excepción por importancia del contenido.» Ningún bloque de texto siempre visible pasa de ~140 caracteres; se mide con el contador de caracteres, no a ojo.",
+    "hay_en_el_build": "Banda de cabecera: «Para dar de alta bastan la razón social y el RFC. El resto se puede completar después, pero sin datos fiscales y documentos no se le podrá programar una orden de instalación ni facturar; y sin sucursal tampoco.» Banda de la sección 3: «Sin sucursal no se le puede programar una orden; se puede añadir después desde la ficha. Si capturas cualquier dato de la sucursal, el nombre, el municipio y la dirección pasan a ser obligatorios.»",
+    "selector": ".detalle .banda.b-info, .seccion > .banda.b-info",
+    "evidencia": "Conteo de caracteres propio sobre el texto literal del markup: 210 caracteres y dos oraciones en la primera (con punto y coma después del primer punto, que §8 prohíbe expresamente); 196 caracteres y dos oraciones en la segunda. El límite es ~140 y una frase. La tercera banda («El contacto no necesita sucursal: sin ella queda como contacto de la empresa.», 76 caracteres, una frase) sí cumple.",
+    "por_que_importa": "Las dos bandas largas son lo primero que se lee antes de capturar; al doblar el límite se saltan, y con ellas se salta la única explicación de por qué «Dar de alta» funciona con dos campos pero el cliente queda sin poder facturar."
+   },
+   {
+    "id": "f1-41alta-04",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado — `.tarjeta-estado`",
+    "dice_el_sistema": "`.tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)}` — es `--r-modal` y `--sh-modal`, no los de `.tarjeta`, y va opaca. `.estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}`, glifo a 28px; `.es-err` cambia solo el fondo a `--err`.",
+    "hay_en_el_build": "`.tarjeta-estado{display:flex;flex-direction:column;align-items:center;gap:var(--sp-2)}` y `.tarjeta-estado h2{font-size:var(--fs-base);font-weight:600}` — sin `max-width`, sin relleno, sin radio, sin sombra. No existe `.estado-ico`: el icono es un `.ico` de 30px en contorno sobre `--text-3`.",
+    "selector": ".tarjeta-estado, .state .ico",
+    "evidencia": "Medición propia: tres ocurrencias de `tarjeta-estado` en el archivo (dos reglas CSS y un uso en `.state-empty`), ninguna de `estado-ico`. `--r-modal` figura entre los tokens declarados y no usados (brief). Captura 41_alta_cliente--empty.png.",
+    "por_que_importa": "El nombre del componente está y la receta no: el estado vacío queda suelto sobre el fondo en vez de en la tarjeta con medallón que §11 exige. Es el único punto donde §6.4 no se cumple en esta pantalla, que por lo demás la aplica bien (encabezado real `<h2>`, anuncio por `aria-live`, foco al contenido)."
+   },
+   {
+    "id": "f1-41alta-05",
+    "severidad": "media",
+    "regla": "§6.7 / §5 `prefers-reduced-motion` y punto de ruptura del esqueleto",
+    "dice_el_sistema": "Hay que aplanar el fondo, no solo parar la animación: `@media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}`. Y: «El punto de ruptura del esqueleto es el de la tabla (860px, no 900px)».",
+    "hay_en_el_build": "`@media (prefers-reduced-motion:reduce){.skel{animation:none}}` (línea 662), sin reponer el fondo; y `@media (max-width:900px){.sk-fila{grid-template-columns:1fr !important}}` (línea 680) mientras el resto de la pantalla rompe a 860px (líneas 192, 275, 304).",
+    "selector": ".skel bajo @media (prefers-reduced-motion:reduce), @media (max-width:900px) .sk-fila",
+    "evidencia": "Medición propia en contexto `reducedMotion:'reduce'` sobre esta familia de maquetas: `animation-name` queda en `none` pero `background-image` sigue siendo el `linear-gradient` y `background-color` es `rgba(0,0,0,0)`. Es el fallo que §6.7 describe palabra por palabra.",
+    "por_que_importa": "Quien pide movimiento reducido ve el degradado congelado a medio recorrido en lugar de una superficie plana; se lee como un error de pintado."
+   },
+   {
+    "id": "f1-41alta-06",
+    "severidad": "alta",
+    "regla": "§1.1 Superficies y texto — `--text-3`",
+    "dice_el_sistema": "`--text-3` es `#5C6675`, no el antiguo `#66717F` (que caía a 4,21:1 sobre `--surface-2`).",
+    "hay_en_el_build": "`--text-3: #66717F` en el `:root` del tema claro.",
+    "selector": ":root{--text-3}",
+    "evidencia": "Brief MEDIDO: `text_3_declarado = \"#66717F\"`. El formulario pinta con `--text-3` la ayuda de campo y usa `--surface-2` en las cabeceras de `.seccion` y en el esqueleto.",
+    "por_que_importa": "Hecho ya establecido para 51 de 52; se marca porque la ayuda de campo en `--text-3` cae sobre la cabecera `--surface-2` de la sección en el modo compacto."
+   },
+   {
+    "id": "f1-41alta-07",
+    "severidad": "media",
+    "regla": "§7.3 Objetivos táctiles — modo dedo",
+    "dice_el_sistema": "Toda regla táctil lleva `:root` y se comprueba midiendo con `data-tacto=\"dedo\"` puesto.",
+    "hay_en_el_build": "Las seis reglas `[data-tacto=\"dedo\"] …` se escriben sin `:root`.",
+    "selector": "[data-tacto=\"dedo\"] .it, [data-tacto=\"dedo\"] .iconbtn, [data-tacto=\"dedo\"] .cromo-prof",
+    "evidencia": "Brief MEDIDO: regla_data_tacto_sin_root = 6, y 0 destinos por debajo de 24px en la pantalla. Medición propia con `data-tacto=\"dedo\"` puesto: los 2 `.iconbtn` de la pantalla sí llegan a 46px y los `.it` del menú también, porque aquí no hay ninguna variante de tamaño posterior que empate la especificidad.",
+    "por_que_importa": "Hoy no muerde —esta pantalla no tiene `.acciones .iconbtn{width:28px}`— pero el bug de especificidad está presente y basta añadir una variante de tamaño para que el modo dedo deje de aplicarse sin que nada avise. Se registra como deuda, no como fallo visible."
+   },
+   {
+    "id": "f1-41alta-08",
+    "severidad": "media",
+    "regla": "§10 trampa 5 — `<symbol>` y `viewBox` repetido",
+    "dice_el_sistema": "Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca. Medidas en el `<use>`, sin `viewBox` en el envoltorio. Se comprueba midiendo la caja del `<use>` contra la del `<svg>`.",
+    "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>` en el logotipo y `<svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\">` en el botón flotante.",
+    "selector": ".logo > svg, .fab > svg",
+    "evidencia": "Medición propia: el `<symbol id=\"dproma-mark\">` declara `viewBox=\"740 0 970 932\"`; el `<use>` del logotipo queda a −32,5px de su `<svg>` y el del botón flotante a −16,2px.",
+    "por_que_importa": "El isotipo se recorta casi entero en la cabecera del menú lateral, en las cinco pantallas del módulo."
+   },
+   {
+    "id": "f1-41alta-09",
+    "severidad": "baja",
+    "regla": "§6.9 Avisos — nombres de las variantes de `.banda`",
+    "dice_el_sistema": "Cuatro variantes: `.banda-info` (`--surface-2`/`--text-2`/`--border`), `.banda-warn` (`--warn-bg`/`--warn-ink`), `.banda-err` (`--err-bg`/`--err-ink`), `.banda-ok` (`--ok-bg`/`--ok-ink`).",
+    "hay_en_el_build": "`.b-info`, `.b-warn`, `.b-err` (líneas 518-521), con los valores correctos pero con nombre abreviado, y sin `.banda-ok`.",
+    "selector": ".b-info, .b-warn, .b-err",
+    "evidencia": "Medición propia del archivo: las tres clases existen con los tokens que el sistema fija; la nomenclatura es la única divergencia.",
+    "por_que_importa": "Funciona igual, pero `b-` es el prefijo de una sola letra que §10 trampa 10 señala como el que más se repite sin querer entre componentes; `banda-` deja el componente de origen escrito en el nombre."
+   },
+   {
+    "id": "f1-41alta-10",
+    "severidad": "baja",
+    "regla": "§6.19 Botón-icono / §6.5 Iconos",
+    "dice_el_sistema": "Nunca viaja solo: `title` + `aria-label`.",
+    "hay_en_el_build": "Los 2 `.iconbtn` de la pantalla (exportar del cromo y conmutador de tema) llevan `aria-label` y ninguno `title`.",
+    "selector": ".iconbtn",
+    "evidencia": "Medición propia: 2 `.iconbtn`, 2 sin `title`, 0 sin `aria-label`.",
+    "por_que_importa": "Impacto bajo en esta pantalla porque solo hay dos y están en el cromo, pero es la misma omisión que en toda la carpeta."
+   }
   ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 4,
+  "dimensiones": {
+   "accesibilidad": 3,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 4
+  },
+  "justificacion": "Es la pantalla más completa del lote y la única que aplica §6.16 de principio a fin: los dos campos que dan de alta llevan `required` y `aria-required` de verdad (regla 3) y los demás se marcan con palabras distintas —«PARA DAR DE ALTA» frente a «PARA FACTURAR»— que es exactamente la regla 2; la validación del domicilio aparece en `blur` y no antes (regla 4) y se vincula con `aria-invalid` más `aria-describedby` al `id` del mensaje (regla 5); los tipos de campo son los del dato, con `type=\"email\"`, `type=\"tel\"`, `inputmode=\"numeric\"` y `pattern=\"[0-9]{5}\"` en el código postal (regla 6); el contador de sección habla en español y cuenta bien, «Completa» / «Falta: domicilio fiscal» / «Faltan N campos» (regla 7); y el tipo de cliente se muestra como dato calculado con su motivo, no como campo (regla 1). §6.17 se cumple entera: `accept` declarado, formatos y peso escritos, `aria-describedby` a la ayuda, y el archivo cargado se dibuja con su nombre, su fecha y un botón «Quitar». §6.4 se cumple salvo la receta visual de la tarjeta: hay `aria-live`, el foco viaja al contenido, cada estado lleva `<h2>` real, y el error va encima como aviso con los campos rellenos a la vista y su referencia `PAD-20260821-1401`. Lo que baja la nota a 4: 25 declaraciones de tipografía bajo el suelo de 12px —entre ellas la ayuda de campo—, el triángulo de advertencia sobre banda neutra, dos bandas que doblan el límite de §8, la tarjeta de estado sin su receta, `--text-3` obsoleto y el esqueleto que no aplana el fondo con movimiento reducido.",
+  "evidencia": [
+   "Brief MEDIDO: 0 de 41 destinos interactivos por debajo de 24px, 0 inputs sin etiqueta, ariaLive 4, h1 1, landmarks 9, skipLink 1, 0 tokens usados sin declarar.",
+   "Medición propia: 2 inputs con `required` + `aria-required` (`#rs`, `#rfc`) y ninguno decorativo; 2 `input[type=file]` con `accept` y `aria-describedby` (`a-car`, `a-ide`); manejadores de `blur`/`input` que ponen y quitan `aria-invalid` y reescriben `aria-describedby`; `role=\"alert\"` en el aviso de error y `aria-live=\"polite\"` en la región de anuncios; 0 `id` duplicados y 0 `aria-controls` huérfanos.",
+   "Medición propia de lo que falla: 32 nodos de texto bajo 12px (`.ayuda` 11px, `.nivel` 10,5px); `.b-info` neutra con `#i-alert`; bandas de 210 y 196 caracteres; `.tarjeta-estado` sin `max-width`/`padding`/`--r-modal`/`--sh-modal`; `<use>` del isotipo a −32,5px; `.skel` con `animation:none` y el degradado sin aplanar.",
+   "Capturas 41_alta_cliente--ok.png, --empty.png, --error.png, --oscuro.png."
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 1,
+   "hallazgo": "Cada sección lleva su estado escrito en el encabezado («Completa», «Falta: domicilio fiscal») y el pie dice «Borrador guardado hace 1 min. Puedes salir y volver», que resuelve la duda de si lo capturado está a salvo. El cambio de vista se anuncia por `aria-live` y mueve el foco. Lo único que no se ve es que el esqueleto de carga no tiene la forma del formulario que va a llegar.",
+   "selector": ".seccion .est, .pie-form, .sk-fila"
+  },
+  {
+   "n": 2,
+   "heuristica": "Coincidencia entre el sistema y el mundo real",
+   "severidad": 0,
+   "hallazgo": "«Como aparece en la constancia de situación fiscal», «Un RFC de 13 posiciones es persona física; de 12, empresa. Si el cliente tiene agencia, agencia manda sobre el RFC»: el formulario habla del documento que la persona tiene delante, no del modelo de datos.",
+   "selector": ".ctrl .ayuda, .dato-calc"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 1,
+   "hallazgo": "Hay «Cancelar», borrador guardado y archivo que se puede quitar una vez subido. No se declara, en cambio, qué pasa con el borrador al cancelar, ni hay confirmación antes de descartarlo.",
+   "selector": ".pie-form .btn, .quitar-archivo"
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 2,
+   "hallazgo": "Las variantes de `.banda` se llaman `.b-info`/`.b-warn`/`.b-err` en vez de `.banda-*`; la banda neutra lleva icono de advertencia; `.tarjeta-estado` conserva el nombre pero no la receta; la ayuda de campo va a 11px donde §2 fija 13.",
+   "selector": ".b-info, .tarjeta-estado, .ctrl .ayuda"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 0,
+   "hallazgo": "`required` y `aria-required` reales en los dos campos que dan de alta, `pattern` y `maxlength` en el código postal, tipos de campo correctos, dos niveles de obligatoriedad con palabras distintas, y el tipo de cliente deducido del RFC se muestra como dato con su regla escrita en vez de como campo que se pueda contradecir.",
+   "selector": "#rs, #rfc, #cp, .dato-calc"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocer antes que recordar",
+   "severidad": 1,
+   "hallazgo": "Las secciones van numeradas y con su estado a la derecha, y la subida dice formatos y peso antes de pulsar. En contra, las marcas «PARA DAR DE ALTA» / «PARA FACTURAR», que son la clave para saber qué se puede dejar para después, están a 10,5px.",
+   "selector": ".seccion header, .subida-caja, .nivel"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia",
+   "severidad": 0,
+   "hallazgo": "Se puede dar de alta con dos campos y completar el resto más tarde desde la ficha; el borrador permite salir y volver. Es el camino corto que pide un alta que hoy empieza en WhatsApp.",
+   "selector": ".pie-form, .detalle .banda"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 2,
+   "hallazgo": "Dos de las tres bandas informativas doblan el límite de ~140 caracteres y una frase de §8, y una de ellas usa punto y coma después del primer punto, que el documento prohíbe expresamente.",
+   "selector": ".detalle .banda.b-info, .seccion > .banda.b-info"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer y recuperarse de errores",
+   "severidad": 0,
+   "hallazgo": "El error de guardado es el ejemplo literal de §6.4 regla 3 y 4: dice qué pasó, qué no se ha perdido («El cliente no se creó, pero lo que capturaste sigue aquí») y qué hacer, con referencia `PAD-20260821-1401`, va encima como aviso con `role=\"alert\"` y deja todos los campos visibles y rellenos.",
+   "selector": "#aviso-error"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 1,
+   "hallazgo": "Hay ayuda bajo cada campo y un «Ver el detalle» que despliega la explicación larga con `aria-expanded`/`aria-controls`. El problema no es que falte sino que la que está siempre visible excede el límite de §8 y se lee a 11px.",
+   "selector": ".mas-ayuda, .ctrl .ayuda"
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-097",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "«El alta de clientes se inicia en WhatsApp, sigue por correo y se captura manualmente en Excel; no existen formularios digitales automatizados.» Esta pantalla es precisamente ese formulario digital: cuatro secciones numeradas, con qué es obligatorio para dar de alta y qué para facturar separado con palabras distintas, y borrador guardado para poder interrumpir la captura."
+   },
+   {
+    "pp": "pp-077",
+    "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
+    "cobertura": "cubre",
+    "evidencia": "«Cada grupo automotriz exige campos de validación distintos (TOT, VIN) no estandarizados para facturar, generando un cuello de botella financiero de casi 2 millones de pesos.» La sección 2 agrupa código postal, régimen, domicilio fiscal y los dos documentos, y marca cada uno con «PARA FACTURAR»: el alta deja explícito, desde el primer día, qué falta para poder cobrar."
+   },
+   {
+    "pp": "pp-045",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "cubre",
+    "evidencia": "«Las bases de datos de clientes se comparten como Excel adjuntos por correo; los cambios de una parte no se reflejan para la otra.» El alta escribe en el padrón único en lugar de en una copia; el borrador («Puedes salir y volver») sustituye al archivo que se guardaba a medias en el escritorio."
+   },
+   {
+    "pp": "pp-044",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "cubre",
+    "evidencia": "«La documentación de clientes se envía por WhatsApp o se guarda en Drive personal, sin estructura de carpetas compartidas por cliente.» Los dos `.subida` —constancia de situación fiscal e identificación— hacen que el documento entre por el expediente del cliente y no por un chat, con formatos y peso declarados y con el archivo cargado mostrado con nombre y fecha."
+   },
+   {
+    "pp": "pp-076",
+    "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
+    "cobertura": "cubre",
+    "evidencia": "«La recepción de datos de clientes finales para instalaciones se realiza de forma informal por WhatsApp o correo, sin formato estandarizado, y algunos registros se pierden.» La sección 4 captura la primera persona de contacto con rol, correo y teléfono en campos con su tipo correcto, dentro del mismo alta."
+   },
+   {
+    "pp": "pp-041",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "cubre",
+    "evidencia": "«Al cerrar un cliente, no existe un formato o procedimiento estándar para transferir la información y responsabilidad del caso hacia operaciones.» La sección 3 (sucursal) declara en banda que sin sucursal no se puede programar una orden: el alta obliga a dejar listo justo lo que operaciones necesita recibir."
+   },
+   {
+    "pp": "pp-042",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "ignora",
+    "evidencia": "«No existe un cuestionario o formato digital para perfilar a un cliente potencial antes de una visita comercial.» El formulario da de alta a un cliente ya cerrado: no contempla el estado previo de prospecto ni ningún campo de perfilado, así que la visita comercial sigue preparándose fuera del sistema."
+   }
+  ],
+  "usabilidad_para_el_area": "Es la pantalla del lote que más trabajo manual retira al área comercial. Convierte en formulario con reglas lo que hoy va de WhatsApp a correo a Excel (pp-097, pp-045), y hace algo que ninguna otra hace: separa con palabras —no con asteriscos— lo que basta para dar de alta de lo que hace falta para facturar, que es el cuello de botella de casi dos millones de pesos que describe pp-077. Las dos subidas de documento meten la constancia y la identificación en el expediente del cliente en vez de en un Drive personal (pp-044). Las pegas son de lectura, no de flujo: la ayuda que evita capturar mal el RFC va a 11px y las marcas «PARA FACTURAR» a 10,5px, justo los textos de los que depende que el alta salga bien a la primera; y las dos bandas largas de cabecera se saltan por tamaño. Para el vendedor que da de alta desde una agencia, con prisa, eso significa releer o equivocarse."
+ },
+ "cobertura": [
+  {
+   "patron": "Contador de completitud en la cabecera de cada `.seccion`, escrito en español y calculado en vivo: «Completa», «Falta: domicilio fiscal», «Faltan N campos», con las secciones opcionales excluidas del recuento. §6.16 regla 7 exige que «el contador de sección hable en español, no en aritmética, y si cuenta, cuente bien», pero no documenta su forma: ni la clase, ni dónde va, ni qué hace cuando la sección es opcional, ni cómo se anuncia el cambio.",
+   "propuesta_de_regla": "§6.16.1 Estado de sección — `.est`. **Cuándo:** toda `.seccion` de un formulario largo cuyo contenido pueda quedar incompleto. Va en la cabecera de la sección, alineado a la derecha, frente al índice numerado. **Tres formas y solo tres:** «Completa» con el glifo de verificación cuando no falta nada; «Falta: <el rótulo del campo en minúsculas>» cuando falta exactamente uno —nombrarlo ahorra el viaje de buscarlo—; «Faltan N campos» a partir de dos. **Una sección opcional no lleva contador**, porque un «Faltan 3 campos» en algo que no bloquea nada se lee como un error. **Qué cuenta:** solo los controles con `aria-required` de verdad; los asteriscos decorativos no cuentan porque no existen (§6.16 regla 3). **Se recalcula en `blur` y en `input`**, nunca en `keypress`, para que el rótulo no parpadee mientras se escribe. **A11y:** el contador es texto, no `aria-label`, y su cambio **no** se anuncia por `aria-live` —anunciar cada recuento interrumpe la captura—; lo que sí se anuncia es el error del campo, por `aria-describedby` (§6.16 regla 5)."
+  },
+  {
+   "patron": "Marca de nivel de obligatoriedad junto al rótulo del campo (`.nivel`): una píldora en mayúsculas que dice «PARA DAR DE ALTA» o «PARA FACTURAR», con su propio color de fondo. §6.16 regla 2 exige «dos niveles de obligatoriedad con palabras distintas» y da esas dos palabras, pero no documenta la pieza que las lleva: ni su tamaño —aquí 10,5px, bajo el suelo de §2.1 y fuera de las dos excepciones admitidas—, ni su color, ni su relación con `.pill` y `.p-type`, con las que convive en la misma pantalla.",
+   "propuesta_de_regla": "§6.16.2 Marca de obligatoriedad — `.nivel`. **Cuándo:** un formulario con dos niveles de exigencia reales, donde una parte de los campos bloquea el alta y otra bloquea una operación posterior. **Nunca sustituye a `required`/`aria-required`**: es la versión legible de lo que el `<input>` ya declara. **Dos valores cerrados**, el texto exacto que §6.16 regla 2 fija, en mayúsculas y pegados al rótulo del campo. **Tamaño:** `var(--fs-meta)` (12px), no 10,5 — la excepción de §2.1 cubre los rótulos de grupo de la barra lateral y las etiquetas de campo del modo tarjeta, y esta no es ninguna de las dos. **Color:** es un dato sobre el dato, no un juicio (§1 y §6.22), así que va en `--text-2` sobre `--surface-2`; nunca en semáforo, porque «falta para facturar» no es un error mientras no se intente facturar. **Relación con las otras marcas:** `.pill` lleva punto o icono y peso 700; `.p-type`, punto y peso 600; `.nivel`, ni punto ni icono y peso 700 en mayúsculas con `letter-spacing` — las tres se distinguen a simple vista, como pide §11."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática servida desde disco, sin backend ni librería que perfilar; el documento tampoco fija umbrales de rendimiento auditables.",
+  "§6.18 Diálogo modal: no aplica — el alta es una pantalla completa y no abre ningún diálogo (brief: dialogNativo 0, divDialog 0). La variante en diálogo de este mismo formulario se audita en 58_altas_como_modal.",
+  "§6.11 Tabla densa: no aplica — la pantalla no tiene tabla (brief: tablas 0).",
+  "§6.16 A11y extra (botón deshabilitado con `aria-disabled` + motivo): no evaluado — no hay ningún control deshabilitado en la pantalla (0 `aria-disabled`, 0 `disabled`), así que no hay implementación que comprobar.",
+  "§6.16 regla 8 (guardado automático o botón de guardar, no los dos): no se marca como incumplimiento. Conviven el borrador automático y «Dar de alta», pero son cosas distintas —guardar el trabajo a medias frente a crear el registro— y el pie lo dice sin ambigüedad: «Borrador guardado hace 1 min. Puedes salir y volver». El documento no distingue borrador de envío, así que el caso queda fuera de lo que la regla resuelve."
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [],
+  "declarados_no_usados": [
+   "--block",
+   "--block-fill",
+   "--border-fuerte",
+   "--dur-enter",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--fs-kpi",
+   "--glass",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--r-modal",
+   "--sp-12",
+   "--stagger",
+   "--velo-trama",
+   "--warn",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 83,
+  "n_usados": 65,
+  "n_divergentes": 15,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": true,
+   "filas": 0,
+   "nodosText3": 0
+  }
+ }
 }

@@ -1,0 +1,558 @@
+{
+ "pantalla": "22_gestoria",
+ "ruta_zip": "04-tramites-vehiculares-y-cfe/22_gestoria.html",
+ "carpeta": "04-tramites-vehiculares-y-cfe",
+ "area": "administracion vehicular",
+ "arquetipo": "bandeja",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "22_gestoria--ok.png",
+  "22_gestoria--oscuro.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-22gest-01",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 — isotipo con viewBox repetido",
+    "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio»; «se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg> en el logo lateral, y <svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el FAB",
+    "selector": ".logo svg, .fab svg",
+    "evidencia": "getBoundingClientRect del <use> contra el del <svg>, 1440px: logo svg x=96 / use x=64 → dx=-32px; FAB svg x=1377 / use x=1361 → dx=-16px. En 22_gestoria--ok.png la marca se ve como una astilla verde sobre el wordmark. La misma pantalla 08_detalle_tramite de este paquete lo escribe bien (use_w=40, sin viewBox, dx=+1px)",
+    "por_que_importa": "La marca de la empresa aparece recortada en todas las pantallas del paquete salvo 08; es lo primero que se ve al entrar y se repite en el botón flotante de cada pantalla."
+   },
+   {
+    "id": "f1-22gest-02",
+    "severidad": "alta",
+    "regla": "§2.1 Suelo tipográfico de 12px",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí»; «si un dato se lee todos los días, va a 12-13px como mínimo». Única excepción: 10,5px en rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta",
+    "hay_en_el_build": "thead th{font-size:11px} (el sistema manda var(--fs-meta)); .pill{font-size:11px} (§6.10 manda var(--fs-meta)); .nota{font-size:11.5px}; .state .ref{font-size:11px}; .dos small{font-size:11px}; .f .cuantos{font-size:11px}; .cromo-av{font:700 11px}",
+    "selector": "thead th, .pill, .nota, .state .ref, .dos small",
+    "evidencia": "Estilo calculado con getComputedStyle (§10 trampa 1) a 1440px, andamio oculto: 6 th a 11px + 1 th.num a 11px; 6 pastillas .pill a 11px; .nota a 11.5px (4 fragmentos en <b>); p.ref a 11px; 2 .pq a 11px. El archivo declara --fs-meta:12px y no lo usa en ninguno de esos sitios",
+    "por_que_importa": "Las cabeceras de columna y las etiquetas de estado son lo que se lee en cada barrido de la bandeja; a 11px quedan por debajo del suelo que el sistema fija para datos de uso diario."
+   },
+   {
+    "id": "f1-22gest-03",
+    "severidad": "alta",
+    "regla": "§6.11 regla 3 — aria-sort en todas las columnas ordenables",
+    "dice_el_sistema": "«aria-sort en todas las columnas ordenables, incluidas las que aún no ordenan (aria-sort=\"none\")»; el markup canónico lleva <th scope=\"col\" aria-sort=\"none\"><button data-col=…>",
+    "hay_en_el_build": "<th scope=\"col\">Folio</th> … 8 cabeceras sin aria-sort y sin <button> dentro; tampoco hay <colgroup>",
+    "selector": "table > thead > tr > th",
+    "evidencia": "Medido en vivo: thCol=8, ariaSort=0, sortBtn=0, colgroup=false (coincide con el brief: thAriaSort 0 sobre 14 th). El CSS sí declara thead th button, .sort y thead th[aria-sort=\"ascending\"] — reglas que ningún markup activa",
+    "por_que_importa": "La bandeja más usada del módulo no se puede ordenar por ninguna columna, y quien use lector de pantalla no recibe ni el estado «sin ordenar»."
+   },
+   {
+    "id": "f1-22gest-04",
+    "severidad": "alta",
+    "regla": "§6.4 reglas 1 y 2 + §11 Estructura — vistas de estado",
+    "dice_el_sistema": "«cada estado lleva encabezado real, no un <b>»; «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo» (.tarjeta-estado con --r-modal, --sh-modal y .estado-ico de 52px)",
+    "hay_en_el_build": "<div class=\"state state-empty\"><svg class=\"ico\"/><b>Ningún trámite coincide con los filtros activos</b><p>…</p></div> y lo mismo en state-error. .state{display:flex;flex-direction:column;align-items:center;padding:56px 16px} sin fondo, sin borde, sin radio y sin sombra; .state .ico{width:30px;height:30px;color:var(--text-3)}",
+    "selector": ".state-empty, .state-error",
+    "evidencia": "Medido: los 2 estados no contienen ningún h1-h4 (h:\"no\"), llevan <b> como título (b:true) y no hay .estado-ico (medallon:false). 42_alta_tramite_gestoria y 08_detalle_tramite del mismo paquete sí usan .tarjeta-estado con <h2> y .estado-ico de 52px",
+    "por_que_importa": "El título del vacío y el del error no entran en el índice de encabezados, así que quien navega por encabezados no encuentra el mensaje; y los dos estados quedan sueltos sobre el fondo en lugar de la tarjeta que el sistema exige."
+   },
+   {
+    "id": "f1-22gest-05",
+    "severidad": "alta",
+    "regla": "§8 Voz de producto, límites 1 y 2 (ANEXO B)",
+    "dice_el_sistema": "«Ningún bloque de texto siempre visible pasa de ~140 caracteres»; «.nota y .banda llevan como máximo UNA frase»; «si el texto explica una decisión, no va en pantalla»",
+    "hay_en_el_build": "<p class=\"nota\"> de 687 caracteres y cuatro oraciones, que explica por qué se diseñó así («Por eso su renglón lleva la pastilla gris…», «y por eso conserva su propia pastilla morada…»). Y <div class=\"banda b-warn\">Propuesta TRAZO con componentes de Studio — pendiente de revisión de Studio.</div>, que habla del proceso de entrega, no de lo que la persona puede hacer",
+    "selector": ".nota, .banda.b-warn",
+    "evidencia": "innerText.length con el andamio oculto: .nota = 687 caracteres (4,9 veces el tope de 140); .banda.b-warn = 76 caracteres pero se refiere a la maqueta y a su revisión",
+    "por_que_importa": "Un párrafo de cinco líneas bajo la tabla ocupa la zona donde deberían ir paginación y pie, y nadie lo lee; el aviso de «pendiente de revisión de Studio» es nota interna del equipo publicada en la interfaz."
+   },
+   {
+    "id": "f1-22gest-06",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles + §10 trampa 4",
+    "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8)»; «Enlaces que son el elemento primario de su fila (folio, miga, Ver en Maps): no son texto en prosa, llevan padding hasta llegar a 24px»; «un <input> de búsqueda dentro de un <div> con forma de pastilla no cumple — el contenedor tiene que ser una <label for=…>»",
+    "hay_en_el_build": ".folio{font-variant-numeric:tabular-nums;font-weight:600;color:var(--link);text-decoration:none} sin padding; <div class=\"search\"><svg/><input id=\"buscar\" type=\"search\" aria-label=\"Buscar trámites de gestoría\"></div>",
+    "selector": ".folio, .search",
+    "evidencia": "Medido a 1440px: los 6 enlaces .folio miden 110×15px con padding computado 0px; el <input type=search> mide 329×15px dentro de un <div class=\"search\"> de 33px que no es <label for>. Coincide con el brief: 7 de 41 interactivos por debajo de 24px",
+    "por_que_importa": "El folio es la entrada principal a cada expediente y es un destino de 15px de alto; pulsar la pastilla del buscador fuera del propio campo no hace nada."
+   },
+   {
+    "id": "f1-22gest-07",
+    "severidad": "alta",
+    "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+    "dice_el_sistema": "«un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero»",
+    "hay_en_el_build": "El único <script> maneja tema, cajón del menú, el andamio .demo [data-set] y la barra de filtros §6.21. Quedan sin ningún manejador: el control de densidad <div class=\"seg\" role=\"group\"><button aria-pressed=\"true\">Cómoda</button><button aria-pressed=\"false\">Compacta</button></div>, «Columnas», «Exportar», «Nuevo trámite», «Admitir», «No admitir», «Ver expediente», el buscador y los botones de los estados vacío/error",
+    "selector": ".seg button, .p4-t .acc button, .acciones .btn.mini",
+    "evidencia": "grep -c querySelectorAll = 3, y los tres selectores son .demo [data-set] (x2) y .pop-l input. Medido: .seg button tiene cursor:pointer y aria-pressed=true/false pero ningún listener; el CSS declara .denso (densidad compacta) y ningún markup o JS la activa. HALLAZGO TRANSVERSAL: se enuncia una vez para toda la pantalla, no uno por control",
+    "por_que_importa": "La pantalla anuncia con aria-pressed un estado de densidad que nunca cambia; un lector de pantalla lee «no pulsado» de un conmutador que no conmuta."
+   },
+   {
+    "id": "f1-22gest-08",
+    "severidad": "alta",
+    "regla": "§1.1 — valor canónico de --text-3",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)»",
+    "hay_en_el_build": "--text-3: #66717F; en el bloque de tema claro",
+    "selector": ":root",
+    "evidencia": "Leído en vivo con getComputedStyle(:root).getPropertyValue('--text-3') = #66717F (coincide con el brief). La medición estática de contraste del brief da 0 fallos porque no captura el sobrevuelo: .rz small y .dos small van en --text-3 y tbody tr:hover td{background:var(--surface-2)}, así que al pasar el cursor por cualquier fila ese texto cae sobre --surface-2 (#E7EDF3) = 4,21:1, bajo el mínimo AA de 4,5:1",
+    "por_que_importa": "El dato secundario de cada fila (RFC, tipo de trámite) pierde el mínimo de contraste exactamente cuando la persona está apuntando a esa fila."
+   },
+   {
+    "id": "f1-22gest-09",
+    "severidad": "alta",
+    "regla": "§6.7 Esqueleto de carga",
+    "dice_el_sistema": "«sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)»; «prefers-reduced-motion aplana el fondo, no solo detiene la animación»: {.skel{animation:none;background:var(--surface-2)}}",
+    "hay_en_el_build": "<span class=\"skel\">GT-2026-00000</span>, <span class=\"skel\">nombre del cliente</span>… en las 6 filas; y @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer el fondo",
+    "selector": ".state-loading .skel",
+    "evidencia": "Medido: 36 de 36 barras .skel llevan texto. Con reducedMotion:'reduce' el estilo calculado da animation-name:none pero background-image sigue siendo linear-gradient(90deg, rgb(231,237,243) 25%, rgba(27,36,48,0.14) …) y background-color rgba(0,0,0,0): el degradado queda congelado en la posición 0, que es justo lo que §6.7 prohíbe",
+    "por_que_importa": "Un lector de pantalla anuncia folios y nombres falsos («GT-2026-00000», «nombre del cliente») mientras la pantalla carga; y con movimiento reducido el esqueleto se ve como una banda a medio pintar, no como una superficie plana."
+   },
+   {
+    "id": "f1-22gest-10",
+    "severidad": "media",
+    "regla": "§6.12 regla 9 + §6.11 regla 7 — la razón de un estado no va en la celda",
+    "dice_el_sistema": "«la razón de un estado va al detalle del registro, no a la celda»; «Una celda no lleva un párrafo: en la celda va la etiqueta; el matiz va a etiqueta emergente o a la ficha»",
+    "hay_en_el_build": "<td data-et=\"Cliente\"><span class=\"falta\"><span class=\"qq\">Comercializadora Vértice del Bajío</span><span class=\"pq\">Falta: <b>carátula del pedimento</b></span></span></td> en los dos expedientes sin admitir",
+    "selector": "tbody .falta .pq",
+    "evidencia": "Medido a 1440px: la fila alcanza 75px de alto frente a --row-comfy=40px declarado, porque la razón social se parte en dos líneas y debajo va la razón del estado. Visible en 22_gestoria--ok.png",
+    "por_que_importa": "La razón de que un trámite no esté admitido ocupa la columna del cliente y casi dobla el alto de la fila, que es lo que hace densa a una tabla densa."
+   },
+   {
+    "id": "f1-22gest-11",
+    "severidad": "media",
+    "regla": "§6.11 regla 10 — el identificador de fila no lleva color de enlace",
+    "dice_el_sistema": "«El identificador de fila no lleva color de enlace. --link es para navegación fuera de tabla (migas, Ver en Maps). El folio va en --text; lo pulsable lo indica tbody tr:hover td{background:var(--surface-2)}»",
+    "hay_en_el_build": ".folio{…color:var(--link)…}",
+    "selector": ".folio",
+    "evidencia": "Línea 383 del <style>. En 22_gestoria--ok.png los seis folios se ven en verde de enlace dentro de la tabla",
+    "por_que_importa": "Dentro de la tabla el verde de enlace deja de significar «esto te saca de aquí» y se convierte en un color de columna."
+   },
+   {
+    "id": "f1-22gest-12",
+    "severidad": "media",
+    "regla": "§6.2 — el suelo se declara con min-height",
+    "dice_el_sistema": ".btn{min-height:36px}, .btn.mini{min-height:28px}; «el suelo se declara con min-height, no se confía al relleno (medido: 35px y 27px sin él)»",
+    "hay_en_el_build": ".btn{…padding:8px 13px;font:600 var(--fs-dense)…} y .btn.mini{padding:5px 10px;font-size:var(--fs-meta)} — ningún min-height en ninguna de las dos",
+    "selector": ".btn, .btn.mini",
+    "evidencia": "Medido a 1440px: el botón «Admitir» (.btn.mini) mide 72×26px, por debajo de los 28px del sistema. Es el fallo exacto que §6.2 documenta como medido",
+    "por_que_importa": "Los botones de acción de fila quedan 2px por debajo de su suelo, y cualquier cambio de tipografía los baja más sin que nada lo detenga."
+   },
+   {
+    "id": "f1-22gest-13",
+    "severidad": "media",
+    "regla": "§10 trampa 10 — una clase corta no se declara dos veces en el mismo archivo",
+    "dice_el_sistema": "«.nota y .f aparecieron declarados dos veces en el mismo archivo con reglas distintas. Antes de escribir .algo{...} se busca con grep -n '^\\.algo{' en el archivo»",
+    "hay_en_el_build": ".f{ declarado en la línea 351 (border:1px solid var(--border)) y otra vez en la 671 (border:1px solid var(--border-fuerte);min-height:32px). .tabla-caja{ declarado en la 363 (min-width:0;overflow-x:auto;flex:none) y otra vez en la 408 (position:relative)",
+    "selector": ".f, .tabla-caja",
+    "evidencia": "grep -oE '^\\.[a-z0-9-]+\\{' 22_gestoria.html | sort | uniq -d devuelve exactamente .f{ y .tabla-caja{ — y .f es una de las dos clases que §10 trampa 10 nombra por su nombre",
+    "por_que_importa": "La primera declaración de .f es código muerto que contradice a la segunda; quien toque la de arriba creerá haber cambiado el filtro y no habrá cambiado nada."
+   },
+   {
+    "id": "f1-22gest-14",
+    "severidad": "media",
+    "regla": "§6.12 regla 5 + §6.21 — el botón de filtro dice su valor",
+    "dice_el_sistema": "«los desplegables se ven desplegables (rótulo + valor + flecha)»; «sin selección = valor por omisión sin resalte; con una = el nombre de esa opción; con varias = «N seleccionados»»",
+    "hay_en_el_build": "w._btn.innerHTML = d.etiqueta + (n ? '<b class=\"cuantos\">'+n+'</b>' : '') + chevron — nunca el valor. El dato FILTROS declara vacio:'Todos' y ese campo no se lee en ninguna parte del script",
+    "selector": ".filtros .f",
+    "evidencia": "Medido en vivo: sin selección el botón mide 106×32px y su innerText es «Estado»; con una opción marcada pasa a «Estado 1». Nunca aparece «Todos» ni el nombre de la opción ni «N seleccionados». El aria-label sí lo dice («Estado, 1 valor puesto»), así que el texto visible y el accesible divergen",
+    "por_que_importa": "Hay que abrir el panel para saber por qué está filtrada la lista; el recuento «1» no dice cuál de los cinco estados se dejó puesto."
+   },
+   {
+    "id": "f1-22gest-15",
+    "severidad": "media",
+    "regla": "§6.10 — una etiqueta de estado lleva color + icono + texto, y la familia se ve como familia",
+    "dice_el_sistema": "«Lleva color + icono + texto, nunca color a secas»; «todas las de una familia se ven como una familia — o las tres llevan punto, o ninguna»",
+    "hay_en_el_build": "En la tabla el estado se pinta con .sla.verde/.amarillo/.rojo/.gris (clases nombradas por el tono, no por el estado), salvo «Bloqueado» que usa .pill.p-block con icono. En el panel de filtros el script crea las cinco pastillas con pl.textContent=o.t, sin icono",
+    "selector": ".sla, .pill, .pop-l .et .pill",
+    "evidencia": "Medido con el panel abierto: las 5 pastillas del desplegable (p-neutro, p-ok, p-warn, p-err, p-block) no contienen ningún <svg>; la única .pill de la tabla (p-block) sí. El mismo estado se ve con icono en la tabla y sin icono en el filtro. Además .sla.verde{color:var(--ok-ink);background:var(--ok-bg)} es .pill.p-ok con otro nombre (trampa adicional de §6.9: reinventar un componente que ya existe en el mismo archivo)",
+    "por_que_importa": "El estado se distingue solo por color en el panel de filtros, y la misma información cambia de forma entre la tabla y el filtro."
+   },
+   {
+    "id": "f1-22gest-16",
+    "severidad": "media",
+    "regla": "§6.14 — una o dos acciones estables, o menú ⋯",
+    "dice_el_sistema": "«Con una o dos acciones estables en todas las filas → botones de icono… Con más de dos, o si cambian según la fila → menú ⋯ con las opciones escritas»",
+    "hay_en_el_build": "Dos filas llevan «Admitir» + «No admitir»; las otras cuatro llevan solo «Ver expediente». No hay ningún botón ⋯, ni aria-haspopup=\"menu\", ni role=\"menu\"",
+    "selector": ".acciones",
+    "evidencia": "Medido fila a fila: [\"Admitir|No admitir\",\"Admitir|No admitir\",\"Ver expediente\",\"Ver expediente\",\"Ver expediente\",\"Ver expediente\"]. roleMenu=0; el único aria-haspopup de la pantalla es el del botón de filtro",
+    "por_que_importa": "La columna de acciones cambia de contenido entre filas, así que la posición no enseña nada y hay que leer cada botón."
+   },
+   {
+    "id": "f1-22gest-17",
+    "severidad": "media",
+    "regla": "§6.12 regla 7 / §13.1 — orden fijo resumen → buscador + filtros en una sola fila → tabla",
+    "dice_el_sistema": "«Orden fijo: resumen → buscador + filtros en una sola fila → tabla»; «.search en la fila de filtros: flex:1;min-width:200px»",
+    "hay_en_el_build": "<div class=\"p4-t\">…h1 + .resumen + acciones</div>, luego <div class=\"banda b-warn\">, luego <div class=\"p4-b\">solo el buscador</div>, y en una fila aparte <div class=\"p4-f\">filtros + densidad</div>",
+    "selector": ".p4-b, .p4-f",
+    "evidencia": "Dos filas distintas en el DOM y en 22_gestoria--ok.png: el buscador en y≈189 y la fila de filtros en y≈233. Además el resumen no es una zona propia: va como <span class=\"resumen\"> dentro de la fila del h1",
+    "por_que_importa": "El buscador y los filtros son la misma decisión («acotar la lista») y están en dos renglones separados por un aviso que no es ninguna de las dos cosas."
+   },
+   {
+    "id": "f1-22gest-18",
+    "severidad": "media",
+    "regla": "§2 — las fuentes se autoalojan y la comprobación es que carguen",
+    "dice_el_sistema": "«Las fuentes se autoalojan (D116)… @font-face con font-display:swap sobre /fuentes/inter-variable.woff2 y /fuentes/michroma.woff2. La comprobación es que la fuente aparezca cargada en las herramientas de red, no la declaración de --font-ui»",
+    "hay_en_el_build": "--font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif y --font-brand: 'Ethnocentric Rg','Michroma','Inter',sans-serif, sin ningún @font-face y sin ningún <link>",
+    "selector": ":root",
+    "evidencia": "Medido en vivo: document.fonts.size = 0 (ninguna cara registrada); grep de @font-face = 0 y de <link> = 0. La tipografía que se ve depende de que Inter esté instalada en el equipo de quien mire",
+    "por_que_importa": "La maqueta se ve bien en un equipo con Inter y cae a la fuente del sistema en cualquier otro, sin que nada lo avise — el mismo fallo silencioso que §2 documenta."
+   },
+   {
+    "id": "f1-22gest-19",
+    "severidad": "media",
+    "regla": "§7.2 — en modo colapsado el rótulo se convierte en etiqueta emergente",
+    "dice_el_sistema": "«Tres anchos: completa ≥1100px, colapsada a solo iconos 860-1100px, cajón con velo <860px. En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece»",
+    "hay_en_el_build": "@media (min-width:860.02px) and (max-width:1100px){.side{width:64px} .side .et{position:absolute;width:1px;height:1px;…clip:rect(0 0 0 0)}} y ningún title en los <a class=\"it\">",
+    "selector": ".side .it",
+    "evidencia": "Medido a 1000px de ancho: .side mide 64px y los rótulos quedan recortados a 1px. En el markup los ítems son <a class=\"it\" href=\"#\"><svg class=\"ico\"/><span class=\"et\">Tablero</span></a>, sin title",
+    "por_que_importa": "Entre 860 y 1100px la navegación queda reducida a diez iconos sin ninguna forma de saber qué es cada uno con el ratón."
+   },
+   {
+    "id": "f1-22gest-20",
+    "severidad": "media",
+    "regla": "§6.11 regla 9 — registros por página elegibles",
+    "dice_el_sistema": "«Registros por página elegibles: selector de 10 / 25 / 50 / 100, recordado entre sesiones»",
+    "hay_en_el_build": "No hay .tfoot en el markup (el CSS sí declara .tfoot y .pag, que quedan sin usar). La tabla termina en la leyenda del semáforo y la .nota",
+    "selector": ".tfoot",
+    "evidencia": "Medido: document.querySelector('.tfoot') = null, .pag button = 0, y el texto de la pantalla no contiene «por página» ni «10/25». El resumen del título dice «6 expedientes en tu alcance» sin ningún pie que confirme cuántos se muestran",
+    "por_que_importa": "No hay forma de saber si la tabla enseña todo lo que hay ni de ampliar la página."
+   },
+   {
+    "id": "f1-22gest-21",
+    "severidad": "media",
+    "regla": "§6.5 Iconos — Material Symbols Rounded, variante rellena",
+    "dice_el_sistema": "«todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1)», con un solo <link> de subconjunto y los cuatro ejes opsz,wght,FILL,GRAD@24,500,1,0 heredados en .msi",
+    "hay_en_el_build": "Un sprite propio de <symbol> SVG de trazo: .ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none}. No existe .msi en el archivo",
+    "selector": ".ico",
+    "evidencia": "grep: 0 ocurrencias de 'Material Symbols' y de .msi en las cinco pantallas del lote; el sprite declara 40 <symbol> de trazo. Los iconos sí llevan aria-hidden=\"true\", que es el requisito a11y de §6.5",
+    "por_que_importa": "El paquete entero usa un sistema de iconos distinto del documentado: el peso visual (trazo de 1,6 frente a relleno) no coincide con el resto del producto."
+   },
+   {
+    "id": "f1-22gest-22",
+    "severidad": "baja",
+    "regla": "§7.3 — la regla táctil lleva :root",
+    "dice_el_sistema": ":root[data-tacto=\"dedo\"] .it, :root[data-tacto=\"dedo\"] .iconbtn, :root[data-tacto=\"dedo\"] .btn{min-height:46px}; «El :root es lo que hace ganar la regla… Se comprueba midiendo con data-tacto=\"dedo\" puesto»",
+    "hay_en_el_build": "[data-tacto=\"dedo\"] .it{min-height:46px} … 7 reglas, todas sin :root (líneas 279-284 y 716)",
+    "selector": "[data-tacto=\"dedo\"]",
+    "evidencia": "Comprobado midiendo con data-tacto=\"dedo\" puesto, como pide §7.3: .it, .iconbtn, .btn, .acciones .btn y .seg button llegan todos a 46px. La pantalla no dibuja ningún .acciones .iconbtn (la regla de 28px que empataría la especificidad), así que el bug es latente, no activo",
+    "por_que_importa": "Hoy no rompe nada; en cuanto una fila use botón de icono de 28px, el modo dedo dejará de aplicarse en esa fila sin que nada falle visiblemente."
+   },
+   {
+    "id": "f1-22gest-23",
+    "severidad": "baja",
+    "regla": "§6.19 — padding:0 en el botón-icono",
+    "dice_el_sistema": "«padding:0 no es cosmético — el relleno de fábrica del navegador (Chromium 1px 6px) descentra el icono en la variante de 28px»",
+    "hay_en_el_build": ".iconbtn{width:36px;height:36px;border:1px solid var(--border);border-radius:var(--r-ctrl);display:grid;place-items:center;…} sin padding:0",
+    "selector": ".iconbtn",
+    "evidencia": "Línea 328 del <style>: no hay padding:0. El place-items:center compensa en la variante de 36px que sí se usa; la regla .acciones .iconbtn{width:28px;height:28px} existe pero ningún markup la invoca",
+    "por_que_importa": "Riesgo latente: el día que se use el botón-icono de 28px en una fila, el glifo saldrá descentrado por el relleno de fábrica."
+   }
+  ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 2,
+   "integridad": 1
+  },
+  "justificacion": "Accesibilidad 1: suma de fallos duros medibles — 11 textos por debajo del suelo de 12px incluidas las cabeceras de columna y las etiquetas de estado, 0 aria-sort sobre 8 columnas, 7 destinos por debajo de 24px (folios de 110x15 y buscador dentro de un div), estados de vacío y error sin encabezado real, esqueleto con texto dentro de las barras y --text-3 obsoleto cayendo a 4,21:1 en el sobrevuelo de fila. Theming 3: los dos temas están completos y medidos (brief: 0 fallos de contraste en claro y en oscuro, tema oscuro medido), las superficies son opacas y el conmutador no depende de ninguna librería; baja de 4 por el valor obsoleto de --text-3 y por los tamaños literales (11px, 11.5px) fuera de token. Responsive 2: el modo tarjeta por debajo de 860px funciona y no hay desplazamiento horizontal de página, pero el rail colapsado de 64px deja diez iconos sin etiqueta emergente y a 1000px la tabla ya necesita scroll interno sin aviso de columnas ocultas (§6.11 regla 5). Integridad 1: el isotipo sale desplazado 32px en el logo y 16px en el FAB, .f y .tabla-caja están declarados dos veces en el mismo archivo, el CSS lleva .tfoot, .pag, .denso y thead th[aria-sort] que ningún markup activa, y todos los controles de producto son inertes.",
+  "evidencia": [
+   "getBoundingClientRect del <use> contra el <svg>: dx=-32px (logo) y dx=-16px (FAB)",
+   "getComputedStyle: 6 th a 11px, 6 .pill a 11px, .nota a 11.5px, .state .ref a 11px",
+   "thCol=8 / ariaSort=0 / sortBtn=0 / colgroup=false; .tfoot ausente del markup",
+   ".folio 110x15px con padding 0px; input[type=search] 329x15px dentro de <div class=\"search\">",
+   "36 de 36 barras .skel con texto; con reducedMotion:reduce el background-image sigue siendo el degradado",
+   "A 1000px: .side 64px con .et recortada a 1px y sin title; .tabla-caja con scrollWidth > clientWidth",
+   "grep -oE '^\\.[a-z0-9-]+\\{' | sort | uniq -d → .f{ .tabla-caja{",
+   "document.fonts.size = 0; 0 @font-face y 0 <link> en el archivo"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+ },
+ "cobertura": [
+  {
+   "patron": "Leyenda de semáforo suelta bajo una tabla densa (.leyenda-sla con marcas de 9px y rótulos en --text-3), que explica qué significa cada color de la columna de estado. §12.5 documenta .leyenda solo como pieza de dashboard dentro de un widget de gráfica; no hay regla para la leyenda de una columna de tabla.",
+   "propuesta_de_regla": "§6.11.1 Leyenda de columna de estado — .leyenda-col. Cuándo: una columna de la tabla usa una escala de más de dos valores y el texto de la pastilla no la explica por sí solo. Antes de añadirla se aplica la prueba de §12.3: si al quitar la leyenda la columna sigue diciendo lo que tiene que decir, la leyenda sobra y lo que falta es texto en la pastilla. Va inmediatamente debajo de .tabla-caja, con padding var(--sp-3) var(--sp-6), marca de 9px en el token de estado y rótulo en --text-3 a var(--fs-meta); repite el mismo par color+palabra que usa la celda, nunca una palabra distinta. Si una fila de la tabla usa un componente que no pertenece a la escala (p. ej. .pill de bloqueado), la leyenda no lo lista: esa distinción va en la ficha del registro (§6.12 regla 9)."
+  },
+  {
+   "patron": "Los hex de las variantes -ink/-bg del semáforo (#22705A, #B03A31, #E2EFEC…) están escritos en el :root de esta maqueta y reproducen los ratios publicados en la tabla de §1.3 (5,03:1 y 5,02:1), pero el documento del dashboard no publica ningún hex para esas variantes: el único sitio donde están escritos es el documento antecesor del acceso, que es justo el que arrastra el --text-3 obsoleto.",
+   "propuesta_de_regla": "Añadir a §1.3 la columna de valores de las tres variantes (-ink, -bg, -fill) en claro y en oscuro, junto a los ratios que ya se publican, para que ninguna maqueta tenga que copiarlos del documento de acceso. Mientras la tabla no exista, el documento debe decir explícitamente de dónde se toman."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática sin backend que perfilar",
+  "§6.13 Barra de selección: la bandeja no ofrece selección múltiple (0 casillas en tbody, ningún .barra-sel), así que la regla no tiene sobre qué medirse",
+  "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (0 <dialog> y 0 div[role=dialog]); varias acciones lo sugieren pero no hay modal que auditar",
+  "§6.20 Ficha de detalle: no aplica a este arquetipo",
+  "§1.4 Series de gráfica: la pantalla no dibuja ninguna gráfica; --serie-1 y --serie-2 solo se usan en .p-s1/.p-s2, que ningún markup invoca"
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--warn",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [],
+  "declarados_no_usados": [
+   "--block",
+   "--block-fill",
+   "--dur-enter",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--fs-kpi",
+   "--glass",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--r-modal",
+   "--sp-12",
+   "--stagger",
+   "--velo-trama",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 83,
+  "n_usados": 67,
+  "n_divergentes": 15,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": true,
+   "filas": 6,
+   "nodosText3": 2
+  }
+ }
+}

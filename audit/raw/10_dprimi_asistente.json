@@ -1,171 +1,414 @@
 {
-  "pantalla": "10_dprimi_asistente",
-  "ruta_zip": "06-soporte/10_dprimi_asistente.html",
-  "carpeta": "06-soporte",
-  "area": "soporte",
-  "arquetipo": "asistente/IA",
-  "modo": "cumplimiento",
-  "estados_auditados": ["ok"],
-  "capturas": ["10_dprimi_asistente--ok.png"],
-  "f1_cumplimiento": {
-    "veredicto": "no_cumple",
-    "hallazgos": [
-      {
-        "id": "f1-10dprimi-01",
-        "severidad": "alta",
-        "regla": "§5 prefers-reduced-motion + §10 (el estilo se comprueba en el navegador, no en la hoja)",
-        "dice_el_sistema": "No es «cero animación»: se conservan opacidad y color, se elimina todo desplazamiento y escala",
-        "hay_en_el_build": "@media (prefers-reduced-motion:reduce){ .enter{animation:none !important;opacity:1;transform:none} } escrito ANTES de .enter{opacity:0;transform:translateY(6px);animation:enter var(--dur-enter) var(--ease-out) forwards}",
-        "selector": ".enter",
-        "evidencia": "Medido con Playwright abriendo la pantalla con reducedMotion:'reduce': los cuatro .msg computan opacity: \"0\" y animation-name: \"none\". Con reducedMotion:'no-preference' computan opacity: \"1\". Ambas reglas tienen la misma especificidad (0,1,0); el !important solo cubre animation, así que el opacity:0 de la regla posterior gana sobre el opacity:1 de la que está dentro del media query. Es visible también en la captura 10_dprimi_asistente--ok.png: el hilo sale en blanco, con la cabecera, las sugerencias y el compositor pintados y los 576px de conversación vacíos.",
-        "por_que_importa": "Es el peor fallo del lote. Quien tiene activada la reducción de movimiento —una preferencia del sistema operativo, no un ajuste de la app— abre el asistente y no ve ni una sola línea de la conversación: la pantalla queda en blanco entre la franja de alcance y las sugerencias, sin ningún mensaje de error que lo explique. Es exactamente la familia de bug de §7.3 («la regla no gana por orden, y falla en silencio»), aquí con consecuencia total en vez de parcial, y es por eso que el documento insiste en comprobar en el navegador."
-      },
-      {
-        "id": "f1-10dprimi-02",
-        "severidad": "alta",
-        "regla": "§7.2 Cromo de aplicación — tres anchos",
-        "dice_el_sistema": "Tres anchos: completa ≥1100px, colapsada a solo iconos 860–1100px, cajón con velo <860px. En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece",
-        "hay_en_el_build": "@media (max-width:980px){ .side{display:none} .split{grid-template-columns:1fr} .tray{display:none} }",
-        "selector": ".side, .tray",
-        "evidencia": "Medido a 900px de ancho: .side computa display:none y ancho 0; .tray computa display:none y ancho 0; .thread ocupa los 900px. Las siete entradas de navegación quedan en el árbol pero sin pintar, y no hay hamburguesa, ni cajón, ni velo, ni ningún control que las devuelva — el <script> no tiene ningún manejador de menú.",
-        "por_que_importa": "Por debajo de 980px desaparecen a la vez la navegación de la aplicación y la lista de conversaciones, sin sustituto. No se puede cambiar de módulo, ni volver a una conversación anterior, ni abrir una nueva salvo escribiendo en el hilo que ya está abierto. Las otras tres pantallas de este lote con el cromo nuevo (40_usuarios, 24_tickets, 47_asistente) sí implementan el cajón con velo, Escape y gestión de foco: el patrón correcto ya existe dentro del producto."
-      },
-      {
-        "id": "f1-10dprimi-03",
-        "severidad": "alta",
-        "regla": "§2 Tipografía — autoalojado (D116)",
-        "dice_el_sistema": "Las fuentes se autoalojan (D116). Prohibido el <link> a Google Fonts para las fuentes de interfaz: un CDN caído falla en silencio (incidencia real de 4 días sin detección). @font-face con font-display:swap sobre /fuentes/inter-variable.woff2 y /fuentes/michroma.woff2",
-        "hay_en_el_build": "<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap\" rel=\"stylesheet\"> y dos <link rel=\"preconnect\"> a fonts.googleapis.com y fonts.gstatic.com",
-        "selector": "head > link[href*=fonts.googleapis.com]",
-        "evidencia": "Líneas 8-10 del archivo. No hay ninguna regla @font-face ni ninguna referencia a /fuentes/. De las cinco pantallas que he abierto en este lote, solo 13_panel_asistencia_rhl y esta cargan de Google Fonts; 40_usuarios, 24_tickets y 47_asistente no cargan ninguna fuente (caen a system-ui, que es otro problema distinto).",
-        "por_que_importa": "La regla se escribió por una incidencia real de cuatro días sin detectar. Y aquí pesa más que en otras pantallas porque --font-brand (Michroma) es el nombre propio del asistente —el <b>D-PRIMI</b> de la cabecera del hilo—: si el CDN cae, la marca del asistente se degrada a Inter sin que nada avise."
-      },
-      {
-        "id": "f1-10dprimi-04",
-        "severidad": "alta",
-        "regla": "§2.1 Suelo tipográfico",
-        "dice_el_sistema": "El suelo son 12px. «Nada baja de ahí.» Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta",
-        "hay_en_el_build": "19 claves con texto propio por debajo de 12px; las más bajas, .legal y .kpimini span a 9,5px",
-        "selector": ".legal, .kpimini span, .msg.a .who, .msg, .src a, .acts button, .confirm, .sugg button, .qchip, .scope, .conv .snip, .conv .when",
-        "evidencia": "Medido con getComputedStyle sobre cada elemento con nodo de texto propio: P.legal@9.5px («D-PRIMI puede equivocarse — verifica los datos críticos…»), SPAN@9.5px ×3 (los rótulos 'vencidos', 'por vencer', 'en tiempo' de los mini-KPI), DIV.who@10px ×2, A@10.5px ×3 (los enlaces de procedencia), SPAN.when@10.5px ×3, BUTTON@11px ×5 (las acciones que el asistente propone), SPAN.scope@11px, .msg a 12,5px (el cuerpo de la conversación), BUTTON.qchip@11.5px ×3. Solo P.grp@10.5px y SPAN.wordmark caen dentro o cerca de la excepción documentada.",
-        "por_que_importa": "El aviso legal sobre que el asistente puede equivocarse —el texto que más importa leer de toda la pantalla— va a 9,5px, por debajo del 79% del suelo. Los rótulos de los tres mini-KPI de la respuesta también. Y el cuerpo de la conversación entera va a 12,5px: está por encima del suelo pero por debajo de --fs-base, en un texto que se lee de corrido y en párrafos largos, que es justo lo contrario de lo que --fs-dense (13px, «tablas densas, cuerpo compacto») contempla."
-      },
-      {
-        "id": "f1-10dprimi-05",
-        "severidad": "alta",
-        "regla": "§1.1 Superficies y texto — valor de --text-3",
-        "dice_el_sistema": "--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)",
-        "hay_en_el_build": "--text-3: #66717F, usado en .conv .snip, .conv .when, .tray-h p, .legal, .kpimini span y el placeholder del compositor",
-        "selector": ":root, [data-theme=\"light\"]",
-        "evidencia": "Brief: tokens.text_3_declarado = \"#66717F\". La pantalla usa --surface-2 en .conv:hover, .conv[aria-current], .cico y el fondo del campo del compositor (.inp input{background:var(--surface-2)}), así que hay texto en --text-3 que cae sobre --surface-2 (el placeholder del compositor, .inp input::placeholder{color:var(--text-3)}).",
-        "por_que_importa": "Hecho ya establecido en 51 de las 52 maquetas: 4,21:1 sobre --surface-2, por debajo del mínimo AA. Aquí afecta además al texto de guía del campo donde se escribe («Pregunta o pide una acción a D-PRIMI…»), que es la instrucción principal de la pantalla."
-      },
-      {
-        "id": "f1-10dprimi-06",
-        "severidad": "media",
-        "regla": "§5 / §6.7 prefers-reduced-motion sobre el esqueleto",
-        "dice_el_sistema": "hay que aplanar el fondo, no solo parar la animación. animation:none a secas congela el degradado en la posición 0. Correcto: @media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}",
-        "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}}",
-        "selector": ".skel",
-        "evidencia": "Línea 263. Leído con document.styleSheets, la única regla de reduced-motion sobre .skel es animation:none, sin background plano. Patrón transversal: idéntico en las cuatro pantallas del lote.",
-        "por_que_importa": "El degradado de 200% se congela en la posición 0 y las barras salen con un gradiente a medias. A favor de esta pantalla: es la única de las cuatro cuyas barras .skel van de verdad mudas (medido: 0 .skel con textContent), que es la otra mitad de la regla y la que las otras tres incumplen."
-      },
-      {
-        "id": "f1-10dprimi-07",
-        "severidad": "media",
-        "regla": "§6.4 Vistas de estado — reglas 1 y 2 + §11 Estructura",
-        "dice_el_sistema": "toda pantalla que pida datos — cuatro formas: con datos, cargando, vacía, con error. «No son un extra: son la pantalla.» · el cambio se anuncia (aria-live=\"polite\") y mueve el foco · cada estado lleva encabezado real, no un <b> · los estados de vacío y error van en tarjeta, con su medallón",
-        "hay_en_el_build": "Los tres estados existen pero solo para la bandeja izquierda (.tray[data-state]); el hilo de la derecha no tiene ninguno. Los tres titulan con <b> (.tray-state b{font-size:12.5px}) y no aplican .tarjeta-estado ni .estado-ico",
-        "selector": ".tray-state, .tray-state b, .thread",
-        "evidencia": "El archivo declara .tray-loading, .tray-empty y .tray-error dentro de <section class=\"tray\" data-state=\"ok\">, pero no hay ningún conmutador ni manejador que cambie ese data-state: el <script> no lo toca. <section class=\"thread\"> —el hilo, que es el 78% del ancho de contenido— no tiene estados en absoluto. El brief confirma --r-modal entre los tokens declarados_sin_usar.",
-        "por_que_importa": "La mitad grande de la pantalla no sabe decir que está cargando ni que falló. Si el servicio del asistente no responde, el hilo se queda en blanco: no hay vista de error que diga qué pasó ni qué no se ha perdido. Y la bandeja, que sí tiene las tres vistas y están bien escritas (la de error cita Ref. DP-20260728-119 y dice «tus conversaciones siguen a salvo»), no tiene forma de alcanzarlas."
-      },
-      {
-        "id": "f1-10dprimi-08",
-        "severidad": "media",
-        "regla": "§9 Andamiaje de maqueta (ANEXO A)",
-        "dice_el_sistema": "Conmutador flotante «Con datos · Cargando · Vacío · Error». Se marca siempre con data-andamio, va visualmente separado del producto y rotulado",
-        "hay_en_el_build": "No hay conmutador ninguno, y los tres estados de la bandeja quedan inalcanzables",
-        "selector": "[data-andamio]",
-        "evidencia": "grep -c 'data-andamio' devuelve 0, y grep de .demo tampoco encuentra nada. Las tres vistas de estado están escritas y no se pueden ver. El brief lo confirma: la única captura disponible es --ok, frente a las cinco de 47_asistente y de las otras dos pantallas con andamiaje.",
-        "por_que_importa": "No es solo una marca que falta: sin conmutador, los estados escritos no se pueden revisar ni aprobar. La consecuencia práctica es que esta pantalla ha llegado a auditoría con un cuarto de su superficie sin verificar."
-      },
-      {
-        "id": "f1-10dprimi-09",
-        "severidad": "media",
-        "regla": "§1.5 Cromo de aplicación + preámbulo («ningún hex literal en un componente»)",
-        "dice_el_sistema": "--chrome-focus (#9FE0AE) es el anillo de foco sobre fondo oscuro, vía .side :focus-visible{outline-color:var(--chrome-focus)} · Un badge sobre el cromo usa --chrome-alerta · ningún hex literal en un componente. Todo pasa por un token",
-        "hay_en_el_build": ".side :focus-visible{outline-color:#9FE0AE}; .av{background:linear-gradient(135deg,#1E4E79,#3E7A4C);color:#F2F5F7}; .dp-av{background:linear-gradient(135deg,#1E4E79,#2e823d)}; .it .n{background:var(--err);color:#2A1512}; .dp-h{background:linear-gradient(135deg,var(--accent-soft),rgba(30,78,121,.12))}",
-        "selector": ".side :focus-visible, .av, .dp-av, .it .n, .dp-h",
-        "evidencia": "Siete hex literales y un rgba() literal que reproducen --chrome-focus, --chrome, --accent, --chrome-ink y --marca-3. Los tokens --chrome-focus, --chrome-alerta y --chrome-alerta-ink no están declarados en el archivo. Nota sobre el brief: el fallo de contraste que reporta para span.av (1,06:1, 'AR' sobre rgb(250,252,253)) es un artefacto de medición — el fondo de .av es un linear-gradient, así que backgroundColor computa transparente y el medidor hereda --surface. No lo cuento como fallo de contraste.",
-        "por_que_importa": "La cabecera del hilo y el avatar del asistente son la identidad visual de D-PRIMI y están pintados con valores sueltos: al cambiar a tema oscuro el gradiente conserva los azules del tema claro. Y el anillo de foco de la barra lateral, que es la única excepción documentada de §1.5, se escribe a mano en vez de leer su token."
-      },
-      {
-        "id": "f1-10dprimi-10",
-        "severidad": "baja",
-        "regla": "§6.12 regla 2 («un filtro, un sitio») aplicada a los accesos rápidos",
-        "dice_el_sistema": "un filtro, un sitio — si el contador es atajo, al pulsarlo actualiza el desplegable · cada filtro tiene una sola vía de entrada y un solo sitio donde se ve su estado",
-        "hay_en_el_build": "Las mismas tres frases aparecen dos veces en pantalla: como <button class=\"qchip\"> en el pie de la bandeja, bajo el rótulo «Accesos rápidos», y como <button> en .sugg sobre el compositor",
-        "selector": ".qchip, .sugg button",
-        "evidencia": "«¿Cómo doy de alta un gestor?», «Busca el contrato de ELEKTRA» y «Llena un trámite desde esta ficha», literalmente idénticas en los dos sitios. Ambas colecciones comparten el mismo manejador (document.querySelectorAll('.sugg button, .qchip')) y hacen exactamente lo mismo: copiar su texto al campo y enfocarlo. Visible en la captura, a 400px de distancia una de otra.",
-        "por_que_importa": "Dos componentes distintos (uno con icono y alineado a la izquierda, otro en píldora) para la misma acción, con el mismo texto, en la misma pantalla. Quien las ve asume que hacen cosas distintas y prueba las dos."
-      },
-      {
-        "id": "f1-10dprimi-11",
-        "severidad": "baja",
-        "regla": "§6.5 Iconos — .msi",
-        "dice_el_sistema": "Cuándo: todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1)",
-        "hay_en_el_build": "Sprite SVG propio de 23 <symbol> con iconos de trazo (.ico{stroke:currentColor;stroke-width:1.6;fill:none})",
-        "selector": ".ico",
-        "evidencia": "grep 'msi' y grep 'Material+Symbols' devuelven 0. Transversal a las cuatro pantallas del lote.",
-        "por_que_importa": "Divergencia de familia visual, no de función: los iconos llevan aria-hidden y no sufren el problema de ligadura ni el del subconjunto mal generado que §6.5 documenta."
-      }
-    ]
-  },
-  "f3_boost_ui": {
-    "puntuacion": 2,
-    "dimensiones": {
-      "accesibilidad": 1,
-      "rendimiento": "no_evaluado",
-      "theming": 2,
-      "responsive": 1,
-      "integridad": 2
-    },
-    "justificacion": "Accesibilidad 1 y responsive 1 por el mismo tipo de fallo: una regla que no gana y nadie comprobó en el navegador. Con prefers-reduced-motion activado la conversación entera computa opacity:0 y la pantalla se queda en blanco; por debajo de 980px la barra lateral y la lista de conversaciones desaparecen a la vez sin cajón, sin hamburguesa y sin forma de recuperarlas. A eso se suman diecinueve claves tipográficas bajo el suelo de 12px —el aviso de que el asistente puede equivocarse a 9,5px— y que la mitad grande de la pantalla, el hilo, no tiene ninguna vista de estado. Theming 2: los dos bloques de tema están completos y el conmutador sincroniza theme-color e icono, pero la identidad del asistente (avatar, cabecera del hilo, anillo de foco de la lateral) está pintada con hex literales que no voltean, y el tema oscuro no se pudo verificar al no haber captura. Integridad 2: sí hay comportamiento real —el conmutador de tema, la selección de conversación, el envío que anuncia por aria-live, las sugerencias que rellenan el campo—, el isotipo está escrito con el patrón correcto (dx = +0,9px, uno de los dos únicos aciertos de todo el lote) y el esqueleto es el único con las barras de verdad mudas; en contra, no hay andamiaje, así que tres de las cuatro vistas escritas son inalcanzables, y los accesos rápidos están duplicados en dos componentes distintos. La pantalla está bien pensada —la franja de alcance, la confirmación antes de ejecutar, la procedencia de cada respuesta— y mal comprobada.",
-    "evidencia": [
-      "Playwright con reducedMotion:'reduce': los cuatro .msg computan opacity:\"0\" y animation-name:\"none\"; con 'no-preference', opacity:\"1\"",
-      "A 900px: .side display:none ancho 0, .tray display:none ancho 0, .thread 900px, sin ningún manejador de menú en el <script>",
-      "getComputedStyle: 19 claves con texto propio bajo 12px, entre ellas P.legal@9.5px y SPAN@9.5px ×3",
-      "getBoundingClientRect: dx del <use> del isotipo = +0,9px sobre un <svg> de 40×38 — patrón correcto de §10 trampa 5",
-      "0 barras .skel con textContent; única regla de reduced-motion sobre .skel = animation:none",
-      "grep 'data-andamio' = 0; .tray[data-state] sin ningún manejador que lo cambie",
-      "Brief: 0 de 30 destinos interactivos bajo 24px, 0 reglas data-tacto sin :root, 1 h1, skip link, 2 regiones aria-live, 0 inputs sin etiqueta",
-      "Captura 10_dprimi_asistente--ok.png: 576px de hilo en blanco entre la franja de alcance y las sugerencias"
-    ]
-  },
-  "f4_nielsen": [],
-  "f5_investigacion": {
-    "pain_points_evaluados": [],
-    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
-  },
-  "cobertura": [
-    {
-      "patron": "CONFIRMACIÓN DE LO YA PROPUESTO PARA 47_asistente. Esta pantalla confirma, con otra implementación, los mismos huecos: hay conversación en turnos (§6.25 propuesto), espera de una respuesta generada (§6.7.1), procedencia de la respuesta (§6.26 — aquí .src, chips con icono por tipo de origen), declaración de alcance (§8.1 — aquí la franja .scope «Respuestas limitadas a tus permisos» más el pie .legal), sugerencia de consulta (§6.8.1 — aquí .sugg y .qchip, duplicadas) e historial de conversaciones (§6.27 — aquí .tray-list). El asistente negándose (§6.25.1) NO aparece aquí, y ese es justamente el hallazgo que sigue. Las propuestas de §6.25, §6.25.1, §6.7.1, §6.26, §8.1, §6.8.1, §6.27 y §13.10 siguen en pie sin cambios; lo que viene a continuación es lo que esta pantalla añade y 47_asistente no tiene.",
-      "propuesta_de_regla": "Sin regla nueva: se confirma el conjunto ya propuesto en la auditoría de 47_asistente."
-    },
-    {
-      "patron": "**EL HALLAZGO GORDO: los dos asistentes del producto no son el mismo patrón, y se contradicen en lo único que de verdad importa — si el asistente ejecuta o no.** 47_asistente declara en tres sitios distintos que no puede actuar: «Consulta y resume · no modifica nada» en la cabecera, «El asistente consulta y resume: no da de alta, no asigna, no aprueba ni cierra nada» en el pie del compositor, y una respuesta entera dedicada a negarse («Eso no lo puedo hacer yo. Asignar un gestor cambia el expediente, y los cambios los haces tú desde la pantalla: así queda tu nombre en la bitácora y no el mío»). 10_dprimi_asistente declara lo contrario en la misma posición de pantalla: «las acciones siempre se confirman antes de ejecutarse», y acto seguido D-PRIMI genera un PDF y ofrece «Enviar \"Reporte_Gestoria_Junio_2026.pdf\" por correo a los 3 usuarios con rol Dirección. Quedará registrado en la bitácora a tu nombre», con botones «Confirmar y enviar» / «Solo descargar», más acciones sueltas como «Notificar a los responsables». Las dos pantallas usan el mismo argumento —la bitácora— para justificar decisiones opuestas. Y no comparten ni una sola clase: .msg.u/.msg.a frente a .msg.yo/.msg.ia, .src frente a .fuentes, .sugg/.qchip frente a .rapidos/.rapido, .scope+.legal frente a .aviso-ia+.resumen, <input type=\"text\"> frente a <textarea>, botones frente a enlaces en el historial, bandeja+hilo a pantalla completa frente a panel dentro del cromo estándar. Una se llama D-PRIMI, con nombre propio en --font-brand y avatar de marca; la otra se llama «Asistente» y no tiene identidad. Las dos se abren desde el mismo FAB (<button class=\"fab\" aria-label=\"Abrir el asistente del sistema\">, presente en 24_tickets y en 40_usuarios).",
-      "propuesta_de_regla": "§6.25.2 Un solo asistente, un solo contrato. Antes de cualquier regla de componente, el sistema fija tres cosas que no pueden diferir entre pantallas: (1) **el nombre** — el asistente tiene uno solo, se escribe igual en todas partes y es el que aparece en el `aria-label` del lanzador; si es una entidad con nombre propio va en `--font-brand` y lleva su avatar, y si no lo es no lleva ninguno de los dos; (2) **el alcance** — la frase que dice qué puede hacer el asistente es una sola, vive en un único sitio de la pantalla y es la misma en todas las pantallas; dos redacciones distintas del alcance son un defecto de la misma gravedad que dos valores distintos de un token; (3) **la agencia** — si el asistente ejecuta acciones, lo hace en todas sus superficies, y si no, en ninguna. Una pantalla que dice «no modifica nada» y otra que envía un PDF por correo a Dirección no son dos variantes: son dos productos. La comprobación es de una línea: el texto de alcance de todas las pantallas del asistente tiene que ser idéntico carácter a carácter.\n\n§6.25.3 Acción propuesta por el asistente — `.acts` y `.confirm`. Cuándo el asistente sí ejecuta (y solo si §6.25.2 lo permite). Dos niveles, y la diferencia entre ellos no es de estilo: (a) **acción reversible o de solo lectura** («Ver los 4 en el kanban») — botón normal dentro de la respuesta, se ejecuta al pulsar; (b) **acción que sale del sistema o que alguien va a recibir** (enviar un correo, notificar a personas, cambiar un expediente) — no se ofrece como botón suelto: se ofrece como bloque de confirmación dentro de la propia respuesta, sobre `--warn-bg` con borde `--warn`, con rótulo «Acción que requiere tu confirmación», el enunciado de la consecuencia en una frase que nombra **a cuántos y a quiénes afecta** y dice **a nombre de quién queda en la bitácora**, y dos botones: el que confirma, nombrado por lo que hace (nunca «Aceptar»), y una salida que no ejecute nada hacia fuera («Solo descargar»). Requisitos a11y, los cuatro: el bloque de confirmación lleva `role=\"group\"` con su `aria-label`; aparece **dentro** del flujo de la conversación y no como diálogo, porque el contexto que lo justifica es el mensaje anterior; mientras la acción está en vuelo el botón se bloquea **en el manejador**, no con `pointer-events` (§6.1); y el resultado se anuncia por `aria-live` diciendo qué se hizo y dónde quedó registrado. Prohibido: ofrecer la acción irreversible y el enlace de procedencia en la misma fila de controles —son dos cosas de peso muy distinto y aquí comparten `.acts`/`.src` a 10,5-11px.\n\n§12.4.3 Cifras dentro de una respuesta generada. Una respuesta puede traer un reparto de un total (aquí `.kpirow` con tres `.kpimini`: 4 vencidos / 6 por vencer / 21 en tiempo). Reusa las reglas de `.cifras` de §12.4.1 —techo de cuatro cifras, cada una con su rótulo dentro, rótulo de una línea, sin borde propio— con dos añadidos: el rótulo nunca baja del suelo de 12px (aquí va a 9,5px) y las cifras **no se pintan con el color del semáforo si el texto de alrededor ya las califica**, porque la frase «4 trámites con SLA vencido» ya lleva el juicio y el color lo duplica. La cifra dentro de una respuesta es una ilustración de lo que el párrafo dice, no una fuente de verdad: lo que hace a esa respuesta comprobable es el enlace de procedencia (§6.26), no el color del número."
-    },
-    {
-      "patron": "Vista partida a pantalla completa (bandeja de conversaciones + hilo activo) que sustituye al cromo estándar: body con overflow:hidden, .app a height:100vh, y el hilo con su propio scroll. El sistema describe el cromo de §7.2 y la zona de contenido, pero no contempla una pantalla que se apodere del alto completo del viewport y gestione su propio desplazamiento interno. §13.7 («la cadena de min-height:0 en cada eslabón de ancestros hasta el contenedor con scroll») es la pieza que lo hace posible y está correctamente aplicada aquí (.main, .split, .tray, .thread, .chat), pero no hay ninguna regla que diga cuándo una pantalla tiene derecho a hacerlo.",
-      "propuesta_de_regla": "§13.9 Pantalla de alto fijo. Una pantalla puede tomar el alto completo del viewport y gestionar su propio desplazamiento interno solo cuando el trabajo es continuo y la posición importa: una conversación donde lo último escrito tiene que estar siempre a la vista, un tablero donde las columnas se comparan entre sí. Requisitos: la cadena de `min-height:0` de §13.7 se declara en **todos** los eslabones hasta el contenedor con scroll y se valida midiendo; el compositor o la barra de acción quedan `flex-shrink:0` fuera del área que se desplaza; y la barra lateral del cromo conserva su propio `overflow-y:auto` para que el menú siga siendo alcanzable cuando no cabe. Lo que una pantalla de alto fijo **no** puede hacer es resolver su estrechamiento ocultando el cromo: por debajo del punto de ruptura sigue aplicando §7.2 (cajón con velo), y el panel maestro se convierte en una vista a la que se vuelve, nunca en un `display:none` sin salida."
-    }
-  ],
-  "sin_datos": [
-    "estados loading/empty/error/oscuro: no_evaluado — solo existe la captura --ok y la pantalla no tiene andamiaje (grep 'data-andamio' = 0), así que las tres vistas de estado escritas para la bandeja no se pueden alcanzar ni desde el navegador. Lo auditable de forma estática (titulado con <b>, ausencia de tarjeta y medallón, barras del esqueleto mudas, regla de prefers-reduced-motion, ausencia total de estados en el hilo) está en los hallazgos 06, 07 y 08.",
-    "tema oscuro: no_evaluado — brief.tema_oscuro_medido = false y no hay captura --oscuro. El bloque [data-theme=\"dark\"] está declarado completo, pero no he comprobado ningún par de contraste real en oscuro.",
-    "f3.rendimiento: maqueta estática, sin backend que perfilar",
-    "§6.18 Diálogo modal: no_evaluado — la pantalla no tiene diálogo (brief: dialogNativo = 0, divDialog = 0). El bloque de confirmación de la acción va dentro del flujo de la conversación, que es una decisión deliberada y razonable; la propuesta de regla correspondiente está en cobertura (§6.25.3)."
+ "pantalla": "10_dprimi_asistente",
+ "ruta_zip": "06-soporte/10_dprimi_asistente.html",
+ "carpeta": "06-soporte",
+ "area": "soporte",
+ "arquetipo": "asistente/IA",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok"
+ ],
+ "capturas": [
+  "10_dprimi_asistente--ok.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-10dprimi-01",
+    "severidad": "alta",
+    "regla": "§5 prefers-reduced-motion + §10 (el estilo se comprueba en el navegador, no en la hoja)",
+    "dice_el_sistema": "No es «cero animación»: se conservan opacidad y color, se elimina todo desplazamiento y escala",
+    "hay_en_el_build": "@media (prefers-reduced-motion:reduce){ .enter{animation:none !important;opacity:1;transform:none} } escrito ANTES de .enter{opacity:0;transform:translateY(6px);animation:enter var(--dur-enter) var(--ease-out) forwards}",
+    "selector": ".enter",
+    "evidencia": "Medido con Playwright abriendo la pantalla con reducedMotion:'reduce': los cuatro .msg computan opacity: \"0\" y animation-name: \"none\". Con reducedMotion:'no-preference' computan opacity: \"1\". Ambas reglas tienen la misma especificidad (0,1,0); el !important solo cubre animation, así que el opacity:0 de la regla posterior gana sobre el opacity:1 de la que está dentro del media query. Es visible también en la captura 10_dprimi_asistente--ok.png: el hilo sale en blanco, con la cabecera, las sugerencias y el compositor pintados y los 576px de conversación vacíos.",
+    "por_que_importa": "Es el peor fallo del lote. Quien tiene activada la reducción de movimiento —una preferencia del sistema operativo, no un ajuste de la app— abre el asistente y no ve ni una sola línea de la conversación: la pantalla queda en blanco entre la franja de alcance y las sugerencias, sin ningún mensaje de error que lo explique. Es exactamente la familia de bug de §7.3 («la regla no gana por orden, y falla en silencio»), aquí con consecuencia total en vez de parcial, y es por eso que el documento insiste en comprobar en el navegador."
+   },
+   {
+    "id": "f1-10dprimi-02",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación — tres anchos",
+    "dice_el_sistema": "Tres anchos: completa ≥1100px, colapsada a solo iconos 860–1100px, cajón con velo <860px. En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece",
+    "hay_en_el_build": "@media (max-width:980px){ .side{display:none} .split{grid-template-columns:1fr} .tray{display:none} }",
+    "selector": ".side, .tray",
+    "evidencia": "Medido a 900px de ancho: .side computa display:none y ancho 0; .tray computa display:none y ancho 0; .thread ocupa los 900px. Las siete entradas de navegación quedan en el árbol pero sin pintar, y no hay hamburguesa, ni cajón, ni velo, ni ningún control que las devuelva — el <script> no tiene ningún manejador de menú.",
+    "por_que_importa": "Por debajo de 980px desaparecen a la vez la navegación de la aplicación y la lista de conversaciones, sin sustituto. No se puede cambiar de módulo, ni volver a una conversación anterior, ni abrir una nueva salvo escribiendo en el hilo que ya está abierto. Las otras tres pantallas de este lote con el cromo nuevo (40_usuarios, 24_tickets, 47_asistente) sí implementan el cajón con velo, Escape y gestión de foco: el patrón correcto ya existe dentro del producto."
+   },
+   {
+    "id": "f1-10dprimi-03",
+    "severidad": "alta",
+    "regla": "§2 Tipografía — autoalojado (D116)",
+    "dice_el_sistema": "Las fuentes se autoalojan (D116). Prohibido el <link> a Google Fonts para las fuentes de interfaz: un CDN caído falla en silencio (incidencia real de 4 días sin detección). @font-face con font-display:swap sobre /fuentes/inter-variable.woff2 y /fuentes/michroma.woff2",
+    "hay_en_el_build": "<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap\" rel=\"stylesheet\"> y dos <link rel=\"preconnect\"> a fonts.googleapis.com y fonts.gstatic.com",
+    "selector": "head > link[href*=fonts.googleapis.com]",
+    "evidencia": "Líneas 8-10 del archivo. No hay ninguna regla @font-face ni ninguna referencia a /fuentes/. De las cinco pantallas que he abierto en este lote, solo 13_panel_asistencia_rhl y esta cargan de Google Fonts; 40_usuarios, 24_tickets y 47_asistente no cargan ninguna fuente (caen a system-ui, que es otro problema distinto).",
+    "por_que_importa": "La regla se escribió por una incidencia real de cuatro días sin detectar. Y aquí pesa más que en otras pantallas porque --font-brand (Michroma) es el nombre propio del asistente —el <b>D-PRIMI</b> de la cabecera del hilo—: si el CDN cae, la marca del asistente se degrada a Inter sin que nada avise."
+   },
+   {
+    "id": "f1-10dprimi-04",
+    "severidad": "alta",
+    "regla": "§2.1 Suelo tipográfico",
+    "dice_el_sistema": "El suelo son 12px. «Nada baja de ahí.» Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta",
+    "hay_en_el_build": "19 claves con texto propio por debajo de 12px; las más bajas, .legal y .kpimini span a 9,5px",
+    "selector": ".legal, .kpimini span, .msg.a .who, .msg, .src a, .acts button, .confirm, .sugg button, .qchip, .scope, .conv .snip, .conv .when",
+    "evidencia": "Medido con getComputedStyle sobre cada elemento con nodo de texto propio: P.legal@9.5px («D-PRIMI puede equivocarse — verifica los datos críticos…»), SPAN@9.5px ×3 (los rótulos 'vencidos', 'por vencer', 'en tiempo' de los mini-KPI), DIV.who@10px ×2, A@10.5px ×3 (los enlaces de procedencia), SPAN.when@10.5px ×3, BUTTON@11px ×5 (las acciones que el asistente propone), SPAN.scope@11px, .msg a 12,5px (el cuerpo de la conversación), BUTTON.qchip@11.5px ×3. Solo P.grp@10.5px y SPAN.wordmark caen dentro o cerca de la excepción documentada.",
+    "por_que_importa": "El aviso legal sobre que el asistente puede equivocarse —el texto que más importa leer de toda la pantalla— va a 9,5px, por debajo del 79% del suelo. Los rótulos de los tres mini-KPI de la respuesta también. Y el cuerpo de la conversación entera va a 12,5px: está por encima del suelo pero por debajo de --fs-base, en un texto que se lee de corrido y en párrafos largos, que es justo lo contrario de lo que --fs-dense (13px, «tablas densas, cuerpo compacto») contempla."
+   },
+   {
+    "id": "f1-10dprimi-05",
+    "severidad": "alta",
+    "regla": "§1.1 Superficies y texto — valor de --text-3",
+    "dice_el_sistema": "--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)",
+    "hay_en_el_build": "--text-3: #66717F, usado en .conv .snip, .conv .when, .tray-h p, .legal, .kpimini span y el placeholder del compositor",
+    "selector": ":root, [data-theme=\"light\"]",
+    "evidencia": "Brief: tokens.text_3_declarado = \"#66717F\". La pantalla usa --surface-2 en .conv:hover, .conv[aria-current], .cico y el fondo del campo del compositor (.inp input{background:var(--surface-2)}), así que hay texto en --text-3 que cae sobre --surface-2 (el placeholder del compositor, .inp input::placeholder{color:var(--text-3)}).",
+    "por_que_importa": "Hecho ya establecido en 51 de las 52 maquetas: 4,21:1 sobre --surface-2, por debajo del mínimo AA. Aquí afecta además al texto de guía del campo donde se escribe («Pregunta o pide una acción a D-PRIMI…»), que es la instrucción principal de la pantalla."
+   },
+   {
+    "id": "f1-10dprimi-06",
+    "severidad": "media",
+    "regla": "§5 / §6.7 prefers-reduced-motion sobre el esqueleto",
+    "dice_el_sistema": "hay que aplanar el fondo, no solo parar la animación. animation:none a secas congela el degradado en la posición 0. Correcto: @media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}",
+    "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}}",
+    "selector": ".skel",
+    "evidencia": "Línea 263. Leído con document.styleSheets, la única regla de reduced-motion sobre .skel es animation:none, sin background plano. Patrón transversal: idéntico en las cuatro pantallas del lote.",
+    "por_que_importa": "El degradado de 200% se congela en la posición 0 y las barras salen con un gradiente a medias. A favor de esta pantalla: es la única de las cuatro cuyas barras .skel van de verdad mudas (medido: 0 .skel con textContent), que es la otra mitad de la regla y la que las otras tres incumplen."
+   },
+   {
+    "id": "f1-10dprimi-07",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado — reglas 1 y 2 + §11 Estructura",
+    "dice_el_sistema": "toda pantalla que pida datos — cuatro formas: con datos, cargando, vacía, con error. «No son un extra: son la pantalla.» · el cambio se anuncia (aria-live=\"polite\") y mueve el foco · cada estado lleva encabezado real, no un <b> · los estados de vacío y error van en tarjeta, con su medallón",
+    "hay_en_el_build": "Los tres estados existen pero solo para la bandeja izquierda (.tray[data-state]); el hilo de la derecha no tiene ninguno. Los tres titulan con <b> (.tray-state b{font-size:12.5px}) y no aplican .tarjeta-estado ni .estado-ico",
+    "selector": ".tray-state, .tray-state b, .thread",
+    "evidencia": "El archivo declara .tray-loading, .tray-empty y .tray-error dentro de <section class=\"tray\" data-state=\"ok\">, pero no hay ningún conmutador ni manejador que cambie ese data-state: el <script> no lo toca. <section class=\"thread\"> —el hilo, que es el 78% del ancho de contenido— no tiene estados en absoluto. El brief confirma --r-modal entre los tokens declarados_sin_usar.",
+    "por_que_importa": "La mitad grande de la pantalla no sabe decir que está cargando ni que falló. Si el servicio del asistente no responde, el hilo se queda en blanco: no hay vista de error que diga qué pasó ni qué no se ha perdido. Y la bandeja, que sí tiene las tres vistas y están bien escritas (la de error cita Ref. DP-20260728-119 y dice «tus conversaciones siguen a salvo»), no tiene forma de alcanzarlas."
+   },
+   {
+    "id": "f1-10dprimi-08",
+    "severidad": "media",
+    "regla": "§9 Andamiaje de maqueta (ANEXO A)",
+    "dice_el_sistema": "Conmutador flotante «Con datos · Cargando · Vacío · Error». Se marca siempre con data-andamio, va visualmente separado del producto y rotulado",
+    "hay_en_el_build": "No hay conmutador ninguno, y los tres estados de la bandeja quedan inalcanzables",
+    "selector": "[data-andamio]",
+    "evidencia": "grep -c 'data-andamio' devuelve 0, y grep de .demo tampoco encuentra nada. Las tres vistas de estado están escritas y no se pueden ver. El brief lo confirma: la única captura disponible es --ok, frente a las cinco de 47_asistente y de las otras dos pantallas con andamiaje.",
+    "por_que_importa": "No es solo una marca que falta: sin conmutador, los estados escritos no se pueden revisar ni aprobar. La consecuencia práctica es que esta pantalla ha llegado a auditoría con un cuarto de su superficie sin verificar."
+   },
+   {
+    "id": "f1-10dprimi-09",
+    "severidad": "media",
+    "regla": "§1.5 Cromo de aplicación + preámbulo («ningún hex literal en un componente»)",
+    "dice_el_sistema": "--chrome-focus (#9FE0AE) es el anillo de foco sobre fondo oscuro, vía .side :focus-visible{outline-color:var(--chrome-focus)} · Un badge sobre el cromo usa --chrome-alerta · ningún hex literal en un componente. Todo pasa por un token",
+    "hay_en_el_build": ".side :focus-visible{outline-color:#9FE0AE}; .av{background:linear-gradient(135deg,#1E4E79,#3E7A4C);color:#F2F5F7}; .dp-av{background:linear-gradient(135deg,#1E4E79,#2e823d)}; .it .n{background:var(--err);color:#2A1512}; .dp-h{background:linear-gradient(135deg,var(--accent-soft),rgba(30,78,121,.12))}",
+    "selector": ".side :focus-visible, .av, .dp-av, .it .n, .dp-h",
+    "evidencia": "Siete hex literales y un rgba() literal que reproducen --chrome-focus, --chrome, --accent, --chrome-ink y --marca-3. Los tokens --chrome-focus, --chrome-alerta y --chrome-alerta-ink no están declarados en el archivo. Nota sobre el brief: el fallo de contraste que reporta para span.av (1,06:1, 'AR' sobre rgb(250,252,253)) es un artefacto de medición — el fondo de .av es un linear-gradient, así que backgroundColor computa transparente y el medidor hereda --surface. No lo cuento como fallo de contraste.",
+    "por_que_importa": "La cabecera del hilo y el avatar del asistente son la identidad visual de D-PRIMI y están pintados con valores sueltos: al cambiar a tema oscuro el gradiente conserva los azules del tema claro. Y el anillo de foco de la barra lateral, que es la única excepción documentada de §1.5, se escribe a mano en vez de leer su token."
+   },
+   {
+    "id": "f1-10dprimi-10",
+    "severidad": "baja",
+    "regla": "§6.12 regla 2 («un filtro, un sitio») aplicada a los accesos rápidos",
+    "dice_el_sistema": "un filtro, un sitio — si el contador es atajo, al pulsarlo actualiza el desplegable · cada filtro tiene una sola vía de entrada y un solo sitio donde se ve su estado",
+    "hay_en_el_build": "Las mismas tres frases aparecen dos veces en pantalla: como <button class=\"qchip\"> en el pie de la bandeja, bajo el rótulo «Accesos rápidos», y como <button> en .sugg sobre el compositor",
+    "selector": ".qchip, .sugg button",
+    "evidencia": "«¿Cómo doy de alta un gestor?», «Busca el contrato de ELEKTRA» y «Llena un trámite desde esta ficha», literalmente idénticas en los dos sitios. Ambas colecciones comparten el mismo manejador (document.querySelectorAll('.sugg button, .qchip')) y hacen exactamente lo mismo: copiar su texto al campo y enfocarlo. Visible en la captura, a 400px de distancia una de otra.",
+    "por_que_importa": "Dos componentes distintos (uno con icono y alineado a la izquierda, otro en píldora) para la misma acción, con el mismo texto, en la misma pantalla. Quien las ve asume que hacen cosas distintas y prueba las dos."
+   },
+   {
+    "id": "f1-10dprimi-11",
+    "severidad": "baja",
+    "regla": "§6.5 Iconos — .msi",
+    "dice_el_sistema": "Cuándo: todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1)",
+    "hay_en_el_build": "Sprite SVG propio de 23 <symbol> con iconos de trazo (.ico{stroke:currentColor;stroke-width:1.6;fill:none})",
+    "selector": ".ico",
+    "evidencia": "grep 'msi' y grep 'Material+Symbols' devuelven 0. Transversal a las cuatro pantallas del lote.",
+    "por_que_importa": "Divergencia de familia visual, no de función: los iconos llevan aria-hidden y no sufren el problema de ligadura ni el del subconjunto mal generado que §6.5 documenta."
+   }
   ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 2,
+   "responsive": 1,
+   "integridad": 2
+  },
+  "justificacion": "Accesibilidad 1 y responsive 1 por el mismo tipo de fallo: una regla que no gana y nadie comprobó en el navegador. Con prefers-reduced-motion activado la conversación entera computa opacity:0 y la pantalla se queda en blanco; por debajo de 980px la barra lateral y la lista de conversaciones desaparecen a la vez sin cajón, sin hamburguesa y sin forma de recuperarlas. A eso se suman diecinueve claves tipográficas bajo el suelo de 12px —el aviso de que el asistente puede equivocarse a 9,5px— y que la mitad grande de la pantalla, el hilo, no tiene ninguna vista de estado. Theming 2: los dos bloques de tema están completos y el conmutador sincroniza theme-color e icono, pero la identidad del asistente (avatar, cabecera del hilo, anillo de foco de la lateral) está pintada con hex literales que no voltean, y el tema oscuro no se pudo verificar al no haber captura. Integridad 2: sí hay comportamiento real —el conmutador de tema, la selección de conversación, el envío que anuncia por aria-live, las sugerencias que rellenan el campo—, el isotipo está escrito con el patrón correcto (dx = +0,9px, uno de los dos únicos aciertos de todo el lote) y el esqueleto es el único con las barras de verdad mudas; en contra, no hay andamiaje, así que tres de las cuatro vistas escritas son inalcanzables, y los accesos rápidos están duplicados en dos componentes distintos. La pantalla está bien pensada —la franja de alcance, la confirmación antes de ejecutar, la procedencia de cada respuesta— y mal comprobada.",
+  "evidencia": [
+   "Playwright con reducedMotion:'reduce': los cuatro .msg computan opacity:\"0\" y animation-name:\"none\"; con 'no-preference', opacity:\"1\"",
+   "A 900px: .side display:none ancho 0, .tray display:none ancho 0, .thread 900px, sin ningún manejador de menú en el <script>",
+   "getComputedStyle: 19 claves con texto propio bajo 12px, entre ellas P.legal@9.5px y SPAN@9.5px ×3",
+   "getBoundingClientRect: dx del <use> del isotipo = +0,9px sobre un <svg> de 40×38 — patrón correcto de §10 trampa 5",
+   "0 barras .skel con textContent; única regla de reduced-motion sobre .skel = animation:none",
+   "grep 'data-andamio' = 0; .tray[data-state] sin ningún manejador que lo cambie",
+   "Brief: 0 de 30 destinos interactivos bajo 24px, 0 reglas data-tacto sin :root, 1 h1, skip link, 2 regiones aria-live, 0 inputs sin etiqueta",
+   "Captura 10_dprimi_asistente--ok.png: 576px de hilo en blanco entre la franja de alcance y las sugerencias"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+ },
+ "cobertura": [
+  {
+   "patron": "CONFIRMACIÓN DE LO YA PROPUESTO PARA 47_asistente. Esta pantalla confirma, con otra implementación, los mismos huecos: hay conversación en turnos (§6.25 propuesto), espera de una respuesta generada (§6.7.1), procedencia de la respuesta (§6.26 — aquí .src, chips con icono por tipo de origen), declaración de alcance (§8.1 — aquí la franja .scope «Respuestas limitadas a tus permisos» más el pie .legal), sugerencia de consulta (§6.8.1 — aquí .sugg y .qchip, duplicadas) e historial de conversaciones (§6.27 — aquí .tray-list). El asistente negándose (§6.25.1) NO aparece aquí, y ese es justamente el hallazgo que sigue. Las propuestas de §6.25, §6.25.1, §6.7.1, §6.26, §8.1, §6.8.1, §6.27 y §13.10 siguen en pie sin cambios; lo que viene a continuación es lo que esta pantalla añade y 47_asistente no tiene.",
+   "propuesta_de_regla": "Sin regla nueva: se confirma el conjunto ya propuesto en la auditoría de 47_asistente."
+  },
+  {
+   "patron": "**EL HALLAZGO GORDO: los dos asistentes del producto no son el mismo patrón, y se contradicen en lo único que de verdad importa — si el asistente ejecuta o no.** 47_asistente declara en tres sitios distintos que no puede actuar: «Consulta y resume · no modifica nada» en la cabecera, «El asistente consulta y resume: no da de alta, no asigna, no aprueba ni cierra nada» en el pie del compositor, y una respuesta entera dedicada a negarse («Eso no lo puedo hacer yo. Asignar un gestor cambia el expediente, y los cambios los haces tú desde la pantalla: así queda tu nombre en la bitácora y no el mío»). 10_dprimi_asistente declara lo contrario en la misma posición de pantalla: «las acciones siempre se confirman antes de ejecutarse», y acto seguido D-PRIMI genera un PDF y ofrece «Enviar \"Reporte_Gestoria_Junio_2026.pdf\" por correo a los 3 usuarios con rol Dirección. Quedará registrado en la bitácora a tu nombre», con botones «Confirmar y enviar» / «Solo descargar», más acciones sueltas como «Notificar a los responsables». Las dos pantallas usan el mismo argumento —la bitácora— para justificar decisiones opuestas. Y no comparten ni una sola clase: .msg.u/.msg.a frente a .msg.yo/.msg.ia, .src frente a .fuentes, .sugg/.qchip frente a .rapidos/.rapido, .scope+.legal frente a .aviso-ia+.resumen, <input type=\"text\"> frente a <textarea>, botones frente a enlaces en el historial, bandeja+hilo a pantalla completa frente a panel dentro del cromo estándar. Una se llama D-PRIMI, con nombre propio en --font-brand y avatar de marca; la otra se llama «Asistente» y no tiene identidad. Las dos se abren desde el mismo FAB (<button class=\"fab\" aria-label=\"Abrir el asistente del sistema\">, presente en 24_tickets y en 40_usuarios).",
+   "propuesta_de_regla": "§6.25.2 Un solo asistente, un solo contrato. Antes de cualquier regla de componente, el sistema fija tres cosas que no pueden diferir entre pantallas: (1) **el nombre** — el asistente tiene uno solo, se escribe igual en todas partes y es el que aparece en el `aria-label` del lanzador; si es una entidad con nombre propio va en `--font-brand` y lleva su avatar, y si no lo es no lleva ninguno de los dos; (2) **el alcance** — la frase que dice qué puede hacer el asistente es una sola, vive en un único sitio de la pantalla y es la misma en todas las pantallas; dos redacciones distintas del alcance son un defecto de la misma gravedad que dos valores distintos de un token; (3) **la agencia** — si el asistente ejecuta acciones, lo hace en todas sus superficies, y si no, en ninguna. Una pantalla que dice «no modifica nada» y otra que envía un PDF por correo a Dirección no son dos variantes: son dos productos. La comprobación es de una línea: el texto de alcance de todas las pantallas del asistente tiene que ser idéntico carácter a carácter.\n\n§6.25.3 Acción propuesta por el asistente — `.acts` y `.confirm`. Cuándo el asistente sí ejecuta (y solo si §6.25.2 lo permite). Dos niveles, y la diferencia entre ellos no es de estilo: (a) **acción reversible o de solo lectura** («Ver los 4 en el kanban») — botón normal dentro de la respuesta, se ejecuta al pulsar; (b) **acción que sale del sistema o que alguien va a recibir** (enviar un correo, notificar a personas, cambiar un expediente) — no se ofrece como botón suelto: se ofrece como bloque de confirmación dentro de la propia respuesta, sobre `--warn-bg` con borde `--warn`, con rótulo «Acción que requiere tu confirmación», el enunciado de la consecuencia en una frase que nombra **a cuántos y a quiénes afecta** y dice **a nombre de quién queda en la bitácora**, y dos botones: el que confirma, nombrado por lo que hace (nunca «Aceptar»), y una salida que no ejecute nada hacia fuera («Solo descargar»). Requisitos a11y, los cuatro: el bloque de confirmación lleva `role=\"group\"` con su `aria-label`; aparece **dentro** del flujo de la conversación y no como diálogo, porque el contexto que lo justifica es el mensaje anterior; mientras la acción está en vuelo el botón se bloquea **en el manejador**, no con `pointer-events` (§6.1); y el resultado se anuncia por `aria-live` diciendo qué se hizo y dónde quedó registrado. Prohibido: ofrecer la acción irreversible y el enlace de procedencia en la misma fila de controles —son dos cosas de peso muy distinto y aquí comparten `.acts`/`.src` a 10,5-11px.\n\n§12.4.3 Cifras dentro de una respuesta generada. Una respuesta puede traer un reparto de un total (aquí `.kpirow` con tres `.kpimini`: 4 vencidos / 6 por vencer / 21 en tiempo). Reusa las reglas de `.cifras` de §12.4.1 —techo de cuatro cifras, cada una con su rótulo dentro, rótulo de una línea, sin borde propio— con dos añadidos: el rótulo nunca baja del suelo de 12px (aquí va a 9,5px) y las cifras **no se pintan con el color del semáforo si el texto de alrededor ya las califica**, porque la frase «4 trámites con SLA vencido» ya lleva el juicio y el color lo duplica. La cifra dentro de una respuesta es una ilustración de lo que el párrafo dice, no una fuente de verdad: lo que hace a esa respuesta comprobable es el enlace de procedencia (§6.26), no el color del número."
+  },
+  {
+   "patron": "Vista partida a pantalla completa (bandeja de conversaciones + hilo activo) que sustituye al cromo estándar: body con overflow:hidden, .app a height:100vh, y el hilo con su propio scroll. El sistema describe el cromo de §7.2 y la zona de contenido, pero no contempla una pantalla que se apodere del alto completo del viewport y gestione su propio desplazamiento interno. §13.7 («la cadena de min-height:0 en cada eslabón de ancestros hasta el contenedor con scroll») es la pieza que lo hace posible y está correctamente aplicada aquí (.main, .split, .tray, .thread, .chat), pero no hay ninguna regla que diga cuándo una pantalla tiene derecho a hacerlo.",
+   "propuesta_de_regla": "§13.9 Pantalla de alto fijo. Una pantalla puede tomar el alto completo del viewport y gestionar su propio desplazamiento interno solo cuando el trabajo es continuo y la posición importa: una conversación donde lo último escrito tiene que estar siempre a la vista, un tablero donde las columnas se comparan entre sí. Requisitos: la cadena de `min-height:0` de §13.7 se declara en **todos** los eslabones hasta el contenedor con scroll y se valida midiendo; el compositor o la barra de acción quedan `flex-shrink:0` fuera del área que se desplaza; y la barra lateral del cromo conserva su propio `overflow-y:auto` para que el menú siga siendo alcanzable cuando no cabe. Lo que una pantalla de alto fijo **no** puede hacer es resolver su estrechamiento ocultando el cromo: por debajo del punto de ruptura sigue aplicando §7.2 (cajón con velo), y el panel maestro se convierte en una vista a la que se vuelve, nunca en un `display:none` sin salida."
+  }
+ ],
+ "sin_datos": [
+  "estados loading/empty/error/oscuro: no_evaluado — solo existe la captura --ok y la pantalla no tiene andamiaje (grep 'data-andamio' = 0), así que las tres vistas de estado escritas para la bandeja no se pueden alcanzar ni desde el navegador. Lo auditable de forma estática (titulado con <b>, ausencia de tarjeta y medallón, barras del esqueleto mudas, regla de prefers-reduced-motion, ausencia total de estados en el hilo) está en los hallazgos 06, 07 y 08.",
+  "tema oscuro: no_evaluado — brief.tema_oscuro_medido = false y no hay captura --oscuro. El bloque [data-theme=\"dark\"] está declarado completo, pero no he comprobado ningún par de contraste real en oscuro.",
+  "f3.rendimiento: maqueta estática, sin backend que perfilar",
+  "§6.18 Diálogo modal: no_evaluado — la pantalla no tiene diálogo (brief: dialogNativo = 0, divDialog = 0). El bloque de confirmación de la acción va dentro del flujo de la conversación, que es una decisión deliberada y razonable; la propuesta de regla correspondiente está en cobertura (§6.25.3)."
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-dim",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-dim",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-ink",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-meta",
+   "--fs-sub",
+   "--link",
+   "--ok",
+   "--ok-fill",
+   "--ok-ink",
+   "--r-ctrl",
+   "--r-pill",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--warn",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [],
+  "declarados_no_usados": [
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-bg",
+   "--err-fill",
+   "--focus-offset",
+   "--focus-w",
+   "--fs-kpi",
+   "--fs-title",
+   "--glass",
+   "--ok-bg",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-modal",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sp-12",
+   "--warn-bg"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 72,
+  "n_usados": 44,
+  "n_divergentes": 15,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": false,
+   "filas": 0,
+   "nodosText3": 0
+  }
+ }
 }

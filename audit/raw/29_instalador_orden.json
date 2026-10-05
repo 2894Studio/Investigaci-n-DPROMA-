@@ -1,218 +1,490 @@
 {
-  "pantalla": "29_instalador_orden",
-  "ruta_zip": "03-icev-instalacion-de-cargadores/29_instalador_orden.html",
-  "carpeta": "03-icev-instalacion-de-cargadores",
-  "area": "ICEV / almacén",
-  "arquetipo": "detalle (app personal)",
-  "modo": "cumplimiento",
-  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
-  "capturas": [
-    "29_instalador_orden--ok.png",
-    "29_instalador_orden--loading.png",
-    "29_instalador_orden--empty.png",
-    "29_instalador_orden--error.png",
-    "29_instalador_orden--oscuro.png",
-    "29_instalador_orden--390.png (medición propia a 390×844)"
-  ],
-  "f1_cumplimiento": {
-    "veredicto": "no_cumple",
-    "hallazgos": [
-      {
-        "id": "f1-29orden-01",
-        "severidad": "alta",
-        "regla": "§3 — «un token que no existe falla en silencio» + §11 («todo token var(--x) que usa el archivo está declarado en ese mismo archivo»)",
-        "dice_el_sistema": "«Un var() que no resuelve invalida la declaración entera (los tres paddings del diálogo computaban a 0). Cuando un espaciado se vea raro, lo primero es comprobar que su token está definido.»",
-        "hay_en_el_build": ".enc-orden .cli{font-size:var(--fs-h2);font-weight:700;line-height:1.25} — y --fs-h2 no está declarado en ningún :root del archivo. Tampoco existe en la escala de §2, que va --fs-meta / --fs-dense / --fs-base / --fs-sub / --fs-title / --fs-kpi.",
-        "selector": ".enc-orden .cli",
-        "evidencia": "Brief, tokens.usados_sin_declarar = [\"--fs-h2\", \"--sp-5\"]. Medido en Chromium: getPropertyValue('--fs-h2') devuelve cadena vacía y getComputedStyle('.enc-orden .cli').fontSize = 14px, con el texto «Comercializadora Vértice del Bajío». Es decir: el nombre del cliente se pinta al tamaño de cuerpo heredado, no al de encabezado que la regla pedía.",
-        "por_que_importa": "«Comercializadora Vértice del Bajío» es el dato con el que el instalador confirma, al llegar, que está en la orden correcta. La regla que lo iba a destacar está invalidada y cae a 14px, al mismo tamaño que la dirección de debajo. El fallo es silencioso: nada en la hoja ni en la pantalla indica que la declaración no se aplicó."
-      },
-      {
-        "id": "f1-29orden-02",
-        "severidad": "alta",
-        "regla": "§1.7 Ratios de contraste mínimos (texto normal 4,5:1, en los dos temas)",
-        "dice_el_sistema": "«Cada color nuevo se mide contra los fondos donde va a aparecer, en los dos temas, antes de darlo por bueno.» «No basta con medirlo sobre --surface: si el elemento puede caer sobre --surface-2, se mide también ahí.» §1.2: «--accent = esto se puede pulsar»; §1.3: el color base «solo elementos gráficos: punto, borde, barra. Nunca texto sobre fondo claro».",
-        "hay_en_el_build": "Los tres pasos del envío de foto se pintan sobre --surface-2: <span class=\"paso-envio\"><span class=\"hecho\">1 · permiso concedido</span>›<span class=\"ahora\">2 · enviando 62 %</span>›<span>3 · revisión del servidor</span></span>, con .ahora en --accent y el resto en --text-3; y <span class=\"meta\">3.4 MB</span> también en --text-3.",
-        "selector": "span.ahora, span.meta, .paso-envio > span",
-        "evidencia": "Brief, contraste (medición corregida con composición alfa real): tres fallos en claro — {span.meta «3.4 MB», rgb(102,113,127) sobre rgb(231,237,243), 10,5px, peso 400, 4,21:1}, {span «3 · revisión del servidor», mismos valores, 4,21:1} y {span.ahora «2 · enviando 62 %», rgb(62,122,76) sobre rgb(231,237,243), 10,5px, peso 700, 4,35:1}; y uno en oscuro — {span.ahora, rgb(74,143,90) sobre rgb(29,39,53), 3,85:1}. Mínimo exigido en los cuatro casos: 4,5:1. Es la pantalla con más fallos reales de contraste del paquete.",
-        "por_que_importa": "Los tres pasos del envío son lo que distingue «la foto ya cuenta» de «la foto se está subiendo y si cierras se pierde» — la propia pantalla lo dice. El paso activo, que es el que hay que leer, es el peor de los tres, falla en los dos temas, va a 10,5px y usa --accent como tinta de texto, que §1.2 reserva para «esto se puede pulsar» y §1.3 prohíbe explícitamente como texto sobre fondo claro."
-      },
-      {
-        "id": "f1-29orden-03",
-        "severidad": "alta",
-        "regla": "§6.17 Subida de archivo — .subida",
-        "dice_el_sistema": "«Un documento no se pide en una caja de texto.» Markup: <input type=\"file\" accept=\".pdf,.jpg,.jpeg,.png\" aria-describedby=\"…\">, data-estado=\"vacio\". «Indica formatos y peso admitidos, muestra el archivo cargado con su nombre y fecha, y permite reemplazarlo o quitarlo. A11y: aria-describedby del <input> al id de la ayuda.»",
-        "hay_en_el_build": "La sección «Fotos de la instalación» no contiene ningún <input type=\"file\">: todo son <button class=\"gordo ancho\" type=\"button\">Tomar la foto del tablero</button> / «Tomar otra foto» / «Volver a tomar esta foto». La ayuda de formatos existe (<p class=\"formatos\">JPEG y PNG hasta 2 MB · … · PDF hasta 5 MB) pero no está vinculada con aria-describedby a nada, porque no hay input al que vincularla.",
-        "selector": "article.tarjeta-tel .ev-lista, p.formatos",
-        "evidencia": "Medido: document.querySelectorAll('input,select,textarea') devuelve lista vacía en toda la pantalla; grep: 0 ocurrencias de type=\"file\" y 0 de class=\"subida\". El propio checklist de la pantalla lo reconoce en el paso del tablero: <p class=\"fallo\">Este paso pide una foto y <b>hoy no hay forma de tomarla desde aquí</b>.</p>",
-        "por_que_importa": "La foto del tablero ANTES es, según la propia pantalla, obligatoria y no reproducible después de montar el centro de carga: sin ella la orden no cierra. El componente que la captura no existe — ni como maqueta. En un teléfono, un <button> sin <input type=\"file\"> no abre la cámara ni el selector: no hay ningún camino desde esta pantalla hasta el archivo."
-      },
-      {
-        "id": "f1-29orden-04",
-        "severidad": "alta",
-        "regla": "§9 Andamiaje de maqueta",
-        "dice_el_sistema": "«Se marca siempre con data-andamio, va visualmente separado del producto y rotulado.» «Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra.»",
-        "hay_en_el_build": "Cuatro etiquetas de estado de construcción pegadas al <h2> de cada tarjeta del producto: <span class=\"no-existe\">No existe todavía</span> (en «Llegada y salida» y en «Fotos de la instalación»), <span class=\"ya-existe\">Ya construido</span> (en «Checklist de instalación») y <span class=\"no-existe\">Analizado, sin construir</span> (en «Cómo se cierra esta orden»). Ninguna lleva data-andamio.",
-        "selector": ".tarjeta-tel .cab .no-existe, .tarjeta-tel .cab .ya-existe",
-        "evidencia": "Líneas 797, 806, 857 y 902 del archivo; grep: 3 × class=\"no-existe\" y 1 × class=\"ya-existe\", y una sola ocurrencia de data-andamio en todo el archivo (el conmutador .demo del pie). Visible en 29_instalador_orden--ok.png y en la medición propia a 390×844: «NO EXISTE TODAVÍA» en violeta junto a «Llegada y salida».",
-        "por_que_importa": "Es estado del proyecto de desarrollo, no información para el instalador, y está dentro de la cabecera de cada tarjeta del producto, al lado del título real. Como no lleva data-andamio, el selector único de retirada no la alcanza y viajaría a la aplicación: el instalador leería «Llegada y salida · No existe todavía» en la pantalla donde acaba de registrar su llegada."
-      },
-      {
-        "id": "f1-29orden-05",
-        "severidad": "alta",
-        "regla": "§8 Voz de producto — límites medibles",
-        "dice_el_sistema": "«Ningún bloque de texto siempre visible pasa de ~140 caracteres. Se mide con el contador de caracteres, no a ojo.» «.nota y .banda llevan como máximo UNA frase.» «Si el texto explica una decisión, no va en pantalla. Si explica una consecuencia para quien está mirando, sí — y en una frase.» «No hay excepción por importancia del contenido.»",
-        "hay_en_el_build": "Ocho bloques siempre visibles por encima del tope. Los peores: <p class=\"donde\"> = 448 caracteres («Al marcar se comprobó si estabas en el domicilio… Te lo decimos aquí, en el momento de marcar, y no en un aviso que firmaste una vez. Fuera del horario de marcaje no se comprueba la ubicación, y por eso el teléfono no te pide permiso fuera de él: pedirlo para no usarlo sería decir una cosa y hacer otra.»), <p class=\"formatos\"> = 282, .senal de aviso = 244, <p> «Tres estados, no dos…» = 192, .senal de conectividad = 177, <p> «Son dos pasos a propósito…» = 163.",
-        "selector": "p.donde, p.formatos, div.senal > p, .sec-titulo + p",
-        "evidencia": "Medido con innerText.length en Chromium a 1440×900 con [data-andamio] oculto: 8 bloques por encima de 140 caracteres, con 448 como máximo. En la medición a 390×844 (29_instalador_orden--390.png) las dos .senal ocupan 540 de los 844px de alto del primer pantallazo: el instalador ve dos cajas de texto antes que la orden.",
-        "por_que_importa": "Esta pantalla se usa de pie, en obra, con guantes y a veces sin señal. El texto de .donde es nivel 3 puro —explica por qué se diseñó así el permiso de ubicación— y ocupa 448 caracteres justo encima del botón «Registrar mi salida». Lo que sí es nivel 1 («te falta la foto del tablero y es obligatoria») queda a la misma altura visual que lo que no lo es, y el instalador acaba sin leer ninguno."
-      },
-      {
-        "id": "f1-29orden-06",
-        "severidad": "alta",
-        "regla": "§6.4 — encabezado real y estados en tarjeta con medallón",
-        "dice_el_sistema": "«(2) cada estado lleva encabezado real, no un <b>.» §11: «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo».",
-        "hay_en_el_build": "<div class=\"state state-empty\"><svg class=\"ico\"><use href=\"#i-file\"/></svg><b>Esta orden todavía no tiene checklist</b><p>…</p></div> y lo mismo en state-error. 0 ocurrencias de .tarjeta-estado y .estado-ico; el icono es un <svg> de 30px en --text-3.",
-        "selector": ".state.state-empty, .state.state-error",
-        "evidencia": "grep: 0 ocurrencias de «tarjeta-estado» y «estado-ico». Medido: los encabezados de la pantalla son ['H1:La orden en sitio','H2:Llegada y salida','H2:Checklist de instalación','H2:Fotos de la instalación','H2:Cómo se cierra esta orden'] — la vista con datos sí tiene jerarquía, pero las vistas vacía y error no aportan ninguno. Contrastar con 36_recetas_despacho--empty.png.",
-        "por_que_importa": "El mensaje de error dice algo crítico para el campo —«nada de lo que ya marcaste se borró; lo que no sabes es si el último toque entró»— y se presenta flotando sobre el fondo, sin tarjeta, sin medallón y sin entrada en el índice de encabezados."
-      },
-      {
-        "id": "f1-29orden-07",
-        "severidad": "alta",
-        "regla": "§6.7 Esqueleto de carga — .skel",
-        "dice_el_sistema": "«sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)»; «prefers-reduced-motion aplana el fondo, no solo detiene la animación»: {.skel{animation:none;background:var(--surface-2)}}.",
-        "hay_en_el_build": "10 barras .skel con texto: «cliente», «domicilio», «cómo llegar», «llegada y salida», «registrar salida», «checklist», «paso» ×2, «cumplido / no» ×2. Línea 604: @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin background:var(--surface-2).",
-        "selector": ".state-loading.sk .sk-caja .skel",
-        "evidencia": "Línea 917 del archivo; 10 ocurrencias de class=\"skel\". CSS .skel{…;color:transparent} línea 600-602. 29_instalador_orden--loading.png muestra las tres cajas con barras aparentemente mudas.",
-        "por_que_importa": "El esqueleto anuncia a un lector de pantalla «cliente, domicilio, cómo llegar, registrar salida, cumplido / no» como si fueran los datos de la orden. Y con movimiento reducido —ajuste frecuente en teléfonos— el degradado se congela en la posición 0 en lugar de aplanarse."
-      },
-      {
-        "id": "f1-29orden-08",
-        "severidad": "media",
-        "regla": "§3 — «un token que no existe falla en silencio»",
-        "dice_el_sistema": "«Un var() que no resuelve invalida la declaración entera.»",
-        "hay_en_el_build": ".gordo{min-height:56px;font-size:var(--fs-base);font-weight:700;padding:0 var(--sp-5);border-radius:var(--r-card);…} — y --sp-5 no está declarado en ningún :root del archivo.",
-        "selector": ".gordo",
-        "evidencia": "Brief, tokens.usados_sin_declarar incluye \"--sp-5\". Medido: getPropertyValue('--sp-5') = cadena vacía y getComputedStyle('.gordo').padding = «0px», paddingLeft = 0px. El min-height:56px sí sobrevive porque va en su propia declaración.",
-        "por_que_importa": "Los botones gordos son las acciones de la pantalla de campo («Tomar la foto del tablero», «Cancelar el envío», «Registrar mi salida», «Marcar trabajo terminado») y quedan con cero relleno horizontal. Hoy no se nota porque casi todos llevan .ancho y ocupan el 100%, pero cualquier botón gordo que no se estire saldrá con el texto tocando el borde."
-      },
-      {
-        "id": "f1-29orden-09",
-        "severidad": "media",
-        "regla": "§6.16 A11y extra — un botón deshabilitado no recibe el foco",
-        "dice_el_sistema": "«Un botón deshabilitado no recibe el foco → aria-disabled=\"true\" + aria-describedby con el motivo, y al pulsarlo se explica. Ese id tiene que ser único.»",
-        "hay_en_el_build": "<div class=\"pie-accion\"><button class=\"gordo p\" type=\"button\" disabled><svg class=\"ico ico-sm\"><use href=\"#i-check\"/></svg>Marcar trabajo terminado</button></div> — con el atributo disabled nativo, sin aria-disabled y sin aria-describedby. El CSS solo lo atenúa: .gordo:disabled{opacity:.72;cursor:not-allowed}.",
-        "selector": ".pie-accion .gordo.p[disabled]",
-        "evidencia": "Línea 915 del archivo; grep: 0 ocurrencias de aria-disabled en todo el archivo. Visible en 29_instalador_orden--ok.png y en la medición a 390×844: la barra fija al pie con el botón gris.",
-        "por_que_importa": "Es la acción principal de la pantalla y la única salida del flujo. Con disabled nativo no entra en el recorrido de teclado y un lector de pantalla puede no anunciarlo siquiera; quien llega hasta ahí no se entera de que existe ni de por qué no puede usarlo. El motivo está escrito en la pantalla (falta la foto del tablero), pero no está vinculado al botón."
-      },
-      {
-        "id": "f1-29orden-10",
-        "severidad": "media",
-        "regla": "§2.1 Suelo tipográfico",
-        "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
-        "hay_en_el_build": "Fuera de las dos excepciones: .formatos a 10,5px, .meta a 10,5px (3 nodos), .paso-envio / .hecho / .ahora a 10,5px, .no-existe y .ya-existe a 10,5px (4 nodos), .ev-tx a 11,5px (5 nodos), .sec-titulo a 11px (3 nodos), .pill a 11px (10 nodos), .donde a 11px, .ref a 11px, más diez <b> a 11 y 11,5px.",
-        "selector": ".formatos, .paso-envio, .ev-tx, .pill, .sec-titulo",
-        "evidencia": "Medido con getComputedStyle por elemento con texto propio a 1440×900: 22 combinaciones distintas por debajo de 12px, entre ellas {«10.5px|P.formatos»:1, «10.5px|SPAN.meta»:3, «10.5px|SPAN.ahora»:1, «11.5px|SPAN.ev-tx»:5, «11px|SPAN.pill p-ok»:4}. Valores literales en la hoja (p. ej. .formatos{font-size:10.5px}), no --fs-meta (12px).",
-        "por_que_importa": "Es la pantalla con más texto por debajo del suelo del lote, y es la que se lee de pie en obra. Lo peor afectado es lo que más importa: las reglas de qué se puede subir (.formatos, 282 caracteres a 10,5px) y el paso activo del envío de la foto, que además es el que falla el contraste."
-      },
-      {
-        "id": "f1-29orden-11",
-        "severidad": "media",
-        "regla": "§6.10 — todas las de una familia se ven como una familia",
-        "dice_el_sistema": "«Todas las de una familia se ven como una familia — o las tres llevan punto, o ninguna.» «Lleva color + icono + texto, nunca color a secas.»",
-        "hay_en_el_build": "De las 10 etiquetas .pill de la pantalla, 6 llevan icono (las del checklist: «Cumplido» con i-check, «Sin contestar» con i-clock, «No cumplido» con i-alertc) y 4 no (las de las fotos: «Obligatoria · falta», «Rechazada», «Aceptada» ×2).",
-        "selector": ".ev-cab .pill, .reactivos .pill",
-        "evidencia": "Medido: document.querySelectorAll('.pill') = 10; con <svg> dentro = 6; sin icono = 4. Las cuatro sin icono están en la sección «Fotos de la instalación», a veces en la misma vista que las seis con icono.",
-        "por_que_importa": "La misma pantalla enseña dos versiones del mismo componente a pocos centímetros. «Obligatoria · falta» es la etiqueta más crítica de la pantalla —marca la foto que impide cerrar la orden— y es de las que se quedan sin icono, así que depende solo del rojo."
-      },
-      {
-        "id": "f1-29orden-12",
-        "severidad": "media",
-        "regla": "§2 — las fuentes se autoalojan (D116)",
-        "dice_el_sistema": "«Las fuentes se autoalojan (D116). Prohibido el <link> a Google Fonts para las fuentes de interfaz… @font-face con font-display:swap sobre /fuentes/inter-variable.woff2 y /fuentes/michroma.woff2. La comprobación es que la fuente aparezca cargada en las herramientas de red, no la declaración de --font-ui.»",
-        "hay_en_el_build": "--font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif, pero el archivo no tiene ningún <link> (0) y ningún @font-face (0). Inter nunca se carga: se usa la pila del sistema.",
-        "selector": ":root --font-ui",
-        "evidencia": "Medido con la comprobación que el sistema exige —la red, no la declaración—: 0 peticiones a nada que contenga «font», «.woff» o «googleapis» durante la carga; document.fonts.size = 0; getComputedStyle(h1).fontFamily devuelve la pila completa con Inter al frente pero sin fuente cargada que la resuelva.",
-        "por_que_importa": "La pantalla se renderiza en la fuente del sistema del teléfono, no en Inter: métricas, altura de x y anchos distintos a los que se diseñaron. Es exactamente el fallo que D116 describe —la declaración de --font-ui está, la fuente no— y afecta a todo el paquete, no solo a esta pantalla."
-      },
-      {
-        "id": "f1-29orden-13",
-        "severidad": "media",
-        "regla": "§10 trampa 5 — isotipo con viewBox repetido",
-        "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio»; «se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal».",
-        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>.",
-        "selector": ".logo svg",
-        "evidencia": "Medido con getBoundingClientRect a 1440px: svg x=96 w=44 h=42; use x=63,5 w=43; dx = −32,5px; el <use> no declara width.",
-        "por_que_importa": "La marca se pinta 32,5px a la izquierda de su caja y se recorta casi entera."
-      },
-      {
-        "id": "f1-29orden-14",
-        "severidad": "baja",
-        "regla": "§7.3 / §10 — la regla táctil lleva :root",
-        "dice_el_sistema": "«El :root es lo que hace ganar la regla»; «se comprueba midiendo con data-tacto=\"dedo\" puesto, no leyendo el archivo».",
-        "hay_en_el_build": "El <html> sí lleva data-tacto=\"dedo\" (línea 2), pero las 6 reglas se escriben sin :root (líneas 279-284), con especificidad (0,2,0) en lugar de (0,3,0).",
-        "selector": "[data-tacto=\"dedo\"] .iconbtn, [data-tacto=\"dedo\"] .btn",
-        "evidencia": "Medido con el modo dedo activo (el estado real de esta pantalla): 0 de 37 elementos .iconbtn/.btn/.it/.gordo quedan por debajo de 46px; .acciones .iconbtn no se dibuja (0 nodos). getComputedStyle(.btn).minHeight = 46px. A 390×844 el único destino por debajo de 44px es el enlace de salto (182×32px), que solo aparece al enfocar.",
-        "por_que_importa": "El bug queda latente: hoy ninguna variante de tamaño compite y la regla gana igual. Pero en la pantalla de campo del paquete es donde más caro saldría que dejara de ganar, y bastaría añadir una fila con .acciones .iconbtn{width:28px}."
-      },
-      {
-        "id": "f1-29orden-15",
-        "severidad": "baja",
-        "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
-        "dice_el_sistema": "«Un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero.»",
-        "hay_en_el_build": "El <script> (38 líneas) solo cablea el conmutador de tema, el cajón del menú y el andamiaje .demo [data-set]. Los conmutadores de tres estados del checklist, «Registrar mi salida», «Tomar la foto del tablero», «Cancelar el envío» y la barra de progreso al 62% no tienen manejador.",
-        "selector": ".reactivos button[aria-pressed], .gordo",
-        "evidencia": "Inventario del script: addEventListener('click') ×4 (demo, tema, menu-btn, velo), keydown ×1, change ×1; querySelectorAll únicamente sobre '.demo [data-set]'. En el archivo hay 15 aria-pressed=\"true\" y 13 «false», ninguno gobernado fuera del andamiaje; el progreso está escrito a mano con style=\"width:62%\" y aria-valuenow=\"62\".",
-        "por_que_importa": "Hallazgo transversal del paquete: las maquetas no traen lógica de producto. Se registra aquí porque esta pantalla es la que más promete —28 atributos aria-pressed, una barra de progreso con role=\"progressbar\" y aria-valuenow— y ninguno de esos estados cambia nunca."
-      }
-    ]
-  },
-  "f3_boost_ui": {
-    "puntuacion": 2,
-    "dimensiones": {
-      "accesibilidad": 1,
-      "rendimiento": "no_evaluado",
-      "theming": 2,
-      "responsive": 3,
-      "integridad": 1
-    },
-    "justificacion": "Es la pantalla más ambiciosa del lote y la que mejor entiende su contexto: a 390×844 funciona de verdad (0 desbordamiento horizontal, todos los destinos a 44px o más, botones gordos de 56px, barra de acción fija al pie), tiene jerarquía de encabezados en la vista con datos y la máquina de estados del envío de foto —permiso, envío, revisión del servidor, rechazo con motivo— es la mejor pieza de diseño del paquete. Pero es también la que más incumple: dos tokens usados sin declarar que invalidan declaraciones medidas (--fs-h2 deja el nombre del cliente a 14px, --sp-5 deja los botones gordos a padding 0), los tres fallos de contraste reales en claro más uno en oscuro, la subida de archivo que no existe como componente, cuatro etiquetas de estado de construcción dentro del producto sin data-andamio y 8 bloques de texto siempre visible por encima de 140 caracteres, el peor de 448. Theming baja a 2 porque el fallo de contraste de .ahora se repite en los dos temas y en oscuro es el peor del lote (3,85:1).",
-    "evidencia": [
-      "Brief: contraste fallos_claro=3 (span.meta 4,21:1; span «3 · revisión del servidor» 4,21:1; span.ahora 4,35:1) y fallos_oscuro=1 (span.ahora 3,85:1); tokens usados_sin_declarar=[\"--fs-h2\",\"--sp-5\"]; tactil_24px por_debajo_de_24px=0 de 39; estructura h1=1, inputs=0, ariaLive=1, dialogNativo=0, skipLink=1.",
-      "Medido: getPropertyValue('--fs-h2')=\"\" y .enc-orden .cli computa 14px; getPropertyValue('--sp-5')=\"\" y .gordo computa padding 0px; 0 peticiones de fuente y document.fonts.size=0; 10 .pill, 6 con icono y 4 sin; 8 bloques siempre visibles por encima de 140 caracteres, máximo 448 (p.donde); 10 .skel con texto; isotipo dx=−32,5px.",
-      "Medido a 390×844 (29_instalador_orden--390.png): scrollWidth 390 = clientWidth 390, 0 elementos desbordan, 0 destinos por debajo de 24px y solo el enlace de salto (32px) por debajo de 44px; pero las dos bandas .senal ocupan 540 de los primeros 844px de alto, antes de la primera tarjeta de la orden."
-    ]
-  },
-  "f4_nielsen": [],
-  "f5_investigacion": {
-    "pain_points_evaluados": [],
-    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
-  },
-  "cobertura": [
-    {
-      "patron": "Banda de estado de conectividad de la app de campo: <div class=\"senal\"> «Sin señal desde hace 6 minutos. Lo que ya marcaste está guardado. Lo que marques ahora no se guarda, y el paso donde falle te lo dirá en ese paso». El sistema no tiene ninguna regla sobre trabajo sin conexión: §6.9 cubre avisos que califican lo de abajo y §6.4 cubre el error de carga, pero ninguno cubre un estado persistente del dispositivo que cambia el significado de cada acción de la pantalla.",
-      "propuesta_de_regla": "§6.25 Banda de conectividad — `.senal`. Cuándo: una pantalla de campo cuyas acciones se guardan contra un servidor que puede no estar. Reusa `.banda` de §6.9 con la variante que corresponda (`.banda-warn` sin señal, `.banda-err` si ya hay algo perdido) y añade `role=\"status\"` + `aria-live=\"polite\"`, porque el estado cambia solo. Dice tres cosas y nada más, en una frase cada una: desde cuándo, qué quedó guardado y qué pasa con lo que se marque ahora. No explica el mecanismo de sincronización. El detalle por acción no vive en la banda: cada control que no pueda completarse lo dice en su propio sitio (§6.4 regla 4, «el error no se lleva por delante lo que había»). La banda es la única del sistema que puede quedarse fija al desplazar, porque su contenido deja de ser cierto en cuanto se pierde de vista."
-    },
-    {
-      "patron": "Captura de foto en campo con máquina de estados de tres pasos visible: permiso concedido → enviando N% → revisión del servidor, con el rechazo llegando al final (el servidor abre el archivo y comprueba su contenido, no la extensión). §6.17 documenta la subida de un documento desde un escritorio, con el archivo ya elegido y validado al elegirlo; no contempla ni la cámara, ni el envío largo, ni la validación diferida.",
-      "propuesta_de_regla": "§6.17.1 Captura de foto en campo — `.subida.foto`. Cuándo: la prueba de un trabajo hecho en sitio, que solo se puede tomar en ese momento. El control es un `<label>` de 56px que envuelve un `<input type=\"file\" accept=\"image/*\" capture=\"environment\">` real: sin el `<input>` no hay cámara ni selector, y un `<button>` no lo sustituye (§10 trampa 4). El estado de cada archivo se enseña con la misma etiqueta `.pill` que el resto de la pantalla (§6.10), con icono, y recorre tres valores y solo tres: enviando, aceptada, rechazada. «Enviando» no es «aceptada»: mientras no haya respuesta del servidor el archivo no cuenta para ningún cierre, y la pantalla lo dice en una frase. Un rechazo nombra el límite concreto que se superó y ofrece la acción que lo resuelve, en un botón, no en prosa. Los formatos y pesos admitidos se declaran una vez, a `--fs-dense` como mínimo, vinculados con `aria-describedby` desde el `<input>`. El progreso usa `role=\"progressbar\"` con `aria-valuenow` y además un texto legible: una barra sola no se lee."
-    },
-    {
-      "patron": "Conmutador de tres estados por paso de checklist: «Sin contestar» (ausencia de respuesta) frente a «Cumplido» y «No cumplido». El sistema solo tiene el semáforo de §1.3, donde no existe «todavía nadie lo ha dicho», y la etiqueta `.p-neutro` que las maquetas usan para esto no está documentada en §6.10.",
-      "propuesta_de_regla": "§6.10 — Sexta variante `.p-neutro` y regla de los tres estados. Cuándo un paso puede estar sin contestar, el componente tiene tres valores, no dos: la ausencia de respuesta es un estado propio y se pinta `background:var(--surface-2);color:var(--text-2)` con icono de reloj, nunca con `--pause` (que significa «en pausa», una decisión) ni con el estado negativo (que afirma que se comprobó y falló). Un contador de avance que diga «2 de 6» cuenta solo los contestados, y el texto de la pantalla distingue siempre «faltan por contestar» de «no cumplidos»."
-    },
-    {
-      "patron": "Iconografía por sprite SVG inline (39 <symbol> en el documento, invocados con <use href=\"#i-…\">), en lugar de la fuente Material Symbols Rounded que fija §6.5. Divergencia transversal a todo el paquete, y en esta pantalla concreta es la decisión correcta: un icono que viene de una fuente remota desaparece sin señal, que es exactamente el escenario que la pantalla documenta.",
-      "propuesta_de_regla": "§6.5.1 Iconos sin red. Cuándo: cualquier pantalla cuyo uso previsto incluya estar sin conexión. Los iconos van en un sprite SVG en línea (`<symbol>` + `<use>`), no en la fuente de iconos: una fuente que no carga deja la ligadura sin resolver y pinta el nombre del icono en letras (§6.5), y sin red eso ocurre siempre. El sprite se limita a los símbolos que el markup usa —se comprueba igual que `icon_names`, listando los `href` del documento contra los `id` declarados— y cada `<use>` lleva sus medidas, sin repetir `viewBox` en el `<svg>` envoltorio (§10 trampa 5). Las reglas de §6.5 que no dependen del formato siguen vigentes: `aria-hidden=\"true\"`, `translate=\"no\"`, nunca el icono como única forma de entender un control, y el glifo se dimensiona en su envoltorio, no recortándolo."
-    }
-  ],
-  "sin_datos": [
-    "f3.rendimiento: maqueta estática, sin backend que perfilar ni librería que cargar.",
-    "f1 §6.11 (tabla densa): la pantalla no tiene ninguna tabla (brief: tablas=0, th=0); no evaluable. El archivo sí arrastra el CSS de tabla densa, incluido thead th[aria-sort] .sort, sin markup que lo use.",
-    "f1 §6.16 reglas 1-8 (formulario): la pantalla no tiene ni un campo — medido document.querySelectorAll('input,select,textarea') = []. No hay asteriscos decorativos, pero tampoco hay required ni aria-required que evaluar. Solo es evaluable la regla de a11y extra del botón deshabilitado, recogida en f1-29orden-09.",
-    "f1 §6.18: no hay diálogo (0 <dialog>, 0 div[role=dialog]); no evaluable.",
-    "f1 §6.20 (ficha de detalle, .cab/.idt/indicador lateral): la pantalla es un detalle, pero resuelto como pila de tarjetas de teléfono (.tarjeta-tel), no con la rejilla de §6.20; el sistema no tiene especificación móvil para este arquetipo, así que la divergencia se registra en cobertura (§7.4 propuesto en 55_verificacion_pedido) y no como incumplimiento."
+ "pantalla": "29_instalador_orden",
+ "ruta_zip": "03-icev-instalacion-de-cargadores/29_instalador_orden.html",
+ "carpeta": "03-icev-instalacion-de-cargadores",
+ "area": "ICEV / almacén",
+ "arquetipo": "detalle (app personal)",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "29_instalador_orden--ok.png",
+  "29_instalador_orden--loading.png",
+  "29_instalador_orden--empty.png",
+  "29_instalador_orden--error.png",
+  "29_instalador_orden--oscuro.png",
+  "29_instalador_orden--390.png (medición propia a 390×844)"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-29orden-01",
+    "severidad": "alta",
+    "regla": "§3 — «un token que no existe falla en silencio» + §11 («todo token var(--x) que usa el archivo está declarado en ese mismo archivo»)",
+    "dice_el_sistema": "«Un var() que no resuelve invalida la declaración entera (los tres paddings del diálogo computaban a 0). Cuando un espaciado se vea raro, lo primero es comprobar que su token está definido.»",
+    "hay_en_el_build": ".enc-orden .cli{font-size:var(--fs-h2);font-weight:700;line-height:1.25} — y --fs-h2 no está declarado en ningún :root del archivo. Tampoco existe en la escala de §2, que va --fs-meta / --fs-dense / --fs-base / --fs-sub / --fs-title / --fs-kpi.",
+    "selector": ".enc-orden .cli",
+    "evidencia": "Brief, tokens.usados_sin_declarar = [\"--fs-h2\", \"--sp-5\"]. Medido en Chromium: getPropertyValue('--fs-h2') devuelve cadena vacía y getComputedStyle('.enc-orden .cli').fontSize = 14px, con el texto «Comercializadora Vértice del Bajío». Es decir: el nombre del cliente se pinta al tamaño de cuerpo heredado, no al de encabezado que la regla pedía.",
+    "por_que_importa": "«Comercializadora Vértice del Bajío» es el dato con el que el instalador confirma, al llegar, que está en la orden correcta. La regla que lo iba a destacar está invalidada y cae a 14px, al mismo tamaño que la dirección de debajo. El fallo es silencioso: nada en la hoja ni en la pantalla indica que la declaración no se aplicó."
+   },
+   {
+    "id": "f1-29orden-02",
+    "severidad": "alta",
+    "regla": "§1.7 Ratios de contraste mínimos (texto normal 4,5:1, en los dos temas)",
+    "dice_el_sistema": "«Cada color nuevo se mide contra los fondos donde va a aparecer, en los dos temas, antes de darlo por bueno.» «No basta con medirlo sobre --surface: si el elemento puede caer sobre --surface-2, se mide también ahí.» §1.2: «--accent = esto se puede pulsar»; §1.3: el color base «solo elementos gráficos: punto, borde, barra. Nunca texto sobre fondo claro».",
+    "hay_en_el_build": "Los tres pasos del envío de foto se pintan sobre --surface-2: <span class=\"paso-envio\"><span class=\"hecho\">1 · permiso concedido</span>›<span class=\"ahora\">2 · enviando 62 %</span>›<span>3 · revisión del servidor</span></span>, con .ahora en --accent y el resto en --text-3; y <span class=\"meta\">3.4 MB</span> también en --text-3.",
+    "selector": "span.ahora, span.meta, .paso-envio > span",
+    "evidencia": "Brief, contraste (medición corregida con composición alfa real): tres fallos en claro — {span.meta «3.4 MB», rgb(102,113,127) sobre rgb(231,237,243), 10,5px, peso 400, 4,21:1}, {span «3 · revisión del servidor», mismos valores, 4,21:1} y {span.ahora «2 · enviando 62 %», rgb(62,122,76) sobre rgb(231,237,243), 10,5px, peso 700, 4,35:1}; y uno en oscuro — {span.ahora, rgb(74,143,90) sobre rgb(29,39,53), 3,85:1}. Mínimo exigido en los cuatro casos: 4,5:1. Es la pantalla con más fallos reales de contraste del paquete.",
+    "por_que_importa": "Los tres pasos del envío son lo que distingue «la foto ya cuenta» de «la foto se está subiendo y si cierras se pierde» — la propia pantalla lo dice. El paso activo, que es el que hay que leer, es el peor de los tres, falla en los dos temas, va a 10,5px y usa --accent como tinta de texto, que §1.2 reserva para «esto se puede pulsar» y §1.3 prohíbe explícitamente como texto sobre fondo claro."
+   },
+   {
+    "id": "f1-29orden-03",
+    "severidad": "alta",
+    "regla": "§6.17 Subida de archivo — .subida",
+    "dice_el_sistema": "«Un documento no se pide en una caja de texto.» Markup: <input type=\"file\" accept=\".pdf,.jpg,.jpeg,.png\" aria-describedby=\"…\">, data-estado=\"vacio\". «Indica formatos y peso admitidos, muestra el archivo cargado con su nombre y fecha, y permite reemplazarlo o quitarlo. A11y: aria-describedby del <input> al id de la ayuda.»",
+    "hay_en_el_build": "La sección «Fotos de la instalación» no contiene ningún <input type=\"file\">: todo son <button class=\"gordo ancho\" type=\"button\">Tomar la foto del tablero</button> / «Tomar otra foto» / «Volver a tomar esta foto». La ayuda de formatos existe (<p class=\"formatos\">JPEG y PNG hasta 2 MB · … · PDF hasta 5 MB) pero no está vinculada con aria-describedby a nada, porque no hay input al que vincularla.",
+    "selector": "article.tarjeta-tel .ev-lista, p.formatos",
+    "evidencia": "Medido: document.querySelectorAll('input,select,textarea') devuelve lista vacía en toda la pantalla; grep: 0 ocurrencias de type=\"file\" y 0 de class=\"subida\". El propio checklist de la pantalla lo reconoce en el paso del tablero: <p class=\"fallo\">Este paso pide una foto y <b>hoy no hay forma de tomarla desde aquí</b>.</p>",
+    "por_que_importa": "La foto del tablero ANTES es, según la propia pantalla, obligatoria y no reproducible después de montar el centro de carga: sin ella la orden no cierra. El componente que la captura no existe — ni como maqueta. En un teléfono, un <button> sin <input type=\"file\"> no abre la cámara ni el selector: no hay ningún camino desde esta pantalla hasta el archivo."
+   },
+   {
+    "id": "f1-29orden-04",
+    "severidad": "alta",
+    "regla": "§9 Andamiaje de maqueta",
+    "dice_el_sistema": "«Se marca siempre con data-andamio, va visualmente separado del producto y rotulado.» «Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra.»",
+    "hay_en_el_build": "Cuatro etiquetas de estado de construcción pegadas al <h2> de cada tarjeta del producto: <span class=\"no-existe\">No existe todavía</span> (en «Llegada y salida» y en «Fotos de la instalación»), <span class=\"ya-existe\">Ya construido</span> (en «Checklist de instalación») y <span class=\"no-existe\">Analizado, sin construir</span> (en «Cómo se cierra esta orden»). Ninguna lleva data-andamio.",
+    "selector": ".tarjeta-tel .cab .no-existe, .tarjeta-tel .cab .ya-existe",
+    "evidencia": "Líneas 797, 806, 857 y 902 del archivo; grep: 3 × class=\"no-existe\" y 1 × class=\"ya-existe\", y una sola ocurrencia de data-andamio en todo el archivo (el conmutador .demo del pie). Visible en 29_instalador_orden--ok.png y en la medición propia a 390×844: «NO EXISTE TODAVÍA» en violeta junto a «Llegada y salida».",
+    "por_que_importa": "Es estado del proyecto de desarrollo, no información para el instalador, y está dentro de la cabecera de cada tarjeta del producto, al lado del título real. Como no lleva data-andamio, el selector único de retirada no la alcanza y viajaría a la aplicación: el instalador leería «Llegada y salida · No existe todavía» en la pantalla donde acaba de registrar su llegada."
+   },
+   {
+    "id": "f1-29orden-05",
+    "severidad": "alta",
+    "regla": "§8 Voz de producto — límites medibles",
+    "dice_el_sistema": "«Ningún bloque de texto siempre visible pasa de ~140 caracteres. Se mide con el contador de caracteres, no a ojo.» «.nota y .banda llevan como máximo UNA frase.» «Si el texto explica una decisión, no va en pantalla. Si explica una consecuencia para quien está mirando, sí — y en una frase.» «No hay excepción por importancia del contenido.»",
+    "hay_en_el_build": "Ocho bloques siempre visibles por encima del tope. Los peores: <p class=\"donde\"> = 448 caracteres («Al marcar se comprobó si estabas en el domicilio… Te lo decimos aquí, en el momento de marcar, y no en un aviso que firmaste una vez. Fuera del horario de marcaje no se comprueba la ubicación, y por eso el teléfono no te pide permiso fuera de él: pedirlo para no usarlo sería decir una cosa y hacer otra.»), <p class=\"formatos\"> = 282, .senal de aviso = 244, <p> «Tres estados, no dos…» = 192, .senal de conectividad = 177, <p> «Son dos pasos a propósito…» = 163.",
+    "selector": "p.donde, p.formatos, div.senal > p, .sec-titulo + p",
+    "evidencia": "Medido con innerText.length en Chromium a 1440×900 con [data-andamio] oculto: 8 bloques por encima de 140 caracteres, con 448 como máximo. En la medición a 390×844 (29_instalador_orden--390.png) las dos .senal ocupan 540 de los 844px de alto del primer pantallazo: el instalador ve dos cajas de texto antes que la orden.",
+    "por_que_importa": "Esta pantalla se usa de pie, en obra, con guantes y a veces sin señal. El texto de .donde es nivel 3 puro —explica por qué se diseñó así el permiso de ubicación— y ocupa 448 caracteres justo encima del botón «Registrar mi salida». Lo que sí es nivel 1 («te falta la foto del tablero y es obligatoria») queda a la misma altura visual que lo que no lo es, y el instalador acaba sin leer ninguno."
+   },
+   {
+    "id": "f1-29orden-06",
+    "severidad": "alta",
+    "regla": "§6.4 — encabezado real y estados en tarjeta con medallón",
+    "dice_el_sistema": "«(2) cada estado lleva encabezado real, no un <b>.» §11: «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo».",
+    "hay_en_el_build": "<div class=\"state state-empty\"><svg class=\"ico\"><use href=\"#i-file\"/></svg><b>Esta orden todavía no tiene checklist</b><p>…</p></div> y lo mismo en state-error. 0 ocurrencias de .tarjeta-estado y .estado-ico; el icono es un <svg> de 30px en --text-3.",
+    "selector": ".state.state-empty, .state.state-error",
+    "evidencia": "grep: 0 ocurrencias de «tarjeta-estado» y «estado-ico». Medido: los encabezados de la pantalla son ['H1:La orden en sitio','H2:Llegada y salida','H2:Checklist de instalación','H2:Fotos de la instalación','H2:Cómo se cierra esta orden'] — la vista con datos sí tiene jerarquía, pero las vistas vacía y error no aportan ninguno. Contrastar con 36_recetas_despacho--empty.png.",
+    "por_que_importa": "El mensaje de error dice algo crítico para el campo —«nada de lo que ya marcaste se borró; lo que no sabes es si el último toque entró»— y se presenta flotando sobre el fondo, sin tarjeta, sin medallón y sin entrada en el índice de encabezados."
+   },
+   {
+    "id": "f1-29orden-07",
+    "severidad": "alta",
+    "regla": "§6.7 Esqueleto de carga — .skel",
+    "dice_el_sistema": "«sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)»; «prefers-reduced-motion aplana el fondo, no solo detiene la animación»: {.skel{animation:none;background:var(--surface-2)}}.",
+    "hay_en_el_build": "10 barras .skel con texto: «cliente», «domicilio», «cómo llegar», «llegada y salida», «registrar salida», «checklist», «paso» ×2, «cumplido / no» ×2. Línea 604: @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin background:var(--surface-2).",
+    "selector": ".state-loading.sk .sk-caja .skel",
+    "evidencia": "Línea 917 del archivo; 10 ocurrencias de class=\"skel\". CSS .skel{…;color:transparent} línea 600-602. 29_instalador_orden--loading.png muestra las tres cajas con barras aparentemente mudas.",
+    "por_que_importa": "El esqueleto anuncia a un lector de pantalla «cliente, domicilio, cómo llegar, registrar salida, cumplido / no» como si fueran los datos de la orden. Y con movimiento reducido —ajuste frecuente en teléfonos— el degradado se congela en la posición 0 en lugar de aplanarse."
+   },
+   {
+    "id": "f1-29orden-08",
+    "severidad": "media",
+    "regla": "§3 — «un token que no existe falla en silencio»",
+    "dice_el_sistema": "«Un var() que no resuelve invalida la declaración entera.»",
+    "hay_en_el_build": ".gordo{min-height:56px;font-size:var(--fs-base);font-weight:700;padding:0 var(--sp-5);border-radius:var(--r-card);…} — y --sp-5 no está declarado en ningún :root del archivo.",
+    "selector": ".gordo",
+    "evidencia": "Brief, tokens.usados_sin_declarar incluye \"--sp-5\". Medido: getPropertyValue('--sp-5') = cadena vacía y getComputedStyle('.gordo').padding = «0px», paddingLeft = 0px. El min-height:56px sí sobrevive porque va en su propia declaración.",
+    "por_que_importa": "Los botones gordos son las acciones de la pantalla de campo («Tomar la foto del tablero», «Cancelar el envío», «Registrar mi salida», «Marcar trabajo terminado») y quedan con cero relleno horizontal. Hoy no se nota porque casi todos llevan .ancho y ocupan el 100%, pero cualquier botón gordo que no se estire saldrá con el texto tocando el borde."
+   },
+   {
+    "id": "f1-29orden-09",
+    "severidad": "media",
+    "regla": "§6.16 A11y extra — un botón deshabilitado no recibe el foco",
+    "dice_el_sistema": "«Un botón deshabilitado no recibe el foco → aria-disabled=\"true\" + aria-describedby con el motivo, y al pulsarlo se explica. Ese id tiene que ser único.»",
+    "hay_en_el_build": "<div class=\"pie-accion\"><button class=\"gordo p\" type=\"button\" disabled><svg class=\"ico ico-sm\"><use href=\"#i-check\"/></svg>Marcar trabajo terminado</button></div> — con el atributo disabled nativo, sin aria-disabled y sin aria-describedby. El CSS solo lo atenúa: .gordo:disabled{opacity:.72;cursor:not-allowed}.",
+    "selector": ".pie-accion .gordo.p[disabled]",
+    "evidencia": "Línea 915 del archivo; grep: 0 ocurrencias de aria-disabled en todo el archivo. Visible en 29_instalador_orden--ok.png y en la medición a 390×844: la barra fija al pie con el botón gris.",
+    "por_que_importa": "Es la acción principal de la pantalla y la única salida del flujo. Con disabled nativo no entra en el recorrido de teclado y un lector de pantalla puede no anunciarlo siquiera; quien llega hasta ahí no se entera de que existe ni de por qué no puede usarlo. El motivo está escrito en la pantalla (falta la foto del tablero), pero no está vinculado al botón."
+   },
+   {
+    "id": "f1-29orden-10",
+    "severidad": "media",
+    "regla": "§2.1 Suelo tipográfico",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+    "hay_en_el_build": "Fuera de las dos excepciones: .formatos a 10,5px, .meta a 10,5px (3 nodos), .paso-envio / .hecho / .ahora a 10,5px, .no-existe y .ya-existe a 10,5px (4 nodos), .ev-tx a 11,5px (5 nodos), .sec-titulo a 11px (3 nodos), .pill a 11px (10 nodos), .donde a 11px, .ref a 11px, más diez <b> a 11 y 11,5px.",
+    "selector": ".formatos, .paso-envio, .ev-tx, .pill, .sec-titulo",
+    "evidencia": "Medido con getComputedStyle por elemento con texto propio a 1440×900: 22 combinaciones distintas por debajo de 12px, entre ellas {«10.5px|P.formatos»:1, «10.5px|SPAN.meta»:3, «10.5px|SPAN.ahora»:1, «11.5px|SPAN.ev-tx»:5, «11px|SPAN.pill p-ok»:4}. Valores literales en la hoja (p. ej. .formatos{font-size:10.5px}), no --fs-meta (12px).",
+    "por_que_importa": "Es la pantalla con más texto por debajo del suelo del lote, y es la que se lee de pie en obra. Lo peor afectado es lo que más importa: las reglas de qué se puede subir (.formatos, 282 caracteres a 10,5px) y el paso activo del envío de la foto, que además es el que falla el contraste."
+   },
+   {
+    "id": "f1-29orden-11",
+    "severidad": "media",
+    "regla": "§6.10 — todas las de una familia se ven como una familia",
+    "dice_el_sistema": "«Todas las de una familia se ven como una familia — o las tres llevan punto, o ninguna.» «Lleva color + icono + texto, nunca color a secas.»",
+    "hay_en_el_build": "De las 10 etiquetas .pill de la pantalla, 6 llevan icono (las del checklist: «Cumplido» con i-check, «Sin contestar» con i-clock, «No cumplido» con i-alertc) y 4 no (las de las fotos: «Obligatoria · falta», «Rechazada», «Aceptada» ×2).",
+    "selector": ".ev-cab .pill, .reactivos .pill",
+    "evidencia": "Medido: document.querySelectorAll('.pill') = 10; con <svg> dentro = 6; sin icono = 4. Las cuatro sin icono están en la sección «Fotos de la instalación», a veces en la misma vista que las seis con icono.",
+    "por_que_importa": "La misma pantalla enseña dos versiones del mismo componente a pocos centímetros. «Obligatoria · falta» es la etiqueta más crítica de la pantalla —marca la foto que impide cerrar la orden— y es de las que se quedan sin icono, así que depende solo del rojo."
+   },
+   {
+    "id": "f1-29orden-12",
+    "severidad": "media",
+    "regla": "§2 — las fuentes se autoalojan (D116)",
+    "dice_el_sistema": "«Las fuentes se autoalojan (D116). Prohibido el <link> a Google Fonts para las fuentes de interfaz… @font-face con font-display:swap sobre /fuentes/inter-variable.woff2 y /fuentes/michroma.woff2. La comprobación es que la fuente aparezca cargada en las herramientas de red, no la declaración de --font-ui.»",
+    "hay_en_el_build": "--font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif, pero el archivo no tiene ningún <link> (0) y ningún @font-face (0). Inter nunca se carga: se usa la pila del sistema.",
+    "selector": ":root --font-ui",
+    "evidencia": "Medido con la comprobación que el sistema exige —la red, no la declaración—: 0 peticiones a nada que contenga «font», «.woff» o «googleapis» durante la carga; document.fonts.size = 0; getComputedStyle(h1).fontFamily devuelve la pila completa con Inter al frente pero sin fuente cargada que la resuelva.",
+    "por_que_importa": "La pantalla se renderiza en la fuente del sistema del teléfono, no en Inter: métricas, altura de x y anchos distintos a los que se diseñaron. Es exactamente el fallo que D116 describe —la declaración de --font-ui está, la fuente no— y afecta a todo el paquete, no solo a esta pantalla."
+   },
+   {
+    "id": "f1-29orden-13",
+    "severidad": "media",
+    "regla": "§10 trampa 5 — isotipo con viewBox repetido",
+    "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio»; «se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal».",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>.",
+    "selector": ".logo svg",
+    "evidencia": "Medido con getBoundingClientRect a 1440px: svg x=96 w=44 h=42; use x=63,5 w=43; dx = −32,5px; el <use> no declara width.",
+    "por_que_importa": "La marca se pinta 32,5px a la izquierda de su caja y se recorta casi entera."
+   },
+   {
+    "id": "f1-29orden-14",
+    "severidad": "baja",
+    "regla": "§7.3 / §10 — la regla táctil lleva :root",
+    "dice_el_sistema": "«El :root es lo que hace ganar la regla»; «se comprueba midiendo con data-tacto=\"dedo\" puesto, no leyendo el archivo».",
+    "hay_en_el_build": "El <html> sí lleva data-tacto=\"dedo\" (línea 2), pero las 6 reglas se escriben sin :root (líneas 279-284), con especificidad (0,2,0) en lugar de (0,3,0).",
+    "selector": "[data-tacto=\"dedo\"] .iconbtn, [data-tacto=\"dedo\"] .btn",
+    "evidencia": "Medido con el modo dedo activo (el estado real de esta pantalla): 0 de 37 elementos .iconbtn/.btn/.it/.gordo quedan por debajo de 46px; .acciones .iconbtn no se dibuja (0 nodos). getComputedStyle(.btn).minHeight = 46px. A 390×844 el único destino por debajo de 44px es el enlace de salto (182×32px), que solo aparece al enfocar.",
+    "por_que_importa": "El bug queda latente: hoy ninguna variante de tamaño compite y la regla gana igual. Pero en la pantalla de campo del paquete es donde más caro saldría que dejara de ganar, y bastaría añadir una fila con .acciones .iconbtn{width:28px}."
+   },
+   {
+    "id": "f1-29orden-15",
+    "severidad": "baja",
+    "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+    "dice_el_sistema": "«Un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero.»",
+    "hay_en_el_build": "El <script> (38 líneas) solo cablea el conmutador de tema, el cajón del menú y el andamiaje .demo [data-set]. Los conmutadores de tres estados del checklist, «Registrar mi salida», «Tomar la foto del tablero», «Cancelar el envío» y la barra de progreso al 62% no tienen manejador.",
+    "selector": ".reactivos button[aria-pressed], .gordo",
+    "evidencia": "Inventario del script: addEventListener('click') ×4 (demo, tema, menu-btn, velo), keydown ×1, change ×1; querySelectorAll únicamente sobre '.demo [data-set]'. En el archivo hay 15 aria-pressed=\"true\" y 13 «false», ninguno gobernado fuera del andamiaje; el progreso está escrito a mano con style=\"width:62%\" y aria-valuenow=\"62\".",
+    "por_que_importa": "Hallazgo transversal del paquete: las maquetas no traen lógica de producto. Se registra aquí porque esta pantalla es la que más promete —28 atributos aria-pressed, una barra de progreso con role=\"progressbar\" y aria-valuenow— y ninguno de esos estados cambia nunca."
+   }
   ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 2,
+   "responsive": 3,
+   "integridad": 1
+  },
+  "justificacion": "Es la pantalla más ambiciosa del lote y la que mejor entiende su contexto: a 390×844 funciona de verdad (0 desbordamiento horizontal, todos los destinos a 44px o más, botones gordos de 56px, barra de acción fija al pie), tiene jerarquía de encabezados en la vista con datos y la máquina de estados del envío de foto —permiso, envío, revisión del servidor, rechazo con motivo— es la mejor pieza de diseño del paquete. Pero es también la que más incumple: dos tokens usados sin declarar que invalidan declaraciones medidas (--fs-h2 deja el nombre del cliente a 14px, --sp-5 deja los botones gordos a padding 0), los tres fallos de contraste reales en claro más uno en oscuro, la subida de archivo que no existe como componente, cuatro etiquetas de estado de construcción dentro del producto sin data-andamio y 8 bloques de texto siempre visible por encima de 140 caracteres, el peor de 448. Theming baja a 2 porque el fallo de contraste de .ahora se repite en los dos temas y en oscuro es el peor del lote (3,85:1).",
+  "evidencia": [
+   "Brief: contraste fallos_claro=3 (span.meta 4,21:1; span «3 · revisión del servidor» 4,21:1; span.ahora 4,35:1) y fallos_oscuro=1 (span.ahora 3,85:1); tokens usados_sin_declarar=[\"--fs-h2\",\"--sp-5\"]; tactil_24px por_debajo_de_24px=0 de 39; estructura h1=1, inputs=0, ariaLive=1, dialogNativo=0, skipLink=1.",
+   "Medido: getPropertyValue('--fs-h2')=\"\" y .enc-orden .cli computa 14px; getPropertyValue('--sp-5')=\"\" y .gordo computa padding 0px; 0 peticiones de fuente y document.fonts.size=0; 10 .pill, 6 con icono y 4 sin; 8 bloques siempre visibles por encima de 140 caracteres, máximo 448 (p.donde); 10 .skel con texto; isotipo dx=−32,5px.",
+   "Medido a 390×844 (29_instalador_orden--390.png): scrollWidth 390 = clientWidth 390, 0 elementos desbordan, 0 destinos por debajo de 24px y solo el enlace de salto (32px) por debajo de 44px; pero las dos bandas .senal ocupan 540 de los primeros 844px de alto, antes de la primera tarjeta de la orden."
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+ },
+ "cobertura": [
+  {
+   "patron": "Banda de estado de conectividad de la app de campo: <div class=\"senal\"> «Sin señal desde hace 6 minutos. Lo que ya marcaste está guardado. Lo que marques ahora no se guarda, y el paso donde falle te lo dirá en ese paso». El sistema no tiene ninguna regla sobre trabajo sin conexión: §6.9 cubre avisos que califican lo de abajo y §6.4 cubre el error de carga, pero ninguno cubre un estado persistente del dispositivo que cambia el significado de cada acción de la pantalla.",
+   "propuesta_de_regla": "§6.25 Banda de conectividad — `.senal`. Cuándo: una pantalla de campo cuyas acciones se guardan contra un servidor que puede no estar. Reusa `.banda` de §6.9 con la variante que corresponda (`.banda-warn` sin señal, `.banda-err` si ya hay algo perdido) y añade `role=\"status\"` + `aria-live=\"polite\"`, porque el estado cambia solo. Dice tres cosas y nada más, en una frase cada una: desde cuándo, qué quedó guardado y qué pasa con lo que se marque ahora. No explica el mecanismo de sincronización. El detalle por acción no vive en la banda: cada control que no pueda completarse lo dice en su propio sitio (§6.4 regla 4, «el error no se lleva por delante lo que había»). La banda es la única del sistema que puede quedarse fija al desplazar, porque su contenido deja de ser cierto en cuanto se pierde de vista."
+  },
+  {
+   "patron": "Captura de foto en campo con máquina de estados de tres pasos visible: permiso concedido → enviando N% → revisión del servidor, con el rechazo llegando al final (el servidor abre el archivo y comprueba su contenido, no la extensión). §6.17 documenta la subida de un documento desde un escritorio, con el archivo ya elegido y validado al elegirlo; no contempla ni la cámara, ni el envío largo, ni la validación diferida.",
+   "propuesta_de_regla": "§6.17.1 Captura de foto en campo — `.subida.foto`. Cuándo: la prueba de un trabajo hecho en sitio, que solo se puede tomar en ese momento. El control es un `<label>` de 56px que envuelve un `<input type=\"file\" accept=\"image/*\" capture=\"environment\">` real: sin el `<input>` no hay cámara ni selector, y un `<button>` no lo sustituye (§10 trampa 4). El estado de cada archivo se enseña con la misma etiqueta `.pill` que el resto de la pantalla (§6.10), con icono, y recorre tres valores y solo tres: enviando, aceptada, rechazada. «Enviando» no es «aceptada»: mientras no haya respuesta del servidor el archivo no cuenta para ningún cierre, y la pantalla lo dice en una frase. Un rechazo nombra el límite concreto que se superó y ofrece la acción que lo resuelve, en un botón, no en prosa. Los formatos y pesos admitidos se declaran una vez, a `--fs-dense` como mínimo, vinculados con `aria-describedby` desde el `<input>`. El progreso usa `role=\"progressbar\"` con `aria-valuenow` y además un texto legible: una barra sola no se lee."
+  },
+  {
+   "patron": "Conmutador de tres estados por paso de checklist: «Sin contestar» (ausencia de respuesta) frente a «Cumplido» y «No cumplido». El sistema solo tiene el semáforo de §1.3, donde no existe «todavía nadie lo ha dicho», y la etiqueta `.p-neutro` que las maquetas usan para esto no está documentada en §6.10.",
+   "propuesta_de_regla": "§6.10 — Sexta variante `.p-neutro` y regla de los tres estados. Cuándo un paso puede estar sin contestar, el componente tiene tres valores, no dos: la ausencia de respuesta es un estado propio y se pinta `background:var(--surface-2);color:var(--text-2)` con icono de reloj, nunca con `--pause` (que significa «en pausa», una decisión) ni con el estado negativo (que afirma que se comprobó y falló). Un contador de avance que diga «2 de 6» cuenta solo los contestados, y el texto de la pantalla distingue siempre «faltan por contestar» de «no cumplidos»."
+  },
+  {
+   "patron": "Iconografía por sprite SVG inline (39 <symbol> en el documento, invocados con <use href=\"#i-…\">), en lugar de la fuente Material Symbols Rounded que fija §6.5. Divergencia transversal a todo el paquete, y en esta pantalla concreta es la decisión correcta: un icono que viene de una fuente remota desaparece sin señal, que es exactamente el escenario que la pantalla documenta.",
+   "propuesta_de_regla": "§6.5.1 Iconos sin red. Cuándo: cualquier pantalla cuyo uso previsto incluya estar sin conexión. Los iconos van en un sprite SVG en línea (`<symbol>` + `<use>`), no en la fuente de iconos: una fuente que no carga deja la ligadura sin resolver y pinta el nombre del icono en letras (§6.5), y sin red eso ocurre siempre. El sprite se limita a los símbolos que el markup usa —se comprueba igual que `icon_names`, listando los `href` del documento contra los `id` declarados— y cada `<use>` lleva sus medidas, sin repetir `viewBox` en el `<svg>` envoltorio (§10 trampa 5). Las reglas de §6.5 que no dependen del formato siguen vigentes: `aria-hidden=\"true\"`, `translate=\"no\"`, nunca el icono como única forma de entender un control, y el glifo se dimensiona en su envoltorio, no recortándolo."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática, sin backend que perfilar ni librería que cargar.",
+  "f1 §6.11 (tabla densa): la pantalla no tiene ninguna tabla (brief: tablas=0, th=0); no evaluable. El archivo sí arrastra el CSS de tabla densa, incluido thead th[aria-sort] .sort, sin markup que lo use.",
+  "f1 §6.16 reglas 1-8 (formulario): la pantalla no tiene ni un campo — medido document.querySelectorAll('input,select,textarea') = []. No hay asteriscos decorativos, pero tampoco hay required ni aria-required que evaluar. Solo es evaluable la regla de a11y extra del botón deshabilitado, recogida en f1-29orden-09.",
+  "f1 §6.18: no hay diálogo (0 <dialog>, 0 div[role=dialog]); no evaluable.",
+  "f1 §6.20 (ficha de detalle, .cab/.idt/indicador lateral): la pantalla es un detalle, pero resuelto como pila de tarjetas de teléfono (.tarjeta-tel), no con la rejilla de §6.20; el sistema no tiene especificación móvil para este arquetipo, así que la divergencia se registra en cobertura (§7.4 propuesto en 55_verificacion_pedido) y no como incumplimiento."
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-h2",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-5",
+   "--sp-6",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--warn",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [
+   "--fs-h2",
+   "--sp-5"
+  ],
+  "declarados_no_usados": [
+   "--block",
+   "--block-fill",
+   "--border-fuerte",
+   "--dur-enter",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--fs-kpi",
+   "--glass",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--r-modal",
+   "--sp-12",
+   "--stagger",
+   "--velo-trama",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 83,
+  "n_usados": 68,
+  "n_divergentes": 15,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": true,
+   "filas": 0,
+   "nodosText3": 0
+  }
+ }
 }

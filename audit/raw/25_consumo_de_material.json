@@ -1,169 +1,436 @@
 {
-  "pantalla": "25_consumo_de_material",
-  "ruta_zip": "03-icev-instalacion-de-cargadores/25_consumo_de_material.html",
-  "carpeta": "03-icev-instalacion-de-cargadores",
-  "area": "ICEV / almacén",
-  "arquetipo": "tabla de captura",
-  "modo": "cumplimiento",
-  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
-  "capturas": [
-    "25_consumo_de_material--ok.png",
-    "25_consumo_de_material--loading.png",
-    "25_consumo_de_material--empty.png",
-    "25_consumo_de_material--error.png",
-    "25_consumo_de_material--oscuro.png"
-  ],
-  "f1_cumplimiento": {
-    "veredicto": "no_cumple",
-    "hallazgos": [
-      {
-        "id": "f1-25consumo-01",
-        "severidad": "alta",
-        "regla": "§9 Andamiaje de maqueta + §8 Voz de producto (nivel 3)",
-        "dice_el_sistema": "§8: «explica por qué se diseñó así o educa sobre un caso que no aplica aquí → no va en la interfaz». §9: «Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra.»",
-        "hay_en_el_build": "Dentro de <main>, bajo la tabla, un bloque .comparativa con dos tarjetas didácticas: <div class=\"comp mal\"><div class=\"rot\">Así no — el renglón único</div>…</div> y <div class=\"comp bien\"><div class=\"rot\">Así sí — agrupado, expandible y etiquetado</div>…</div>, cada una con su párrafo .porque explicando la decisión de diseño. Ninguna lleva data-andamio.",
-        "selector": "main .comparativa, .comp.mal, .comp.bien",
-        "evidencia": "Líneas 718 y 721 del archivo. Visible en 25_consumo_de_material--ok.png, mitad inferior: dos tarjetas rotuladas «ASÍ NO — EL RENGLÓN ÚNICO» y «ASÍ SÍ — AGRUPADO, EXPANDIBLE Y ETIQUETADO». Los párrafos .porque miden 160 y 204 caracteres (innerText.length). El archivo solo tiene 1 ocurrencia de data-andamio (el conmutador .demo), así que el selector de retirada no las alcanza.",
-        "por_que_importa": "Es documentación del sistema de diseño colocada dentro del producto. Quien captura el consumo de una orden ve, bajo la tabla real, una tabla falsa etiquetada «así no» — dos representaciones del mismo dato, una de ellas deliberadamente incorrecta, sin nada que diga que no es su pantalla. Y como no lleva data-andamio, viajaría al producto."
-      },
-      {
-        "id": "f1-25consumo-02",
-        "severidad": "alta",
-        "regla": "§6.4 Vistas de estado — .tarjeta-estado y encabezado real",
-        "dice_el_sistema": "«(2) cada estado lleva encabezado real, no un <b>». §11: «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo». Valores: .tarjeta-estado{max-width:480px;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)} y .estado-ico{52px;border-radius:50%;background:var(--accent)}.",
-        "hay_en_el_build": "<div class=\"state state-empty\"><svg class=\"ico\"><use href=\"#i-box\"/></svg><b>Esta orden todavía no tiene consumo capturado</b><p>…</p>…</div> y lo mismo en state-error. No hay .tarjeta-estado ni .estado-ico en todo el archivo: el icono es un <svg class=\"ico\"> de 30px teñido con --text-3 (CSS .state .ico{width:30px;height:30px;color:var(--text-3)}) y el título es un <b>.",
-        "selector": ".state.state-empty, .state.state-error",
-        "evidencia": "Medido: el árbol de encabezados de la pantalla completa es ['H1:Consumo de material'] — ni un solo h2/h3/h4 en ninguna de las cuatro vistas. grep: 0 ocurrencias de «tarjeta-estado» y de «estado-ico». Comparar con 36_recetas_despacho--empty.png, que sí trae la tarjeta opaca con medallón y <h2>.",
-        "por_que_importa": "El estado vacío y el de error no tienen entrada en el índice de encabezados: quien navega por encabezados con un lector de pantalla llega a «Consumo de material» y después no encuentra nada. Y visualmente el mensaje flota sobre el fondo de página, sin la tarjeta que §6.4 exige para que se lea como una respuesta del sistema y no como contenido ausente."
-      },
-      {
-        "id": "f1-25consumo-03",
-        "severidad": "alta",
-        "regla": "§6.7 Esqueleto de carga — .skel",
-        "dice_el_sistema": "«role=\"status\" + aria-label en el contenedor y sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)». «prefers-reduced-motion aplana el fondo, no solo detiene la animación»: correcto es {.skel{animation:none;background:var(--surface-2)}}.",
-        "hay_en_el_build": "30 barras .skel con texto dentro, repitiendo seis veces la misma fila: <span class=\"skel\">Tramo de cable instalado</span><span class=\"skel\">origen del renglón</span><span class=\"skel\">20.000</span><span class=\"skel\">×3</span><span class=\"skel\">60.000 m</span>. CSS línea 600-602: .skel{…;color:transparent}; línea 604: @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin background.",
-        "selector": ".state-loading.sk .sk-fila .skel",
-        "evidencia": "Línea 726 del archivo: la vista de carga completa en una sola línea, con 30 nodos .skel y texto real en cada uno. grep sobre el archivo: 30 ocurrencias de class=\"skel\".",
-        "por_que_importa": "Durante la carga un lector de pantalla anuncia seis veces «Tramo de cable instalado, origen del renglón, 20.000, ×3, 60.000 m» — cifras de consumo de material que nadie ha capturado. En una pantalla cuyo propósito es que el kardex cuadre, leer cantidades inventadas como si fueran datos es el peor contenido posible para un esqueleto."
-      },
-      {
-        "id": "f1-25consumo-04",
-        "severidad": "media",
-        "regla": "§7.2 Cromo de aplicación — aria-current=\"page\"",
-        "dice_el_sistema": "«aria-current=\"page\" en el ítem activo» y activo [aria-current=\"page\"]{background:var(--chrome-activo);…;border-left-color:var(--ok)}.",
-        "hay_en_el_build": "El ítem marcado como página actual es «Recetas de despacho», no la sección a la que pertenece esta pantalla: <a class=\"it\" href=\"#\" aria-current=\"page\">…<span class=\"et\">Recetas de despacho</span></a>.",
-        "selector": ".side [aria-current=\"page\"]",
-        "evidencia": "Medido: el único [aria-current] de la pantalla devuelve el texto «Recetas de despacho». El <title> es «SIO-DPROMA — Consumo de material» y el h1 es «Consumo de material». Visible en 25_consumo_de_material--ok.png: el resaltado del menú está sobre «Recetas de despacho».",
-        "por_que_importa": "El menú afirma que estás en otra pantalla. Un lector de pantalla anuncia «Recetas de despacho, página actual», y visualmente el indicador de posición apunta a un sitio donde no estás, que es justo lo que el cromo existe para evitar."
-      },
-      {
-        "id": "f1-25consumo-05",
-        "severidad": "media",
-        "regla": "§8 Voz de producto — límite de ~140 caracteres y una sola frase",
-        "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto. Una segunda oración se borra o pasa a toggletip. No hay excepción por importancia del contenido.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres.»",
-        "hay_en_el_build": "Dos bandas siempre visibles encima de la tabla: .banda.b-info «Este consumo se derivó con la receta vigente desde el 01 ene 2026. Las recetas no se editan: se suceden…» y .banda.b-err «El instalador capturó 20 m de tramo. Del almacén salieron 60 m. Un tramo instalado lleva tres conductores…». Más dos .porque bajo la comparativa.",
-        "selector": ".banda.b-info > p, .banda.b-err > p, p.porque",
-        "evidencia": "Medido con innerText.length (con [data-andamio] oculto): .banda.b-info = 276 caracteres y tres oraciones; .banda.b-err = 290 caracteres y tres oraciones; p.porque = 160 y 204. Tope del sistema: ~140 y una frase.",
-        "por_que_importa": "566 caracteres de explicación entre el título y la primera fila de datos. La banda roja además no bloquea ninguna acción inmediata (es una explicación de por qué la columna «consumo físico» no coincide con «capturado»), así que por §8 es nivel 2 y le corresponde un toggletip (§6.23), no una caja de error permanente que avisa de un problema que no existe."
-      },
-      {
-        "id": "f1-25consumo-06",
-        "severidad": "media",
-        "regla": "§10 trampa 5 — isotipo con viewBox repetido",
-        "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio»; «se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal».",
-        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>, y el mismo patrón en el botón flotante (<svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\">).",
-        "selector": ".logo svg, .fab svg",
-        "evidencia": "Medido con getBoundingClientRect en Chromium a 1440px: svg x=96 w=44 h=42; use x=63,5 w=43; desplazamiento dx = −32,5px. El <use> no declara width.",
-        "por_que_importa": "La marca se pinta 32,5px fuera de su caja y se recorta: el isotipo de la barra lateral y el del botón flotante salen como una astilla."
-      },
-      {
-        "id": "f1-25consumo-07",
-        "severidad": "media",
-        "regla": "§2.1 Suelo tipográfico",
-        "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» Excepciones: 10,5px solo en rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
-        "hay_en_el_build": "Fuera de esas dos excepciones: .derivado a 10,5px (2 nodos), .rot a 10,5px (2 nodos), .sku a 11px (6 nodos), thead th a 11px (5 nodos), .aclara a 11px, .ref a 11px, .porque y tres <b> a 11,5px.",
-        "selector": ".sku, .derivado, thead th, .porque",
-        "evidencia": "Medido con getComputedStyle por elemento con texto propio a 1440×900: {«10.5px|SPAN.derivado»:2, «10.5px|DIV.rot»:2, «11px|SPAN.sku»:6, «11px|TH.num»:3, «11px|TH.»:2, «11px|SPAN.aclara»:1, «11.5px|P.porque»:2, «11.5px|B.»:3, «11px|P.ref»:1}. Valores literales en la hoja, no --fs-meta (12px).",
-        "por_que_importa": "El SKU y las cabeceras de columna son los datos con los que el almacén concilia el kardex, y se leen todos los días: la regla práctica del sistema los sitúa en 12–13px como mínimo."
-      },
-      {
-        "id": "f1-25consumo-08",
-        "severidad": "media",
-        "regla": "§7.3 Objetivos táctiles — 24×24px mínimo (WCAG 2.2, 2.5.8)",
-        "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo.»",
-        "hay_en_el_build": "Los dos botones que abren la fila agrupada de cable (<button class=\"abrir\" aria-expanded aria-controls=\"g-cable\">Tramo de cable instalado…</button>) miden 23px de alto.",
-        "selector": "button.abrir",
-        "evidencia": "Brief, tactil_24px: por_debajo_de_24px = 2, muestra = [{tag:button, cls:abrir, w:353.2, h:23}, {w:337.2, h:23}]. Reproducido con getBoundingClientRect: 2 destinos por debajo de 24px sobre 29 interactivos.",
-        "por_que_importa": "Es el único control que despliega los tres conductores derivados de la receta —es decir, el que explica por qué del almacén salieron 60 m y el instalador capturó 20—. Queda 1px por debajo del mínimo de WCAG 2.2."
-      },
-      {
-        "id": "f1-25consumo-09",
-        "severidad": "media",
-        "regla": "§6.2 Botones — .btn",
-        "dice_el_sistema": "«El suelo se declara con min-height, no se confía al relleno (medido: 35px y 27px sin él).»",
-        "hay_en_el_build": ".btn{…padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);…} sin min-height; .btn.mini sin min-height:28px.",
-        "selector": ".btn",
-        "evidencia": "getComputedStyle(.btn).minHeight = «auto» medido en Chromium. El <html> no lleva data-tacto, así que [data-tacto=\"dedo\"] .btn{min-height:46px} tampoco repone el suelo.",
-        "por_que_importa": "La altura de «Cerrar la orden», «Ver vale de salida» y los botones de los estados depende solo del relleno; es el fallo silencioso que §6.2 documenta."
-      },
-      {
-        "id": "f1-25consumo-10",
-        "severidad": "baja",
-        "regla": "§7.3 / §10 — la regla táctil lleva :root",
-        "dice_el_sistema": "«El :root es lo que hace ganar la regla»; «se comprueba midiendo con data-tacto=\"dedo\" puesto».",
-        "hay_en_el_build": "Las 6 reglas de modo dedo se escriben sin :root (líneas 279-284) y data-tacto no aparece en el <html> ni en el JS.",
-        "selector": "[data-tacto=\"dedo\"] .iconbtn",
-        "evidencia": "Medido forzando data-tacto=\"dedo\": 0 de 20 elementos .iconbtn/.btn/.it quedan por debajo de 46px, y la pantalla no dibuja ningún .acciones .iconbtn que compita. El bug queda latente.",
-        "por_que_importa": "No rompe nada hoy, pero el modo dedo dejará de aplicar en cuanto la pantalla gane una columna de acciones por fila, sin que nada avise."
-      },
-      {
-        "id": "f1-25consumo-11",
-        "severidad": "baja",
-        "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
-        "dice_el_sistema": "«Un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero.»",
-        "hay_en_el_build": "El <script> (38 líneas) solo cablea tema, cajón del menú y andamiaje .demo. El segmentado «Por concepto / Por SKU», el de densidad «Cómoda / Compacta» y los botones .abrir con aria-expanded no tienen manejador.",
-        "selector": ".seg button[aria-pressed], button.abrir[aria-expanded]",
-        "evidencia": "Inventario del script: querySelectorAll únicamente sobre '.demo [data-set]'; 13 aria-pressed=\"true\" y 6 aria-pressed=\"false\" en el archivo, más 2 aria-expanded=\"true\" y 3 «false», ninguno gobernado por el script.",
-        "por_que_importa": "Hallazgo transversal del paquete: las maquetas no traen lógica de producto. Aquí pesa más que en otras porque la pantalla ofrece dos ejes de agrupación («Por concepto / Por SKU») que son la diferencia entre ver 20 m y ver 60 m, y ninguno conmuta."
-      }
-    ]
-  },
-  "f3_boost_ui": {
-    "puntuacion": 2,
-    "dimensiones": {
-      "accesibilidad": 1,
-      "rendimiento": "no_evaluado",
-      "theming": 3,
-      "responsive": 2,
-      "integridad": 1
-    },
-    "justificacion": "El dato está bien pensado —la fila agrupada con factor y el total «cable que salió del almacén» resuelven de verdad el descuadre por factor 3— pero la ejecución incumple lo estructural: las vistas de vacío y error no tienen encabezado real (el árbol completo de encabezados de la pantalla es ['H1:Consumo de material'], nada más) ni tarjeta ni medallón, el esqueleto lee 30 cifras falsas, el menú señala otra pantalla y, sobre todo, dentro de <main> viven dos tarjetas de documentación de diseño («Así no / Así sí») sin data-andamio. Theming se sostiene: dos temas completos, 0 fallos de contraste medidos en claro y oscuro, ningún hex literal fuera de los bloques de tema. Responsive baja por la tabla de 1204px con cinco columnas cuyo modo tarjeta depende de un @media que esta pantalla no se ha verificado, y por el destino de 23px.",
-    "evidencia": [
-      "Brief: contraste 0 fallos claro / 0 oscuro; tokens usados_sin_declarar = []; estructura h1=1, tablas=3, thAriaSort=0, ariaLive=0, inputs=0, dialogNativo=0.",
-      "Medido: encabezados = ['H1:Consumo de material'] (0 h2/h3/h4); 0 ocurrencias de «tarjeta-estado»; isotipo dx=−32,5px; .btn minHeight «auto»; 30 .skel con texto; bandas de 276 y 290 caracteres; 2 destinos de 23px; aria-current apunta a «Recetas de despacho».",
-      "25_consumo_de_material--ok.png: las dos tarjetas «ASÍ NO / ASÍ SÍ» ocupan el tercio inferior de la zona de contenido."
-    ]
-  },
-  "f4_nielsen": [],
-  "f5_investigacion": {
-    "pain_points_evaluados": [],
-    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
-  },
-  "cobertura": [
-    {
-      "patron": "Fila padre que agrupa renglones derivados por un factor de receta: «Tramo de cable instalado · derivado · 3 SKU · capturado 20.000 · ×3 · consumo físico 60.000», desplegable con un botón aria-expanded, y un pie de tabla que declara el total físico («Cable que salió del almacén, en total»). §6.15 cubre la fila desplegable y §6.11 la tabla densa, pero ninguna regla dice qué cifra manda cuando lo capturado y lo descontado del kardex no son el mismo número.",
-      "propuesta_de_regla": "§6.11 regla 12 — Cuando un renglón se deriva de otro, la tabla enseña la cifra que el sistema descuenta, no la que la persona tecleó. La fila padre lleva: la cifra física (la que mueve el inventario) en la columna de totales, la cifra capturada en su propia columna rotulada, el factor visible entre ambas, y una etiqueta `derivado · N SKU` junto al concepto. Los renglones derivados se abren dentro de la propia fila (§6.15), nunca en otra pantalla. Prohibido colapsar la familia en un renglón único con la cifra capturada: afirma que del almacén salió lo que se tecleó. El total de la tabla va en `<tfoot>` con línea encima y peso (§12.3) y declara en una línea de qué suma habla."
-    },
-    {
-      "patron": "Escala de medida acoplada al concepto: la misma columna mezcla unidades distintas («m», «pza», «kit») y las cifras llevan tres decimales fijos (20.000, 1.000, 6.000) con font-variant-numeric:tabular-nums. El sistema no documenta cómo se formatea una cantidad con unidad en una tabla densa.",
-      "propuesta_de_regla": "§6.11 regla 13 — Cifra con unidad en tabla densa. La cifra va alineada a la derecha, en `font-variant-numeric:tabular-nums`, con el número de decimales que la unidad necesita y no más (una pieza no tiene milésimas). La unidad va en la misma celda, después de la cifra, en `--text-3` y `--fs-meta`, nunca en una columna aparte: separarla obliga a leer dos celdas para entender un dato. Si en una misma columna conviven unidades distintas, la cabecera no nombra la unidad."
-    }
-  ],
-  "sin_datos": [
-    "f3.rendimiento: maqueta estática, sin backend que perfilar ni librería que cargar.",
-    "f1 §6.16 (formulario): la pantalla se llama «tabla de captura» pero no contiene ni un solo campo — 0 <input>, 0 <select>, 1 <textarea>=no, medido document.querySelectorAll('input,select,textarea') = []. No hay required ni aria-required porque no hay nada que marcar; la captura real ocurre en otra pantalla. No evaluable aquí, pero conviene decidir si el arquetipo asignado es el correcto.",
-    "f1 §6.17 (subida de archivo): 0 input[type=file] y ningún componente de adjunto en la pantalla; no evaluable.",
-    "f1 §6.11 regla 3 (aria-sort): ninguna de las tres tablas ofrece columna ordenable (0 botones en thead, 0 th[aria-sort]); no se puede declarar incumplimiento, aunque el archivo trae el CSS thead th[aria-sort] .sort sin markup que lo active.",
-    "f1 §6.18: no hay diálogo (0 <dialog>, 0 div[role=dialog]); no evaluable."
+ "pantalla": "25_consumo_de_material",
+ "ruta_zip": "03-icev-instalacion-de-cargadores/25_consumo_de_material.html",
+ "carpeta": "03-icev-instalacion-de-cargadores",
+ "area": "ICEV / almacén",
+ "arquetipo": "tabla de captura",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "25_consumo_de_material--ok.png",
+  "25_consumo_de_material--loading.png",
+  "25_consumo_de_material--empty.png",
+  "25_consumo_de_material--error.png",
+  "25_consumo_de_material--oscuro.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-25consumo-01",
+    "severidad": "alta",
+    "regla": "§9 Andamiaje de maqueta + §8 Voz de producto (nivel 3)",
+    "dice_el_sistema": "§8: «explica por qué se diseñó así o educa sobre un caso que no aplica aquí → no va en la interfaz». §9: «Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra.»",
+    "hay_en_el_build": "Dentro de <main>, bajo la tabla, un bloque .comparativa con dos tarjetas didácticas: <div class=\"comp mal\"><div class=\"rot\">Así no — el renglón único</div>…</div> y <div class=\"comp bien\"><div class=\"rot\">Así sí — agrupado, expandible y etiquetado</div>…</div>, cada una con su párrafo .porque explicando la decisión de diseño. Ninguna lleva data-andamio.",
+    "selector": "main .comparativa, .comp.mal, .comp.bien",
+    "evidencia": "Líneas 718 y 721 del archivo. Visible en 25_consumo_de_material--ok.png, mitad inferior: dos tarjetas rotuladas «ASÍ NO — EL RENGLÓN ÚNICO» y «ASÍ SÍ — AGRUPADO, EXPANDIBLE Y ETIQUETADO». Los párrafos .porque miden 160 y 204 caracteres (innerText.length). El archivo solo tiene 1 ocurrencia de data-andamio (el conmutador .demo), así que el selector de retirada no las alcanza.",
+    "por_que_importa": "Es documentación del sistema de diseño colocada dentro del producto. Quien captura el consumo de una orden ve, bajo la tabla real, una tabla falsa etiquetada «así no» — dos representaciones del mismo dato, una de ellas deliberadamente incorrecta, sin nada que diga que no es su pantalla. Y como no lleva data-andamio, viajaría al producto."
+   },
+   {
+    "id": "f1-25consumo-02",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado — .tarjeta-estado y encabezado real",
+    "dice_el_sistema": "«(2) cada estado lleva encabezado real, no un <b>». §11: «los estados de vacío y error van en tarjeta, con su medallón, no sueltos sobre el fondo». Valores: .tarjeta-estado{max-width:480px;padding:var(--sp-8);border-radius:var(--r-modal);box-shadow:var(--sh-modal)} y .estado-ico{52px;border-radius:50%;background:var(--accent)}.",
+    "hay_en_el_build": "<div class=\"state state-empty\"><svg class=\"ico\"><use href=\"#i-box\"/></svg><b>Esta orden todavía no tiene consumo capturado</b><p>…</p>…</div> y lo mismo en state-error. No hay .tarjeta-estado ni .estado-ico en todo el archivo: el icono es un <svg class=\"ico\"> de 30px teñido con --text-3 (CSS .state .ico{width:30px;height:30px;color:var(--text-3)}) y el título es un <b>.",
+    "selector": ".state.state-empty, .state.state-error",
+    "evidencia": "Medido: el árbol de encabezados de la pantalla completa es ['H1:Consumo de material'] — ni un solo h2/h3/h4 en ninguna de las cuatro vistas. grep: 0 ocurrencias de «tarjeta-estado» y de «estado-ico». Comparar con 36_recetas_despacho--empty.png, que sí trae la tarjeta opaca con medallón y <h2>.",
+    "por_que_importa": "El estado vacío y el de error no tienen entrada en el índice de encabezados: quien navega por encabezados con un lector de pantalla llega a «Consumo de material» y después no encuentra nada. Y visualmente el mensaje flota sobre el fondo de página, sin la tarjeta que §6.4 exige para que se lea como una respuesta del sistema y no como contenido ausente."
+   },
+   {
+    "id": "f1-25consumo-03",
+    "severidad": "alta",
+    "regla": "§6.7 Esqueleto de carga — .skel",
+    "dice_el_sistema": "«role=\"status\" + aria-label en el contenedor y sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)». «prefers-reduced-motion aplana el fondo, no solo detiene la animación»: correcto es {.skel{animation:none;background:var(--surface-2)}}.",
+    "hay_en_el_build": "30 barras .skel con texto dentro, repitiendo seis veces la misma fila: <span class=\"skel\">Tramo de cable instalado</span><span class=\"skel\">origen del renglón</span><span class=\"skel\">20.000</span><span class=\"skel\">×3</span><span class=\"skel\">60.000 m</span>. CSS línea 600-602: .skel{…;color:transparent}; línea 604: @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin background.",
+    "selector": ".state-loading.sk .sk-fila .skel",
+    "evidencia": "Línea 726 del archivo: la vista de carga completa en una sola línea, con 30 nodos .skel y texto real en cada uno. grep sobre el archivo: 30 ocurrencias de class=\"skel\".",
+    "por_que_importa": "Durante la carga un lector de pantalla anuncia seis veces «Tramo de cable instalado, origen del renglón, 20.000, ×3, 60.000 m» — cifras de consumo de material que nadie ha capturado. En una pantalla cuyo propósito es que el kardex cuadre, leer cantidades inventadas como si fueran datos es el peor contenido posible para un esqueleto."
+   },
+   {
+    "id": "f1-25consumo-04",
+    "severidad": "media",
+    "regla": "§7.2 Cromo de aplicación — aria-current=\"page\"",
+    "dice_el_sistema": "«aria-current=\"page\" en el ítem activo» y activo [aria-current=\"page\"]{background:var(--chrome-activo);…;border-left-color:var(--ok)}.",
+    "hay_en_el_build": "El ítem marcado como página actual es «Recetas de despacho», no la sección a la que pertenece esta pantalla: <a class=\"it\" href=\"#\" aria-current=\"page\">…<span class=\"et\">Recetas de despacho</span></a>.",
+    "selector": ".side [aria-current=\"page\"]",
+    "evidencia": "Medido: el único [aria-current] de la pantalla devuelve el texto «Recetas de despacho». El <title> es «SIO-DPROMA — Consumo de material» y el h1 es «Consumo de material». Visible en 25_consumo_de_material--ok.png: el resaltado del menú está sobre «Recetas de despacho».",
+    "por_que_importa": "El menú afirma que estás en otra pantalla. Un lector de pantalla anuncia «Recetas de despacho, página actual», y visualmente el indicador de posición apunta a un sitio donde no estás, que es justo lo que el cromo existe para evitar."
+   },
+   {
+    "id": "f1-25consumo-05",
+    "severidad": "media",
+    "regla": "§8 Voz de producto — límite de ~140 caracteres y una sola frase",
+    "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto. Una segunda oración se borra o pasa a toggletip. No hay excepción por importancia del contenido.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres.»",
+    "hay_en_el_build": "Dos bandas siempre visibles encima de la tabla: .banda.b-info «Este consumo se derivó con la receta vigente desde el 01 ene 2026. Las recetas no se editan: se suceden…» y .banda.b-err «El instalador capturó 20 m de tramo. Del almacén salieron 60 m. Un tramo instalado lleva tres conductores…». Más dos .porque bajo la comparativa.",
+    "selector": ".banda.b-info > p, .banda.b-err > p, p.porque",
+    "evidencia": "Medido con innerText.length (con [data-andamio] oculto): .banda.b-info = 276 caracteres y tres oraciones; .banda.b-err = 290 caracteres y tres oraciones; p.porque = 160 y 204. Tope del sistema: ~140 y una frase.",
+    "por_que_importa": "566 caracteres de explicación entre el título y la primera fila de datos. La banda roja además no bloquea ninguna acción inmediata (es una explicación de por qué la columna «consumo físico» no coincide con «capturado»), así que por §8 es nivel 2 y le corresponde un toggletip (§6.23), no una caja de error permanente que avisa de un problema que no existe."
+   },
+   {
+    "id": "f1-25consumo-06",
+    "severidad": "media",
+    "regla": "§10 trampa 5 — isotipo con viewBox repetido",
+    "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio»; «se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal».",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>, y el mismo patrón en el botón flotante (<svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\">).",
+    "selector": ".logo svg, .fab svg",
+    "evidencia": "Medido con getBoundingClientRect en Chromium a 1440px: svg x=96 w=44 h=42; use x=63,5 w=43; desplazamiento dx = −32,5px. El <use> no declara width.",
+    "por_que_importa": "La marca se pinta 32,5px fuera de su caja y se recorta: el isotipo de la barra lateral y el del botón flotante salen como una astilla."
+   },
+   {
+    "id": "f1-25consumo-07",
+    "severidad": "media",
+    "regla": "§2.1 Suelo tipográfico",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» Excepciones: 10,5px solo en rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta.",
+    "hay_en_el_build": "Fuera de esas dos excepciones: .derivado a 10,5px (2 nodos), .rot a 10,5px (2 nodos), .sku a 11px (6 nodos), thead th a 11px (5 nodos), .aclara a 11px, .ref a 11px, .porque y tres <b> a 11,5px.",
+    "selector": ".sku, .derivado, thead th, .porque",
+    "evidencia": "Medido con getComputedStyle por elemento con texto propio a 1440×900: {«10.5px|SPAN.derivado»:2, «10.5px|DIV.rot»:2, «11px|SPAN.sku»:6, «11px|TH.num»:3, «11px|TH.»:2, «11px|SPAN.aclara»:1, «11.5px|P.porque»:2, «11.5px|B.»:3, «11px|P.ref»:1}. Valores literales en la hoja, no --fs-meta (12px).",
+    "por_que_importa": "El SKU y las cabeceras de columna son los datos con los que el almacén concilia el kardex, y se leen todos los días: la regla práctica del sistema los sitúa en 12–13px como mínimo."
+   },
+   {
+    "id": "f1-25consumo-08",
+    "severidad": "media",
+    "regla": "§7.3 Objetivos táctiles — 24×24px mínimo (WCAG 2.2, 2.5.8)",
+    "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo.»",
+    "hay_en_el_build": "Los dos botones que abren la fila agrupada de cable (<button class=\"abrir\" aria-expanded aria-controls=\"g-cable\">Tramo de cable instalado…</button>) miden 23px de alto.",
+    "selector": "button.abrir",
+    "evidencia": "Brief, tactil_24px: por_debajo_de_24px = 2, muestra = [{tag:button, cls:abrir, w:353.2, h:23}, {w:337.2, h:23}]. Reproducido con getBoundingClientRect: 2 destinos por debajo de 24px sobre 29 interactivos.",
+    "por_que_importa": "Es el único control que despliega los tres conductores derivados de la receta —es decir, el que explica por qué del almacén salieron 60 m y el instalador capturó 20—. Queda 1px por debajo del mínimo de WCAG 2.2."
+   },
+   {
+    "id": "f1-25consumo-09",
+    "severidad": "media",
+    "regla": "§6.2 Botones — .btn",
+    "dice_el_sistema": "«El suelo se declara con min-height, no se confía al relleno (medido: 35px y 27px sin él).»",
+    "hay_en_el_build": ".btn{…padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);…} sin min-height; .btn.mini sin min-height:28px.",
+    "selector": ".btn",
+    "evidencia": "getComputedStyle(.btn).minHeight = «auto» medido en Chromium. El <html> no lleva data-tacto, así que [data-tacto=\"dedo\"] .btn{min-height:46px} tampoco repone el suelo.",
+    "por_que_importa": "La altura de «Cerrar la orden», «Ver vale de salida» y los botones de los estados depende solo del relleno; es el fallo silencioso que §6.2 documenta."
+   },
+   {
+    "id": "f1-25consumo-10",
+    "severidad": "baja",
+    "regla": "§7.3 / §10 — la regla táctil lleva :root",
+    "dice_el_sistema": "«El :root es lo que hace ganar la regla»; «se comprueba midiendo con data-tacto=\"dedo\" puesto».",
+    "hay_en_el_build": "Las 6 reglas de modo dedo se escriben sin :root (líneas 279-284) y data-tacto no aparece en el <html> ni en el JS.",
+    "selector": "[data-tacto=\"dedo\"] .iconbtn",
+    "evidencia": "Medido forzando data-tacto=\"dedo\": 0 de 20 elementos .iconbtn/.btn/.it quedan por debajo de 46px, y la pantalla no dibuja ningún .acciones .iconbtn que compita. El bug queda latente.",
+    "por_que_importa": "No rompe nada hoy, pero el modo dedo dejará de aplicar en cuanto la pantalla gane una columna de acciones por fila, sin que nada avise."
+   },
+   {
+    "id": "f1-25consumo-11",
+    "severidad": "baja",
+    "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+    "dice_el_sistema": "«Un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero.»",
+    "hay_en_el_build": "El <script> (38 líneas) solo cablea tema, cajón del menú y andamiaje .demo. El segmentado «Por concepto / Por SKU», el de densidad «Cómoda / Compacta» y los botones .abrir con aria-expanded no tienen manejador.",
+    "selector": ".seg button[aria-pressed], button.abrir[aria-expanded]",
+    "evidencia": "Inventario del script: querySelectorAll únicamente sobre '.demo [data-set]'; 13 aria-pressed=\"true\" y 6 aria-pressed=\"false\" en el archivo, más 2 aria-expanded=\"true\" y 3 «false», ninguno gobernado por el script.",
+    "por_que_importa": "Hallazgo transversal del paquete: las maquetas no traen lógica de producto. Aquí pesa más que en otras porque la pantalla ofrece dos ejes de agrupación («Por concepto / Por SKU») que son la diferencia entre ver 20 m y ver 60 m, y ninguno conmuta."
+   }
   ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 2,
+   "integridad": 1
+  },
+  "justificacion": "El dato está bien pensado —la fila agrupada con factor y el total «cable que salió del almacén» resuelven de verdad el descuadre por factor 3— pero la ejecución incumple lo estructural: las vistas de vacío y error no tienen encabezado real (el árbol completo de encabezados de la pantalla es ['H1:Consumo de material'], nada más) ni tarjeta ni medallón, el esqueleto lee 30 cifras falsas, el menú señala otra pantalla y, sobre todo, dentro de <main> viven dos tarjetas de documentación de diseño («Así no / Así sí») sin data-andamio. Theming se sostiene: dos temas completos, 0 fallos de contraste medidos en claro y oscuro, ningún hex literal fuera de los bloques de tema. Responsive baja por la tabla de 1204px con cinco columnas cuyo modo tarjeta depende de un @media que esta pantalla no se ha verificado, y por el destino de 23px.",
+  "evidencia": [
+   "Brief: contraste 0 fallos claro / 0 oscuro; tokens usados_sin_declarar = []; estructura h1=1, tablas=3, thAriaSort=0, ariaLive=0, inputs=0, dialogNativo=0.",
+   "Medido: encabezados = ['H1:Consumo de material'] (0 h2/h3/h4); 0 ocurrencias de «tarjeta-estado»; isotipo dx=−32,5px; .btn minHeight «auto»; 30 .skel con texto; bandas de 276 y 290 caracteres; 2 destinos de 23px; aria-current apunta a «Recetas de despacho».",
+   "25_consumo_de_material--ok.png: las dos tarjetas «ASÍ NO / ASÍ SÍ» ocupan el tercio inferior de la zona de contenido."
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+ },
+ "cobertura": [
+  {
+   "patron": "Fila padre que agrupa renglones derivados por un factor de receta: «Tramo de cable instalado · derivado · 3 SKU · capturado 20.000 · ×3 · consumo físico 60.000», desplegable con un botón aria-expanded, y un pie de tabla que declara el total físico («Cable que salió del almacén, en total»). §6.15 cubre la fila desplegable y §6.11 la tabla densa, pero ninguna regla dice qué cifra manda cuando lo capturado y lo descontado del kardex no son el mismo número.",
+   "propuesta_de_regla": "§6.11 regla 12 — Cuando un renglón se deriva de otro, la tabla enseña la cifra que el sistema descuenta, no la que la persona tecleó. La fila padre lleva: la cifra física (la que mueve el inventario) en la columna de totales, la cifra capturada en su propia columna rotulada, el factor visible entre ambas, y una etiqueta `derivado · N SKU` junto al concepto. Los renglones derivados se abren dentro de la propia fila (§6.15), nunca en otra pantalla. Prohibido colapsar la familia en un renglón único con la cifra capturada: afirma que del almacén salió lo que se tecleó. El total de la tabla va en `<tfoot>` con línea encima y peso (§12.3) y declara en una línea de qué suma habla."
+  },
+  {
+   "patron": "Escala de medida acoplada al concepto: la misma columna mezcla unidades distintas («m», «pza», «kit») y las cifras llevan tres decimales fijos (20.000, 1.000, 6.000) con font-variant-numeric:tabular-nums. El sistema no documenta cómo se formatea una cantidad con unidad en una tabla densa.",
+   "propuesta_de_regla": "§6.11 regla 13 — Cifra con unidad en tabla densa. La cifra va alineada a la derecha, en `font-variant-numeric:tabular-nums`, con el número de decimales que la unidad necesita y no más (una pieza no tiene milésimas). La unidad va en la misma celda, después de la cifra, en `--text-3` y `--fs-meta`, nunca en una columna aparte: separarla obliga a leer dos celdas para entender un dato. Si en una misma columna conviven unidades distintas, la cabecera no nombra la unidad."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática, sin backend que perfilar ni librería que cargar.",
+  "f1 §6.16 (formulario): la pantalla se llama «tabla de captura» pero no contiene ni un solo campo — 0 <input>, 0 <select>, 1 <textarea>=no, medido document.querySelectorAll('input,select,textarea') = []. No hay required ni aria-required porque no hay nada que marcar; la captura real ocurre en otra pantalla. No evaluable aquí, pero conviene decidir si el arquetipo asignado es el correcto.",
+  "f1 §6.17 (subida de archivo): 0 input[type=file] y ningún componente de adjunto en la pantalla; no evaluable.",
+  "f1 §6.11 regla 3 (aria-sort): ninguna de las tres tablas ofrece columna ordenable (0 botones en thead, 0 th[aria-sort]); no se puede declarar incumplimiento, aunque el archivo trae el CSS thead th[aria-sort] .sort sin markup que lo active.",
+  "f1 §6.18: no hay diálogo (0 <dialog>, 0 div[role=dialog]); no evaluable."
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [],
+  "declarados_no_usados": [
+   "--block",
+   "--block-fill",
+   "--border-fuerte",
+   "--dur-enter",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--fs-kpi",
+   "--glass",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--r-modal",
+   "--sp-12",
+   "--stagger",
+   "--velo-trama",
+   "--warn",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 83,
+  "n_usados": 65,
+  "n_divergentes": 15,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": true,
+   "filas": 10,
+   "nodosText3": 12
+  }
+ }
 }

@@ -1,347 +1,608 @@
 {
-  "pantalla": "43_alta_tramite_vehicular",
-  "ruta_zip": "04-tramites-vehiculares-y-cfe/43_alta_tramite_vehicular.html",
-  "carpeta": "04-tramites-vehiculares-y-cfe",
-  "area": "administracion vehicular",
-  "arquetipo": "formulario",
-  "modo": "cumplimiento",
-  "estados_auditados": [
-    "ok",
-    "loading",
-    "empty",
-    "error",
-    "oscuro"
-  ],
-  "capturas": [
-    "43_alta_tramite_vehicular--ok.png",
-    "43_alta_tramite_vehicular--loading.png",
-    "43_alta_tramite_vehicular--empty.png",
-    "43_alta_tramite_vehicular--error.png",
-    "43_alta_tramite_vehicular--oscuro.png"
-  ],
-  "f1_cumplimiento": {
-    "veredicto": "no_cumple",
-    "hallazgos": [
-      {
-        "id": "f1-43alta-01",
-        "severidad": "alta",
-        "regla": "§6.16 Formulario — regla 3, obligatoriedad de verdad",
-        "dice_el_sistema": "«required y aria-required de verdad, no asteriscos decorativos.» Y la regla 2: «dos niveles de obligatoriedad con palabras distintas — obligatorio para dar de alta vs necesario para facturar o programar».",
-        "hay_en_el_build": "Seis campos llevan <span class=\"req\">*</span> en su <label> —Número de serie, Marca, Modelo, Cliente, Tipo de trámite, Plaza, Canal de entrada, Fecha de recepción— y ninguno de los diez controles del formulario declara required ni aria-required. Tampoco hay leyenda que explique qué significa el asterisco, ni los dos niveles de obligatoriedad de la regla 2.",
-        "selector": ".ctrl > label .req, #vin, #mar, #mod, #cli2, #tt2, #plz, #can2, #fr",
-        "evidencia": "Medición propia con Playwright sobre los diez controles: required = false y aria-required = null en los diez (input#vin, select#mar, input#mod, input#plc, select#cli2, select#tt2, select#plz, select#can2, input#fr, textarea#obs). El asterisco es un <span> teñido con --err-ink.",
-        "por_que_importa": "Es el antipatrón que §6.16 regla 3 nombra con esas palabras. Con lector de pantalla la obligatoriedad no existe: el asterisco es un carácter suelto dentro del <label>, y el navegador no impide enviar el formulario vacío porque nada se lo dice."
-      },
-      {
-        "id": "f1-43alta-02",
-        "severidad": "alta",
-        "regla": "§6.16 Formulario — regla 6, el tipo de campo es el tipo del dato",
-        "dice_el_sistema": "«El tipo de campo es el tipo del dato (type=\"email\", type=\"tel\", inputmode=\"numeric\") + autocomplete.»",
-        "hay_en_el_build": "Los cuatro campos de texto son type=\"text\" sin inputmode y sin autocomplete: el número de serie (VIN, 17 caracteres alfanuméricos), el modelo (un año: «2026»), la placa (patrón AAA-00-AA) y las observaciones. Ningún control del formulario declara autocomplete.",
-        "selector": "#vin, #mod, #plc",
-        "evidencia": "Medición propia con Playwright: para los diez controles, autocomplete = null e inputmode = null; #vin, #mod y #plc son type=\"text\".",
-        "por_que_importa": "En tableta —el escenario de ventanilla— capturar un año y una placa con el teclado alfanumérico completo es más lento y más propenso a error. El VIN y la placa tienen un formato conocido que la pantalla ya enuncia en el placeholder («17 caracteres», «AAA-00-AA») pero que no comunica al navegador."
-      },
-      {
-        "id": "f1-43alta-03",
-        "severidad": "alta",
-        "regla": "§6.4 Vistas de estado — regla 4, el error no se lleva por delante lo que había",
-        "dice_el_sistema": "«(4) el error no se lleva por delante lo que había — con trabajo del usuario en pantalla el error va encima, como aviso, con los campos visibles y rellenos.» §11: «el error deja a la vista el trabajo que la persona ya había hecho».",
-        "hay_en_el_build": "La vista de error sustituye el formulario entero por una .tarjeta-estado centrada. El propio texto admite que había trabajo en curso: «Lo capturado sigue en el borrador». Y la barra de acciones está escrita fuera de <main>, así que sobrevive al cambio de estado: en la vista de error siguen a la vista «Cancelar», «Guardar borrador» y «Crear expediente» bajo una pantalla sin ningún campo.",
-        "selector": "main[data-state=\"error\"] .state-error, .barra-form",
-        "evidencia": "Captura 43_alta_tramite_vehicular--error.png: el formulario ha desaparecido, la tarjeta de error ocupa el centro y la barra inferior conserva los tres botones. Medición propia con Playwright poniendo data-state=\"error\": la .barra-form sigue teniendo altura mayor que 0. El markup la coloca después de </main>.",
-        "por_que_importa": "Es el caso literal de §6.4 regla 4: tres campos obligatorios capturados desaparecen de la pantalla justo en el momento en que el sistema falla, y la única garantía de que no se han perdido es una frase. Y la barra deja pulsable «Crear expediente» sobre un formulario que ya no está."
-      },
-      {
-        "id": "f1-43alta-04",
-        "severidad": "alta",
-        "regla": "§1.1 Superficies y texto — valor de --text-3",
-        "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)… si el elemento puede caer sobre --surface-2, se mide también ahí.»",
-        "hay_en_el_build": "--text-3: #66717F en el tema claro. A diferencia de 52 y 53, esta maqueta no declara el token paralelo --text-3-fuerte, así que el valor obsoleto gobierna toda la ayuda de campo (.ctrl .ayuda), la referencia del error y el texto de la barra de acciones.",
-        "selector": ":root{--text-3}, .ctrl .ayuda, .barra-form .izq",
-        "evidencia": "Brief del orquestador: text_3_declarado = «#66717F». Fallo de contraste del brief en la misma familia: span.et-g «VIENDO COMO» a 4,21:1 en el patrón compartido del cromo.",
-        "por_que_importa": "Hecho ya establecido para 51 de 52 maquetas. Aquí afecta a la ayuda de campo, que es el texto que explica por qué un dato es necesario justo cuando la persona lo está escribiendo."
-      },
-      {
-        "id": "f1-43alta-05",
-        "severidad": "media",
-        "regla": "§6.16 Formulario — regla 5, el error se vincula / §6.17 aria-describedby de la ayuda",
-        "dice_el_sistema": "«(5) el error se vincula: aria-invalid=\"true\" + aria-describedby al id del mensaje.» §6.17: «aria-describedby del <input> al id de la ayuda». §11: «cada aria-describedby/aria-controls apunta a algo que existe».",
-        "hay_en_el_build": "Las tres ayudas de campo son <span class=\"ayuda\"> sin id, y ningún control lleva aria-describedby. El CSS declara .ctrl .mal y .ctrl.error input{border-color:var(--err);box-shadow:0 0 0 1px var(--err)} —la presentación del error de §6.16— pero no hay ningún mensaje de error en el markup ni JS que lo active.",
-        "selector": ".ctrl .ayuda, .ctrl .mal",
-        "evidencia": "Medición propia con Playwright: aria-describedby = null en los diez controles; la comprobación de aria-describedby/aria-controls rotos devuelve lista vacía porque no hay ninguno declarado. grep «class=\"mal\"» en el markup: 0 ocurrencias.",
-        "por_que_importa": "La ayuda que explica que el VIN «no aparece en la dirección de la página ni en los listados» sólo existe para quien la ve. Y la maquinaria de error está dibujada pero sin conectar, así que no se puede comprobar la regla 4 («no hay error antes de la interacción») ni la 5."
-      },
-      {
-        "id": "f1-43alta-06",
-        "severidad": "media",
-        "regla": "§6.16 Formulario — valores de .ctrl",
-        "dice_el_sistema": "«input/select/textarea{min-height:38px;padding:9px 11px;border:1px solid var(--border-2);border-radius:var(--r-ctrl);background:var(--bg);font:400 var(--fs-dense)}»",
-        "hay_en_el_build": "La regla declara padding:9px 12px, border:1px solid var(--border) y no declara min-height. El resultado medido es 35px en los campos de texto y 37px en los <select> y el campo de fecha.",
-        "selector": ".ctrl input[type=\"text\"], .ctrl select, .ctrl input[type=\"date\"]",
-        "evidencia": "Medición propia con Playwright: #vin 35px, #mod 35px, #plc 35px; #mar, #cli2, #tt2, #plz, #can2 y #fr 37px. El sistema fija 38px. CSS líneas 581-584 de la maqueta servida: la declaración no contiene min-height y usa --border en vez de --border-2.",
-        "por_que_importa": "Mismo defecto que §6.2 señala en los botones: el suelo se confía al relleno, así que la altura la decide el tamaño de fuente heredado. Con --border en vez de --border-2 el campo usa el borde decorativo donde el sistema pide el de control interactivo."
-      },
-      {
-        "id": "f1-43alta-07",
-        "severidad": "media",
-        "regla": "§10 trampa 2 — selectores por exclusión, no por enumeración",
-        "dice_el_sistema": "«El tamaño de los campos estaba definido como .ctrl input[type=\"text\"], .ctrl input[type=\"date\"], .ctrl input[type=\"number\"]. Al cambiar dos campos a type=\"email\" y type=\"tel\" —que es lo correcto— se quedaron fuera y colapsaron a 19px de alto. Lo que aplica a todos los campos se escribe .ctrl input:not([type=\"file\"]):not([type=\"checkbox\"]):not([type=\"radio\"]).»",
-        "hay_en_el_build": ".ctrl input[type=\"text\"],.ctrl input[type=\"date\"],.ctrl input[type=\"number\"],.ctrl select,.ctrl textarea{…} — la enumeración exacta que §10 trampa 2 describe, repetida además en el bloque @media (pointer:coarse) y en el bloque de :focus-visible.",
-        "selector": ".ctrl input[type=\"text\"], .ctrl input[type=\"date\"], .ctrl input[type=\"number\"]",
-        "evidencia": "CSS líneas 581, 587 y 588 de la maqueta servida: tres reglas distintas con la misma enumeración de tres tipos. En la maqueta 53 aparece la misma enumeración, copiada.",
-        "por_que_importa": "El defecto es latente hoy porque ningún campo usa un tipo fuera de la lista. Deja de serlo en cuanto se cumpla el hallazgo f1-43alta-02, que pide poner type=\"tel\" o inputmode a estos mismos campos: la hoja los dejaría fuera y colapsarían, que es exactamente el fallo registrado."
-      },
-      {
-        "id": "f1-43alta-08",
-        "severidad": "media",
-        "regla": "§6.16 Formulario — regla 7, el contador de sección",
-        "dice_el_sistema": "«el contador de sección habla en español, no en aritmética, y si cuenta, cuenta bien.»",
-        "hay_en_el_build": "Tres contadores fijos en el markup: «3 de 4 capturados» (sección 1), «2 de 3 capturados» (sección 2) y «2 de 2 capturados» con icono de verificación (sección 3). Son texto estático: el único <script> del documento sólo trae tema, menú y conmutador de estados. La sección 1 tiene cuatro campos y sólo dos con valor (Marca con la opción por omisión «Otro» y Modelo «2026»); Número de serie y Placa están vacíos. La sección 3 tiene tres campos y cuenta dos, mientras la sección 1 tiene cuatro y cuenta cuatro: el denominador incluye el campo opcional en una sección y lo excluye en la otra.",
-        "selector": ".seccion > header .est",
-        "evidencia": "Markup de las tres <section class=\"seccion\"> en la maqueta servida y captura 43_alta_tramite_vehicular--ok.png: «3 de 4 capturados» sobre una sección con dos campos vacíos. El documento tiene un solo <script> y no toca .est.",
-        "por_que_importa": "§6.16 regla 7 lo dice literal: «si cuenta, cuenta bien». Un contador que no se mueve y que además no cuadra enseña a desconfiar de él, y es lo único que indica cuánto falta para poder enviar."
-      },
-      {
-        "id": "f1-43alta-09",
-        "severidad": "media",
-        "regla": "§8 Voz de producto — una frase, ~140 caracteres / §6.9 .banda",
-        "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto. Una segunda oración se borra o pasa a toggletip. No hay excepción por importancia del contenido.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres.» Y la prueba base: «si el texto explica una decisión, no va en pantalla».",
-        "hay_en_el_build": "La .banda b-info de idempotencia tiene 254 caracteres y tres oraciones: «Este formulario se puede enviar una sola vez. Si el envío tarda y pulsas otra vez, el sistema reconoce que es el mismo intento y no crea un segundo expediente. Dos folios para el mismo vehículo se descubren semanas después, cuando ya hay dos historiales.» La tercera oración explica por qué se diseñó así.",
-        "selector": ".banda.b-info > p",
-        "evidencia": "Medición propia con textContent.length sobre .nota/.note/.banda/.sub/.pie: un único bloque por encima de 140 caracteres, con len = 254 y 3 oraciones.",
-        "por_que_importa": "Es el límite que §8 marca como no interpretable («se mide con el contador de caracteres, no a ojo»), casi doblado, y encima de un formulario que la persona quiere empezar a rellenar."
-      },
-      {
-        "id": "f1-43alta-10",
-        "severidad": "media",
-        "regla": "§9 Andamiaje de maqueta",
-        "dice_el_sistema": "«Se marca siempre con data-andamio, va visualmente separado del producto y rotulado… Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra.»",
-        "hay_en_el_build": "La primera banda de la pantalla, encima de la miga de pan, dice «Propuesta TRAZO con componentes de Studio — pendiente de revisión de Studio». Es estado del proceso de diseño, no información de producto, y está escrita como .banda b-info dentro del flujo, sin data-andamio.",
-        "selector": ".form > .banda.b-info:first-child",
-        "evidencia": "Markup de la maqueta servida, primer hijo de .form; captura 43_alta_tramite_vehicular--ok.png, banda gris sobre la miga. grep data-andamio en el archivo: 1 ocurrencia, el <aside class=\"demo\">.",
-        "por_que_importa": "Un solo selector ya no retira el andamiaje: en la versión real esa banda seguiría en lo alto del formulario de alta. §9 existe precisamente para que eso no pase."
-      },
-      {
-        "id": "f1-43alta-11",
-        "severidad": "media",
-        "regla": "§2.1 Suelo tipográfico / §6.16 ayuda de campo",
-        "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» §6.16 fija la ayuda de campo en --fs-dense (13px) dentro de la escala de §2, donde --fs-meta (12px) es el mínimo para etiquetas de campo.",
-        "hay_en_el_build": ".ctrl .ayuda{font-size:11px} y .ctrl .mal{font-size:11px}; .seccion > header .idx a 11px; .cromo-av con «font:700 11px var(--font-ui)» —la forma abreviada de §10 trampa 1—; .cromo-quien small a 11px; .grp de la barra lateral a 10,5px.",
-        "selector": ".ctrl .ayuda, .ctrl .mal, .seccion > header .idx, .cromo-av",
-        "evidencia": "Medición propia con Playwright sobre el estilo calculado, ocultando [data-andamio]: {\"p.grp @10.5\":6, \"span.cromo-av @11\":1, \"small @11\":1, \"span.idx.tnum @11\":3, \"span.ayuda @11\":3}. El brief del orquestador ya reportaba span.cromo-av a 11px.",
-        "por_que_importa": "La ayuda de campo es el texto que decide si el dato se captura bien; a 11px queda por debajo del suelo y dos puntos por debajo del tamaño que §6.16 le asigna. El mensaje de error (.mal) comparte el mismo tamaño."
-      },
-      {
-        "id": "f1-43alta-12",
-        "severidad": "media",
-        "regla": "§7.3 Objetivos táctiles — la regla lleva :root",
-        "dice_el_sistema": "«:root[data-tacto=\"dedo\"] .it, .iconbtn, .btn{min-height:46px}. El :root es lo que hace ganar la regla: con :root suma (0,3,0); sin él (0,2,0) y lo empata cualquier variante de tamaño del componente… Se comprueba midiendo con data-tacto=\"dedo\" puesto.»",
-        "hay_en_el_build": "Las seis reglas van sin :root: «[data-tacto=\"dedo\"] .it{min-height:46px}», «[data-tacto=\"dedo\"] .iconbtn{width:46px;height:46px}»… Y data-tacto no aparece ni en el markup ni en el JS, así que el modo dedo no se puede activar desde el producto. Además ninguna regla cubre los campos del formulario, que es lo que se toca en una ventanilla.",
-        "selector": "[data-tacto=\"dedo\"] .it/.iconbtn/.cromo-prof/.cromo-av/.seg button/.btn",
-        "evidencia": "Líneas 279-284 de la maqueta servida; brief del orquestador: regla_data_tacto_sin_root = 6. Medición propia poniendo data-tacto=\"dedo\" a mano: .iconbtn sí llega a 46px porque en esta pantalla no hay ninguna variante de tamaño que la empate; el defecto está presente pero latente. Los campos siguen en 35-37px.",
-        "por_que_importa": "Es el bug de especificidad que §7.3 documenta, escrito tal cual, en el formulario que §7.3 señala como caso de 44px («si el uso es en campo o tableta»). Y el modo dedo no sube la altura de ningún campo."
-      },
-      {
-        "id": "f1-43alta-13",
-        "severidad": "media",
-        "regla": "§6.7 Esqueleto — prefers-reduced-motion y texto real dentro de las barras",
-        "dice_el_sistema": "«@media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}» y «sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)».",
-        "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer el fondo; y las ocho .skel llevan texto real («Vehículo», «número de serie», «marca», «modelo», «Cliente y trámite», «cliente», «tipo de trámite», «plaza») ocultos sólo con color:transparent, dentro de un contenedor con role=\"status\".",
-        "selector": ".skel, .state-loading.sk[role=status]",
-        "evidencia": "CSS líneas 600-605 de la maqueta servida: «.skel{…animation:shimmer 1.4s linear infinite;color:transparent}» y la regla de movimiento reducido sin background. Markup del estado cargando: 8 .skel, 8 con texto.",
-        "por_que_importa": "Dos defectos que §6.7 documenta. El role=\"status\" lee en voz alta los nombres de los campos antes de que existan, y con movimiento reducido el degradado queda congelado como franja oscura."
-      },
-      {
-        "id": "f1-43alta-14",
-        "severidad": "media",
-        "regla": "§10 trampa 5 — <symbol> y viewBox repetido",
-        "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio… se pinta 32,5px a la izquierda de su caja… si el desplazamiento no es ~0, está mal.»",
-        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el logotipo y <svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el botón flotante.",
-        "selector": ".logo > svg > use[href=\"#dproma-mark\"]",
-        "evidencia": "Medición propia con getBoundingClientRect(): svg 44×42, use 43×42, dx = −32px, dy = 0; botón flotante dx = −16px. Visible en 43_alta_tramite_vehicular--ok.png.",
-        "por_que_importa": "La marca aparece recortada en la cabecera. Es el caso medido de §10 trampa 5, con el mismo desplazamiento en las cuatro maquetas del lote."
-      },
-      {
-        "id": "f1-43alta-15",
-        "severidad": "media",
-        "regla": "§13.8 Cierre garantizado / §6.19 Botón-icono — el botón flotante tapa la acción primaria",
-        "dice_el_sistema": "§13.3: «Un contenedor no cede el ancho a un descendiente»; §13.8 pide que el cierre de la composición sea deliberado, no por casualidad. §6.2: «.btn.p = primaria» y §11: la acción principal tiene que poder pulsarse.",
-        "hay_en_el_build": "El botón flotante del asistente (.fab, 52×52px, fijo a 1362,779) se superpone al botón primario «Crear expediente» de la barra de acciones (174×33px a 1242,812). En la captura el rótulo del botón primario queda cortado por el círculo.",
-        "selector": ".fab, .barra-form .btn.p",
-        "evidencia": "Medición propia con Playwright a 1440×900: solape de 52px en horizontal y 19px en vertical entre las dos cajas. En el punto muestreado del borde derecho del botón, document.elementFromPoint devuelve todavía el propio botón, así que la pulsación llega; lo que se pierde es la legibilidad. Visible en las cinco capturas de esta pantalla.",
-        "por_que_importa": "La acción que da nombre a la pantalla se lee «Crear expedie▮▮▮» en una ventana de 1440px, que no es un tamaño raro. El botón flotante no reserva espacio en la barra inferior."
-      },
-      {
-        "id": "f1-43alta-16",
-        "severidad": "baja",
-        "regla": "§6.9 Avisos — nombres de las variantes de .banda",
-        "dice_el_sistema": "«Cuatro variantes: .banda-info (--surface-2/--text-2/--border), .banda-warn (--warn-bg/--warn-ink), .banda-err (--err-bg/--err-ink), .banda-ok (--ok-bg/--ok-ink).»",
-        "hay_en_el_build": ".banda con variantes .b-info, .b-warn y .b-ok —abreviadas— y sin .banda-err. Los valores sí coinciden: .b-info{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}.",
-        "selector": ".banda.b-info, .b-warn",
-        "evidencia": "CSS líneas 515-522 de la maqueta servida. Los tokens son los correctos; sólo cambian los nombres de clase.",
-        "por_que_importa": "Divergencia de nomenclatura, no de resultado. Importa porque §6.9 pide «verificar si .banda + una de sus cuatro variantes ya lo cubre» antes de escribir una clase nueva, y esa búsqueda falla si las variantes no se llaman como el sistema dice."
-      },
-      {
-        "id": "f1-43alta-17",
-        "severidad": "baja",
-        "regla": "§6.2 Botones — el suelo se declara con min-height",
-        "dice_el_sistema": "«.btn{min-height:36px;…}… el suelo se declara con min-height, no se confía al relleno (medido: 35px y 27px sin él).»",
-        "hay_en_el_build": ".btn{…padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);…} sin min-height, igual que en las otras tres maquetas del lote.",
-        "selector": ".btn, .barra-form .btn",
-        "evidencia": "CSS línea 317 de la maqueta servida. Medición propia del botón primario de la barra de acciones: 33px de alto, tres por debajo del suelo de 36px.",
-        "por_que_importa": "Los tres botones que cierran el formulario —Cancelar, Guardar borrador y Crear expediente— quedan por debajo del suelo del sistema."
-      }
-    ]
-  },
-  "f3_boost_ui": {
-    "puntuacion": 2,
-    "dimensiones": {
-      "accesibilidad": 1,
-      "rendimiento": "no_evaluado",
-      "theming": 3,
-      "responsive": 3,
-      "integridad": 2
-    },
-    "justificacion": "Accesibilidad 1: el formulario tiene <label for> en los diez campos, focus-visible propio y el bloque @media (pointer:coarse){font-size:max(16px,…)} de §6.16, pero le falta todo lo que convierte eso en un formulario accesible: 0 required, 0 aria-required, 0 aria-describedby, 0 autocomplete, 0 inputmode, ningún mensaje de error conectado, obligatoriedad sólo por asterisco visual, ayuda de campo a 11px y --text-3 obsoleto. A eso se suma que el error borra el trabajo capturado (§6.4 regla 4). Theming 3: los dos temas completos, conmutador propio, color-scheme declarado; baja por --text-3. Responsive 3: la rejilla es la canónica de §6.16, repeat(auto-fit,minmax(230px,1fr)), con .ctrl.ancho para los campos de ancho completo y los tres anchos de barra lateral de §7.2; no se midió por debajo de 620px. Integridad 2: ningún token usado sin declarar y los estados bien construidos con .tarjeta-estado y <h2>, pero el contador de sección es estático y no cuadra, el botón flotante tapa la acción primaria, el isotipo sale desplazado −32px, hay andamiaje sin marcar en lo alto del formulario y la enumeración de selectores de §10 trampa 2 está escrita tal cual. Rendimiento no evaluado: maqueta estática sin backend y sin manejador de envío.",
-    "evidencia": [
-      "Playwright, los diez controles: required=false, aria-required=null, autocomplete=null, inputmode=null, aria-describedby=null en todos",
-      "Playwright: alturas de campo 35px (texto) y 37px (select/date), frente a los 38px de §6.16",
-      "Playwright: solape de 52×19px entre .fab y el .btn.p de la barra de acciones a 1440×900",
-      "Playwright, estilo calculado: 5 selectores con texto visible <12px (10,5px y 11px), entre ellos .ayuda y .idx",
-      "Playwright con data-state=\"error\": la .barra-form sigue visible aunque el formulario haya desaparecido",
-      "Capturas --ok.png y --error.png: contadores «3 de 4 capturados» sobre dos campos vacíos; vista de error sin campos y con los tres botones"
-    ]
-  },
-  "f4_nielsen": [
-    {
-      "n": 1,
-      "heuristica": "Visibilidad del estado del sistema",
-      "severidad": 3,
-      "hallazgo": "Los tres contadores de sección («3 de 4 capturados», «2 de 3», «2 de 2» con palomita) son texto fijo en el markup: no se mueven al escribir y el primero no cuadra con los campos rellenos. Es la única señal de progreso del formulario y miente.",
-      "selector": ".seccion > header .est"
-    },
-    {
-      "n": 2,
-      "heuristica": "Correspondencia entre el sistema y el mundo real",
-      "severidad": 1,
-      "hallazgo": "El vocabulario es el del trámite («Canal de entrada: Ventanilla · Querétaro», «El expediente se creará recibido, sin admitir») y la ayuda de Plaza explica la consecuencia real: «decide quién lo va a ver». Resta que «Número de serie» se pida con el placeholder «17 caracteres» sin nombrar el VIN, que es como lo llama quien lo teclea.",
-      "selector": "#vin, .barra-form .izq"
-    },
-    {
-      "n": 3,
-      "heuristica": "Control y libertad del usuario",
-      "severidad": 1,
-      "hallazgo": "Hay «Cancelar» y «Guardar borrador» junto a la acción primaria, que es el reparto correcto. Pero «Cancelar» no advierte de que se pierde lo capturado, y la barra sigue ofreciendo las tres acciones en la vista de error, donde ya no hay formulario.",
-      "selector": ".barra-form .der"
-    },
-    {
-      "n": 4,
-      "heuristica": "Consistencia y estándares",
-      "severidad": 2,
-      "hallazgo": "Las variantes de .banda se llaman .b-info/.b-warn en vez de .banda-info/.banda-warn, los campos usan --border donde el sistema pide --border-2 y no llegan a los 38px declarados. El resto del vocabulario (.seccion, .rejilla, .ctrl, .ctrl.ancho) sí es el de §6.16.",
-      "selector": ".banda.b-info, .ctrl input"
-    },
-    {
-      "n": 5,
-      "heuristica": "Prevención de errores",
-      "severidad": 4,
-      "hallazgo": "Seis campos marcados obligatorios con un asterisco y ninguno con required ni aria-required: el formulario se puede enviar vacío sin que nada lo impida. No hay validación de formato para el VIN ni para la placa, pese a que la pantalla enuncia los dos formatos, y la maquinaria de error (.ctrl.error, .ctrl .mal) está dibujada pero sin conectar.",
-      "selector": ".ctrl > label .req, #vin, #plc, .ctrl .mal"
-    },
-    {
-      "n": 6,
-      "heuristica": "Reconocer antes que recordar",
-      "severidad": 2,
-      "hallazgo": "Los selects traen sus opciones y los placeholders dan el formato, pero no se pide ni un solo documento, y el detalle del trámite (53) sí muestra carta poder, identificación del titular, del testigo y comprobante de domicilio como parte del expediente. Quien da de alta no ve en ningún momento qué documentos hará falta reunir.",
-      "selector": ".seccion .rejilla"
-    },
-    {
-      "n": 7,
-      "heuristica": "Flexibilidad y eficiencia de uso",
-      "severidad": 2,
-      "hallazgo": "Sin autocomplete ni inputmode, capturar en tableta obliga a cambiar de teclado para el año y la placa. No hay forma de dar de alta varios trámites del mismo cliente seguidos, que es el caso de volumen que describe el área.",
-      "selector": "#mod, #plc, .barra-form"
-    },
-    {
-      "n": 8,
-      "heuristica": "Diseño estético y minimalista",
-      "severidad": 2,
-      "hallazgo": "Antes del primer campo hay dos bandas apiladas: una de proceso interno de diseño («Propuesta TRAZO… pendiente de revisión de Studio») y otra de 254 caracteres sobre idempotencia. Tres pantallas de scroll de formulario empiezan con 300 caracteres de preámbulo.",
-      "selector": ".form > .banda.b-info"
-    },
-    {
-      "n": 9,
-      "heuristica": "Ayudar a reconocer y recuperarse de errores",
-      "severidad": 3,
-      "hallazgo": "El texto del error es ejemplar —dice qué pasó, que no se creó nada, que no hay riesgo de duplicado y da referencia TVE-20260821-1610— pero la vista borra el formulario entero, que es justo lo que §6.4 regla 4 prohíbe cuando hay trabajo en pantalla, y deja los tres botones flotando sobre una pantalla sin campos.",
-      "selector": ".state-error .tarjeta-estado, .barra-form"
-    },
-    {
-      "n": 10,
-      "heuristica": "Ayuda y documentación",
-      "severidad": 2,
-      "hallazgo": "Las tres ayudas de campo dicen lo correcto, pero van a 11px y ninguna está vinculada con aria-describedby, así que no existen para un lector de pantalla. No hay ningún toggletip (§6.23), que es donde §8 mandaría la segunda y tercera oración de la banda de idempotencia.",
-      "selector": ".ctrl .ayuda"
-    }
-  ],
-  "f5_investigacion": {
-    "pain_points_evaluados": [
-      {
-        "pp": "pp-081",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "cubre",
-        "evidencia": "pp-081 (300-900 trámites al mes capturados en hojas de Excel con macros, compartidas entre usuarios internos y del cliente) se ataca de raíz: la captura pasa a un formulario con tres secciones numeradas, campos tipados por catálogo (cliente, tipo de trámite, plaza, canal) y un estado inicial declarado en la barra inferior («El expediente se creará recibido, sin admitir»). Lo que todavía no cubre es el volumen: no hay alta en lote ni repetición del cliente anterior, y sin required el formulario no garantiza que la fila llegue completa, que es exactamente lo que el Excel con macros sí forzaba."
-      },
-      {
-        "pp": "pp-084",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "cubre",
-        "evidencia": "pp-084 (severidad alta: los clientes asignan trámites por canales distintos sin alerta centralizada y se pierde al menos un día) queda registrado desde el alta: «Canal de entrada» con Ventanilla, Portal de agencias y Traspaso interno, más «Fecha de recepción» como campo propio distinto de la fecha de admisión. Con esos dos datos el día perdido deja de ser invisible y se puede medir por canal, que es lo que la oportunidad op-074 necesita."
-      },
-      {
-        "pp": "pp-089",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "cubre",
-        "evidencia": "pp-089 (no hay criterio único para asignar la responsabilidad de trámites de alto volumen: por persona o por localidad) se resuelve en el alta eligiendo la localidad: el campo Plaza es obligatorio y su ayuda declara la consecuencia —«El expediente ancla en esta plaza: decide quién lo va a ver»—. La pantalla toma partido por el criterio territorial y lo dice; la asignación nominal se deja para después, en la bandeja, donde «Responsable» es filtrable y admite «Sin asignar»."
-      },
-      {
-        "pp": "pp-082",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "ignora",
-        "evidencia": "pp-082 (la comunicación interna y con clientes depende de grupos de WhatsApp, con ambigüedad sobre quién responde) no se toca en el alta: el formulario no captura ningún contacto del cliente ni ningún responsable asignado, pese a que el detalle (53) muestra «Contacto del cliente» con persona, correo y teléfono como parte del expediente. Ese dato entra por otra vía que la pantalla no declara."
-      },
-      {
-        "pp": "pp-085",
-        "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
-        "cobertura": "ignora",
-        "evidencia": "pp-085 (no existe un panel donde el cliente consulte el estatus en tiempo real, con esperas de hasta una hora) no tiene nada en esta pantalla: el alta no registra ningún dato de notificación al cliente ni ninguna referencia que el cliente pueda consultar después. El folio, que sería esa referencia, se genera sin que el formulario lo muestre."
-      }
-    ],
-    "usabilidad_para_el_area": "El formulario acierta en lo estructural: convierte la fila de Excel de pp-081 en una captura por secciones, registra desde el minuto cero el canal y la fecha de recepción que miden el día perdido de pp-084, y resuelve pp-089 tomando partido por la plaza y explicando la consecuencia en la propia ayuda del campo. Es, de las cuatro pantallas del lote, la que más claro tiene qué dato está pidiendo y por qué. El problema es que la capa de formulario no está construida: ninguno de los diez campos es obligatorio de verdad, ningún campo declara su tipo ni su autocompletado, la ayuda no está vinculada, no hay validación ni mensaje de error conectado, y el contador que indica cuánto falta es texto fijo que además no cuadra. Para un equipo que mueve 300-900 altas al mes en tableta y ventanilla, eso significa que el expediente puede nacer incompleto sin que nada avise — justo lo contrario de lo que el Excel con macros y semáforos sí hacía. Y falta por completo la captura documental: el detalle del trámite muestra cuatro documentos obligatorios y una pastilla «falta 1», pero el alta no pide ninguno, así que el expediente empieza en deuda por diseño."
-  },
-  "cobertura": [
-    {
-      "patron": "Contador de avance por sección en la cabecera de cada .seccion («3 de 4 capturados», «2 de 2 capturados» con palomita), con denominadores que a veces incluyen el campo opcional y a veces no.",
-      "propuesta_de_regla": "§6.16 bis — Contador de sección. El contador cuenta sólo los campos obligatorios de su sección, nunca los opcionales, y lo dice con esas palabras («faltan 2 obligatorios», no «3 de 4»). Se recalcula en cada input y change, no se escribe en el markup, y anuncia el cambio por aria-live sólo cuando la sección pasa a completa. Si no hay lógica que lo mueva, no se pone: un contador fijo es peor que ninguno, porque §6.12 regla 8 ya dice que «un control con pinta de interactivo tiene que interactuar»."
-    },
-    {
-      "patron": "Barra de acciones fija escrita fuera de <main>, de modo que sobrevive al cambio de vista y sigue ofreciendo la acción primaria en los estados cargando, vacío y error.",
-      "propuesta_de_regla": "§6.4 bis — Alcance de la barra de acciones. La barra de acciones de un formulario pertenece a la vista «con datos» y vive dentro del mismo contenedor que las cuatro vistas de §6.4, no fuera. En «cargando» se muestra deshabilitada con aria-disabled y el motivo; en «vacío» y «error» desaparece, porque no hay nada que guardar ni que crear. Corolario de §6.4 regla 4: si el error ocurre con trabajo capturado, el error va encima como aviso y la barra se queda con los campos a la vista."
-    },
-    {
-      "patron": "Declaración del estado inicial del registro en la barra de acciones, junto al botón que lo crea: «El expediente se creará recibido, sin admitir».",
-      "propuesta_de_regla": "§6.16 bis — Estado inicial declarado. Cuando el alta crea un registro que nace en un estado concreto del semáforo, ese estado se enuncia junto al botón que lo crea, con el mismo texto que usará la pastilla de §6.10 en el listado. Una frase, en --text-3 y a --fs-meta, sin pastilla propia para no confundirse con un estado ya alcanzado. Evita el caso de pp-084: quien da de alta sabe que el reloj todavía no arranca."
-    }
-  ],
-  "sin_datos": [
-    "f3.rendimiento: maqueta estática, sin backend que perfilar",
-    "§6.17 Subida de archivo (.subida): la pantalla no pide ningún documento — 0 <input type=\"file\"> y 0 .subida en el documento — así que no hay componente que medir contra los requisitos de §6.17 (formatos y peso admitidos, nombre y fecha del archivo cargado, reemplazar o quitar, aria-describedby). Que no exista es un hallazgo de F4 (heurística 6) y de F5, no de cumplimiento de §6.17",
-    "§6.16 regla 1 (.dato-calc): no hay ningún dato calculado en el formulario, nada que auditar",
-    "§6.16 regla 8 (guardado automático o botón de guardar, no los dos): hay «Guardar borrador» y «Crear expediente», que son dos acciones distintas, no guardado automático más botón; no hay JS que permita comprobar si además existe autoguardado",
-    "§6.16 A11y extra (botón deshabilitado con aria-disabled y motivo) y §6.1 (bloqueo en el manejador, aria-busy): ninguno de los tres botones de la barra tiene manejador — el único <script> del documento sólo trae tema, menú y conmutador de estados — así que no se puede comprobar el bloqueo del envío ni el estado ocupado",
-    "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (dialog=0, [role=dialog]=0)",
-    "Contraste de span.et «Trámites vehiculares» (1,09:1) y span.cromo-av «AR» (3,05:1) del brief: el medidor comparó contra el color rgba sin componerlo con la superficie de debajo. Compuestos dan 5,98:1 sobre --chrome y 13,5:1 sobre --surface; no los cuento como fallo de contraste. Lo que sí es hallazgo real de span.cromo-av es el tamaño de 11px, recogido en f1-43alta-11",
-    "Comportamiento por debajo de 620px: sólo se midió a 1440×900 y con las capturas del orquestador"
+ "pantalla": "43_alta_tramite_vehicular",
+ "ruta_zip": "04-tramites-vehiculares-y-cfe/43_alta_tramite_vehicular.html",
+ "carpeta": "04-tramites-vehiculares-y-cfe",
+ "area": "administracion vehicular",
+ "arquetipo": "formulario",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "43_alta_tramite_vehicular--ok.png",
+  "43_alta_tramite_vehicular--loading.png",
+  "43_alta_tramite_vehicular--empty.png",
+  "43_alta_tramite_vehicular--error.png",
+  "43_alta_tramite_vehicular--oscuro.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-43alta-01",
+    "severidad": "alta",
+    "regla": "§6.16 Formulario — regla 3, obligatoriedad de verdad",
+    "dice_el_sistema": "«required y aria-required de verdad, no asteriscos decorativos.» Y la regla 2: «dos niveles de obligatoriedad con palabras distintas — obligatorio para dar de alta vs necesario para facturar o programar».",
+    "hay_en_el_build": "Seis campos llevan <span class=\"req\">*</span> en su <label> —Número de serie, Marca, Modelo, Cliente, Tipo de trámite, Plaza, Canal de entrada, Fecha de recepción— y ninguno de los diez controles del formulario declara required ni aria-required. Tampoco hay leyenda que explique qué significa el asterisco, ni los dos niveles de obligatoriedad de la regla 2.",
+    "selector": ".ctrl > label .req, #vin, #mar, #mod, #cli2, #tt2, #plz, #can2, #fr",
+    "evidencia": "Medición propia con Playwright sobre los diez controles: required = false y aria-required = null en los diez (input#vin, select#mar, input#mod, input#plc, select#cli2, select#tt2, select#plz, select#can2, input#fr, textarea#obs). El asterisco es un <span> teñido con --err-ink.",
+    "por_que_importa": "Es el antipatrón que §6.16 regla 3 nombra con esas palabras. Con lector de pantalla la obligatoriedad no existe: el asterisco es un carácter suelto dentro del <label>, y el navegador no impide enviar el formulario vacío porque nada se lo dice."
+   },
+   {
+    "id": "f1-43alta-02",
+    "severidad": "alta",
+    "regla": "§6.16 Formulario — regla 6, el tipo de campo es el tipo del dato",
+    "dice_el_sistema": "«El tipo de campo es el tipo del dato (type=\"email\", type=\"tel\", inputmode=\"numeric\") + autocomplete.»",
+    "hay_en_el_build": "Los cuatro campos de texto son type=\"text\" sin inputmode y sin autocomplete: el número de serie (VIN, 17 caracteres alfanuméricos), el modelo (un año: «2026»), la placa (patrón AAA-00-AA) y las observaciones. Ningún control del formulario declara autocomplete.",
+    "selector": "#vin, #mod, #plc",
+    "evidencia": "Medición propia con Playwright: para los diez controles, autocomplete = null e inputmode = null; #vin, #mod y #plc son type=\"text\".",
+    "por_que_importa": "En tableta —el escenario de ventanilla— capturar un año y una placa con el teclado alfanumérico completo es más lento y más propenso a error. El VIN y la placa tienen un formato conocido que la pantalla ya enuncia en el placeholder («17 caracteres», «AAA-00-AA») pero que no comunica al navegador."
+   },
+   {
+    "id": "f1-43alta-03",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado — regla 4, el error no se lleva por delante lo que había",
+    "dice_el_sistema": "«(4) el error no se lleva por delante lo que había — con trabajo del usuario en pantalla el error va encima, como aviso, con los campos visibles y rellenos.» §11: «el error deja a la vista el trabajo que la persona ya había hecho».",
+    "hay_en_el_build": "La vista de error sustituye el formulario entero por una .tarjeta-estado centrada. El propio texto admite que había trabajo en curso: «Lo capturado sigue en el borrador». Y la barra de acciones está escrita fuera de <main>, así que sobrevive al cambio de estado: en la vista de error siguen a la vista «Cancelar», «Guardar borrador» y «Crear expediente» bajo una pantalla sin ningún campo.",
+    "selector": "main[data-state=\"error\"] .state-error, .barra-form",
+    "evidencia": "Captura 43_alta_tramite_vehicular--error.png: el formulario ha desaparecido, la tarjeta de error ocupa el centro y la barra inferior conserva los tres botones. Medición propia con Playwright poniendo data-state=\"error\": la .barra-form sigue teniendo altura mayor que 0. El markup la coloca después de </main>.",
+    "por_que_importa": "Es el caso literal de §6.4 regla 4: tres campos obligatorios capturados desaparecen de la pantalla justo en el momento en que el sistema falla, y la única garantía de que no se han perdido es una frase. Y la barra deja pulsable «Crear expediente» sobre un formulario que ya no está."
+   },
+   {
+    "id": "f1-43alta-04",
+    "severidad": "alta",
+    "regla": "§1.1 Superficies y texto — valor de --text-3",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)… si el elemento puede caer sobre --surface-2, se mide también ahí.»",
+    "hay_en_el_build": "--text-3: #66717F en el tema claro. A diferencia de 52 y 53, esta maqueta no declara el token paralelo --text-3-fuerte, así que el valor obsoleto gobierna toda la ayuda de campo (.ctrl .ayuda), la referencia del error y el texto de la barra de acciones.",
+    "selector": ":root{--text-3}, .ctrl .ayuda, .barra-form .izq",
+    "evidencia": "Brief del orquestador: text_3_declarado = «#66717F». Fallo de contraste del brief en la misma familia: span.et-g «VIENDO COMO» a 4,21:1 en el patrón compartido del cromo.",
+    "por_que_importa": "Hecho ya establecido para 51 de 52 maquetas. Aquí afecta a la ayuda de campo, que es el texto que explica por qué un dato es necesario justo cuando la persona lo está escribiendo."
+   },
+   {
+    "id": "f1-43alta-05",
+    "severidad": "media",
+    "regla": "§6.16 Formulario — regla 5, el error se vincula / §6.17 aria-describedby de la ayuda",
+    "dice_el_sistema": "«(5) el error se vincula: aria-invalid=\"true\" + aria-describedby al id del mensaje.» §6.17: «aria-describedby del <input> al id de la ayuda». §11: «cada aria-describedby/aria-controls apunta a algo que existe».",
+    "hay_en_el_build": "Las tres ayudas de campo son <span class=\"ayuda\"> sin id, y ningún control lleva aria-describedby. El CSS declara .ctrl .mal y .ctrl.error input{border-color:var(--err);box-shadow:0 0 0 1px var(--err)} —la presentación del error de §6.16— pero no hay ningún mensaje de error en el markup ni JS que lo active.",
+    "selector": ".ctrl .ayuda, .ctrl .mal",
+    "evidencia": "Medición propia con Playwright: aria-describedby = null en los diez controles; la comprobación de aria-describedby/aria-controls rotos devuelve lista vacía porque no hay ninguno declarado. grep «class=\"mal\"» en el markup: 0 ocurrencias.",
+    "por_que_importa": "La ayuda que explica que el VIN «no aparece en la dirección de la página ni en los listados» sólo existe para quien la ve. Y la maquinaria de error está dibujada pero sin conectar, así que no se puede comprobar la regla 4 («no hay error antes de la interacción») ni la 5."
+   },
+   {
+    "id": "f1-43alta-06",
+    "severidad": "media",
+    "regla": "§6.16 Formulario — valores de .ctrl",
+    "dice_el_sistema": "«input/select/textarea{min-height:38px;padding:9px 11px;border:1px solid var(--border-2);border-radius:var(--r-ctrl);background:var(--bg);font:400 var(--fs-dense)}»",
+    "hay_en_el_build": "La regla declara padding:9px 12px, border:1px solid var(--border) y no declara min-height. El resultado medido es 35px en los campos de texto y 37px en los <select> y el campo de fecha.",
+    "selector": ".ctrl input[type=\"text\"], .ctrl select, .ctrl input[type=\"date\"]",
+    "evidencia": "Medición propia con Playwright: #vin 35px, #mod 35px, #plc 35px; #mar, #cli2, #tt2, #plz, #can2 y #fr 37px. El sistema fija 38px. CSS líneas 581-584 de la maqueta servida: la declaración no contiene min-height y usa --border en vez de --border-2.",
+    "por_que_importa": "Mismo defecto que §6.2 señala en los botones: el suelo se confía al relleno, así que la altura la decide el tamaño de fuente heredado. Con --border en vez de --border-2 el campo usa el borde decorativo donde el sistema pide el de control interactivo."
+   },
+   {
+    "id": "f1-43alta-07",
+    "severidad": "media",
+    "regla": "§10 trampa 2 — selectores por exclusión, no por enumeración",
+    "dice_el_sistema": "«El tamaño de los campos estaba definido como .ctrl input[type=\"text\"], .ctrl input[type=\"date\"], .ctrl input[type=\"number\"]. Al cambiar dos campos a type=\"email\" y type=\"tel\" —que es lo correcto— se quedaron fuera y colapsaron a 19px de alto. Lo que aplica a todos los campos se escribe .ctrl input:not([type=\"file\"]):not([type=\"checkbox\"]):not([type=\"radio\"]).»",
+    "hay_en_el_build": ".ctrl input[type=\"text\"],.ctrl input[type=\"date\"],.ctrl input[type=\"number\"],.ctrl select,.ctrl textarea{…} — la enumeración exacta que §10 trampa 2 describe, repetida además en el bloque @media (pointer:coarse) y en el bloque de :focus-visible.",
+    "selector": ".ctrl input[type=\"text\"], .ctrl input[type=\"date\"], .ctrl input[type=\"number\"]",
+    "evidencia": "CSS líneas 581, 587 y 588 de la maqueta servida: tres reglas distintas con la misma enumeración de tres tipos. En la maqueta 53 aparece la misma enumeración, copiada.",
+    "por_que_importa": "El defecto es latente hoy porque ningún campo usa un tipo fuera de la lista. Deja de serlo en cuanto se cumpla el hallazgo f1-43alta-02, que pide poner type=\"tel\" o inputmode a estos mismos campos: la hoja los dejaría fuera y colapsarían, que es exactamente el fallo registrado."
+   },
+   {
+    "id": "f1-43alta-08",
+    "severidad": "media",
+    "regla": "§6.16 Formulario — regla 7, el contador de sección",
+    "dice_el_sistema": "«el contador de sección habla en español, no en aritmética, y si cuenta, cuenta bien.»",
+    "hay_en_el_build": "Tres contadores fijos en el markup: «3 de 4 capturados» (sección 1), «2 de 3 capturados» (sección 2) y «2 de 2 capturados» con icono de verificación (sección 3). Son texto estático: el único <script> del documento sólo trae tema, menú y conmutador de estados. La sección 1 tiene cuatro campos y sólo dos con valor (Marca con la opción por omisión «Otro» y Modelo «2026»); Número de serie y Placa están vacíos. La sección 3 tiene tres campos y cuenta dos, mientras la sección 1 tiene cuatro y cuenta cuatro: el denominador incluye el campo opcional en una sección y lo excluye en la otra.",
+    "selector": ".seccion > header .est",
+    "evidencia": "Markup de las tres <section class=\"seccion\"> en la maqueta servida y captura 43_alta_tramite_vehicular--ok.png: «3 de 4 capturados» sobre una sección con dos campos vacíos. El documento tiene un solo <script> y no toca .est.",
+    "por_que_importa": "§6.16 regla 7 lo dice literal: «si cuenta, cuenta bien». Un contador que no se mueve y que además no cuadra enseña a desconfiar de él, y es lo único que indica cuánto falta para poder enviar."
+   },
+   {
+    "id": "f1-43alta-09",
+    "severidad": "media",
+    "regla": "§8 Voz de producto — una frase, ~140 caracteres / §6.9 .banda",
+    "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto. Una segunda oración se borra o pasa a toggletip. No hay excepción por importancia del contenido.» «Ningún bloque de texto siempre visible pasa de ~140 caracteres.» Y la prueba base: «si el texto explica una decisión, no va en pantalla».",
+    "hay_en_el_build": "La .banda b-info de idempotencia tiene 254 caracteres y tres oraciones: «Este formulario se puede enviar una sola vez. Si el envío tarda y pulsas otra vez, el sistema reconoce que es el mismo intento y no crea un segundo expediente. Dos folios para el mismo vehículo se descubren semanas después, cuando ya hay dos historiales.» La tercera oración explica por qué se diseñó así.",
+    "selector": ".banda.b-info > p",
+    "evidencia": "Medición propia con textContent.length sobre .nota/.note/.banda/.sub/.pie: un único bloque por encima de 140 caracteres, con len = 254 y 3 oraciones.",
+    "por_que_importa": "Es el límite que §8 marca como no interpretable («se mide con el contador de caracteres, no a ojo»), casi doblado, y encima de un formulario que la persona quiere empezar a rellenar."
+   },
+   {
+    "id": "f1-43alta-10",
+    "severidad": "media",
+    "regla": "§9 Andamiaje de maqueta",
+    "dice_el_sistema": "«Se marca siempre con data-andamio, va visualmente separado del producto y rotulado… Todo lo que lleve data-andamio se retira en la versión real. Un solo selector lo encuentra.»",
+    "hay_en_el_build": "La primera banda de la pantalla, encima de la miga de pan, dice «Propuesta TRAZO con componentes de Studio — pendiente de revisión de Studio». Es estado del proceso de diseño, no información de producto, y está escrita como .banda b-info dentro del flujo, sin data-andamio.",
+    "selector": ".form > .banda.b-info:first-child",
+    "evidencia": "Markup de la maqueta servida, primer hijo de .form; captura 43_alta_tramite_vehicular--ok.png, banda gris sobre la miga. grep data-andamio en el archivo: 1 ocurrencia, el <aside class=\"demo\">.",
+    "por_que_importa": "Un solo selector ya no retira el andamiaje: en la versión real esa banda seguiría en lo alto del formulario de alta. §9 existe precisamente para que eso no pase."
+   },
+   {
+    "id": "f1-43alta-11",
+    "severidad": "media",
+    "regla": "§2.1 Suelo tipográfico / §6.16 ayuda de campo",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí.» §6.16 fija la ayuda de campo en --fs-dense (13px) dentro de la escala de §2, donde --fs-meta (12px) es el mínimo para etiquetas de campo.",
+    "hay_en_el_build": ".ctrl .ayuda{font-size:11px} y .ctrl .mal{font-size:11px}; .seccion > header .idx a 11px; .cromo-av con «font:700 11px var(--font-ui)» —la forma abreviada de §10 trampa 1—; .cromo-quien small a 11px; .grp de la barra lateral a 10,5px.",
+    "selector": ".ctrl .ayuda, .ctrl .mal, .seccion > header .idx, .cromo-av",
+    "evidencia": "Medición propia con Playwright sobre el estilo calculado, ocultando [data-andamio]: {\"p.grp @10.5\":6, \"span.cromo-av @11\":1, \"small @11\":1, \"span.idx.tnum @11\":3, \"span.ayuda @11\":3}. El brief del orquestador ya reportaba span.cromo-av a 11px.",
+    "por_que_importa": "La ayuda de campo es el texto que decide si el dato se captura bien; a 11px queda por debajo del suelo y dos puntos por debajo del tamaño que §6.16 le asigna. El mensaje de error (.mal) comparte el mismo tamaño."
+   },
+   {
+    "id": "f1-43alta-12",
+    "severidad": "media",
+    "regla": "§7.3 Objetivos táctiles — la regla lleva :root",
+    "dice_el_sistema": "«:root[data-tacto=\"dedo\"] .it, .iconbtn, .btn{min-height:46px}. El :root es lo que hace ganar la regla: con :root suma (0,3,0); sin él (0,2,0) y lo empata cualquier variante de tamaño del componente… Se comprueba midiendo con data-tacto=\"dedo\" puesto.»",
+    "hay_en_el_build": "Las seis reglas van sin :root: «[data-tacto=\"dedo\"] .it{min-height:46px}», «[data-tacto=\"dedo\"] .iconbtn{width:46px;height:46px}»… Y data-tacto no aparece ni en el markup ni en el JS, así que el modo dedo no se puede activar desde el producto. Además ninguna regla cubre los campos del formulario, que es lo que se toca en una ventanilla.",
+    "selector": "[data-tacto=\"dedo\"] .it/.iconbtn/.cromo-prof/.cromo-av/.seg button/.btn",
+    "evidencia": "Líneas 279-284 de la maqueta servida; brief del orquestador: regla_data_tacto_sin_root = 6. Medición propia poniendo data-tacto=\"dedo\" a mano: .iconbtn sí llega a 46px porque en esta pantalla no hay ninguna variante de tamaño que la empate; el defecto está presente pero latente. Los campos siguen en 35-37px.",
+    "por_que_importa": "Es el bug de especificidad que §7.3 documenta, escrito tal cual, en el formulario que §7.3 señala como caso de 44px («si el uso es en campo o tableta»). Y el modo dedo no sube la altura de ningún campo."
+   },
+   {
+    "id": "f1-43alta-13",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto — prefers-reduced-motion y texto real dentro de las barras",
+    "dice_el_sistema": "«@media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}» y «sin texto real dentro de las barras (color:transparent sigue en el árbol de accesibilidad)».",
+    "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer el fondo; y las ocho .skel llevan texto real («Vehículo», «número de serie», «marca», «modelo», «Cliente y trámite», «cliente», «tipo de trámite», «plaza») ocultos sólo con color:transparent, dentro de un contenedor con role=\"status\".",
+    "selector": ".skel, .state-loading.sk[role=status]",
+    "evidencia": "CSS líneas 600-605 de la maqueta servida: «.skel{…animation:shimmer 1.4s linear infinite;color:transparent}» y la regla de movimiento reducido sin background. Markup del estado cargando: 8 .skel, 8 con texto.",
+    "por_que_importa": "Dos defectos que §6.7 documenta. El role=\"status\" lee en voz alta los nombres de los campos antes de que existan, y con movimiento reducido el degradado queda congelado como franja oscura."
+   },
+   {
+    "id": "f1-43alta-14",
+    "severidad": "media",
+    "regla": "§10 trampa 5 — <symbol> y viewBox repetido",
+    "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio… se pinta 32,5px a la izquierda de su caja… si el desplazamiento no es ~0, está mal.»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el logotipo y <svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el botón flotante.",
+    "selector": ".logo > svg > use[href=\"#dproma-mark\"]",
+    "evidencia": "Medición propia con getBoundingClientRect(): svg 44×42, use 43×42, dx = −32px, dy = 0; botón flotante dx = −16px. Visible en 43_alta_tramite_vehicular--ok.png.",
+    "por_que_importa": "La marca aparece recortada en la cabecera. Es el caso medido de §10 trampa 5, con el mismo desplazamiento en las cuatro maquetas del lote."
+   },
+   {
+    "id": "f1-43alta-15",
+    "severidad": "media",
+    "regla": "§13.8 Cierre garantizado / §6.19 Botón-icono — el botón flotante tapa la acción primaria",
+    "dice_el_sistema": "§13.3: «Un contenedor no cede el ancho a un descendiente»; §13.8 pide que el cierre de la composición sea deliberado, no por casualidad. §6.2: «.btn.p = primaria» y §11: la acción principal tiene que poder pulsarse.",
+    "hay_en_el_build": "El botón flotante del asistente (.fab, 52×52px, fijo a 1362,779) se superpone al botón primario «Crear expediente» de la barra de acciones (174×33px a 1242,812). En la captura el rótulo del botón primario queda cortado por el círculo.",
+    "selector": ".fab, .barra-form .btn.p",
+    "evidencia": "Medición propia con Playwright a 1440×900: solape de 52px en horizontal y 19px en vertical entre las dos cajas. En el punto muestreado del borde derecho del botón, document.elementFromPoint devuelve todavía el propio botón, así que la pulsación llega; lo que se pierde es la legibilidad. Visible en las cinco capturas de esta pantalla.",
+    "por_que_importa": "La acción que da nombre a la pantalla se lee «Crear expedie▮▮▮» en una ventana de 1440px, que no es un tamaño raro. El botón flotante no reserva espacio en la barra inferior."
+   },
+   {
+    "id": "f1-43alta-16",
+    "severidad": "baja",
+    "regla": "§6.9 Avisos — nombres de las variantes de .banda",
+    "dice_el_sistema": "«Cuatro variantes: .banda-info (--surface-2/--text-2/--border), .banda-warn (--warn-bg/--warn-ink), .banda-err (--err-bg/--err-ink), .banda-ok (--ok-bg/--ok-ink).»",
+    "hay_en_el_build": ".banda con variantes .b-info, .b-warn y .b-ok —abreviadas— y sin .banda-err. Los valores sí coinciden: .b-info{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}.",
+    "selector": ".banda.b-info, .b-warn",
+    "evidencia": "CSS líneas 515-522 de la maqueta servida. Los tokens son los correctos; sólo cambian los nombres de clase.",
+    "por_que_importa": "Divergencia de nomenclatura, no de resultado. Importa porque §6.9 pide «verificar si .banda + una de sus cuatro variantes ya lo cubre» antes de escribir una clase nueva, y esa búsqueda falla si las variantes no se llaman como el sistema dice."
+   },
+   {
+    "id": "f1-43alta-17",
+    "severidad": "baja",
+    "regla": "§6.2 Botones — el suelo se declara con min-height",
+    "dice_el_sistema": "«.btn{min-height:36px;…}… el suelo se declara con min-height, no se confía al relleno (medido: 35px y 27px sin él).»",
+    "hay_en_el_build": ".btn{…padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);…} sin min-height, igual que en las otras tres maquetas del lote.",
+    "selector": ".btn, .barra-form .btn",
+    "evidencia": "CSS línea 317 de la maqueta servida. Medición propia del botón primario de la barra de acciones: 33px de alto, tres por debajo del suelo de 36px.",
+    "por_que_importa": "Los tres botones que cierran el formulario —Cancelar, Guardar borrador y Crear expediente— quedan por debajo del suelo del sistema."
+   }
   ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "Accesibilidad 1: el formulario tiene <label for> en los diez campos, focus-visible propio y el bloque @media (pointer:coarse){font-size:max(16px,…)} de §6.16, pero le falta todo lo que convierte eso en un formulario accesible: 0 required, 0 aria-required, 0 aria-describedby, 0 autocomplete, 0 inputmode, ningún mensaje de error conectado, obligatoriedad sólo por asterisco visual, ayuda de campo a 11px y --text-3 obsoleto. A eso se suma que el error borra el trabajo capturado (§6.4 regla 4). Theming 3: los dos temas completos, conmutador propio, color-scheme declarado; baja por --text-3. Responsive 3: la rejilla es la canónica de §6.16, repeat(auto-fit,minmax(230px,1fr)), con .ctrl.ancho para los campos de ancho completo y los tres anchos de barra lateral de §7.2; no se midió por debajo de 620px. Integridad 2: ningún token usado sin declarar y los estados bien construidos con .tarjeta-estado y <h2>, pero el contador de sección es estático y no cuadra, el botón flotante tapa la acción primaria, el isotipo sale desplazado −32px, hay andamiaje sin marcar en lo alto del formulario y la enumeración de selectores de §10 trampa 2 está escrita tal cual. Rendimiento no evaluado: maqueta estática sin backend y sin manejador de envío.",
+  "evidencia": [
+   "Playwright, los diez controles: required=false, aria-required=null, autocomplete=null, inputmode=null, aria-describedby=null en todos",
+   "Playwright: alturas de campo 35px (texto) y 37px (select/date), frente a los 38px de §6.16",
+   "Playwright: solape de 52×19px entre .fab y el .btn.p de la barra de acciones a 1440×900",
+   "Playwright, estilo calculado: 5 selectores con texto visible <12px (10,5px y 11px), entre ellos .ayuda y .idx",
+   "Playwright con data-state=\"error\": la .barra-form sigue visible aunque el formulario haya desaparecido",
+   "Capturas --ok.png y --error.png: contadores «3 de 4 capturados» sobre dos campos vacíos; vista de error sin campos y con los tres botones"
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 3,
+   "hallazgo": "Los tres contadores de sección («3 de 4 capturados», «2 de 3», «2 de 2» con palomita) son texto fijo en el markup: no se mueven al escribir y el primero no cuadra con los campos rellenos. Es la única señal de progreso del formulario y miente.",
+   "selector": ".seccion > header .est"
+  },
+  {
+   "n": 2,
+   "heuristica": "Correspondencia entre el sistema y el mundo real",
+   "severidad": 1,
+   "hallazgo": "El vocabulario es el del trámite («Canal de entrada: Ventanilla · Querétaro», «El expediente se creará recibido, sin admitir») y la ayuda de Plaza explica la consecuencia real: «decide quién lo va a ver». Resta que «Número de serie» se pida con el placeholder «17 caracteres» sin nombrar el VIN, que es como lo llama quien lo teclea.",
+   "selector": "#vin, .barra-form .izq"
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 1,
+   "hallazgo": "Hay «Cancelar» y «Guardar borrador» junto a la acción primaria, que es el reparto correcto. Pero «Cancelar» no advierte de que se pierde lo capturado, y la barra sigue ofreciendo las tres acciones en la vista de error, donde ya no hay formulario.",
+   "selector": ".barra-form .der"
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 2,
+   "hallazgo": "Las variantes de .banda se llaman .b-info/.b-warn en vez de .banda-info/.banda-warn, los campos usan --border donde el sistema pide --border-2 y no llegan a los 38px declarados. El resto del vocabulario (.seccion, .rejilla, .ctrl, .ctrl.ancho) sí es el de §6.16.",
+   "selector": ".banda.b-info, .ctrl input"
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 4,
+   "hallazgo": "Seis campos marcados obligatorios con un asterisco y ninguno con required ni aria-required: el formulario se puede enviar vacío sin que nada lo impida. No hay validación de formato para el VIN ni para la placa, pese a que la pantalla enuncia los dos formatos, y la maquinaria de error (.ctrl.error, .ctrl .mal) está dibujada pero sin conectar.",
+   "selector": ".ctrl > label .req, #vin, #plc, .ctrl .mal"
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocer antes que recordar",
+   "severidad": 2,
+   "hallazgo": "Los selects traen sus opciones y los placeholders dan el formato, pero no se pide ni un solo documento, y el detalle del trámite (53) sí muestra carta poder, identificación del titular, del testigo y comprobante de domicilio como parte del expediente. Quien da de alta no ve en ningún momento qué documentos hará falta reunir.",
+   "selector": ".seccion .rejilla"
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 2,
+   "hallazgo": "Sin autocomplete ni inputmode, capturar en tableta obliga a cambiar de teclado para el año y la placa. No hay forma de dar de alta varios trámites del mismo cliente seguidos, que es el caso de volumen que describe el área.",
+   "selector": "#mod, #plc, .barra-form"
+  },
+  {
+   "n": 8,
+   "heuristica": "Diseño estético y minimalista",
+   "severidad": 2,
+   "hallazgo": "Antes del primer campo hay dos bandas apiladas: una de proceso interno de diseño («Propuesta TRAZO… pendiente de revisión de Studio») y otra de 254 caracteres sobre idempotencia. Tres pantallas de scroll de formulario empiezan con 300 caracteres de preámbulo.",
+   "selector": ".form > .banda.b-info"
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer y recuperarse de errores",
+   "severidad": 3,
+   "hallazgo": "El texto del error es ejemplar —dice qué pasó, que no se creó nada, que no hay riesgo de duplicado y da referencia TVE-20260821-1610— pero la vista borra el formulario entero, que es justo lo que §6.4 regla 4 prohíbe cuando hay trabajo en pantalla, y deja los tres botones flotando sobre una pantalla sin campos.",
+   "selector": ".state-error .tarjeta-estado, .barra-form"
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 2,
+   "hallazgo": "Las tres ayudas de campo dicen lo correcto, pero van a 11px y ninguna está vinculada con aria-describedby, así que no existen para un lector de pantalla. No hay ningún toggletip (§6.23), que es donde §8 mandaría la segunda y tercera oración de la banda de idempotencia.",
+   "selector": ".ctrl .ayuda"
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-081",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-081 (300-900 trámites al mes capturados en hojas de Excel con macros, compartidas entre usuarios internos y del cliente) se ataca de raíz: la captura pasa a un formulario con tres secciones numeradas, campos tipados por catálogo (cliente, tipo de trámite, plaza, canal) y un estado inicial declarado en la barra inferior («El expediente se creará recibido, sin admitir»). Lo que todavía no cubre es el volumen: no hay alta en lote ni repetición del cliente anterior, y sin required el formulario no garantiza que la fila llegue completa, que es exactamente lo que el Excel con macros sí forzaba."
+   },
+   {
+    "pp": "pp-084",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-084 (severidad alta: los clientes asignan trámites por canales distintos sin alerta centralizada y se pierde al menos un día) queda registrado desde el alta: «Canal de entrada» con Ventanilla, Portal de agencias y Traspaso interno, más «Fecha de recepción» como campo propio distinto de la fecha de admisión. Con esos dos datos el día perdido deja de ser invisible y se puede medir por canal, que es lo que la oportunidad op-074 necesita."
+   },
+   {
+    "pp": "pp-089",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-089 (no hay criterio único para asignar la responsabilidad de trámites de alto volumen: por persona o por localidad) se resuelve en el alta eligiendo la localidad: el campo Plaza es obligatorio y su ayuda declara la consecuencia —«El expediente ancla en esta plaza: decide quién lo va a ver»—. La pantalla toma partido por el criterio territorial y lo dice; la asignación nominal se deja para después, en la bandeja, donde «Responsable» es filtrable y admite «Sin asignar»."
+   },
+   {
+    "pp": "pp-082",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-082 (la comunicación interna y con clientes depende de grupos de WhatsApp, con ambigüedad sobre quién responde) no se toca en el alta: el formulario no captura ningún contacto del cliente ni ningún responsable asignado, pese a que el detalle (53) muestra «Contacto del cliente» con persona, correo y teléfono como parte del expediente. Ese dato entra por otra vía que la pantalla no declara."
+   },
+   {
+    "pp": "pp-085",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-085 (no existe un panel donde el cliente consulte el estatus en tiempo real, con esperas de hasta una hora) no tiene nada en esta pantalla: el alta no registra ningún dato de notificación al cliente ni ninguna referencia que el cliente pueda consultar después. El folio, que sería esa referencia, se genera sin que el formulario lo muestre."
+   }
+  ],
+  "usabilidad_para_el_area": "El formulario acierta en lo estructural: convierte la fila de Excel de pp-081 en una captura por secciones, registra desde el minuto cero el canal y la fecha de recepción que miden el día perdido de pp-084, y resuelve pp-089 tomando partido por la plaza y explicando la consecuencia en la propia ayuda del campo. Es, de las cuatro pantallas del lote, la que más claro tiene qué dato está pidiendo y por qué. El problema es que la capa de formulario no está construida: ninguno de los diez campos es obligatorio de verdad, ningún campo declara su tipo ni su autocompletado, la ayuda no está vinculada, no hay validación ni mensaje de error conectado, y el contador que indica cuánto falta es texto fijo que además no cuadra. Para un equipo que mueve 300-900 altas al mes en tableta y ventanilla, eso significa que el expediente puede nacer incompleto sin que nada avise — justo lo contrario de lo que el Excel con macros y semáforos sí hacía. Y falta por completo la captura documental: el detalle del trámite muestra cuatro documentos obligatorios y una pastilla «falta 1», pero el alta no pide ninguno, así que el expediente empieza en deuda por diseño."
+ },
+ "cobertura": [
+  {
+   "patron": "Contador de avance por sección en la cabecera de cada .seccion («3 de 4 capturados», «2 de 2 capturados» con palomita), con denominadores que a veces incluyen el campo opcional y a veces no.",
+   "propuesta_de_regla": "§6.16 bis — Contador de sección. El contador cuenta sólo los campos obligatorios de su sección, nunca los opcionales, y lo dice con esas palabras («faltan 2 obligatorios», no «3 de 4»). Se recalcula en cada input y change, no se escribe en el markup, y anuncia el cambio por aria-live sólo cuando la sección pasa a completa. Si no hay lógica que lo mueva, no se pone: un contador fijo es peor que ninguno, porque §6.12 regla 8 ya dice que «un control con pinta de interactivo tiene que interactuar»."
+  },
+  {
+   "patron": "Barra de acciones fija escrita fuera de <main>, de modo que sobrevive al cambio de vista y sigue ofreciendo la acción primaria en los estados cargando, vacío y error.",
+   "propuesta_de_regla": "§6.4 bis — Alcance de la barra de acciones. La barra de acciones de un formulario pertenece a la vista «con datos» y vive dentro del mismo contenedor que las cuatro vistas de §6.4, no fuera. En «cargando» se muestra deshabilitada con aria-disabled y el motivo; en «vacío» y «error» desaparece, porque no hay nada que guardar ni que crear. Corolario de §6.4 regla 4: si el error ocurre con trabajo capturado, el error va encima como aviso y la barra se queda con los campos a la vista."
+  },
+  {
+   "patron": "Declaración del estado inicial del registro en la barra de acciones, junto al botón que lo crea: «El expediente se creará recibido, sin admitir».",
+   "propuesta_de_regla": "§6.16 bis — Estado inicial declarado. Cuando el alta crea un registro que nace en un estado concreto del semáforo, ese estado se enuncia junto al botón que lo crea, con el mismo texto que usará la pastilla de §6.10 en el listado. Una frase, en --text-3 y a --fs-meta, sin pastilla propia para no confundirse con un estado ya alcanzado. Evita el caso de pp-084: quien da de alta sabe que el reloj todavía no arranca."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática, sin backend que perfilar",
+  "§6.17 Subida de archivo (.subida): la pantalla no pide ningún documento — 0 <input type=\"file\"> y 0 .subida en el documento — así que no hay componente que medir contra los requisitos de §6.17 (formatos y peso admitidos, nombre y fecha del archivo cargado, reemplazar o quitar, aria-describedby). Que no exista es un hallazgo de F4 (heurística 6) y de F5, no de cumplimiento de §6.17",
+  "§6.16 regla 1 (.dato-calc): no hay ningún dato calculado en el formulario, nada que auditar",
+  "§6.16 regla 8 (guardado automático o botón de guardar, no los dos): hay «Guardar borrador» y «Crear expediente», que son dos acciones distintas, no guardado automático más botón; no hay JS que permita comprobar si además existe autoguardado",
+  "§6.16 A11y extra (botón deshabilitado con aria-disabled y motivo) y §6.1 (bloqueo en el manejador, aria-busy): ninguno de los tres botones de la barra tiene manejador — el único <script> del documento sólo trae tema, menú y conmutador de estados — así que no se puede comprobar el bloqueo del envío ni el estado ocupado",
+  "§6.18 Diálogo modal: la pantalla no abre ningún diálogo (dialog=0, [role=dialog]=0)",
+  "Contraste de span.et «Trámites vehiculares» (1,09:1) y span.cromo-av «AR» (3,05:1) del brief: el medidor comparó contra el color rgba sin componerlo con la superficie de debajo. Compuestos dan 5,98:1 sobre --chrome y 13,5:1 sobre --surface; no los cuento como fallo de contraste. Lo que sí es hallazgo real de span.cromo-av es el tamaño de 11px, recogido en f1-43alta-11",
+  "Comportamiento por debajo de 620px: sólo se midió a 1440×900 y con las capturas del orquestador"
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [],
+  "declarados_no_usados": [
+   "--block",
+   "--block-fill",
+   "--border-fuerte",
+   "--dur-enter",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--fs-kpi",
+   "--glass",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--sp-12",
+   "--stagger",
+   "--velo-trama",
+   "--warn",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 83,
+  "n_usados": 66,
+  "n_divergentes": 15,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": true,
+   "filas": 0,
+   "nodosText3": 0
+  }
+ }
 }
