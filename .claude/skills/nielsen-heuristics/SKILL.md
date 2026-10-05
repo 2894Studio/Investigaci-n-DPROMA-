@@ -1,6 +1,6 @@
 ---
 name: nielsen-heuristics
-description: 10 foundational usability principles for evaluating and designing user interfaces
+description: Las 10 heurísticas de usabilidad de Nielsen Norman Group como marco de evaluación sistemática de interfaces. Úsalo cuando el usuario pida evaluar, revisar, diagnosticar o justificar la usabilidad de una pantalla, flujo, prototipo o interfaz, cuando pida una evaluación heurística, o cuando necesite nombrar y clasificar problemas de usabilidad con lenguaje estándar ante stakeholders. También para decidir entre varias alternativas de diseño apoyándose en principios reconocidos, y para revisar un diseño antes de llevarlo a test con usuarios. Dispara con: "evaluación heurística", "análisis heurístico", "heurísticas de Nielsen", "las 10 heurísticas", "heuristic evaluation", "Nielsen heuristics", "revisa la usabilidad", "evalúa la usabilidad de esta pantalla", "qué problemas de usabilidad tiene esto", "esto se entiende", "esto es usable", "por qué este diseño es mejor", "justifica esta decisión de diseño", "qué principio de usabilidad incumple", "usability review", "usability audit". Cubre feedback y visibilidad del estado, lenguaje del usuario frente a jerga, control y libertad (undo, cancelar, salir), consistencia y estándares, prevención de errores, reconocer en vez de recordar, atajos y eficiencia para expertos, diseño minimalista y divulgación progresiva, mensajes de error que ayudan a recuperarse, y ayuda y documentación. No es para auditar conformidad contra el sistema de diseño SIO-DPROMA (usa sio-dproma-design-audit), ni para producir o mejorar el diseño en sí (usa impeccable); esta skill diagnostica y nombra el problema, no lo implementa.
 ---
 
 # Nielsen Norman Group's 10 Usability Heuristics
@@ -92,3 +92,12 @@ Provide searchable, task-focused documentation when needed. List concrete steps 
 - Heuristic Evaluation Methodology (systematic application of these principles)
 - Cognitive Load Theory (theoretical foundation for heuristics 6, 8)
 - Progressive Disclosure Pattern (implements heuristics 6, 8)
+
+## Procedencia
+
+Origen: `lev-os/agents` → `skills-db/thinking/patterns/nielsen-heuristics/`.
+El cuerpo de la skill se mantiene igual al upstream. La única divergencia local
+es el campo `description` del frontmatter, ampliado con triggers en español e
+inglés y con los límites frente a las skills `impeccable` y
+`sio-dproma-design-audit`. Al actualizar desde upstream, conservar esa
+`description`.
