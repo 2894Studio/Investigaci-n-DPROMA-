@@ -1,0 +1,286 @@
+{
+  "pantalla": "34_instaladores",
+  "ruta_zip": "03-icev-instalacion-de-cargadores/34_instaladores.html",
+  "carpeta": "03-icev-instalacion-de-cargadores",
+  "area": "ICEV",
+  "arquetipo": "bandeja/agenda",
+  "modo": "cumplimiento",
+  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
+  "capturas": [
+    "34_instaladores--ok.png",
+    "34_instaladores--loading.png",
+    "34_instaladores--empty.png",
+    "34_instaladores--error.png",
+    "34_instaladores--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-34ins-01",
+        "severidad": "alta",
+        "regla": "§2.1 Suelo tipográfico",
+        "dice_el_sistema": "**El suelo son 12px. «Nada baja de ahí.»** Regla práctica: «si un dato se lee todos los días, va a **12–13px** como mínimo». **Única excepción admitida:** `10,5px` en mayúsculas con `letter-spacing` para **rótulos de grupo** de la barra lateral y **etiquetas de campo del modo tarjeta**.",
+        "hay_en_el_build": "`.agenda thead th{text-align:center;font-size:10.5px}`, `.vt{…font-size:10.5px…}`, `.libre{…font-size:10.5px…}`, `.bloque-cita .dur{font-size:10.5px}`, `.ciudades .et-c{font-size:10.5px}` y `.bloque-cita{font-size:11px}`.",
+        "selector": ".agenda thead th, .vt, .libre, .bloque-cita",
+        "evidencia": "Medido con getComputedStyle sobre todo el DOM visible a 1440×960, con [data-andamio] oculto: **64 nodos** con texto propio por debajo de 12px. Entre ellos las 8 cabeceras de día a 10,5px, las 9 horas de visita (`<b>08:00</b>`) a 10,5px, las 19 celdas libres «—» a 10,5px y los 4 rótulos «órdenes abiertas» a 10,5px. Ninguno es rótulo de grupo de la barra lateral ni etiqueta de modo tarjeta: la rejilla de la agenda sigue siendo una tabla de escritorio a 1440px (comprobado a 820px: `thead` sigue en `table-header-group`).",
+        "por_que_importa": "La agenda es la pantalla donde se decide a quién se le manda qué visita y qué día. Toda su información —el día, la hora, el cliente, el hueco libre— está escrita por debajo del suelo tipográfico del sistema, en la pantalla del lote que más nodos pequeños tiene."
+      },
+      {
+        "id": "f1-34ins-02",
+        "severidad": "alta",
+        "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+        "dice_el_sistema": "(8) **un control con pinta de interactivo tiene que interactuar** — sin lógica real se presenta como cifra de lectura, **sin `aria-pressed` ni cursor de puntero**.",
+        "hay_en_el_build": "Tres `.schip[data-f]` con `aria-pressed=\"false\"`, cuatro `.f` de ciudad con `aria-pressed`, y un control segmentado de tres botones «Día · Semana · Quincena» donde solo dos llevan `data-vista`: `<button type=\"button\" aria-pressed=\"false\">Quincena</button>`.",
+        "selector": ".p4-f .schip[data-f], .ciudades .f, .seg button",
+        "evidencia": "Medido en Chromium. Pulsando «Quincena»: `#ag` sigue con `data-vista=\"semana\"`, los `aria-pressed` siguen en [Día:false, Semana:true, Quincena:false] y sigue visible `.v-semana` — no existe ninguna vista de quincena en el archivo (solo `.v-semana` y `.v-dia`). Pulsando «Celaya»: los cuatro chips de ciudad siguen en [Todas:true, Querétaro:false, Celaya:false, San Juan del Río:false]. El `<script>` solo registra manejadores para `.seg [data-vista]`, el tema y el menú; nada para `[data-f]` ni para `.ciudades .f`.",
+        "por_que_importa": "Siete controles anuncian con `aria-pressed` que son conmutadores y no lo son; «Quincena» además promete un rango de fechas que no existe en ninguna parte del archivo. Quien programa la semana pulsa para acotar por ciudad y la agenda no cambia."
+      },
+      {
+        "id": "f1-34ins-03",
+        "severidad": "alta",
+        "regla": "§6.12 regla 1 — un filtro se resalta solo si su valor difiere del predeterminado",
+        "dice_el_sistema": "(1) un filtro **se resalta solo si su valor difiere del predeterminado**. (…) `[data-activo=\"true\"]{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}`. §6.21: «sin selección = valor por omisión **sin resalte**».",
+        "hay_en_el_build": "`<button class=\"f\" type=\"button\" aria-pressed=\"true\">Todas<span class=\"n\">11</span></button>` con `.f[aria-pressed=\"true\"]{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}`",
+        "selector": ".ciudades .f[aria-pressed=\"true\"]",
+        "evidencia": "«Todas» es el valor por omisión del filtro de ciudad y es el único que arranca resaltado en acento. Se ve en 34_instaladores--ok.png: el chip «Todas 11» lleva borde y fondo de acento mientras «Querétaro», «Celaya» y «San Juan del Río» van neutros.",
+        "por_que_importa": "El resalte de acento es la señal de «aquí hay algo puesto». Si lo lleva el estado por omisión, la señal deja de significar nada y no se puede saber de un vistazo si la agenda está filtrada."
+      },
+      {
+        "id": "f1-34ins-04",
+        "severidad": "alta",
+        "regla": "§1 Decisión previa a elegir color + §1.4 regla de series",
+        "dice_el_sistema": "si el dato **tiene juicio** → semáforo §1.3; si solo **distingue** una cosa de otra → paleta categórica §1.4. «**Un color de estado no se reutiliza para una categoría, ni al revés.**» §1.4: «Una serie **nunca** reutiliza un color de estado.»",
+        "hay_en_el_build": "`.carga .bar i{background:var(--serie-1)}` y `.carga .bar i.alto{background:var(--warn)}` — la misma barra cambia de la paleta categórica al semáforo según el umbral.",
+        "selector": ".carga .bar i / .carga .bar i.alto",
+        "evidencia": "Medido en el navegador: las barras de J. Olvera (4 órdenes, 66%), M. Ríos (2, 33%) y S. Elizalde (0, 0%) computan `background-color: rgb(44,108,168)` = `--serie-1`; la de R. Beltrán (5 órdenes, 83%) computa `rgb(185,138,30)` = `--warn`. Un mismo elemento gráfico se pinta desde los dos sistemas de color según su valor.",
+        "por_que_importa": "La carga de un instalador sí tiene juicio («va demasiado cargado») y por tanto es semáforo entero, no azul hasta el 80% y ámbar después. Tal como está, tres de las cuatro barras usan un color categórico para expresar un juicio y la cuarta usa un color de estado para la misma magnitud."
+      },
+      {
+        "id": "f1-34ins-05",
+        "severidad": "alta",
+        "regla": "§6.22 Ámbito de datos — los dos vacíos distintos",
+        "dice_el_sistema": "**Dos vacíos distintos:** *sin permiso* → vista vacía de §6.4 con el ámbito diciendo qué sí alcanza, **nunca un 0** («**un cero afirma que se midió**»); *conjunto vacío* → la cifra con su cero.",
+        "hay_en_el_build": "La fila de Sandra Elizalde Ruvalcaba muestra `<span class=\"n tnum\">0</span> órdenes abiertas` con su barra al 0%, mientras la banda superior de la propia pantalla explica que ese cero no significa que esté libre: «La carga se cuenta sólo sobre el trabajo que tú alcanzas a ver. Sandra Elizalde aparece con cero porque no tiene órdenes en tus plazas — puede estar llena en otra.»",
+        "selector": ".carga .n / .banda.b-info",
+        "evidencia": "Medido: la barra de S. Elizalde computa `width:0%` y el número es «0». La pantalla reconoce por escrito que es un vacío por alcance, no un conjunto vacío, y aun así pinta el cero — y además lo cuenta como filtro: `<button class=\"schip c-neutro\">1 sin carga visible</button>`.",
+        "por_que_importa": "Es el caso exacto que §6.22 prohíbe: el cero afirma que se midió y la propia pantalla tiene que desmentirlo con un párrafo de 269 caracteres. Quien reparte trabajo ve a alguien «libre» que puede estar lleno."
+      },
+      {
+        "id": "f1-34ins-06",
+        "severidad": "alta",
+        "regla": "§8 Voz de producto (ANEXO B, límites 1, 2 y 3) + §6.9",
+        "dice_el_sistema": "**`.nota` y `.banda` llevan como máximo UNA frase.** (…) **Ningún bloque de texto siempre visible pasa de ~140 caracteres.** (…) **`.nota` no es un componente de explicación general** — solo nivel 1. «si el texto explica **una decisión**, no va en pantalla».",
+        "hay_en_el_build": "Tres bandas y dos `.nota` siempre visibles. La peor: «La vista de día existe porque la de semana deja de caber. Con cuatro instaladores la semana se lee entera; pasando de ocho hay que desplazar para ver al último, y comparar entre ellos —que es lo que se hace aquí— deja de poderse. El día cabe siempre, porque las columnas son las personas de esa jornada, no las siete de la semana.»",
+        "selector": ".v-dia > .nota, .v-semana > .nota, .banda.b-warn, .banda.b-info",
+        "evidencia": "Medido con innerText.length a 1440px con [data-andamio] oculto, en la vista de semana (la que arranca): `.banda.b-warn` = 279 caracteres y 3 frases; `.banda.b-info` del cero de carga = 269 caracteres y 4 frases; `.nota` del domingo = 134 caracteres y 2 frases. La `.nota` de la vista de día, que no entra en esa medición por estar oculta, mide 329 caracteres en el markup y es íntegramente una justificación de diseño («La vista de día existe porque…»), nivel 3 de §8. La banda «Propuesta con componentes de Studio — pendiente de revisión de Studio.» (70 caracteres) habla del entregable y no lleva `data-andamio`, así que §9 no la retira en la versión real.",
+        "por_que_importa": "Antes de ver la agenda hay que leer 618 caracteres de texto permanente en tres bandas apiladas. Dos de ellas explican por qué la pantalla es como es, no qué hacer con ella, y una tercera desmiente un dato que la propia pantalla pinta (el cero de carga)."
+      },
+      {
+        "id": "f1-34ins-07",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto — valor de --text-3",
+        "dice_el_sistema": "`--text-3` **es `#5C6675`**, no el antiguo `#66717F` (que caía a 4,21:1 sobre `--surface-2`)",
+        "hay_en_el_build": "--text-3: #66717F",
+        "selector": ":root",
+        "evidencia": "brief.MEDIDO_por_el_orquestador.tokens.text_3_declarado = '#66717F'. Lo usan `.ciudades .et-c`, `.ciudades .f .n`, los rótulos «órdenes abiertas» y `.bloque-cita .dur`.",
+        "por_que_importa": "El rótulo de la dimensión de filtro y los conteos por ciudad van con esa tinta, bajo el mínimo AA cuando caen sobre superficie secundaria."
+      },
+      {
+        "id": "f1-34ins-08",
+        "severidad": "alta",
+        "regla": "§10 trampa 5 — isotipo con viewBox repetido",
+        "dice_el_sistema": "medidas en el `<use>` y **sin `viewBox` en el envoltorio**; se comprueba midiendo la caja del `<use>` contra la del `<svg>`.",
+        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> y lo mismo a 22×21 en el .fab",
+        "selector": ".side .logo svg, .fab svg",
+        "evidencia": "Medido con getBoundingClientRect: dx = -32,5px (logotipo) y dx = -16,2px (.fab). Se ve como una astilla verde en 34_instaladores--ok.png.",
+        "por_que_importa": "La marca sale recortada en todas las pantallas del módulo."
+      },
+      {
+        "id": "f1-34ins-09",
+        "severidad": "alta",
+        "regla": "§7.2 Cromo de aplicación — modo colapsado",
+        "dice_el_sistema": "En modo colapsado **el rótulo se convierte en etiqueta emergente; no desaparece**.",
+        "hay_en_el_build": "@media (min-width:860.02px) and (max-width:1100px){.side{width:64px}.side .et,.grp,.side .wordmark{display:none}} con `<a class=\"it\" href=\"#\">` sin `title` ni `aria-label`.",
+        "selector": ".side .it",
+        "evidencia": "Medido a 1000px: .side = 64px, .it .et display:none, .it title = null.",
+        "por_que_importa": "Entre 860 y 1100px la navegación queda en iconos anónimos, ni visibles ni accesibles."
+      },
+      {
+        "id": "f1-34ins-10",
+        "severidad": "media",
+        "regla": "§6.21 Barra de filtros con desplegable, buscador y selección múltiple",
+        "dice_el_sistema": "**«es el único componente para filtrar por un campo categórico con más de un valor posible»**. Única excepción legítima: chips booleanos sobre dos condiciones sí/no. (…) Panel siempre igual: buscador arriba, lista de casillas en medio, pie con la cuenta de seleccionados y un «Limpiar» acotado a esa dimensión.",
+        "hay_en_el_build": "`<div class=\"ciudades\" role=\"group\" aria-label=\"Filtrar por ciudad\">` con cuatro botones `.f` de alternancia, y ningún `.fwrap`/`.pop` en la pantalla.",
+        "selector": ".p4-f .ciudades",
+        "evidencia": "grep de 'fwrap' y 'class=\"pop\"' en el archivo → 0. «Ciudad» es un campo categórico con cuatro valores visibles (Todas, Querétaro, Celaya, San Juan del Río), no dos condiciones sí/no, así que la excepción no aplica. Tampoco hay desplegable para «instalador» ni para «tipo de contrato» (Interno/Externo), que son las otras dos dimensiones que la propia tabla muestra.",
+        "por_que_importa": "No hay forma de ver dos ciudades a la vez ni de combinar ciudad con instalador, que es lo que se necesita para redistribuir una semana. Y el componente que el sistema reserva para esto no aparece."
+      },
+      {
+        "id": "f1-34ins-11",
+        "severidad": "media",
+        "regla": "§6.12 regla 7 + §13.1 — orden fijo de las zonas",
+        "dice_el_sistema": "Orden fijo: **resumen → buscador + filtros en una sola fila → tabla** (regla 7). (…) **Son dos zonas distintas, no una fila.** (3) contadores **agrupados por criterio, con rótulo por grupo**.",
+        "hay_en_el_build": "`.p4-t` (título + resumen inline) → `.p4-b` (solo el buscador) → `.p4-f` (tres contadores de estado sin rótulo de grupo + el grupo «CIUDAD» con sus cuatro chips + el segmentado de rango) → agenda.",
+        "selector": ".p4-t / .p4-b / .p4-f",
+        "evidencia": "Leído del markup y visible en 34_instaladores--ok.png: el buscador ocupa una fila entera él solo; los contadores van debajo, no encima; y en la misma fila conviven tres cosas de naturaleza distinta (contadores de estado sin rótulo, filtro de ciudad con rótulo, y rango de la agenda), cuando regla 3 pide rótulo por grupo y regla 7 pide buscador y filtros en una sola fila.",
+        "por_que_importa": "La fila de controles mezcla «qué está mal» (sin instalador, en domingo), «qué estoy mirando» (ciudad) y «cuánto tiempo estoy mirando» (día/semana) sin separación, y el resumen de estatus queda después del buscador en vez de antes."
+      },
+      {
+        "id": "f1-34ins-12",
+        "severidad": "media",
+        "regla": "§7.3 Objetivos táctiles + §10 trampa 4",
+        "dice_el_sistema": "**Todo destino interactivo mide 24×24px como mínimo.** (…) §10 trampa 4: un `<input>` de búsqueda dentro de un `<div>` con forma de pastilla **no** cumple — el contenedor tiene que ser una `<label for=\"…\">`.",
+        "hay_en_el_build": "`<div class=\"search\"><svg …/><input id=\"buscar\" type=\"search\" aria-label=\"Buscar en la agenda\"></div>`",
+        "selector": ".search > input#buscar",
+        "evidencia": "Medido a 1440×960: el `input[type=search]` mide 329×15px. Coincide con brief.tactil_24px.por_debajo_de_24px = 1. El envoltorio es un `<div>`, no una `<label for=\"buscar\">`, así que pulsar la pastilla fuera del campo no enfoca nada: el caso literal de la trampa 4.",
+        "por_que_importa": "El buscador aparenta un destino de 40px de alto y solo acepta la pulsación en 15px."
+      },
+      {
+        "id": "f1-34ins-13",
+        "severidad": "media",
+        "regla": "§1.7 Anillo de foco — un control compuesto lleva un solo anillo",
+        "dice_el_sistema": "«si un contenedor reacciona a `:focus-within` dibujando foco, **ningún descendiente suyo dibuja foco además**».",
+        "hay_en_el_build": "`.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}` **y** `.search input:focus-visible{outline:var(--focus-w) solid var(--accent);outline-offset:var(--focus-offset)}`",
+        "selector": ".search, .search input",
+        "evidencia": "Las dos reglas conviven en la hoja del archivo; al tabular al buscador se dibujan a la vez el resalte del envoltorio y el anillo de 2px del campo. Además el envoltorio simula el foco con `box-shadow` en vez del `outline` que §1.7 fija literalmente.",
+        "por_que_importa": "Dos anillos concéntricos en el mismo control; el sistema lo prohíbe porque hace dudar de cuál es el elemento enfocado."
+      },
+      {
+        "id": "f1-34ins-14",
+        "severidad": "media",
+        "regla": "§12.4 Barra de progreso — `.progreso`",
+        "dice_el_sistema": "| Barra de progreso | `.progreso` | Avance **contra una meta declarada**. CSS, no librería (§12.1) |",
+        "hay_en_el_build": "`<span class=\"bar\"><i style=\"width:66%\"></i></span>` junto a «4 órdenes abiertas». La meta —el denominador que convierte 4 en 66%— no aparece en ninguna parte de la pantalla.",
+        "selector": ".carga .bar",
+        "evidencia": "Medido: las cuatro barras llevan width 66%, 83%, 33% y 0% para 4, 5, 2 y 0 órdenes. 4/66% implica un tope de ~6 y 5/83% también ~6, pero ese 6 no está escrito ni en el rótulo, ni en una leyenda, ni en una etiqueta emergente. El componente tampoco se llama `.progreso` ni reutiliza su receta.",
+        "por_que_importa": "La barra es la señal visual de «este instalador va cargado» y nadie puede saber cargado respecto a qué. Sin la meta declarada, el 83% no se puede interpretar ni discutir."
+      },
+      {
+        "id": "f1-34ins-15",
+        "severidad": "media",
+        "regla": "§6.7 Esqueleto de carga — barras mudas, aplanado y misma forma",
+        "dice_el_sistema": "**sin texto real dentro de las barras**; `prefers-reduced-motion` **aplana el fondo**; **Imita la forma de lo que va a llegar**: mismas columnas, mismos anchos (en `fr`) **y el mismo alto**.",
+        "hay_en_el_build": "`<span class=\"skel\" style=\"width:46%\">aviso de visitas sin asignar</span>`, `…style=\"width:100%;height:28px\">encabezado de días</span>` y tres filas de 52px; `@media (prefers-reduced-motion:reduce){.skel{animation:none}}` sin `background`.",
+        "selector": ".state-loading .skel",
+        "evidencia": "Las 6 barras del estado «cargando» llevan texto real. Medido con reducedMotion:'reduce' (mismo bloque CSS en las 5 maquetas del lote): el `.skel` conserva el `linear-gradient` con `background-size:200% 100%` congelado en `background-position: 0% 0%`, `animation-name:none` y `background-color: rgba(0,0,0,0)`. Además el esqueleto dibuja tres filas planas de 52px, mientras la agenda real es una rejilla de 4 filas × 8 columnas: no anticipa la forma de lo que llega.",
+        "por_que_importa": "Mientras carga, un lector de pantalla lee «aviso de visitas sin asignar, encabezado de días, fila de instalador» como si ya hubiera contenido, y la forma del esqueleto no se parece a la agenda que aparece después."
+      },
+      {
+        "id": "f1-34ins-16",
+        "severidad": "media",
+        "regla": "§6.5 Iconos — `.msi`",
+        "dice_el_sistema": "todo icono del sistema: Material Symbols Rounded, variante **rellena (`FILL@1`)**, carga por subconjunto con **un solo `<link>`**",
+        "hay_en_el_build": "0 ocurrencias de 'Material Symbols' y de class=\"msi\"; sprite SVG propio (`<symbol id=\"i-*\">` + `.ico`).",
+        "selector": ".ico",
+        "evidencia": "grep -c 'Material Symbols\\|class=\"msi\"' = 0 en el archivo.",
+        "por_que_importa": "Los requisitos de §6.5 no se pueden verificar contra este archivo y los iconos no coincidirán con los de una pantalla que sí los siga."
+      },
+      {
+        "id": "f1-34ins-17",
+        "severidad": "media",
+        "regla": "§1.4 Series de gráfica (paleta categórica)",
+        "dice_el_sistema": "`--serie-1` `#2a78d6` · `--serie-2` `#eb6834` · `--serie-3` `#4a3aa7` · `--serie-4` `#e87ba4`",
+        "hay_en_el_build": "--serie-1: #2C6CA8; --serie-2: #7A5FA8; sin --serie-3 ni --serie-4.",
+        "selector": ":root",
+        "evidencia": "Leído del bloque :root y confirmado en la medición de `.carga .bar i` (rgb(44,108,168) = #2C6CA8, no #2a78d6).",
+        "por_que_importa": "Las comprobaciones de separación cromática de §1.4 están calculadas sobre los hex publicados y dejan de ser válidas con otros valores."
+      },
+      {
+        "id": "f1-34ins-18",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado — regla 1",
+        "dice_el_sistema": "(1) el cambio **se anuncia (`aria-live=\"polite\"`) y mueve el foco**",
+        "hay_en_el_build": "El JS cambia `data-state` en <main> y `data-vista` en `#ag`; no hay `aria-live` en el documento ni ninguna llamada a focus().",
+        "selector": "main#contenido, #ag[data-vista]",
+        "evidencia": "grep de 'aria-live' en el archivo → 0 ocurrencias (el ariaLive:1 del brief es el `role=\"status\"` del esqueleto). El cambio Día↔Semana sí funciona pero reemplaza toda la región de contenido sin anunciarlo ni mover el foco.",
+        "por_que_importa": "El conmutador Día/Semana es el único control que sí funciona en la pantalla, y cambia la tabla entera sin que un lector de pantalla se entere; el foco se queda en el botón mientras debajo hay otra agenda."
+      },
+      {
+        "id": "f1-34ins-19",
+        "severidad": "baja",
+        "regla": "§7.3 — la regla táctil lleva `:root`",
+        "dice_el_sistema": "**El `:root` es lo que hace ganar la regla** (…) **Se comprueba midiendo con `data-tacto=\"dedo\"` puesto**.",
+        "hay_en_el_build": "Las 6 reglas de modo dedo escritas sin `:root`.",
+        "selector": "[data-tacto=\"dedo\"] .it, .iconbtn, .btn, .seg button",
+        "evidencia": "Medido con data-tacto=\"dedo\" puesto: .it = 46px ×3, .iconbtn = 46px ×3, .btn = 46px, .seg button = 46px ×3. La pantalla no dibuja `.acciones .iconbtn` (0 elementos), así que la regla gana igual. Nota: los enlaces `.vt` de la rejilla de agenda no los cubre ningún bloque de modo dedo.",
+        "por_que_importa": "Bug latente: hoy funciona porque falta la variante de 28px que lo rompe; al añadirla dejará de aplicarse sin aviso."
+      },
+      {
+        "id": "f1-34ins-20",
+        "severidad": "baja",
+        "regla": "§6.9 Avisos — nomenclatura de las variantes de `.banda`",
+        "dice_el_sistema": "Cuatro variantes: `.banda-info`, `.banda-warn`, `.banda-err`, `.banda-ok`.",
+        "hay_en_el_build": "class=\"banda b-info\" y class=\"banda b-warn\"; `.b-warn{background:var(--warn-bg);color:var(--warn-ink)}`.",
+        "selector": ".banda.b-info, .banda.b-warn",
+        "evidencia": "Los valores de token son los correctos; solo diverge el nombre del modificador.",
+        "por_que_importa": "Buscar el componente por su nombre documentado no lo encuentra; la divergencia está en las 52 maquetas."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 1,
+      "rendimiento": "no_evaluado",
+      "theming": 2,
+      "responsive": 2,
+      "integridad": 1
+    },
+    "justificacion": "Accesibilidad 1: 64 nodos de texto por debajo del suelo de 12px —la agenda entera, día, hora, cliente y hueco libre, está escrita a 10,5px—, buscador de 15px dentro de un `<div>` en vez de `<label for>`, doble anillo de foco en ese buscador, cromo colapsado sin rótulos, ningún `aria-live` y un cambio de vista (Día↔Semana) que reemplaza toda la región sin anunciarse. Lo que sostiene el 1 en vez de 0 es sólido y poco habitual: las dos tablas llevan `<caption>`, las 16 filas llevan `<th scope=\"row\">`, todas las celdas llevan `data-et`, hay skip link, h1, 5 landmarks, anillo de foco canónico y la excepción correcta del cromo. Theming 2: dos temas resueltos y 0 fallos de contraste medidos, pero `--text-3` obsoleto, series fuera de §1.4 y una barra que mezcla paleta categórica y semáforo. Responsive 2: la rejilla de agenda no entra en el modo tarjeta de §6.11 (medido a 820px: `thead` sigue en `table-header-group`, sin `::before`) y resuelve el estrechamiento con desplazamiento horizontal, lo que §6.11 regla 5 admite pero deja la pantalla fuera del patrón documentado; súmese el cromo colapsado. Integridad 1: siete controles declaran `aria-pressed` y no hacen nada, «Quincena» promete una vista que no existe en el archivo, el filtro por omisión arranca resaltado, y la pantalla pinta un cero de carga que ella misma desmiente en un párrafo.",
+    "evidencia": [
+      "getComputedStyle: 64 nodos con texto propio < 12px, de ellos 8 cabeceras de día, 9 horas de visita y 19 celdas «—» a 10,5px.",
+      "Pulsando «Quincena»: #ag sigue en data-vista='semana', aria-pressed sin cambios, .v-semana sigue visible y .v-dia oculta. Pulsando «Celaya»: los cuatro chips de ciudad siguen en [Todas:true, resto:false].",
+      ".carga .bar i computa rgb(44,108,168) = --serie-1 en tres barras y rgb(185,138,30) = --warn en la cuarta.",
+      "Barra de S. Elizalde: width:0% con el número «0», mientras la banda superior explica que el cero es por alcance, no por conjunto vacío.",
+      "innerText.length: .banda.b-warn = 279 caracteres / 3 frases; .banda.b-info = 269 / 4 frases; .nota = 134 / 2 frases.",
+      "A 820px la agenda conserva thead table-header-group y resuelve con scroll horizontal; a 1000px .side = 64px con .it title = null.",
+      "34_instaladores--oscuro.png y brief.contraste.fallos_oscuro = 0."
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+  },
+  "cobertura": [
+    {
+      "patron": "**Rejilla de agenda semanal (persona × día) y rejilla de jornada (hora × persona).** La pantalla inventa un calendario completo que el sistema no documenta en ninguna parte: `.agenda table` con una fila por instalador y una columna por día, celdas `.cel` que contienen o un enlace de visita `.vt` (hora en negrita + cliente) o un hueco `.libre` («—»); y una segunda rejilla `.dia-caja` con una fila por hora, una columna por persona y un `.bloque-cita` con cliente, sucursal y duración. El sistema solo tiene §6.11 (tabla densa de registros) y §12.4 (piezas de dashboard); ninguna de las dos describe una rejilla de tiempo. Consecuencia medible: todo el componente cae fuera del suelo tipográfico (10,5–11px), fuera del modo tarjeta de §6.11 y sin regla de destino táctil para sus celdas. **No es culpa de la maqueta: es un hueco de nuestra fuente de verdad.**",
+      "propuesta_de_regla": "§6.24 **Rejilla de agenda — `.agenda` (semana) y `.jornada` (día)**. *Cuándo:* comparar la ocupación de varias personas o recursos a lo largo del tiempo. No es una tabla densa de registros (§6.11): el dato de cada celda es «hay o no hay», y la comparación se hace entre filas, no dentro de una fila. *Estructura:* `<table>` con `<caption>`, el eje de entidades en `<th scope=\"row\">` y el eje de tiempo en `<th scope=\"col\">`, para que el lector de pantalla pueda nombrar las dos coordenadas de cada cita. La semana va a siete columnas con el eje de entidades fijo (`position:sticky;left:0`); la jornada va a una fila por hora. *Valores:* la cita es un destino de 24px mínimo (§7.3, 44px si la agenda se usa en campo), con la hora a `var(--fs-dense)` y el cliente a `var(--fs-meta)` — **ningún texto de la rejilla baja de 12px: la excepción de 10,5px de §2.1 no alcanza a una agenda**, que es dato de lectura diaria. El hueco vacío se escribe con un carácter y un texto solo para lectores («sin visitas»), nunca con un guion mudo. *Responsive:* la rejilla **no pasa a modo tarjeta** —convertir un calendario en tarjetas destruye la comparación, que es su única razón de ser—: se conserva la rejilla con desplazamiento horizontal y el eje de entidades fijo, y por debajo del punto de ruptura de la tabla (860px) la vista por omisión pasa a jornada. *A11y:* el cambio de rango se anuncia (`aria-live=\"polite\"`) y mueve el foco, como cualquier cambio de vista (§6.4)."
+    },
+    {
+      "patron": "**Día no laborable marcado en la rejilla.** La columna del domingo se pinta con `--pause-bg` (`.agenda th.dom-col,.agenda td.dom-col{background:var(--pause-bg)}`) y una visita que caiga ahí se pinta en ámbar (`.vt.domingo{border-left-color:var(--warn);background:var(--warn-bg);color:var(--warn-ink)}`). La elección de tokens es defendible —`--pause` es «inactivo, no es un fallo» y `--warn` es «falta algo»— pero el sistema no tiene ninguna regla sobre cómo se marca el calendario laborable, así que hoy es una interpretación de la maqueta.",
+      "propuesta_de_regla": "§1.3 / §6.24 — añadir: «**Calendario laborable.** Un tramo no laborable es una condición del calendario, no un juicio sobre el trabajo: su fondo va en `--pause-bg` y nunca en `--warn-bg` ni en `--err-bg`. Lo que sí es un juicio es *programar trabajo en él*: esa cita concreta se marca con el semáforo, y la marca se acompaña siempre de texto —no basta el color (§6.10)—. El calendario laborable es un dato del sistema, no una constante del componente: se declara en un sitio y la rejilla lo lee, para que una plaza con sábado laborable no obligue a tocar el CSS.»"
+    },
+    {
+      "patron": "**Visita sin instalador colocada en la fila de un instalador.** La visita «10:00 · Sin instalador» del miércoles está dibujada dentro de la fila cuyo `<th scope=\"row\">` dice «Mauricio Ríos Cantú». Para un lector de pantalla esa celda se anuncia como «Mauricio Ríos Cantú, miércoles 26, sin instalador», que es una contradicción; visualmente parece que M. Ríos tiene una visita, y su barra de carga dice 2 órdenes. La agenda no tiene dónde poner lo que aún no está asignado.",
+      "propuesta_de_regla": "§6.24 — añadir: «**La fila de lo no asignado.** Toda rejilla de agenda reserva una fila (o columna) propia, la primera, para el trabajo que todavía no tiene responsable, rotulada «Sin asignar» y con su conteo. Lo pendiente de asignar no se cuelga de nadie: colocarlo en la fila de una persona le atribuye trabajo que no tiene y rompe la correspondencia entre el encabezado de fila y su contenido, que es lo único que hace legible la rejilla con lector de pantalla.»"
+    },
+    {
+      "patron": "**Control segmentado de rango temporal (Día · Semana · Quincena).** El sistema usa `.seg` para la densidad de una tabla (§6.11 regla 6) y no documenta ningún control de rango de fechas. Aquí el mismo componente cambia el alcance temporal de los datos, que es una operación de otra naturaleza: no cambia cómo se ve lo mismo, cambia qué se muestra.",
+      "propuesta_de_regla": "§6.12 / §6.24 — añadir: «**Rango de una agenda.** El rango temporal no es densidad: cambia el conjunto de datos, así que no comparte componente con `.seg` de densidad. Va en su propio control segmentado, rotulado con el rango concreto que está mostrando («24 – 30 ago 2026») y no solo con su nombre, y con navegación anterior/siguiente al lado. Como todo cambio de conjunto, se anuncia (`aria-live`) y mueve el foco (§6.4). Un rango que la pantalla no sepa dibujar no se ofrece: un botón de rango sin vista detrás es el caso de §6.12 regla 8.»"
+    },
+    {
+      "patron": "**Barra de carga por persona (`.carga` + `.bar`).** El sistema tiene `.barra` (reparto de un total entre estados del semáforo) y `.progreso` (avance contra una meta declarada), pero no una barra que exprese «cuánto trabajo lleva encima esta persona» con un tope implícito. Aquí el tope (≈6 órdenes) no está escrito en ninguna parte, y el relleno mezcla paleta categórica y semáforo (hallazgo f1-34ins-04).",
+      "propuesta_de_regla": "§12.4 — añadir fila a la tabla de piezas: «| Barra de carga | `.carga` | Cuánto ocupa una entidad respecto a su capacidad. **La capacidad se declara junto a la barra, en texto** («4 de 6 órdenes»), nunca solo como porcentaje: sin denominador escrito, un 83% no se puede interpretar. El relleno es **de un solo sistema de color de principio a fin**: como la carga tiene juicio, es semáforo (§1.3) en toda su escala, nunca categórico por debajo de un umbral y semáforo por encima. Si la capacidad no se conoce, no hay barra: va la cifra sola.»"
+    },
+    {
+      "patron": "Toda la interacción de producto es inerte salvo una excepción. El primer `<script>` solo conmuta `.v-dia`/`.v-semana` desde los dos botones con `data-vista`; el segundo maneja el andamio de demo (`data-set`), el tema y el menú. Los tres contadores de estado, los cuatro chips de ciudad, el botón «Quincena», el buscador, las nueve visitas `.vt`, «Programar visita» y «Exportar» no tienen ningún manejador. Lo digo una sola vez para toda la pantalla: no es un hallazgo por control. Lo que sí registro aparte (f1-34ins-02) es que siete de esos controles declaran `aria-pressed`, que es lo que §6.12 regla 8 prohíbe.",
+      "propuesta_de_regla": "§9 (andamiaje) — añadir: «En una maqueta, todo control de producto sin lógica detrás se declara una sola vez dentro del bloque `data-andamio`, y mientras no la tenga no lleva `aria-pressed`, `aria-current` ni `cursor:pointer`. Caso agravado: un control que ofrece una opción para la que no existe vista en el archivo (un tercer rango, una columna adicional) no se dibuja, porque no hay forma de que alguien distinga “todavía no está conectado” de “está roto”.»"
+    },
+    {
+      "patron": "El archivo declara `--text-3-fuerte: #5D6774` con el comentario «defecto de tanda 2: se citaba sin definir». Es un token que el sistema no tiene, y su valor está a un dígito del `--text-3` canónico (#5C6675): es el valor correcto de `--text-3` añadido con otro nombre en vez de corregir el token original. En la misma línea, `--focus-w: 2px` y `--focus-offset: 2px` están declarados y usados correctamente aquí, pero el documento los marca como «no documentado».",
+      "propuesta_de_regla": "§1.1 — «No se crea un token paralelo para arreglar el valor de otro: si un token publicado tiene mal el valor, se corrige el token.» §1.7 — publicar los dos valores que faltan: «`--focus-w` = 2px, `--focus-offset` = 2px, iguales en los dos temas, con la única excepción del color dentro del cromo (§1.5).»"
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática, sin backend que perfilar.",
+    "f2_tokens: lo inyecta el orquestador desde la medición mecánica; no se escribe aquí.",
+    "§6.11 regla 3 (`aria-sort`): brief.estructura.thAriaSort = 0 con th = 25, y las dos únicas apariciones de `aria-sort` en el archivo están en el CSS. No lo registro como incumplimiento porque ninguna columna de las dos rejillas es ordenable —los ejes son días y horas— y la regla se aplica a columnas ordenables. Si se añadiera orden por carga en la columna «Instalador y carga», pasaría a aplicar.",
+    "§6.13 barra de selección: la agenda no tiene selección múltiple (0 casillas), así que `.barra-sel` no se ejerce.",
+    "§6.18 diálogo modal: no hay diálogo (0 `<dialog>` y 0 `div[role=dialog]`); programar una visita desde la agenda sería el caso natural, pero el botón es inerte y no abre nada.",
+    "§6.16 formulario: no es el arquetipo de esta pantalla; el único control de captura es el buscador.",
+    "§6.17 subida de archivo: no hay ningún punto que pida un adjunto (0 `input[type=file]`), así que la regla no se ejerce.",
+    "§6.11 modo tarjeta por debajo de 860px: medido a 820px, la rejilla de agenda **no** entra en modo tarjeta (`thead` sigue en `table-header-group`, `tbody tr` en `table-row` y `td::before` en `none`) porque va envuelta en `.agenda` y no en `.tabla-caja`. Resuelve con desplazamiento horizontal, que §6.11 regla 5 admite. No lo cuento como incumplimiento sino como cobertura: el sistema no dice qué debe hacer un calendario al estrecharse, y convertirlo en tarjetas destruiría la comparación."
+  ]
+}
