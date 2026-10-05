@@ -1,0 +1,206 @@
+{
+  "pantalla": "33_cfe_detalle",
+  "ruta_zip": "04-tramites-vehiculares-y-cfe/33_cfe_detalle.html",
+  "carpeta": "04-tramites-vehiculares-y-cfe",
+  "area": "admin vehicular",
+  "arquetipo": "detalle",
+  "modo": "cumplimiento",
+  "estados_auditados": ["ok", "loading", "empty", "error", "oscuro"],
+  "capturas": [
+    "33_cfe_detalle--ok.png",
+    "33_cfe_detalle--loading.png",
+    "33_cfe_detalle--empty.png",
+    "33_cfe_detalle--error.png",
+    "33_cfe_detalle--oscuro.png"
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "f1-33cfe-01",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto — valor de --text-3",
+        "dice_el_sistema": "`--text-3` **es `#5C6675`**, no el antiguo `#66717F` (que caía a 4,21:1 sobre `--surface-2`)",
+        "hay_en_el_build": "--text-3: #66717F (tema claro, :root del propio archivo)",
+        "selector": ":root",
+        "evidencia": "brief.MEDIDO_por_el_orquestador.tokens.text_3_declarado = '#66717F'; leído también en el bloque :root del archivo. La pantalla usa --surface-2 en cabeceras de tarjeta y en .explica, donde ese valor cae a 4,21:1 (hecho ya establecido para 51 de 52 maquetas).",
+        "por_que_importa": "Toda la tinta auxiliar (el .resumen del título, los pies de bitácora) queda por debajo del mínimo AA de 4,5:1 cuando cae sobre superficie secundaria. Es el fallo de contraste más repetido del conjunto."
+      },
+      {
+        "id": "f1-33cfe-02",
+        "severidad": "alta",
+        "regla": "§10 trampa 5 — isotipo con viewBox repetido",
+        "dice_el_sistema": "Correcto: `<svg width=\"44\" height=\"42\" aria-hidden=\"true\"><use href=\"#dproma-mark\" width=\"44\" height=\"42\"/></svg>` — medidas en el `<use>` y sin `viewBox` en el envoltorio. (…) Se comprueba midiendo la caja del `<use>` contra la del `<svg>`: si el desplazamiento no es ~0, está mal.",
+        "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg> — y el mismo patrón en el botón flotante: <svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\">",
+        "selector": ".side .logo svg, .fab svg",
+        "evidencia": "Medido con getBoundingClientRect en Chromium a 1440px: el <use> del logotipo sale desplazado dx = -32,5px respecto a su <svg> de 44px; el del .fab, dx = -16,2px sobre 22px. En 33_cfe_detalle--ok.png la marca se ve como una astilla verde vertical.",
+        "por_que_importa": "La marca de la empresa aparece recortada en todas las pantallas del módulo. Es el elemento más visible del cromo y el único identificador gráfico del producto."
+      },
+      {
+        "id": "f1-33cfe-03",
+        "severidad": "alta",
+        "regla": "§2.1 Suelo tipográfico",
+        "dice_el_sistema": "**El suelo son 12px. «Nada baja de ahí.»** (…) **Única excepción admitida:** `10,5px` en mayúsculas con `letter-spacing` para **rótulos de grupo** de la barra lateral y **etiquetas de campo del modo tarjeta**.",
+        "hay_en_el_build": "37 elementos con texto propio por debajo de 12px computados: span.et (etiqueta de campo de la ficha) a 10,5px ×13; span.origen a 10,5px ×3; span.cuando / span.quien / span.cfe-sem a 11px ×10; el párrafo de cierre de Observaciones a 11,5px.",
+        "selector": ".campos .et, .origen, .cuando, .quien, .cfe-sem",
+        "evidencia": "Medido con getComputedStyle sobre todo el DOM visible, con [data-andamio] oculto, a 1440×960. Total 37 nodos < 12px; el más repetido es .et a 10,5px (13 ocurrencias). Ninguno de ellos es rótulo de grupo de la barra lateral ni etiqueta de modo tarjeta: son los rótulos de campo de una ficha de escritorio.",
+        "por_que_importa": "Las etiquetas que dicen qué es cada dato de la ficha (CLIENTE, OBRA, NÚMERO DE SERVICIO) y las fechas de la bitácora son datos que se leen todos los días; el sistema fija 12–13px como mínimo precisamente para ese caso."
+      },
+      {
+        "id": "f1-33cfe-04",
+        "severidad": "alta",
+        "regla": "§7.3 Objetivos táctiles",
+        "dice_el_sistema": "**Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8).** (…) Enlaces que son el elemento primario de su fila (folio, miga, «Ver en Maps»): **no son texto en prosa, llevan padding hasta llegar a 24px**.",
+        "hay_en_el_build": ".lnk sin padding (`.lnk{color:var(--link);font-weight:600;text-decoration:none;border-radius:4px}`); la miga tampoco lo lleva.",
+        "selector": ".lnk, .migas a",
+        "evidencia": "Medido a 1440×960: 6 enlaces por debajo de 24px de alto — la miga «Trámites CFE» 87,9×14; ORD-202608-0421 133,3×15; solicitud-factibilidad.pdf 180×15; unifilar-v2.pdf 104,8×15; croquis.pdf 83×15; acuse-12ago.pdf 122×15. Coincide con brief.tactil_24px.por_debajo_de_24px = 6.",
+        "por_que_importa": "El enlace a la orden ligada y los cinco documentos del expediente son las salidas principales de la ficha, y todas tienen 15px de alto útil: con ratón impreciso o con temblor la pulsación falla."
+      },
+      {
+        "id": "f1-33cfe-05",
+        "severidad": "alta",
+        "regla": "§7.2 Cromo de aplicación — modo colapsado",
+        "dice_el_sistema": "**Tres anchos:** completa **≥1100px**, colapsada a solo iconos **860–1100px**, cajón con velo **<860px**. En modo colapsado **el rótulo se convierte en etiqueta emergente; no desaparece**.",
+        "hay_en_el_build": "@media (min-width:860.02px) and (max-width:1100px){.side .et,.grp,.side .wordmark{display:none}} y los ítems son `<a class=\"it\" href=\"#\">` sin `title` ni `aria-label`.",
+        "selector": ".side .it",
+        "evidencia": "Medido a 1000px de ancho: .side = 64px, getComputedStyle('.it .et').display = 'none', y .it.getAttribute('title') = null. No hay atributo de reemplazo de ningún tipo.",
+        "por_que_importa": "Entre 860 y 1100px —el portátil de oficina— la navegación completa queda reducida a catorce iconos sin nombre, ni visible ni accesible. No hay forma de saber a dónde lleva cada uno."
+      },
+      {
+        "id": "f1-33cfe-06",
+        "severidad": "media",
+        "regla": "§6.10 Etiqueta de estado `.pill` y de clasificación `.p-type` + §1 decisión previa a elegir color",
+        "dice_el_sistema": "«Un color de estado no se reutiliza para una categoría, ni al revés.» (…) **todas las de una familia se ven como una familia** — «o las tres llevan punto, o ninguna».",
+        "hay_en_el_build": ".o-cfe{background:var(--err-bg);color:var(--err-ink)} y .o-rhl{background:color-mix(in srgb,var(--serie-2) 18%,var(--surface));color:var(--text-2)}",
+        "selector": ".origen.o-cfe / .origen.o-rhl",
+        "evidencia": "Medido: .o-cfe computa color rgb(176,58,49) sobre rgb(244,232,231) — es el semáforo --err-ink/--err-bg; .o-rhl computa color rgb(76,90,107) sobre color(srgb .890 .877 .932) — es la paleta categórica. Visible en 33_cfe_detalle--ok.png: la insignia CFE es roja y la RHL lila.",
+        "por_que_importa": "El origen de una observación es una clasificación («de quién viene»), no un juicio. Pintar una mitad de la familia con el semáforo hace leer «CFE» como un error, y deja a los dos miembros de la misma familia en dos sistemas de color distintos."
+      },
+      {
+        "id": "f1-33cfe-07",
+        "severidad": "media",
+        "regla": "§6.20 Ficha de detalle — `.cab`, `.idt`, indicador lateral",
+        "dice_el_sistema": "Abre con **bloque de identidad** (folio, nombre del expediente, marcas de estado) y a su derecha **el indicador que decide la urgencia**. (…) **el indicador de la derecha declara su ancho; no se queda con lo que sobre** (rejilla, no `flex`).",
+        "hay_en_el_build": "No existe `.cab` ni `.idt` en el archivo (0 ocurrencias). La identidad va en `.p4-t{display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap}` y el indicador de urgencia («CFE va tarde · 4 d») vive dentro de la cabecera de la primera tarjeta.",
+        "selector": ".p4-t / .tarjeta > header > .cfe-sem",
+        "evidencia": "grep de 'class=\"cab\"|class=\"idt\"' → 0. En 33_cfe_detalle--ok.png el semáforo «CFE va tarde · 4 d» aparece junto al título «Datos del trámite», no como columna derecha. El cuerpo usa .dosc{grid-template-columns:1.6fr 1fr} sin minmax, así que la columna derecha tampoco declara piso ni techo (§13.2 pide `minmax(300px,360px)` para ese caso).",
+        "por_que_importa": "El dato que decide si hay que actuar hoy queda escondido dentro de una tarjeta en vez de en el sitio fijo que la ficha reserva para él, y su ancho depende de lo que sobre, así que cambia de tamaño según el contenido de la izquierda."
+      },
+      {
+        "id": "f1-33cfe-08",
+        "severidad": "media",
+        "regla": "§6.7 Esqueleto de carga — barras mudas y aplanado bajo prefers-reduced-motion",
+        "dice_el_sistema": "`role=\"status\"` + `aria-label` en el contenedor y **sin texto real dentro de las barras** (`color:transparent` sigue en el árbol de accesibilidad). `prefers-reduced-motion` **aplana el fondo**, no solo detiene la animación.",
+        "hay_en_el_build": "<span class=\"skel\" style=\"width:32%\">Datos del trámite</span> … y @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin `background`.",
+        "selector": ".state-loading .skel",
+        "evidencia": "Las doce barras del estado «cargando» llevan texto real. Medido con reducedMotion:'reduce': backgroundImage sigue siendo el linear-gradient, background-size 200% 100%, background-position 0% 0%, animation-name 'none' y background-color rgba(0,0,0,0) — el degradado queda congelado en la posición 0, exactamente el fallo que §6.7 describe.",
+        "por_que_importa": "Un lector de pantalla lee «Datos del trámite, cliente y obra, número de servicio…» como si ya hubiera contenido, y quien pide movimiento reducido ve una barra con un degradado fijo a medias en vez de una superficie plana."
+      },
+      {
+        "id": "f1-33cfe-09",
+        "severidad": "media",
+        "regla": "§8 Voz de producto (ANEXO B, límites 1 y 2) + §6.9",
+        "dice_el_sistema": "**Ningún bloque de texto siempre visible pasa de ~140 caracteres.** «Se mide con el contador de caracteres, no a ojo.» (…) **`.nota` y `.banda` llevan como máximo UNA frase.** (…) «si el texto explica **una decisión**, no va en pantalla».",
+        "hay_en_el_build": "Párrafo de cierre de Observaciones: «El origen de cada observación se enseña siempre, y no es decoración. Una de CFE es un requisito de la dependencia y bloquea el avance. Una de RHL es una nota interna. Tratarlas igual convertiría una obligación externa en un comentario.» · .explica: «Este semáforo mide a la dependencia. «CFE va tarde» significa que CFE pasó la fecha que ella misma se dio, no que nosotros vayamos retrasados.» · banda superior: «Propuesta TRAZO con componentes de Studio — pendiente de revisión de Studio.»",
+        "selector": ".interior > p[style], .explica, .banda.b-info.aviso-trazo",
+        "evidencia": "Medido con innerText.length a 1440px, con [data-andamio] oculto: el párrafo de cierre = 235 caracteres y 4 frases (y además a 11,5px); .explica = 142 caracteres y 2 frases; .sin-resp = 141 caracteres y 2 frases. La banda superior (76 caracteres) se refiere al propio entregable y no lleva `data-andamio`, así que §9 no la retira en la versión real.",
+        "por_que_importa": "Son tres bloques de texto permanente que explican por qué se diseñó la pantalla así. Ocupan tanto como la propia ficha y empujan la bitácora fuera de la primera pantalla."
+      },
+      {
+        "id": "f1-33cfe-10",
+        "severidad": "media",
+        "regla": "§6.5 Iconos — `.msi`",
+        "dice_el_sistema": "**Cuándo:** todo icono del sistema. Material Symbols Rounded, variante **rellena (`FILL@1`)**. (…) **Carga por subconjunto**, con **un solo `<link>`**",
+        "hay_en_el_build": "0 ocurrencias de 'Material Symbols' y 0 de class=\"msi\". Todos los iconos son un sprite SVG propio inyectado en el documento (`<symbol id=\"i-*\">` + `<svg class=\"ico\"><use href=\"#i-…\"/></svg>`).",
+        "selector": ".ico / symbol#i-*",
+        "evidencia": "grep -c 'Material Symbols\\|class=\"msi\"' = 0 en el archivo. El `<defs>` del documento declara 38 `<symbol id=\"i-…\">` propios.",
+        "por_que_importa": "El sistema de iconos documentado (nombres, cuatro ejes `opsz,wght,FILL,GRAD@24,500,1,0`, regeneración de `icon_names`) no se puede verificar ni mantener contra esta maqueta, y los iconos no se parecerán a los de las pantallas que sí lo sigan."
+      },
+      {
+        "id": "f1-33cfe-11",
+        "severidad": "media",
+        "regla": "§1.4 Series de gráfica (paleta categórica)",
+        "dice_el_sistema": "`--serie-1` azul `#2a78d6` · `--serie-2` naranja `#eb6834` · `--serie-3` violeta `#4a3aa7` · `--serie-4` magenta `#e87ba4`. «se asignan en **orden fijo y no se ciclan**»",
+        "hay_en_el_build": "--serie-1: #2C6CA8; --serie-2: #7A5FA8; — y no se declaran --serie-3 ni --serie-4.",
+        "selector": ":root",
+        "evidencia": "Leído del bloque :root del archivo. #2C6CA8 no es #2a78d6, y #7A5FA8 es un violeta ocupando la ranura que el sistema reserva al naranja. La paleta categórica se usa aquí en .o-rhl vía color-mix(--serie-2).",
+        "por_que_importa": "Las comprobaciones de separación de §1.4 (ΔE 15, pares 1–4 y 1–3) están calculadas sobre los hex publicados; con otros valores no sirven, y dos pantallas distintas pintarán la misma categoría de dos colores."
+      },
+      {
+        "id": "f1-33cfe-12",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado — regla 1",
+        "dice_el_sistema": "(1) el cambio **se anuncia (`aria-live=\"polite\"`) y mueve el foco**",
+        "hay_en_el_build": "El único JS del archivo cambia `data-state` en <main> desde los botones de andamiaje; no hay `aria-live` en ninguna parte del documento ni ninguna llamada a `.focus()` sobre `main`.",
+        "selector": "main#contenido[data-vista]",
+        "evidencia": "grep de 'aria-live' en el archivo → 0 ocurrencias (lo que el brief cuenta como ariaLive:1 es el `role=\"status\"` del esqueleto). El <main> sí lleva `tabindex=\"-1\"`, pero nada lo enfoca.",
+        "por_que_importa": "Al pasar de «cargando» a «con datos» o a «error», quien usa lector de pantalla no se entera de que la pantalla cambió y el foco se queda donde estaba. Nota: el conmutador de estados es andamiaje, pero el mecanismo de anuncio y foco es del producto y aquí no existe en ninguna forma."
+      },
+      {
+        "id": "f1-33cfe-13",
+        "severidad": "baja",
+        "regla": "§7.3 — la regla táctil lleva `:root`",
+        "dice_el_sistema": "**El `:root` es lo que hace ganar la regla**: con `:root` suma (0,3,0); sin él (0,2,0) y lo empata cualquier variante de tamaño del componente. **Se comprueba midiendo con `data-tacto=\"dedo\"` puesto**.",
+        "hay_en_el_build": "[data-tacto=\"dedo\"] .it{...}, [data-tacto=\"dedo\"] .iconbtn{...}, [data-tacto=\"dedo\"] .btn{...} — las 6 reglas sin `:root`.",
+        "selector": "[data-tacto=\"dedo\"] .it, .iconbtn, .btn, .cromo-prof, .cromo-av, .seg button",
+        "evidencia": "Medido poniendo data-tacto=\"dedo\" en <html> a 1440×960: .it = 46/46/46px, .iconbtn = 46/46px, .btn = 46px en los cuatro botones. Esta pantalla no dibuja `.acciones .iconbtn` (0 elementos), que es la variante de 28px que empataría la especificidad, así que la regla gana igual.",
+        "por_que_importa": "El bug es latente, no activo: funciona hoy porque la pantalla no tiene la variante que lo rompe. En cuanto se añada una fila de acciones densa, el modo dedo dejará de aplicarse sin aviso."
+      },
+      {
+        "id": "f1-33cfe-14",
+        "severidad": "baja",
+        "regla": "§6.9 Avisos — nomenclatura de las cuatro variantes de `.banda`",
+        "dice_el_sistema": "Cuatro variantes: `.banda-info` (`--surface-2`/`--text-2`/`--border`), `.banda-warn` (`--warn-bg`/`--warn-ink`), `.banda-err`, `.banda-ok`.",
+        "hay_en_el_build": "class=\"banda b-info\" y .b-info{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}",
+        "selector": ".banda.b-info",
+        "evidencia": "Los valores son los correctos; solo cambia el nombre del modificador (`b-info` en vez de `banda-info`).",
+        "por_que_importa": "Funciona, pero una búsqueda por el nombre documentado no encuentra el componente, y la divergencia se propaga a las 52 maquetas."
+      }
+    ]
+  },
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 1,
+      "rendimiento": "no_evaluado",
+      "theming": 2,
+      "responsive": 2,
+      "integridad": 2
+    },
+    "justificacion": "Accesibilidad 1: 37 nodos de texto por debajo del suelo de 12px, seis enlaces primarios a 15px de alto, la barra lateral pierde todos sus rótulos entre 860 y 1100px sin `title`, y no hay `aria-live` ni movimiento de foco en los cambios de vista. Lo que sí está bien y sostiene el 1 en vez de 0: skip link, `lang=\"es-MX\"`, h1 único, 8 landmarks, anillo de foco canónico (`outline:var(--focus-w) solid var(--accent)` con `--focus-w:2px` y `--focus-offset:2px` declarados) y la excepción correcta del cromo (`.side :focus-visible{outline-color:var(--chrome-focus)}`). Theming 2: los dos temas se resuelven y el oscuro está medido sin fallos de contraste, pero `--text-3` arrastra el valor obsoleto y `--serie-1`/`--serie-2` no son los del sistema. Responsive 2: `.dosc` colapsa limpiamente a una columna a 1180px, pero el cromo colapsado deja la navegación sin nombres. Integridad 2: ninguna acción hace nada (ver cobertura), el esqueleto lleva texto dentro de las barras y no aplana bajo movimiento reducido, y el isotipo se pinta recortado con el error exacto de §10 trampa 5.",
+    "evidencia": [
+      "getComputedStyle sobre todo el DOM visible a 1440×960: 37 nodos con texto propio < 12px (13 de ellos a 10,5px en .campos .et).",
+      "getBoundingClientRect: 6 enlaces < 24px de alto (14–15px).",
+      "A 1000px: .side = 64px, .it .et display:none, title = null.",
+      "Con reducedMotion:'reduce': .skel conserva background-image linear-gradient con background-position 0% 0% y background-color transparente.",
+      "33_cfe_detalle--oscuro.png y brief.contraste.fallos_oscuro = 0."
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+  },
+  "cobertura": [
+    {
+      "patron": "Toda la interacción de producto es inerte. El único <script> del archivo maneja el andamio de demo (conmutador de estados `data-set`), el botón de tema y el cajón del menú. Los tres botones de la cabecera de ficha (Exportar PDF, Subir documento, Responder observación), el botón «Responder» de la observación abierta y los seis enlaces a documentos no tienen ningún manejador. Lo digo una sola vez para toda la pantalla: no es un hallazgo por control.",
+      "propuesta_de_regla": "§9 (andamiaje) — añadir: «En una maqueta, todo control de producto que no tenga lógica detrás se rotula como tal. Si la maqueta quiere enseñar la forma del control sin su comportamiento, el control se presenta en reposo y la pantalla declara una sola vez, dentro del bloque `data-andamio`, qué acciones están sin conectar. Lo que no se admite es un control con `aria-pressed`, cursor de puntero o aspecto de botón primario que, al pulsarse, no cambie nada: §6.12 regla 8 ya lo prohíbe para los contadores de filtro y aquí se generaliza a cualquier acción.»"
+    },
+    {
+      "patron": "El archivo declara `--text-3-fuerte: #5D6774` con el comentario «defecto de tanda 2: se citaba sin definir». Es un token que el sistema no tiene, y su valor (#5D6774) está a un dígito del `--text-3` canónico (#5C6675): en la práctica es el valor correcto de `--text-3` añadido con otro nombre en vez de corregir el token original.",
+      "propuesta_de_regla": "§1.1 — añadir: «No se crea un token paralelo para arreglar el valor de otro. Si un token publicado tiene mal el valor, se corrige el token; un nombre nuevo (`--text-3-fuerte`) deja los dos conviviendo y multiplica la tinta auxiliar por dos. Antes de añadir un token a la tabla, se comprueba que el que ya existe no sea el mismo con otro valor.»"
+    },
+    {
+      "patron": "`--focus-w: 2px` y `--focus-offset: 2px` están declarados y usados correctamente en la maqueta, pero el documento los marca como «no documentado». La maqueta es hoy la única fuente de esos dos valores.",
+      "propuesta_de_regla": "§1.7 — publicar los dos valores en la tabla de tokens: «`--focus-w` = 2px, `--focus-offset` = 2px. El anillo de foco mide 2px y se separa 2px del control; son los mismos en los dos temas y la única excepción es el color dentro del cromo (§1.5).»"
+    }
+  ],
+  "sin_datos": [
+    "f3.rendimiento: maqueta estática, sin backend que perfilar.",
+    "f2_tokens: lo inyecta el orquestador desde la medición mecánica; no se escribe aquí.",
+    "§6.17 subida de archivo: la ficha lista documentos ya entregados como enlaces y ofrece un botón «Subir documento» que no abre nada; no hay ningún `<input type=\"text\">` pidiendo un adjunto, así que §6.17 no llega a incumplirse ni a cumplirse en esta pantalla (0 `input[type=file]` en el archivo).",
+    "§6.18 diálogo modal: no hay ningún diálogo en la pantalla (0 `<dialog>` y 0 `div[role=dialog]`), así que la regla no se ejerce.",
+    "§6.11 tabla densa: la pantalla no tiene tablas (brief.estructura.tablas = 0).",
+    "brief.contraste.detalle_claro: el único fallo que reporta el brief (span.origen, 2,97:1 sobre «rgb(1,1,1)») es un artefacto de medición: el fondo real de `.o-rhl` es `color-mix(in srgb,var(--serie-2) 18%,var(--surface))`, que Chromium computa como `color(srgb 0.890039 0.877412 0.932157)` = rgb(227,224,238). Recalculado sobre ese fondo con el texto en `--text-2` rgb(76,90,107), el ratio real es ≈5,1:1 y pasa AA. Lo que sí falla en ese elemento es el tamaño (10,5px, hallazgo f1-33cfe-03) y el sistema de color (f1-33cfe-06)."
+  ]
+}
