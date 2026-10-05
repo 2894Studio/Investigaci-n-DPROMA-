@@ -1193,6 +1193,14 @@ thead th:first-child{z-index:7}
     del texto — un identificador verde sugiere falsamente que es un enlace distinto al resto de
     la fila, cuando toda la fila se comporta igual. El folio va en `--text`, igual que el resto
     de la celda.
+11. **Si la fila entera navega, nada más dentro de ella repite esa acción.** Un botón «Ver
+    detalle» o un ícono de flecha al final de la fila, al lado de un folio que ya navega, son dos
+    formas de hacer lo mismo — la segunda no añade alcance, solo ruido visual y una pregunta sin
+    responder (¿hacen cosas distintas?). La fila entera es clicable (`cursor:pointer`, `tabindex`,
+    `Enter` navega) y es la única entrada; un botón se queda solo si hace algo que la fila no hace
+    (`Aprobar`, `Rechazar`). Caso real: Viáticos y Cuentas por cobrar tenían el folio/nombre como
+    `<a>` **y además** un botón «Ver detalle»/«Ver agencias» con ícono de flecha — se quitó el
+    botón, el folio pasó a texto plano (regla 10) y la fila completa absorbió la navegación.
 
 **Modo tarjeta por debajo de 860px.** La tabla pasa a lista de tarjetas; cada celda muestra su
 rótulo desde `data-et`:
@@ -2532,3 +2540,17 @@ Caso real: en Viático detalle, la columna principal (Solicitud + Comprobantes) 
 de diferencia por casualidad. Con `stretch` en el contenedor y `flex:1` en la última tarjeta de la
 barra lateral, los dos `bottom` quedan en el mismo pixel, siempre, sin importar cuánto crezca o
 encoja el contenido de cada lado.
+
+**Esta regla tiene un límite, y pasarlo produce un defecto peor que el que resuelve.** El
+mecanismo reparte el espacio sobrante en el último bloque de la columna corta — y eso solo se ve
+bien cuando ese espacio es invisible: el *padding* al final de una lista, el margen debajo de una
+tabla. Si la columna corta cierra con una tarjeta de contenido estructurado (una tabla, un
+formulario) y la diferencia real es grande, `flex:1` no rellena con aire — deja un rectángulo en
+blanco del tamaño de la diferencia, dentro del borde de la tarjeta, sin nada que lo explique: se
+lee como una tarjeta rota, no como dos columnas alineadas. Caso real que lo probó al revés: en
+Autorización de compra, "Partidas" (una tabla) cerraba ~155px antes que "Traza de la decisión"
+(una bitácora) — mecánicamente el mismo caso que Viático detalle, pero el resultado fue un bloque
+vacío notorio, no un cierre limpio. Se revirtió a `align-items:start`. **Antes de aplicar 13.8,
+comprobar las dos condiciones a la vez: la diferencia es chica (unos pocos píxeles, no decenas) y
+el relleno sobrante cae en un elemento donde el espacio extra no se nota.** Si falta cualquiera de
+las dos, el desnivel natural se queda — es menos defecto que el rectángulo vacío.
