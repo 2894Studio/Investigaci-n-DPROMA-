@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.13.2
-last_updated: 2026-09-30
+version: 2.13.3
+last_updated: 2026-10-05
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -1195,6 +1195,11 @@ thead th:first-child{z-index:7}
     (migas, «Ver en Maps»). Dentro de una tabla la fila entera es la zona pulsable, y lo indica
     el fondo al pasar el cursor, no el color del texto. El folio va en `--text`, igual que el
     resto de la celda.
+11. **Si la fila entera navega, nada más dentro de ella repite esa acción.** Un botón «Ver
+    detalle» o un ícono de flecha junto a un folio que ya navega son dos formas de hacer lo
+    mismo — la fila es la única entrada; un botón se queda solo si hace algo que la fila no hace
+    (Aprobar, Rechazar). Caso real: Viáticos y Cuentas por cobrar tenían folio-como-link **y**
+    botón «Ver detalle»; se quitó el botón y la fila completa absorbió la navegación.
 
 **Modo tarjeta por debajo de 860px.** La tabla pasa a lista de tarjetas; cada celda muestra su
 rótulo desde `data-et`:
@@ -2466,6 +2471,15 @@ que el cierre sea por construcción, no por longitud de contenido. Caso real: Vi
 columna principal y barra lateral no se comparan, medían a ~3px por casualidad; con `stretch` +
 `flex:1` los dos `bottom` quedan en el mismo pixel, siempre.
 
+**Límite de la regla.** El mecanismo reparte el sobrante en el último bloque de la columna corta
+— se ve bien solo si ese espacio es invisible (padding al final de una lista). Si la columna
+corta cierra con contenido estructurado (una tabla) y la diferencia es grande, `flex:1` deja un
+rectángulo en blanco notorio, no un cierre limpio. Caso real al revés: en Autorización de compra,
+"Partidas" (tabla) cerraba ~155px antes que "Traza de la decisión" — mismo mecanismo que Viático
+detalle, pero el resultado fue un bloque vacío visible. Se revirtió a `align-items:start`. Aplicar
+13.8 solo si las dos condiciones se cumplen a la vez: diferencia chica (pocos píxeles) y el
+relleno cae donde no se nota. Si falta una, el desnivel natural es menos defecto que el vacío.
+
 ---
 
 ## Historial de cambios
@@ -2502,3 +2516,4 @@ columna principal y barra lateral no se comparan, medían a ~3px por casualidad;
 | 2.13.0 | 2026-09-30 | §8 (voz de producto) gana una corrección final: el criterio de tres niveles seguía dejando pasar texto porque era un juicio, no un límite. Ahora `.nota`/`.banda` llevan como máximo una frase, bajo ~140 caracteres, y solo cuando bloquean la acción inmediata — cualquier segunda oración, o cualquier texto que aclare/eduque/cite un documento, se borra o pasa a un toggletip (§6.23). `.nota` deja de ser un componente de explicación general. §11 gana el paso de releer cada `.nota`/`.banda` nueva contra estas reglas antes de dar la pantalla por terminada, en vez de encontrarlo en una auditoría posterior. §10 gana la décima trampa: un nombre de clase corto (`.resumen`, `.nota`, `.f`…) no se declara dos veces en el mismo archivo ni se comparte entre componentes sin relación — encontrado auditando Padrón, donde rompió en silencio el encabezado. §6.21 fija que es el único componente para filtrar por un campo categórico con más de un valor, salvo condiciones booleanas (chip, no desplegable); Padrón queda señalado como deuda pendiente de migrar. |
 | 2.13.2 | 2026-09-30 | Corrige la deuda que la 2.13.0 dejó señalada: Padrón de clientes migra sus cuatro botones de un solo valor (Tipo, Estado, Documentos, Actividad) al componente estándar de §6.21 — desplegable con buscador, casillas de selección múltiple y pastillas removibles con tope de cuatro, mismo motor que ya usan Trámites vehiculares y Viáticos. Mismos cuatro campos, sin cambio de alcance; ahora con filtrado real sobre las filas de la tabla. §6.21 y este historial actualizan la nota de deuda a migrado. §6.9 gana una aclaración: antes de escribir una clase nueva para un aviso de ancho completo, se verifica si `.banda` + variante ya lo cubre — Autorización de compra había declarado `.bloqueado`, idéntico en estructura y propósito a `.banda.b-info`, sin buscar primero si ya existía. |
 | 2.11.1 | 2026-09-29 | Cuatro reglas salidas de revisar Viáticos, Viático detalle, Cuentas por cobrar, Padrón de clientes y Editar cliente contra el sistema. §6.11 (tabla densa) gana la regla 10: el identificador de fila (folio) no lleva color de enlace — va en `--text`, porque `--link` es para navegación fuera de tabla y la fila entera, no el texto verde, es la zona pulsable. §6.12 gana la regla 9: la razón de un estado no vive como texto libre en la celda — va al detalle del registro. §8 (voz de producto) endurece su criterio a tres niveles: lo que bloquea una acción ahora se queda visible en una frase, lo que aclara una consecuencia sin bloquear nada pasa a un toggletip (§6.23) sobre el control relacionado, y el racional de diseño o la educación sobre un caso que no aplica al registro visible no va en la interfaz. Y se aprueba §13 Composición y grid, con sus ocho reglas —de la proporción de columna al orden lectura → control → objeto—, validadas contra pantallas reales; deja de estar marcada como borrador. 13.4 (comparar exige igualar) y 13.8 (cierre garantizado, no por casualidad) quedan como dos reglas separadas, con mecanismos distintos para dos preguntas distintas. |
+| 2.13.3 | 2026-10-05 | Auditoría de cierre: se contrastó cada criterio de corrección usado en sesión contra lo que el sistema deja escrito, y se encontraron dos huecos reales. §6.11 gana la regla 11 — si la fila entera navega, ningún botón ni ícono dentro de ella repite esa acción (Viáticos y Cuentas por cobrar tenían folio-link **y** botón «Ver detalle» a la vez; se quitó el botón). §13.8 (cierre garantizado) gana su límite: el mecanismo solo se ve bien cuando el relleno sobrante cae en espacio invisible (el final de una lista) — si la columna corta cierra con contenido estructurado (una tabla) y la diferencia es grande, `flex:1` deja un rectángulo vacío notorio en vez de un cierre limpio. Caso real al revés de Viático detalle: en Autorización de compra el mismo mecanismo, aplicado a una diferencia de ~155px sobre una tabla, produjo justo ese rectángulo; se revirtió a `align-items:start`. Las demás correcciones de la sesión (voz de producto, folio, semáforo, `.banda` vs. clase nueva, filtros §6.21) ya estaban cubiertas — se verificó, no se repitió. |
