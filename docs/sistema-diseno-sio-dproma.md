@@ -2567,3 +2567,51 @@ vacío notorio, no un cierre limpio. Se revirtió a `align-items:start`. **Antes
 comprobar las dos condiciones a la vez: la diferencia es chica (unos pocos píxeles, no decenas) y
 el relleno sobrante cae en un elemento donde el espacio extra no se nota.** Si falta cualquiera de
 las dos, el desnivel natural se queda — es menos defecto que el rectángulo vacío.
+
+### 13.9 Un alto que viene del dato, no del contenido, necesita un plan de contenido
+
+13.3 y 13.6 cubren el contenedor cuyo tamaño lo decide el *layout* y que no se lo cede a su
+contenido. Hay un tercer caso, distinto de los dos: un bloque cuyo alto lo decide un **dato
+externo** — una duración, una magnitud, una proporción — y no el contenido que ese bloque aloja
+ni el espacio que el layout tendría disponible. Ahí no aplica "que el contenedor crezca": crecer
+rompería lo que el alto representa (una barra de 30 minutos que mide lo mismo que una de una hora
+deja de comunicar la duración). El contenido tiene que poder **reducirse** en vez de desbordar o
+aplastarse, con un orden de prioridad explícito de qué se retira primero.
+
+Dos fallas que produce no planearlo, encontradas en el calendario de instalaciones (vista
+semana, bloques de evento con alto = duración × escala de px/minuto):
+
+- **La más visible: `overflow:hidden` recorta el contenido a medias.** El bloque reserva un alto
+  fijo por duración y el contenido (hora, cliente, instalador, estado) necesita más alto del que
+  esa duración da — con `overflow:hidden` sin mecanismo de ajuste, el texto se corta a mitad de
+  línea en vez de mostrarse completo o retirarse limpio.
+- **La más engañosa, y la que de verdad rompió el calendario: no hace falta que nada desborde
+  para que el contenido se vea roto.** Con `display:flex;flex-direction:column` y alto fijo, el
+  valor por omisión de cada hijo es `flex-shrink:1` — si la suma de los altos naturales de las
+  líneas no cabe, el navegador no desborda, **encoge cada línea por debajo de su propio
+  `line-height`**, y el texto se renderiza superpuesto consigo mismo, ilegible, sin que
+  `scrollHeight > clientHeight` lo detecte (porque, tras encogerse, ya "cabe"). Se agrava si una
+  de esas líneas ya lleva su propio `overflow:hidden` para truncar con elipsis (`.cli`, `.dir`
+  en este caso): el tamaño mínimo automático de un ítem flex es el de su contenido *solo si* su
+  `overflow` es `visible` — en cuanto deja de serlo, ese mínimo pasa a 0, y nada impide que
+  `flex-shrink` lo aplaste hasta el tamaño que haga falta.
+
+**El mecanismo correcto, en dos partes:**
+
+1. `flex-shrink:0` en cada línea de contenido del bloque. Sin esto el síntoma ni siquiera se
+   puede medir: el navegador prefiere aplastar antes que desbordar, y un bloque aplastado no
+   dispara ningún cálculo de `scrollHeight`.
+2. Con el encogido desactivado, el desborde real sí es medible (`scrollHeight > clientHeight`)
+   — y se resuelve retirando líneas completas en orden de prioridad (la de menos relevancia
+   primero) hasta que el contenido quepa, nunca recortando una línea a la mitad. Es la misma
+   lógica que §6.11 regla 7 ("una celda no lleva un párrafo": si no cabe, se retira, no se
+   aplana) aplicada a un bloque de alto variable en vez de a una fila de tabla fija. La
+   información retirada no desaparece: sigue en el `aria-label`/`title` del bloque y en el
+   diálogo de detalle al que ya abre un clic.
+
+Un detalle de orden de ejecución que también costó diagnosticar: el ajuste tiene que correr
+**después** de que el bloque y sus contenedores ancestros estén insertados en el documento, no
+en el momento de crearlo. Medido antes de esa inserción, el subárbol puede no tener todavía el
+ancho real del layout final, y `clientHeight`/`scrollHeight` devuelven valores que no corresponden
+al resultado visible — el ajuste "corre" pero no retira nada, porque mide un estado que el
+navegador va a descartar en el siguiente reflow.
