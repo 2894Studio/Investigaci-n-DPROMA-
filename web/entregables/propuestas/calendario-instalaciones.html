@@ -396,11 +396,17 @@ main[data-state="loading"] .state-loading{display:flex}
   background:var(--surface);box-shadow:var(--sh-rest);padding:5px 7px;overflow:hidden;cursor:pointer;
   display:flex;flex-direction:column;gap:2px;text-align:left}
 .cal-evt:hover{box-shadow:var(--sh-float);border-color:var(--border-fuerte)}
-.cal-evt .hr{font-size:11px;font-weight:700;color:var(--text-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+/* flex-shrink:0 en cada línea: sin esto, cuando la duración (alto) no alcanza para las 4 líneas,
+   el eje principal (columna) las encoge por omisión en vez de desbordar — y como .cli/.dir ya
+   llevan su propio overflow:hidden, su mínimo automático es 0 y se comprimen hasta solaparse
+   (texto ilegible), no se recortan limpiamente. Con flex-shrink:0 cada línea conserva su alto
+   real; si no caben todas, ajustaClipEvt() retira líneas completas en vez de aplastarlas. */
+.cal-evt .hr{font-size:11px;font-weight:700;color:var(--text-2);font-variant-numeric:tabular-nums;
+  white-space:nowrap;flex-shrink:0}
 .cal-evt .cli{font-size:var(--fs-meta);font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;
-  white-space:nowrap;line-height:1.2}
-.cal-evt .dir{font-size:11px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cal-evt .pill{padding:1px 6px;font-size:10.5px;align-self:flex-start}
+  white-space:nowrap;line-height:1.2;flex-shrink:0}
+.cal-evt .dir{font-size:11px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.cal-evt .pill{padding:1px 6px;font-size:10.5px;align-self:flex-start;flex-shrink:0}
 .cal-evt[data-estado="ok"]{border-left:3px solid var(--ok)}
 .cal-evt[data-estado="warn"]{border-left:3px solid var(--warn)}
 .cal-evt[data-estado="block"]{border-left:3px solid var(--block)}
@@ -436,15 +442,16 @@ main[data-state="loading"] .state-loading{display:flex}
 .cal-mes-grid{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(6,1fr);
   grid-auto-rows:minmax(108px,1fr)}
 .cal-mes-dia{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:var(--sp-1);
-  display:flex;flex-direction:column;gap:3px;min-width:0;cursor:pointer;background:var(--surface)}
+  display:flex;flex-direction:column;gap:3px;min-width:0;cursor:pointer;background:transparent}
 .cal-mes-dia:hover{background:var(--surface-2)}
 .cal-mes-dia:nth-child(6n){border-right:0}
-.cal-mes-dia[data-fuera="true"]{background:var(--bg);color:var(--text-3)}
-.cal-mes-dia[data-fuera="true"]:hover{background:var(--surface-2)}
+.cal-mes-dia[data-fuera="true"]{background:var(--surface-2);color:var(--text-3)}
+.cal-mes-dia[data-fuera="true"]:hover{background:var(--surface)}
 .cal-mes-dia .nn{font-size:var(--fs-meta);font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;
   padding:2px 4px;align-self:flex-start;border-radius:999px;min-width:22px;text-align:center}
 .cal-mes-dia[data-fuera="true"] .nn{color:var(--text-3)}
-.cal-mes-dia[data-hoy="true"] .nn{background:var(--accent);color:var(--accent-ink)}
+.cal-mes-dia[data-hoy="true"] .nn{background:var(--accent);color:var(--accent-ink);
+  width:22px;height:22px;padding:0;display:inline-flex;align-items:center;justify-content:center}
 .cal-mes-chip{display:flex;align-items:center;gap:4px;border-radius:4px;padding:1px 5px;font-size:10.5px;
   font-weight:600;color:var(--text);background:var(--surface-2);overflow:hidden;text-overflow:ellipsis;
   white-space:nowrap;border:0;cursor:pointer;width:100%;text-align:left}
@@ -584,11 +591,11 @@ dialog.modal > footer{display:flex;align-items:center;justify-content:flex-end;g
 </div>
 <div class="p4-b">
 <div class="cal-nav">
+<button type="button" class="hoy" id="cal-hoy" aria-label="Ir a hoy">Hoy</button>
 <div class="cal-nav-btns">
 <button type="button" id="cal-prev" aria-label="Periodo anterior"><svg class="ico ico-sm" aria-hidden="true" translate="no"><use href="#m-chevron_left"/></svg></button>
 <button type="button" id="cal-next" aria-label="Periodo siguiente"><svg class="ico ico-sm" aria-hidden="true" translate="no"><use href="#m-chevron_right"/></svg></button>
 </div>
-<button type="button" class="hoy" id="cal-hoy">Hoy</button>
 <span class="cal-rango tnum" id="cal-rango" aria-live="polite"></span>
 </div>
 </div>
@@ -974,6 +981,19 @@ document.querySelectorAll('#seg-vista button').forEach(function(b){
   });
 });
 
+/* ── Igual que §6.11 regla 7 ("una celda no lleva un párrafo"): cuando la duración de la
+   instalación no da alto suficiente para las 4 líneas de la tarjeta, se retira contenido
+   completo en orden de relevancia (instalador → estado en texto → hora) en vez de recortarlo
+   a medias con overflow:hidden. El cliente permanece siempre visible; el color del borde
+   izquierdo (data-estado) y el aria-label/title ya cargan la información retirada. ── */
+function ajustaClipEvt(box){
+  var orden=['.dir','.pill','.hr'];
+  for(var i=0;i<orden.length && box.scrollHeight>box.clientHeight+1;i++){
+    var el=box.querySelector(orden[i]);
+    if(el) el.hidden=true;
+  }
+}
+
 /* ── Render: vista semana (línea de tiempo, ≥860px) ── */
 function renderSemanaAncha(cont,lun){
   var wrap=document.createElement('div'); wrap.className='cal-semana';
@@ -982,7 +1002,7 @@ function renderSemanaAncha(cont,lun){
   for(var i=0;i<6;i++){
     var d=sumaDias(lun,i), iso=aISO(d), esHoy=(iso===aISO(hoy));
     var c=document.createElement('div'); c.className='cal-dia-cab'; c.setAttribute('data-hoy',String(esHoy));
-    c.innerHTML='<div class="nd">'+DIAS_SEM_ABR[i]+'</div><div class="nn tnum">'+d.getDate()+'</div>';
+    c.innerHTML='<div class="nd">'+DIAS_SEM_ABR[i]+'</div><div class="nn tnum">'+d.getDate()+(esHoy?'<span class="sr"> — hoy</span>':'')+'</div>';
     cab.appendChild(c);
   }
   wrap.appendChild(cab);
@@ -1009,8 +1029,10 @@ function renderSemanaAncha(cont,lun){
       box.setAttribute('data-estado',e.estado);
       box.style.top=top+'px'; box.style.height=Math.max(h2-3,26)+'px';
       var est=ESTADOS[e.estado];
-      box.innerHTML='<span class="hr">'+horaLegible(e.h,e.d)+'</span><span class="cli">'+e.cli+'</span><span class="dir">'+e.inst+'</span><span class="pill '+est.pill+'">'+est.t+'</span>';
-      box.setAttribute('aria-label',e.cli+', '+horaLegible(e.h,e.d)+', '+est.t+', instalador '+e.inst);
+      var horaTxt=horaLegible(e.h,e.d);
+      box.innerHTML='<span class="hr">'+horaTxt+'</span><span class="cli">'+e.cli+'</span><span class="dir">'+e.inst+'</span><span class="pill '+est.pill+'">'+est.t+'</span>';
+      box.title=e.cli+' · '+horaTxt+' · '+est.t+' · Instalador: '+e.inst;
+      box.setAttribute('aria-label',e.cli+', '+horaTxt+', '+est.t+', instalador '+e.inst);
       box.addEventListener('click',function(ev){ return function(){ abreDetalle(ev,box); }; }(e));
       col.appendChild(box);
     });
@@ -1019,6 +1041,10 @@ function renderSemanaAncha(cont,lun){
   cuerpoWrap.appendChild(cuerpo);
   wrap.appendChild(cuerpoWrap);
   cont.appendChild(wrap);
+  /* El ajuste corre hasta aquí, con wrap ya insertado en el documento: antes de esto el
+     subárbol (col/cuerpo) no tenía ancho real todavía y clientHeight/scrollHeight no eran
+     fiables para decidir qué línea retirar. */
+  wrap.querySelectorAll('.cal-evt').forEach(ajustaClipEvt);
 }
 
 /* ── Render: vista semana en lista (<860px) ── */
@@ -1070,8 +1096,8 @@ function renderMes(cont){
       celda.setAttribute('data-fuera',String(fuera));
       celda.setAttribute('data-hoy',String(esHoy));
       var evs=eventosDelDia(iso);
-      celda.setAttribute('aria-label',d.getDate()+' de '+MESES[d.getMonth()]+', '+evs.length+(evs.length===1?' instalación':' instalaciones'));
-      var html='<span class="nn tnum">'+d.getDate()+'</span>';
+      celda.setAttribute('aria-label',d.getDate()+' de '+MESES[d.getMonth()]+(esHoy?' (hoy)':'')+', '+evs.length+(evs.length===1?' instalación':' instalaciones'));
+      var html='<span class="nn tnum">'+d.getDate()+(esHoy?'<span class="sr"> — hoy</span>':'')+'</span>';
       var muestra=evs.slice(0,3);
       muestra.forEach(function(e){
         var est=ESTADOS[e.estado];

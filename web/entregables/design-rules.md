@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.13.4
+version: 2.14.0
 last_updated: 2026-10-09
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -2488,6 +2488,34 @@ detalle, pero el resultado fue un bloque vacío visible. Se revirtió a `align-i
 13.8 solo si las dos condiciones se cumplen a la vez: diferencia chica (pocos píxeles) y el
 relleno cae donde no se nota. Si falta una, el desnivel natural es menos defecto que el vacío.
 
+### 13.9 Un alto que viene del dato, no del contenido, necesita un plan de contenido
+
+Distinta de 13.3/13.6: ahí el contenedor no le cede su tamaño al contenido porque el *layout*
+ya se lo dio. Aquí el alto lo fija un **dato externo** (una duración, una magnitud) y no el
+layout ni el contenido — así que el contenedor no puede crecer para acomodar texto sin dejar de
+representar correctamente ese dato (una barra de 30 min que mide igual que una de 1h miente).
+El contenido tiene que poder reducirse, con un orden explícito de qué se retira primero.
+
+Caso real: los bloques de evento del calendario de instalaciones (alto = duración × px/minuto).
+Dos fallas, no una:
+
+- `overflow:hidden` sin plan de reducción corta el texto a media línea cuando la duración no da
+  alto suficiente para las 4 líneas (hora, cliente, instalador, estado).
+- La falla más engañosa: con `flex-direction:column` y alto fijo, el valor por omisión de cada
+  hijo flex es `flex-shrink:1` — si el contenido no cabe, el navegador no desborda, **encoge cada
+  línea por debajo de su `line-height`** y el texto se renderiza superpuesto consigo mismo. Ni
+  siquiera se detecta con `scrollHeight > clientHeight`, porque ya "cabe" tras encogerse. Se
+  agrava si esa línea ya lleva su propio `overflow:hidden` para truncar con elipsis: ahí su
+  mínimo automático como ítem flex deja de ser el de su contenido y pasa a 0, así que nada frena
+  el aplastamiento.
+
+Mecanismo: `flex-shrink:0` en cada línea (para que el desborde sea medible en vez de aplastado),
+y al medir desborde real, retirar líneas completas en orden de prioridad hasta que quepa — misma
+lógica que §6.11 regla 7 ("una celda no lleva un párrafo") aplicada a un bloque de alto variable.
+La información retirada sigue en el `aria-label`/`title` y en el detalle a un clic. Y el ajuste
+tiene que correr después de insertar el bloque en el documento: medido antes, con el subárbol
+sin su ancho final, el cálculo no refleja el resultado visible y no retira nada.
+
 ---
 
 ## Historial de cambios
@@ -2526,3 +2554,4 @@ relleno cae donde no se nota. Si falta una, el desnivel natural es menos defecto
 | 2.11.1 | 2026-09-29 | Cuatro reglas salidas de revisar Viáticos, Viático detalle, Cuentas por cobrar, Padrón de clientes y Editar cliente contra el sistema. §6.11 (tabla densa) gana la regla 10: el identificador de fila (folio) no lleva color de enlace — va en `--text`, porque `--link` es para navegación fuera de tabla y la fila entera, no el texto verde, es la zona pulsable. §6.12 gana la regla 9: la razón de un estado no vive como texto libre en la celda — va al detalle del registro. §8 (voz de producto) endurece su criterio a tres niveles: lo que bloquea una acción ahora se queda visible en una frase, lo que aclara una consecuencia sin bloquear nada pasa a un toggletip (§6.23) sobre el control relacionado, y el racional de diseño o la educación sobre un caso que no aplica al registro visible no va en la interfaz. Y se aprueba §13 Composición y grid, con sus ocho reglas —de la proporción de columna al orden lectura → control → objeto—, validadas contra pantallas reales; deja de estar marcada como borrador. 13.4 (comparar exige igualar) y 13.8 (cierre garantizado, no por casualidad) quedan como dos reglas separadas, con mecanismos distintos para dos preguntas distintas. |
 | 2.13.3 | 2026-10-05 | Auditoría de cierre: se contrastó cada criterio de corrección usado en sesión contra lo que el sistema deja escrito, y se encontraron dos huecos reales. §6.11 gana la regla 11 — si la fila entera navega, ningún botón ni ícono dentro de ella repite esa acción (Viáticos y Cuentas por cobrar tenían folio-link **y** botón «Ver detalle» a la vez; se quitó el botón). §13.8 (cierre garantizado) gana su límite: el mecanismo solo se ve bien cuando el relleno sobrante cae en espacio invisible (el final de una lista) — si la columna corta cierra con contenido estructurado (una tabla) y la diferencia es grande, `flex:1` deja un rectángulo vacío notorio en vez de un cierre limpio. Caso real al revés de Viático detalle: en Autorización de compra el mismo mecanismo, aplicado a una diferencia de ~155px sobre una tabla, produjo justo ese rectángulo; se revirtió a `align-items:start`. Las demás correcciones de la sesión (voz de producto, folio, semáforo, `.banda` vs. clase nueva, filtros §6.21) ya estaban cubiertas — se verificó, no se repitió. |
 | 2.13.4 | 2026-10-09 | Bug real reportado por el cliente: el ícono del botón verde en un estado vacío (Cuentas por cobrar, "Marca A no tiene saldo por cobrar") salía gris en vez de blanco, sin contraste contra el fondo. Causa: `.state .ico{color:var(--text-3)}` es un selector descendiente que alcanza también a los íconos pequeños de los botones dentro de `.acc`, aplastando el color que heredaban de `.btn.p`. Mismo bug activo en Viáticos, Viático detalle, Cuentas por cobrar y Autorización de compra — las cuatro copiaron el bloque `ARQ-ESTADOS` con el selector descendiente; Administración Vehicular ya tenía el fix (`.state > .ico`, hijo directo) desde el principio. Corregido en las cuatro pantallas. §6.4 gana la regla 6, documentando el selector correcto y el caso real. |
+| 2.14.0 | 2026-10-09 | Añade §13.9: un bloque cuyo alto lo fija un dato externo (una duración, no el contenido ni el layout) necesita un plan explícito de qué línea de contenido se retira primero si no cabe — crecer el contenedor falsearía el dato que ese alto representa. A partir del calendario de instalaciones: sus bloques de evento recortaban texto a media línea con `overflow:hidden`, y en los casos más ajustados el contenido ni desbordaba — se aplastaba por `flex-shrink:1`, el valor por omisión en un hijo de `flex-direction:column`, hasta quedar ilegible sin disparar ningún indicador de desborde. |
