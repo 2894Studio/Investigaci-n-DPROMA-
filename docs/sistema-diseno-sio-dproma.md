@@ -791,7 +791,7 @@ no existe.
 siendo texto en `--text-3`, el gris más apagado del sistema, a 30px. Las cuatro maquetas del
 padrón llegaron así pese a que este apartado ya lo prescribía.
 
-**Cuatro reglas que no son opcionales:**
+**Seis reglas que no son opcionales:**
 
 1. **El cambio se anuncia y mueve el foco.** Sin esto, quien usa lector de pantalla no se entera
    de que la pantalla cambió. Las tres maquetas del padrón llegaron sin un solo `aria-live`, con
@@ -836,6 +836,19 @@ padrón llegaron así pese a que este apartado ya lo prescribía.
    **Y tiene salida.** Pasados unos segundos sin respuesta se pasa al estado de error, con su
    reintento y su vuelta al acceso. Sin eso nadie distingue «tarda» de «se colgó», y la única
    salida que queda es recargar.
+
+6. **`.state .ico` apunta solo al ícono grande, nunca a los de sus botones.** `.state`
+   lleva `.acc` con botones `.btn`/`.btn.p` que traen su propio ícono pequeño (`.ico.ico-sm`) —
+   y un selector descendiente (`.state .ico{color:var(--text-3)}`) los alcanza a todos por
+   igual, aplastando el `color` heredado del botón con el gris apagado del ícono de estado. El
+   resultado: el ícono del botón verde (`.btn.p`, texto `--accent-ink`, blanco) sale gris en vez
+   de blanco — mismo texto, ícono distinto, contraste roto contra el fondo verde. El selector
+   correcto es `.state > .ico` (hijo directo): solo alcanza al ícono que cuelga directo de
+   `.state`, nunca a los anidados dentro de `.acc`. Caso real: Administración Vehicular ya lo
+   tenía bien (hijo directo) desde el principio; Viáticos, Viático detalle, Cuentas por cobrar y
+   Autorización de compra copiaron el bloque `ARQ-ESTADOS` con el selector descendiente y
+   arrastraron el bug en las cuatro — mismo patrón que la trampa 10 (§10), pero rompiendo
+   contraste de ícono en vez de nombre de clase.
 
 ### 6.5 Iconos (`.msi`)
 
