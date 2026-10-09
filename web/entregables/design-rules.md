@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.13.3
-last_updated: 2026-10-05
+version: 2.13.4
+last_updated: 2026-10-09
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -798,7 +798,7 @@ no existe.
 siendo texto en `--text-3`, el gris más apagado del sistema, a 30px. Las cuatro maquetas del
 padrón llegaron así pese a que este apartado ya lo prescribía.
 
-**Cuatro reglas que no son opcionales:**
+**Seis reglas que no son opcionales:**
 
 1. **El cambio se anuncia y mueve el foco.** Sin esto, quien usa lector de pantalla no se entera
    de que la pantalla cambió. Las tres maquetas del padrón llegaron sin un solo `aria-live`, con
@@ -843,6 +843,14 @@ padrón llegaron así pese a que este apartado ya lo prescribía.
    **Y tiene salida.** Pasados unos segundos sin respuesta se pasa al estado de error, con su
    reintento y su vuelta al acceso. Sin eso nadie distingue «tarda» de «se colgó», y la única
    salida que queda es recargar.
+
+6. **`.state .ico` apunta solo al ícono grande, nunca a los de sus botones.** `.state` lleva
+   `.acc` con botones que traen su propio ícono pequeño — un selector descendiente
+   (`.state .ico{color:var(--text-3)}`) los alcanza a todos, aplastando el color heredado del
+   botón. El ícono del botón verde sale gris en vez de blanco: mismo texto, ícono con contraste
+   roto. Selector correcto: `.state > .ico` (hijo directo). Caso real: Viáticos, Viático
+   detalle, Cuentas por cobrar y Autorización de compra copiaron el selector descendiente;
+   Administración Vehicular ya tenía el hijo directo.
 
 ### 6.5 Iconos (`.msi`)
 
@@ -2517,3 +2525,4 @@ relleno cae donde no se nota. Si falta una, el desnivel natural es menos defecto
 | 2.13.2 | 2026-09-30 | Corrige la deuda que la 2.13.0 dejó señalada: Padrón de clientes migra sus cuatro botones de un solo valor (Tipo, Estado, Documentos, Actividad) al componente estándar de §6.21 — desplegable con buscador, casillas de selección múltiple y pastillas removibles con tope de cuatro, mismo motor que ya usan Trámites vehiculares y Viáticos. Mismos cuatro campos, sin cambio de alcance; ahora con filtrado real sobre las filas de la tabla. §6.21 y este historial actualizan la nota de deuda a migrado. §6.9 gana una aclaración: antes de escribir una clase nueva para un aviso de ancho completo, se verifica si `.banda` + variante ya lo cubre — Autorización de compra había declarado `.bloqueado`, idéntico en estructura y propósito a `.banda.b-info`, sin buscar primero si ya existía. |
 | 2.11.1 | 2026-09-29 | Cuatro reglas salidas de revisar Viáticos, Viático detalle, Cuentas por cobrar, Padrón de clientes y Editar cliente contra el sistema. §6.11 (tabla densa) gana la regla 10: el identificador de fila (folio) no lleva color de enlace — va en `--text`, porque `--link` es para navegación fuera de tabla y la fila entera, no el texto verde, es la zona pulsable. §6.12 gana la regla 9: la razón de un estado no vive como texto libre en la celda — va al detalle del registro. §8 (voz de producto) endurece su criterio a tres niveles: lo que bloquea una acción ahora se queda visible en una frase, lo que aclara una consecuencia sin bloquear nada pasa a un toggletip (§6.23) sobre el control relacionado, y el racional de diseño o la educación sobre un caso que no aplica al registro visible no va en la interfaz. Y se aprueba §13 Composición y grid, con sus ocho reglas —de la proporción de columna al orden lectura → control → objeto—, validadas contra pantallas reales; deja de estar marcada como borrador. 13.4 (comparar exige igualar) y 13.8 (cierre garantizado, no por casualidad) quedan como dos reglas separadas, con mecanismos distintos para dos preguntas distintas. |
 | 2.13.3 | 2026-10-05 | Auditoría de cierre: se contrastó cada criterio de corrección usado en sesión contra lo que el sistema deja escrito, y se encontraron dos huecos reales. §6.11 gana la regla 11 — si la fila entera navega, ningún botón ni ícono dentro de ella repite esa acción (Viáticos y Cuentas por cobrar tenían folio-link **y** botón «Ver detalle» a la vez; se quitó el botón). §13.8 (cierre garantizado) gana su límite: el mecanismo solo se ve bien cuando el relleno sobrante cae en espacio invisible (el final de una lista) — si la columna corta cierra con contenido estructurado (una tabla) y la diferencia es grande, `flex:1` deja un rectángulo vacío notorio en vez de un cierre limpio. Caso real al revés de Viático detalle: en Autorización de compra el mismo mecanismo, aplicado a una diferencia de ~155px sobre una tabla, produjo justo ese rectángulo; se revirtió a `align-items:start`. Las demás correcciones de la sesión (voz de producto, folio, semáforo, `.banda` vs. clase nueva, filtros §6.21) ya estaban cubiertas — se verificó, no se repitió. |
+| 2.13.4 | 2026-10-09 | Bug real reportado por el cliente: el ícono del botón verde en un estado vacío (Cuentas por cobrar, "Marca A no tiene saldo por cobrar") salía gris en vez de blanco, sin contraste contra el fondo. Causa: `.state .ico{color:var(--text-3)}` es un selector descendiente que alcanza también a los íconos pequeños de los botones dentro de `.acc`, aplastando el color que heredaban de `.btn.p`. Mismo bug activo en Viáticos, Viático detalle, Cuentas por cobrar y Autorización de compra — las cuatro copiaron el bloque `ARQ-ESTADOS` con el selector descendiente; Administración Vehicular ya tenía el fix (`.state > .ico`, hijo directo) desde el principio. Corregido en las cuatro pantallas. §6.4 gana la regla 6, documentando el selector correcto y el caso real. |
