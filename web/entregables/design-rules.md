@@ -1,6 +1,6 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.14.0
+version: 2.15.0
 last_updated: 2026-10-09
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
@@ -169,6 +169,36 @@ de "cada tema tiene su paleta" que sí aplica a `--bg`/`--surface`/`--accent`. U
 cambiar de color al cambiar de tema — es la misma regla que ya protegía al verde lima suelto de
 arriba, aplicada de forma incompleta. Se declara **una sola vez, fuera de cualquier bloque de
 tema**, y así queda verificado en los dos temas por DPROMA.
+
+### 1.2.1 Logotipo: uso y restricciones
+
+Fuente: *DPROMA — Manual de uso*, LAIÖN (15/03/2026).
+
+**Dos lockups, dos contextos — no se mezclan.** Isotipo + «SIO-DPROMA» (`--font-brand`) es el
+lockup del *producto*, ya en el cromo de cada pantalla. Isotipo + «DPROMA» es el lockup
+*corporativo* del manual del cliente — para comunicación externa (documentos, redes, membretes),
+nunca dentro de la interfaz. Assets: `img/marca/dproma-isotipo.svg` (producto),
+`dproma-lockup-color.svg` / `dproma-lockup-reversa.svg` (corporativo, claro/oscuro).
+
+**Variante por fondo.** Color (wordmark en `--marca-azul`) sobre fondos claros; reversa (wordmark
+blanco) sobre fondos oscuros. El gradiente del isotipo nunca cambia — es la firma de color de la
+marca.
+
+**Fondos** (regla literal del manual): limpios o con textura sutil sí; saturados, multicolor o con
+patrones ajenos no — *"generan ruido visual, reducen la legibilidad y afectan la consistencia"*.
+
+**Área de seguridad y tamaño mínimo** (no estaban en el manual con medida exacta; se fijan aquí
+por convención estándar): espacio libre ≥ la altura del isotipo solo; mínimo digital 24px de alto
+para el isotipo — por debajo, el pico de la "Λ" pierde su curva.
+
+**Usos incorrectos:** no estirar/deformar, no recolorear el isotipo fuera de su gradiente, no
+partir el gradiente en bloques sólidos, no colocarlo sin el contraste 3:1 de §1.7, no
+reconstruirlo a mano — siempre el asset oficial.
+
+**Tipografía de marca vs. de producto.** El manual pide Ethnocentric (titulares, ya es
+`--font-brand`) y Arial Rounded MT Bold (texto informativo) para comunicación de marca — ninguna
+de las dos sustituye a Inter (`--font-ui`, §2) dentro del producto. Arial Rounded MT Bold aplica
+solo fuera de `SIO-DPROMA`.
 
 ### 1.3 Semáforo — cinco estados, tres variantes cada uno
 
@@ -2554,4 +2584,4 @@ sin su ancho final, el cálculo no refleja el resultado visible y no retira nada
 | 2.11.1 | 2026-09-29 | Cuatro reglas salidas de revisar Viáticos, Viático detalle, Cuentas por cobrar, Padrón de clientes y Editar cliente contra el sistema. §6.11 (tabla densa) gana la regla 10: el identificador de fila (folio) no lleva color de enlace — va en `--text`, porque `--link` es para navegación fuera de tabla y la fila entera, no el texto verde, es la zona pulsable. §6.12 gana la regla 9: la razón de un estado no vive como texto libre en la celda — va al detalle del registro. §8 (voz de producto) endurece su criterio a tres niveles: lo que bloquea una acción ahora se queda visible en una frase, lo que aclara una consecuencia sin bloquear nada pasa a un toggletip (§6.23) sobre el control relacionado, y el racional de diseño o la educación sobre un caso que no aplica al registro visible no va en la interfaz. Y se aprueba §13 Composición y grid, con sus ocho reglas —de la proporción de columna al orden lectura → control → objeto—, validadas contra pantallas reales; deja de estar marcada como borrador. 13.4 (comparar exige igualar) y 13.8 (cierre garantizado, no por casualidad) quedan como dos reglas separadas, con mecanismos distintos para dos preguntas distintas. |
 | 2.13.3 | 2026-10-05 | Auditoría de cierre: se contrastó cada criterio de corrección usado en sesión contra lo que el sistema deja escrito, y se encontraron dos huecos reales. §6.11 gana la regla 11 — si la fila entera navega, ningún botón ni ícono dentro de ella repite esa acción (Viáticos y Cuentas por cobrar tenían folio-link **y** botón «Ver detalle» a la vez; se quitó el botón). §13.8 (cierre garantizado) gana su límite: el mecanismo solo se ve bien cuando el relleno sobrante cae en espacio invisible (el final de una lista) — si la columna corta cierra con contenido estructurado (una tabla) y la diferencia es grande, `flex:1` deja un rectángulo vacío notorio en vez de un cierre limpio. Caso real al revés de Viático detalle: en Autorización de compra el mismo mecanismo, aplicado a una diferencia de ~155px sobre una tabla, produjo justo ese rectángulo; se revirtió a `align-items:start`. Las demás correcciones de la sesión (voz de producto, folio, semáforo, `.banda` vs. clase nueva, filtros §6.21) ya estaban cubiertas — se verificó, no se repitió. |
 | 2.13.4 | 2026-10-09 | Bug real reportado por el cliente: el ícono del botón verde en un estado vacío (Cuentas por cobrar, "Marca A no tiene saldo por cobrar") salía gris en vez de blanco, sin contraste contra el fondo. Causa: `.state .ico{color:var(--text-3)}` es un selector descendiente que alcanza también a los íconos pequeños de los botones dentro de `.acc`, aplastando el color que heredaban de `.btn.p`. Mismo bug activo en Viáticos, Viático detalle, Cuentas por cobrar y Autorización de compra — las cuatro copiaron el bloque `ARQ-ESTADOS` con el selector descendiente; Administración Vehicular ya tenía el fix (`.state > .ico`, hijo directo) desde el principio. Corregido en las cuatro pantallas. §6.4 gana la regla 6, documentando el selector correcto y el caso real. |
-| 2.14.0 | 2026-10-09 | Añade §13.9: un bloque cuyo alto lo fija un dato externo (una duración, no el contenido ni el layout) necesita un plan explícito de qué línea de contenido se retira primero si no cabe — crecer el contenedor falsearía el dato que ese alto representa. A partir del calendario de instalaciones: sus bloques de evento recortaban texto a media línea con `overflow:hidden`, y en los casos más ajustados el contenido ni desbordaba — se aplastaba por `flex-shrink:1`, el valor por omisión en un hijo de `flex-direction:column`, hasta quedar ilegible sin disparar ningún indicador de desborde. |
+| 2.15.0 | 2026-10-09 | Añade §13.9: un bloque cuyo alto lo fija un dato externo (una duración, no el contenido ni el layout) necesita un plan explícito de qué línea de contenido se retira primero si no cabe — crecer el contenedor falsearía el dato que ese alto representa. A partir del calendario de instalaciones: sus bloques de evento recortaban texto a media línea con `overflow:hidden`, y en los casos más ajustados el contenido ni desbordaba — se aplastaba por `flex-shrink:1`, el valor por omisión en un hijo de `flex-direction:column`, hasta quedar ilegible sin disparar ningún indicador de desborde. Añade §1.2.1: normas de uso del logotipo, traducidas del manual de marca que entregó el cliente (LAIÖN, 15/03/2026) — dos lockups que no se mezclan (isotipo+«SIO-DPROMA» del producto vs. isotipo+«DPROMA» corporativo), variante por fondo, usos incorrectos, y una aclaración de qué tipografía del manual aplica dentro del producto (ninguna de las dos: sigue siendo Inter) y cuál solo fuera de él. Área de seguridad y tamaño mínimo no venían en el manual con una medida exacta — se fijan aquí por convención. Se incorporan los assets oficiales a `web/entregables/img/marca/` (isotipo, lockup color, lockup reversa). |

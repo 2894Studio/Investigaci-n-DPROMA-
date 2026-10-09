@@ -163,6 +163,80 @@ cambiar de color al cambiar de tema — es la misma regla que ya protegía al ve
 arriba, aplicada de forma incompleta. Se declara **una sola vez, fuera de cualquier bloque de
 tema**, y así queda verificado en los dos temas por DPROMA.
 
+### 1.2.1 Logotipo: uso y restricciones
+
+Fuente: *DPROMA — Manual de uso*, LAIÖN (15/03/2026). Lo que sigue traduce ese manual a reglas
+verificables para este sistema — citando cada regla que viene del documento del cliente tal cual,
+y marcando explícitamente las que no estaban ahí y se añaden por convención de marca ya
+establecida (área de seguridad, tamaño mínimo), para no hacerlas pasar por una regla del cliente
+que no es.
+
+**Dos lockups distintos, para dos contextos distintos — no se mezclan.**
+
+| Lockup | Qué es | Dónde vive | Asset |
+|---|---|---|---|
+| Isotipo + «SIO-DPROMA» | El isotipo (gradiente de marca) junto al nombre del *producto*, en `--font-brand` | Cromo de la aplicación (barra lateral, pantalla de acceso) — es lo que ya existe en cada pantalla | `<symbol id="dproma-mark">` inline, o `img/marca/dproma-isotipo.svg` |
+| Isotipo + «DPROMA» | El lockup corporativo completo del manual — el isotipo y el wordmark de la *empresa*, no del producto | Comunicación externa: documentos, presentaciones, redes sociales, membretes — nunca dentro de la interfaz del sistema | `img/marca/dproma-lockup-color.svg` (azul sobre claro) y `dproma-lockup-reversa.svg` (blanco sobre oscuro) |
+
+Confundir los dos es el error más fácil: el segundo lockup **no** reemplaza al wordmark
+«SIO-DPROMA» del cromo — son identidades de capas distintas (la empresa y el producto que
+construye), igual que una compañía de software y el nombre de su app no comparten logotipo.
+
+**Variantes de color, una por fondo — nunca a ojo.**
+
+| Variante | Isotipo | Wordmark | Sobre |
+|---|---|---|---|
+| Color | Gradiente de marca (`--marca-1`…`--marca-7`) | `--marca-azul` (`#1E4E79`) | Fondos claros — `--surface`, `--bg`, blanco |
+| Reversa | Gradiente de marca (igual, no cambia) | Blanco (`--marca-lienzo-ink` o `#fff`) | Fondos oscuros — `--chrome`, `--marca-lienzo`, negro |
+
+El gradiente del isotipo **nunca cambia** entre variantes — es la única parte del lockup que no
+tiene versión monocromática ni invertida; es la firma de color de la marca. (Regla del manual,
+página 6: *«la aplicación del logotipo debe respetar la paleta institucional, asegurando siempre
+un contraste adecuado»*.)
+
+**Fondos permitidos y no permitidos** (regla literal del manual, página 6):
+
+- ✓ Fondos limpios de un solo color (claro, oscuro) o con textura muy sutil que no compita con el
+  símbolo.
+- ✗ Fondos saturados, multicolor, o con patrones geométricos ajenos a la identidad — *"generan
+  ruido visual, reducen la legibilidad y afectan la consistencia de la marca"* (cita literal).
+
+**Área de seguridad y tamaño mínimo — no estaban en el manual con una medida exacta; se derivan
+aquí por convención estándar de marca, y quedan fijados para este sistema:**
+
+- Área de seguridad: el espacio libre alrededor del lockup completo nunca es menor a la altura del
+  isotipo solo (el pico de la "Λ"). Nada —texto, borde, otro elemento— entra en esa franja.
+- Tamaño mínimo digital: 24px de alto para el isotipo solo (es el tamaño ya validado en producción
+  en el cromo de la aplicación, `width="44" height="42"` sobre el `<symbol>`, con margen). Por
+  debajo de eso el pico de la "Λ" pierde su curva y se lee como un triángulo genérico.
+
+**Usos incorrectos — los del manual, más los que se desprenden del mismo criterio:**
+
+1. No estirar ni deformar el lockup en un solo eje (el manual lo implica al fijar el isotipo como
+   forma geométrica precisa; estirarlo rompe la curva del pico).
+2. No recolorear el isotipo fuera de su gradiente de marca — ni a un solo color plano, ni a una
+   paleta distinta. Es la misma regla de §1.4 (una serie de gráfica nunca reutiliza un color de
+   estado) aplicada al logotipo: el gradiente es la firma, sustituirlo lo vuelve irreconocible.
+3. No partir el gradiente en bloques sólidos (tres franjas de verde en vez de la transición
+   continua) — dejaría de ser el mismo asset.
+4. No colocar el lockup sobre un fondo que no cumpla el contraste de §1.7 para elementos gráficos
+   (3:1 mínimo) — un isotipo que se funde con su fondo falla por la misma regla que cualquier otro
+   elemento gráfico del sistema, no por una regla nueva de marca.
+5. No reconstruir el isotipo a mano con herramientas de icono del sistema (Material Symbols, SVG
+   dibujado a ojo) — siempre el asset oficial (`img/marca/dproma-isotipo.svg` o el `<symbol>` ya
+   declarado), nunca una aproximación.
+
+**Tipografía de marca — una aclaración necesaria, porque el manual y este sistema no dicen lo
+mismo y hay que decidir cuál manda dónde.** El manual especifica dos tipografías para la
+*comunicación de marca* (redes sociales, documentos externos): **Ethnocentric** para titulares —
+coincide con `--font-brand` del sistema (`'Ethnocentric Rg','Michroma'`), ya en uso — y **Arial
+Rounded MT Bold** para texto informativo/descriptivo. Esta segunda **no** se usa en la interfaz
+del producto: `--font-ui` sigue siendo Inter (§2), ya justificada ahí por legibilidad en pantalla
+y por ser autoalojada. Arial Rounded MT Bold aplica solo a piezas de comunicación de marca fuera
+del producto (perfiles de redes sociales, membretes, presentaciones) — nunca dentro de
+`SIO-DPROMA`. Si algún día se usa Arial Rounded MT Bold dentro de la interfaz, es un error, no una
+inconsistencia a resolver a favor del manual.
+
 ### 1.3 Semáforo — cinco estados, tres variantes cada uno
 
 Cinco estados, no dos. Un cliente no está solo bien o mal: puede estar en espera de un
