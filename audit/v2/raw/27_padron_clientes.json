@@ -1,0 +1,792 @@
+{
+ "pantalla": "27_padron_clientes",
+ "tier": "A",
+ "sha256": "5ea9232613d30bc43564045165ab297e149af1aa2ead357870b32ca0d80cb3a3",
+ "estado_entrega": "modificada",
+ "estado_vs_pdf": "alineado",
+ "estados_auditados": [
+  "con datos (captura 1440 y 1280)",
+  "cargando (render propio)",
+  "vacío (código)",
+  "error (render propio y código)"
+ ],
+ "capturas": [
+  "27_padron_clientes--1280-fold.png",
+  "27_padron_clientes--1440.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 3,
+   "texto_usuario": "Estados demasiado específicos («Falta documento», «Incompleto»); recuadro de acciones cortado en todas las filas; «Acciones» debe alinearse a la izquierda de su casilla.",
+   "veredicto": "parcial",
+   "evidencia": [
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "I9_celdas",
+      "detalle": "brief: 13 celdas largas; «Documentos fiscales»: 140 caracteres y 7 líneas («Falta 1»), 86 («Los dos»), y 236 caracteres en «Sin calcular» (aud2/a27_d.cjs: 85–236 caracteres por celda)"
+     },
+     "dato": "Ninguna etiqueta dice literalmente «Falta documento» ni «Incompleto»: la columna usa cinco estados de expediente —«Los dos», «Falta 1», «Por vencer», «Faltan los 2», «Sin calcular»— y dos comerciales —«Activo», «Inactivo»—. «incompleto» solo aparece dentro de la prosa de «Sin calcular». Pero cada estado de expediente arrastra una explicación de 85 a 236 caracteres en la misma celda."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 800,
+      "cita": "<span class=\"falta\">Falta la <b>constancia de situación fiscal</b>. Se puede seguir trabajando el cliente;"
+     },
+     "dato": "Ejemplo: la celda «Falta 1» repite la consecuencia («no se le puede programar ni facturar») que ya dice la nota al pie y el chip «42 sin los dos documentos»."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 848,
+      "cita": "⛔ <b>No es lo mismo que «faltan».</b>"
+     },
+     "dato": "«Sin calcular» usa un emoji (⛔) como icono y explica la mecánica del servidor en 236 caracteres; el mismo mensaje se repite en una nota al pie."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "anchos",
+      "detalle": "brief anchos_1440_1280_1024: 1440 sin scroll horizontal; 1280 scroll-x en div.tabla-caja dx 51 (ancho 1044); 1024 scroll-x dx 135 (ancho 960)"
+     },
+     "dato": "El recorte aparece cuando el contenedor mide menos que la tabla: a 1280 y 1024, no a 1440."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_a27_acciones",
+      "detalle": "script aud2/a27_a.cjs: tabla 1095,3 px de ancho; caja visible 1204 px (1440), 1130 (1366), 1044 (1280), 960 (1024). Botones de acción de las 6 filas: a 1440 y 1366 dentro de la caja; a 1280 el 2.º termina en x=1281 y el 3.º en x=1315 (caja hasta 1280): clipped=true en 6 de 6 filas; a 1024 los tres botones quedan fuera (x≥1047 frente a 1024)"
+     },
+     "dato": "Es el recorte «en todas las filas»: las seis filas comparten la misma columna. El umbral es un viewport de 1331 px (236 de barra lateral + 1095 de tabla)."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 639,
+      "cita": ".pad table{min-width:1000px}"
+     },
+     "dato": "La tabla tiene min-width:1000px y sus celdas con nowrap (cabeceras, botones de orden, pills) empujan el contenido mínimo a 1095 px; el contenedor .tabla-caja tiene overflow-x:auto."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 361,
+      "cita": ".tabla-caja{min-width:0;overflow-x:auto;flex:none}"
+     },
+     "dato": "El elemento que recorta es .tabla-caja, no main: main#contenido mide scrollWidth = clientWidth (1044 a 1280) con overflow-x:hidden."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_a27_hit_test",
+      "detalle": "script aud2/a27_b.cjs, 1440: se desplaza main hasta que cada fila pasa bajo el botón flotante y se hace elementFromPoint en el centro de los tres botones; solo en la fila 4 el botón «Editar» devuelve el .fab (solape 471 px²) y en las filas 3 y 5 hay solape sin interceptar el centro"
+     },
+     "dato": "El botón flotante tapa una fila a la vez según el scroll; no explica que estén cortadas todas."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "captura",
+      "archivo": "27_padron_clientes--1280-fold.png",
+      "region": "columna de acciones del primer renglón: se ve el ojo y el lápiz a medias; el tercer botón queda fuera del borde derecho"
+     },
+     "dato": "Coincide con lo descrito por la persona."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 771,
+      "cita": "<span class=\"sr\">Acciones</span>"
+     },
+     "dato": "El encabezado de la última columna es solo texto de lector de pantalla: no hay rótulo «Acciones» visible que alinear."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 387,
+      "cita": ".acciones{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}"
+     },
+     "dato": "Los botones se alinean a la derecha de su celda; hoy no se nota porque la columna fija de 136 px (<col style=\"width:136px\">) queda llena (3×28 + 2×6 = 96 px dentro de 96 px útiles): a 1440 el primer botón empieza en x=1328, el mismo borde izquierdo que tendría el texto del <th> (1312 + 16 de relleno)."
+    }
+   ],
+   "causa_raiz": "Tres causas distintas. (A) Producto + forma: las decisiones del dictamen (partir expediente y comercial, «decir qué documento falta, no «incompletos»», vigencia, FICHAS 27) están bien; lo que sobra es la prosa de cada celda, que contradice §6.11 regla 7 («Una celda no lleva un párrafo») y repite en cada fila lo que una nota o un toggletip diría una vez. (B) Layout: una tabla de 7 columnas con nowrap necesita 1095 px; con la barra lateral de 236 px el contenedor deja de alcanzar por debajo de un viewport de 1331 px, y como la columna de acciones es la última, es la que queda fuera; D-6 (la tabla se desliza con la primera columna anclada) legitima el deslizamiento pero no dice nada de la última. El botón flotante es una causa secundaria y distinta (un solo renglón a la vez). (C) El encabezado «Acciones» es sr-only y la alineación a la derecha de .acciones es latente.",
+   "solucion_propuesta": "(A) La pill nombra qué documento falta —«Los dos», «Falta constancia», «Falta identificación», «Faltan los 2», «Sin calcular»— y la celda no lleva más texto; la consecuencia común («no se le puede programar ni facturar») se dice una vez, en toggletip sobre el encabezado «Documentos fiscales» (§6.23); «Sin calcular» pierde el emoji y el párrafo. «Por vencer» y su chip se quedan fuera hasta que exista la columna de vigencia (D7 la pospone). Esto sigue diciendo qué documento falta (dictamen 6) y no contradice D7. (B) Dos palancas en el lenguaje del sistema: pasar a §6.14 (con más de dos acciones, menú ⋯ con opciones escritas y la fila abre la ficha, §6.11 regla 11), lo que deja la columna en ~64 px y la tabla en ~1020 px; o anclar la última columna a la derecha como D-6 ancla la primera. En ambos casos documentar en §6.11 que la columna de acciones no puede quedar fuera sin aviso (regla 5). (C) Si se muestra el rótulo, text-align:left (ya lo es) y .acciones{justify-content:flex-start}, para que el borde izquierdo de «Acciones» y el del primer botón coincidan a cualquier ancho.",
+   "tipo_de_cambio": "medio",
+   "critico": {
+    "es": false,
+    "criterio": null
+   },
+   "decision": {
+    "valor": "ajustar_sistema",
+    "motivo": "(B) y (C) son huecos del sistema (§6.11 no cubre la columna de acciones cuando la tabla se desliza; §6.14 no se aplicó) y D-6 es decisión del cliente que no se contradice. (A) respeta el dictamen 6: la pill sigue diciendo qué falta. No es crítico: la acción primaria «Ver ficha» sigue visible a 1280 y el recorte se resuelve desplazando (lectura alternativa: a 1024 los tres botones quedan fuera de la vista, lo que sí rozaría el criterio 2)."
+   }
+  },
+  {
+   "hoja": 12,
+   "texto_usuario": "Rediseño crítico del acordeón de sucursales: no es usable ni estético; diseñarlo y documentarlo.",
+   "veredicto": "confirmada",
+   "evidencia": [
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 908,
+      "cita": "document.querySelectorAll('.demo [data-set]')"
+     },
+     "dato": "El <script> solo registra manejadores para el andamiaje de estados, el tema y el menú lateral: ningún manejador para .suc-btn, así que los cinco botones de sucursales no hacen nada y su aria-expanded no cambia."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_a27_acciones",
+      "detalle": "script aud2/a27_a.cjs: de los 5 button.suc-btn con aria-controls, solo suc-gav existe en el documento; suc-cvb, suc-aca, suc-rda y suc-dpa no apuntan a nada; hay un único tr.hijas en todo el documento"
+     },
+     "dato": "4 de 5 botones anuncian «contraído» y controlan un id inexistente: es el mismo fallo que §6.15 describe literalmente."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 799,
+      "cita": "aria-controls=\"suc-cvb\""
+     },
+     "dato": "Ejemplo de id inexistente; el panel abierto es el de la primera fila, con id=\"suc-gav\", y está fijo en el HTML."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 811,
+      "cita": "Ver las 1 sucursales de Autotransportes"
+     },
+     "dato": "Nombre accesible con plural erróneo en las dos filas de una sola sucursal («Ver las 1 sucursales de…»)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_a27_acordeon",
+      "detalle": "script aud2/a27_e.cjs: a 1440 el panel (tr.hijas, td colspan=7) mide 246 px de alto y 1204 de ancho; el texto de cada sucursal termina en x≈490–566 y su pill empieza en x=1144: 578–654 px de vacío entre el nombre y su estado; a 1280 la distancia es 469–545 px"
+     },
+     "dato": "El estado y la acción de cada sucursal quedan a más de medio metro de su nombre: hay que recorrer toda la fila con el ojo para saber a qué sucursal pertenece «Puede recibir órdenes»."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_a27_acordeon",
+      "detalle": "script aud2/a27_a.cjs y a27_e.cjs a 1280: los cuatro botones «Ver órdenes» del panel terminan en x=1298 y la caja visible en x=1280 (18 px ocultos en 4 de 4); a 1440 el .fab (x 1362–1414, y 722–774) cubre más de la mitad del botón de la segunda sucursal en el primer pliegue"
+     },
+     "dato": "El acordeón abierto queda recortado por el scroll horizontal de la tabla y, en el primer pliegue, parcialmente tapado por el botón flotante."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "captura",
+      "archivo": "27_padron_clientes--1440.png",
+      "region": "panel «Sucursales de esta razón social» bajo la primera fila: cuatro renglones con nombre a la izquierda, pill verde «Puede recibir órdenes» y botón «Ver órdenes» pegados al borde derecho; «Ver órd…» cubierto por el botón flotante"
+     },
+     "dato": "Visible: panel grisáceo a ancho completo con tarjeta blanca dentro, sin sangría ni conector con la fila que lo abre; los cuatro estados son idénticos."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 672,
+      "cita": ".suc-lista .der{margin-left:auto;display:flex;gap:var(--sp-2);align-items:center;flex-wrap:wrap}"
+     },
+     "dato": "margin-left:auto empuja pill y botón al extremo derecho del colspan, que mide el ancho completo de la tabla (y a 1280, más que el viewport)."
+    }
+   ],
+   "causa_raiz": "No es un solo defecto sino la suma de cinco: (1) falta el comportamiento (ningún manejador) y el HTML solo trae un panel con id real, así que 4 de 5 controles apuntan al vacío; (2) el contenido del panel vive en un <td colspan=7> cuyo ancho es el de la tabla (1204 a 1440; 1095 a 1280, mayor que la caja visible), de modo que lo que se alinea a la derecha (margin-left:auto) cae fuera de la vista a 1280; (3) ninguna parte del panel se alinea con las columnas de arriba ni con el control que lo abre, y la fila hija está en una tarjeta blanca dentro de una banda gris dentro de la tabla (tarjeta anidada, §6.3); (4) el estado por sucursal («Puede recibir órdenes») es igual en las cuatro y no aporta; (5) el botón flotante no tiene zona segura documentada en el sistema.",
+   "solucion_propuesta": "Solo diagnóstico; la solución es de la Fase 4. REQUISITOS: (R1, §6.15) cada botón apunta a un id que existe; el control abre y cierra de verdad (en maqueta, al menos un par abierto y un par cerrado dibujados) y con Escape se cierra devolviendo el foco al botón; (R2, §6.11 regla 5 y §13.3) el contenido del panel no depende del ancho de la tabla: legible sin desplazamiento horizontal a 1280 y 1024, y su ancho útil no crece con las columnas; (R3, FICHAS 27 · dictamen 9 y 17) cada sucursal dice su propio estado y por qué (el bloqueo se dice en la sucursal; la orden cuelga de la sucursal, nunca de la razón social) y ofrece «Ver órdenes» de esa sucursal, que responde a pp-098 (saber qué sucursal generó el servicio); (R4, §8 y §6.11 regla 7) un renglón por sucursal, nombre · municipio, dirección en una línea y a lo sumo una pill con texto + icono + color (§6.10) cuando el estado difiera; (R5, §7.3) destinos ≥24 px (hoy el botón mide 62,7×24 y «Ver órdenes» 92×28); (R6) relación visual clara entre la fila madre y su panel (sin tarjeta dentro de tarjeta, §6.3) y proximidad entre nombre y estado; (R7, D2 y D3) razón social sin sucursales no muestra control («Sin sucursales»), y grupo y marca, si se muestran, se derivan de las sucursales; (R8) texto correcto en singular/plural en el nombre accesible; (R9) no invadir la zona del botón flotante (68 px); (R10, D6, D7 y D8) no dibujar «Reenviar liga», vigencia ni duplicados dentro del panel. NO contradecir: la fila de sucursales desplegable en vez del contador (dictamen 29) ni la casilla dentro de la celda de razón social.",
+   "tipo_de_cambio": "rediseño",
+   "critico": {
+    "es": true,
+    "criterio": 5
+   },
+   "decision": {
+    "valor": "decidir_diseño",
+    "motivo": "Rediseño crítico marcado por la persona. Viabilidad (la decide la Fase 4): a mi juicio viable; no requiere datos nuevos (nombre, municipio, dirección y estado ya existen en el dibujo) y no toca D-n. Lo único abierto es cuántos estados distintos puede tener una sucursal y cuáles son sus textos (la maqueta solo dibuja el positivo)."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-27padron-01",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles + §10 trampa 4",
+    "dice_el_sistema": "«Todo destino interactivo mide **24×24px como mínimo**» y las casillas de 15×15 px se resuelven con `.selfila{… min-height:24px;padding:4px;margin:-4px}` o haciendo pulsable toda la celda.",
+    "hay_en_el_build": ".selfila{display:flex;gap:var(--sp-3);align-items:flex-start;min-width:0}: siete casillas de 15×15 px, el buscador (input de 329×16) y los dos botones de orden de cabecera (160,7×21 y 163,9×21) bajo 24 px; el <span class=\"selfila\"> no es una <label>.",
+    "selector": ".selfila input.rowsel, thead th button, #buscar",
+    "linea": 643,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil",
+     "detalle": "brief tactil_bajo24: total 77, bajo24 10 (7 casillas 15×15, search 329×16, dos botones de cabecera 21 px de alto)"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino táctil < 24 px (criterio 1), medido, en la casilla que más se pulsa de la bandeja (selección múltiple). v1 lo marcó alta y el cliente no lo tocó. Arreglo: <label class=\"selfila\"> con padding de 4 px y margen negativo; min-height:24px en los botones de cabecera; <label for=\"buscar\"> en el buscador."
+    },
+    "por_que_importa": "Acertar una casilla de 15 px con ratón impreciso o tableta selecciona la fila equivocada y la acción masiva («Pedir por correo lo que falta», «Cambiar a inactivo») se ejecuta sobre quien no era."
+   },
+   {
+    "id": "v2-27padron-02",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (modo colapsado) + §11 Estructura (nombre accesible)",
+    "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.»",
+    "hay_en_el_build": "A 1000 px la barra lateral mide 64 px, .side .et{display:none}, los 15 enlaces .it no llevan aria-label ni title y el árbol de accesibilidad les da nombre vacío.",
+    "selector": ".side .et, .it",
+    "linea": 288,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "sidebar",
+     "detalle": "brief menu_1000px: hayMenu true, total 15, sinNombre 15; reproducido con CDP Accessibility.getFullAXTree a 1000×800 (aud2/common_b.cjs)"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1), medido. Cromo compartido por todas las pantallas: un solo arreglo (aria-label y title en cada .it o técnica de solo-lector en lugar de display:none)."
+    },
+    "por_que_importa": "En un portátil pequeño o una tableta, quien usa lector de pantalla oye quince enlaces sin nombre."
+   },
+   {
+    "id": "v2-27padron-03",
+    "severidad": "alta",
+    "regla": "§6.15 Fila desplegable + §6.11 regla 5 + §13.3",
+    "dice_el_sistema": "«`aria-expanded` y `aria-controls` **tienen que apuntar a algo que exista**. Cuatro de los cinco botones de sucursales del padrón apuntaban a identificadores inexistentes y anunciaban «contraído» sobre un control que no hacía nada.» · «Cierra con Escape, y al cerrar el foco vuelve al botón que lo abrió.»",
+    "hay_en_el_build": "Hoy exactamente el mismo fallo: 4 de 5 button.suc-btn con aria-controls a ids inexistentes; ningún manejador de clic ni de Escape; un único tr.hijas con id real; panel de 246 px en un <td colspan=7> con el contenido alineado al extremo derecho (578–654 px de vacío entre el nombre y su estado a 1440); a 1280 los botones «Ver órdenes» quedan 18 px fuera de la caja visible; aria-label «Ver las 1 sucursales».",
+    "selector": "button.suc-btn[aria-controls], tr.hijas, .suc-lista .der",
+    "linea": 799,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 799,
+     "cita": "aria-controls=\"suc-cvb\""
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 5
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Rediseño crítico marcado por la persona; ver observación hoja 12 para el diagnóstico completo y los requisitos. v1 lo dejó en media (f1-27padron-08) porque solo vio los ids: la causa es más amplia."
+    },
+    "por_que_importa": "El control que el padrón eligió para saber a qué sucursal pertenece un servicio (pp-098) no funciona en 4 de 5 filas y, en la que funciona, sus acciones quedan fuera de la vista a 1280."
+   },
+   {
+    "id": "v2-27padron-04",
+    "severidad": "alta",
+    "regla": "§6.11 regla 5 (ninguna columna desaparece en silencio) + §6.14 Menú de acciones por fila · D-6 (FICHAS)",
+    "dice_el_sistema": "«O hay desplazamiento horizontal, o hay un aviso de cuántas columnas están ocultas con forma de recuperarlas.» · «Con **más de dos** [acciones], o si cambian según la fila: menú `⋯` con las opciones **escritas**.» FICHAS (D-6): «se desliza con la primera columna anclada».",
+    "hay_en_el_build": "Tres botones de icono por fila (ojo, lápiz, recibo) en una columna de 136 px que es la última de una tabla de 1095 px mínimos: a 1280 quedan fuera dos de tres en las 6 filas y a 1024 los tres; el encabezado «Acciones» es sr-only.",
+    "selector": ".acciones .iconbtn, .tabla-caja, .pad table",
+    "linea": 639,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "anchos",
+     "detalle": "brief: scroll-x en div.tabla-caja a 1280 (dx 51) y 1024 (dx 135); medición propia aud2/a27_a.cjs: clipped=true en 6 de 6 filas a 1280"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Responde a la observación hoja 3 (recuadro de acciones). El sistema debe decir qué pasa con la columna de acciones cuando la tabla se desliza (D-6 solo ancla la primera) y aplicar §6.14; v1 marcó el menú de más de dos acciones como media (f1-27padron-11). Crítico no: «Ver ficha» sigue visible a 1280."
+    },
+    "por_que_importa": "La edición y la lista de órdenes de un cliente quedan escondidas justo en los portátiles de 1280 px, sin ningún indicio de que haya más a la derecha."
+   },
+   {
+    "id": "v2-27padron-05",
+    "severidad": "alta",
+    "regla": "§13 Composición y grid (la zona de contenido) + §7.3 (destino alcanzable) · el sistema no documenta el botón flotante",
+    "dice_el_sistema": "Búsqueda de «flotante» y de «FAB» en sistema-diseno.md: 0 coincidencias; no hay zona segura definida para el botón flotante del asistente.",
+    "hay_en_el_build": ".fab{position:absolute;right:max(26px,…);bottom:max(26px,…)} 52×52 px sobre la zona derecha-inferior de .main; el .nota reserva 68 px de relleno derecho y nada más lo hace. Hit-test a 1440: el .fab intercepta el clic del botón «Editar» de la fila 4 al pasar por debajo; a 1280 cubre el primer botón de la fila 3 y tapa parte de «Ver órdenes» en el primer pliegue.",
+    "selector": ".fab, .acciones .iconbtn",
+    "linea": 268,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_a27_hit_test",
+     "detalle": "script aud2/a27_b.cjs: elementFromPoint en el centro del botón «Editar Laura Núñez Peralta» devuelve .fab a 1440 con la fila 4 a la altura del botón flotante; solape de 471 px²"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Causa en el sistema: sin regla de zona segura. El cliente la resuelve ad hoc (68 px en .nota; margin-right:68px en 41_alta_cliente). Propuesta de regla en cobertura. Lectura alternativa: WCAG 2.2 (2.4.11) pide que un componente enfocado no quede oculto por contenido del autor; aquí el .fab puede ocultar por completo un botón de fila, pero depende del scroll, por eso no lo marco crítico."
+    },
+    "por_que_importa": "En una tabla larga cada fila pasa por debajo del botón flotante; el clic en el icono que quedó debajo abre el asistente en vez de editar el cliente."
+   },
+   {
+    "id": "v2-27padron-06",
+    "severidad": "alta",
+    "regla": "§6.11 regla 7 (una celda no lleva un párrafo) + regla 9 de §6.12 (la razón de un estado va al detalle)",
+    "dice_el_sistema": "«Una tabla se escanea en vertical; con dos o tres líneas de prosa distintas por fila deja de poder escanearse y obliga a leerlo todo. En la celda va la etiqueta; el matiz va a etiqueta emergente o a la ficha.»",
+    "hay_en_el_build": "La columna «Documentos fiscales» lleva pill + prosa de 85 a 236 caracteres en las seis filas (I9: 13 celdas largas, 140 caracteres y 7 líneas a 1280 en «Falta 1»); filas de 99 a 167 px de alto a 1440; «Sin calcular» con emoji y explicación de la mecánica del servidor.",
+    "selector": ".exp, .falta",
+    "linea": 848,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I9_celdas",
+     "detalle": "brief: celdas 13, largas 13; td «SUCURSALES…» 437 caracteres, td «Falta 1» 140 caracteres y 7 líneas"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "El contenido es decisión del cliente (dictamen 5, 6, 7 y 11: «Decir qué documento falta, no «incompletos»»), así que no se le exige quitarlo; la forma sí es una pregunta de diseño y coincide con la observación hoja 3 de la persona. Propuesta concreta en esa observación."
+    },
+    "por_que_importa": "La columna que más decide («a quién le falta papel») es la más difícil de escanear: siete líneas por fila y alturas que varían de 99 a 167 px."
+   },
+   {
+    "id": "v2-27padron-07",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado de una pantalla (reglas 1 y 2, tarjeta con medallón)",
+    "dice_el_sistema": "«El cambio se anuncia y mueve el foco.» · «Cada estado lleva un encabezado real, no un `<b>`.» · «El estado va dentro de una tarjeta, no suelto sobre el fondo.»",
+    "hay_en_el_build": "<b>No se pudo cargar el padrón</b> sobre .state sin tarjeta ni medallón (el color del icono se pone en línea); 0 aria-live en el documento y 0 llamadas a focus(); el manejador de estado solo escribe data-state.",
+    "selector": ".state, .state-error, .state-empty",
+    "linea": 877,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 877,
+     "cita": "<b>No se pudo cargar el padrón</b>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Maqueta estática; el texto del error cumple la regla 3 de §6.4 (qué pasó, qué no se perdió, qué hacer, referencia). Se adopta y se pide la forma de 41_alta_cliente (que ya trae .tarjeta-estado) como referencia interna del cliente. v1 lo marcó alta (f1-27padron-03)."
+    },
+    "por_que_importa": "Quien usa lector de pantalla no se entera de que la vista cambió a error, y el título del estado no entra en el índice de encabezados."
+   },
+   {
+    "id": "v2-27padron-08",
+    "severidad": "media",
+    "regla": "§6.12 regla 8 (un control con pinta de interactivo tiene que interactuar) + §6.11 reglas 3 y 6 + §6.13",
+    "dice_el_sistema": "«Un `.schip` o `.f` con `aria-pressed`/`data-activo` promete que al pulsarlo pasa algo.» · «`aria-sort` en todas las columnas ordenables» · la barra de selección «aparece solo cuando hay selección».",
+    "hay_en_el_build": "Cuatro .schip con aria-pressed y data-f, el segmentado Cómoda/Compacta (sin ninguna regla [data-density=\"compact\"]), dos botones de orden de los que solo «Último movimiento» lleva aria-sort, y .barra-sel visible sin condición, sin manejadores.",
+    "selector": ".schip, .seg button, .barra-sel, thead th button",
+    "linea": 730,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 730,
+     "cita": "data-f=\"documento-por-vencer\""
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Es una maqueta estática declarada; la lógica pertenece a la implementación. Se rebaja respecto a v1 (alta en f1-27padron-07; media en -09, -17 y baja en -20) y se agrupa. Pendiente de sistema: decir cómo se dibuja un filtro sin lógica y que §6.11 retiró la densidad."
+    },
+    "por_que_importa": "Los chips de filtro y la densidad se ven pulsables y no cambian nada; en una revisión con el cliente se confunde «dibujado» con «funciona»."
+   },
+   {
+    "id": "v2-27padron-09",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga (alto, reduced-motion, punto de ruptura)",
+    "dice_el_sistema": "«Hay que aplanar el fondo, no solo parar la animación.» · «El punto de ruptura del esqueleto es el de la tabla.» · el esqueleto necesita el mismo alto: `.sk-fila{min-height:67px}`, `.sk-cab{min-height:35px}`.",
+    "hay_en_el_build": ".skel{animation:none} sin reponer el fondo (línea 603); .sk-fila sin min-height y con barras de 12 px: seis filas de ~20 px frente a una tabla de más de 900 px; @media (max-width:900px) mientras la tabla pasa a tarjetas a 860 px; las barras llevan texto dentro («razón social y RFC»).",
+    "selector": ".skel, .sk-fila",
+    "linea": 603,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 603,
+     "cita": "prefers-reduced-motion:reduce){.skel{animation:none}}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No se exige; el arreglo ya está documentado en §6.7. v1 lo marcó alta (-04) y media (-05, -06); aquí media porque no impide completar la tarea."
+    },
+    "por_que_importa": "Al cargar, la página salta de unos 130 px a más de 900; con movimiento reducido las barras quedan a medio pintar."
+   },
+   {
+    "id": "v2-27padron-10",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 (isotipo) + §1.2.1 Logotipo",
+    "dice_el_sistema": "«Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>: el <use> queda 32,5 px a la izquierda del <svg> y solo se ve una astilla de la «Λ»; el botón flotante, 16,2 px.",
+    "selector": ".logo svg, .fab svg",
+    "linea": 713,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_isotipo",
+     "detalle": "aud2/common_a.cjs: <use> en x=63,5 frente a <svg> en x=96; FAB 16,2 px; 46 de 50 archivos del paquete conservan el patrón"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Corrección sencilla y global en la plantilla del cromo (medidas en el <use>, sin viewBox en el <svg>), documentada en §10; v1 la marcó media (-15)."
+    },
+    "por_que_importa": "La marca aparece cortada en la barra lateral y en el botón del asistente de cada pantalla."
+   },
+   {
+    "id": "v2-27padron-11",
+    "severidad": "baja",
+    "regla": "§8 Voz de producto (regla 3: .nota no es un componente de explicación) + FICHAS 27 (contacto principal pasó a la ficha)",
+    "dice_el_sistema": "«`.nota` no es un componente de explicación general. Se usa solo para el nivel 1 … una restricción o instrucción que bloquea la acción inmediata.»",
+    "hay_en_el_build": "Tres .nota al pie explican mecánica: ««Sin calcular» no es «faltan»…», «Los dos documentos son opcionales aquí y obligatorios para programar…» y «Tipo, contacto principal y último movimiento se encienden y apagan desde «Columnas»». La tercera nombra una columna, «contacto principal», que la tabla no tiene (7 columnas sin ella; FICHAS 27: «Contacto principal | A la ficha del cliente»). Además, el panel de duplicados cierra con «El sistema propone; nadie fusiona solo…».",
+    "selector": ".nota",
+    "linea": 865,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 865,
+     "cita": "<b>Tipo</b>, <b>contacto principal</b>"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Cada nota está bajo ~140 caracteres, pero ninguna bloquea una acción. Se adopta y se propone pasarlas a toggletips (§6.23) sobre la cabecera de columna o el botón «Columnas». La mención de «contacto principal» es una incoherencia menor del dibujo, no una decisión."
+    },
+    "por_que_importa": "Tres frases de ayuda fija debajo de la tabla ocupan más alto que una fila y dicen cosas que ya dice la cabecera."
+   },
+   {
+    "id": "v2-27padron-12",
+    "severidad": "baja",
+    "regla": "§6.5 Iconos (un icono no cambia de significado) + §6.19 (title en el botón-icono)",
+    "dice_el_sistema": "«Si un icono va sin texto visible, lleva **como mínimo** etiqueta emergente y `aria-label`.»",
+    "hay_en_el_build": "«Pedir por correo lo que falta» lleva el icono #i-link (cadena), el mismo que en otras pantallas del cliente significa «liga»; las tres acciones de fila llevan aria-label con el dato concreto pero ningún title.",
+    "selector": ".barra-sel .btn, .acciones .iconbtn",
+    "linea": 736,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 736,
+     "cita": "<use href=\"#i-link\"/></svg>Pedir por correo lo que falta"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Menor. El cliente rechazó «Reenviar liga de registro» (D6); conviene que ningún icono de cadena sugiera una liga. v1: f1-27padron-10, baja/media."
+    },
+    "por_que_importa": "Un icono de cadena para pedir documentos por correo invita a leer «liga de registro», justo lo que D6 rechazó."
+   },
+   {
+    "id": "v2-27padron-13",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (rótulo de grupo del cromo)",
+    "dice_el_sistema": "«Se admite una excepción, y solo una: 10,5px en mayúsculas con `letter-spacing` para los rótulos de grupo de la barra lateral.»",
+    "hay_en_el_build": ".grp a 10,5 px sin text-transform: «Principal», «Operación», «Trámites vehiculares», «Dirección y Administración», «Soporte» en mayúscula inicial.",
+    "selector": ".grp",
+    "linea": 235,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "brief: 5 fallos, p.grp ×5"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El ejemplo de §7.2 escribe .grp sin text-transform aunque §2.1 exige mayúsculas: el sistema se contradice; corregir el ejemplo."
+    },
+    "por_que_importa": "Menor: rótulo de navegación, pero queda fuera de la excepción que el propio sistema concede."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [
+  {
+   "id_v1": "f1-27padron-02",
+   "evidencia": "Las seis reglas táctiles llevan ahora :root[data-tacto=\"dedo\"] (líneas 279–284); medido con data-tacto=\"dedo\" puesto, los .iconbtn miden 46 px (aud2/common_a.cjs)."
+  },
+  {
+   "id_v1": "f1-27padron-12",
+   "evidencia": "Los 30 tamaños bajo 12 px pasaron a var(--fs-meta): lt12_medido = 0 (brief estado_vs_pdf). Quedan solo tipos en mayúsculas a 10,5 px dentro de la excepción (th de modo tarjeta, .campo .et, .demo .et-g)."
+  },
+  {
+   "id_v1": "f1-27padron-13",
+   "evidencia": "contraste: 0 fallos en claro y oscuro sobre 158 nodos de texto (brief); .p-type ya no cae bajo 4,5:1."
+  },
+  {
+   "id_v1": "f1-27padron-14",
+   "evidencia": "--text-3 pasó de #66717F a #5C6675 (diff v1flat/27_padron_clientes.html línea 67→70); el diff también añade --on-state, --surface-hover y --border-ctrl."
+  },
+  {
+   "id_v1": "f1-27padron-18",
+   "evidencia": ".search:focus-within ahora usa outline y se retiró la segunda regla .search input:focus-visible: un solo anillo (diff líneas 329–332)."
+  }
+ ],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 2,
+   "integridad": 2
+  },
+  "justificacion": "Sube de 2 a 3: el cliente aplicó los arreglos globales (token --text-3, tamaños, :root táctil, .state > .ico, un solo anillo) y el contraste queda en 0 fallos en claro y oscuro. Pero conserva dos críticos de accesibilidad medidos (10 destinos bajo 24 px; 15 enlaces del menú sin nombre a 1000 px), el acordeón de sucursales no funciona en 4 de 5 filas, la columna de acciones sale del contenedor a 1280 y 1024 (scroll horizontal) y el botón flotante tapa filas. Responsive 2: scroll-x en la tabla a 1280 y 1024 con las acciones fuera. Integridad 2: aria-controls al vacío, controles sin comportamiento, isotipo recortado.",
+  "evidencia": [
+   "tactil: 10 de 77 bajo 24 px; sidebar: 15/15 sin nombre; contraste: 0 fallos",
+   "anchos: scroll-x en .tabla-caja a 1280 (dx 51) y 1024 (dx 135)",
+   "propio_a27_acciones: 4 de 5 aria-controls sin destino"
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 1,
+   "hallazgo": "Los chips con conteos, el pie «Mostrando 6 de 1,248» y la barra «2 seleccionados» dan buen estado; pero la fila abierta del acordeón es la única que puede abrirse y su estado aria-expanded no cambia.",
+   "selector": ".barra-sel, .tfoot",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 734,
+    "cita": "<div class=\"barra-sel\">"
+   }
+  },
+  {
+   "n": 2,
+   "heuristica": "Relación entre el sistema y el mundo real",
+   "severidad": 2,
+   "hallazgo": "Las pills usan vocabulario del negocio («Faltan los 2», «Por vencer», «Sin movimiento desde hace 101 días»), pero «Sin calcular» y su explicación del servidor son jerga de sistema (el propio texto aclara «el servidor no pudo calcularlo»).",
+   "selector": ".exp .falta",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 848,
+    "cita": "⛔ <b>No es lo mismo que «faltan».</b>"
+   }
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 2,
+   "hallazgo": "«Cambiar a inactivo» y «Pedir por correo lo que falta» se aplican a la selección sin confirmar a cuántos y a quiénes ni ofrecer «Deshacer» (§6.13 reglas 3 y 4); FICHAS lo declara desvío aceptado («sin «Deshacer»»).",
+   "selector": ".barra-sel .btn",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 736,
+    "cita": "Pedir por correo lo que falta"
+   }
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 3,
+   "hallazgo": "Controles con pinta de interactivos que no actúan (chips, densidad, 4 de 5 sucursales) rompen la expectativa; tres iconos por fila contra el menú ⋯ de §6.14; icono de cadena para «Pedir por correo».",
+   "selector": ".schip, .suc-btn, .acciones .iconbtn",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 799,
+    "cita": "aria-controls=\"suc-cvb\""
+   }
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 2,
+   "hallazgo": "La acción masiva destructiva (inactivar) está pegada a las demás en la barra, no separada a la derecha como §6.13 regla 2; el botón «Quitar la selección» sí está separado.",
+   "selector": ".barra-sel",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 738,
+    "cita": "Cambiar a inactivo"
+   }
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocimiento antes que recuerdo",
+   "severidad": 2,
+   "hallazgo": "Las acciones de fila son tres iconos sin texto ni title (solo aria-label): quien no usa lector tiene que recordar que el recibo es «Ver órdenes».",
+   "selector": ".acciones .iconbtn",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 783,
+    "cita": "aria-label=\"Ver órdenes de Grupo Automotriz Vértice\""
+   }
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 2,
+   "hallazgo": "Búsqueda, cuatro filtros con conteo y acciones masivas sirven la tarea frecuente («a quién le falta papel»); faltan filtros combinables (§6.21) y el botón «Columnas» no tiene panel dibujado.",
+   "selector": ".p4-f, .p4-t .btn",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 728,
+    "cita": "Columnas</button>"
+   }
+  },
+  {
+   "n": 8,
+   "heuristica": "Estética y diseño minimalista",
+   "severidad": 3,
+   "hallazgo": "Celdas de documentos con prosa de hasta 236 caracteres, panel de duplicados fuera de esta tanda (D8) abierto sobre la tabla y tres notas al pie: el contenido auxiliar compite con la lista.",
+   "selector": ".exp, .dups, .nota",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "I9_celdas",
+    "detalle": "brief: 13 celdas largas; 437 caracteres en la celda del panel de sucursales"
+   }
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de errores",
+   "severidad": 1,
+   "hallazgo": "El error del padrón dice qué falló, qué no se perdió (ningún cliente se dio de alta, se fusionó ni cambió) y qué hacer, con referencia PAD-20260821-1655; solo falla en forma (sin tarjeta ni encabezado real).",
+   "selector": ".state-error",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 877,
+    "cita": "<b>No se pudo cargar el padrón</b>"
+   }
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 2,
+   "hallazgo": "Las aclaraciones («Sin calcular no es faltan», «se encienden y apagan desde Columnas») viven como notas fijas al pie en vez de toggletips sobre su elemento.",
+   "selector": ".nota",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 863,
+    "cita": "«Sin calcular» no es «faltan»"
+   }
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-044",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "cubre",
+    "evidencia": "«La documentación de clientes se envía por WhatsApp o se guarda en Drive personal»: la columna «Documentos fiscales» y el filtro «42 sin los dos documentos» ponen el estado del expediente en un solo sitio."
+   },
+   {
+    "pp": "pp-045",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "cubre",
+    "evidencia": "«Las bases de datos de clientes se comparten como Excel adjuntos»: un padrón único con exportar, selección y estado comercial sustituye al adjunto; no hay control de cambios visible en esta pantalla (vive en la ficha)."
+   },
+   {
+    "pp": "pp-098",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "«se identifica manualmente qué sucursal generó el servicio»: el desplegable de sucursales con «Ver órdenes» por sucursal es la respuesta, pero hoy funciona en 1 de 5 filas y sus acciones salen de la vista a 1280."
+   },
+   {
+    "pp": "pp-069",
+    "documento": "data/insights/2026-07-31_direccion-general-supervision-operativa.json",
+    "cobertura": "cubre",
+    "evidencia": "«No existen alertas automáticas que señalen cuando un cliente no ha sido contactado»: «Último movimiento», «Sin movimiento desde hace 101 días» y el chip «9 agencias sin órdenes en 90 días» ponen a la vista al cliente que se enfrió."
+   },
+   {
+    "pp": "pp-109",
+    "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+    "cobertura": "cubre",
+    "evidencia": "«Los datos fiscales del cliente se transcriben a mano… un error en la razón social o el RFC provoca el rechazo fiscal»: el RFC va bajo la razón social en la celda principal y el estado del expediente dice si se puede facturar; la validación del RFC no se ve en esta pantalla."
+   },
+   {
+    "pp": "pp-013",
+    "documento": "data/insights/2026-07-28_juridico-recursos-humanos.json",
+    "cobertura": "cubre",
+    "evidencia": "«No existe un repositorio documental centralizado… para los expedientes de clientes («padrón»)»: el expediente de dos documentos está, aunque el dictamen y FICHAS reconocen que qué documentos lo componen lo inventó el diseñador."
+   }
+  ],
+  "usabilidad_para_el_area": "Para comercial y administración vehicular el padrón acierta en lo que decide la tarea frecuente: a quién le falta papel, quién se enfrió y quién puede recibir una orden. Pierde claridad en la celda de documentos (demasiado texto por fila) y falla en el desplegable de sucursales, que es la respuesta a la necesidad de saber qué sucursal generó un servicio. A 1280 px de ancho, el ancho de muchos portátiles de oficina, las acciones por fila quedan fuera de la vista."
+ },
+ "cobertura": [
+  {
+   "patron": "Fila desplegable con lista de hijas (acordeón de sucursales)",
+   "propuesta_de_regla": "La fila hija comparte columnas con la madre o declara su propio ancho útil, nunca el del colspan de la tabla; su contenido es legible sin desplazamiento horizontal; un renglón por hija (nombre · municipio, dirección, estado, acción); sin tarjeta dentro de tarjeta; cada control con aria-expanded + aria-controls a un id real y cierra con Escape devolviendo el foco."
+  },
+  {
+   "patron": "Columna de acciones de fila cuando la tabla se desliza",
+   "propuesta_de_regla": "Con desplazamiento horizontal (D-6) la primera columna se ancla a la izquierda y la de acciones a la derecha; o las acciones se reducen a un menú ⋯ (§6.14) con la fila navegable (§6.11 regla 11). Ninguna acción de fila queda fuera de la vista a 1280 px sin aviso."
+  },
+  {
+   "patron": "Estado de expediente en celda (pill específica + consecuencia común)",
+   "propuesta_de_regla": "La celda lleva una pill con el estado exacto («Falta constancia») y nada más; la consecuencia común se dice una vez en toggletip del encabezado de columna (§6.23). Los estados que dependen de datos aún no disponibles (vigencia, D7) no se dibujan."
+  },
+  {
+   "patron": "Botón flotante del asistente y su zona segura",
+   "propuesta_de_regla": "Reservar 68 px a la derecha y abajo de todo contenedor de scroll; ninguna acción de fila ni de pie se ancla dentro de ese cuadro (ver 41_alta_cliente: margin-right:68px)."
+  }
+ ],
+ "sin_datos": [
+  "No sé qué ancho de viewport usó la persona para su captura; el recorte de acciones ocurre por debajo de 1331 px. No puedo afirmar el ancho exacto de su pantalla.",
+  "No puedo verificar si el scroll horizontal de .tabla-caja muestra barra visible en un navegador de escritorio: la medición de Playwright usa barras superpuestas (offsetHeight−clientHeight = 0). Geométricamente la barra quedaría al final de la tabla (y≈1680 a 1280), fuera del primer pliegue.",
+  "No hay contradicción con D1–D10 del aviso del 28-sep en esta pantalla: D6 se respeta (sin «Reenviar liga»); D7 (vigencia) y D8 (duplicados) están dibujados aunque pospuestos, y FICHAS 27 lo reconoce («la 27 los dibuja, pero no entran en esta tanda»); D10 («Último movimiento») está presente; el panel de «Columnas» no está dibujado.",
+  "Modo oscuro: solo la medición de contraste del brief (0 fallos); no se inspeccionó visualmente.",
+  "Rendimiento: no evaluado."
+ ]
+}
