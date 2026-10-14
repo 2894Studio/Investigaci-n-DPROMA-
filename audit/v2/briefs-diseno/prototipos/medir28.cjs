@@ -62,6 +62,7 @@ function medir() {
   out.scrollHorizontalPagina = document.documentElement.scrollWidth > innerWidth + 1;
   out.fueraDelAncho = [...document.querySelectorAll('main *,.p4 *,.pie-accion *')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.right > innerWidth + .5 || r.left < -.5); }).slice(0, 5).map(e => e.className || e.tagName);
   // solape entre la última tarjeta y la barra fija (al final) ya cubierto en cola; solape cabecera / contenido:
+  { const sv = document.querySelector('.side .logo svg'), u = sv.querySelector('use'); out.logoDx = f1(u.getBoundingClientRect().left - sv.getBoundingClientRect().left); }
   out.solapeCabeceraContenido = inter(p4r, m0);
   // 7. Contraste (claro y oscuro)
   const cc = {}; const rs = p4.querySelector('.resumen'); if (rs && rs.getBoundingClientRect().height) { cc.resumen = contr(rs); const pl = rs.querySelector('.pill'); if (pl) cc.pillCabecera = contr(pl); const rb = rs.querySelector('b'); if (rb) cc.resumenB = contr(rb); }

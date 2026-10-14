@@ -121,6 +121,9 @@ B28 = aplica(A28, [
     # ARQ-CROMO: la sombra del cajón solo existe con el cajón abierto (cerrado, se cuela en el borde izquierdo a ≤860 px)
     ('    transform:translateX(-101%);transition:transform var(--dur-base) var(--ease-out);\n    box-shadow:var(--sh-modal)}\n  :root[data-menu="abierto"] .side{transform:none}',
      '    transform:translateX(-101%);transition:transform var(--dur-base) var(--ease-out)}\n  :root[data-menu="abierto"] .side{transform:none;box-shadow:var(--sh-modal)}', 1),
+    # §10: isotipo del logo del cromo con las medidas en el <use>
+    ('<svg width="44" height="42" viewBox="740 0 970 932" aria-hidden="true"><use href="#dproma-mark"/></svg>',
+     '<svg width="44" height="42" aria-hidden="true"><use href="#dproma-mark" width="44" height="42"/></svg>', 1),
 ], 'B28')
 escribe('28-mi-dia-B-recomendado.html', o28, B28, 'B recomendado')
 

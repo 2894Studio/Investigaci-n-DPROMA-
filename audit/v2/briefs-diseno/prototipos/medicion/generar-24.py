@@ -2,7 +2,7 @@
 # Genera prototipos/24-tickets-zona-superior.html a partir de la maqueta del cliente (24_tickets.html, sin tocarla).
 # Cada sustitución exige exactamente una coincidencia: si la maqueta cambia, el script falla en vez de adivinar.
 import sys, pathlib
-ORIG = pathlib.Path(sys.argv[1]); DEST = pathlib.Path(sys.argv[2])
+ORIG = pathlib.Path(sys.argv[1]); DEST = pathlib.Path(sys.argv[2]); MIN = len(sys.argv) > 3 and sys.argv[3] == 'min'
 s = ORIG.read_text(encoding='utf-8')
 
 def sub(viejo, nuevo, n=1):
@@ -22,6 +22,11 @@ sub('.p4{background:var(--surface);border-bottom:1px solid var(--border);flex-sh
 sub('.detalle .banda{margin:var(--sp-4) var(--sp-6) 0}', '.detalle > .banda{margin:var(--sp-4) var(--sp-6) 0}')
 sub('@media (max-width:1280px){.detalle .banda{margin-left:var(--sp-4);margin-right:var(--sp-4)}}',
     '@media (max-width:1280px){.detalle > .banda{margin-left:var(--sp-4);margin-right:var(--sp-4)}}')
+
+if MIN:
+    # Opción 1 (mínimo cambio): solo la cabecera y el selector del margen; el resto de la maqueta queda como está.
+    sub('<title>SIO-DPROMA — Tickets TI (prototipo: zona superior)</title>', '<title>SIO-DPROMA — Tickets TI (opción 1: mínimo cambio)</title>')
+    DEST.write_text(s, encoding='utf-8'); print('escrito (min)', DEST, len(s)); sys.exit(0)
 
 # 3. Etiqueta de campo al suelo de 12 px (§2.1)
 sub('.campo .et{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3)}',

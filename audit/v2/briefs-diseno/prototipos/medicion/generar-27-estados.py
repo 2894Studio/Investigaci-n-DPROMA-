@@ -24,7 +24,7 @@ assert n == 6, n
 # 2. Cabecera de la columna con toggletip (§6.23, §8 nivel 2)
 tip = ('<span class="thx">Documentos fiscales<button class="infob" type="button" aria-expanded="false" aria-controls="tip-docs" aria-describedby="tip-docs" '
        'aria-label="Más información sobre documentos fiscales">' + ICO('info') + '</button>'
-       '<span class="tip" id="tip-docs" role="tooltip" hidden>Opcionales para dar de alta; obligatorios para programar o facturar. «Sin calcular» significa que no se pudo comprobar, no que falten.</span></span>')
+       '<span class="tip" id="tip-docs" role="tooltip" hidden>Opcionales para dar de alta, obligatorios para programar o facturar. «Sin calcular» significa que no se pudo comprobar, no que falten.</span></span>')
 sub('<th scope="col">Documentos fiscales</th>', f'<th scope="col">{tip}</th>')
 
 # 3. Chips: «sin los dos documentos» → «con documentos pendientes»; «por vencer» fuera (D7)

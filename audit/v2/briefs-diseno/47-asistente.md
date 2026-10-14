@@ -34,7 +34,7 @@
 | Compositor | `.rapido` ×4 · `textarea#preg` · `.btn.p «Enviar»` · `.aviso-ia` | 757-766 |
 | Estados | `state-ok`, `state-loading` (esqueleto con texto), `state-empty`, `state-error` | 705-793 |
 
-Tokens en juego: `--surface #FAFCFD`, `--surface-2 #E7EDF3`, `--bg #F2F5F7`, `--link #2F6B3C`, `--text-3 #5C6675` (todos en el `:root` de la maqueta, l.60-80).
+Tokens en juego: `--surface #FAFCFD`, `--surface-2 #E7EDF3`, `--bg #F2F5F7`, `--link #2F6B3C`, `--text-3 #5C6675` (todos en el `:root` de la maqueta, l.60-86).
 
 ### 1.2 Qué falla (con prueba)
 
@@ -42,7 +42,7 @@ Tokens en juego: `--surface #FAFCFD`, `--surface-2 #E7EDF3`, `--bg #F2F5F7`, `--
 |---|---|---|---|
 | F1 | **La franja se monta sobre la última línea.** Aire entre el texto y la franja: **−8,9 px** en las dos respuestas, a los 4 anchos. Es lo que la persona vio en la captura. | `[m47] original, respuestas[].aireUltimaLineaFranja = -8.9` · `l.669` · captura `prototipos/47-original-respuesta1.png` | Crítico (5) |
 | F2 | **Una clase, dos significados.** `.fuentes` rotula «De dónde salió» (l.729, enlaces de lectura) y «Para hacerlo» (l.745, pasos a seguir). Mismo aspecto, mismo tipo de control. | `grep -n 'class="fuentes"' 47_asistente.html` → 729, 745 | Sistema/diseño |
-| F3 | **Tres tonos para dos conceptos.** Cuerpo blanco (`--surface`), franja gris (`--surface-2`), y el turno del usuario sin tarjeta sobre el lienzo (`--bg`). Entre sí: 1,15 : 1 (surface/surface-2), 1,06 : 1 (surface/bg), 1,08 : 1 (bg/surface-2); en oscuro 1,10 / 1,10 / 1,21. El tono **no** separa nada por sí solo: separan el borde de 1 px, el rótulo y el avatar. | Cálculo de contraste sobre los tokens (script en la sesión; valores en §1.3) · `[m47] respuestas[].tarjetaFondo/franjaFondo` | Estético / comprensión |
+| F3 | **Tres tonos para dos conceptos.** Cuerpo blanco (`--surface`), franja gris (`--surface-2`), y el turno del usuario sin tarjeta sobre el lienzo (`--bg`). Entre sí: 1,15 : 1 (surface/surface-2), 1,06 : 1 (surface/bg), 1,08 : 1 (bg/surface-2); en oscuro 1,10 / 1,10 / 1,21. El tono **no** separa nada por sí solo: separan el borde de 1 px, el rótulo y el avatar. | `prototipos/contraste-tonos.py` (cálculo sobre los tokens del `:root`) · `[m47] respuestas[].tarjetaFondo/franjaFondo` | Estético / comprensión |
 | F4 | **5 destinos <24 px.** `input#buscar` 216×16 y cuatro enlaces de la franja de 780×19,8. | `[m47] original, destinos.bajo24` (5, a los 5 anchos) · §7.3 | Crítico (1) |
 | F5 | **El hilo no anuncia nada nuevo** (cero `aria-live`/`role="log"`) y el buscador es un `<div>`, no una `<label>` (la región pulsable es el `<input>` de 16 px). | `[m47] ariaLive=false, buscarEsLabel=false` · l.709, l.716 · §6.4 regla 1, §10 («El destino táctil es la región que acepta la pulsación») | Accesibilidad |
 | F6 | **Isotipo recortado** en el avatar del asistente (y en el logo del cromo): `viewBox` repetido en el `<svg>`. Desplazamiento del `<use>`: −11,4 px (avatar) y −32,5 px (logo). | `[m47] isotipoAvatar.dx=-11.4, isotipoLogo.dx=-32.5` · l.692, l.723, l.740 · §10 («Un `<symbol>` ya trae su `viewBox`…») · `grep -l 'viewBox="740 0 970 932" aria-hidden="true"><use href="#dproma-mark"/>' *.html` → 35 archivos | Estético / sistema |
@@ -50,7 +50,7 @@ Tokens en juego: `--surface #FAFCFD`, `--surface-2 #E7EDF3`, `--bg #F2F5F7`, `--
 | F8 | **El hilo queda estrecho a ≤1024 px:** 32 % de la altura a 1024×768, 25 % a 390×844 (215 px). | `[m47] altura.hiloPct` | Mejora (no crítico) |
 | F9 | **Dos asistentes con contratos opuestos.** 47: «no modifica nada» (l.704) y «Eso no lo puedo hacer yo» (l.743). 10: «las acciones siempre se confirman antes de ejecutarse» (`10_dprimi_asistente.html:487`), «Notificar a los responsables» (:509), «Acción que requiere tu confirmación … Confirmar y enviar» (:519-522). Nombre distinto («Asistente» / «Asistente D-PRIMI») y el lanzador de las pantallas originales dice «Abrir D-PRIMI» (`02_dashboard.html:548`) frente a «Abrir el asistente del sistema» (`20_tablero.html:952`). | `grep -n` en los tres archivos | Producto (no se resuelve con CSS) |
 | F10 | **El lanzador no está en 47.** Su CSS existe (l.268-275) y su marcado no (`grep -c 'class="fab' 47_asistente.html` → 0). La ficha dice que está «portado al armazón, deshabilitado y con su aviso de “entrega posterior”»; en `20_tablero.html:952` el `.fab` no lleva `disabled` y `grep -c "entrega posterior" *.html` da 0 en todo el paquete. | `grep` indicado | Contradicción ficha ↔ marcado |
-| F11 | **Sombra del cajón de menú que se cuela a ≤860 px.** El `.side` fuera de pantalla conserva `box-shadow:var(--sh-modal)` (l.296): a 390 px el píxel x=0 mide `219,223,226` frente a `242,245,247` sin sombra, y llega hasta x≈50. Se ve como un degradado gris en el borde izquierdo de todas las capturas a 390. | `prototipos/medir-sombra-cajon.cjs` · 36 archivos con `translateX(-101%)` | Estético / sistema |
+| F11 | **Sombra del cajón de menú que se cuela a ≤860 px.** El `.side` fuera de pantalla conserva `box-shadow:var(--sh-modal)` (l.296): a 390 px el píxel x=0 mide `219,223,226` frente a `242,245,247` sin sombra, y llega hasta x≈40-50. Se ve como un degradado gris en el borde izquierdo de todas las capturas a 390. | `prototipos/medir-sombra-cajon.cjs` · 36 archivos con `translateX(-101%)` | Estético / sistema |
 | F12 | La tarjeta de respuesta es una **séptima implementación de la receta de tarjeta**, sin `overflow:hidden` ni `--sh-rest`. | §6.3 («Es una clase, no un patrón que cada pantalla reimplementa») · l.665 | Causa raíz de F1 |
 
 ### 1.3 Las tres preguntas de la persona, respondidas
@@ -77,7 +77,7 @@ Tokens en juego: `--surface #FAFCFD`, `--surface-2 #E7EDF3`, `--bg #F2F5F7`, `--
 | R1 | Cuerpo y pie de la tarjeta son zonas separadas, sin márgenes negativos, con ≥12 px entre la última línea y el pie. | §3.1; §6.3 (anatomía: banda `--surface-2` + `.interior` con relleno propio, `overflow:hidden`) |
 | R2 | Procedencia (solo lectura) y paso a seguir se distinguen por la **forma**, no solo por el rótulo. | Auditoría v2 R2; §11 («lo que ejecuta es un `<button>` y lo que navega un `<a>`») |
 | R3 | Todo destino ≥24 px; el buscador es una `<label>`. | §7.3; §10 |
-| R4 | Lo nuevo del hilo se anuncia; los estados llevan encabezado real y los cargando no llevan texto dentro de las barras. | §6.4 reglas 1-2; §6.7 |
+| R4 | Lo nuevo del hilo se anuncia; los estados llevan encabezado real y los cargando no llevan texto dentro de las barras. | §6.4 reglas 1-2; §6.7. El propio `10_dprimi_asistente.html:490` ya lleva `aria-live="polite"` en su hilo. |
 | R5 | Una sola definición del asistente (consulta o consulta+acción) y el límite se dice una vez, donde condiciona la acción. | §8 (nivel 1); F9 |
 | R6 | Textos ≤140 caracteres. | §8 |
 | R7 | Sin hex en componentes; todo por tokens. | `sistema-diseno.md` cabecera («La regla de fondo») |
@@ -111,7 +111,7 @@ Tokens en juego: `--surface #FAFCFD`, `--surface-2 #E7EDF3`, `--bg #F2F5F7`, `--
 - **C — Historial compacto a ≤1024 px** (B + `.hist ol` en una fila horizontal): el hilo pasa de 30 % a 39 % (1024×768), de 24 % a 35 % (390×844) y de 42 % a 58 % (820×1180). Opcional; no crítico.
 - **D — Estados de una respuesta** (B + «consultando…» y «no pude responder»), que el cliente no dibujó. Usa solo componentes existentes.
 
-**Sobre «dos colores» (decisión):** se **conserva** el tono de la franja. Es lo que dibujó el cliente; además §6.3 ya usa `--surface-2` para la banda de cabecera de una tarjeta, así que el par `--surface` / `--surface-2` dentro de una tarjeta es del sistema. Alternativa si DPROMA prefiere una sola superficie: `.fuentes{background:transparent}` (una línea; los pies `.barra-form` y `.tfoot` del sistema son `--surface` con borde superior). No es crítico.
+**Sobre «dos colores» (decisión):** se **conserva** el tono de la franja. Es lo que dibujó el cliente; además §6.3 ya usa `--surface-2` para la banda de cabecera de una tarjeta, así que el par `--surface` / `--surface-2` dentro de una tarjeta es del sistema. Alternativa si DPROMA prefiere una sola superficie: `.fuentes{background:transparent}` (una línea; los pies `.tfoot` y `.barra-form` de la propia maqueta, l.389 y l.591, son `--surface` con borde superior). No es crítico.
 
 ---
 
@@ -172,8 +172,8 @@ Tokens en juego: `--surface #FAFCFD`, `--surface-2 #E7EDF3`, `--bg #F2F5F7`, `--
 | **Respuesta fallida** (no dibujada) | «**No pude responder.** Tu pregunta se guardó y nada del sistema cambió.» (67 caracteres) + referencia + pie «Qué hacer» con `Reintentar` (`.btn.mini`) | Misma tarjeta con pie; mismo orden de §6.4 regla 3. |
 
 ### 4.4 Accesibilidad
-- **Nombre accesible:** `.mensajes` = «Mensajes» (`role="log"`); cada enlace/botón de pie se nombra por su texto («Abrir GT-2026-02417»), distinto uno de otro (§10, `aria-label` nombra el dato concreto).
-- **Teclado:** 34 paradas de tabulación, en orden del DOM, sin trampas; el hilo es una parada (`tabindex="0"`) porque desplaza; los 4 controles de pie y el buscador muestran contorno de 2 px (el buscador, en su `<label>`, por `:focus-within`) [`prototipos/teclado47.cjs`].
+- **Nombre accesible:** `.mensajes` = «Mensajes» (`role="log"`); cada enlace/botón de pie se nombra por su texto («Abrir GT-2026-02417»), distinto uno de otro (§6.19: el nombre accesible nombra el dato concreto).
+- **Teclado:** las 34 primeras paradas de tabulación (cromo, historial, hilo, pies, compositor) siguen el orden del DOM, sin trampas; el hilo es una parada (`tabindex="0"`) porque desplaza; los 4 controles de pie y el buscador muestran contorno de 2 px (el buscador, en su `<label>`, por `:focus-within`) [`prototipos/teclado47.cjs`].
 - **Foco:** el contorno (2 px + 2 px de separación) de cada control de pie cabe dentro de la tarjeta, no lo recorta `overflow:hidden` [m47 `foco`].
 - **`aria-*`:** `role="log"`, `aria-busy` y `role="status"` solo donde se indica; `aria-hidden` en avatares e isotipos.
 
@@ -235,7 +235,7 @@ Mínimo exigido: 4,5 : 1 texto; 3 : 1 gráficos (§1.7). Cumplen todos los pares
 | **Alcance dentro del sistema** | Sí. Cero tokens nuevos (`--surface`, `--surface-2`, `--surface-hover`, `--sp-*`, `--r-card`, `--link`) y cero componentes nuevos: `.btn.mini` (§6.2), anatomía de §6.3. Las clases nuevas (`.tx-cuerpo`, `.fuentes--paso`) son modificadores locales. |
 | **Esfuerzo** | A: 5 ediciones (~6 líneas). B: ~20 líneas de CSS, un envoltorio por respuesta en la plantilla, 3 `<svg>` de isotipo. Proporcionado: el defecto F1 es el que la persona vio. |
 | **Compatibilidad con DPROMA** | No toca ningún D-n. Conserva S-19 y S-20 (supuestos sin ratificar, FICHAS 47). Respeta «Que el lanzador sea **cromo** y viva en el armazón está ya decidido y portado» y «Las 14 originales … se copiaron sin tocar». |
-| **Condiciones** | (1) DPROMA decide si el asistente **solo consulta** (47) o **consulta y ejecuta con confirmación** (10) antes de construir; B es compatible con ambos (el pie de paso admite botones que ejecutan). (2) Según la ficha, la pantalla depende de «piezas sin backend» (FICHAS, fin de la tanda 2: «`45`/`46`/`50`/`54`/`55`/`13`/`14`/`12`/`47` … siguen fuera»): se diseña, no se construye aún. (3) Probar `role="log"` con un lector de pantalla real (no medido). |
+| **Condiciones** | (1) DPROMA decide si el asistente **solo consulta** (47) o **consulta y ejecuta con confirmación** (10) antes de construir; B es compatible con ambos (el pie de paso admite botones que ejecutan). (2) Según la ficha, `47` queda «fuera» de lo portado porque depende «de la decisión pendiente de Jhon … o de piezas sin backend» (FICHAS, «Fase 2, tanda 2 · Lo que sigue sin copiar», l.1456-1459): se diseña, no se construye aún. (3) Probar `role="log"` con un lector de pantalla real (no medido). |
 
 **Lo no viable ahora, documentado como deuda (no crítico):** (i) unificar 47 y 10 en un solo asistente (decisión de producto); (ii) reconstruir la respuesta como `.tarjeta` + `.interior` + pie (el objetivo del sistema, F12) en lugar de `.tx`; (iii) historial plegable en móvil con `<details>` (C lo mitiga con CSS).
 

@@ -67,6 +67,7 @@ const CAPDIR = path.join(__dirname, '..', 'capturas');
       const zonaEls = [caja, ...bandas].filter(Boolean);
       chars = zonaEls.reduce((s, e) => s + e.textContent.trim().replace(/\s+/g, ' ').length, 0);
       res.caracteresEnCajas = chars;
+      res.caracteresVisibles = zonaEls.reduce((s2, e) => s2 + e.innerText.trim().replace(/\s+/g, ' ').length, 0);
       res.primerCampoY = primerCampo === null ? null : +(primerCampo - rd.top).toFixed(1);
       // cuántos elementos de la zona alta llevan el fondo ámbar (--warn-bg)
       const probe = document.createElement('i'); probe.style.background = 'var(--warn-bg)'; document.body.appendChild(probe);

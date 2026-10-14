@@ -1,3 +1,4 @@
+// Mide cuánto se cuela la sombra del cajón de menú cerrado en el borde izquierdo a 390 px (28 y 47). Compara píxeles con y sin sombra. Solo lee.
 const { chromium } = require('playwright');
 const lib = require('/home/user/Investigaci-n-DPROMA-/audit/v2/instrumentos/lib.cjs');
 (async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});

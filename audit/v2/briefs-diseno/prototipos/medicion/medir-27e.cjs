@@ -68,7 +68,7 @@ const CAPDIR = path.join(__dirname, '..', 'capturas');
     });
     out.medidas[`${w}x${h}-${tema}`] = r;
     if (tema === 'light') {
-      await page.evaluate(() => { const m = document.getElementById('contenido'); m.scrollTop = 0; });
+      await page.evaluate(() => { if (document.activeElement) document.activeElement.blur(); const m = document.getElementById('contenido'); m.scrollTop = 0; });
       const caja = await page.$('.tabla-caja');
       if (w >= 1024) await caja.screenshot({ path: path.join(CAPDIR, `27e-tabla-${etiqueta}--${w}.png`) });
       else { await page.evaluate(() => { document.querySelector('tbody tr').scrollIntoView({ block: 'start' }); }); await page.screenshot({ path: path.join(CAPDIR, `27e-tabla-${etiqueta}--${w}.png`) }); }
