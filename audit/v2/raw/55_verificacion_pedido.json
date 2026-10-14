@@ -1,0 +1,471 @@
+{
+ "pantalla": "55_verificacion_pedido",
+ "tier": "B",
+ "sha256": "2db289827b94f4ebf79133f1fec358ca93f94658ca32e0ba1ad2019e6411bb8f",
+ "estado_entrega": "modificada",
+ "estado_vs_pdf": "alineado",
+ "estados_auditados": [
+  "ok",
+  "vacío",
+  "error",
+  "cargando"
+ ],
+ "capturas": [
+  "55_verificacion_pedido--1440.png",
+  "55_verificacion_pedido--1280-fold.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 19,
+   "texto_usuario": "«Siguiente» cortado en el borde superior de la tarjeta; debe ir por fuera.",
+   "veredicto": "confirmada",
+   "evidencia": [
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 678,
+      "cita": ".ren.siguiente::before{content:'SIGUIENTE';position:absolute;transform:translateY(-32px);"
+     },
+     "dato": "ELEMENTO. La etiqueta «SIGUIENTE» no es un nodo: es el pseudo-elemento `::before` de `button.ren.siguiente` (el renglón «Centro de carga 4 polos», el primero sin verificar). CSS: `.ren.siguiente::before{content:'SIGUIENTE';position:absolute;transform:translateY(-32px);font:800 12px var(--font-ui);letter-spacing:.08em;color:var(--accent)}` y `.ren.siguiente{position:relative;margin-top:var(--sp-4)}` (líneas 677-680). El pseudo no declara `top`, `bottom` ni `left`."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "c55.cjs + s55.cjs (scratchpad/b2)",
+      "detalle": "getComputedStyle(el,\"::before\") y getBoundingClientRect a 1280×800 y 390×844"
+     },
+     "dato": "GEOMETRÍA. El botón es `display:flex;align-items:center` (`.ren`), así que la posición estática del pseudo absoluto queda centrada en vertical: `top` calculado 26,5 px (1280 y 390, tarjeta de 70 px). Posición real respecto al borde superior de la tarjeta = 26,5 + 1 de borde − 32 de translate = −4,5 px; el texto mide 15 px, así que ocupa de −4,5 a +10,5 px: el borde de 1 px y el aro de `box-shadow:0 0 0 1px` de `.ren.siguiente` lo atraviesan por la mitad. Con un nombre de dos líneas (tarjeta de 78 px a 390) `top` pasa a 30,7 px y la etiqueta queda en −0,3 px, es decir, dentro de la tarjeta: su posición depende del alto de la tarjeta. La separación con el renglón anterior es de 28 px (16 de margen + 12 de gap), de sobra para que quepa por fuera."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "captura",
+      "archivo": "55-sig-1280.png (scratchpad/b2/, captura propia a 2× de 1280 y de 390 px)",
+      "region": "recorte alrededor de «Centro de carga 4 polos»: «SIGUIENTE» montada sobre la línea verde superior de la tarjeta, con la parte baja de las letras tapada por el borde"
+     },
+     "dato": "LO QUE SE VE. Coincide con lo que dice la persona: la etiqueta está cortada por el borde superior de la tarjeta (se ve en las dos capturas, 55-sig-1280.png y 55-sig-390.png)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "s55.cjs",
+      "detalle": "ancestros con `overflow` distinto de visible desde el botón hasta `body`"
+     },
+     "dato": "NO ES UN RECORTE POR OVERFLOW. El botón tiene `overflow:visible`; los únicos ancestros con overflow son `main#contenido` (y auto, x hidden), `.main`, `.area`, `.hoja` y `body` (hidden), y ninguno toca la etiqueta (está dentro de su caja a −4,5 px). Lo que la corta es el borde y el aro de la propia tarjeta. Por eso I3 (recorte) no la marca."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "f55.cjs (scratchpad/b2)",
+      "detalle": "CSS inyectado en la página, sin tocar el archivo: `.ren.siguiente::before{top:auto;bottom:calc(100% + var(--sp-2));left:var(--sp-4);transform:none}` y `.ren.siguiente{margin-top:var(--sp-6)}`; nombre largo forzado a dos líneas; captura 55-fix-390.png"
+     },
+     "dato": "SOLUCIÓN PROBADA. Anclando la etiqueta por su borde inferior (`bottom`) deja de depender del alto de la tarjeta: queda por fuera, 8 px sobre el borde, con nombre de una o de dos líneas (captura 55-fix-390.png)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "c55.cjs",
+      "detalle": "ariaSnapshot de `.ren.siguiente`"
+     },
+     "dato": "NOMBRE ACCESIBLE. El contenido generado entra en el nombre del botón: `button \"SIGUIENTE Centro de carga 4 polos CEN-04 1 pieza\"`. Si la etiqueta sale a un elemento propio fuera del botón, conviene marcar el botón con `aria-current=\"step\"` para que el lector siga sabiendo cuál es el siguiente."
+    }
+   ],
+   "causa_raiz": "`.ren.siguiente::before` se coloca con `position:absolute` sin `top`/`bottom`: su posición estática la decide el `align-items:center` del botón (centro vertical de la tarjeta), y un `translateY(-32px)` fijo, calibrado a ojo, la sube hasta el borde en lugar de dejarla fuera. El resultado cae a mitad del borde (−4,5 px) y cambia con el alto de la tarjeta.",
+   "solucion_propuesta": "`.ren.siguiente::before{top:auto;bottom:calc(100% + var(--sp-2));left:var(--sp-4);transform:none}` y `.ren.siguiente{margin-top:var(--sp-6)}` (probado a 390 px con una y dos líneas de nombre); añadir `aria-current=\"step\"` al botón. Alternativa: sacar la etiqueta a un `<span class=\"sig\">Siguiente</span>` en el `<li>`, antes del botón.",
+   "tipo_de_cambio": "sencillo",
+   "critico": {
+    "es": false,
+    "criterio": null
+   },
+   "decision": {
+    "valor": "adoptar_cliente",
+    "motivo": "Se adopta el patrón del cliente (etiqueta sobre la tarjeta del siguiente renglón); no es crítico y no es regresión demostrable. La persona ya pidió que vaya por fuera y el parche es de dos líneas, probado: se propone como corrección sencilla (Regla 2) y se documenta el patrón en cobertura."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-55verif-menu-colapsado-sin-nombre",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación — modo colapsado (860–1100 px): el rótulo no desaparece",
+    "dice_el_sistema": "En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+    "hay_en_el_build": "A 1000 px la barra lateral mide 64 px y `.side .et{display:none}`: los 15 enlaces `.it` quedan sin nombre accesible (brief menu_1000px: total 15, sinNombre 15; medición propia con ariaSnapshot: `- link:` sin nombre en los 15). Ningún `.it` lleva `aria-label` ni `title`.",
+    "selector": ".side .it",
+    "linea": 288,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 288,
+     "cita": ".side .et,.grp,.side .wordmark{display:none}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1). Arreglo de una línea por enlace: `aria-label` y `title` con el rótulo (o mover el texto a `.sr` en lugar de `display:none`). El mismo cromo está copiado en todas las pantallas: conviene arreglarlo en la plantilla."
+    },
+    "por_que_importa": "En un portátil de 860–1100 px (o con zoom) quien usa lector de pantalla oye «enlace, enlace, enlace» en toda la navegación principal, y quien ve solo tiene iconos sin etiqueta emergente."
+   },
+   {
+    "id": "v2-55verif-isotipo-viewbox",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 — un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` descoloca la marca",
+    "dice_el_sistema": "Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.",
+    "hay_en_el_build": "El `<svg>` del logo (y el del botón flotante, si lo hay) repite `viewBox=\"740 0 970 932\"` y su `<use>` no lleva medidas. Medición propia (cromo.cjs): el `<use>` queda en x=-22,5 frente al `<svg>` en x=10, un desplazamiento de 32,5 px (el que §10 predice); la parte que cae dentro de la caja de 44 px es ≈ 24 % de la marca.",
+    "selector": ".side .logo svg, .fab svg",
+    "linea": 717,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 717,
+     "cita": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Es un fallo de implementación conocido y de una línea (quitar `viewBox`, poner `width`/`height` en el `<use>`); se recomienda corregirlo en la plantilla del cromo (regla 2), no se exige pantalla por pantalla."
+    },
+    "por_que_importa": "La marca de DPROMA aparece recortada a una cuarta parte en la esquina superior de todas las pantallas."
+   },
+   {
+    "id": "v2-55verif-grp-105-sin-mayusculas",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px — la excepción de 10,5 px es «en mayúsculas» (contradicción interna del sistema con §7.2)",
+    "dice_el_sistema": "Se admite una excepción, y solo una: 10,5px en mayúsculas",
+    "hay_en_el_build": "Los 5 `p.grp` de la barra lateral van a 10,5 px sin `text-transform:uppercase` (brief C2_105_no_mayusculas: 5 fallos; en la captura se leen «Principal», «Operación»…). Es la copia literal de la receta de §7.2 (línea 1942 del sistema: `.grp{margin:14px 8px 4px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}`, sin `text-transform`).",
+    "selector": "p.grp",
+    "linea": 235,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 235,
+     "cita": ".grp{margin:9px 8px 2px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "La causa raíz es nuestra: §2.1 permite 10,5 px solo en mayúsculas pero el CSS de §7.2 no las pone. Hay que corregir §7.2 (añadir `text-transform:uppercase`) o ampliar la excepción de §2.1; el cliente copió lo que decía el documento."
+    },
+    "por_que_importa": "Cinco rótulos de grupo por pantalla quedan por debajo del suelo de 12 px sin la compensación (mayúsculas) que justifica la excepción."
+   },
+   {
+    "id": "v2-55verif-caja-desmarcada-contraste",
+    "severidad": "alta",
+    "regla": "§1.1 `--border-ctrl` — borde de control cuya única frontera es el borde; §1.7 elementos gráficos a 3:1",
+    "dice_el_sistema": "Texto normal 4,5:1 mínimo; texto grande (≥24px, o ≥18,66px en negrita) y elementos gráficos",
+    "hay_en_el_build": "`.ren .caja{…border:2px solid var(--border-2);…color:transparent}` = rgba(27,36,48,.26): mezclado con `--surface` da rgb(192,196,200), 1,70:1 contra `#FAFCFD` (medición propia c55.cjs + cálculo desde los valores calculados). El borde del propio renglón, `1px solid var(--border)` (.14), da 1,31:1. Con `--border-ctrl` (.5) serían 3,13:1. El archivo no declara `--border-ctrl` (token de 2.15.0). El estado marcado sí cumple: icono rgb(250,252,253) sobre `.caja` rgb(34,112,90) = 5,78:1.",
+    "selector": ".ren .caja, .ren",
+    "linea": 665,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 665,
+     "cita": "border:2px solid var(--border-2);display:grid;place-items:center;color:transparent}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Contraste < 3:1 medido en el indicador de estado de un control (criterio 1, lectura literal): `.caja{border:2px solid var(--border-ctrl)}` y declarar el token. Segunda lectura, menos dramática: el desmarcado también se distingue por la ausencia del relleno verde del marcado, y el renglón entero lleva texto; pero el uso es de pie, al sol (FICHA), que es cuando un borde de 1,7:1 desaparece."
+    },
+    "por_que_importa": "En campo, con sol, las casillas aún sin marcar —las que el instalador tiene que ver para saber qué le falta— casi no se distinguen del fondo."
+   },
+   {
+    "id": "v2-55verif-sin-gutter-lateral",
+    "severidad": "media",
+    "regla": "§3.1 El relleno de un contenedor lo declara el contenedor",
+    "dice_el_sistema": "el relleno de un contenedor lo declara el contenedor",
+    "hay_en_el_build": "El contenido se abre con `<div class=\"pad\"><div class=\"pedido\">` y `.pad` no existe en la hoja; `.pedido` solo declara `max-width:720px;margin:0 auto`. Aparte, el archivo sí declara `.cuerpo{padding:…;@media(max-width:1280px) padding-left/right:var(--sp-4)}` pero ningún elemento la usa (0 `class=\"cuerpo\"`). Medido (m55.cjs): a 390 y 360 px `.pedido` mide 390/360 px con 0 px a cada lado: la cabecera, el aviso, los 11 renglones y el pie tocan los bordes de la pantalla; a 1280 está centrado (162 px a cada lado). La captura de 390 px del orquestador (55_verificacion_pedido--390.png, en la raíz del scratchpad) muestra lo mismo.",
+    "selector": ".pad, .pedido",
+    "linea": 730,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 730,
+     "cita": "<div class=\"state-ok \"><div class=\"pad\"><div class=\"pedido\">"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico y no es regresión demostrable. Parche sencillo (Regla 2): `.pad{padding:var(--sp-4)}` o usar `.cuerpo` que ya está declarada. Se recomienda porque es la pantalla pensada para el teléfono."
+    },
+    "por_que_importa": "En el teléfono, que es el dispositivo de esta pantalla, las tarjetas van pegadas al borde: se ve sin terminar y el pulgar roza el borde."
+   },
+   {
+    "id": "v2-55verif-pie-verif-alto",
+    "severidad": "media",
+    "regla": "FICHA 55 — D-12 «cerrar con renglones sin marcar exige decirlo» y pendiente de campo: «La maqueta dibuja escribir y puede estar equivocada»",
+    "dice_el_sistema": "FICHA 55: «Cerrar con renglones sin marcar exige decirlo.» y «Pendiente de campo — Cómo se dice al cerrar incompleto: pulsar «cerrar de todas formas» o escribir el motivo. La maqueta dibuja escribir y puede estar equivocada».",
+    "hay_en_el_build": "`.pie-verif{position:sticky;bottom:0;…}` aloja siempre el aviso «Quedan 3 materiales sin verificar», el `<textarea>` y el botón «Cerrar con 3 sin verificar». Medido (m55.cjs): alto del pie 283 px a 1280×800 (38 % del alto de `main`), 322 px a 390×844 (41 %), 322 px a 390×667 (53 %), 322 px a 360×640 (56 %) y 283 px a 844×390 (87 %: quedan 44 px para ver renglones de 70 px). El pie es opaco (`background:var(--surface)`): los renglones que quedan debajo no se ven, y es lo esperado de un pie fijo.",
+    "selector": ".pie-verif",
+    "linea": 682,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 682,
+     "cita": ".pie-verif{position:sticky;bottom:0;z-index:16;display:flex;flex-direction:column;gap:var(--sp-3);"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No es crítico en vertical estándar (a 390×844 se ven dos renglones completos sobre el pie y al llegar al fondo el último renglón queda 16 px sobre él). Lo que lo hace una pregunta abierta es que el mecanismo («escribir» frente a «cerrar de todas formas») está pendiente de campo en la propia FICHA: con «cerrar de todas formas» el pie bajaría a ~90 px. Propuesta concreta: pie con solo el botón (56 px) y el motivo en una hoja modal (§6.18) al pulsarlo."
+    },
+    "por_que_importa": "En teléfonos de pantalla corta (o en horizontal) la lista queda reducida a una o ninguna fila visible mientras el pie ocupa más de la mitad."
+   },
+   {
+    "id": "v2-55verif-motivo-no-exigido",
+    "severidad": "media",
+    "regla": "§6.16 regla 3 — `required` y `aria-required` de verdad; FICHA 55 D-12 «cerrar con renglones sin marcar exige decirlo»",
+    "dice_el_sistema": "3. **`required` y `aria-required` de verdad.** Los asteriscos eran `<span>` decorativos sin",
+    "hay_en_el_build": "`<textarea id=\"motivo\" placeholder=\"…\"></textarea>` sin `required` ni `aria-required`; el botón «Cerrar con 3 sin verificar» (`button.gordo.p`) no está `disabled` y no hay manejador. El texto sí lo dice («hace falta que digas por qué»), pero nada lo exige en el marcado. Comprobación de las tres decisiones de D-12: (1) sin botón «falta»: CUMPLE (los 11 `button.ren` solo tienen `aria-pressed`; «falta» aparece solo en frases); (2) sin cantidad parcial: CUMPLE (`.cuánto` es texto, 0 `input` salvo el `textarea`); (3) cerrar incompleto exige decirlo: CUMPLE en el texto, NO en el marcado.",
+    "selector": "#motivo, .gordo.p",
+    "linea": 819,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 819,
+     "cita": "<textarea id=\"motivo\" placeholder=\"Ej.: el centro de carga y la varilla no estaban en el andén\"></textarea>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "El mecanismo está pendiente de campo en la FICHA («pulsar cerrar de todas formas o escribir el motivo»). Mientras tanto, `required` + `aria-required` + `aria-describedby` al párrafo es de una línea y no prejuzga cuál se elige. v1 la puso media; sigue media."
+    },
+    "por_que_importa": "Un lector de pantalla no oye que el motivo es obligatorio y el botón principal se puede activar con el campo vacío."
+   },
+   {
+    "id": "v2-55verif-sin-encabezado",
+    "severidad": "alta",
+    "regla": "§6.4 regla 2 y §11 — cada vista lleva un encabezado real, no un `<b>`",
+    "dice_el_sistema": "Cada estado lleva un encabezado real",
+    "hay_en_el_build": "La pantalla no tiene ningún `h1`-`h6` (medición propia st.cjs: `h1` = []). El título del pedido es `<span class=\"folio\" translate=\"no\">PED-202608-0117</span>` y los estados vacío y error abren con `<b>`.",
+    "selector": ".cabeza .folio, .state > b",
+    "linea": 733,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 733,
+     "cita": "<span class=\"folio\" translate=\"no\">PED-202608-0117</span>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico por la lista de la Regla 1; arreglo sencillo (`<h1 class=\"folio\">`). Persiste desde v1 (f1-55verifica-01, alta), la severidad alta se mantiene por ser accesibilidad."
+    },
+    "por_que_importa": "La página no tiene título navegable: quien usa lector de pantalla no puede saltar al pedido."
+   },
+   {
+    "id": "v2-55verif-incompleto-largo",
+    "severidad": "media",
+    "regla": "§8 Voz de producto — ningún bloque siempre visible pasa de ~140 caracteres y `.nota`/`.banda` una frase",
+    "dice_el_sistema": "Ningún bloque de texto siempre visible pasa de ~140 caracteres.",
+    "hay_en_el_build": "`.incompleto > p` mide 154 caracteres y dos frases («Puedes cerrar así, pero el pedido no queda completo y hace falta que digas por qué. Lo que escribas lo lee el encargado de almacén, no se archiva sin más.»). El brief C11 revisó 1 bloque y dio 0 por encima de 140: `p.nota.aviso-pedido` (75 caracteres) ya cumple.",
+    "selector": ".incompleto > p",
+    "linea": 816,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 816,
+     "cita": "<p>Puedes cerrar así, pero <b>el pedido no queda completo</b> y hace falta que digas por qué. Lo que"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Menor: la primera frase es la instrucción, la segunda es consecuencia; se resuelve en el diálogo de la FICHA pendiente. v1 la puso media (junto a p.nota, ya cerrado)."
+    },
+    "por_que_importa": "Texto fijo de más sobre un pie que ya ocupa 41 % del alto."
+   },
+   {
+    "id": "v2-55verif-estados-no-se-anuncian",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado, regla 1 — el cambio se anuncia y mueve el foco",
+    "dice_el_sistema": "El cambio se anuncia y mueve el foco.",
+    "hay_en_el_build": "El único código que cambia de vista es `cont.setAttribute('data-state',…)`. Medición propia (st.cjs): tras activar «Error», `document.activeElement` es BODY; no existe ninguna región `aria-live` visible (solo el `role=\"status\"` del esqueleto, oculto en ok).",
+    "selector": "main#contenido",
+    "linea": 868,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 868,
+     "cita": "cont.setAttribute('data-state',b.dataset.set);"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico por la lista de la Regla 1; la regla de §6.4 está escrita con el JS que lo resuelve (`live.textContent` + `main.focus()`), por lo que es una adición sencilla al script compartido de las maquetas. Se recomienda a nivel de plantilla."
+    },
+    "por_que_importa": "Quien navega con lector de pantalla no se entera de que la pantalla pasó de «cargando» a «error» o «vacío»: el foco se queda donde estaba y no se anuncia nada."
+   },
+   {
+    "id": "v2-55verif-estados-sin-tarjeta-ni-encabezado",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado — el estado va dentro de una tarjeta, con medallón y encabezado real",
+    "dice_el_sistema": "El estado va dentro de una tarjeta, no suelto sobre el fondo.",
+    "hay_en_el_build": "Medición propia (st.cjs, estado Error): `.state-error` con fondo rgba(0,0,0,0), sombra none, radio 0; sin `.tarjeta-estado` ni `.estado-ico`; icono de 30 px sin medallón; el título es `<b>` (0 `h1`-`h3` dentro del estado).",
+    "selector": ".state, .state b",
+    "linea": 608,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 608,
+     "cita": ".state > .ico{width:30px;height:30px;color:var(--text-3)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico; son tres vistas secundarias. Se documenta que la receta de 2.15.0 (§6.4) no llegó a estas maquetas y se recomienda adoptarla en la plantilla compartida ARQ-ESTADOS."
+    },
+    "por_que_importa": "Sin tarjeta el mensaje se lee como una pantalla que no terminó de cargar; sin encabezado real no se puede saltar a él con el lector de pantalla. (v1 f1-55verifica-03 la puso alta; con los criterios v2 es media: vistas secundarias.)"
+   },
+   {
+    "id": "v2-55verif-esqueleto-texto-y-sin-aplanar",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga — sin texto real dentro de las barras; con reduced-motion se aplana el fondo",
+    "dice_el_sistema": "Hay que aplanar el fondo, no solo parar la animación.",
+    "hay_en_el_build": "`@media (prefers-reduced-motion:reduce){.skel{animation:none}}` detiene la animación pero deja el degradado congelado (el sistema pide `background:var(--surface-2)`). Además las 23 barras `.skel` llevan texto real dentro (p. ej. «x», medición propia st.cjs) bajo un `role=\"status\"` (§6.7: «sin texto real dentro de las barras»).",
+    "selector": ".skel",
+    "linea": 603,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 603,
+     "cita": "@media (prefers-reduced-motion:reduce){.skel{animation:none}}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico (estado transitorio). Dos líneas por maqueta; se recomienda corregir la plantilla ARQ-ESTADOS."
+    },
+    "por_que_importa": "Con «menos movimiento» las barras quedan a medio pintar; un lector de pantalla puede recitar el texto de relleno. (v1 f1-55verifica-04 la puso alta; con los criterios v2 es media: estado transitorio.)"
+   },
+   {
+    "id": "v2-55verif-ren-sin-accion",
+    "severidad": "baja",
+    "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+    "dice_el_sistema": "Un control con pinta de interactivo tiene que interactuar.",
+    "hay_en_el_build": "Medición propia (clk.cjs): clic en `button.ren.siguiente`, en un `button.ren` marcado y en `.gordo`: `aria-pressed` no cambia y el DOM no cambia. El script del archivo solo gestiona estados de demo, tema y menú. Es la interacción central de la pantalla.",
+    "selector": "button.ren[aria-pressed], .gordo",
+    "linea": 868,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 868,
+     "cita": "cont.setAttribute('data-state',b.dataset.set);"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Maqueta sin lógica; se adopta y se promueve a control real con el flujo. v1: baja (f1-55verifica-11)."
+    },
+    "por_que_importa": "La maqueta no permite probar la interacción de la que depende toda la pantalla."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [
+  {
+   "id_v1": "f1-55verifica-02",
+   "evidencia": "`.cabeza` ahora declara `padding:var(--sp-4) var(--sp-5,20px)` (línea 640): con el valor de reserva computa `16px 20px` (medición propia, m55.cjs). `--sp-5` sigue sin declararse en `:root`, por eso el brief lo lista en tokens_usados_no_declarados: es un falso positivo, la declaración ya no se invalida."
+  },
+  {
+   "id_v1": "f1-55verifica-09",
+   "evidencia": "`.ren .qué .sku{…font-size:12px…}`; brief lt12_medido 0."
+  },
+  {
+   "id_v1": "f1-55verifica-10",
+   "evidencia": "La regla táctil ya lleva `:root`: `:root[data-tacto=\"dedo\"] .iconbtn{width:46px;height:46px}` (líneas 279-284); `data-tacto=\"dedo\"` está en `<html>` y el brief mide 0 destinos bajo 24 px."
+  }
+ ],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 2,
+   "integridad": 3
+  },
+  "justificacion": "Accesibilidad 2: destinos de 44–56 px con `data-tacto=\"dedo\"` bien aplicado, contraste de texto sin fallos (0/82), estado marcado muy legible (5,78:1); pero el borde de la casilla desmarcada da 1,70:1, no hay ningún encabezado, el menú no tiene nombre a 1000 px, el motivo no se exige en el marcado y los cambios de vista no se anuncian. Theming 3: `--text-3` y `--sp-5` resueltos desde v1, `--border-ctrl` ausente, pares -ink/-bg de antes de 2.15.0. Responsive 2: es la pantalla del teléfono y no tiene gutter lateral (`.pad` sin declarar), y el pie fijo ocupa 41–87 % del alto según el dispositivo. Integridad 3: las tres decisiones de D-12 están dibujadas (sin «falta», sin cantidad parcial, cierre incompleto con motivo), el vacío no se presenta como fallo; fallan la etiqueta «SIGUIENTE» y la falta de manejadores. Rendimiento no evaluado. Puntuación en el borde inferior de 3.",
+  "evidencia": [
+   "D-12 (1) sin botón «falta»: cumple. 11 `button.ren` solo con `aria-pressed`; grep de «falta» en el marcado: solo frases («hace falta que digas por qué»).",
+   "D-12 (2) sin cantidad parcial: cumple. `.cuánto` es texto; el único control de entrada es `#motivo`.",
+   "D-12 (3) cerrar con renglones sin marcar exige decirlo: cumple en el texto del aviso y el botón («Cerrar con 3 sin verificar»), no en el marcado (`#motivo` sin required).",
+   "I1 (12 fallos «en estado») son falsos positivos: 9 son iconos de `.caja` marcada (el instrumento los compara con el fondo del botón, rgb(226,239,236), y no con el de la `.caja` que los aloja, rgb(34,112,90): real 5,78:1), 3 son iconos de `.caja` desmarcada con `color:transparent` por diseño; todos están marcados «en estado» porque `.state-ok` casa con el patrón. I3 (4 intersecciones de `.pie-verif` con `button.ren`, solape 1) e I7 (4 colisiones de texto con el pie) son el pie sticky opaco tapando los renglones de más abajo: por diseño. Medido (m55.cjs): al desplazar `main` hasta el fondo el último renglón queda 16 px por encima del pie (solape −16) a 1280, 390, 360 y 844×390; ningún renglón queda tapado en reposo.",
+   "m55.cjs, c55.cjs, s55.cjs, f55.cjs, st.cjs, clk.cjs, cromo.cjs (scratchpad/b2); briefs2/55_verificacion_pedido.json",
+   "55_verificacion_pedido--1440.png, 55-sig-1280.png, 55-sig-390.png, 55-fix-390.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — Tier B"
+ },
+ "cobertura": [
+  {
+   "patron": "Etiqueta de «siguiente paso» sobre el renglón activo de una lista de verificación (`.ren.siguiente::before` con `translateY(-32px)`). El sistema no tiene un patrón para señalar cuál es el próximo elemento a atender dentro de una lista; el cliente lo resolvió con un pseudo-elemento anclado a ojo.",
+   "propuesta_de_regla": "§6.25 **Marca de paso actual.** El renglón que toca atender se señala con su borde en `--accent` y una etiqueta de texto («Siguiente») **fuera** de la tarjeta, anclada por su borde inferior (`bottom:calc(100% + var(--sp-2))`) y nunca con un desplazamiento fijo: su posición no puede depender del alto de la tarjeta. La lista reserva el espacio (`--sp-6` de margen superior) y el botón lleva `aria-current=\"step\"`. Un texto de estado no se pinta a caballo del borde de lo que califica."
+  }
+ ],
+ "sin_datos": [
+  "Cómo se dice al cerrar incompleto (pulsar «cerrar de todas formas» o escribir el motivo): pendiente de campo en la FICHA (`HOJA_DE_CAMPO_2026-08-26.md`, no está en mi brief). No se puede decir cuál de las dos es la correcta, solo medir lo que cuesta la que está dibujada.",
+  "Qué hace el botón «Cerrar con 3 sin verificar» si no se escribe motivo: la maqueta no tiene lógica.",
+  "El encuadre exacto de la hoja 19 de la persona: se asume que es el renglón «Centro de carga 4 polos» con `.siguiente`; no hay otra etiqueta «Siguiente» en el archivo (grep: una sola, línea 678).",
+  "La captura 55_verificacion_pedido--390.png de la raíz del scratchpad se hizo con tipografía del sistema (no Inter) y fecha anterior; se usó solo como apoyo del hallazgo de gutter, que está medido de forma independiente."
+ ]
+}
