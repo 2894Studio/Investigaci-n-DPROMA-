@@ -1,0 +1,145 @@
+{
+ "pantalla": "05_app_cliente",
+ "tier": "B",
+ "modo": "cobertura",
+ "sha256": "fbc480eeeb6f4c8e400e435f28f3955b36106c79e0f518250b82fbd6b0ce2d42",
+ "estado_entrega": "nueva",
+ "estado_vs_pdf": "no_listado_en_pdf",
+ "estados_auditados": [
+  "Inicio (con datos)",
+  "Mi cargador",
+  "Mis trámites: con datos, vacío y error (por el andamio de demo)"
+ ],
+ "capturas": [
+  "05_app_cliente--1280-fold.png",
+  "05_app_cliente--1440.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 2,
+   "texto_usuario": "Portal del cliente móvil («Laura Núñez», identificado por contenido, por confirmar): «Contactar a DPROMA» no uniforme con «Reagendar cita»; icono junto al texto en uno y apartado en otro; reducir texto.",
+   "veredicto": "confirmada",
+   "evidencia": [
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 398,
+      "cita": "Contactar a DPROMA</button>"
+     },
+     "dato": "Identificación de la pantalla: coincide. Contiene «Laura Núñez» (`<b>Laura Núñez</b>` en el hero), contrato C-2264, Wallbox 7.4 kW y exactamente el grupo «Reagendar cita» + «Contactar a DPROMA» (`.actions`, líneas 397-398, repetido en «Mi cargador» líneas 479-480). Es el portal del cliente móvil de la persona."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "script aud-b/m05.cjs (Playwright, 390×844, lib.cjs preparar)",
+      "detalle": "para cada `.actions .abtn` visible: getBoundingClientRect del botón y del `<svg>`, Range.getClientRects() del nodo de texto"
+     },
+     "dato": "A 390 px (teléfono 342 px de ancho, sin desborde horizontal): «Reagendar cita» 135×52 px, 14 caracteres, 1 línea, icono 14×14 a x=15,2 px del borde izquierdo y a 6 px del texto. «Contactar a DPROMA» 135×52 px, 18 caracteres, 2 líneas, icono a x=7 px del borde y a 23,5 px del texto (el texto queda centrado en el resto del ancho). Mismo alto y mismo ancho: por eso el instrumento I8 no lo ve (compara cajas, no el reparto interno). A 360 px: iconos a 7,7 px/6 px (Reagendar) y 7 px/16 px (Contactar); a 1440 px (teléfono 368 px): 21,7/6 y 7/30."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "script aud-b/m05b.cjs",
+      "detalle": "anchura del texto en una línea con la fuente del botón (white-space:nowrap) frente al ancho disponible: 390 px → 135−2 borde−12 relleno−14 icono−6 gap = 101 px"
+     },
+     "dato": "«Contactar a DPROMA» necesita 120,1 px en una línea y solo hay 101 px: por eso envuelve. «Reagendar cita» necesita 84,7 px y cabe. «Contactar» (56,6 px) cabe en una línea incluso a 360 px (86 px disponibles). «Escribir a DPROMA» (106,7 px) no cabe."
+    }
+   ],
+   "causa_raiz": "No es una regla distinta: ambos botones son `.abtn` con el mismo CSS (`display:inline-flex;gap:6px;justify-content:center;text-align:center`, línea 246-249). La diferencia es que el texto de «Contactar a DPROMA» (120 px) no cabe en la media celda de la rejilla (`.actions{display:grid;grid-template-columns:1fr 1fr}`), envuelve a dos líneas y el nodo de texto pasa a ocupar todo el ancho restante: el icono se queda a la izquierda, lejos de su palabra, y el botón sube de 44 a 52 px (el vecino se estira). El diseño es sensible al largo del rótulo; no hay `white-space:nowrap`.",
+   "solucion_propuesta": "Acortar el rótulo a «Contactar» (56,6 px, una línea a 360 y 390 px; el contexto —tarjeta de la instalación de DPROMA— ya dice a quién) y añadir `white-space:nowrap` a `.abtn` para que un rótulo largo no vuelva a partirse. Resultado: ambos botones 44 px (min-height), icono a 6 px de la palabra y grupo icono+texto centrado en los dos. Alternativa sin tocar el copy: `.abtn{flex-direction:column}` en ambos (icono arriba, texto debajo, dos líneas permitidas). El «Contactar a soporte» del estado de error va en otra fila y no se ve afectado.",
+   "tipo_de_cambio": "sencillo",
+   "critico": {
+    "es": false,
+    "criterio": null
+   },
+   "decision": {
+    "valor": "decidir_diseño",
+    "motivo": "No crítico (ambos botones cumplen 44 px y contraste 4,89:1). El rótulo es copy de DPROMA: la solución está lista y es de bajo riesgo; el sistema carece de regla para pares de botones en móvil (ver cobertura)."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-05appcli-01",
+    "severidad": "media",
+    "regla": "§1.7 Regla de contraste (texto 4,5:1)",
+    "dice_el_sistema": "Regla de contraste del sistema: texto ≥ 4,5:1, elemento gráfico ≥ 3:1 (§1.7)",
+    "hay_en_el_build": "La barra de estado simulada del teléfono, `<div class=\"status\"><span class=\"tnum\">9:41</span>…señal y batería…` (líneas 361-367), se pinta en `color:var(--chrome-ink)` (#F2F5F7, línea 193) sobre `--bg` (#F2F5F7): 1:1 en tema claro. En la captura la franja superior del teléfono aparece vacía. Es un adorno de maqueta (la hora, la señal y la batería las pinta el sistema operativo en un móvil real), pero está en el DOM sin aria-hidden. Los otros 3 «fallos» del instrumento (DPROMA, «Buen día», «Laura Núñez») son falsos positivos: están sobre el degradado `.hero`, donde el instrumento resolvió el fondo mal; con los tokens, #F2F5F7 sobre #1E4E79 = 7,92:1 y sobre el extremo oscuro del degradado 9,95:1; «Buen día» a opacity .78 ≈ 5,0:1 o más.",
+    "selector": ".status, .status .rt",
+    "linea": 193,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "contraste.claro.detalle (brief) + cálculo aud-b (python)",
+     "detalle": "brief: span.tnum «9:41» color rgb(242,245,247) fondo rgb(242,245,247) ratio 1 (4 nodos, 3 son falsos positivos del degradado). Cálculo propio de WCAG sobre los tokens: ink/--bg 1,00; ink/#1E4E79 7,92; ink/extremo del degradado 9,95"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Dos lecturas: (a) si la barra fuera UI de producto, sería criterio 1 (texto a 1:1); (b) es marco de dispositivo simulado, no producto. Me inclino por (b) y por eso no la marco crítica. Arreglo trivial: `.status{color:var(--text)}` o marcarla `aria-hidden=\"true\"` y `data-andamio`."
+    },
+    "por_que_importa": "Quien abre la maqueta ve un hueco sobre la cabecera azul; un lector de pantalla anuncia «9:41» como si fuera contenido. En un build nativo desaparece."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 3,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 3
+  },
+  "justificacion": "Portal móvil bien resuelto: §7.3 cumple (19 destinos, 0 < 24 px; tab bar 66×45, botones de acción 52, de estado 48, iconbtn 44), sin desborde horizontal a 360, 390 ni 1440 px, los iconos de los botones de estado heredan el color del botón (4,89:1: no tiene el defecto de 22/32), foco visible y dos temas. Baja por la barra de estado invisible en claro, Google Fonts por <link> (D116), tokens del antecesor (--text-3 #66717F y el resto de 15) y tamaños < 12 px (11,5 px en botones y 10 px en la barra de pestañas).",
+  "evidencia": [
+   "brief: tactil bajo24 0 de 19; I8 0 grupos dispares (no detecta la observación); anchos 1440/1280/1024 sin scroll",
+   "aud-b/m05.cjs a 390, 360 y 1440; m05c.cjs (botones de error/vacío 48 px, icono rgb(247,250,249))",
+   "captura 05_app_cliente--1440.png y aud-b/05-390.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — Tier B"
+ },
+ "cobertura": [
+  {
+   "patron": "Par de botones de acción hermanos en tarjeta móvil (`.abtn`): rótulos de distinta longitud, uno envuelve y el icono queda apartado",
+   "propuesta_de_regla": "En una rejilla de dos botones de acción, el rótulo cabe en una línea al ancho más estrecho soportado (360 px): ≤ 14 caracteres o `white-space:nowrap` y un verbo corto. El icono va siempre a `gap:6px` de su palabra y el grupo icono+texto se centra; si no cabe, se apilan icono y texto en ambos botones, nunca solo en uno."
+  },
+  {
+   "patron": "Google Fonts por <link> en una pantalla móvil (línea 10)",
+   "propuesta_de_regla": "D116 aplica a toda pantalla, también a las de app: sin `<link>` a Google Fonts; `@font-face` autoalojado."
+  },
+  {
+   "patron": "Tamaños < 12 px en móvil: `.abtn`, `.stbtn`, `.tile` a 11,5 px y etiquetas de la barra de pestañas a 10 px (línea 264)",
+   "propuesta_de_regla": "§2.1 decide el suelo en 12 px para el dashboard; falta decir si el móvil lo hereda. Propuesta: el suelo es el mismo; las etiquetas de la barra de pestañas se pueden quedar en 12 px con una sola palabra («Cargador», «Trámites»)."
+  },
+  {
+   "patron": "Marco de teléfono y barra de estado simulados dentro del DOM",
+   "propuesta_de_regla": "El marco de dispositivo (`main.phone`, `.status`) es andamio de maqueta: va `aria-hidden=\"true\"` y `data-andamio`, y su texto usa un color con contraste sobre su fondo real."
+  },
+  {
+   "patron": "Tokens del antecesor en pantalla de cliente (--text-3 #66717F, 14 más)",
+   "propuesta_de_regla": "Mismo caso que 01: propagar `_sio-tokens.css` 2.15.0."
+  }
+ ],
+ "sin_datos": [
+  "El tema oscuro no se midió (solo hay medición de contraste en claro en el brief).",
+  "El brief da estado_vs_pdf 'no_listado_en_pdf': confirmado con cambios.txt (la pantalla es nueva, no figura).",
+  "I8_paridad_botones reportó 0 grupos dispares: mide caja (alto/ancho), no el reparto interno ni el envuelto de texto; no detecta esta observación. I1 marcó `button.iconbtn` con ratio 1: falso positivo (fondo transparente sobre el degradado del hero).",
+  "I7 marcó `code«-ink»`/`code«-bg»` (colisión de texto): es texto de la columna explicativa de la demo, fuera del teléfono; no se evaluó como producto.",
+  "Rendimiento: no_evaluado."
+ ]
+}
