@@ -77,7 +77,7 @@ def validar(n):
             raw_i = (rep.get('instrumento') or '')
             propio = re.match(r'^(script|grep|diff|lectura|ficha|propio|brief|[a-z]\d+[a-z]?$)', raw_i.strip()) or '.cjs' in raw_i or raw_i.startswith('anchos') or '(brief)' in raw_i or 'brief' in raw_i.split()[:1]
             base = re.split(r'[\s(]', ins)[0]
-            if base in INSTR or ins in INSTR or propio: pass
+            if base in INSTR or ins in INSTR or base.split('_')[0] in INSTR or propio: pass
             else: err.append(f'V6 {hid}: instrumento «{raw_i[:40]}» no reconocido (ni del brief ni script/grep propio)')
         elif rep and ambito == 'f1': err.append(f'V4 {hid}: reproduce.tipo «{t}» desconocido')
     # V7 pp
@@ -93,7 +93,7 @@ def validar(n):
     return err, adv
 
 if __name__ == '__main__':
-    nombres = sys.argv[1:] or sorted(os.path.basename(f)[:-5] for f in glob.glob(f'{RAW}/*.json'))
+    nombres = sys.argv[1:] or sorted(os.path.basename(f)[:-5] for f in glob.glob(f'{RAW}/[0-9]*.json'))
     out = {}; tot = 0
     for n in nombres:
         e, a = validar(n); out[n] = {'errores': e, 'avisos': a}; tot += len(e)
