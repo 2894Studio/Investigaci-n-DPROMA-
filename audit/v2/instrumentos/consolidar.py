@@ -119,18 +119,19 @@ for nm, vals in filas: P(f'| {nm} | {sum(vals.values())} | {sum(1 for x in vals.
 P('')
 P('## 4 · Tus 19 observaciones, una por una\n')
 P('Veredicto = lo que se **reprodujo** con evidencia en el archivo recibido. Ojo: los auditores conocían cada observación, así que esta tabla mide si se puede **verificar** lo que viste, no si lo habrían descubierto solos (§8).\n')
-P('| Hoja | Pantalla | Veredicto | Causa raíz | Cambio | Crítico | Decisión |\n|---:|---|---|---|---|:-:|---|')
+P('| Hoja | Pantalla | Veredicto | Causa raíz | Cambio · crítico · decisión |\n|---:|---|---|---|---|')
 for h in range(1, 20):
     rs = RESP.get(h)
     if h == 14:
-        P('| 14 | `34_instaladores` | respondida en el brief | La agenda del sistema no existe en 2.15.0 (no hay §6.24; §13.9 solo regula alto por dato). No cambiar la del cliente; cambio mínimo en texto, «Sin asignar» y domingo a 1280. | medio | no | adoptar_cliente (con cambio mínimo) |')
+        P('| 14 | `34_instaladores` | respondida en el brief | La agenda del sistema no existe en 2.15.0 (no hay §6.24; §13.9 solo regula alto por dato). No cambiar la del cliente; cambio mínimo en texto, «Sin asignar» y domingo a 1280. | medio<br>no<br>adoptar_cliente (con cambio mínimo) |')
         continue
     if rs:
         for n, o in rs:
-            cr = (o.get('causa_raiz') or '—').replace('|', '/').replace('\n', ' ')[:210]
-            P(f'| {h} | `{n}` | {o["veredicto"]} | {cr} | {o.get("tipo_de_cambio") or "—"} | {"sí (criterio " + str(o["critico"].get("criterio")) + ")" if (o.get("critico") or {}).get("es") else "no"} | {(o.get("decision") or {}).get("valor")} |')
-    elif h in (4, 15): P(f'| {h} | `49_alta_orden` | **sin datos v2** | La pantalla no viene en el ZIP (el PDF dice que se actualizó) | — | — | pedir el archivo |')
-    else: P(f'| {h} | — | sin datos | — | — | — | — |')
+            cr = (o.get('causa_raiz') or '—').replace('|', '/').replace('\n', ' ')
+            nz = n.replace('_', '_' + chr(0x200b))
+            P(f'| {h} | `{nz}` | {o["veredicto"]} | {cr} | {o.get("tipo_de_cambio") or "—"}<br>{"crítico (criterio " + str(o["critico"].get("criterio")) + ")" if (o.get("critico") or {}).get("es") else "no crítico"}<br>{(o.get("decision") or {}).get("valor")} |')
+    elif h in (4, 15): P(f'| {h} | `49_alta_orden` | **sin datos** | La pantalla no viene en el ZIP | pedir el archivo |')
+    else: P(f'| {h} | — | sin datos | — | — |')
 P('\nObservaciones 0 son de la lista de «revisión exhaustiva» (Acceso, Altas como modal).\n')
 
 P('## 5 · Lo que se le pide al cliente: los hallazgos críticos\n')
