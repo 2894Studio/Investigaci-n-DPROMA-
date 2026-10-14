@@ -359,12 +359,24 @@ for k in 'ABCD':
     indice_html += f'<h3 class="idx-parte">{PARTES[k][0]} · {PARTES[k][1]}</h3><ol class="indice" start="{[i for p, i, t, g in indice if p == k][0]}">' + ''.join(
         f'<li><a href="#c{i}"><span class="n">{i}</span><span class="t">{t}</span><span class="g g-{g if g != "menor" else "rec"}">{PCT[g]}</span></a></li>' for p, i, t, g in indice if p == k) + '</ol>'
 
-MEDIDAS = [('Destinos de pulsación menores de 24 px', '134', '29 de 50'), ('Enlaces del menú sin nombre accesible a 1000 px', '525', '35 de 42'), ('Textos de 10,5 px sin mayúsculas', '240', '45 de 50'),
- ('Iconos que se pierden contra el relleno del botón', '51', '23 de 50'), ('Barras de cabecera sin holgura inferior', '51', '20 de 50'), ('Textos visibles de más de 140 caracteres', '25', '14 de 50'),
- ('Celdas de tabla que llevan un párrafo', '24', '7 de 50'), ('Textos bajo el contraste AA, tema claro', '19', '11 de 50'), ('Textos bajo el contraste AA, tema oscuro', '2', '2 de 50'),
- ('Tokens usados sin declarar', '9', '7 de 50'), ('Elementos afectados por <code>--sp-5</code> sin declarar', '67', '7 de 50'), ('Grupos de botones hermanos con altura o icono dispar', '5', '5 de 50')]
-tabla_med = ('<table class="t"><colgroup><col style="width:58%"><col style="width:16%"><col style="width:26%"></colgroup><thead><tr><th>Indicador</th><th class="r">Total</th><th>Pantallas afectadas</th></tr></thead><tbody>'
-  + ''.join(f'<tr><td>{a}</td><td class="r">{b}</td><td>{c}</td></tr>' for a, b, c in MEDIDAS) + '</tbody></table>')
+def c(t): return '<a href="#c' + ref(t) + '">cambio ' + ref(t) + '</a>'
+MEDIDAS = [
+ ('Botones, enlaces y casillas más pequeños de 24 × 24 px', '134', '29 de 50', 'Cuesta acertarlos con ratón impreciso o con tableta, y una pulsación errada puede activar otra cosa.', 'Ver ' + c('Los destinos de pulsación')),
+ ('Entradas del menú lateral que un lector de pantalla no sabe nombrar, a 1000 px', '525', '35 de 42', 'A ese ancho el menú queda en iconos y no hay texto que decir a dónde lleva cada uno. Solo se contó en las 42 pantallas que llevan menú.', 'Ver ' + c('El menú lateral')),
+ ('Iconos casi del mismo color que el relleno del botón', '51', '23 de 50', 'El icono se funde con el botón y casi no se ve, como el gris sobre el verde de «Reintentar».', 'Ver ' + c('El icono del botón verde')),
+ ('Cabeceras cuyos controles tocan la línea inferior', '51', '20 de 50', 'Falta el aire que sí hay arriba. Viene de una plantilla de cabecera que se copió.', 'Ver ' + c('Las cajas de cabecera')),
+ ('Textos con contraste por debajo de 4,5:1, tema claro', '19', '11 de 50', 'Se leen mal con poca luz o con baja visión.', 'Ver ' + c('El gris del texto') + ' y ' + c('El contador de Asistencia')),
+ ('Textos con contraste por debajo de 4,5:1, tema oscuro', '2', '2 de 50', 'Lo mismo, con el tema oscuro activado.', 'Sin cambio asociado todavía'),
+ ('Celdas de tabla que llevan un párrafo', '24', '7 de 50', 'Una celda debe llevar un dato, no una frase (§6.11, regla 7).', 'Ver ' + c('Viáticos: la tabla')),
+ ('Textos siempre visibles de más de 140 caracteres', '25', '14 de 50', 'El sistema pone un tope de 140 caracteres y una frase para los avisos (§8). Pasado ese tope, el texto explica en lugar de indicar.', 'Se atiende caso por caso, por ejemplo en los ' + c('Tickets TI') + ' y en ' + c('Viáticos: la tabla')),
+ ('Textos de 10,5 px que no están en mayúsculas', '240', '45 de 50', 'El sistema solo prevé ese tamaño para rótulos en mayúsculas (§2.1). Fuera de ahí cuesta leerlo.', 'Sin cambio para DPROMA: el sistema se contradice (§7.2) y lo resuelve Studio'),
+ ('Variables de color o espaciado que se usan y nunca se definen', '9', '7 de 50', 'El navegador ignora la variable y el elemento pierde ese valor.', 'El caso de <code>--sp-5</code> está en el ' + c('Mi día')),
+ ('Elementos que usan <code>--sp-5</code>, que nadie define', '67', '7 de 50', 'Quedan con 0 px de espaciado donde debería haber 20 px.', 'Ver ' + c('Mi día')),
+ ('Parejas de botones de distinta altura o con el icono en otro sitio', '5', '5 de 50', 'Dos botones que hacen cosas parecidas se ven distintos.', 'Ver ' + c('Los botones hermanos')),
+]
+tabla_med = ('<table class="t t-med"><colgroup><col style="width:27%"><col style="width:9%"><col style="width:11%"><col style="width:31%"><col style="width:22%"></colgroup>'
+  '<thead><tr><th>Qué se contó</th><th class="r">Cuántos</th><th>En cuántas pantallas</th><th>Por qué importa</th><th>Dónde se resuelve</th></tr></thead><tbody>'
+  + ''.join(f'<tr><td>{a}</td><td class="r">{b}</td><td>{c_}</td><td>{d}</td><td>{e}</td></tr>' for a, b, c_, d, e in MEDIDAS) + '</tbody></table>')
 
 NO_SE_PIDE = [
  ('Iconos como sprite SVG (<code>&lt;use href="#i-…"&gt;</code>)', 'Se adopta. Funciona sin red y sin el parpadeo de una fuente que carga tarde. Quien debe corregirse es el sistema: §6.5 pedía Material Symbols por <code>&lt;link&gt;</code>, y eso contradice a D116.'),
@@ -417,8 +429,9 @@ DOC = f'''<!doctype html>
     <li><span class="tag tag-rec">Recomendado</span> no se exige. Mejora algo visible y a veces delata una causa que se repite.</li>
   </ul>
   <p>Varios defectos nacen en un bloque que se copia de pantalla en pantalla, y con cada copia se repiten. La cabecera <code>.p4</code> sin relleno inferior está en 36 archivos, la regla <code>.state .ico</code> en 21 y el menú lateral colapsado deja sin nombre sus quince enlaces en 35 de las 42 pantallas que lo llevan. Corregir el bloque de origen y repetir la corrección es más barato que perseguir cada síntoma.</p>
-  <h3 class="sub">Lo que se midió en las 50</h3>
-  <p class="nota">Son candidatos a revisar. Los cambios de las partes A y B ya pasaron por esa revisión: una persona los reprodujo en el archivo y otra intentó refutarlos.</p>
+  <h3 class="sub">Qué se contó en las 50 pantallas</h3>
+  <p>Antes de revisar nada a mano, un programa abrió cada pantalla en un navegador y contó lo que se puede contar sin criterio humano: botones pequeños, contrastes, menús sin nombre. Sirve para saber qué tan extendido está cada problema.</p>
+  <p class="nota">Que algo se cuente no significa que sea un error: son candidatos. Los cambios de las partes A y B son los que una persona reprodujo en el archivo y otra intentó refutar.</p>
   {tabla_med}
   <h2 class="idx">Los {n} cambios</h2>
   {indice_html}
