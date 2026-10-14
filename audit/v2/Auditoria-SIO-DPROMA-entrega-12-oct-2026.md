@@ -2,54 +2,46 @@
 
 **Estudio:** 2894 Studio · **Fecha de la auditoría:** 14-oct-2026 · **Sistema de diseño de referencia:** v2.15.0 · **Solo auditoría:** ningún archivo del cliente se modificó (SHA-256 en `MANIFIESTO.json`).
 
-> **Cómo leer este informe.** Es la primera auditoría que se entrega al cliente: nadie le ha comunicado antes ningún hallazgo nuestro. «Persiste» significa solo que el problema ya estaba en la entrega del 30-sep; no que se haya ignorado un aviso. «Regresión» y «pérdida» se usan únicamente cuando el cliente tenía algo bien en septiembre (o lo declaró él mismo) y en octubre dejó de estarlo.
+> **Alcance de este informe.** Es la primera auditoría de estas pantallas. Describe lo que hay en el ZIP recibido; no lo compara con entregas anteriores.
 
 ## 1 · Resumen ejecutivo
 
-1. **Alcance.** Se audita lo que contiene el ZIP: 50 pantallas. El listado de pantallas del PDF del cliente no se usa como criterio. Sí se contrastó, a modo informativo, lo que el PDF declara contra los archivos (Anexo A): 40 de sus 50 pantallas están en el ZIP y en 19 de ellas no se ven los cambios declarados.
-2. **Qué se auditó.** 50 pantallas en el ZIP: **23** a fondo (observaciones, F1, F3; F4 y F5 en las de nivel A), con instrumentos medidos y fixtures validados; las otras 27 solo con regresión mecánica. 6 son idénticas a la entrega del 30-sep.
+1. **Alcance.** Se audita lo que contiene el ZIP: 50 pantallas. Es la primera auditoría de estas pantallas: describe lo que hay y no lo compara con entregas anteriores.
+2. **Qué se auditó.** **23** pantallas a fondo (observaciones, F1, F3; F4 y F5 en las de nivel A), con instrumentos medidos y fixtures validados; las otras 27 solo con medición mecánica.
 3. **Calidad de la propia auditoría.** 119 afirmaciones altas o críticas pasaron por verificadores que intentaron refutarlas con medición propia: **110 confirmadas, 9 exageradas, 0 refutadas** (precisión 92.4 %). Una réplica ciega de 2 pantallas **no** alcanzó el umbral de concordancia que nos fijamos (§8): una sola pasada no agota lo que hay.
 4. **Lo que sí está medido, en una línea cada uno.**
-    - El icono gris sobre «Reintentar» (obs. 1) tiene causa raíz: `.state .ico` descendiente. El arreglo es `.state > .ico`; el cliente lo declara y no lo aplicó en 6 hallazgos críticos de estas pantallas.
-    - El menú lateral colapsado sigue sin nombre accesible en 19 pantallas auditadas (existía en la entrega del 30-sep).
+    - El icono gris sobre «Reintentar» (obs. 1) tiene causa raíz: `.state .ico` descendiente. El arreglo es `.state > .ico`. Aparece en 6 hallazgos críticos de estas pantallas.
+    - El menú lateral colapsado no tiene nombre accesible en 19 de las pantallas auditadas.
     - La hipótesis de que `--sp-5` explica los problemas de espaciado se **refuta** para Mi día (obs. 13): la causa es `.p4-t` con `padding-bottom:0` (§3.1). Para Acceso (51) explica los huecos de 0 px entre bloques, no el interlineado.
     - Las «cajas contra la línea inferior» (obs. 10) son sistémicas: la plantilla de cabecera `.p4` no tiene relleno inferior y se copió en decenas de archivos.
     - El panel «CON QUÉ FILTROS» (obs. 18) es, según la FICHA del cliente, un **registro de auditoría**, no controles: el defecto es de color y de mezcla de conceptos, no de operabilidad.
 5. **Rediseños críticos** (Tickets TI, acordeón de sucursales, Asistente, Mi día): diagnóstico y brief con veredicto de viabilidad en §7.
-6. **Lo que se le pide al cliente** se limita a críticos y regresiones (§5); el resto se adopta y se documenta en nuestro sistema (§6).
+6. **Lo que se le pide al cliente** se limita a los hallazgos críticos (§5); el resto se adopta y se documenta en nuestro sistema (§6).
 
 ## 2 · Qué contiene el ZIP
 
-El ZIP trae 50 pantallas HTML (más `_sio-tokens.css`, `FICHAS_TECNICAS.md` y el aviso del padrón). Frente a la entrega del 30-sep: **6 idénticas** (10_dprimi_asistente, 11_app_login_2fa_offline, 12_app_checado_asistencia, 13_panel_asistencia_rhl, 14_app_checado_oficina, 56_frontera_error), **8 nuevas** (02_dashboard, 03_kanban_gestoria, 04_app_personal, 05_app_cliente, 06_padron_clientes, 07_orden_instalacion, 38_vehicular_detalle, 48_asistencia_rhl) y 36 modificadas. De las 52 de la entrega del 30-sep, 10 no están en este ZIP (31_orden_detalle, 49_alta_orden, 52_vehicular_bandeja, 53_tramite_detalle, facturacion, viaticos-adeudos-nomina, viaticos-alta-solicitud, viaticos-discrepancia-cfdi, viaticos-reembolso, viaticos-remanente); sus observaciones (4 y 15, `49_alta_orden`) quedan sin datos.
+El ZIP trae 50 pantallas HTML (más `_sio-tokens.css`, `FICHAS_TECNICAS.md` y el aviso del padrón). `49_alta_orden` no está en el ZIP: sus observaciones (4 y 15) quedan sin datos.
 
-Auditoría a fondo: 23 pantallas. Solo regresión mecánica: 27.
+**Auditadas a fondo (23):** `01_login`, `05_app_cliente`, `13_panel_asistencia_rhl`, `20_tablero`, `21_ficha_cliente`, `22_gestoria`, `23_viaticos`, `24_tickets`, `25_consumo_de_material`, `26_estados_de_pantalla`, `27_padron_clientes`, `28_instalador_mi_dia`, `32_cfe_bandeja`, `34_instaladores`, `41_alta_cliente`, `46_cuentas_por_cobrar`, `47_asistente`, `48_asistencia_rhl`, `51_acceso`, `54_bitacora_descargas`, `55_verificacion_pedido`, `58_altas_como_modal`, `59_editar_cliente`. **Solo medición mecánica (27):** `02_dashboard`, `03_kanban_gestoria`, `04_app_personal`, `06_padron_clientes`, `07_orden_instalacion`, `08_detalle_tramite`, `09_app_checklist_instalacion`, `10_dprimi_asistente`, `11_app_login_2fa_offline`, `12_app_checado_asistencia`, `14_app_checado_oficina`, `29_instalador_orden`, `30_ordenes_listado`, `33_cfe_detalle`, `35_incidencias`, `36_recetas_despacho`, `37_concluidos`, `38_vehicular_detalle`, `39_viatico_detalle`, `40_usuarios`, `42_alta_tramite_gestoria`, `43_alta_tramite_vehicular`, `44_alta_tramite_cfe`, `45_autorizacion_compra`, `50_compras_almacen`, `56_frontera_error`, `57_menu_cuenta`.
 
-## 3 · Qué cambió entre la entrega del 30-sep y la del 12-oct (mismo arnés, mismas fuentes)
+## 3 · Mediciones mecánicas sobre las 50 pantallas
 
-Se midieron las 36 pantallas modificadas comunes a la entrega del 30-sep y la entrega del 12-oct con los mismos instrumentos en las dos entregas (la entrega del 30-sep se re-midió con el mismo arnés para que la diferencia sea honesta).
+Medidas en el navegador con fuentes reales, sobre las 50 pantallas. **Son candidatos, no veredictos:** los hallazgos de las secciones 4 y 5 son los que un auditor reprodujo y un verificador intentó refutar.
 
-| Indicador | Entrega 30-sep | Entrega 12-oct |
+| Indicador | Total | Pantallas con al menos uno |
 |---|---:|---:|
-| Destinos < 24 px | 114 | 101 |
-| Fallos de contraste (claro) | 12 | 9 |
-| Fallos de contraste (oscuro) | 2 | 2 |
-| Enlaces de menú sin nombre a 1000 px | 465 | 480 |
-| Tokens usados sin declarar | 10 | 9 |
-
-Instrumentos nuevos (42 pantallas comunes). **Son candidatos, no veredictos:** los auditores encontraron falsos positivos (I3 e I7) y errores míos que se corrigieron (I6, I9, capturas, C1 en línea).
-
-| Instrumento | Entrega 30-sep | Entrega 12-oct |
-|---|---:|---:|
-| I1 icono vs relleno del botón | 80 | 47 |
-| I2 barras sin holgura inferior | 26 | 26 |
-| I6 familias de color (suma por pantalla) | 137 | 139 |
-| I8 grupos de botones dispares | 5 | 5 |
-| I9 celdas largas | 22 | 23 |
-| C2 10,5 px sin mayúsculas | 260 | 208 |
-| C11 textos de más de 140 caracteres | 60 | 25 |
-| `--sp-5` sin declarar: elementos afectados | 67 | 67 |
-
-**Regresiones confirmadas por auditor (7):** `22_gestoria` (§7.2 Cromo de aplicación); `22_gestoria` (§13.3 Un contenedor no cede el ancho a un descen); `24_tickets` (§1.7 Regla de contraste); `24_tickets` (§6.4 Vistas de estado); `26_estados_de_pantalla` (FICHAS_TECNICAS.md del cliente · «Defectos reale); `51_acceso` (§6.4 regla 2 «Cada estado lleva un encabezado re); `58_altas_como_modal` (§6.4 regla 2).
+| Destinos de pulsación menores de 24 px | 134 | 29 de 50 |
+| Textos bajo el contraste AA, tema claro | 19 | 11 de 50 |
+| Textos bajo el contraste AA, tema oscuro | 2 | 2 de 50 |
+| Enlaces del menú sin nombre accesible a 1000 px | 525 | 35 de 42 |
+| Tokens usados sin declarar | 9 | 7 de 50 |
+| icono vs relleno del botón | 51 | 23 de 50 |
+| barras sin holgura inferior | 51 | 20 de 50 |
+| grupos de botones dispares | 5 | 5 de 50 |
+| celdas largas | 24 | 7 de 50 |
+| 10,5 px sin mayúsculas | 240 | 45 de 50 |
+| textos de más de 140 caracteres | 25 | 14 de 50 |
+| `--sp-5` sin declarar: elementos afectados | 67 | 7 de 50 |
 
 ## 4 · Tus 19 observaciones, una por una
 
@@ -62,7 +54,7 @@ Veredicto = lo que se **reprodujo** con evidencia en el archivo recibido. Ojo: l
 | 1 | `32_cfe_bandeja` | confirmada | Regla de contexto descendiente `.state .ico{...color:var(--text-3)}` (línea 609) en lugar del hijo directo `.state > .ico`: el icono pequeño del `.btn.p` hereda el gris del icono grande del estado. Es el defect | sencillo | sí (criterio 1) | exigir_cambio |
 | 2 | `05_app_cliente` | confirmada | No es una regla distinta: ambos botones son `.abtn` con el mismo CSS (`display:inline-flex;gap:6px;justify-content:center;text-align:center`, línea 246-249). La diferencia es que el texto de «Contactar a DPROMA | sencillo | no | decidir_diseño |
 | 3 | `27_padron_clientes` | parcial | Tres causas distintas. (A) Producto + forma: las decisiones del dictamen (partir expediente y comercial, «decir qué documento falta, no «incompletos»», vigencia, FICHAS 27) están bien; lo que sobra es la prosa  | medio | no | ajustar_sistema |
-| 4 | `49_alta_orden` | **sin datos la entrega del 12-oct** | La pantalla no viene en el ZIP (el PDF dice que se actualizó) | — | — | pedir el archivo |
+| 4 | `49_alta_orden` | **sin datos v2** | La pantalla no viene en el ZIP (el PDF dice que se actualizó) | — | — | pedir el archivo |
 | 5 | `13_panel_asistencia_rhl` | confirmada | No es el valor de line-height ni la escala --sp-*: es la regla `.inc .body span` (línea 181), un selector descendiente de elemento (`span`) que se filtra en dos sitios: la fila de acciones `.acts` (que es un <s | sencillo | no | ajustar_sistema |
 | 5 | `48_asistencia_rhl` | parcial | Tres causas, de más a menos general. (1) El sistema 2.15.0 no define ningún interlineado: solo hay `line-height` dentro de cinco reglas de componente (1,4 `.cifras .apoyo`, 1,5 `.paso-txt`/`.note`/`.ayuda`, 1,5 | sencillo | no | ajustar_sistema |
 | 6 | `20_tablero` | parcial | (1) `.sem` es una columna flex cuyo rótulo `.et` existe solo en 2 de 12 columnas: el rótulo ocupa 15 px en esas dos y 0 en las otras, y `justify-content:flex-end` baja cada pila hasta su propio rótulo, de modo  | medio | no | decidir_diseño |
@@ -74,7 +66,7 @@ Veredicto = lo que se **reprodujo** con evidencia en el archivo recibido. Ojo: l
 | 12 | `27_padron_clientes` | confirmada | No es un solo defecto sino la suma de cinco: (1) falta el comportamiento (ningún manejador) y el HTML solo trae un panel con id real, así que 4 de 5 controles apuntan al vacío; (2) el contenido del panel vive e | rediseño | sí (criterio 5) | decidir_diseño |
 | 13 | `28_instalador_mi_dia` | confirmada | Relleno inferior repartido entre filas opcionales (§3.1): .p4-t lleva padding-bottom:0 esperando que .p4-b/.p4-f cierren el bloque, y en Mi día no existen. NO es --sp-5 (hipotesis verificada y refutada: afecta  | sencillo | sí (criterio 5) | exigir_cambio |
 | 14 | `34_instaladores` | respondida en el brief | La agenda del sistema no existe en 2.15.0 (no hay §6.24; §13.9 solo regula alto por dato). No cambiar la del cliente; cambio mínimo en texto, «Sin asignar» y domingo a 1280. | medio | no | adoptar_cliente (con cambio mínimo) |
-| 15 | `49_alta_orden` | **sin datos la entrega del 12-oct** | La pantalla no viene en el ZIP (el PDF dice que se actualizó) | — | — | pedir el archivo |
+| 15 | `49_alta_orden` | **sin datos v2** | La pantalla no viene en el ZIP (el PDF dice que se actualizó) | — | — | pedir el archivo |
 | 16 | `46_cuentas_por_cobrar` | confirmada | Tres factores encadenados: (a) `.minis` omite `align-items:start`, el valor por omisión que fija §13.4 (la propuesta lo tiene en su línea 674); (b) `.kpis` está en dos columnas con el hero en la primera, de mod | medio | no | decidir_diseño |
 | 17 | `47_asistente` | parcial | (a) Solape: margen superior negativo en .fuentes (linea 669) dentro de una tarjeta que lleva su relleno en el contenedor (.tx, linea 666) y no en filas hermanas: §3.1. (b) Dos tonos: el componente «respuesta» m | rediseño | sí (criterio 5) | exigir_cambio |
 | 18 | `54_bitacora_descargas` | parcial | El panel cumple su función de registro (FICHA) y no debe ser operable. Los dos problemas reales son de sistema y de composición: (1) el sistema no tiene un patrón para marcar sensibilidad del dato —§1.3 es para | sencillo | no | ajustar_sistema |
@@ -82,7 +74,7 @@ Veredicto = lo que se **reprodujo** con evidencia en el archivo recibido. Ojo: l
 
 Observaciones 0 son de la lista de «revisión exhaustiva» (Acceso, Altas como modal).
 
-## 5 · Lo que se le pide al cliente: solo críticos y regresiones
+## 5 · Lo que se le pide al cliente: los hallazgos críticos
 
 Criterios de «crítico» (acordados): (1) fallo de accesibilidad medido, (2) impide la tarea u oculta la acción primaria, (3) acción irreversible o de dinero sin protección, (4) contradice una decisión de DPROMA o expone datos personales, (5) rediseño marcado y viable. Todo lo demás se adopta.
 
@@ -101,49 +93,37 @@ Criterios de «crítico» (acordados): (1) fallo de accesibilidad medido, (2) im
 
 ### 5.2 Críticos propios de una pantalla
 
-| Pantalla | Hallazgo | Criterio | Estado vs la entrega del 30-sep | Verificación |
-|---|---|:-:|---|---|
-| `13_panel_asistencia_rhl` | §1.5 Cromo de aplicación (`--chrome-alerta` / `--chrome-alerta-ink`) + — El número «4» es el conteo de incidencias pendientes de dictamen que el menú le muestra a RHL: es el dato que dice si hay trabajo. A 3,4:1 y 10,5px, con baja visión o brillo alto, se lee mal. Hay dos lecturas: el badge es redundan | 1 | persiste | confirmada |
-| `27_padron_clientes` | §6.15 Fila desplegable + §6.11 regla 5 + §13.3 — El control que el padrón eligió para saber a qué sucursal pertenece un servicio (pp-098) no funciona en 4 de 5 filas y, en la que funciona, sus acciones quedan fuera de la vista a 1280. | 5 | persiste | confirmada |
-| `28_instalador_mi_dia` | §3.1 El relleno de un contenedor no vive en un hijo opcional — La barra que abre la pantalla se ve cortada: el titulo y la linea de resumen (donde esta el aviso de material incompleto) quedan pegados a la linea divisoria, mientras arriba tienen 12px. En un instalador que mira la pantalla de p | 5 | nuevo | confirmada |
-| `47_asistente` | §3.1 El relleno de un contenedor no vive en un hijo opcional (el siste — La ultima linea de cada respuesta —la conclusion, el dato que se va a copiar o actuar— queda cruzada por el borde de la franja; se lee como un error de pintado y apiña la conclusion con el rotulo «DE DÓNDE SALIÓ», que queda justo  | 5 | persiste | confirmada |
-| `55_verificacion_pedido` | §1.1 `--border-ctrl` — borde de control cuya única frontera es el bord — En campo, con sol, las casillas aún sin marcar —las que el instalador tiene que ver para saber qué le falta— casi no se distinguen del fondo. | 1 | nuevo | confirmada |
-| `58_altas_como_modal` | FICHAS_TECNICAS.md (58): «ninguna de las cinco cabe sin desplazar» + § — La pagina cuya funcion es mostrar que formulario cabe en un dialogo muestra formularios con la mitad de los campos tapados por las cabeceras de seccion; quien decide D-15 con ese dibujo decide sobre lo que no ve. | 2 | nuevo | confirmada |
-| `58_altas_como_modal` | Decision D1 del aviso del 28-sep (alta de cliente = pagina) y FICHAS_T — Quien abra 58 para decidir ve una recomendacion (modal en escritorio para el alta de cliente) que contradice la decision ya tomada; la pagina de decision da ahora una respuesta distinta de la que se decidio. | 4 | persiste | confirmada |
+| Pantalla | Hallazgo | Criterio | Verificación |
+|---|---|:-:|---|
+| `13_panel_asistencia_rhl` | §1.5 Cromo de aplicación (`--chrome-alerta` / `--chrome-alerta-ink`) + — El número «4» es el conteo de incidencias pendientes de dictamen que el menú le muestra a RHL: es el dato que dice si hay trabajo. A 3,4:1 y 10,5px, con baja visión o brillo alto, se lee mal. Hay dos lecturas: el badge es redundan | 1 | confirmada |
+| `27_padron_clientes` | §6.15 Fila desplegable + §6.11 regla 5 + §13.3 — El control que el padrón eligió para saber a qué sucursal pertenece un servicio (pp-098) no funciona en 4 de 5 filas y, en la que funciona, sus acciones quedan fuera de la vista a 1280. | 5 | confirmada |
+| `28_instalador_mi_dia` | §3.1 El relleno de un contenedor no vive en un hijo opcional — La barra que abre la pantalla se ve cortada: el titulo y la linea de resumen (donde esta el aviso de material incompleto) quedan pegados a la linea divisoria, mientras arriba tienen 12px. En un instalador que mira la pantalla de p | 5 | confirmada |
+| `47_asistente` | §3.1 El relleno de un contenedor no vive en un hijo opcional (el siste — La ultima linea de cada respuesta —la conclusion, el dato que se va a copiar o actuar— queda cruzada por el borde de la franja; se lee como un error de pintado y apiña la conclusion con el rotulo «DE DÓNDE SALIÓ», que queda justo  | 5 | confirmada |
+| `55_verificacion_pedido` | §1.1 `--border-ctrl` — borde de control cuya única frontera es el bord — En campo, con sol, las casillas aún sin marcar —las que el instalador tiene que ver para saber qué le falta— casi no se distinguen del fondo. | 1 | confirmada |
+| `58_altas_como_modal` | FICHAS_TECNICAS.md (58): «ninguna de las cinco cabe sin desplazar» + § — La pagina cuya funcion es mostrar que formulario cabe en un dialogo muestra formularios con la mitad de los campos tapados por las cabeceras de seccion; quien decide D-15 con ese dibujo decide sobre lo que no ve. | 2 | confirmada |
+| `58_altas_como_modal` | Decision D1 del aviso del 28-sep (alta de cliente = pagina) y FICHAS_T — Quien abra 58 para decidir ve una recomendacion (modal en escritorio para el alta de cliente) que contradice la decision ya tomada; la pagina de decision da ahora una respuesta distinta de la que se decidio. | 4 | confirmada |
 
-### 5.3 Regresiones frente a la entrega del 30-sep
+### 5.3 Arreglos que `FICHAS_TECNICAS.md` documenta como hechos y que los archivos no tienen
 
-| Pantalla | Hallazgo | Regla | Verificación |
-|---|---|---|---|
-| `22_gestoria` | Entre 860 y 1100 px (portátil pequeño, ventana partida) la navegación son 15 iconos que un lector de pantalla anuncia como «enlace» sin nombre. Es regresión: la entrega del 30-sep lo hacía bien en esta pantalla. Es la p | §7.2 Cromo de aplicación | confirmada |
-| `22_gestoria` | Quien trabaja en un portátil de 1280 px abre la bandeja y no ve ningún botón de acción; tiene que descubrir que debe desplazar la tabla. El botón «Admitir», que arranca el reloj y no se puede deshacer | §13.3 Un contenedor no cede el ancho a un descendiente + dec | exagerada — La tabla tiene 6 filas (8 botones), no '8 filas'; a 1280 los botones estan cortados 20 px, no 'fuera del area visible'. §13.3 (hijo con max-width en tarjeta) no |
-| `24_tickets` | El folio, la fecha de apertura y la prioridad «Baja» son lo que se escanea en la bandeja de tickets; a 4,2:1 y 10,5–11 px cuestan lectura a quien tiene baja visión. Los tres pasaban en la entrega ante | §1.7 Regla de contraste + §1.1 Superficies y texto | confirmada |
-| `24_tickets` | El título del estado no entra en la lista de encabezados y el esqueleto anuncia texto inventado a un lector de pantalla; con movimiento reducido las barras quedan a medio pintar. | §6.4 Vistas de estado | no verificada (severidad no alta) |
-| `26_estados_de_pantalla` | Un lector de pantalla encuentra dos «banner» en la pagina que ensena el patron de accesibilidad. | FICHAS_TECNICAS.md del cliente · «Defectos reales de accesib | no verificada (severidad no alta) |
-| `51_acceso` | La pantalla de entrada se queda sin ningun encabezado: quien navega por encabezados no encuentra la pagina y el titulo de la ventana es lo unico que la nombra. | §6.4 regla 2 «Cada estado lleva un encabezado real» + FICHAS | confirmada |
-| `58_altas_como_modal` | La pagina pierde su titulo: no hay encabezado de nivel 1 ni nombre visible, y el subtitulo que reconocia que el modal ya solo gobierna cuatro altas desaparece. | §6.4 regla 2 | confirmada |
+`FICHAS_TECNICAS.md` («Defectos reales de accesibilidad encontrados y corregidos», verificados con axe-core) lista arreglos como hechos. Se comprobó cada uno en el ZIP: **9 de 9 no están** en el archivo.
 
-### 5.4 Arreglos de accesibilidad que el propio cliente documentó y que la entrega del 12-oct deshace
+| Pantalla | Arreglo que la ficha documenta | Veces que aparece en el archivo |
+|---|---|---:|
+| `26_estados_de_pantalla` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 1 |
+| `33_cfe_detalle` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 1 |
+| `42_alta_tramite_gestoria` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 1 |
+| `43_alta_tramite_vehicular` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 1 |
+| `44_alta_tramite_cfe` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 1 |
+| `24_tickets` | `--text-3-fuerte` en textos que no pasaban 4,5:1 | 0 |
+| `33_cfe_detalle` | `--text-3-fuerte` en textos que no pasaban 4,5:1 | 0 |
+| `01_login` | `--text-3-fuerte` en textos que no pasaban 4,5:1 | 0 |
+| `57_menu_cuenta` | sin `role="menu"` mal aplicado (aria-required-children) | 2 |
 
-`FICHAS_TECNICAS.md` («Defectos reales de accesibilidad encontrados y corregidos», verificados con axe-core) lista arreglos ya hechos en la entrega del 30-sep. Se comprobó cada uno en el ZIP: **9 de 9 se han perdido** (el patrón de la entrega del 30-sep ya no está). Parece que la actualización se aplicó sobre copias anteriores a esos arreglos.
-
-| Pantalla | Arreglo documentado | la entrega del 30-sep | la entrega del 12-oct | ¿Perdido? |
-|---|---|---:|---:|:-:|
-| `26_estados_de_pantalla` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 0 | 1 | **sí** |
-| `33_cfe_detalle` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 0 | 1 | **sí** |
-| `42_alta_tramite_gestoria` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 0 | 1 | **sí** |
-| `43_alta_tramite_vehicular` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 0 | 1 | **sí** |
-| `44_alta_tramite_cfe` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 0 | 1 | **sí** |
-| `24_tickets` | `--text-3-fuerte` en textos que no pasaban 4,5:1 | 6 | 0 | **sí** |
-| `33_cfe_detalle` | `--text-3-fuerte` en textos que no pasaban 4,5:1 | 5 | 0 | **sí** |
-| `01_login` | `--text-3-fuerte` en textos que no pasaban 4,5:1 | 2 | 0 | **sí** |
-| `57_menu_cuenta` | sin `role="menu"` mal aplicado (aria-required-children) | 0 | 2 | **sí** |
-
-(Ocurrencias = veces que aparece la construcción en el archivo; para el arreglo de `header` y `role="menu"`, 0 es lo correcto; para `--text-3-fuerte`, lo correcto es >0.) Además, en `24`, `33` y `01` el `--text-3` sigue en `#66717F` (4,21:1 sobre `--surface-2`), así que esos textos quedan sin ninguno de los dos arreglos: ni `--text-3-fuerte` ni el `#5C6675` nuevo. Esto amplía las 7 regresiones de §5.3, que solo cubrían las pantallas auditadas a fondo.
+Para el arreglo de `header` y de `role="menu"` lo correcto es 0 apariciones; para `--text-3-fuerte`, más de 0. Además, en `24`, `33` y `01` el `--text-3` está en `#66717F` (4,21:1 sobre `--surface-2`), así que esos textos no cumplen el contraste.
 
 ## 6 · Lo que se adopta del cliente y se documenta en nuestro sistema
 
-De los 268 hallazgos de F1: **128 se adoptan** (el cliente decide), **58 se le exigen**, **58 piden ajustar nuestro sistema**, 22 son decisiones de diseño abiertas y 2 no requieren acción. Estado frente a la entrega del 30-sep: 198 persisten, 63 son nuevos, 7 son regresiones.
+De los 268 hallazgos de F1: **128 se adoptan** (el cliente decide), **58 se le exigen**, **58 piden ajustar nuestro sistema**, 22 son decisiones de diseño abiertas y 2 no requieren acción.
 
 Patrones que el cliente usa y nuestro sistema no documenta (propuestas de regla en cada ficha, campo `cobertura`):
 
@@ -194,7 +174,7 @@ Patrones que el cliente usa y nuestro sistema no documenta (propuestas de regla 
 | `47_asistente` | Burbuja de respuesta de asistente con pie de procedencia (`.msg.ia .tx` + `.fuentes`) |
 | `47_asistente` | Hilo de conversacion (`.mensajes`) con turnos de usuario sin tarjeta y de asistente con tarjeta |
 | `47_asistente` | Accesos rapidos tipo chip (`.rapido`) y compositor |
-| `47_asistente` | Contradiccion entre 10_dprimi_asistente (identico a la entrega del 30-sep) y 47_asistente |
+| `47_asistente` | Contradiccion entre 10_dprimi_asistente y 47_asistente |
 | `48_asistencia_rhl` | Interlineado de interfaz: el sistema no tiene escala ni valor por omisión. Hay `line-height` solo dentro de cinco componentes (1,4; 1,5; 1,55; 1,6) y las pantallas fijan además 1,25, 1,3 y 1,35 por su cuenta; lo demás computa `normal`. El brief I5 cuenta 4–5 i |
 | `51_acceso` | Entrada de tarjeta unica sin columna de marca (`.acceso > .caja-acc`) |
 | `51_acceso` | Estado de error de autenticacion con variantes |
@@ -247,7 +227,7 @@ Cada brief parte de lo que dibujó el cliente, evalúa al menos dos opciones (la
 | [`47-asistente.md`](briefs-diseno/47-asistente.md) | 17 · Asistente | **viable con condiciones** | «Chat» no merece sección propia. La franja se conserva. Quitar `margin-top:-12px` de `.fuentes`; cuerpo y pie como zonas hermanas; 24 px a los 5 destinos pequeños. Condición: decidir si el asistente solo consulta (47) o ejecuta con confirmación (10). |
 | [`54-panel-con-que-filtros.md`](briefs-diseno/54-panel-con-que-filtros.md) | 18 · panel «CON QUÉ FILTROS» | **viable con condiciones** | Dos grupos en la misma celda; marca «Dato personal» con escudo sin color de estado; valores literales («Querétaro y Celaya», no «2 de 5»). Incluye la regla de sistema para la marca de sensibilidad. |
 
-**Dos hechos que cambian la lectura de la observación 3:** las etiquetas «Falta documento» e «Incompleto» no existen en `27_padron_clientes` del ZIP (`grep` = 0); «Incompleto» solo aparece en `06_padron_clientes`, un prototipo anterior. Probablemente tu captura es de otra versión. Y los briefs de `24` y `27` parten de la copia que trae el ZIP (Anexo A).
+**Dos hechos que cambian la lectura de la observación 3:** las etiquetas «Falta documento» e «Incompleto» no existen en `27_padron_clientes` del ZIP (`grep` = 0); «Incompleto» solo aparece en `06_padron_clientes`, otra pantalla del padrón. Probablemente tu captura es de otra versión. Y los briefs de `24` y `27` parten de la copia que trae el ZIP (Anexo A).
 
 ### 7.3 Padrón de clientes con todos los ajustes a la vez
 
@@ -286,27 +266,10 @@ Se combinaron sobre el archivo real de `27_padron_clientes` el acordeón de sucu
 
 ## 9 · Pendientes
 
-1. **Opcional:** si más adelante se consigue la carpeta `sistema/` del cliente, re-medir esas pantallas; este informe se limita al ZIP recibido.
-2. **Confirmar identidades inferidas**: la hoja 1 es `22` o `32` (ambas tienen el defecto); la hoja 2 es `05_app_cliente` (coincide el nombre «Laura Núñez»); la hoja 5 es `13_panel_asistencia_rhl`, no `48`.
-3. **Decidir** las preguntas de diseño abiertas (§7.2). Para documentar divergencias en el sistema, el contenido de la 2.15.0 es el mismo en las 4 ramas que la traen; solo falta elegir en cuál se commitea.
-4. **Corregir en nuestro sistema** las contradicciones de §6 antes de subir versión.
+1. **Confirmar identidades inferidas**: la hoja 1 es `22` o `32` (ambas tienen el defecto); la hoja 2 es `05_app_cliente` (coincide el nombre «Laura Núñez»); la hoja 5 es `13_panel_asistencia_rhl`, no `48`.
+2. **Decidir** las preguntas de diseño abiertas (§7.2). Para documentar divergencias en el sistema, el contenido de la 2.15.0 es el mismo en las 4 ramas que la traen; solo falta elegir en cuál se commitea.
+3. **Corregir en nuestro sistema** las contradicciones de §6 antes de subir versión.
 
-## Anexo A · Contraste informativo con el PDF del cliente
+## Anexo · Cómo reproducir
 
-La columna «Carpeta» sale del propio PDF (`html_v2/` o `sistema/`). El análisis sale de `claims.py` (lectura estática de cada código C1–C18 del PDF contra su archivo) y de comparar hashes con la entrega del 30-sep. C11, C13, C14, C15 y C18 no se pueden verificar mecánicamente; C2 se mide en navegador.
-
-| Grupo | N | Pantallas |
-|---|---:|---|
-| Listadas en el PDF y **ausentes del ZIP** | 10 | 31_orden_detalle, 49_alta_orden, 52_vehicular_bandeja, 53_tramite_detalle, facturacion, viaticos-adeudos-nomina, viaticos-alta-solicitud, viaticos-discrepancia-cfdi, viaticos-reembolso, viaticos-remanente |
-| Listadas, presentes, **sin los cambios declarados** | 19 | 01_login, 08_detalle_tramite, 22_gestoria, 24_tickets, 26_estados_de_pantalla, 30_ordenes_listado, 32_cfe_bandeja, 33_cfe_detalle, 34_instaladores, 36_recetas_despacho, 42_alta_tramite_gestoria, 43_alta_tramite_vehicular, 44_alta_tramite_cfe, 45_autorizacion_compra, 46_cuentas_por_cobrar, 51_acceso, 56_frontera_error, 57_menu_cuenta, 58_altas_como_modal |
-| Listadas, presentes, **cambios confirmados** | 21 | 07_orden_instalacion, 09_app_checklist_instalacion, 20_tablero, 21_ficha_cliente, 23_viaticos, 25_consumo_de_material, 27_padron_clientes, 28_instalador_mi_dia, 29_instalador_orden, 35_incidencias, 37_concluidos, 38_vehicular_detalle, 39_viatico_detalle, 40_usuarios, 41_alta_cliente, 47_asistente, 48_asistencia_rhl, 50_compras_almacen, 54_bitacora_descargas, 55_verificacion_pedido, 59_editar_cliente |
-| En el ZIP y nuevas respecto a la entrega del 30-sep | 8 | 02_dashboard, 03_kanban_gestoria, 04_app_personal, 05_app_cliente, 06_padron_clientes, 07_orden_instalacion, 38_vehicular_detalle, 48_asistencia_rhl |
-| Idénticas byte a byte a la entrega del 30-sep | 6 | 10_dprimi_asistente, 11_app_login_2fa_offline, 12_app_checado_asistencia, 13_panel_asistencia_rhl, 14_app_checado_oficina, 56_frontera_error |
-
-Nota sobre C1 (nada menor de 12 px): se midió en las hojas `<style>`. Además, 8 pantallas tienen `font-size` menor de 12 px en atributos `style=""` (23_viaticos, 33_cfe_detalle, 36_recetas_despacho, 37_concluidos, 38_vehicular_detalle, 39_viatico_detalle, 45_autorizacion_compra, 46_cuentas_por_cobrar); no es claro si el PDF contaba esos atributos, así que no se usa para clasificar.
-
-**Lectura.** Las observaciones 4 y 15 (`49_alta_orden`, que vive en `sistema/icev/`) no se pueden auditar sobre la entrega del 12-oct. Tickets TI, Acceso, Altas como modal, Cuentas por cobrar y Agenda de instaladores son pantallas de `sistema/`: lo que se auditó de ellas es la copia que trae el ZIP, que puede no ser la que viste en tus capturas.
-
-## Anexo B · Cómo reproducir
-
-`audit/v2/instrumentos/` (medidores, `verificar-fixtures.sh`, `validar.py`, `concordancia.py`, `consolidar.py`), `audit/v2/mediciones/` (JSON de la entrega del 30-sep y la entrega del 12-oct), `audit/v2/raw/` (una ficha por pantalla), `audit/v2/verif/` y `audit/v2/replica/`. Todas las cifras de este documento salen de esos archivos.
+`audit/v2/instrumentos/` (medidores, `verificar-fixtures.sh`, `validar.py`, `concordancia.py`, `consolidar.py`), `audit/v2/mediciones/` (JSON de las mediciones), `audit/v2/raw/` (una ficha por pantalla), `audit/v2/verif/` y `audit/v2/replica/`. Todas las cifras de este documento salen de esos archivos.
