@@ -105,7 +105,7 @@ Medidas en tema claro. Las columnas «Opción 1» y «Opción 2» salen de los p
 
 **Opción 2 · recomendada.** Opción 1 + indicador de plazo a ancho declarado (`minmax(200px,240px)`) en una fila con los datos, regla de cierre en `.banda b-info` de una frase bajo los botones, aclaraciones a toggletip (§6.23) y el campo «Plazo» duplicado fuera. Ventajas: el primer dato sube 253 px, una sola caja ámbar, cumple R1–R13. Costes: un componente nuevo para el cliente (toggletip: ~25 líneas de CSS y ~20 de JS, que ninguna maqueta suya trae) y un símbolo `i-info` (que §6.23 ya usa y el sprite del cliente no tiene). Riesgo: la persona que lea la regla de cierre tendrá que pulsar ⓘ para ver los 5 días hábiles.
 
-**Opción 3 · §6.20 al pie de la letra** (indicador a la derecha del bloque de identidad dentro de `.dh`, `minmax(0,1.6fr) minmax(300px,360px)`). *No prototipada.* Aritmética con medidas de la maqueta: ancho útil del panel 775 px a 1440 y 631 a 1280; con 24 de `gap` y 300 de columna derecha, la identidad queda en 451 y 307 px. Las tres acciones suman 493,6 px y el título 434,9: a 1440 las acciones ya envuelven y a 1280 el título también. §6.20 rompe a 1080 px de *viewport* (`L1720`), pero aquí el panel es ~40% más estrecho que el viewport, así que haría falta un punto de ruptura por contenedor que el sistema no documenta. Se descarta por coste y por no poder resolverse con lo existente.
+**Opción 3 · §6.20 al pie de la letra** (indicador a la derecha del bloque de identidad dentro de `.dh`, `minmax(0,1.6fr) minmax(300px,360px)`). *No prototipada.* Aritmética con medidas de la maqueta: ancho útil del panel 775 px a 1440 y 631 a 1280; con 24 de `gap` y 300 de columna derecha, la identidad queda en 451 y 307 px. Las tres acciones suman 493,6 px y el título 434,9: a 1440 las acciones ya envuelven y a 1280 el título también. §6.20 rompe a 1080 px de *viewport* (`L1720`), pero aquí el panel mide 824 px con un viewport de 1440 (57%), así que haría falta un punto de ruptura por contenedor que el sistema no documenta. Se descarta por coste y por no poder resolverse con lo existente.
 
 ---
 
@@ -141,7 +141,7 @@ Medidas en tema claro. Las columnas «Opción 1» y «Opción 2» salen de los p
 </div>
 ```
 
-La variante de color usa las clases que la maqueta ya tiene (`.rojo`, `.ambar`, `.verde`, `.gris`, L641–L645): **rojo** si venció, **ámbar** si vence hoy o mañana, **verde** el resto, **gris** si no hay plazo («Sin plazo registrado», ya dibujado en la fila 6 de la bandeja). Modo «solo antigüedad» (Tanda 3, L868): `Lleva abierto · 3 días · desde el 21 ago 2026, 08:12`, en gris.
+La variante de color usa las clases que la maqueta ya tiene (`.rojo`, `.ambar`, `.verde`, `.gris`, L641–L645): **rojo** si venció, **ámbar** si vence hoy o mañana, **verde** el resto, **gris** si no hay plazo («Sin plazo registrado», ya dibujado en la fila 6 de la bandeja). Modo «solo antigüedad» (Tanda 3, L870): `Lleva abierto · 3 días · desde el 21 ago 2026, 08:12`, en gris.
 
 ### 4.3 CSS (solo tokens; valores literales de maquetación: 240/200 px de columna, 24 px de `.infob`, 220 px de `.tip`, tomados de §6.20/§6.23)
 
@@ -196,7 +196,7 @@ La regla de 1 día hábil, el «por qué no cambia el plazo» y la explicación 
 
 ## 5. Prototipo medido
 
-**Archivos.** `prototipos/24-tickets-zona-superior.html` (83 líneas distintas respecto a la maqueta) · `…/24-tickets-opcion1-minimo.html` (4) · `prototipos/medicion/` (`generar-24.py`, `medir-24.cjs`, `medir-lib.cjs`, `captura-24.cjs`, `intermedios.cjs`, `tokens-huerfanos.py`, JSON de resultados) · capturas `prototipos/capturas/24-zona-{original,prototipo}--{1440,1280,1024,390}.png` y `24-{original,opcion1,prototipo}--*.png`. Tokens: los del `:root` de la maqueta; `tokens-huerfanos.py` da **0 tokens sin declarar y 0 hex fuera de `:root`** (§10, trampa de `--sp-5`).
+**Archivos.** `prototipos/24-tickets-zona-superior.html` (83 líneas distintas respecto a la maqueta) · `…/24-tickets-opcion1-minimo.html` (8 líneas distintas) · `prototipos/medicion/` (`generar-24.py`, `medir-24.cjs`, `medir-lib.cjs`, `captura-24.cjs`, `intermedios.cjs`, `tokens-huerfanos.py`, JSON de resultados) · capturas `prototipos/capturas/24-zona-{original,prototipo}--{1440,1280,1024,390}.png` y `24-{original,opcion1,prototipo}--*.png`. Tokens: los del `:root` de la maqueta; `tokens-huerfanos.py` da **0 tokens sin declarar y 0 hex fuera de `:root`** (§10, trampa de `--sp-5`).
 
 **Reproducir:**
 ```
@@ -267,5 +267,5 @@ Lo que **no** cubre este brief y sigue abierto en la misma pantalla (críticos d
 - **Investigación de TI: sin datos** (0 pain points sobre tickets o mesa de ayuda; §2).
 - **Lector de pantalla:** verifiqué atributos y comportamiento en el DOM, no con NVDA/VoiceOver. Con el `aria-live` de toda la `<section>`, no sé qué anuncia al abrir un globo.
 - **Anchos 1101–1279 con la barra lateral completa:** medidos sin recorte (§4.6), pero en 1101 los campos se apilan en tres filas; no lo vi con datos de longitud real.
-- **Modo oscuro:** medido en contraste y capturado en 1440; no revisé el resto visualmente.
+- **Modo oscuro:** medido en contraste; las capturas del repositorio son solo en claro.
 - **Rendimiento:** no evaluado.

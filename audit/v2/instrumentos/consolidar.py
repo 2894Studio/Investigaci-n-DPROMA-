@@ -92,11 +92,11 @@ P(f'1. **Alcance.** Se audita lo que contiene el ZIP: {len(htmls)} pantallas. El
 P(f'2. **Qué se auditó.** {len(htmls)} pantallas en el ZIP: **{len(profundas)}** a fondo (observaciones, F1, F3; F4 y F5 en las de nivel A), con instrumentos medidos y fixtures validados; las otras {len(mecanicas)} solo con regresión mecánica. {len(identicas)} son idénticas a v1.')
 P(f'3. **Calidad de la propia auditoría.** {sum(vc.values())} afirmaciones altas o críticas pasaron por verificadores que intentaron refutarlas con medición propia: **{vc["confirmada"]} confirmadas, {vc["exagerada"]} exageradas, {vc.get("refutada",0)} refutadas** (precisión {100*vc["confirmada"]/sum(vc.values()):.1f} %). Una réplica ciega de 2 pantallas **no** alcanzó el umbral de concordancia que nos fijamos (§8): una sola pasada no agota lo que hay.')
 P('4. **Lo que sí está medido, en una línea cada uno.**')
-P('   - El icono gris sobre «Reintentar» (obs. 1) tiene causa raíz: `.state .ico` descendiente. El arreglo es `.state > .ico`; el cliente lo declara y no lo aplicó en ' + str(len(temas['state_ico']['items'])) + ' hallazgos críticos de estas pantallas.')
-P('   - El menú lateral colapsado sigue sin nombre accesible en ' + str(len({i['pantalla'] for i in temas['menu']['items']})) + ' pantallas auditadas (existía en v1).')
-P('   - La hipótesis de que `--sp-5` explica los problemas de espaciado se **refuta** para Mi día (obs. 13): la causa es `.p4-t` con `padding-bottom:0` (§3.1). Para Acceso (51) explica los huecos de 0 px entre bloques, no el interlineado.')
-P('   - Las «cajas contra la línea inferior» (obs. 10) son sistémicas: la plantilla de cabecera `.p4` no tiene relleno inferior y se copió en decenas de archivos.')
-P('   - El panel «CON QUÉ FILTROS» (obs. 18) es, según la FICHA del cliente, un **registro de auditoría**, no controles: el defecto es de color y de mezcla de conceptos, no de operabilidad.')
+P('    - El icono gris sobre «Reintentar» (obs. 1) tiene causa raíz: `.state .ico` descendiente. El arreglo es `.state > .ico`; el cliente lo declara y no lo aplicó en ' + str(len(temas['state_ico']['items'])) + ' hallazgos críticos de estas pantallas.')
+P('    - El menú lateral colapsado sigue sin nombre accesible en ' + str(len({i['pantalla'] for i in temas['menu']['items']})) + ' pantallas auditadas (existía en v1).')
+P('    - La hipótesis de que `--sp-5` explica los problemas de espaciado se **refuta** para Mi día (obs. 13): la causa es `.p4-t` con `padding-bottom:0` (§3.1). Para Acceso (51) explica los huecos de 0 px entre bloques, no el interlineado.')
+P('    - Las «cajas contra la línea inferior» (obs. 10) son sistémicas: la plantilla de cabecera `.p4` no tiene relleno inferior y se copió en decenas de archivos.')
+P('    - El panel «CON QUÉ FILTROS» (obs. 18) es, según la FICHA del cliente, un **registro de auditoría**, no controles: el defecto es de color y de mezcla de conceptos, no de operabilidad.')
 P('5. **Rediseños críticos** (Tickets TI, acordeón de sucursales, Asistente, Mi día): diagnóstico y brief con veredicto de viabilidad en §7.')
 P('6. **Lo que se le pide al cliente** se limita a críticos y regresiones (§5); el resto se adopta y se documenta en nuestro sistema (§6).\n')
 
@@ -119,6 +119,9 @@ P('Veredicto = lo que se **reprodujo** con evidencia en el archivo recibido. Ojo
 P('| Hoja | Pantalla | Veredicto | Causa raíz | Cambio | Crítico | Decisión |\n|---:|---|---|---|---|:-:|---|')
 for h in range(1, 20):
     rs = RESP.get(h)
+    if h == 14:
+        P('| 14 | `34_instaladores` | respondida en el brief | La agenda del sistema no existe en 2.15.0 (no hay §6.24; §13.9 solo regula alto por dato). No cambiar la del cliente; cambio mínimo en texto, «Sin asignar» y domingo a 1280. | medio | no | adoptar_cliente (con cambio mínimo) |')
+        continue
     if rs:
         for n, o in rs:
             cr = (o.get('causa_raiz') or '—').replace('|', '/').replace('\n', ' ')[:210]
@@ -150,7 +153,7 @@ P('## 6 · Lo que se adopta del cliente y se documenta en nuestro sistema\n')
 P(f'De los {sum(dec.values())} hallazgos de F1: **{dec["adoptar_cliente"]} se adoptan** (el cliente decide), **{dec["exigir_cambio"]} se le exigen**, **{dec["ajustar_sistema"]} piden ajustar nuestro sistema**, {dec["decidir_diseño"]} son decisiones de diseño abiertas y {dec["sin_accion"]} no requieren acción. Estado frente a v1: {estv1["persiste"]} persisten, {estv1["nuevo"]} son nuevos, {estv1["regresion"]} son regresiones.\n')
 P('Patrones que el cliente usa y nuestro sistema no documenta (propuestas de regla en cada ficha, campo `cobertura`):\n')
 P('| Pantalla | Patrón sin regla |\n|---|---|')
-for n, c in cober: P(f'| `{n}` | {c[:150].replace("|","/")} |')
+for n, c in cober: P(f'| `{n}` | {c[:260].replace("|","/")} |')
 P('\nContradicciones internas de nuestro sistema que los auditores encontraron (a resolver al subir versión): §2.1 (10,5 px solo en mayúsculas) frente a §7.2 (`.grp` a 10,5 px sin mayúsculas); §6.5 (Material Symbols por `<link>`) frente a D116 (sin Google Fonts); §1.4 frente a §12.5 en la antigüedad de saldo por tramos.\n')
 
 P('## 7 · Conformidad con el aviso del ingeniero (28-sep) y rediseños\n')
@@ -159,23 +162,35 @@ P('| # | Decisión | ' + ' | '.join(f'`{p[:2]}`' for p in ('27', '21', '41', '58
 SIM = {'cumple': '✓', 'no_cumple': '✗', 'no_aplica': '·', 'no_verificable': '?'}
 for it in aviso['items']:
     cells = [SIM.get(it['por_pantalla'].get(p, {}).get('estado'), '·') for p in ('27_padron_clientes', '21_ficha_cliente', '41_alta_cliente', '58_altas_como_modal', '59_editar_cliente')]
-    P(f'| {it["n"]} | {it["decision"]}: {it["texto"][:80]} | ' + ' | '.join(cells) + ' |')
-P('\n✓ cumple · ✗ no cumple · ? no verificable · · no aplica. Desajustes extra y críticos: ' + '; '.join(c['resumen'][:150] for c in aviso.get('hallazgos_criticos', [])) + '\n')
+    P(f'| {it["n"]} | {it["decision"]}: {it["texto"]} | ' + ' | '.join(cells) + ' |')
+P('\nLas ✗ de `58` se refieren al diálogo «Nuevo cliente» de esa página, obsoleto para el alta de cliente según FICHAS (`58` ya no gobierna `41`, pero sigue gobernando las otras cuatro altas).')
+P('\n✓ cumple · ✗ no cumple · ? no verificable · · no aplica. Desajustes extra y críticos: ' + '; '.join(c['resumen'] for c in aviso.get('hallazgos_criticos', [])) + '\n')
 P('### 7.2 Briefs de diseño (Fase 4)\n')
 bd = sorted(glob.glob(f'{R}/briefs-diseno/*.md'))
-if not bd: P('_Pendientes de entrega al cierre de este documento._\n')
+P('Cada brief parte de lo que dibujó el cliente, evalúa al menos dos opciones (la primera siempre «mínimo cambio sobre lo del cliente»), trae un prototipo medido a 1440/1280/1024/390 px y termina con un veredicto de viabilidad. Los archivos completos están en `audit/v2/briefs-diseno/`.\n')
+P('| Brief | Observación | Veredicto de viabilidad | Recomendación |\n|---|---|---|---|')
+OBSB = {'24-tickets-zona-superior.md': '9 y 10 · Tickets TI, zona superior', '27-acordeon-sucursales.md': '12 · acordeón de sucursales', '27-etiquetas-de-estado.md': '3 · etiquetas de estado del padrón', '28-mi-dia.md': '13 · Mi día',
+        '34-agenda.md': '14 · agenda de instaladores', '47-asistente.md': '17 · Asistente', '54-panel-con-que-filtros.md': '18 · panel «CON QUÉ FILTROS»'}
+RECB = {'24-tickets-zona-superior.md': 'Un solo bloque ámbar (el plazo) a ancho declarado junto a los datos; la regla de cierre en una banda neutra de una frase; el resto a toggletip; `padding-bottom` en la cabecera.',
+ '27-acordeon-sucursales.md': 'Cinco filas hijas que abren; lista de 560 px sin tarjeta; estado solo si la sucursal no puede recibir órdenes; «Ver órdenes» junto a cada una. Botones fuera de vista a 1280: de 4 a 0.',
+ '27-etiquetas-de-estado.md': 'Un estado por eje (Completos · Pendientes · Sin calcular; Activo · Inactivo); el documento que falta es una línea, no un estado; sin «Por vencer» hasta D7.',
+ '28-mi-dia.md': '`.p4{padding-bottom:var(--sp-3)}`, declarar `--sp-5`, aire al final de la lista y resumen oculto en vacío/error. La opción C recupera los 12 px de pliegue subiendo la fecha a la cabecera, pero requiere decisión de producto.',
+ '34-agenda.md': 'No cambiarla: ningún fallo crítico depende de ella. Cambio mínimo: texto ≥12 px, fila «Sin asignar», domingo visible a 1280, cabecera fija, `--text-3`. La «agenda del sistema» no existe en 2.15.0.',
+ '47-asistente.md': '«Chat» no merece sección propia. La franja se conserva. Quitar `margin-top:-12px` de `.fuentes`; cuerpo y pie como zonas hermanas; 24 px a los 5 destinos pequeños. Condición: decidir si el asistente solo consulta (47) o ejecuta con confirmación (10).',
+ '54-panel-con-que-filtros.md': 'Dos grupos en la misma celda; marca «Dato personal» con escudo sin color de estado; valores literales («Querétaro y Celaya», no «2 de 5»). Incluye la regla de sistema para la marca de sensibilidad.'}
 for f in bd:
     t = open(f, encoding='utf-8').read(); nm = os.path.basename(f)
-    m = re.search(r'(?is)#+\s*\d*\.?\s*Veredicto[^\n]*\n(.{0,600})', t); rec = re.search(r'(?is)#+\s*\d*\.?\s*Recomendaci[^\n]*\n(.{0,500})', t)
-    P(f'**`{nm}`** — veredicto: ' + (re.sub(r"\s+", " ", m.group(1)).strip()[:420] if m else '(ver archivo)') + '\n')
-P('')
-
+    i = t.find('Veredicto de viabilidad'); seg = t[i:i + 400] if i >= 0 else ''
+    m = re.findall(r'no viable ahora|viable con condiciones|viable', seg.lower())
+    ver_txt = ('B viable; C viable con condiciones' if nm == '28-mi-dia.md' else (m[0] if m else '(ver archivo)'))
+    P(f'| [`{nm}`](briefs-diseno/{nm}) | {OBSB.get(nm, nm)} | **{ver_txt}** | {RECB.get(nm, "(ver archivo)")} |')
+P('\n**Dos hechos que cambian la lectura de la observación 3:** las etiquetas «Falta documento» e «Incompleto» no existen en `27_padron_clientes` del ZIP (`grep` = 0); «Incompleto» solo aparece en `06_padron_clientes`, un prototipo anterior. Probablemente tu captura es de otra versión. Y los briefs de `24` y `27` parten de la copia que trae el ZIP (Anexo A).\n')
 P('## 8 · Qué tan fiable es esta auditoría\n')
 P(f'- **Validadores deterministas** (no son agentes): {len(raw)} de {len(raw)} fichas con 0 errores (JSON, § existentes en la 2.15.0, clases y ids presentes en el HTML, citas literales en su línea, `pp-NNN` reales, hashes). Una ficha de prueba rota a propósito dispara los 8 errores inyectados.')
 P(f'- **Verificación adversarial:** {sum(vc.values())} afirmaciones: {vc["confirmada"]} confirmadas, {vc["exagerada"]} exageradas, {vc.get("refutada",0)} refutadas, {vc.get("no_concluyente",0)} no concluyentes. Las exageradas se corrigieron en este informe (p. ej. el recorte de acciones a 1366 px es de 11 px, no «fuera»; el hueco del acordeón mide 578–654 px). **Cero refutaciones no prueba que no haya errores:** la réplica lo muestra.')
 if conc: P(f'- **Réplica ciega** (2 pantallas, sin ver el original): mismo veredicto de observación 2 de 2; coincidencia de § citados **{round(100*sum(v["jaccard_§"] for v in conc.values())/len(conc))} %**, por debajo del 80 % que nos fijamos. De los hallazgos altos del original, la réplica reprodujo 5 de 10; encontró otros que el original no tenía. Lo que ambas pasadas encuentran es sólido; la lista no es exhaustiva.')
 P('- **Instrumentos validados antes de usarse** con HTML sintético de respuesta conocida (contraste con alfa y `color-mix`, táctil, menú, I1–I9, C2, C11, `--sp-5`): 15 de 15 aciertos. Aun así los auditores hallaron seis fallos de mi instrumental (capturas de 800 px, I6, I9, C1 sin estilos en línea, I3 e I7 con falsos positivos, `lib.cjs` inyecta las fuentes y no sirve para probar fuentes). Están corregidos o documentados.')
-P('- **Recall frente a tus 19 observaciones:** ' + str(sum(1 for h in range(1, 20) if RESP.get(h) and any(o["veredicto"] in ("confirmada", "parcial") for _, o in RESP[h]))) + ' de 19 reproducidas con evidencia; 2 (4 y 15) no se pueden probar porque `49_alta_orden` no viene en el ZIP; la 14 es una comparación de diseño (brief 4a). **No es un recall ciego:** los auditores sabían qué buscar.')
+P('- **Recall frente a tus 19 observaciones:** ' + str(sum(1 for h in range(1, 20) if RESP.get(h) and any(o["veredicto"] in ("confirmada", "parcial") for _, o in RESP[h]))) + ' de 19 reproducidas con evidencia por un auditor (más la 14, respondida por el brief de agenda: 17 de 19 con respuesta); 2 (4 y 15) no se pueden probar porque `49_alta_orden` no viene en el ZIP; **No es un recall ciego:** los auditores sabían qué buscar.')
 P('- **Límites.** Las otras ' + str(len(mecanicas)) + ' pantallas solo tienen medición mecánica. Los hallazgos se refieren al archivo recibido, no a lo que el cliente tenga en otra carpeta. `FICHAS_TECNICAS.md` se usó como fuente de decisiones del cliente; se contradice a sí misma en un punto (plazo de tickets, tanda 3 frente a tanda 4). F3 sale entre 2 y 4 en las pantallas auditadas: ' + ', '.join(f'{k}: {v}' for k, v in sorted(f3.items())) + ' pantallas.')
 P(f'- **F5 contra investigación** (solo nivel A y 54): ' + ', '.join(f'{k} {v}' for k, v in f5.items()) + '.\n')
 

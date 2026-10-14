@@ -8,11 +8,11 @@
 2. **Qué se auditó.** 50 pantallas en el ZIP: **23** a fondo (observaciones, F1, F3; F4 y F5 en las de nivel A), con instrumentos medidos y fixtures validados; las otras 27 solo con regresión mecánica. 6 son idénticas a v1.
 3. **Calidad de la propia auditoría.** 119 afirmaciones altas o críticas pasaron por verificadores que intentaron refutarlas con medición propia: **110 confirmadas, 9 exageradas, 0 refutadas** (precisión 92.4 %). Una réplica ciega de 2 pantallas **no** alcanzó el umbral de concordancia que nos fijamos (§8): una sola pasada no agota lo que hay.
 4. **Lo que sí está medido, en una línea cada uno.**
-   - El icono gris sobre «Reintentar» (obs. 1) tiene causa raíz: `.state .ico` descendiente. El arreglo es `.state > .ico`; el cliente lo declara y no lo aplicó en 6 hallazgos críticos de estas pantallas.
-   - El menú lateral colapsado sigue sin nombre accesible en 19 pantallas auditadas (existía en v1).
-   - La hipótesis de que `--sp-5` explica los problemas de espaciado se **refuta** para Mi día (obs. 13): la causa es `.p4-t` con `padding-bottom:0` (§3.1). Para Acceso (51) explica los huecos de 0 px entre bloques, no el interlineado.
-   - Las «cajas contra la línea inferior» (obs. 10) son sistémicas: la plantilla de cabecera `.p4` no tiene relleno inferior y se copió en decenas de archivos.
-   - El panel «CON QUÉ FILTROS» (obs. 18) es, según la FICHA del cliente, un **registro de auditoría**, no controles: el defecto es de color y de mezcla de conceptos, no de operabilidad.
+    - El icono gris sobre «Reintentar» (obs. 1) tiene causa raíz: `.state .ico` descendiente. El arreglo es `.state > .ico`; el cliente lo declara y no lo aplicó en 6 hallazgos críticos de estas pantallas.
+    - El menú lateral colapsado sigue sin nombre accesible en 19 pantallas auditadas (existía en v1).
+    - La hipótesis de que `--sp-5` explica los problemas de espaciado se **refuta** para Mi día (obs. 13): la causa es `.p4-t` con `padding-bottom:0` (§3.1). Para Acceso (51) explica los huecos de 0 px entre bloques, no el interlineado.
+    - Las «cajas contra la línea inferior» (obs. 10) son sistémicas: la plantilla de cabecera `.p4` no tiene relleno inferior y se copió en decenas de archivos.
+    - El panel «CON QUÉ FILTROS» (obs. 18) es, según la FICHA del cliente, un **registro de auditoría**, no controles: el defecto es de color y de mezcla de conceptos, no de operabilidad.
 5. **Rediseños críticos** (Tickets TI, acordeón de sucursales, Asistente, Mi día): diagnóstico y brief con veredicto de viabilidad en §7.
 6. **Lo que se le pide al cliente** se limita a críticos y regresiones (§5); el resto se adopta y se documenta en nuestro sistema (§6).
 
@@ -71,7 +71,7 @@ Veredicto = lo que se **reprodujo** con evidencia en el archivo recibido. Ojo: l
 | 11 | `25_consumo_de_material` | parcial | El contrato no tiene color para tres cosas que la pantalla necesita: «derivado» (clasificación), el color físico de un material y «total» (énfasis). El autor las resolvió con el semáforo, que es lo único que ha | sencillo | no | ajustar_sistema |
 | 12 | `27_padron_clientes` | confirmada | No es un solo defecto sino la suma de cinco: (1) falta el comportamiento (ningún manejador) y el HTML solo trae un panel con id real, así que 4 de 5 controles apuntan al vacío; (2) el contenido del panel vive e | rediseño | sí (criterio 5) | decidir_diseño |
 | 13 | `28_instalador_mi_dia` | confirmada | Relleno inferior repartido entre filas opcionales (§3.1): .p4-t lleva padding-bottom:0 esperando que .p4-b/.p4-f cierren el bloque, y en Mi día no existen. NO es --sp-5 (hipotesis verificada y refutada: afecta  | sencillo | sí (criterio 5) | exigir_cambio |
-| 14 | `34_instaladores` | sin_datos | no determinada: la pregunta es una comparación entre dos componentes y su decisión es de la Fase 4a. Condicionantes medidos: (1) el sistema 2.15.0 no define una agenda, solo cita un calendario de instalaciones  | no_evaluado (comparación y decisión: Fase 4a) | no | decidir_diseño |
+| 14 | `34_instaladores` | respondida en el brief | La agenda del sistema no existe en 2.15.0 (no hay §6.24; §13.9 solo regula alto por dato). No cambiar la del cliente; cambio mínimo en texto, «Sin asignar» y domingo a 1280. | medio | no | adoptar_cliente (con cambio mínimo) |
 | 15 | `49_alta_orden` | **sin datos v2** | La pantalla no viene en el ZIP (el PDF dice que se actualizó) | — | — | pedir el archivo |
 | 16 | `46_cuentas_por_cobrar` | confirmada | Tres factores encadenados: (a) `.minis` omite `align-items:start`, el valor por omisión que fija §13.4 (la propuesta lo tiene en su línea 674); (b) `.kpis` está en dos columnas con el hero en la primera, de mod | medio | no | decidir_diseño |
 | 17 | `47_asistente` | parcial | (a) Solape: margen superior negativo en .fuentes (linea 669) dentro de una tarjeta que lleva su relleno en el contenedor (.tx, linea 666) y no en filas hermanas: §3.1. (b) Dos tonos: el componente «respuesta» m | rediseño | sí (criterio 5) | exigir_cambio |
@@ -135,10 +135,10 @@ Patrones que el cliente usa y nuestro sistema no documenta (propuestas de regla 
 | `05_app_cliente` | Tamaños < 12 px en móvil: `.abtn`, `.stbtn`, `.tile` a 11,5 px y etiquetas de la barra de pestañas a 10 px (línea 264) |
 | `05_app_cliente` | Marco de teléfono y barra de estado simulados dentro del DOM |
 | `05_app_cliente` | Tokens del antecesor en pantalla de cliente (--text-3 #66717F, 14 más) |
-| `13_panel_asistencia_rhl` | Selector descendiente de elemento (`.componente span`, `.componente b`) dentro de un componente cuyas filas contienen <span> con otro rol (acciones, t |
-| `13_panel_asistencia_rhl` | Escala de interlineado: el sistema no la define (§2 y §3 solo tienen tamaños y espaciados). En esta pantalla conviven `normal` (≈1,25), 1, 1,05, 1,3,  |
-| `13_panel_asistencia_rhl` | Fila de bandeja de dictamen (icono-badge 26px + título + detalle + acciones), no descrita en el sistema. Aparece en esta pantalla y es el equivalente  |
-| `13_panel_asistencia_rhl` | El 10px de padding (y 9px) aparece en componentes del propio sistema (§6.9 `.note`, §7.2 `.it`) sin estar en la escala --sp-*, por lo que los clientes |
+| `13_panel_asistencia_rhl` | Selector descendiente de elemento (`.componente span`, `.componente b`) dentro de un componente cuyas filas contienen <span> con otro rol (acciones, texto en línea). Medido en la bandeja de Asistencia RHL: el span genérico anuló display, gap y margin-top de la |
+| `13_panel_asistencia_rhl` | Escala de interlineado: el sistema no la define (§2 y §3 solo tienen tamaños y espaciados). En esta pantalla conviven `normal` (≈1,25), 1, 1,05, 1,3, 1,35 y 1,55, y los bloques de texto multilínea del sistema usan 1,4, 1,5, 1,55 y 1,6 sin nombre (§6.7, §6.9, § |
+| `13_panel_asistencia_rhl` | Fila de bandeja de dictamen (icono-badge 26px + título + detalle + acciones), no descrita en el sistema. Aparece en esta pantalla y es el equivalente de §6.15/§6.12 para colas de decisión. |
+| `13_panel_asistencia_rhl` | El 10px de padding (y 9px) aparece en componentes del propio sistema (§6.9 `.note`, §7.2 `.it`) sin estar en la escala --sp-*, por lo que los clientes lo reproducen. |
 | `20_tablero` | Columnas de una gráfica que no comparten línea base porque el rótulo del eje vive dentro de la columna |
 | `20_tablero` | Gráfica dibujada en CSS o SVG sin tabla equivalente |
 | `21_ficha_cliente` | Bloque de lectura con edición en línea (datos fiscales) |
@@ -175,11 +175,11 @@ Patrones que el cliente usa y nuestro sistema no documenta (propuestas de regla 
 | `47_asistente` | Hilo de conversacion (`.mensajes`) con turnos de usuario sin tarjeta y de asistente con tarjeta |
 | `47_asistente` | Accesos rapidos tipo chip (`.rapido`) y compositor |
 | `47_asistente` | Contradiccion entre 10_dprimi_asistente (identico a v1) y 47_asistente |
-| `48_asistencia_rhl` | Interlineado de interfaz: el sistema no tiene escala ni valor por omisión. Hay `line-height` solo dentro de cinco componentes (1,4; 1,5; 1,55; 1,6) y  |
+| `48_asistencia_rhl` | Interlineado de interfaz: el sistema no tiene escala ni valor por omisión. Hay `line-height` solo dentro de cinco componentes (1,4; 1,5; 1,55; 1,6) y las pantallas fijan además 1,25, 1,3 y 1,35 por su cuenta; lo demás computa `normal`. El brief I5 cuenta 4–5 i |
 | `51_acceso` | Entrada de tarjeta unica sin columna de marca (`.acceso > .caja-acc`) |
 | `51_acceso` | Estado de error de autenticacion con variantes |
-| `54_bitacora_descargas` | Marca de sensibilidad del dato (dato personal, confidencial) en un registro o una fila. El sistema tiene el semáforo (§1.3, juicios de estado) y las s |
-| `55_verificacion_pedido` | Etiqueta de «siguiente paso» sobre el renglón activo de una lista de verificación (`.ren.siguiente::before` con `translateY(-32px)`). El sistema no ti |
+| `54_bitacora_descargas` | Marca de sensibilidad del dato (dato personal, confidencial) en un registro o una fila. El sistema tiene el semáforo (§1.3, juicios de estado) y las series (§1.4 y `.p-type`, clasificaciones sin connotación), pero nada para decir «esto tocó dato personal» sin  |
+| `55_verificacion_pedido` | Etiqueta de «siguiente paso» sobre el renglón activo de una lista de verificación (`.ren.siguiente::before` con `translateY(-32px)`). El sistema no tiene un patrón para señalar cuál es el próximo elemento a atender dentro de una lista; el cliente lo resolvió c |
 | `58_altas_como_modal` | Cuerpo de dialogo con secciones que desplaza (`.modal .cuerpo > .seccion`) |
 | `58_altas_como_modal` | Marco de dialogo ilustrado en una pagina de referencia (sin <dialog>) |
 | `58_altas_como_modal` | Seccion de registro historico dentro de una maqueta de decision (D1: 41 ya no es dialogo) |
@@ -198,31 +198,36 @@ Contradicciones internas de nuestro sistema que los auditores encontraron (a res
 |---:|---|:-:|:-:|:-:|:-:|:-:|
 | 1 | D6: «Reenviar liga de registro» retirada (no se construye; dictamen 2894 punto 15). | ✓ | ✓ | ✓ | ✓ | · |
 | 2 | D5: Sección «Unidades» (VIN, placas, descripción) en la ficha del cliente. | · | ✓ | · | · | · |
-| 3 | D9: «Datos fiscales» (CP, régimen, domicilio) editables en línea en la ficha; `edita | · | ✓ | · | · | ✓ |
-| 4 | D3: Grupo automotriz y Marca pertenecen a «Sucursal» (no a la razón social); en la f | · | ? | ✓ | ✗ | · |
-| 5 | D2: Sucursal opcional en el alta, con el aviso «Sin sucursal no se le puede programa | · | · | ✗ | ✗ | · |
-| 6 | D1: El alta de cliente es una página (ruta /clientes/nuevo), no un diálogo. `58_alta | ? | · | ✓ | ✗ | · |
+| 3 | D9: «Datos fiscales» (CP, régimen, domicilio) editables en línea en la ficha; `editar-cliente` se queda en dos renglones (razón social + RFC solo lectura). | · | ✓ | · | · | ✓ |
+| 4 | D3: Grupo automotriz y Marca pertenecen a «Sucursal» (no a la razón social); en la ficha el grupo se deriva de las sucursales. | · | ? | ✓ | ✗ | · |
+| 5 | D2: Sucursal opcional en el alta, con el aviso «Sin sucursal no se le puede programar una orden; se puede añadir después desde la ficha». | · | · | ✗ | ✗ | · |
+| 6 | D1: El alta de cliente es una página (ruta /clientes/nuevo), no un diálogo. `58_altas_como_modal` existe: ¿sigue vigente o quedó obsoleta? | ? | · | ✓ | ✗ | · |
 | 7 | D10: «Último movimiento» en el listado, ocultable desde «Columnas». | ✓ | · | · | · | · |
-| 8 | D13: Contacto «De la empresa» (sin sucursal) en la ficha y en el alta; la sucursal de | · | ✓ | ✓ | ✗ | · |
-| 9 | D15: Ficha de cliente inactivo en solo lectura, con banda «Cliente inactivo» y botón  | · | ✓ | · | · | · |
-| 10 | D7: D7 (vigencia por documento) AUSENTE: sin columna de vigencia ni chip «con un doc | ✗ | ✓ | ✓ | ✓ | · |
+| 8 | D13: Contacto «De la empresa» (sin sucursal) en la ficha y en el alta; la sucursal del alta es todo o nada. | · | ✓ | ✓ | ✗ | · |
+| 9 | D15: Ficha de cliente inactivo en solo lectura, con banda «Cliente inactivo» y botón «Reactivar». | · | ✓ | · | · | · |
+| 10 | D7: D7 (vigencia por documento) AUSENTE: sin columna de vigencia ni chip «con un documento por vencer». | ✗ | ✓ | ✓ | ✓ | · |
 | 11 | D8: D8 (duplicados) AUSENTE: sin banner de duplicados ni «Comparar y decidir». | ✗ | ✓ | ✓ | ✓ | · |
-| 12 | D4: Exportar la ficha como PDF de una hoja (identidad, estado, expediente, contacto  | · | ? | · | · | · |
+| 12 | D4: Exportar la ficha como PDF de una hoja (identidad, estado, expediente, contacto principal, sucursales, contactos; sin historial). Sin cambios. | · | ? | · | · | · |
 
-✓ cumple · ✗ no cumple · ? no verificable · · no aplica. Desajustes extra y críticos: D7 se pospone, pero 27 dibuja en el estado por defecto el chip «7 con un documento por vencer», la pastilla «Por vencer» con fecha de vencimiento y av; D8 se pospone, pero 27 dibuja la tarjeta «Dos pares de razones sociales se parecen demasiado» con dos botones «Comparar y decidir» y la nota de fusión; D1: 58 sigue dibujando «Nuevo cliente» como diálogo (con aritmética que lo declara «el único que pasa de dos») y propone «modal en escritorio y página; D2: la sucursal es opcional, pero falta el aviso literal «Sin sucursal no se le puede programar una orden; se puede añadir después desde la ficha» (la
+Las ✗ de `58` se refieren al diálogo «Nuevo cliente» de esa página, obsoleto para el alta de cliente según FICHAS (`58` ya no gobierna `41`, pero sigue gobernando las otras cuatro altas).
+
+✓ cumple · ✗ no cumple · ? no verificable · · no aplica. Desajustes extra y críticos: D7 se pospone, pero 27 dibuja en el estado por defecto el chip «7 con un documento por vencer», la pastilla «Por vencer» con fecha de vencimiento y aviso de 30 días, y «revisadas y vigentes» (FICHAS reconoce que 27 lo dibuja).; D8 se pospone, pero 27 dibuja la tarjeta «Dos pares de razones sociales se parecen demasiado» con dos botones «Comparar y decidir» y la nota de fusión, visible por defecto.; D1: 58 sigue dibujando «Nuevo cliente» como diálogo (con aritmética que lo declara «el único que pasa de dos») y propone «modal en escritorio y página en el teléfono», sin ninguna marca en el HTML de que quedó superada para el alta de cliente; la supersesión solo está en FICHAS_TECNICAS.md. Arrastra los ítems 4, 5 y 8 (Grupo y marca como sección propia, sin Sucursal).; D2: la sucursal es opcional, pero falta el aviso literal «Sin sucursal no se le puede programar una orden; se puede añadir después desde la ficha» (la sección dice solo el todo-o-nada y el estado vacío omite la consecuencia). Omisión de texto, no contradicción de fondo.
 
 ### 7.2 Briefs de diseño (Fase 4)
 
-**`24-tickets-zona-superior.md`** — veredicto: **Alcance dentro del sistema actual.** Sí. Todo con tokens existentes (`--warn-*`, `--err-*`, `--ok-*`, `--surface-2`, `--sp-*`, `--fs-meta`, `--fs-title`) y componentes documentados: `.banda` (§6.9), indicador de §6.20, toggletip §6.23. El único elemento no presente en las maquetas del cliente es el toggletip (ninguna lo implementa: `grep infob` en el paquete solo devuelve `.infobox` de otro componente). **Esfuerzo.
+Cada brief parte de lo que dibujó el cliente, evalúa al menos dos opciones (la primera siempre «mínimo cambio sobre lo del cliente»), trae un prototipo medido a 1440/1280/1024/390 px y termina con un veredicto de viabilidad. Los archivos completos están en `audit/v2/briefs-diseno/`.
 
-**`28-mi-dia.md`** — veredicto: **B: viable.** **C: viable con condiciones.** (Veredicto de la pantalla: **viable**; lo exigible es B.) | Criterio | Respuesta | |---|---| | **Alcance dentro del sistema** | Sí. B usa solo tokens existentes (`--sp-3`, `--sp-4`, `--sp-5`, `--sp-6`, `--sh-modal`) y §3.1 tal como está escrito. C añade únicamente `.pill.p-block` (§6.10) con el icono que la propia pantalla ya usa en la cita (`#i-pause`). Cero componentes 
+| Brief | Observación | Veredicto de viabilidad | Recomendación |
+|---|---|---|---|
+| [`24-tickets-zona-superior.md`](briefs-diseno/24-tickets-zona-superior.md) | 9 y 10 · Tickets TI, zona superior | **viable con condiciones** | Un solo bloque ámbar (el plazo) a ancho declarado junto a los datos; la regla de cierre en una banda neutra de una frase; el resto a toggletip; `padding-bottom` en la cabecera. |
+| [`27-acordeon-sucursales.md`](briefs-diseno/27-acordeon-sucursales.md) | 12 · acordeón de sucursales | **viable** | Cinco filas hijas que abren; lista de 560 px sin tarjeta; estado solo si la sucursal no puede recibir órdenes; «Ver órdenes» junto a cada una. Botones fuera de vista a 1280: de 4 a 0. |
+| [`27-etiquetas-de-estado.md`](briefs-diseno/27-etiquetas-de-estado.md) | 3 · etiquetas de estado del padrón | **viable con condiciones** | Un estado por eje (Completos · Pendientes · Sin calcular; Activo · Inactivo); el documento que falta es una línea, no un estado; sin «Por vencer» hasta D7. |
+| [`28-mi-dia.md`](briefs-diseno/28-mi-dia.md) | 13 · Mi día | **B viable; C viable con condiciones** | `.p4{padding-bottom:var(--sp-3)}`, declarar `--sp-5`, aire al final de la lista y resumen oculto en vacío/error. La opción C recupera los 12 px de pliegue subiendo la fecha a la cabecera, pero requiere decisión de producto. |
+| [`34-agenda.md`](briefs-diseno/34-agenda.md) | 14 · agenda de instaladores | **viable con condiciones** | No cambiarla: ningún fallo crítico depende de ella. Cambio mínimo: texto ≥12 px, fila «Sin asignar», domingo visible a 1280, cabecera fija, `--text-3`. La «agenda del sistema» no existe en 2.15.0. |
+| [`47-asistente.md`](briefs-diseno/47-asistente.md) | 17 · Asistente | **viable con condiciones** | «Chat» no merece sección propia. La franja se conserva. Quitar `margin-top:-12px` de `.fuentes`; cuerpo y pie como zonas hermanas; 24 px a los 5 destinos pequeños. Condición: decidir si el asistente solo consulta (47) o ejecuta con confirmación (10). |
+| [`54-panel-con-que-filtros.md`](briefs-diseno/54-panel-con-que-filtros.md) | 18 · panel «CON QUÉ FILTROS» | **viable con condiciones** | Dos grupos en la misma celda; marca «Dato personal» con escudo sin color de estado; valores literales («Querétaro y Celaya», no «2 de 5»). Incluye la regla de sistema para la marca de sensibilidad. |
 
-**`34-agenda.md`** — veredicto: **Mantener la agenda del cliente con cambio mínimo (A′): `viable con condiciones`.** - Alcance: dentro del sistema actual; 0 componentes nuevos; CSS y HTML de un archivo; sin JS nuevo. - Esfuerzo: K1–K3 de una línea cada uno; S1–S6 en un solo archivo (+44/−22 líneas). - Compatibilidad con decisiones citadas literal: respeta L366, L367, L369–371 y L910–912. - **Condiciones**: (a) que el cliente acepte la fila «Sin asi
-
-**`47-asistente.md`** — veredicto: | Criterio | Respuesta | |---|---| | **Alcance dentro del sistema** | Sí. Cero tokens nuevos (`--surface`, `--surface-2`, `--surface-hover`, `--sp-*`, `--r-card`, `--link`) y cero componentes nuevos: `.btn.mini` (§6.2), anatomía de §6.3. Las clases nuevas (`.tx-cuerpo`, `.fuentes--paso`) son modificadores locales. | | **Esfuerzo** | A: 5 ediciones (~6 líneas). B: ~20 líneas de CSS, un envoltorio por respuesta en la p
-
-**`54-panel-con-que-filtros.md`** — veredicto: **`viable con condiciones`.** - **Alcance:** dentro del sistema actual; 0 componentes nuevos; +15/−8 líneas en un archivo; sin JS. - **Compatibilidad con decisiones del cliente, citadas literal:** conserva «6 columnas × 5 filas, se desliza con la primera columna anclada (`D-6`)» y «un renglón no se edita ni se borra». Cambia el vehículo de la marca (ámbar → forma y texto), no lo decidido. - **Esfuerzo:** bajo para el
-
+**Dos hechos que cambian la lectura de la observación 3:** las etiquetas «Falta documento» e «Incompleto» no existen en `27_padron_clientes` del ZIP (`grep` = 0); «Incompleto» solo aparece en `06_padron_clientes`, un prototipo anterior. Probablemente tu captura es de otra versión. Y los briefs de `24` y `27` parten de la copia que trae el ZIP (Anexo A).
 
 ## 8 · Qué tan fiable es esta auditoría
 
@@ -230,7 +235,7 @@ Contradicciones internas de nuestro sistema que los auditores encontraron (a res
 - **Verificación adversarial:** 119 afirmaciones: 110 confirmadas, 9 exageradas, 0 refutadas, 0 no concluyentes. Las exageradas se corrigieron en este informe (p. ej. el recorte de acciones a 1366 px es de 11 px, no «fuera»; el hueco del acordeón mide 578–654 px). **Cero refutaciones no prueba que no haya errores:** la réplica lo muestra.
 - **Réplica ciega** (2 pantallas, sin ver el original): mismo veredicto de observación 2 de 2; coincidencia de § citados **43 %**, por debajo del 80 % que nos fijamos. De los hallazgos altos del original, la réplica reprodujo 5 de 10; encontró otros que el original no tenía. Lo que ambas pasadas encuentran es sólido; la lista no es exhaustiva.
 - **Instrumentos validados antes de usarse** con HTML sintético de respuesta conocida (contraste con alfa y `color-mix`, táctil, menú, I1–I9, C2, C11, `--sp-5`): 15 de 15 aciertos. Aun así los auditores hallaron seis fallos de mi instrumental (capturas de 800 px, I6, I9, C1 sin estilos en línea, I3 e I7 con falsos positivos, `lib.cjs` inyecta las fuentes y no sirve para probar fuentes). Están corregidos o documentados.
-- **Recall frente a tus 19 observaciones:** 16 de 19 reproducidas con evidencia; 2 (4 y 15) no se pueden probar porque `49_alta_orden` no viene en el ZIP; la 14 es una comparación de diseño (brief 4a). **No es un recall ciego:** los auditores sabían qué buscar.
+- **Recall frente a tus 19 observaciones:** 16 de 19 reproducidas con evidencia por un auditor (más la 14, respondida por el brief de agenda: 17 de 19 con respuesta); 2 (4 y 15) no se pueden probar porque `49_alta_orden` no viene en el ZIP; **No es un recall ciego:** los auditores sabían qué buscar.
 - **Límites.** Las otras 27 pantallas solo tienen medición mecánica. Los hallazgos se refieren al archivo recibido, no a lo que el cliente tenga en otra carpeta. `FICHAS_TECNICAS.md` se usó como fuente de decisiones del cliente; se contradice a sí misma en un punto (plazo de tickets, tanda 3 frente a tanda 4). F3 sale entre 2 y 4 en las pantallas auditadas: 2: 10, 3: 12, 4: 1 pantallas.
 - **F5 contra investigación** (solo nivel A y 54): cubre 36, ignora 10.
 

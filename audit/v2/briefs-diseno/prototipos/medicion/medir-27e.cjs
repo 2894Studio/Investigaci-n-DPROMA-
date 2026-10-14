@@ -47,6 +47,9 @@ const CAPDIR = path.join(__dirname, '..', 'capturas');
       res.fuentesChips = M.fuentes(document.querySelector('.p4-f'));
       res.destinosTabla = (() => { const d = M.destinos(document.querySelector('table')); return { total: d.total, bajo24: d.bajo24, detalle: d.detalle }; })();
       res.cabeceraDocs = (() => { const th = Array.from(document.querySelectorAll('thead th')).find(x => /Documentos fiscales/i.test(x.textContent)); const r = th.getBoundingClientRect(); return { alto: +r.height.toFixed(1), ancho: +r.width.toFixed(1), tieneInfob: !!th.querySelector('.infob') }; })();
+      res.solapes = { docs: filas.reduce((n, tr) => n + M.solapes(tr.querySelector('td[data-et="Documentos fiscales"] .exp'), ':scope > *').length, 0),
+                      chips: M.solapes(document.querySelector('.p4-f'), ':scope > *').length,
+                      celdasDeFila: filas.reduce((n, tr) => n + M.solapes(tr, ':scope > td, :scope > th').length, 0) };
       const caja = document.querySelector('.tabla-caja');
       res.scroll = { scrollW: caja.scrollWidth, clientW: caja.clientWidth, horizontal: caja.scrollWidth > caja.clientWidth + 1, docScrollH: document.documentElement.scrollWidth > innerWidth };
       return res;
