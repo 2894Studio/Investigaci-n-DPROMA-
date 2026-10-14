@@ -6,9 +6,9 @@ D, TXT, OUT = sys.argv[1:4]
 t = open(TXT, encoding='utf-8').read()
 filas = {}
 for l in t.splitlines():
-    m = re.match(r'\s*(?:html_v2|sistema(?:/[\w\-]+)+)/([\w\-\.]+\.html)\s+((?:C\d+(?:\s*·\s*)?)+)\s+(\d+)→(\d+)\s+(\d+|—)(?:→(\d+))?\s+#(\d+)', l)
+    m = re.match(r'\s*(?:html_v2|sistema(?:/[\w\-]+)+)/([\w\-\.]+\.html)\s+((?:C\d+(?:\s*·\s*)?)+)\s+(\d+|—)→(\d+)\s+(\d+|—)(?:→(\d+))?\s+#(\d+)', l)
     if m:
-        filas[m.group(1)] = {'codigos': re.findall(r'C\d+', m.group(2)), 'lt12': (int(m.group(3)), int(m.group(4))),
+        filas[m.group(1)] = {'codigos': re.findall(r'C\d+', m.group(2)), 'lt12': (None if m.group(3) == "—" else int(m.group(3)), int(m.group(4))),
                              'p105': (None if m.group(5) == '—' else int(m.group(5)), None if m.group(6) is None else int(m.group(6))), 'pr': m.group(7)}
 def estilos(src): return '\n'.join(re.findall(r'<style[^>]*>(.*?)</style>', src, re.S | re.I))
 def regla(css, sel):
