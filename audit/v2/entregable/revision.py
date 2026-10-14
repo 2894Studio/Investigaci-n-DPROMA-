@@ -127,7 +127,7 @@ cambio(B, 'El padrón con todos los ajustes a la vez', 'dis',
   'A 1280 px, «Ver órdenes» está a la vista en 0 de 4 filas y los botones de fila completos son 6 de 18. Con los ajustes, 4 de 4 y 18 de 18. A 1024 px, de 0 de 4 y 0 de 18 a 4 de 4 y 18 de 18.',
   a_d('p27', 'Padrón de clientes tal como llega en el archivo, con banner de duplicados y chip por vencer', 'Padrón de clientes con acordeón, estados por eje y acciones ancladas', 'Antes — 1440 px', 'Después — 1440 px', apilado=True),
   None,
-  'La columna de acciones anclada a la derecha es una propuesta de Studio sin brief propio. Por debajo de 1331 px la tabla no cabe junto a la barra lateral y la última columna, la de acciones, queda fuera. Sin resolver: «Acciones» alineada con su casilla, y el botón flotante, que sigue tapando parte de la última fila.',
+  'La columna de acciones anclada a la derecha es una propuesta sin brief de diseño propio. Por debajo de 1331 px la tabla no cabe junto a la barra lateral y la última columna, la de acciones, queda fuera. Sin resolver: «Acciones» alineada con su casilla, y el botón flotante, que sigue tapando parte de la última fila.',
   ('Viable con condiciones',))
 
 cambio(B, 'El acordeón de sucursales abre y se lee', 'dis',
@@ -364,7 +364,7 @@ MEDIDAS = [
  ('Textos con contraste por debajo de 4,5:1, tema oscuro', '2', '2 de 50', 'Lo mismo, con el tema oscuro activado.', 'Sin cambio asociado todavía'),
  ('Celdas de tabla que llevan un párrafo', '24', '7 de 50', 'Una celda debe llevar un dato, no una frase (§6.11, regla 7).', 'Ver ' + c('Viáticos: la tabla')),
  ('Textos siempre visibles de más de 140 caracteres', '25', '14 de 50', 'El sistema pone un tope de 140 caracteres y una frase para los avisos (§8). Pasado ese tope, el texto explica en lugar de indicar.', 'Se atiende caso por caso, por ejemplo en los ' + c('Tickets TI') + ' y en ' + c('Viáticos: la tabla')),
- ('Textos de 10,5 px que no están en mayúsculas', '240', '45 de 50', 'El sistema solo prevé ese tamaño para rótulos en mayúsculas (§2.1). Fuera de ahí cuesta leerlo.', 'Sin cambio para DPROMA: el sistema se contradice (§7.2) y lo resuelve Studio'),
+ ('Textos de 10,5 px que no están en mayúsculas', '240', '45 de 50', 'El sistema solo prevé ese tamaño para rótulos en mayúsculas (§2.1). Fuera de ahí cuesta leerlo.', 'No se pide cambio por ahora'),
  ('Variables de color o espaciado que se usan y nunca se definen', '9', '7 de 50', 'El navegador ignora la variable y el elemento pierde ese valor.', 'El caso de <code>--sp-5</code> está en el ' + c('Mi día')),
  ('Elementos que usan <code>--sp-5</code>, que nadie define', '67', '7 de 50', 'Quedan con 0 px de espaciado donde debería haber 20 px.', 'Ver ' + c('Mi día')),
  ('Parejas de botones de distinta altura o con el icono en otro sitio', '5', '5 de 50', 'Dos botones que hacen cosas parecidas se ven distintos.', 'Ver ' + c('Los botones hermanos')),
@@ -414,7 +414,7 @@ DOC = f'''<!doctype html>
   </div>
   <p>Cada cambio lleva una etiqueta que dice cuánto pesa:</p>
   <ul class="plano">
-    <li><span class="tag tag-pide">Se pide</span> cumple al menos una de las cinco condiciones de crítico: falla de accesibilidad medida; impide la tarea u oculta la acción principal; acción irreversible o de dinero sin protección; contradice una decisión de DPROMA o expone datos personales; o es un rediseño que Studio marcó como crítico y es viable.</li>
+    <li><span class="tag tag-pide">Se pide</span> cumple al menos una de las cinco condiciones de crítico: falla de accesibilidad medida; impide la tarea u oculta la acción principal; acción irreversible o de dinero sin protección; contradice una decisión de DPROMA o expone datos personales; o es un rediseño marcado como crítico y viable.</li>
     <li><span class="tag tag-dis">Propuesta de diseño</span> es un rediseño probado en un prototipo. El veredicto de viabilidad lo acompaña.</li>
     <li><span class="tag tag-rec">Recomendado</span> no se exige. Mejora algo visible y a veces delata una causa que se repite.</li>
   </ul>
