@@ -1,0 +1,446 @@
+{
+ "pantalla": "54_bitacora_descargas",
+ "tier": "B",
+ "sha256": "07a79dd158762e7f1acccd2ad59f81ddbfdcb01a98963cca45061edf6224fefa",
+ "estado_entrega": "modificada",
+ "estado_vs_pdf": "alineado",
+ "estados_auditados": [
+  "ok",
+  "vacío",
+  "error",
+  "cargando"
+ ],
+ "capturas": [
+  "54_bitacora_descargas--1440.png",
+  "54_bitacora_descargas--1280-fold.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 18,
+   "texto_usuario": "Panel «CON QUÉ FILTROS»: ¿estos filtros tienen sentido para el flujo?",
+   "veredicto": "parcial",
+   "evidencia": [
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "ficha_tecnica_del_cliente (brief)",
+      "detalle": "FICHAS_TECNICAS.md líneas 1129-1141 (sección 54_bitacora_descargas)"
+     },
+     "dato": "PROPÓSITO SEGÚN EL CLIENTE. La FICHA: «Quién descargó qué reporte, con qué filtros y cuándo. Sale de Legal.»; «un renglón no se edita ni se borra. Una bitácora que se puede corregir después no acredita nada»; «Los reportes no se almacenan: se construyen cada vez, así que este renglón es lo único que queda de una entrega.» Es decir: el panel «Con qué filtros» es un registro de lo aplicado en cada descarga, no un conjunto de controles."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "m54.cjs + a54.cjs (scratchpad/b2)",
+      "detalle": "getComputedStyle de los 12 `.f-chip` a 1440; ariaSnapshot de la primera fila; grep de editar|eliminar|borrar"
+     },
+     "dato": "EL PANEL NO ES OPERABLE Y NO DEBE SERLO. Los 12 `.f-chip` son `<span>` con `cursor:auto`, sin `tabindex`, `role` ni `aria-pressed`; la fila solo trae un botón, «Ver el detalle» (grep: 0 coincidencias de editar/eliminar/borrar) y la nota al pie dice que un renglón no se edita ni se borra. La lectura previa de que «los filtros no son operables» era un defecto no se sostiene contra la FICHA: es el comportamiento pedido. Lo que sí persiste de v1 es otra cosa: la barra de la pantalla no tiene ningún filtro para acotar la bitácora (ver hallazgo `sin-filtros-de-periodo`)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "m54.cjs",
+      "detalle": "texto de cada chip y subtítulo de la columna «Qué reporte» en las 5 filas"
+     },
+     "dato": "SUFICIENCIA COMO REGISTRO. Los chips guardan valores concretos («corte 31 jul 2026», «mes julio 2026», «semana 17 – 23 ago», «estado activos»), pero «plaza 2 de 5» no nombra las dos plazas (los nombres solo están en el subtítulo de otra columna: «Querétaro y Celaya») y «marca todas» repite el subtítulo «Todas las marcas». Para una bitácora cuyo renglón «es lo único que queda de una entrega», cada chip debería poder leerse solo. El detalle completo, si existe, está detrás de «Ver el detalle» (no dibujado): no evaluado."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 693,
+      "cita": "<span class=\"f-chip pers\">incluye <b>razón social y RFC</b></span>"
+     },
+     "dato": "FILTROS Y CAMPOS ENTREGADOS CONVIVEN BAJO UN MISMO RÓTULO. 3 de los 12 chips empiezan por «incluye» («razón social y RFC», «domicilio fiscal», «VIN y titular»): no son filtros sino los campos con dato personal que llevaba el reporte. Que figuren en el registro es coherente con la FICHA (es lo único que queda de la entrega), pero la cabecera dice «Con qué filtros» y el lector de pantalla los lee seguidos, sin separador: «marca todas corte 31 jul 2026 incluye razón social y RFC» (ariaSnapshot)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 652,
+      "cita": ".f-chip.pers{border-color:var(--warn);background:var(--warn-bg);color:var(--warn-ink)}"
+     },
+     "dato": "ÁMBAR PARA UNA CLASIFICACIÓN. `.f-chip.pers` (3 chips), `.schip.c-warn` «41 con dato personal» y la nota «Los filtros en ámbar incluyen dato personal» usan `--warn`, que §1.3 define como «Falta algo, o vence pronto». No es color a secas: el chip lleva el texto «incluye…» y la nota lo explica; contraste `--warn-ink` sobre `--warn-bg` 5,25:1 (brief y cálculo propio desde los tokens). Dos lecturas: (a) es una clasificación de lo entregado y §1 («Un color de estado no se reutiliza para una categoría») y §6.10 (`.p-type` = clasificación) mandan paleta categórica o ninguna; (b) es una marca de atención para auditoría («este renglón tocó dato personal») y ninguna de las dos paletas existentes la cubre: el sistema no tiene patrón de «sensibilidad del dato». La nota de v1 que decía «no para culpar a nadie» ya no existe (95 caracteres ahora)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "m54.cjs",
+      "detalle": "tamaño, wrap y contraste calculado desde tokens (#4C5A6B sobre #E7EDF3 = 5,97:1)"
+     },
+     "dato": "LEGIBILIDAD. 12 px (suelo cumplido), 23 px de alto, `line-height:1.4`, texto `--text-2` sobre `--surface-2` 5,97:1 y tinta ámbar 5,25:1. A 1440 la columna mide 322 px y las filas 1 y 2 envuelven a dos líneas (el chip «incluye…» baja solo); a 1280 mide 276 px, mismas dos filas. La lectura se hace bien a ojo; el único problema de legibilidad es el de lector de pantalla (sin separadores)."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 736,
+      "cita": "comprueba el rango de fechas"
+     },
+     "dato": "LO QUE FALTA EN LA PANTALLA (no en el panel). El estado vacío manda a «comprobar el rango de fechas» y ofrece «Ampliar a los últimos 12 meses», pero la cabecera no tiene control de fechas, ni de persona, reporte o formato; los tres `.schip`, «Compacta» y la paginación no tienen manejador (clk.cjs). Con 318 descargas y 5 filas visibles, quien audita no puede acotar. La FICHA no dice que no deba poder hacerlo."
+    }
+   ],
+   "causa_raiz": "El panel cumple su función de registro (FICHA) y no debe ser operable. Los dos problemas reales son de sistema y de composición: (1) el sistema no tiene un patrón para marcar sensibilidad del dato —§1.3 es para juicios de estado y §6.10 `.p-type` para clasificaciones sin connotación—, así que el cliente reutilizó `--warn`; (2) el mismo rótulo «Con qué filtros» agrupa filtros aplicados y campos entregados, y «2 de 5» no es autosuficiente.",
+   "solucion_propuesta": "Dejar los chips como texto no interactivo. (a) Mover «incluye …» a su propia línea dentro de la celda o a una columna «Datos incluidos». (b) Marca de dato personal sin semáforo: chip en `--surface-2` con icono de escudo y borde `--border-fuerte` (el escudo ya está en el resumen y en la nota), leyenda «con escudo: incluye dato personal»; el resumen «41 con dato personal» pasa a `c-neutro`. (c) Escribir los valores donde hoy hay conteo («plaza Querétaro, Celaya») o dar `title`/toggletip (§6.23). (d) Envolver los chips en `<ul><li>` para que el lector los separe.",
+   "tipo_de_cambio": "sencillo",
+   "critico": {
+    "es": false,
+    "criterio": null
+   },
+   "decision": {
+    "valor": "ajustar_sistema",
+    "motivo": "El panel como registro tiene sentido y se adopta tal cual (FICHA). El uso del ámbar no es crítico y el sistema no ofrece alternativa sancionada: hay que documentar un patrón de «marca de sensibilidad» (ver cobertura) en lugar de exigirle al cliente que elija entre dos paletas que no cubren su caso."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-54bit-buscador-16px",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles + §10 trampa 4 (el destino táctil es la región que acepta la pulsación)",
+    "dice_el_sistema": "El destino táctil es la región que acepta la pulsación, no el elemento.",
+    "hay_en_el_build": "`<div class=\"search\">` envuelve al `<input id=\"buscar\">`; el input mide 329×16 px (brief tactil_bajo24: 1 de N bajo 24 px). Medición propia (cromo.cjs): el padre es un DIV de 34 px de alto, el input no está dentro de ningún `<label>`; pulsar en el relleno de la pastilla no enfoca el campo.",
+    "selector": ".search > input#buscar",
+    "linea": 681,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 681,
+     "cita": "<div class=\"search\"><svg class=\"ico ico-sm\" aria-hidden=\"true\"><use href=\"#i-search\"/></svg><input id=\"buscar\""
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino táctil < 24 px medido (criterio 1). El arreglo ya está prescrito en §10: cambiar el `<div class=\"search\">` por `<label class=\"search\" for=\"buscar\">`; el campo pasa a ser la pastilla entera (34 px) sin tocar el diseño."
+    },
+    "por_que_importa": "Quien pulsa en la pastilla (34 px) no enfoca el buscador: solo responde la franja de 16 px que ocupa el texto. Con dedo o con temblor, el primer toque suele caer en el vacío."
+   },
+   {
+    "id": "v2-54bit-menu-colapsado-sin-nombre",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación — modo colapsado (860–1100 px): el rótulo no desaparece",
+    "dice_el_sistema": "En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+    "hay_en_el_build": "A 1000 px la barra lateral mide 64 px y `.side .et{display:none}`: los 15 enlaces `.it` quedan sin nombre accesible (brief menu_1000px: total 15, sinNombre 15; medición propia con ariaSnapshot: `- link:` sin nombre en los 15). Ningún `.it` lleva `aria-label` ni `title`.",
+    "selector": ".side .it",
+    "linea": 288,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 288,
+     "cita": ".side .et,.grp,.side .wordmark{display:none}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1). Arreglo de una línea por enlace: `aria-label` y `title` con el rótulo (o mover el texto a `.sr` en lugar de `display:none`). El mismo cromo está copiado en todas las pantallas: conviene arreglarlo en la plantilla."
+    },
+    "por_que_importa": "En un portátil de 860–1100 px (o con zoom) quien usa lector de pantalla oye «enlace, enlace, enlace» en toda la navegación principal, y quien ve solo tiene iconos sin etiqueta emergente."
+   },
+   {
+    "id": "v2-54bit-isotipo-viewbox",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 — un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` descoloca la marca",
+    "dice_el_sistema": "Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.",
+    "hay_en_el_build": "El `<svg>` del logo (y el del botón flotante, si lo hay) repite `viewBox=\"740 0 970 932\"` y su `<use>` no lleva medidas. Medición propia (cromo.cjs): el `<use>` queda en x=-22,5 frente al `<svg>` en x=10, un desplazamiento de 32,5 px (el que §10 predice); la parte que cae dentro de la caja de 44 px es ≈ 24 % de la marca.",
+    "selector": ".side .logo svg, .fab svg",
+    "linea": 667,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 667,
+     "cita": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Es un fallo de implementación conocido y de una línea (quitar `viewBox`, poner `width`/`height` en el `<use>`); se recomienda corregirlo en la plantilla del cromo (regla 2), no se exige pantalla por pantalla."
+    },
+    "por_que_importa": "La marca de DPROMA aparece recortada a una cuarta parte en la esquina superior de todas las pantallas."
+   },
+   {
+    "id": "v2-54bit-grp-105-sin-mayusculas",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px — la excepción de 10,5 px es «en mayúsculas» (contradicción interna del sistema con §7.2)",
+    "dice_el_sistema": "Se admite una excepción, y solo una: 10,5px en mayúsculas",
+    "hay_en_el_build": "Los 5 `p.grp` de la barra lateral van a 10,5 px sin `text-transform:uppercase` (brief C2_105_no_mayusculas: 5 fallos; en la captura se leen «Principal», «Operación»…). Es la copia literal de la receta de §7.2 (línea 1942 del sistema: `.grp{margin:14px 8px 4px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}`, sin `text-transform`).",
+    "selector": "p.grp",
+    "linea": 235,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 235,
+     "cita": ".grp{margin:9px 8px 2px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "La causa raíz es nuestra: §2.1 permite 10,5 px solo en mayúsculas pero el CSS de §7.2 no las pone. Hay que corregir §7.2 (añadir `text-transform:uppercase`) o ampliar la excepción de §2.1; el cliente copió lo que decía el documento."
+    },
+    "por_que_importa": "Cinco rótulos de grupo por pantalla quedan por debajo del suelo de 12 px sin la compensación (mayúsculas) que justifica la excepción."
+   },
+   {
+    "id": "v2-54bit-estados-no-se-anuncian",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado, regla 1 — el cambio se anuncia y mueve el foco",
+    "dice_el_sistema": "El cambio se anuncia y mueve el foco.",
+    "hay_en_el_build": "El único código que cambia de vista es `cont.setAttribute('data-state',…)`. Medición propia (st.cjs): tras activar «Error», `document.activeElement` es BODY; no existe ninguna región `aria-live` visible (solo el `role=\"status\"` del esqueleto, oculto en ok).",
+    "selector": "main#contenido",
+    "linea": 775,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 775,
+     "cita": "cont.setAttribute('data-state',b.dataset.set);"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico por la lista de la Regla 1; la regla de §6.4 está escrita con el JS que lo resuelve (`live.textContent` + `main.focus()`), por lo que es una adición sencilla al script compartido de las maquetas. Se recomienda a nivel de plantilla."
+    },
+    "por_que_importa": "Quien navega con lector de pantalla no se entera de que la pantalla pasó de «cargando» a «error» o «vacío»: el foco se queda donde estaba y no se anuncia nada. (v1 f1-54bit-05 la puso alta; sigue siéndolo aquí por ser accesibilidad.)"
+   },
+   {
+    "id": "v2-54bit-estados-sin-tarjeta-ni-encabezado",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado — el estado va dentro de una tarjeta, con medallón y encabezado real",
+    "dice_el_sistema": "El estado va dentro de una tarjeta, no suelto sobre el fondo.",
+    "hay_en_el_build": "Medición propia (st.cjs, estado Error): `.state-error` con fondo rgba(0,0,0,0), sombra none, radio 0; sin `.tarjeta-estado` ni `.estado-ico`; icono de 30 px sin medallón; el título es `<b>` (0 `h1`-`h3` dentro del estado).",
+    "selector": ".state, .state b",
+    "linea": 608,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 608,
+     "cita": ".state > .ico{width:30px;height:30px;color:var(--text-3)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico; son tres vistas secundarias. Se documenta que la receta de 2.15.0 (§6.4) no llegó a estas maquetas y se recomienda adoptarla en la plantilla compartida ARQ-ESTADOS."
+    },
+    "por_que_importa": "Sin tarjeta el mensaje se lee como una pantalla que no terminó de cargar; sin encabezado real no se puede saltar a él con el lector de pantalla. (v1 f1-54bit-06 la puso alta; con los criterios v2 es media: vistas secundarias que no bloquean la tarea.)"
+   },
+   {
+    "id": "v2-54bit-esqueleto-texto-y-sin-aplanar",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga — sin texto real dentro de las barras; con reduced-motion se aplana el fondo",
+    "dice_el_sistema": "Hay que aplanar el fondo, no solo parar la animación.",
+    "hay_en_el_build": "`@media (prefers-reduced-motion:reduce){.skel{animation:none}}` detiene la animación pero deja el degradado congelado (el sistema pide `background:var(--surface-2)`). Además las 30 barras `.skel` llevan texto real dentro (p. ej. «quién lo descargó», medición propia st.cjs) bajo un `role=\"status\"` (§6.7: «sin texto real dentro de las barras»).",
+    "selector": ".skel",
+    "linea": 603,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 603,
+     "cita": "@media (prefers-reduced-motion:reduce){.skel{animation:none}}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico (estado transitorio). Dos líneas por maqueta; se recomienda corregir la plantilla ARQ-ESTADOS."
+    },
+    "por_que_importa": "Con «menos movimiento» las barras quedan a medio pintar; un lector de pantalla puede recitar el texto de relleno. (v1 f1-54bit-07 la puso alta; con los criterios v2 es media: estado transitorio.)"
+   },
+   {
+    "id": "v2-54bit-ambar-clasificacion",
+    "severidad": "media",
+    "regla": "§1 Decisión previa a elegir color + §1.3 Semáforo + §6.10 `.p-type` = clasificación",
+    "dice_el_sistema": "Un color de estado no se reutiliza para una categoría, ni al revés.",
+    "hay_en_el_build": "`.f-chip.pers{border-color:var(--warn);background:var(--warn-bg);color:var(--warn-ink)}` pinta «incluye razón social y RFC», «incluye domicilio fiscal» e «incluye VIN y titular» con el ámbar del semáforo, además de `.schip.c-warn` «41 con dato personal». §1.3: `--warn` = «Falta algo, o vence pronto».",
+    "selector": ".f-chip.pers, .schip.c-warn",
+    "linea": 652,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 652,
+     "cita": ".f-chip.pers{border-color:var(--warn);background:var(--warn-bg);color:var(--warn-ink)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "No es crítico: hay texto («incluye…») y leyenda, y el contraste cumple (5,25:1). Dos lecturas (clasificación vs. marca de atención de auditoría) y ninguna paleta del sistema cubre la segunda: se documenta un patrón de sensibilidad y se adopta lo del cliente mientras tanto. v1 la puso alta; con los criterios v2 es media."
+    },
+    "por_que_importa": "Un ámbar que en el resto del sistema quiere decir «falta algo» aparece en renglones que no tienen nada pendiente: desgasta el aviso de verdad."
+   },
+   {
+    "id": "v2-54bit-sin-filtros-de-periodo",
+    "severidad": "media",
+    "regla": "§6.21 Barra de filtros — único componente para filtrar por un campo categórico; §11 si la interfaz dice «retira uno», existe la forma de retirarlo",
+    "dice_el_sistema": "Es el único componente para filtrar por un campo categórico con más de un valor posible.",
+    "hay_en_el_build": "La cabecera tiene buscador (placeholder «Buscar por persona, reporte o filtro…»), tres `.schip` de conteo y «Cómoda/Compacta»; ningún selector de fechas, persona, reporte o formato. El estado vacío dice «comprueba el rango de fechas — por omisión se enseña el mes en curso» y ofrece «Ampliar a los últimos 12 meses». Ningún control del archivo responde (clk.cjs).",
+    "selector": ".p4-f, .state-empty",
+    "linea": 736,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 736,
+     "cita": "comprueba el rango de fechas"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "v1 la puso alta («inhabilita la pantalla para su función»); con los criterios v2 es media: es una maqueta con 5 filas y la FICHA no pide filtros. Pregunta abierta: ¿qué ejes necesita Legal para acotar (periodo, persona, reporte)? Hasta entonces el estado vacío no debería citar un control que no existe."
+    },
+    "por_que_importa": "Un registro de auditoría se usa para preguntas acotadas («qué se descargó entre el 1 y el 15»); sin ejes de acotación y con 318 renglones, la consulta depende de paginar."
+   },
+   {
+    "id": "v2-54bit-controles-sin-accion",
+    "severidad": "media",
+    "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+    "dice_el_sistema": "Un control con pinta de interactivo tiene que interactuar.",
+    "hay_en_el_build": "Medición propia (clk.cjs): los 3 `.schip` y «Compacta» conservan `aria-pressed=\"false\"` tras el clic y la paginación (`.pag button`) tampoco cambia nada; el script del archivo solo gestiona estados de demo, tema y menú.",
+    "selector": ".schip[data-f], .seg button, .pag button",
+    "linea": 775,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 775,
+     "cita": "cont.setAttribute('data-state',b.dataset.set);"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Es una maqueta sin lógica de filtrado; el sistema lo prevé («se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero»). Se adopta y se promueve a control real cuando exista el filtrado."
+    },
+    "por_que_importa": "Quien prueba la maqueta pulsa y no pasa nada: el control promete un comportamiento que no existe."
+   },
+   {
+    "id": "v2-54bit-tabla-min-width-1080",
+    "severidad": "media",
+    "regla": "§6.11 regla 5 — ninguna columna desaparece en silencio (el desplazamiento horizontal es lo admitido)",
+    "dice_el_sistema": "5. **Ninguna columna desaparece en silencio.** Ocultar por `@media` sin avisar deja a quien",
+    "hay_en_el_build": "`.bit table{min-width:1080px}` frente a una caja de 1044 px a 1280: 36 px ocultos (brief anchos: dx 36 a 1280, 120 a 1024). Con `min-width:0` la tabla mide 1044 a 1280 sin desborde (t48.cjs). La primera columna sí queda fija (`position:sticky`, medido a 1280), tal como pide D-6 en la FICHA.",
+    "selector": ".bit table",
+    "linea": 637,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 637,
+     "cita": ".bit table{min-width:1080px}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "El sistema admite el desplazamiento; mejora sencilla: bajar `min-width` a ~1040 para que a 1280 cuadre."
+    },
+    "por_que_importa": "A 1280 px la columna «Cuándo»/«Ver el detalle» se desplaza 36 px sin necesidad de contenido."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [
+  {
+   "id_v1": "f1-54bit-01",
+   "evidencia": "Brief lt12_medido 0; `.f-chip`, `.fmt`, `.quien small`, `.cuando2 small` y `.nota` ya están a 12 px (líneas con `font-size:12px` en `.f-chip`, `.fmt`, `.cuando2 small`)."
+  },
+  {
+   "id_v1": "f1-54bit-04",
+   "evidencia": "`--text-3: #5C6675;` en la línea 68; el brief no lo lista entre tokens_valores_divergentes."
+  },
+  {
+   "id_v1": "f1-54bit-10",
+   "evidencia": "La nota de pie mide 95 caracteres y una frase («Los filtros en ámbar incluyen dato personal; un renglón de la bitácora no se edita ni se borra.»); v1 contaba 1.042 caracteres de nota."
+  }
+ ],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 3
+  },
+  "justificacion": "Accesibilidad 2: contraste sin fallos (0/121 nodos), suelo de 12 px cumplido, tabla con caption, colgroup y `th scope=row`, inmutabilidad dicha en la nota; pero dos críticos de cromo (menú sin nombre a 1000 px, buscador de 16 px), cambios de vista sin anunciar y chips que el lector lee sin separador. Theming 3: tokens al día en `--text-3`, anillo del buscador ya con la receta del sistema, ámbar usado para una clasificación. Responsive 3: modo tarjeta con `data-et`, primera columna fija (D-6 cumplida), `min-width:1080` desplaza 36 px a 1280. Integridad 3: coherente con la FICHA (sin controles de edición, orden «lo más reciente primero», estados con contenido propio) pero con controles sin acción y sin ejes de acotación. Rendimiento no evaluado.",
+  "evidencia": [
+   "m54.cjs, a54.cjs, t48.cjs, clk.cjs, st.cjs, cromo.cjs (scratchpad/b2)",
+   "briefs2/54_bitacora_descargas.json",
+   "54_bitacora_descargas--1440.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-016",
+    "documento": "data/insights/2026-07-28_juridico-recursos-humanos.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-016 (media, categoría falta_governance_ia; evidencia 00:35:27): el uso de IA en Legal depende del criterio individual, sin política sobre qué datos incluir; ai_adoption.barreras: «nunca introduce datos reales del cliente en la IA». Es la única señal documentada de la preocupación de Legal por el manejo de datos reales de clientes. La bitácora no habla de IA ni la entrevista menciona descargas, filtros ni exportaciones: no la cubre ni la contradice."
+   },
+   {
+    "pp": "pp-013",
+    "documento": "data/insights/2026-07-28_juridico-recursos-humanos.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-013 (media; evidencia 00:23:42): sin repositorio documental centralizado ni control de vigencias; op-012 propone «permisos diferenciados». Habla de dónde viven los documentos, no de registrar quién descarga un reporte."
+   },
+   {
+    "pp": "pp-017",
+    "documento": "data/insights/2026-07-28_juridico-recursos-humanos.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-017 (baja; evidencia 00:46:26): no hay panel o reporte de indicadores legal/RH; el responsable aprende SQL y Python para sacar estadísticas. Es una demanda de consumir reportes, no de auditar su descarga; 54 no la atiende ni la contradice."
+   }
+  ],
+  "usabilidad_para_el_area": "La entrevista de jurídico y RH (2026-07-28) no contiene ningún pain point, cita ni oportunidad sobre un registro de descargas, los filtros aplicados o datos personales en exportaciones; la FICHA solo dice «Sale de Legal», sin fuente verificable en data/insights, así que no puede afirmarse que el panel responda a una necesidad investigada (va a sin_datos). Lo que sí encaja es la cautela documentada de Legal con los datos reales de clientes (pp-016). Para ese lector el panel funciona como registro: valores concretos, sin controles de edición, con la marca de dato personal visible; le faltan chips autosuficientes y ejes para acotar la bitácora."
+ },
+ "cobertura": [
+  {
+   "patron": "Marca de sensibilidad del dato (dato personal, confidencial) en un registro o una fila. El sistema tiene el semáforo (§1.3, juicios de estado) y las series (§1.4 y `.p-type`, clasificaciones sin connotación), pero nada para decir «esto tocó dato personal» sin juzgar. 54 usa `--warn` para «incluye razón social y RFC».",
+   "propuesta_de_regla": "§6.10.1 **Marca de sensibilidad.** Un dato que toca información personal se marca con el icono de escudo, el texto del campo («incluye RFC») y el borde `--border-fuerte`, sobre `--surface-2`; nunca con un color del semáforo, porque no es un estado ni cuenta como «falta algo». La marca siempre lleva texto y la pantalla la explica una vez en una frase. Un conteo de renglones con dato personal en el resumen es un contador neutro (`c-neutro`), no `c-warn`."
+  }
+ ],
+ "sin_datos": [
+  "Origen de la bitácora «sale de Legal» (FICHA): la entrevista de jurídico y RH (2026-07-28) no menciona descargas, filtros ni exportaciones, y ningún otro documento de data/insights lo hace (grep de auditor|bitácora|dato personal|datos personales|privacidad|exporta|descarg sobre los 11 JSON: solo «Descarga… el formato de solicitud de viáticos» en jurídico y dos «auditoría» de conteo de inventario y de revisión de instalaciones). F5 cierra sin pain point verificable.",
+  "Qué muestra «Ver el detalle» de cada renglón: no está dibujado; no se puede decir si el detalle completa los filtros resumidos («plaza 2 de 5»).",
+  "Nombre accesible repetido: cinco botones «Ver el detalle» sin la persona o el reporte en su nombre (no hay § del sistema que lo cubra; se deja como observación).",
+  "Instrumentos del brief para 54: I3 marca `caption` y `span.sr` (falsos positivos conocidos); I9 marca 10 de 25 celdas «largas» y son las celdas de chips y de dos líneas de la propia bitácora, no párrafos (§6.11 regla 7 no aplica)."
+ ]
+}
