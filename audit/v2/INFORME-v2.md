@@ -250,6 +250,7 @@ Cada brief parte de lo que dibujó el cliente, evalúa al menos dos opciones (la
 ## 8 · Qué tan fiable es esta auditoría
 
 - **Validadores deterministas** (no son agentes): 23 de 23 fichas con 0 errores (JSON, § existentes en la 2.15.0, clases y ids presentes en el HTML, citas literales en su línea, `pp-NNN` reales, hashes). Una ficha de prueba rota a propósito dispara los 8 errores inyectados.
+- **Citas del sistema de diseño:** todo lo citado se contrastó con el md de la **v2.15.0** (`docs/sistema-diseno-sio-dproma.md`; es el último disponible: las 4 ramas que traen la 2.15.0 tienen el mismo archivo, hash `a4b43d7a3f3e`; la rama de trabajo, en 2.13.3, no se usó como fuente). De 280 fragmentos entrecomillados, **255 son literales en la 2.15.0** (91 %). Los 25 restantes son citas de `FICHAS_TECNICAS.md` (15) o paráfrasis; **ninguno coincide con la 2.13.3** (0), así que no hay arrastre de la versión anterior. Detalle en `mediciones/v2/citas.json`.
 - **Verificación adversarial:** 119 afirmaciones: 110 confirmadas, 9 exageradas, 0 refutadas, 0 no concluyentes. Las exageradas se corrigieron en este informe (p. ej. el recorte de acciones a 1366 px es de 11 px, no «fuera»; el hueco del acordeón mide 578–654 px). **Cero refutaciones no prueba que no haya errores:** la réplica lo muestra.
 - **Réplica ciega** (2 pantallas, sin ver el original): mismo veredicto de observación 2 de 2; coincidencia de § citados **43 %**, por debajo del 80 % que nos fijamos. De los hallazgos altos del original, la réplica reprodujo 5 de 10; encontró otros que el original no tenía. Lo que ambas pasadas encuentran es sólido; la lista no es exhaustiva.
 - **Instrumentos validados antes de usarse** con HTML sintético de respuesta conocida (contraste con alfa y `color-mix`, táctil, menú, I1–I9, C2, C11, `--sp-5`): 15 de 15 aciertos. Aun así los auditores hallaron seis fallos de mi instrumental (capturas de 800 px, I6, I9, C1 sin estilos en línea, I3 e I7 con falsos positivos, `lib.cjs` inyecta las fuentes y no sirve para probar fuentes). Están corregidos o documentados.
@@ -261,7 +262,7 @@ Cada brief parte de lo que dibujó el cliente, evalúa al menos dos opciones (la
 
 1. **Opcional:** si más adelante se consigue la carpeta `sistema/` del cliente, re-medir esas pantallas; este informe se limita al ZIP recibido.
 2. **Confirmar identidades inferidas**: la hoja 1 es `22` o `32` (ambas tienen el defecto); la hoja 2 es `05_app_cliente` (coincide el nombre «Laura Núñez»); la hoja 5 es `13_panel_asistencia_rhl`, no `48`.
-3. **Decidir** las preguntas de diseño abiertas (§7.2) y qué rama de la 2.15.0 es la base para documentar las divergencias.
+3. **Decidir** las preguntas de diseño abiertas (§7.2). Para documentar divergencias en el sistema, el contenido de la 2.15.0 es el mismo en las 4 ramas que la traen; solo falta elegir en cuál se commitea.
 4. **Corregir en nuestro sistema** las contradicciones de §6 antes de subir versión.
 
 ## Anexo A · Contraste informativo con el PDF del cliente
