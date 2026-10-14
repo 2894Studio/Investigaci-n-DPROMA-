@@ -1,0 +1,711 @@
+{
+ "pantalla": "24_tickets",
+ "tier": "A",
+ "sha256": "d110a181bbd76b5897feb7674cdfac520221086a9ab693cd75942c992ed3c438",
+ "estado_entrega": "modificada",
+ "estado_vs_pdf": "NO_ALINEADO",
+ "estados_auditados": [
+  "con datos (captura)",
+  "cargando (render propio)",
+  "vacío (render propio)",
+  "error (render propio y código)"
+ ],
+ "capturas": [
+  "24_tickets--1280-fold.png",
+  "24_tickets--1440.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 9,
+   "texto_usuario": "Rediseño crítico, parte superior: las dos cajas amarillas no se distribuyen bien.",
+   "veredicto": "confirmada",
+   "evidencia": [
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_a24_geometria",
+      "detalle": "script aud2/a24_a.cjs a 1440×800: .caja-plazo x641–1416 (775×139 px, p de 420 caracteres a 11,5 px); .banda.b-warn x665–1392 (727×125 px, p de 366 caracteres a 13 px). La banda queda 24 px dentro de la caja a cada lado (16 px a 1280 y a 1024) y a 32 px de ella en vertical; mismo par de tokens en las dos: rgb(241,236,222) / rgb(126,91,14) (5,25:1)."
+     },
+     "dato": "Las dos cajas amarillas no comparten borde: la segunda es 48 px más estrecha que la primera (24+24) y está separada 32 px, el doble del gap de 16 px que usa el resto de bloques de .det-cuerpo."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 560,
+      "cita": ".detalle .banda{margin:var(--sp-4) var(--sp-6) 0}"
+     },
+     "dato": "Regla escrita para una .banda que cuelga directamente de .detalle; aquí se aplica a una .banda hija de .det-cuerpo."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 657,
+      "cita": ".det-cuerpo{padding:var(--sp-4) var(--sp-6);display:flex;flex-direction:column;gap:var(--sp-4);flex:1}"
+     },
+     "dato": "El contenedor ya aporta 24 px laterales de relleno y 16 px de gap vertical: el margen de la banda se suma (24 px laterales extra, 16 px superiores extra)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "C11_texto_largo",
+      "detalle": "brief: div.banda.b-warn 366 caracteres visibles; p.nota de 405 y de 205 caracteres más abajo en el mismo panel"
+     },
+     "dato": "Entre las dos cajas hay 786 caracteres antes de que aparezca el primer dato de identidad (Reporta · Atiende · Abierto · Plazo), que empieza en y=555 de un panel visible de 674 px de alto a 1440."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "captura",
+      "archivo": "24_tickets--1440.png",
+      "region": "panel derecho: «Vence hoy / 24 AGO 2026» a ancho completo y debajo la banda «Tú puedes marcarlo resuelto; cerrarlo no» más estrecha y centrada"
+     },
+     "dato": "Visible: dos rectángulos del mismo amarillo con anchos, radios y ritmo distintos; el segundo parece flotar."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_a24_geometria",
+      "detalle": "mismo script: el plazo aparece 4 veces dentro del panel de detalle («Vence hoy», «24 ago 2026», «Un ticket crítico tiene 1 día hábil», campo «Plazo 1 día hábil · vence el 24 ago») y una quinta como semáforo «Vence hoy» en el renglón de la bandeja"
+     },
+     "dato": "El mismo dato se repite cinco veces en pantalla."
+    }
+   ],
+   "causa_raiz": "Tres causas apiladas. (1) Geométrica: el selector .detalle .banda (línea 560) pone margen lateral y superior a CUALQUIER .banda dentro de .detalle, y la banda de esta pantalla vive dentro de .det-cuerpo, que ya tiene padding y gap: el margen se suma. (2) De componente: .caja-plazo es una clase propia (ancho completo, fuente 11,5 px) que reinventa un aviso con el mismo par warn-bg/warn-ink que .banda.b-warn; el sistema pide verificar si .banda + variante ya lo cubre (§6.9) y que un indicador de plazo declare su ancho (§6.20). (3) De contenido y semántica: las dos cajas explican reglas (cuánto dura un plazo crítico, por qué no cambia, quién cierra, cierre automático a 5 días) con 420 y 366 caracteres, contra el tope de 140 y una frase de §8; y la segunda no es un estado «warn» (nada falta ni vence): es una regla de permisos pintada con el color de «vence pronto» (§1.3).",
+   "solucion_propuesta": "Solo diagnóstico; la solución es de la Fase 4. REQUISITOS que debe cumplir un rediseño: (R1, §6.20) el indicador de plazo declara su propio ancho —rejilla tipo minmax(0,1.6fr) minmax(300px,360px) con align-items:center— y se coloca junto al bloque de identidad, no como bloque de ancho completo encima de todo; (R2, §1.3) el ámbar solo para lo que vence pronto o falta (el plazo cuando es hoy o mañana); la regla «quien lo reportó confirma» no es warn: va en .banda neutra de una frase (§6.9) o en toggletip (§6.23); (R3, §8) ≤1 frase y ≤140 caracteres visibles por bloque, sin punto y coma; el razonamiento («por qué no cambia el plazo») sale de la pantalla; (R4, §2.1) nada bajo 12 px (hoy 11,5 y 11); (R5, §3 y §13.3) un solo origen del espaciado: ningún hijo de .det-cuerpo suma margen propio a su padding y gap; todos comparten los mismos bordes izquierdo y derecho; (R6) el plazo se dice una vez en el panel de detalle (hoy cuatro); (R7, §13.1) identidad y acciones antes que política; (R8, §6.9) el icono coincide con la variante; (R9) responsive: a ≤1024 el split se apila (.split a una columna) y las piezas del plazo deben seguir alineadas entre sí. NO contradecir: semáforo calculado por el servidor («Conservado», FICHAS 24), bitácora inmutable, quién cierra (S-10: «Tú puedes marcarlo resuelto; cerrarlo no»), prioridad con forma + color, y la fila de 4 colores con el gris como cuarto estado (forma + color). Viabilidad (la decide la Fase 4): a mi juicio viable; solo usa datos ya presentes y no toca ninguna decisión D-n; la excepción es la discrepancia sobre si existe plazo (ver v2-24tickets-14).",
+   "tipo_de_cambio": "rediseño",
+   "critico": {
+    "es": true,
+    "criterio": 5
+   },
+   "decision": {
+    "valor": "decidir_diseño",
+    "motivo": "Rediseño crítico marcado por la persona. Diagnóstico completo arriba; la forma la decide la Fase 4. Dos decisiones previas pendientes: (a) si el plazo sigue existiendo (FICHAS contiene dos lecturas, ver v2-24tickets-14) y (b) cuánto del texto de reglas se conserva y dónde."
+   }
+  },
+  {
+   "hoja": 10,
+   "texto_usuario": "Sistémico, visto aquí: las cajas (Abiertos/Míos/Todos + Nuevo ticket) chocan con la línea inferior; debe haber siempre margen. En múltiples páginas.",
+   "veredicto": "confirmada",
+   "evidencia": [
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "I2_holgura_inferior",
+      "detalle": "brief: div.p4 gap 0 (altoBarra 47, 5 controles); div.seg → línea de button.btn.p gap -30,5"
+     },
+     "dato": "El segmentado Abiertos/Míos/Todos y «Nuevo ticket» tocan la línea inferior de la cabecera."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_a24_geometria",
+      "detalle": "script aud2/a24_a.cjs a 1440: .p4 y=57–104 (borde inferior de 1 px); .seg y=69,5–102,5; .btn.p y=69–103; padding superior de .p4-t = 12 px; inferior = 0"
+     },
+     "dato": "Aire encima 12 px; debajo 1 px (el propio borde): el contenido queda pegado a la línea y la barra se ve asimétrica."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 309,
+      "cita": ".p4-t{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-6) 0;flex-wrap:wrap}"
+     },
+     "dato": "El relleno inferior de la fila de título es 0."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 308,
+      "cita": ".p4{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}"
+     },
+     "dato": "El contenedor no declara relleno inferior; esta pantalla no tiene .p4-b ni .p4-f que lo aporten."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_p4scan",
+      "detalle": "script aud2/p4scan.cjs sobre los 50 HTML del paquete a 1440×900: 36 archivos declaran .p4{ y ninguno declara padding-bottom; 16 de los 30 con .p4-t tienen solo la fila de título; con control a 0 px de la línea inferior: 20_tablero, 21_ficha_cliente, 24_tickets, 33_cfe_detalle, 36_recetas_despacho, 38_vehicular_detalle, 45_autorizacion_compra y 47_asistente (8 páginas)"
+     },
+     "dato": "Confirma «en múltiples páginas»: 8 pantallas con el control a 0 px, todas por la misma causa."
+    }
+   ],
+   "causa_raiz": "El bloque ARQ-P4 copiado en 36 archivos define .p4 sin padding-bottom y deja el cierre inferior a la última fila hija (.p4-f). Cuando la cabecera solo lleva .p4-t (título + acciones) no hay quien cierre. Es exactamente el caso que §3.1 describe y prescribe resolver con .p4{padding-bottom:var(--sp-3)}; el bloque de DPROMA no lo incorporó.",
+   "solucion_propuesta": "Una declaración en el bloque ARQ-P4 compartido: .p4{padding-bottom:var(--sp-3)} y, para no duplicar el cierre cuando existe .p4-f, quitar su relleno inferior (hoy padding:var(--sp-3) var(--sp-6) → padding-top y laterales solamente), tal como §3.1 manda: «cada fila declara solo su relleno superior». Efecto medible esperado: 12 px entre el control más bajo y la línea, igual que el aire superior, en las 36 pantallas con .p4. No hay que tocar ninguna pantalla una por una.",
+   "tipo_de_cambio": "sencillo",
+   "critico": {
+    "es": false,
+    "criterio": null
+   },
+   "decision": {
+    "valor": "ajustar_sistema",
+    "motivo": "Regla 2: cambio sencillo, global (36 archivos) y que delata una causa raíz en la plantilla. La regla ya existe en §3.1; lo que falta es que la plantilla de DPROMA la contenga y un instrumento (I2) que la compruebe. Se propone al cliente como corrección de plantilla, no como defecto de la pantalla."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-24tickets-01",
+    "severidad": "alta",
+    "regla": "§1.7 Regla de contraste + §1.1 Superficies y texto (--text-3) · FICHAS_TECNICAS.md tanda 4 (--text-3-fuerte)",
+    "dice_el_sistema": "Texto normal 4,5:1 mínimo; «Cada color nuevo se mide contra los fondos donde va a aparecer» y --text-3 pasó a #5C6675 porque #66717F caía a 4,21:1 sobre --surface-2.",
+    "hay_en_el_build": "Tres textos bajo 4,5:1 en claro: span.prio «Baja» 4,21:1 (10,5 px), span.ref «TKT-202608-0418» 4,24:1 (11 px) y span.cuando «abierto el 21 ago» 4,24:1 (11 px). --text-3 sigue en #66717F y las tres reglas usan var(--text-3) sin la variante fuerte.",
+    "selector": ".pr-baja, .tk .ref, .tk .cuando",
+    "linea": 479,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "contraste",
+     "detalle": "brief: claro 3 fallos (span.prio 4,21 · span.ref 4,24 · span.cuando 4,24); oscuro 0"
+    },
+    "estado_vs_v1": "regresion",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Falla de contraste medida (criterio 1) y regresión: el archivo de v1 (sha dd58a979…) ya usaba --text-3-fuerte (#5D6774, 4,87:1 sobre --surface-2) en estos tres selectores y medía 0 fallos (mediciones/v1-control/contraste.json); el archivo recibido los revierte. Lectura alternativa: si se toma como referencia el hallazgo f1-24tickets-05 del texto de v1, persiste (--text-3 obsoleto); el diff de archivos dice regresión. Arreglo de una línea por selector (o declarar --text-3: #5C6675)."
+    },
+    "por_que_importa": "El folio, la fecha de apertura y la prioridad «Baja» son lo que se escanea en la bandeja de tickets; a 4,2:1 y 10,5–11 px cuestan lectura a quien tiene baja visión. Los tres pasaban en la entrega anterior: el archivo recibido es una variante anterior, no una mejora."
+   },
+   {
+    "id": "v2-24tickets-02",
+    "severidad": "alta",
+    "regla": "§1.4.1 Tinta sobre relleno sólido de color (.state > .ico) + §6.4 regla 6",
+    "dice_el_sistema": "«La regla es `.state > .ico`: un `.ico` puede estar dentro de un botón que ya tiene su propio color, y una regla de contexto no debe pisarlo.»",
+    "hay_en_el_build": ".state .ico{width:30px;height:30px;color:var(--text-3)} (selector descendiente). Con el estado vacío activo, el icono «+» de «Abrir un ticket» computa rgb(102,113,127) sobre el verde rgb(62,122,76): 1,03:1; y el icono de «Ver todos…» se agranda a 30 px.",
+    "selector": ".state .ico, .state .acc .btn.p",
+    "linea": 609,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I1_icono_vs_boton",
+     "detalle": "brief: 2 fallos, button.btn.p «Abrir un ticket» y «Reintentar», colorIcono rgb(102,113,127), ratio 1,03; verificado con aud2/a24_b.cjs: icono de 30 px y mismo color en el estado vacío"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Contraste de control < 3:1 (1,03:1), medido. Los otros cuatro archivos del lote ya usan .state > .ico; este no. v1 tampoco lo midió (instrumento nuevo): el archivo v1 de control da el mismo 1,03:1."
+    },
+    "por_que_importa": "En los estados vacío y de error la acción principal («Abrir un ticket», «Reintentar») pierde su icono: queda un botón verde con un «+» casi invisible. Es el defecto 2.13.4 del sistema, aún presente aquí."
+   },
+   {
+    "id": "v2-24tickets-03",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (modo colapsado) + §11 Estructura (nombre accesible)",
+    "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.»",
+    "hay_en_el_build": "A 1000 px la barra lateral mide 64 px y .side .et{display:none}: los 15 enlaces .it quedan sin texto, sin aria-label y sin title; el árbol de accesibilidad da nombre vacío a 15 de 15.",
+    "selector": ".side .et, .it",
+    "linea": 288,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "sidebar",
+     "detalle": "brief menu_1000px: hayMenu true, total 15, sinNombre 15, anchoSide 64; reproducido con CDP Accessibility.getFullAXTree a 1000×800 (aud2/common_b.cjs): 15 enlaces con nombre vacío"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1), medido. Es el cromo compartido por todas las pantallas: el arreglo es uno solo (aria-label y title en cada .it, o ocultar el rótulo con la técnica de solo-lector en vez de display:none)."
+    },
+    "por_que_importa": "Quien navega con lector de pantalla o teclado en un portátil pequeño o una tableta oye «enlace» quince veces seguidas, sin saber a qué módulo va cada uno."
+   },
+   {
+    "id": "v2-24tickets-04",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles + §10 trampa 4 (el destino es la región que acepta la pulsación)",
+    "dice_el_sistema": "«un campo de búsqueda dentro de un `<div>` con forma de pastilla **no** cumple, porque pulsar la pastilla no hace nada. El contenedor tiene que ser una `<label for=\"…\">`.»",
+    "hay_en_el_build": "<div class=\"search\"> envuelve <input id=\"buscar\" type=\"search\">; el input mide 296×16 px y el div no es una label.",
+    "selector": ".search, #buscar",
+    "linea": 689,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil",
+     "detalle": "brief tactil_bajo24: 1 de 34 bajo 24 px — input type=search «Buscar tickets» 296×16"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino táctil < 24 px (criterio 1), medido. Arreglo mínimo: <label class=\"search\" for=\"buscar\"> en lugar de <div>."
+    },
+    "por_que_importa": "El buscador de la bandeja es lo primero que se usa para localizar un folio; la zona que responde al clic es una franja de 16 px aunque la píldora mida 36."
+   },
+   {
+    "id": "v2-24tickets-05",
+    "severidad": "alta",
+    "regla": "§8 Voz de producto, límites 1 y 2 (una frase; ~140 caracteres) + §6.23 Toggletip",
+    "dice_el_sistema": "«Ningún bloque de texto siempre visible pasa de ~140 caracteres.» · «`.nota` y `.banda` llevan como máximo una frase, sin punto y coma ni raya explicativa después del primer punto.»",
+    "hay_en_el_build": "Cuatro bloques de interfaz sobre el tope en el mismo panel: .caja-plazo p (420 caracteres, dos párrafos), .banda.b-warn p (366, dos párrafos con <br><br>), p.nota (405) y p.nota (205). Explican por qué el plazo no cambia, por qué lo cierra quien reportó y cómo funciona el semáforo.",
+    "selector": ".caja-plazo p, .banda.b-warn p, p.nota",
+    "linea": 732,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C11_texto_largo",
+     "detalle": "brief: sobre140 = 3 de 3 revisados (banda 366, nota 405, nota 205); .caja-plazo p = 420 caracteres medidos en aud2/a24_a.cjs"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Las reglas que se explican (S-10 quién cierra; plazo fijado al abrir; el reloj no se pausa) son decisiones del cliente y deben seguir existiendo; lo que no cabe es su forma de párrafo siempre visible. Se adopta el contenido y se propone moverlo a toggletip sobre «Plazo» y sobre «Marcar resuelto»."
+    },
+    "por_que_importa": "Antes del primer dato del ticket hay 786 caracteres de política. Quien viene a resolver un ticket tiene que saltar un muro de texto en cada ticket que abre."
+   },
+   {
+    "id": "v2-24tickets-06",
+    "severidad": "alta",
+    "regla": "§1 Color: «Un color de estado no se reutiliza para una categoría, ni al revés» + §1.3 Semáforo + §6.9 (el icono coincide con la variante)",
+    "dice_el_sistema": "«Un color de estado no se reutiliza para una categoría, ni al revés.» · «El icono tiene que coincidir con la variante.»",
+    "hay_en_el_build": "El mismo ámbar (--warn-bg/--warn-ink) significa cinco cosas: plazo «Vence hoy» (.plazo.ambar), prioridad «Alta» (.pr-alta), estatus «En atención» (.pill.p-warn), la caja del plazo y la banda de permisos «Tú puedes marcarlo resuelto; cerrarlo no», esta última con icono de personas (#i-users) sobre variante warn.",
+    "selector": ".pr-alta, .plazo.ambar, .banda.b-warn",
+    "linea": 475,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 475,
+     "cita": ".pr-alta{background:var(--warn-bg);color:var(--warn-ink)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "La prioridad «forma + color» es decisión documentada del cliente (FICHAS 24: «Prioridad con forma + color — doc 34 §4 y §8»), pero el sistema no tiene escala ordinal de prioridad y §1 prohíbe reutilizar el semáforo; el sistema debe documentar qué color lleva una prioridad ordinal (cobertura). La banda de permisos no es un warn: se corrige a variante neutra."
+    },
+    "por_que_importa": "Con un solo amarillo para plazo, prioridad, estatus y regla, el ojo deja de saber qué ámbar es una urgencia. Es el origen de que las «dos cajas amarillas» se lean como un solo bloque de alarma."
+   },
+   {
+    "id": "v2-24tickets-07",
+    "severidad": "media",
+    "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional",
+    "dice_el_sistema": "«el relleno de un contenedor lo declara el contenedor, no el hijo que casualmente va último» — `.p4{ padding-bottom: var(--sp-3) }`.",
+    "hay_en_el_build": ".p4-t con padding-bottom 0 y .p4 sin relleno inferior: seg y «Nuevo ticket» terminan a 1 px del borde de la cabecera.",
+    "selector": ".p4, .p4-t",
+    "linea": 309,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I2_holgura_inferior",
+     "detalle": "brief: div.p4 gap 0; barra 47 px; 5 controles"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Ver observación hoja 10: una declaración en la plantilla ARQ-P4 corrige 8 pantallas."
+    },
+    "por_que_importa": "La cabecera de cada pantalla se ve cortada en seco; es lo que la persona marcó como defecto sistémico."
+   },
+   {
+    "id": "v2-24tickets-08",
+    "severidad": "alta",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "«`--fs-meta` es el tamaño más pequeño del sistema. **Nada baja de ahí.**»",
+    "hay_en_el_build": "19 nodos visibles bajo 12 px según el instrumento (26 declaraciones en la hoja): .tk .ref/.tk .cuando/.tk .quien a 11 px, .plazo a 11 px, .prio a 10,5 px sin mayúsculas, .caja-plazo p a 11,5 px, .inmutable y .bitacora .ev .cuando a 11 px, .ctrl .mal a 11 px. El PDF del cliente declara 0.",
+    "selector": ".tk .ref, .plazo, .prio, .caja-plazo p",
+    "linea": 652,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "claims",
+     "detalle": "brief estado_vs_pdf_del_cliente: lt12_medido 19 contra lt12_pdf_despues 0 (NO_ALINEADO)"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No aplicado, no regresión: el cliente ya declaró el arreglo (PDF: 0 bajo 12 px), que coincide con §2.1; falta que el archivo recibido lo contenga. v1 no lo reportó para esta pantalla aunque el archivo de v1 tenía 26 declaraciones."
+    },
+    "por_que_importa": "Folio, antigüedad, plazo y prioridad —lo que se escanea en cada renglón— están a 10,5–11 px."
+   },
+   {
+    "id": "v2-24tickets-09",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 (isotipo: el <symbol> ya trae su viewBox) + §1.2.1 Logotipo",
+    "dice_el_sistema": "«Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.» El isotipo se escribe con las medidas en el <use> y sin viewBox en el envoltorio.",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>: el <use> queda 32,5 px a la izquierda de su <svg> (x=63,5 contra x=96) y solo se ve una astilla de la «Λ»; el mismo patrón en el botón flotante (desplazamiento de 16,2 px).",
+    "selector": ".logo svg, .fab svg",
+    "linea": 672,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_isotipo",
+     "detalle": "script aud2/common_a.cjs: caja del <use> en x=63,5 frente a la del <svg> en x=96 (−32,5 px) en el logotipo; −16,2 px en el FAB; 46 de 50 archivos del paquete conservan viewBox=\"740 0 970 932\""
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El sistema ya documenta la receta (§10); el patrón erróneo vive en la plantilla del cromo copiada en 46 archivos. Corrección sencilla y global: <svg width=\"44\" height=\"42\"><use href=\"#dproma-mark\" width=\"44\" height=\"42\"/></svg>. v1 lo marcó alta en esta pantalla."
+    },
+    "por_que_importa": "El isotipo de la marca aparece recortado en todas las pantallas del paquete; es lo primero que se ve en la barra lateral."
+   },
+   {
+    "id": "v2-24tickets-10",
+    "severidad": "media",
+    "regla": "§13 Composición y grid (zona de contenido) + §7.3 Objetivos táctiles (destino alcanzable)",
+    "dice_el_sistema": "El sistema no documenta el botón flotante del asistente ni su zona segura (búsqueda de «flotante» y «FAB» en sistema-diseno.md: 0 coincidencias).",
+    "hay_en_el_build": ".fab{position:absolute;right:max(26px,…);bottom:max(26px,…)} 52×52 px, siempre sobre el contenido de la zona derecha-inferior; a 1280 cubre «probado tres» del párrafo de descripción del ticket. El cliente reservó 68 px solo en .nota (padding-right: calc(var(--sp-6) + 68px)).",
+    "selector": ".fab, .descrip",
+    "linea": 268,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "captura",
+     "archivo": "24_tickets--1280-fold.png",
+     "region": "esquina inferior derecha: el botón flotante tapa parte del texto «Lo he probado tres veces…» de la descripción"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Causa raíz en el sistema: no define la zona segura del FAB. El cliente ya la resuelve ad hoc (68 px en .nota; margin-right:68px en el pie de 41_alta_cliente). Propuesta de regla en cobertura."
+    },
+    "por_que_importa": "Un botón fijo tapa contenido que no se puede mover: en una bandeja de lectura larga cada párrafo pasa por debajo."
+   },
+   {
+    "id": "v2-24tickets-11",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado (reglas 2 y tarjeta) + §6.7 Esqueleto de carga",
+    "dice_el_sistema": "«Cada estado lleva un encabezado real, no un `<b>`.» · «El estado va dentro de una tarjeta, no suelto sobre el fondo.» · «Hay que aplanar el fondo, no solo parar la animación.»",
+    "hay_en_el_build": "Vacío y error: <svg class=\"ico\"> + <b>título</b> sin tarjeta ni medallón. Esqueleto: 19 barras con texto dentro («TKT-202608-0000 · crítica», «caja del plazo»…), @media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer el fondo y un bloque de carga de ~320 px frente a los ~680 px de la bandeja real.",
+    "selector": ".state b, .skel, .sk-split",
+    "linea": 604,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 604,
+     "cita": "@media (prefers-reduced-motion:reduce){.skel{animation:none}}"
+    },
+    "estado_vs_v1": "regresion",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "El archivo de v1 ya traía .tarjeta-estado, .estado-ico y <h2> en vacío/error (diff v1flat/24_tickets.html contra la entrega: 36 líneas) y el cliente declaró adoptarlos en la tanda 4; la entrega los quita. Lectura alternativa: el hallazgo f1-24tickets-11 de v1 describe exactamente el <b> actual, así que persiste; el texto de v1 y el archivo de v1 no coinciden entre sí."
+    },
+    "por_que_importa": "El título del estado no entra en la lista de encabezados y el esqueleto anuncia texto inventado a un lector de pantalla; con movimiento reducido las barras quedan a medio pintar."
+   },
+   {
+    "id": "v2-24tickets-12",
+    "severidad": "media",
+    "regla": "§6.12 regla 8 — «Un control con pinta de interactivo tiene que interactuar»",
+    "dice_el_sistema": "«En una maqueta de demostración sin lógica de filtrado real, un dato así se presenta como lo que es — una cifra de lectura, sin `aria-pressed` ni cursor de puntero.»",
+    "hay_en_el_build": "El segmentado Abiertos/Míos/Todos lleva aria-pressed y los seis renglones son <a class=\"tk\" href=\"#\">; el <script> solo registra tema, menú lateral y el panel de maqueta.",
+    "selector": ".seg button, a.tk",
+    "linea": 691,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 691,
+     "cita": "<a class=\"tk\" href=\"#\">"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Es una maqueta estática declarada como tal (FICHAS: Grupo B, sin lógica); v1 lo marcó alta, aquí se rebaja a media porque la lógica pertenece a la implementación. Se documenta para que el sistema diga cómo se dibuja un filtro sin lógica."
+    },
+    "por_que_importa": "Cambiar de «Abiertos» a «Todos» no cambia nada en pantalla, y pulsar un ticket salta al principio de la página."
+   },
+   {
+    "id": "v2-24tickets-13",
+    "severidad": "baja",
+    "regla": "§7.3 Objetivos táctiles (el :root hace ganar la regla) + §2.1 (rótulo de grupo del cromo)",
+    "dice_el_sistema": "«El `:root` es lo que hace ganar la regla.» · «Se admite una excepción, y solo una: 10,5px en mayúsculas con `letter-spacing` para los rótulos de grupo de la barra lateral.»",
+    "hay_en_el_build": "Las seis reglas [data-tacto=\"dedo\"] van sin :root (líneas 279–284), a diferencia de los cuatro archivos del padrón; y .grp está a 10,5 px sin text-transform (rótulos «Principal», «Operación»… en mayúscula inicial).",
+    "selector": ".grp, .iconbtn",
+    "linea": 235,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "brief: 12 fallos, p.grp ×5 y span.prio ×7"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El ejemplo de §7.2 escribe .grp sin text-transform aunque §2.1 exige mayúsculas para el 10,5 px: el sistema se contradice a sí mismo; debe añadir text-transform:uppercase al ejemplo o subir el rótulo a 12 px."
+    },
+    "por_que_importa": "El rótulo de grupo del menú está fuera de la excepción que el propio sistema concede."
+   },
+   {
+    "id": "v2-24tickets-14",
+    "severidad": "media",
+    "regla": "FICHAS_TECNICAS.md · Tanda 3 «24_tickets.html — se retiró el reloj de plazo» frente a la ficha de 24 y a la tanda 4",
+    "dice_el_sistema": "FICHAS (Tanda 3): «No hay compromiso de respuesta escrito. Lo que había medía contra un número que me inventé.» y «Y la píldora se quedó sin color a propósito. Colorearla exigiría decidir a partir de cuántas horas se pone ámbar, y eso es el plazo otra vez por la puerta de atrás.» Pero la ficha de 24 conserva «El semáforo lo calcula el servidor» y la tanda 4 dice «tickets ya tiene su propio semáforo de plazo».",
+    "hay_en_el_build": "La pantalla dibuja semáforo de color (.plazo.rojo/.ambar/.verde), orden «por lo que queda de plazo» y una caja con «Un ticket crítico tiene 1 día hábil», es decir, un compromiso de plazo por prioridad.",
+    "selector": ".caja-plazo, .plazo",
+    "linea": 729,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 729,
+     "cita": "<b>Un ticket crítico tiene 1 día hábil.</b>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Dos lecturas incompatibles en la misma documentación del cliente: (A) tanda 3 retira el reloj y prohíbe colorear por plazo; (B) tanda 4 y la ficha de 24 dan por vigente el semáforo del servidor. No puedo atribuir contradicción a una decisión D-n con certeza, así que no lo marco crítico. Hay que preguntar al cliente si el plazo existe antes de rediseñar la caja amarilla."
+    },
+    "por_que_importa": "Si la lectura A es la vigente, la caja del plazo entera y el color del plazo sobran; si es la B, el rediseño debe conservarlos. Rediseñar sin resolverlo repite el error que la tanda 3 corrigió."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [
+  {
+   "id_v1": "f1-24tickets-03",
+   "evidencia": "La banda «Propuesta con componentes de Studio — pendiente de revisión de Studio» (andamiaje publicado como aviso) no existe en el archivo recibido (grep 'Propuesta con componentes': 0). Cuidado: no es mejora del cliente sino que la entrega es una variante anterior a la tanda 4 (diff v1flat/24_tickets.html contra la entrega)."
+  }
+ ],
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "Accesibilidad 1: tres contrastes bajo 4,5:1 (regresión), icono de botón a 1,03:1 en los estados vacío/error, buscador de 16 px de alto y 15 enlaces del menú sin nombre a 1000 px. Theming 3: ningún token sin declarar y claro/oscuro con 0 fallos de contraste en oscuro, pero --text-3 sigue en #66717F y falta --text-3-fuerte. Responsive 3: sin scroll horizontal a 1440, 1280 ni 1024 y el split se apila a ≤1024; el panel de detalle conserva dos cajas anchas que empujan el contenido. Integridad 2: es una variante anterior a la de v1 (sin tarjeta-estado ni --on-state), con 26 declaraciones bajo 12 px y la plantilla .p4 sin cierre inferior. Mantiene la nota 2 de v1 (el brief la dio igual): lo que mejora —ningún aviso de andamiaje publicado— lo compensan los tres retrocesos.",
+  "evidencia": [
+   "contraste: 3 fallos en claro; I1: 2; tactil: 1; sidebar: 15/15 sin nombre; anchos: sin scroll horizontal a 1440/1280/1024",
+   "diff v1flat/24_tickets.html: 36 líneas de diferencia, todas revierten fixes de v1"
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 1,
+   "hallazgo": "El semáforo de plazo y la antigüedad están a la vista en cada renglón y la bandeja dice cuántos hay y en qué orden; pero con la vista vacía la cabecera sigue diciendo «6 abiertos · 1 vencido · 2 vencen hoy o mañana».",
+   "selector": ".p4-t .resumen",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "propio_estados",
+    "detalle": "aud2/states.cjs: data-state=empty deja intacto .resumen (captura propia aud2/24_tickets-empty.png)"
+   }
+  },
+  {
+   "n": 2,
+   "heuristica": "Relación entre el sistema y el mundo real",
+   "severidad": 1,
+   "hallazgo": "Lenguaje claro («Vence hoy», «Venció hace 3 d», «Quedan 3 d»), aunque la abreviatura «d» para días obliga a pensar.",
+   "selector": ".plazo",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 692,
+    "cita": "<span class=\"plazo rojo der\"><i class=\"luz\" aria-hidden=\"true\"></i>Venció hace 3 d</span>"
+   }
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 1,
+   "hallazgo": "Marcar resuelto, Reasignar y Poner en espera se pintan habilitadas sin confirmación ni «Deshacer» (FICHAS: se pintan todas habilitadas por no haber matriz de permisos). El diseño de dos actos (resolver ≠ cerrar) amortigua el riesgo.",
+   "selector": ".detalle .acciones .btn",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 722,
+    "cita": "<button class=\"btn p\" type=\"button\"><svg class=\"ico ico-sm\" aria-hidden=\"true\"><use href=\"#i-check\"/></svg>Marcar resuelto</button>"
+   }
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 3,
+   "hallazgo": "Dos nombres para la misma acción («Nuevo ticket» en la cabecera y «Abrir un ticket» en el estado vacío) y un mismo ámbar para plazo, prioridad, estatus y reglas. El icono de la banda de permisos (personas) no coincide con la variante warn.",
+   "selector": ".p4-t .btn.p, .state-empty .btn.p",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 778,
+    "cita": "Abrir un ticket</button>"
+   }
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": "n/a",
+   "hallazgo": "No aplica: la pantalla no contiene ningún formulario de alta ni edición; el alta de ticket no está dibujada.",
+   "selector": "",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 684,
+    "cita": "<button class=\"btn p\" type=\"button\"><svg class=\"ico ico-sm\" aria-hidden=\"true\"><use href=\"#i-plus\"/></svg>Nuevo ticket</button>"
+   }
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocimiento antes que recuerdo",
+   "severidad": 1,
+   "hallazgo": "Las acciones llevan icono y texto y el segmentado dice «Abiertos · Míos · Todos»; el plazo y la prioridad usan forma además de color (flecha, punto, raya, círculo), lo que evita depender solo del color.",
+   "selector": ".prio::before",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 474,
+    "cita": ".pr-crit::before{border-left:5px solid currentColor"
+   }
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 2,
+   "hallazgo": "Solo búsqueda libre y tres vistas fijas; no hay filtro por prioridad ni por plazo ni orden alterno, aunque la lista se ordena por lo que vence antes (supuesto S-03 del cliente).",
+   "selector": ".bandeja .bh",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 690,
+    "cita": "ordenados por <b>lo que queda de plazo</b>"
+   }
+  },
+  {
+   "n": 8,
+   "heuristica": "Estética y diseño minimalista",
+   "severidad": 3,
+   "hallazgo": "Dos cajas amarillas con 786 caracteres antes de los datos del ticket y el plazo repetido cinco veces; el esfuerzo de lectura recae en políticas, no en el trabajo.",
+   "selector": ".caja-plazo, .banda.b-warn",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "C11_texto_largo",
+    "detalle": "brief: banda 366 caracteres; caja-plazo p 420 (propio_a24_geometria)"
+   }
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de errores",
+   "severidad": 1,
+   "hallazgo": "El estado de error sigue §6.4 regla 3: dice qué pasó, que ningún ticket cambió ni venció por la caída y qué hacer, con referencia TKT-20260824-1305 (y sugiere el canal alterno, FICHAS 24). Falla solo en forma (sin tarjeta ni encabezado real).",
+   "selector": ".state-error",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 783,
+    "cita": "<b>Ningún ticket cambió de estado ni venció por esto</b>"
+   }
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 2,
+   "hallazgo": "Las reglas de plazo y de cierre están siempre en pantalla como párrafos; la ayuda debería estar a petición (toggletip) sobre «Plazo» y sobre «Marcar resuelto».",
+   "selector": ".caja-plazo, .nota",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 755,
+    "cita": "<p class=\"nota\"><svg class=\"ico\" aria-hidden=\"true\"><use href=\"#i-clock\"/></svg><span><b>Poner un ticket en espera del usuario no para el reloj.</b>"
+   }
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-064",
+    "documento": "data/insights/2026-07-31_direccion-general-supervision-operativa.json",
+    "cobertura": "cubre",
+    "evidencia": "«La coordinación diaria con todas las áreas se realiza a través de más de 70 grupos de WhatsApp sin historial estructurado». La mesa de ayuda con bitácora inmutable (alta, asignación, notas con autor y fecha) da el historial que ese canal no tiene. Cobertura de la necesidad de trazabilidad, no de un dolor específico de TI."
+   },
+   {
+    "pp": "pp-082",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "cubre",
+    "evidencia": "«ambigüedad sobre quién responde»: el ticket declara Reporta, Atiende y quién confirma el cierre (S-10), con lo que queda claro quién tiene la pelota."
+   },
+   {
+    "pp": "pp-103",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "«las consultas de soporte solo abordan configuración de cuentas»: los tickets de ejemplo (alta de usuario, 2FA que manda el código a un teléfono que ya no se usa) son justo ese tipo de consulta; la pantalla los recoge pero no distingue categoría ni sugiere autoservicio."
+   }
+  ],
+  "usabilidad_para_el_area": "Para soporte administrativo la pantalla resuelve bien lo estructural (bandeja y detalle, prioridad con forma, bitácora inmutable, quién cierra) pero entierra el dato de trabajo bajo dos cajas de política y repite el plazo cinco veces. La investigación no contiene ningún pain point sobre una mesa de ayuda de TI (búsqueda de «ticket» y «mesa de ayuda» en data/insights: 0 coincidencias), de modo que la necesidad de plazo, prioridad y cierre es una decisión del cliente, no un hallazgo de campo."
+ },
+ "cobertura": [
+  {
+   "patron": "Indicador de plazo dentro de un detalle (cifra grande + fecha + regla de cálculo)",
+   "propuesta_de_regla": "El bloque de plazo declara su ancho (rejilla de §6.20), lleva una cifra, una fecha y como máximo una frase; el cómo se calcula va en toggletip (§6.23) sobre «Plazo». Solo usa --warn cuando vence hoy o mañana, --err cuando venció y --ok en el resto; nunca pinta una regla de permisos."
+  },
+  {
+   "patron": "Prioridad ordinal (Crítica · Alta · Media · Baja) con forma + color",
+   "propuesta_de_regla": "La prioridad es una escala ordinal, no un estado: lleva forma (flecha, punto, raya, círculo) y una escala de tinta propia (--err solo para Crítica, el resto en tinta neutra), de modo que no compita con el semáforo de plazo ni con el de estatus en el mismo renglón."
+  },
+  {
+   "patron": "Botón flotante del asistente (FAB) y su zona segura",
+   "propuesta_de_regla": "El FAB ocupa 52 px + 16 de aire en la esquina inferior derecha. Todo contenedor con scroll reserva esa zona: padding-bottom y, en tablas y barras ancladas a la derecha, padding-right de 68 px; ninguna acción primaria se ancla dentro de ese cuadro."
+  },
+  {
+   "patron": "Plantilla de cabecera .p4 (ARQ-P4)",
+   "propuesta_de_regla": "La cabecera de pantalla se escribe con padding-bottom:var(--sp-3) en el contenedor y relleno superior en cada fila; el instrumento I2 (holgura inferior) debe dar ≥12 px entre el control más bajo y el borde."
+  }
+ ],
+ "sin_datos": [
+  "Discrepancia en FICHAS_TECNICAS.md sobre si el plazo de tickets existe: tanda 3 («se retiró el reloj de plazo») frente a la ficha de 24 y a la tanda 4 («tickets ya tiene su propio semáforo de plazo»). No he podido decidir cuál es la vigente.",
+  "El archivo recibido de 24_tickets difiere del de v1 (sha dd58a979… frente a d110a181…) y es una variante ANTERIOR: no contiene --text-3-fuerte, --on-state, .tarjeta-estado ni la banda de andamiaje. El brief lo llama NO_ALINEADO respecto al PDF; respecto a v1 es una regresión de contraste (3 nodos). El texto de los hallazgos f1-24tickets-03 y f1-24tickets-11 de v1 no concuerda con el archivo de v1 (el 03 describe algo que solo hay en v1; el 11 algo que solo hay en la entrega), así que el estado persiste/cerrado de esos dos depende del documento que se tome.",
+  "F5 directo: 0 pain points mencionan tickets o mesa de ayuda; los tres citados son indirectos.",
+  "Rendimiento: no evaluado (no hay medición en el brief).",
+  "Modo oscuro: solo se dispone de la medición de contraste del brief (0 fallos); no se inspeccionó visualmente.",
+  "No se verificó el efecto de data-tacto=\"dedo\" en la bandeja (solo 2 .iconbtn; los .seg button y .btn sí tienen regla)."
+ ]
+}

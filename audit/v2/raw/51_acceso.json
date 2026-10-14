@@ -4,7 +4,7 @@
  "sha256": "0c1242a2f17aec7c70f10f0250b203ffcf87d66dba61d2f47db2d8e85bc2afff",
  "estado_entrega": "modificada",
  "estado_vs_pdf": "NO_ALINEADO",
- "nota_estado_vs_pdf": "El PDF declara para 51 los cambios C1-C7 y C10, pero el brief mide 16 declaraciones <12px (el PDF dice 0), `--text-3` sigue en #66717F, `.state .ico` sigue siendo descendiente y las reglas [data-tacto] siguen sin :root. Ademas FICHAS_TECNICAS.md dice textualmente: «Falta `<h1>` en tres pantallas: `51_acceso.html` (el wordmark `SIO-DPROMA` era un `<span>` decorativo — se cambió la etiqueta a `<h1>`...)», y en el archivo recibido el wordmark sigue siendo `<span class=\"wm\">` (linea 668) y no hay ningun <h1>/<h2> (grep = 0). Todo lo que persiste es 'no aplicado', no regresion.",
+ "nota_estado_vs_pdf": "REGRESION detectada con diff contra la entrega v1 (v1flat): <h1 class=\"wm\"> pasa a <span class=\"wm\">. El PDF declara para 51 los cambios C1-C7 y C10, pero el brief mide 16 declaraciones <12px (el PDF dice 0), `--text-3` sigue en #66717F, `.state .ico` sigue siendo descendiente y las reglas [data-tacto] siguen sin :root. Ademas FICHAS_TECNICAS.md dice textualmente: «Falta `<h1>` en tres pantallas: `51_acceso.html` (el wordmark `SIO-DPROMA` era un `<span>` decorativo — se cambió la etiqueta a `<h1>`...)», y en el archivo recibido el wordmark sigue siendo `<span class=\"wm\">` (linea 668) y no hay ningun <h1>/<h2> (grep = 0). Todo lo que persiste es 'no aplicado', no regresion.",
  "estados_auditados": [
   "ok",
   "loading",
@@ -104,7 +104,7 @@
     "severidad": "alta",
     "regla": "§6.4 Vistas de estado (reglas 1 y 2) + §6.4 «En la pantalla de entrada, el contenedor es la propia tarjeta»",
     "dice_el_sistema": "«El cambio se anuncia y mueve el foco.» · «Cada estado lleva un encabezado real, no un `<b>`» · «No una tarjeta suelta por estado: la pantalla no debe cambiar de forma según lo que tenga que decir»",
-    "hay_en_el_build": "0 elementos <h1>/<h2> en el archivo; el wordmark es `<span class=\"wm\">`; vacio y error titulan con `<b>`; 0 aria-live ni focus(); los estados vacio y error son bloques sueltos sobre --bg, no la tarjeta de 420px",
+    "hay_en_el_build": "Vacio y error titulan con `<b>` (lineas 684 y 690); 0 aria-live ni focus() en el archivo; los estados vacio y error son bloques sueltos sobre --bg, no la tarjeta de 420px (la regresion del <h1> va aparte: v2-51acceso-13)",
     "selector": ".state-empty > b",
     "linea": 684,
     "certeza": "leido_en_codigo",
@@ -120,9 +120,9 @@
     },
     "decision": {
      "valor": "adoptar_cliente",
-     "motivo": "v1 f1-51acceso-03/05/06 (alta). El propio FICHAS_TECNICAS.md del cliente dice haber cambiado el wordmark a <h1> en 51 (linea 1440); el archivo recibido no lo contiene: 'no aplicado', y se verifica en la proxima entrega (no se le pide de nuevo)."
+     "motivo": "v1 f1-51acceso-03/05/06 (alta). Lo que persiste (`<b>` como titulo, sin aria-live, sin tarjeta) es 'no aplicado' y se verifica en la proxima entrega; el <h1> perdido es regresion y se trata aparte (v2-51acceso-13)."
     },
-    "por_que_importa": "La pantalla de entrada no tiene ningun encabezado: quien navega por encabezados no encuentra la pagina, y el lector de pantalla no sabe que «cargando» paso a «error»."
+    "por_que_importa": "Quien usa lector de pantalla no se entera de que «cargando» paso a «error» ni encuentra el titulo de cada estado."
    },
    {
     "id": "v2-51acceso-03",
@@ -373,6 +373,31 @@
      "motivo": "v1 f1-51acceso-12. FICHAS describe 51 como «La entrada al sistema. Sin cromo», sin pedir columna de marca. Se documenta la entrada de tarjeta unica como variante de §7.1 (ver cobertura) en lugar de exigir la columna."
     },
     "por_que_importa": "Sin columna de marca, la unica señal de identidad es el bloque que lleva el icono generico (v2-51acceso-05)."
+   },
+   {
+    "id": "v2-51acceso-13",
+    "severidad": "alta",
+    "regla": "§6.4 regla 2 «Cada estado lleva un encabezado real» + FICHAS_TECNICAS.md del cliente (corregido: «Falta `<h1>` en tres pantallas: `51_acceso.html`»)",
+    "dice_el_sistema": "§6.4: «Cada estado lleva un encabezado real, no un `<b>`. Es lo que permite navegar la página saltando de encabezado en encabezado.» · FICHAS_TECNICAS.md linea 1440: «`51_acceso.html` (el wordmark `SIO-DPROMA` era un `<span>` decorativo — se cambió la etiqueta a `<h1>`...)»",
+    "hay_en_el_build": "`<span class=\"wm\">SIO-DPROMA</span>` y 0 elementos <h1>/<h2> en el archivo (banners.cjs: h1 = 0). El archivo de la entrega v1 (v1flat/51_acceso.html) tenia `<h1 class=\"wm\">SIO-DPROMA</h1>`",
+    "selector": ".marca-acc .wm",
+    "linea": 668,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 668,
+     "cita": "<span class=\"wm\">SIO-DPROMA</span>"
+    },
+    "estado_vs_v1": "regresion",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Regresion: v1 tenia el <h1> (diff v1flat → v2: `<h1 class=\"wm\">` → `<span class=\"wm\">`) y el cliente dice haberlo hecho (FICHAS). Es la unica regresion de esta pantalla; el arreglo es cambiar la etiqueta, sin tocar estilos (la clase se mantiene)."
+    },
+    "por_que_importa": "La pantalla de entrada se queda sin ningun encabezado: quien navega por encabezados no encuentra la pagina y el titulo de la ventana es lo unico que la nombra."
    }
   ]
  },
