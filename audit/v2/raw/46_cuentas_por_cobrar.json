@@ -1,0 +1,454 @@
+{
+  "pantalla": "46_cuentas_por_cobrar",
+  "tier": "B",
+  "sha256": "92bf1beea7573de63c883775d154113503c0602699f11ff9fea377e3eef3cf0e",
+  "estado_entrega": "modificada",
+  "estado_vs_pdf": "NO_ALINEADO",
+  "estados_auditados": [
+    "ok (drill-down nivel 2, Marca A)",
+    "vacío y error (solo código)"
+  ],
+  "capturas": [
+    "46_cuentas_por_cobrar--1440.png",
+    "46_cuentas_por_cobrar--1280-fold.png"
+  ],
+  "observaciones_resueltas": [
+    {
+      "hoja": 16,
+      "texto_usuario": "Las cajas se habían ajustado; existe una vista optimizada con reglas para que no se repitiera (propuestas/cuentas-por-cobrar.html, §13.2–§13.4).",
+      "veredicto": "confirmada",
+      "evidencia": [
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "script mi/t46.cjs (Playwright; altura de cada `.mini` y de sus hijos)",
+            "detalle": "A 1440 px: `.hero` 349 px; `.minis` 349 px; las tres `.mini` miden 349 px cada una y su contenido (rótulo + cifra + pie, con el gap) mide 169, 92 y 91 px: vacío interior 156, 233 y 234 px. A 1280: hero 365, vacío 141 / 249 / 234. A 1181: hero 457, vacío 218 / 341 / 326. Por debajo de 1180 (una columna) las tres miden 179 y el vacío cae a 2 / 79 / 79."
+          },
+          "dato": "Confirmado: las tres tarjetas pequeñas se estiran a la altura de la primera dejando vacío interior. En «Días promedio de cobro» y «Grupos con más del 20 %…» el vacío es de ~233 px sobre 349 (dos tercios de la caja), con la cifra a media altura y el pie pegado abajo."
+        },
+        {
+          "certeza": "leido_en_codigo",
+          "reproduce": {
+            "tipo": "codigo",
+            "linea": 665,
+            "cita": ".minis{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3)}"
+          },
+          "dato": "CSS: `.minis` (línea 665) no declara `align-items`, así que la rejilla estira sus pistas; `.kpis{display:grid;grid-template-columns:minmax(280px,1fr) 2fr…}` (línea 648) pone el hero y las tres `.mini` en la misma fila, de modo que `.minis` mide lo que mide el hero; y `.mini{…display:flex;flex-direction:column;justify-content:space-between…}` (línea 667) reparte el rótulo arriba y el pie abajo, que es lo que deja el hueco a la vista."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "lectura del repo: web/entregables/propuestas/cuentas-por-cobrar.html (solo lectura) + script mi/t46.cjs",
+            "detalle": "Propuesta: línea 654 `.kpis{display:flex;flex-direction:column;…}`; línea 674 `.minis{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3);align-items:start}`; y el marcado real usa `.kpis-d{display:grid;grid-template-columns:1.4fr 1fr…}` (línea 690, marcado en la 758) con dos tarjetas de 211 px de alto a 1440, 1280, 1181 y 1024: `.panel-graf-d` (el hero, con una frase de 84 caracteres en `.pie`) y `.ficha-d` «Otros indicadores», donde las tres cifras pequeñas son filas `dl > .fila-d` con su explicación en toggletip `.infob`+`.tip`."
+          },
+          "dato": "La «vista optimizada» existe y es esa: ahí no hay tarjetas pequeñas que estirar. Es además el ejemplo que §13.2 cita como patrón real: «`1.4fr 1fr` en `.kpis-d` de Cuentas por cobrar»."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "diff v1flat/46_cuentas_por_cobrar.html v2zip/…/46_cuentas_por_cobrar.html (11 líneas cambiadas)",
+            "detalle": "Las 11 líneas del diff son: retirada de `--text-3-fuerte` (3 declaraciones y 3 usos) y retirada de la `.banda.b-warn` «Propuesta — sin backend» (líneas 713-714 de v1). Ninguna toca `.kpis`, `.minis` ni `.mini`. brief: estado_vs_pdf NO_ALINEADO; C1, C3–C8 y C10 `NO_confirmado`; lt12_medido 19 frente a 0 del PDF."
+          },
+          "dato": "No es regresión respecto a v1 (la maqueta de v1 ya estiraba las tarjetas y v1 no lo registró): es lo que el PDF dice haber ajustado y el archivo recibido no contiene. Sí es regresión respecto a la propuesta del repo."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "captura",
+            "archivo": "46_cuentas_por_cobrar--1440.png",
+            "region": "Fila de cuatro tarjetas bajo las migas: «Por cobrar en Marca A» (hero con dos párrafos de nota) y a su derecha «Cerrado y sin facturar» (borde discontinuo), «Días promedio de cobro» y «Grupos con más del 20 %…», con 38 y 2 flotando en mitad de una caja alta y vacía"
+          },
+          "dato": "La captura coincide con la medición: el hueco queda entre la cifra y el pie, no al final."
+        }
+      ],
+      "causa_raiz": "Tres factores encadenados: (a) `.minis` omite `align-items:start`, el valor por omisión que fija §13.4 (la propuesta lo tiene en su línea 674); (b) `.kpis` está en dos columnas con el hero en la primera, de modo que las tres `.mini` heredan la altura del hero (349 px) en vez de la suya (92 a 169); (c) la altura del hero la fija su `.pie` de 523 caracteres en dos párrafos a 11 px (líneas 726 y 658), y el `.pie` de «Cerrado y sin facturar» añade ~290 más. La propuesta resolvió (c) moviendo esas explicaciones a toggletip y una frase (`f3ba73f fix(voz)…`), y (b) con `.kpis-d`. No determinado: si el autor del paquete recibió la propuesta; el PDF declara cambios que el archivo no contiene.",
+      "solucion_propuesta": "Tres soluciones evaluadas. A) Mínima, 1 línea: `.minis{align-self:start}` (las tres siguen iguales entre sí por el `stretch` interno de §3.1: «tres tarjetas que se comparan entre sí» pasan a la altura de la mayor, 169 px) o `.minis{align-items:start}` como en la propuesta (cada una a su alto: 169, 92 y 91 px). Coste: el vacío no desaparece, se muda debajo de las tarjetas (349 − 169 = 180 px de panel en blanco bajo ellas) y la fila queda descompensada. B) Restaurar la propuesta: hero + `.ficha-d` en `.kpis-d{grid-template-columns:1.4fr 1fr}` y las tres cifras como filas con toggletip. Coste: sustituir ~25 líneas de marcado y borrar `.mini*`; ganancia: tarjetas de 211 px sin hueco, se retiran de golpe los dos párrafos de 523 y 292 caracteres (v2-46cxc-09), la barra de antigüedad pasa a `--serie-1…4` y desaparece el semáforo de §1; pérdida: la cifra de «Cerrado y sin facturar» deja de tener su propia tarjeta de 30 px (la ficha pedía que no se sumara al total: en la propuesta lo dice el toggletip). C) Intermedia: dejar las tres tarjetas, mover el texto del hero a una `.nota-reloj` (§12.6) bajo la fila y los dos `.pie` largos a toggletip; el hero baja a ~211 px y `.minis{align-items:start}`. Coste: medio (redacción + 3 toggletips) y sigue quedando ~120 px bajo las `.mini`. Recomendación: B si se quiere cerrar lo que el PDF declaraba; A si solo se quiere quitar el vacío dentro de las cajas esta semana. En ninguno se cambia el contenido de datos.",
+      "tipo_de_cambio": "medio",
+      "critico": {
+        "es": false,
+        "criterio": null
+      },
+      "decision": {
+        "valor": "decidir_diseño",
+        "motivo": "No es crítico ni regresión respecto a v1. Hay una decisión que tomar: exigir el cambio como «no aplicado» (Regla 1 no lo permite salvo crítico) o adoptar la propuesta del repo por el sistema (B). Lectura alternativa de §13.4/§3.1: estirar las tres `.mini` entre sí es legítimo; lo que no lo es es estirarlas a la altura del hero, que no es una comparación con ellas."
+      }
+    }
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "v2-46cxc-01",
+        "severidad": "alta",
+        "regla": "§13.4 Comparar exige igualar (+ §3.1: una fila de tarjetas hermanas va a la misma altura)",
+        "dice_el_sistema": "«El valor por omisión de una fila de tarjetas es `align-items:start`: cada una a su alto real… Fuera de ese caso, `stretch` por omisión obliga a las tarjetas cortas a inventar relleno vacío que no significa nada.» (§13.4)",
+        "hay_en_el_build": "`.minis{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3)}` sin `align-items`, dentro de `.kpis` en dos columnas con el hero. Tres `.mini` de 349 px con 92 a 169 px de contenido: 156, 233 y 234 px de vacío interior a 1440 px.",
+        "selector": ".kpis > .minis > .mini",
+        "linea": 665,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "script mi/t46.cjs (Playwright 1440/1280/1181/1024)",
+          "detalle": "`.mini` height 349/349/349 con contenido 169/92/91 a 1440; 365 con 199/92/107 a 1280; 457 con 215/92/107 a 1181; 179 con 153/76/76 a 1024. Propuesta: `.kpis-d` cards 211 px a los cuatro anchos."
+        },
+        "estado_vs_v1": "nuevo",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Ver la respuesta a la observación 16: tres soluciones evaluadas (A una línea, B restaurar la propuesta, C intermedia). No crítico ni regresión respecto a v1 (la maqueta es la misma); es «no aplicado» respecto al PDF y regresión respecto a la propuesta del repo."
+        },
+        "por_que_importa": "Es lo primero que se ve bajo las migas y tres de las cuatro tarjetas tienen dos tercios de caja vacía; además deja la cifra de 30 px flotando lejos de su rótulo."
+      },
+      {
+        "id": "v2-46cxc-02",
+        "severidad": "alta",
+        "regla": "§1.4 Series de gráfica (caso real: antigüedad de cartera) + §1 Un color de estado no se reutiliza para una categoría",
+        "dice_el_sistema": "«Cuatro tramos de tiempo, ninguno es un estado — y aun así 0–30 días quedó en `--ok` («correcto») y +90 en `--err` («error»)… La corrección no cambia el layout ni los porcentajes, solo la fuente del color: `--serie-1…4`.» (§1.4)",
+        "hay_en_el_build": "`<i style=\"width:57%;background:var(--ok)\"></i><i style=\"width:23%;background:var(--warn)\"></i><i style=\"width:12%;background:var(--block)\"></i><i style=\"width:8%;background:var(--err)\"></i>` y la leyenda repite los cuatro colores (línea 720). Es literalmente el ejemplo «✗ Mal» de §1.4.",
+        "selector": ".barra-edad > i, .leg .sw",
+        "linea": 717,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 717,
+          "cita": "<i style=\"width:57%;background:var(--ok)\"></i><i style=\"width:23%;background:var(--warn)\"></i>"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "No crítico, pero es un arreglo ya hecho en el repo (`9ac186f Barra de cartera a --serie-1…4` en `propuestas/cuentas-por-cobrar.html`) y quita el semáforo de la barra principal y de su leyenda (I6 cuenta 5 familias de color en la pantalla: acento, ok, warn, block, err). Cuidado al aplicarlo: §1.4 exige un segundo canal (rayas en una de las dos series y en su cuadro de leyenda) cuando `--serie-1` y `--serie-4` aparecen juntas, y la propuesta no lo lleva. Contradice además la ficha del cliente: «series propias — doc 34 §5». Tensión interna del sistema que conviene aclarar: §12.5 dice «si el dato tiene juicio —va bien, vence pronto, ya venció— es el semáforo»; la antigüedad tiene algo de juicio y §1.4 la prohíbe."
+        },
+        "por_que_importa": "Quien mira «+90 d» en rojo lee «error», no «más de 90 días»; y 0–30 d en verde se lee «correcto». Es el KPI principal de la pantalla."
+      },
+      {
+        "id": "v2-46cxc-03",
+        "severidad": "media",
+        "regla": "§1 Decisión previa a elegir color (un color de estado no se reutiliza para una categoría, ni al revés)",
+        "dice_el_sistema": "«Un color de estado no se reutiliza para una categoría, ni al revés.» (§1)",
+        "hay_en_el_build": "`.mini-barra i{…background:var(--serie-1)}` (línea 679) y `.mini-barra i.tarde{background:var(--err)}` (línea 680): la misma barra de «Proporción a más de 60 días» cambia de categoría (azul) a estado (rojo) según el valor; el umbral del 20 % lo dice la ficha: «umbral inventado por mí».",
+        "selector": ".mini-barra i, .mini-barra i.tarde",
+        "linea": 680,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 680,
+          "cita": ".mini-barra i.tarde{background:var(--err)}"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Dos lecturas: (a) el rojo marca un juicio (más del 20 % vencido) y eso es legítimo en §1.3; (b) la barra «sana» va en un color categórico, no en neutro ni en `--ok`. Solución: barra siempre en `--text-3` o `--ok` y solo `--err` al pasar del umbral. El umbral no es de DPROMA: es del autor del paquete."
+        },
+        "por_que_importa": "El azul de las barras bajas parece una categoría; el rojo, un estado: en la misma columna hay dos significados."
+      },
+      {
+        "id": "v2-46cxc-04",
+        "severidad": "media",
+        "regla": "§1.4 Series de gráfica (valores y número de ranuras)",
+        "dice_el_sistema": "`--serie-1` `#2a78d6` / `#3987e5`, `--serie-2` `#eb6834` / `#d95926`, `--serie-3`, `--serie-4`; los anteriores `#2C6CA8` y `#7A5FA8` «no se distinguían entre sí… ΔE 1,1 en protanopia y 10,0 en visión normal… Por eso se sustituyen, no se amplían.» (§1.4)",
+        "hay_en_el_build": "`--serie-1: #2C6CA8;` y `--serie-2: #7A5FA8;` (líneas 89-90; en oscuro `#6FA8DC` / `#B69BE0`); `--serie-3` y `--serie-4` no existen. `--serie-1` se pinta en la barra de las filas de la tabla (línea 679) y en la variante `.p-s1`.",
+        "selector": ":root, :root[data-theme=\"dark\"]",
+        "linea": 89,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 89,
+          "cita": "--serie-1: #2C6CA8;"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "v1 lo puso en alta; aquí media: con una sola serie visible (las barras bajas) la indistinción entre serie 1 y 2 no se manifiesta. Reemplazar las dos líneas por los valores de §1.4 es sencillo; es «no aplicado» (el brief también lo lista entre tokens_valores_divergentes: --serie-1, --serie-2)."
+        },
+        "por_que_importa": "Si se aplica la solución del v2-46cxc-02 sobre estos tokens heredaría la pareja que el sistema retiró por indistinguible."
+      },
+      {
+        "id": "v2-46cxc-05",
+        "severidad": "alta",
+        "regla": "§2.1 El suelo son 12px",
+        "dice_el_sistema": "«`--fs-meta` es el tamaño más pequeño del sistema. Nada baja de ahí.» (§2.1)",
+        "hay_en_el_build": "19 nodos de texto a menos de 12 px (brief). En zona de producto: `.hero .pie{font-size:11px}`, `.mini .pie{font-size:11px}`, `.mini .lbl{font-size:11.5px}`, `.leg{font-size:11.5px}` (los cuatro importes de la antigüedad), `thead th{font-size:11px}`; más las fechas y porcentajes en línea (`style=\"font-size:11px\"`).",
+        "selector": ".hero .pie, .mini .pie, .mini .lbl, .leg, thead th",
+        "linea": 658,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "brief estado_vs_pdf_del_cliente.lt12_medido (19) + código",
+          "detalle": "lt12_medido 19, lt12_pdf_despues 0 → NO_ALINEADO. Código: líneas 658 (.hero .pie 11 px), 661 (.leg 11,5), 668 (.mini .lbl 11,5), 670 (.mini .pie 11), 365 (thead th 11)."
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "No es fallo de accesibilidad medido (contraste 0 fallos). Es «no aplicado»: el PDF dice 0 declaraciones < 12 px y el archivo trae 19. Cambio sencillo y global (Regla 2): sustituir cada literal por `var(--fs-meta)`."
+        },
+        "por_que_importa": "Son los textos que explican qué entra y qué no en cada cifra, la leyenda de importes y las cabeceras de la tabla: lo que se consulta a diario."
+      },
+      {
+        "id": "v2-46cxc-06",
+        "severidad": "media",
+        "regla": "§1.1 Superficies y texto — valor de --text-3",
+        "dice_el_sistema": "«`--text-3` es `#5C6675`, no el antiguo `#66717F` (que caía a 4,21:1 sobre `--surface-2`).» (§1.1)",
+        "hay_en_el_build": "`--text-3: #66717F;` (línea 68) en claro. Además v2 retiró `--text-3-fuerte` (que v1 usaba como refuerzo en `.pr-baja`, `.tk .ref` y `.tk .cuando`).",
+        "selector": ":root{--text-3}",
+        "linea": 68,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 68,
+          "cita": "--text-3: #66717F;"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "No crítico: el contraste medido en esta pantalla da 0 fallos en claro y oscuro (102 nodos), así que ningún nodo cae hoy bajo 4,5:1. Es el código C1 del PDF, `NO_confirmado`. Arreglo de una línea."
+        },
+        "por_que_importa": "El valor obsoleto sigue gobernando todo el texto auxiliar y basta con que un elemento caiga sobre `--surface-2` para que falle (4,21:1)."
+      },
+      {
+        "id": "v2-46cxc-07",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado (regla 6: `.state > .ico`) + §6.2 + §1.4.1",
+        "dice_el_sistema": "«`.state .ico` apunta solo al ícono grande, nunca a los de sus botones» (§6.4 regla 6); la regla es `.state > .ico` (§1.4.1).",
+        "hay_en_el_build": "`.state .ico{width:30px;height:30px;color:var(--text-3)}` (selector descendiente): alcanza al icono de `.btn.p` dentro de la vista. I1: «Volver a todas las marcas» y «Reintentar», icono rgb(102,113,127) sobre fondo rgb(62,122,76), ratio 1,03.",
+        "selector": ".state .ico  (alcanza a .state .acc .btn.p .ico)",
+        "linea": 609,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "I1_icono_vs_boton (brief)",
+          "detalle": "I1: fallos 2, `button.btn.p` «Volver a todas las marcas» y «Reintentar», colorIcono rgb(102,113,127), fondo rgb(62,122,76), ratio 1,03, enEstado true, oculto true (vista de estado no activa en la captura). 20, 23 y 25 ya traen `.state > .ico` (líneas 611); 46 conserva la forma antigua."
+        },
+        "estado_vs_v1": "nuevo",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Dos lecturas: (A) el criterio 1 habla de «contraste < 3:1 en controles» y el instrumento mide 1,03:1; (B) el icono es decorativo (`aria-hidden`) y el texto del botón, blanco sobre verde, cumple; WCAG 1.4.11 no exige el glifo cuando el rótulo lo repite. Lo trato como no crítico, pero es el defecto 2.13.4 con arreglo de un carácter (`.state > .ico`) y el cliente ya lo aplicó en las otras tres pantallas."
+        },
+        "por_que_importa": "En el estado de error el botón «Reintentar» enseña un glifo gris casi invisible sobre el verde."
+      },
+      {
+        "id": "v2-46cxc-08",
+        "severidad": "media",
+        "regla": "§7.3 Objetivos táctiles (24×24 px mínimo; la miga es destino primario) + criterio crítico 1",
+        "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo… los enlaces que son el elemento primario de su fila (un folio, una miga, «Ver en Maps») no son texto en prosa: llevan padding hasta llegar a 24px.» (§7.3)",
+        "hay_en_el_build": "`.migas-drill a{color:var(--link);text-decoration:none;font-weight:600;font-size:var(--fs-dense);border-radius:4px}`: sin padding. «Todas las marcas» mide 108,8×16 px.",
+        "selector": ".migas-drill > a",
+        "linea": 643,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "tactil_bajo24 (brief) + script mi/tsearch.cjs",
+          "detalle": "brief: bajo24 2; muestra `a` «Todas las marcas» w 108,8 h 16. Mi medición a 1440: `.migas-drill a` 109×16."
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": true,
+          "criterio": 1
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Destino táctil medido < 24 px y §7.3 nombra a la miga expresamente. Dos lecturas: WCAG 2.5.8 admite destinos pequeños si un círculo de 24 px centrado en ellos no toca otro destino, y aquí los vecinos no son enlaces; pero el criterio de la persona fija 24 px y §7.3 lo repite. Arreglo sin efecto visual: `.migas-drill a{padding:4px 0;margin:-4px 0}`."
+        },
+        "por_que_importa": "Es el único camino de vuelta en un drill-down de tres niveles; con 16 px de alto es fácil fallar con el dedo o el ratón."
+      },
+      {
+        "id": "v2-46cxc-09",
+        "severidad": "media",
+        "regla": "§8 Voz de producto, límites medibles (punto 2: ningún bloque siempre visible pasa de ~140 caracteres)",
+        "dice_el_sistema": "«Ningún bloque de texto siempre visible pasa de ~140 caracteres.» y «`.nota` y `.banda` llevan como máximo una frase» (§8, límites medibles 1 y 2)",
+        "hay_en_el_build": "`p.nota` de 240 caracteres, visible («Entran Dirección y Administración. Quien persigue el cobro es Administración: dejarla fuera sería dibujar la pantalla para quien no hace el trabajo…»), y otra de 298 (oculta); `.hero .pie` de 523 caracteres en dos párrafos y `.mini.aparte .pie` de ~290 siempre visibles.",
+        "selector": "p.nota, .hero .pie, .mini.aparte .pie",
+        "linea": 776,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "C11_texto_largo (brief) + recuento de caracteres de las líneas 726 y 730",
+          "detalle": "C11: revisados 2, sobre140 2: `p.nota` 240 (visible) y 298 (oculto). Texto sin etiquetas de la línea 726 (`.hero .pie`): 523 caracteres; línea 730 (`.mini.aparte`): 292 con el rótulo y la cifra."
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "No crítico. Son decisiones de redacción del autor (la ficha lo declara: «lo que decidí yo»). Se resuelve mejor con la propuesta del repo (toggletip, una frase de 84 caracteres)."
+        },
+        "por_que_importa": "Es el texto que hace alto al hero (349 px) y por tanto lo que produce el vacío del v2-46cxc-01."
+      },
+      {
+        "id": "v2-46cxc-10",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado de una pantalla (regla 2: encabezado real)",
+        "dice_el_sistema": "«Cada estado lleva un encabezado real, no un `<b>`.» (§6.4, regla 2)",
+        "hay_en_el_build": "`<b>No se pudo cargar el desglose de cobranza</b>` dentro de `div.state.state-error`, sin `.tarjeta-estado` ni `.estado-ico`.",
+        "selector": ".state.state-empty, .state.state-error",
+        "linea": 789,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 789,
+          "cita": "<b>No se pudo cargar el desglose de cobranza</b>"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "v1 lo puso en alta; aquí media (sin fallo medido; vista alcanzable solo por el conmutador de andamio)."
+        },
+        "por_que_importa": "El lector de pantalla no anuncia el error como sección."
+      },
+      {
+        "id": "v2-46cxc-11",
+        "severidad": "media",
+        "regla": "§7.3 Objetivos táctiles + criterio crítico 1",
+        "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8)» (§7.3)",
+        "hay_en_el_build": "`.search input{border:0;background:transparent;…;width:100%;outline:0}`: `input#buscar` mide 329×16 dentro de un contenedor visible de 380×34 px. Un clic a 3 px del borde superior del contenedor deja el foco en `BODY`.",
+        "selector": ".search > input#buscar",
+        "linea": 334,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "tactil_bajo24 (brief) + script mi/tsearch.cjs",
+          "detalle": "brief: `input` tipo search 329×16. Mi medición: `.search` 380×34, `input` 329×16; mouse.click a 3 px del borde superior del contenedor → document.activeElement BODY."
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": true,
+          "criterio": 1
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Igual que v2-23viat-07: el destino del input es de 16 px. Lectura alternativa: el control visible mide 34 px y teclado y clic sobre el texto funcionan. Arreglo de una línea: `.search input{min-height:24px}` o `<label class=\"search\">`."
+        },
+        "por_que_importa": "Un clic en el borde del campo de búsqueda no lo enfoca."
+      },
+      {
+        "id": "v2-46cxc-12",
+        "severidad": "baja",
+        "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+        "dice_el_sistema": "«Un control con pinta de interactivo tiene que interactuar.» (§6.12, regla 8)",
+        "hay_en_el_build": "Cuatro `.schip` con `aria-pressed=\"false\"` y `data-f`, el segmentado Cómoda/Compacta, los cinco `.abrir-n` y las migas no tienen manejador: el único `querySelectorAll` del script es `.demo [data-set]`.",
+        "selector": ".p4-f .schip[data-f], .seg button, .abrir-n",
+        "linea": 702,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 702,
+          "cita": "<div class=\"p4-f\"><button class=\"schip c-err\" type=\"button\" aria-pressed=\"false\" data-f=\"err\">"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "sin_accion",
+          "motivo": "Maqueta estática; el contrato del cliente (D62, drill-down) no promete aquí lógica de filtros."
+        },
+        "por_que_importa": "En la sesión con usuarios pulsarán un filtro o un grupo y no pasará nada."
+      },
+      {
+        "id": "v2-46cxc-13",
+        "severidad": "alta",
+        "regla": "§7.2 Cromo de aplicación (modo colapsado) + criterio crítico 1 (control sin nombre accesible)",
+        "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.» (§7.2)",
+        "hay_en_el_build": "Entre 861 y 1100 px: `.side .et,.grp,.side .wordmark{display:none}` oculta el texto de los 15 enlaces `a.it`; el icono es `<svg aria-hidden=\"true\">`, el enlace no lleva `aria-label` ni `title`. El árbol de accesibilidad (ariaSnapshot de `nav.side` a 1000 px) da `link` sin nombre ×15; no hay etiqueta emergente.",
+        "selector": ".side .et (en @media 860.02–1100 px) / a.it",
+        "linea": 288,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "menu_1000px (brief)",
+          "detalle": "menu_1000px: hayMenu true, total 15, sinNombre 15, anchoSide 64. Reproducido con Playwright a 1000 px: `await page.locator('nav.side').ariaSnapshot()` → 15 `link:` sin texto (script mi/t20f.cjs). Citas de código: línea del `display:none` y enlaces `<a class=\"it\" href=\"#\">` sin atributos de nombre."
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": true,
+          "criterio": 1
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Control sin nombre accesible, medido. Arreglo de una línea en el cromo: sustituir el `display:none` por la clase de solo lectores (`.sr`) en `.et` y añadir `title`/etiqueta emergente. Lo que el cliente decidió (colapsar a iconos) se adopta; lo que se exige es que el nombre siga existiendo."
+        },
+        "por_que_importa": "Quien navega con lector de pantalla entre 861 y 1100 px (portátil con ventana reducida, tableta apaisada) oye «enlace» quince veces sin saber a qué módulo va cada uno. No es regresión: el CSS es idéntico en v1 (v1flat, líneas 288 a 291 según la pantalla) y delta_vs_v1.menu_sin_nombre = 0; v1 no lo registró como hallazgo. Es el cromo compartido: aparece igual en las otras pantallas del paquete. Quién lo introdujo no está determinado: la ficha dice que el cromo sale de `Marco.tsx`, no del cliente."
+      }
+    ]
+  },
+  "cerrados_desde_v1": [
+    {
+      "id_v1": "f1-46cxc-17",
+      "evidencia": "La `.banda.b-warn` «Propuesta — sin backend» (que v1 nombraba por nomenclatura de `.banda` y por voz) ya no está: el diff v1flat → v2zip la elimina (líneas 713-714 de v1). Efecto lateral a confirmar con la persona: con ella desaparece la única frase de la pantalla que dice que no hay backend."
+    }
+  ],
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 2,
+      "rendimiento": "no_evaluado",
+      "theming": 2,
+      "responsive": 3,
+      "integridad": 2
+    },
+    "justificacion": "El archivo es prácticamente el de v1 (11 líneas de diferencia): el PDF declara C1, C3–C8 y C10 y el brief los marca `NO_confirmado`. Persisten el semáforo en la barra de antigüedad, `--serie-1/2` con valores retirados, 19 declaraciones < 12 px, `--text-3` obsoleto, `.state .ico` en forma antigua, dos destinos de 16 px y las tarjetas pequeñas estiradas. Lo que sostiene la nota: 0 fallos de contraste en ambos temas, sin scroll horizontal a 1440/1280/1024 y un drill-down con migas bien resuelto en su contenido.",
+    "evidencia": [
+      "brief: lt12 19 (PDF 0), tactil bajo24 2 (miga 108,8×16, buscador 329×16), I1 2 fallos (1,03:1, vista de estado), I6 5 familias de color, C11 2 textos > 140, menu sinNombre 15",
+      "mi/t46.cjs: minis 349 px con 92–169 px de contenido a 1440; propuesta 211 px",
+      "diff v1flat/v2zip: 11 líneas (texto-3-fuerte y banda de «sin backend»)"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — Tier B"
+  },
+  "cobertura": [
+    {
+      "patron": "Antigüedad de saldo por tramos: la regla de color de §1.4 y la de §12.5 se contradicen",
+      "propuesta_de_regla": "Una distribución por tramos de tiempo (0–30, 31–60, 61–90, +90) usa `--serie-1…4` con leyenda de rangos; el semáforo solo se aplica a un umbral declarado (p. ej. «más de 60 días») sobre una cifra, no a los tramos. Y cuando aparecen `--serie-1` y `--serie-4` juntas lleva el segundo canal de §1.4."
+    },
+    {
+      "patron": "Fila de KPIs con una tarjeta de texto largo y otras de cifra única",
+      "propuesta_de_regla": "§13.4 bis: las tarjetas de cifra no comparten fila-pista con una tarjeta de explicación; si la explicación es larga, va a toggletip (§6.23) o a `.nota-reloj` (§12.6) y el widget sube a la altura de su cifra."
+    }
+  ],
+  "sin_datos": [
+    "El PDF del cliente no está en mi brief: sé qué códigos el orquestador no confirmó (C1, C3–C8, C10), no el texto de cada uno. No puedo atribuirle al PDF una promesa concreta sobre las cajas de este layout.",
+    "No se puede determinar si el equipo de DPROMA recibió `propuestas/cuentas-por-cobrar.html`; solo que el repo lo contiene y que el archivo recibido no se parece a él en la fila de KPIs.",
+    "I2 marca 5 `td` con gap 7,5 px: es el `padding:var(--sp-2)` de la celda con el botón «Ver agencias»; falso positivo.",
+    "El umbral del 20 % vencido que pinta de rojo los grupos es «umbral inventado por mí» (ficha): no es una decisión de DPROMA y no está validado.",
+    "Estados cargando, vacío y error: solo código."
+  ]
+}
