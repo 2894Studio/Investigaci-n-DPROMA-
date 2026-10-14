@@ -221,7 +221,26 @@ P('**Lectura.** Las observaciones 4 y 15 (`49_alta_orden`, que vive en `sistema/
 
 P('## Anexo B · Cómo reproducir\n')
 P('`audit/v2/instrumentos/` (medidores, `verificar-fixtures.sh`, `validar.py`, `concordancia.py`, `consolidar.py`), `audit/v2/mediciones/` (JSON de v1 y v2), `audit/v2/raw/` (una ficha por pantalla), `audit/v2/verif/` y `audit/v2/replica/`. Todas las cifras de este documento salen de esos archivos.\n')
-open(f'{R}/INFORME-v2.md', 'w', encoding='utf-8').write('\n'.join(out))
+# ---- redacción para el ingeniero: esta es SU primera auditoría; "v1/v2" no existen para él.
+txt = '\n'.join(out)
+txt = txt.replace('# Auditoría v2 · SIO-DPROMA · paquete «Actualización 12-oct-2026»', '# Auditoría SIO-DPROMA · entrega «Actualización 12-oct-2026»')
+txt = txt.replace('| Indicador | v1 | v2 |', '| Indicador | Entrega 30-sep | Entrega 12-oct |').replace('| Instrumento | v1 | v2 |', '| Instrumento | Entrega 30-sep | Entrega 12-oct |')
+txt = txt.replace('| Pantalla | Patrón sin regla |', '| Pantalla | Patrón sin regla |')
+txt = txt.replace('## 3 · Regresión mecánica v1 → v2', '## 3 · Qué cambió entre la entrega del 30-sep y la del 12-oct')
+txt = txt.replace('Estado frente a v1:', 'Estado frente a la entrega del 30-sep:')
+txt = txt.replace('Frente a v1:', 'Frente a la entrega del 30-sep:').replace('De las 52 de v1,', 'De las 52 de la entrega del 30-sep,')
+txt = txt.replace('(v1 se re-midió con el mismo arnés para que la diferencia sea honesta)', '(la entrega del 30-sep se re-midió con el mismo arnés para que la diferencia sea honesta)')
+txt = txt.replace('con los instrumentos de v1', 'con los mismos instrumentos en las dos entregas')
+txt = txt.replace('Regresiones frente a v1', 'Regresiones frente a la entrega del 30-sep').replace('frente a v1', 'frente a la entrega del 30-sep')
+txt = re.sub(r'(?<![\w./`-])v1(?![\w/-]|\.\w)', 'la entrega del 30-sep', txt)
+txt = re.sub(r'(?<![\w./`-])v2(?![\w/-]|\.\w)', 'la entrega del 12-oct', txt)
+txt = txt.replace('Este documento', 'Este documento')
+nota = ('> **Cómo leer este informe.** Es la primera auditoría que se entrega al cliente: nadie le ha comunicado antes ningún hallazgo nuestro. '
+        '«Persiste» significa solo que el problema ya estaba en la entrega del 30-sep; no que se haya ignorado un aviso. '
+        '«Regresión» y «pérdida» se usan únicamente cuando el cliente tenía algo bien en septiembre (o lo declaró él mismo) y en octubre dejó de estarlo.\n')
+txt = txt.replace('## 1 · Resumen ejecutivo', nota + '\n## 1 · Resumen ejecutivo', 1)
+open(f'{R}/INFORME-v2.md', 'w', encoding='utf-8').write(txt)
+print('ok', len(txt), 'caracteres')
 json.dump({'entrega': {'ausentes': ausentes, 'no_alineadas': no_alin, 'confirmadas': conf, 'nuevas': nuevas, 'identicas': identicas}, 'temas': {k: {'titulo': v['titulo'], 'n': len(v['items']), 'pantallas': sorted({i['pantalla'] for i in v['items']})} for k, v in temas.items()},
            'otros_criticos': len(otros), 'regresiones': len(regres), 'verificacion': dict(vc), 'decisiones': dict(dec), 'cobertura': len(cober)}, open(f'{R}/consolidado-v2.json', 'w'), ensure_ascii=False, indent=1)
-print('ok', len('\n'.join(out)), 'caracteres')
+
