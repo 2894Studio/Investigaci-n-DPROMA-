@@ -31,6 +31,7 @@ OBS = {  # hoja, texto de la observación (palabras de la persona, resumidas sin
  '54_bitacora_descargas': [(18, 'Panel «CON QUÉ FILTROS»: ¿estos filtros tienen sentido para el flujo?')],
  '55_verificacion_pedido': [(19, '«Siguiente» cortado en el borde superior de la tarjeta; debe ir por fuera.')],
  '01_login': [],
+ '13_panel_asistencia_rhl': [(5, 'RHL incidentes: el interlineado da sensación de desorden. (El auditor del 48 halló que la «bandeja de incidencias» está en ESTE archivo, no en 48.)')],
 }
 def ficha(n):
     out = []; blocks = re.split(r'(?m)^(?=#{1,2} )', fich)
