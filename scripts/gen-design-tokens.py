@@ -26,6 +26,7 @@ GROUPS = [
     ("r-", "radio"),
     ("sh-", "sombra"),
     ("fs-", "tipografia.tamano"),
+    ("lh-", "tipografia.interlineado"),
     ("font-", "tipografia.familia"),
 ]
 
