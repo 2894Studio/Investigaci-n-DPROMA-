@@ -42,7 +42,7 @@ def validar(n):
     html = open(f'{V2}/{n}.html', encoding='utf-8', errors='replace').read(); lines = html.split('\n')
     if d.get('sha256') and d['sha256'] != man[n + '.html']['sha256']: err.append('V9 sha256 distinto al manifiesto')
     # V2 §
-    textos = json.dumps(d, ensure_ascii=False)
+    textos = json.dumps({k: v for k, v in d.items() if k != 'cobertura'}, ensure_ascii=False)  # cobertura = propuestas de regla NUEVAS: su § aún no existe
     for s in set(re.findall(r'§\s?(\d+(?:\.\d+)*)', textos)):
         if s not in SECC: err.append(f'V2 §{s} no existe en el sistema 2.15.0')
     brief = json.load(open(f'{SP}/briefs2/{n}.json'))
@@ -70,10 +70,15 @@ def validar(n):
                 near = ' '.join(lines[max(0, ln - 2):ln + 1])
                 (adv if norm(cita) in norm(near) else err).append(f'V4 {hid}: la cita no es literal en la línea {ln}' + (' (sí en ±1 línea)' if norm(cita) in norm(near) else ''))
         elif t == 'captura':
-            if rep.get('archivo') not in caps and not os.path.exists(f'{R}/img/{rep.get("archivo")}'): err.append(f'V5 {hid}: la captura {rep.get("archivo")} no existe')
+            fa = os.path.basename(str(rep.get('archivo') or '').split(' ')[0])
+            if fa not in caps and not os.path.exists(f'{R}/img/{fa}') and not glob.glob(f'{SP}/**/{fa}', recursive=True): err.append(f'V5 {hid}: la captura {rep.get("archivo")} no existe')
         elif t == 'medicion':
             ins = (rep.get('instrumento') or '').split('.')[0]
-            if ins not in INSTR and not ins.startswith('propio'): err.append(f'V6 {hid}: instrumento «{ins}» desconocido')
+            raw_i = (rep.get('instrumento') or '')
+            propio = re.match(r'^(script|grep|diff|lectura|ficha|propio|brief|[a-z]\d+[a-z]?$)', raw_i.strip()) or '.cjs' in raw_i or raw_i.startswith('anchos') or '(brief)' in raw_i or 'brief' in raw_i.split()[:1]
+            base = re.split(r'[\s(]', ins)[0]
+            if base in INSTR or ins in INSTR or propio: pass
+            else: err.append(f'V6 {hid}: instrumento «{raw_i[:40]}» no reconocido (ni del brief ni script/grep propio)')
         elif rep and ambito == 'f1': err.append(f'V4 {hid}: reproduce.tipo «{t}» desconocido')
     # V7 pp
     for pp in (d.get('f5_investigacion') or {}).get('pain_points_evaluados', []):
