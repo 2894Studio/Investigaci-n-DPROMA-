@@ -20,8 +20,9 @@ for n, f in sorted(filas.items()):
     src = open(p, encoding='utf-8', errors='replace').read(); css = estilos(src)
     css_nocom = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
     inl = ' '.join(re.findall(r'style="([^"]*)"', src))
-    tam = [float(x) for x in re.findall(r'font-size\s*:\s*([\d.]+)px', css_nocom + ' ' + inl)]
+    tam = [float(x) for x in re.findall(r'font-size\s*:\s*([\d.]+)px', css_nocom)]
     lt12 = sum(1 for x in tam if x < 12 and x != 10.5); n105 = sum(1 for x in tam if x == 10.5)
+    lt12_inline = sum(1 for x in re.findall(r'font-size\s*:\s*([\d.]+)px', inl) if float(x) < 12 and float(x) != 10.5)  # atributos style="": se informa aparte
     r = {}
     chk = {
       'C1': lambda: lt12 == 0,
@@ -44,7 +45,7 @@ for n, f in sorted(filas.items()):
     # C2: ¿alguna regla con 10.5px sin text-transform:uppercase?
     malas = [b.strip()[:80] for b in re.findall(r'\{([^{}]*font-size\s*:\s*10\.5px[^{}]*)\}', css_nocom) if 'uppercase' not in b]
     if 'C2' in r: r['C2'] = 'se_mide_en_navegador'
-    res[n] = {'codigos': r, 'lt12_pdf_despues': f['lt12'][1], 'lt12_medido': lt12, 'p105_pdf_despues': f['p105'][1], 'p105_medido': n105,
+    res[n] = {'codigos': r, 'lt12_pdf_despues': f['lt12'][1], 'lt12_medido': lt12, 'lt12_inline': lt12_inline, 'p105_pdf_despues': f['p105'][1], 'p105_medido': n105,
               'p105_sin_uppercase': malas[:3], 'pr': f['pr']}
 tot = {}
 for n, v in res.items():
