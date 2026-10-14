@@ -6,17 +6,17 @@ D, TXT, OUT = sys.argv[1:4]
 t = open(TXT, encoding='utf-8').read()
 filas = {}
 for l in t.splitlines():
-    m = re.match(r'\s*(?:html_v2|sistema(?:/[\w\-]+)+)/([\w\-\.]+\.html)\s+((?:C\d+(?:\s*·\s*)?)+)\s+(\d+|—)→(\d+)\s+(\d+|—)(?:→(\d+))?\s+#(\d+)', l)
+    m = re.match(r'\s*(html_v2|sistema(?:/[\w\-]+)+)/([\w\-\.]+\.html)\s+((?:C\d+(?:\s*·\s*)?)+)\s+(\d+|—)→(\d+)\s+(\d+|—)(?:→(\d+))?\s+#(\d+)', l)
     if m:
-        filas[m.group(1)] = {'codigos': re.findall(r'C\d+', m.group(2)), 'lt12': (None if m.group(3) == "—" else int(m.group(3)), int(m.group(4))),
-                             'p105': (None if m.group(5) == '—' else int(m.group(5)), None if m.group(6) is None else int(m.group(6))), 'pr': m.group(7)}
+        filas[m.group(2)] = {'codigos': re.findall(r'C\d+', m.group(3)), 'lt12': (None if m.group(4) == "—" else int(m.group(4)), int(m.group(5))),
+                             'p105': (None if m.group(6) == '—' else int(m.group(6)), None if m.group(7) is None else int(m.group(7))), 'pr': m.group(8), 'carpeta': m.group(1)}
 def estilos(src): return '\n'.join(re.findall(r'<style[^>]*>(.*?)</style>', src, re.S | re.I))
 def regla(css, sel):
     return [m.group(1) for m in re.finditer(r'(?:^|[}\s,])' + sel + r'\s*\{([^}]*)\}', css)]
 res, resumen = {}, {}
 for n, f in sorted(filas.items()):
     p = os.path.join(D, n)
-    if not os.path.exists(p): res[n] = {'estado': 'archivo_ausente_del_zip', 'codigos': f['codigos']}; continue
+    if not os.path.exists(p): res[n] = {'estado': 'archivo_ausente_del_zip', 'codigos': f['codigos'], 'carpeta_pdf': f['carpeta']}; continue
     src = open(p, encoding='utf-8', errors='replace').read(); css = estilos(src)
     css_nocom = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
     inl = ' '.join(re.findall(r'style="([^"]*)"', src))
@@ -46,7 +46,7 @@ for n, f in sorted(filas.items()):
     malas = [b.strip()[:80] for b in re.findall(r'\{([^{}]*font-size\s*:\s*10\.5px[^{}]*)\}', css_nocom) if 'uppercase' not in b]
     if 'C2' in r: r['C2'] = 'se_mide_en_navegador'
     res[n] = {'codigos': r, 'lt12_pdf_despues': f['lt12'][1], 'lt12_medido': lt12, 'lt12_inline': lt12_inline, 'p105_pdf_despues': f['p105'][1], 'p105_medido': n105,
-              'p105_sin_uppercase': malas[:3], 'pr': f['pr']}
+              'p105_sin_uppercase': malas[:3], 'pr': f['pr'], 'carpeta_pdf': f['carpeta']}
 tot = {}
 for n, v in res.items():
     for c, e in (v.get('codigos') or {}).items() if isinstance(v.get('codigos'), dict) else []:

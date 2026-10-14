@@ -4,7 +4,7 @@
 
 ## 1 · Resumen ejecutivo
 
-1. **La entrega no coincide con lo que el cliente declara.** El PDF del cliente lista 50 pantallas actualizadas a la v2.15.0. En el ZIP: **10 no vienen**, **19 vienen sin los cambios que el PDF declara** y solo **21** los muestran (verificado por código, no por confianza). Conviene pedir el ZIP correcto antes de tratar como «hecho» lo que el PDF afirma.
+1. **El ZIP trae 50 pantallas, pero no son las mismas 50 que lista el PDF.** El PDF las reparte en dos carpetas del repo del cliente: `html_v2/` (21 pantallas) y `sistema/` (29 pantallas). Las 21 de `html_v2/` están en el ZIP **y muestran los cambios** que el PDF declara. De las 29 de `sistema/`, 10 **no están** y 19 están, pero **sin** los cambios declarados (parecen la copia anterior). La coincidencia es total (50 de 50 pantallas), así que lo más probable es que el ZIP sea la carpeta `html_v2/` y falte la carpeta `sistema/` actualizada. Está por confirmar con el cliente.
 2. **Qué se auditó.** 50 pantallas en el ZIP: **23** a fondo (observaciones, F1, F3; F4 y F5 en las de nivel A), con instrumentos medidos y fixtures validados; las otras 27 solo con regresión mecánica. 6 son idénticas a v1.
 3. **Calidad de la propia auditoría.** 119 afirmaciones altas o críticas pasaron por verificadores que intentaron refutarlas con medición propia: **110 confirmadas, 9 exageradas, 0 refutadas** (precisión 92.4 %). Una réplica ciega de 2 pantallas **no** alcanzó el umbral de concordancia que nos fijamos (§8): una sola pasada no agota lo que hay.
 4. **Lo que sí está medido, en una línea cada uno.**
@@ -18,7 +18,7 @@
 
 ## 2 · Qué se recibió frente a lo que se declara
 
-El análisis sale de `claims.py` (lectura estática de cada código C1–C18 del PDF contra su archivo) y de comparar hashes con v1. C11, C13, C14, C15 y C18 no se pueden verificar mecánicamente; C2 se mide en navegador.
+La columna «Carpeta» sale del propio PDF (`html_v2/` o `sistema/`). El análisis sale de `claims.py` (lectura estática de cada código C1–C18 del PDF contra su archivo) y de comparar hashes con v1. C11, C13, C14, C15 y C18 no se pueden verificar mecánicamente; C2 se mide en navegador.
 
 | Grupo | N | Pantallas |
 |---|---:|---|
@@ -30,7 +30,7 @@ El análisis sale de `claims.py` (lectura estática de cada código C1–C18 del
 
 Nota sobre C1 (nada menor de 12 px): se midió en las hojas `<style>`. Además, 8 pantallas tienen `font-size` menor de 12 px en atributos `style=""` (23_viaticos, 33_cfe_detalle, 36_recetas_despacho, 37_concluidos, 38_vehicular_detalle, 39_viatico_detalle, 45_autorizacion_compra, 46_cuentas_por_cobrar); no es claro si el PDF contaba esos atributos, así que no se usa para clasificar.
 
-Consecuencia directa: las observaciones 4 y 15 (`49_alta_orden`) **no se pueden auditar sobre v2**; Tickets TI, Acceso, Altas como modal y Cuentas por cobrar están entre las que no muestran los cambios declarados.
+**Consecuencia directa.** Las observaciones 4 y 15 (`49_alta_orden`, que vive en `sistema/icev/`) no se pueden auditar sobre v2. Tickets TI, Acceso, Altas como modal, Cuentas por cobrar y Agenda de instaladores son pantallas de `sistema/`: lo que se auditó de ellas es la copia que trae el ZIP, que puede no ser la que viste en tus capturas.
 
 ## 3 · Regresión mecánica v1 → v2 (mismo arnés, mismas fuentes)
 
@@ -223,7 +223,13 @@ Contradicciones internas de nuestro sistema que los auditores encontraron (a res
 
 ### 7.2 Briefs de diseño (Fase 4)
 
-_Pendientes de entrega al cierre de este documento._
+**`28-mi-dia.md`** — veredicto: **B: viable.** **C: viable con condiciones.** (Veredicto de la pantalla: **viable**; lo exigible es B.) | Criterio | Respuesta | |---|---| | **Alcance dentro del sistema** | Sí. B usa solo tokens existentes (`--sp-3`, `--sp-4`, `--sp-5`, `--sp-6`, `--sh-modal`) y §3.1 tal como está escrito. C añade únicamente `.pill.p-block` (§6.10) con el icono que la propia pantalla ya usa en la cita (`#i-pause`). Cero componentes 
+
+**`34-agenda.md`** — veredicto: **Mantener la agenda del cliente con cambio mínimo (A′): `viable con condiciones`.** - Alcance: dentro del sistema actual; 0 componentes nuevos; CSS y HTML de un archivo; sin JS nuevo. - Esfuerzo: K1–K3 de una línea cada uno; S1–S6 en un solo archivo (+44/−22 líneas). - Compatibilidad con decisiones citadas literal: respeta L366, L367, L369–371 y L910–912. - **Condiciones**: (a) que el cliente acepte la fila «Sin asi
+
+**`47-asistente.md`** — veredicto: | Criterio | Respuesta | |---|---| | **Alcance dentro del sistema** | Sí. Cero tokens nuevos (`--surface`, `--surface-2`, `--surface-hover`, `--sp-*`, `--r-card`, `--link`) y cero componentes nuevos: `.btn.mini` (§6.2), anatomía de §6.3. Las clases nuevas (`.tx-cuerpo`, `.fuentes--paso`) son modificadores locales. | | **Esfuerzo** | A: 5 ediciones (~6 líneas). B: ~20 líneas de CSS, un envoltorio por respuesta en la p
+
+**`54-panel-con-que-filtros.md`** — veredicto: **`viable con condiciones`.** - **Alcance:** dentro del sistema actual; 0 componentes nuevos; +15/−8 líneas en un archivo; sin JS. - **Compatibilidad con decisiones del cliente, citadas literal:** conserva «6 columnas × 5 filas, se desliza con la primera columna anclada (`D-6`)» y «un renglón no se edita ni se borra». Cambia el vehículo de la marca (ámbar → forma y texto), no lo decidido. - **Esfuerzo:** bajo para el
 
 
 ## 8 · Qué tan fiable es esta auditoría
@@ -238,7 +244,7 @@ _Pendientes de entrega al cierre de este documento._
 
 ## 9 · Pendientes
 
-1. **Pedir al cliente el ZIP correcto**: las 10 pantallas ausentes (entre ellas `49_alta_orden`) y las 19 sin los cambios declarados.
+1. **Confirmar con el cliente si el ZIP es solo la carpeta `html_v2/`** y pedir la carpeta `sistema/` actualizada: 10 pantallas ausentes (entre ellas `49_alta_orden`) y 19 con la copia anterior.
 2. **Confirmar identidades inferidas**: la hoja 1 es `22` o `32` (ambas tienen el defecto); la hoja 2 es `05_app_cliente` (coincide el nombre «Laura Núñez»); la hoja 5 es `13_panel_asistencia_rhl`, no `48`.
 3. **Decidir** las preguntas de diseño abiertas (§7.2) y qué rama de la 2.15.0 es la base para documentar las divergencias.
 4. **Corregir en nuestro sistema** las contradicciones de §6 antes de subir versión.
