@@ -1,0 +1,650 @@
+{
+ "pantalla": "21_ficha_cliente",
+ "tier": "A",
+ "sha256": "32c287300e0b8cd59b465fcc902796c43be6b6f877c82b8eb8684e529860f3e7",
+ "estado_entrega": "modificada",
+ "estado_vs_pdf": "alineado",
+ "estados_auditados": [
+  "con datos (captura 1440 y 1280)",
+  "edición fiscal en línea (render propio)",
+  "cargando (render propio)",
+  "vacío y error (código y render propio)",
+  "inactivo (código)"
+ ],
+ "capturas": [
+  "21_ficha_cliente--1280-fold.png",
+  "21_ficha_cliente--1440.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 7,
+   "texto_usuario": "Caja «Datos fiscales» innecesariamente alta; «Editar datos fiscales» al final de la línea.",
+   "veredicto": "confirmada",
+   "evidencia": [
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_a21_fiscales",
+      "detalle": "script aud2/a21_a.cjs a 1440×900: section «Datos fiscales» y=331–525 (194 px): h3 20 px + ayuda 40 px + tarjeta 117,5 px; dentro de la tarjeta, .campos mide 31,5 px (27 % del alto) y .fiscal-acc 36 px + 16 px de margen-top; relleno 16 px arriba y abajo"
+     },
+     "dato": "La tarjeta mide 117,5 px para tres datos de una línea cada uno; el 45 % de su alto (52 de 117,5 px) es la fila del botón."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_a21_fiscales",
+      "detalle": "mismo script: .campos computa 366 px por columna a 1440 (318 a 1280) y los valores miden 42 px («76090»), 201 px («General de ley personas morales») y 115 px («Falta capturarlo»)"
+     },
+     "dato": "Tres valores cortos repartidos en 1122 px: el 11 %, 55 % y 31 % de cada columna."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_a21_fiscales",
+      "detalle": "mismo script: botón «Editar datos fiscales» en x=1224–1399, y=472–508; el título «Datos fiscales» en x=260, y=331"
+     },
+     "dato": "El botón está a 964 px a la derecha y 141 px por debajo del rótulo del bloque que edita: al final de la línea, como dice la persona."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 742,
+      "cita": ".fiscal-acc{display:flex;gap:var(--sp-2);flex-wrap:wrap;justify-content:flex-end;margin-top:var(--sp-4)}"
+     },
+     "dato": "Fila propia, alineada al extremo derecho, con 16 px de margen superior."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 499,
+      "cita": ".campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:var(--sp-3)}"
+     },
+     "dato": "auto-fit con mínimo 190 px reparte tres datos cortos por todo el ancho."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 1040,
+      "cita": "function fiscal(edita){"
+     },
+     "dato": "D9 ya está implementada: abrir lleva el foco al código postal (f-cp), cancelar o guardar devuelven el foco al botón. En edición la tarjeta crece de 117,5 a 246,4 px (medido)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "captura",
+      "archivo": "21_ficha_cliente--1440.png",
+      "region": "caja «Datos fiscales»: tres campos en una línea y, debajo, el botón «Editar datos fiscales» pegado al borde derecho"
+     },
+     "dato": "Coincide con la descripción de la persona."
+    }
+   ],
+   "causa_raiz": "El botón de edición ocupa una fila propia (.fiscal-acc) con justify-content:flex-end y 16 px de margen: eso añade 52 px a una tarjeta cuyo contenido real son 31,5 px, y lo coloca lejos del rótulo que lo explica. Además .campos usa auto-fit minmax(190px,1fr), pensado para el formulario, para tres valores de lectura que no necesitan ese ancho.",
+   "solucion_propuesta": "Mantener la edición en línea de D9 y mover solo el disparador: (a) el botón sube a la línea del rótulo «Datos fiscales» —h3 a la izquierda, «Editar» como .btn.mini a la derecha de esa misma línea, igual que la cabecera de cada contacto («Editar» junto al nombre)—; la tarjeta pierde la fila del botón y queda en ≈65 px (31,5 + 32 de relleno + bordes), es decir 52 px menos; o (b) a ≥1080 px el botón es una cuarta columna de la rejilla de lectura, alineado con los valores. Lectura alternativa de «al final de la línea»: si la persona quiere el botón junto a los datos y no junto al título, (b) es la opción. En ambos casos la edición sigue en la misma tarjeta (246 px) con el foco en el primer campo, sin diálogo, como manda D9. Y en edición, subir el mínimo de la rejilla a 230 px (§6.16) para que «Régimen fiscal» se lea completo (ver v2-21ficha-13).",
+   "tipo_de_cambio": "sencillo",
+   "critico": {
+    "es": false,
+    "criterio": null
+   },
+   "decision": {
+    "valor": "decidir_diseño",
+    "motivo": "No contradice D9 (edición en línea desde la ficha, «no en el diálogo 59»): D9 solo fija el lugar de la edición, no la posición del disparador ni la altura. No hay regla del sistema sobre dónde va la acción de un bloque de lectura (cobertura). Es una pregunta de diseño con solución concreta y de bajo costo."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-21ficha-01",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles (enlaces primarios de fila)",
+    "dice_el_sistema": "«los enlaces que son el elemento primario de su fila (un folio, una miga, «Ver en Maps») no son texto en prosa: llevan padding hasta llegar a 24px.»",
+    "hay_en_el_build": ".migas a y .maps sin padding ni min-height: la miga «Padrón de clientes» mide 107,6×15 px y los tres «Ver en Maps» 90,1×15 px. En 41_alta_cliente el mismo enlace ya lleva .migas a{min-height:24px;display:inline-flex;…}.",
+    "selector": ".migas a, .maps",
+    "linea": 490,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil",
+     "detalle": "brief tactil_bajo24: 4 de 61 — a «Padrón de clientes» 107,6×15 y a.maps «Ver en Maps» ×3 90,1×15"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino táctil < 24 px (criterio 1), medido. Mejoró de 8 a 4 respecto a v1 y el arreglo ya existe en el archivo hermano 41_alta_cliente (una línea). v1: f1-21ficha-01 alta."
+    },
+    "por_que_importa": "Quien usa tableta o puntero impreciso falla el enlace de regreso al padrón o el mapa de una dirección."
+   },
+   {
+    "id": "v2-21ficha-02",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (modo colapsado) + §11 Estructura (nombre accesible)",
+    "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.»",
+    "hay_en_el_build": "A 1000 px: barra de 64 px, .side .et{display:none}, 15 enlaces .it sin aria-label ni title; nombre accesible vacío en 15 de 15.",
+    "selector": ".side .et, .it",
+    "linea": 291,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "sidebar",
+     "detalle": "brief menu_1000px: total 15, sinNombre 15; CDP Accessibility.getFullAXTree a 1000×800 (aud2/common_b.cjs): 15 enlaces con nombre vacío"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1), medido; cromo común a todas las pantallas, un solo arreglo."
+    },
+    "por_que_importa": "En portátil pequeño o tableta, quien usa lector de pantalla oye quince enlaces sin nombre."
+   },
+   {
+    "id": "v2-21ficha-03",
+    "severidad": "alta",
+    "regla": "§11 Estructura (todos los id únicos; aria-describedby apunta a algo que existe) + §6.16 (el id del tope debe ser único)",
+    "dice_el_sistema": "«Ese `id` **tiene que ser único**. Con dos contactos en pantalla, los mensajes de tope de correos, teléfonos y direcciones compartían identificador, así que `aria-describedby` resolvía siempre al primero.»",
+    "hay_en_el_build": "Siguen repetidos cuatro id: tope-CORREO, tope-TELEFONO, l-DIRECCION-16 y tope-DIRECCION (dos veces cada uno) porque el bloque de listas del contacto se duplicó sin renumerar; el botón «Añadir» deshabilitado del segundo contacto apunta con aria-describedby=\"tope-CORREO\" al mensaje del primero.",
+    "selector": "#tope-CORREO, #tope-TELEFONO, #tope-DIRECCION",
+    "linea": 896,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_ids",
+     "detalle": "script aud2/common_b.cjs: id duplicados en 21_ficha_cliente = tope-CORREO×2, tope-TELEFONO×2, l-DIRECCION-16×2, tope-DIRECCION×2; 0 en 24, 27 y 41"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Maqueta que repite el bloque de un contacto; el sistema ya lo prohíbe y v1 lo marcó alta. No es crítico porque cada botón conserva su nombre accesible; lo que se pierde es la descripción correcta del segundo. Se pide renumerar (sufijo por contacto)."
+    },
+    "por_que_importa": "El segundo contacto anuncia el motivo del tope del primero: «Tope: 4 de 4…» sobre un botón que no está en tope."
+   },
+   {
+    "id": "v2-21ficha-04",
+    "severidad": "media",
+    "regla": "§11 Estructura (un solo landmark banner) · FICHAS_TECNICAS.md tanda 1 (header.p4 duplicaba role=banner)",
+    "dice_el_sistema": "FICHAS (tanda 1): «Un `<header>` fuera de `<main>` toma implícitamente `role=\"banner\"`, y como `.cromo-top` … también lo es, quedaban **dos** banners en la misma página.» El cliente corrigió <header class=\"p4\"> a <div class=\"p4\"> en otras maquetas.",
+    "hay_en_el_build": "<header class=\"p4\"> en la línea 771: el árbol de accesibilidad da 2 landmarks banner (cromo-top y p4).",
+    "selector": "header.p4, .cromo-top",
+    "linea": 771,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_landmarks",
+     "detalle": "script aud2/common_b.cjs: banners=2 en 21_ficha_cliente y 41_alta_cliente; 1 en 24, 27 y 59"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "El propio cliente ya describió y aplicó el arreglo en otras pantallas (header → div). Se señala para que lo extienda; no cambia estilos (el selector CSS es por clase)."
+    },
+    "por_que_importa": "Un lector de pantalla anuncia dos banners y la navegación por landmarks pierde sentido."
+   },
+   {
+    "id": "v2-21ficha-05",
+    "severidad": "media",
+    "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional",
+    "dice_el_sistema": "«el relleno de un contenedor lo declara el contenedor, no el hijo que casualmente va último» — `.p4{ padding-bottom: var(--sp-3) }`.",
+    "hay_en_el_build": ".p4-t{…padding:var(--sp-3) var(--sp-6) 0…} y .p4 sin relleno inferior: «Editar cliente» y el botón de exportar terminan a 0 px del borde de la cabecera.",
+    "selector": ".p4, .p4-t",
+    "linea": 312,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I2_holgura_inferior",
+     "detalle": "brief: header.p4 gap 0, altoBarra 49, 2 controles"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Misma causa que 24_tickets (hoja 10): plantilla ARQ-P4 sin cierre inferior en 36 archivos; 8 pantallas con el control a 0 px. Una declaración en la plantilla."
+    },
+    "por_que_importa": "La cabecera de la ficha se ve cortada: el botón principal toca la línea."
+   },
+   {
+    "id": "v2-21ficha-06",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado de una pantalla (reglas 1 y 2, tarjeta con medallón)",
+    "dice_el_sistema": "«El cambio se anuncia y mueve el foco.» · «Cada estado lleva un encabezado real, no un `<b>`.» · «El estado va dentro de una tarjeta, no suelto sobre el fondo.»",
+    "hay_en_el_build": "Vacío y error: <svg class=\"ico\"> + <b>título</b> sin tarjeta ni medallón; 0 aria-live en el documento; el único focus() de la pantalla es el de la edición fiscal; el manejador de estado solo escribe data-state y data-ficha.",
+    "selector": ".state, .state-error, .state-empty",
+    "linea": 995,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 995,
+     "cita": "<b>No se pudo cargar la ficha del cliente</b>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Maqueta estática; el texto del error cumple §6.4 regla 3. v1 lo marcó alta (-02) y media (-10); 41_alta_cliente ya trae .tarjeta-estado y aria-live: es la referencia dentro del mismo lote."
+    },
+    "por_que_importa": "El cambio a error o a «Cliente inactivo» no se anuncia a quien usa lector de pantalla."
+   },
+   {
+    "id": "v2-21ficha-07",
+    "severidad": "media",
+    "regla": "§8 Voz de producto (límites 1 y 2) + §6.23 Toggletip",
+    "dice_el_sistema": "«la ficha empezaba la sección de contactos con cinco líneas de explicación, que es lo primero que se encuentra quien viene a consultar un teléfono.» · «Ningún bloque de texto siempre visible pasa de ~140 caracteres.»",
+    "hay_en_el_build": "El párrafo de «Contactos» mide 453 caracteres y 5 líneas (justo el caso que §8 cita); la ayuda de «Datos fiscales» son dos frases con punto y coma (135 caracteres); cada sección lleva su .ayuda; no existe ningún .infob ni .tip.",
+    "selector": ".ayuda, .grupo-t",
+    "linea": 825,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_a21_fiscales",
+     "detalle": "script aud2/a21_a.cjs: p.ayuda de Contactos = 453 caracteres, 100,7 px de alto; p.ayuda de Datos fiscales = 135 caracteres"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "El contenido son decisiones de producto (D131 del corpus y D13 del padrón 28-sep: un contacto principal, uno solo; puede ser de la empresa); se adopta y se propone pasarlo a toggletip (§6.23) sobre «Contactos». v1: f1-21ficha-13 y -14 (baja)."
+    },
+    "por_que_importa": "Quien abre la ficha a buscar un teléfono lee cinco líneas de reglas de negocio antes del primer contacto."
+   },
+   {
+    "id": "v2-21ficha-08",
+    "severidad": "media",
+    "regla": "§6.5 Iconos (un icono no cambia de significado) + §6.16 regla 6 (el dato dice de qué es)",
+    "dice_el_sistema": "«se sostiene solo cuando es universal **y su significado no cambia de contexto**.» El sistema usa Material Symbols (existen mail y call) y no fija el nombre de icono por concepto.",
+    "hay_en_el_build": "Correos lleva el icono de cadena (#i-link) y Teléfonos el de tarjeta (#i-card), tanto en las cabeceras de lista como en el contacto principal; las migas separan con una flecha hacia abajo (#i-down).",
+    "selector": ".contacto header, .princ .via, .migas",
+    "linea": 834,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 834,
+     "cita": "<use href=\"#i-link\"/></svg><h4 id=\"l-CORREO-20\">Correos</h4>"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El cliente usa un sprite propio de 38 símbolos sin mail, phone ni chevron-derecha; el sistema no fija un nombre de icono por concepto. Documentar la tabla concepto→icono y añadir los tres símbolos."
+    },
+    "por_que_importa": "Una tarjeta de crédito para un teléfono y una cadena para un correo obligan a leer el texto: el icono no ayuda a escanear."
+   },
+   {
+    "id": "v2-21ficha-09",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 (isotipo) + §1.2.1 Logotipo",
+    "dice_el_sistema": "«Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>: el <use> queda 32,5 px a la izquierda del <svg> y solo se ve una astilla de la «Λ»; en el FAB, 16,2 px.",
+    "selector": ".logo svg, .fab svg",
+    "linea": 757,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_isotipo",
+     "detalle": "aud2/common_a.cjs: <use> x=63,5 frente a <svg> x=96 (−32,5 px); 46 de 50 archivos conservan el patrón"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Corrección sencilla y global en la plantilla del cromo, ya documentada en §10; v1 la marcó media (-11)."
+    },
+    "por_que_importa": "La marca aparece recortada en el cromo de cada pantalla."
+   },
+   {
+    "id": "v2-21ficha-10",
+    "severidad": "media",
+    "regla": "§13 Composición y grid + §7.3 (destino alcanzable) · el sistema no documenta el botón flotante",
+    "dice_el_sistema": "Búsqueda de «flotante» y «FAB» en sistema-diseno.md: 0 coincidencias; no hay zona segura del botón flotante.",
+    "hay_en_el_build": ".fab de 52×52 px fijo abajo a la derecha; a 1440×900 cubre el botón «Editar» de la tarjeta del contacto principal (botón x 1342–1398, y 824–852; .fab x 1362–1414, y 822–874).",
+    "selector": ".fab, .contacto .btn.mini",
+    "linea": 271,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_a21_fiscales",
+     "detalle": "script aud2/a21_b.cjs a 1440×900: rectángulo del botón «Editar» del contacto principal frente al del .fab (solapan 36×28 px)"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Sin regla de zona segura en el sistema; el cliente la resuelve ad hoc en otras pantallas (41_alta_cliente: margin-right:68px)."
+    },
+    "por_que_importa": "La acción «Editar» del contacto principal queda bajo el botón del asistente en pantallas de 900 px de alto."
+   },
+   {
+    "id": "v2-21ficha-11",
+    "severidad": "media",
+    "regla": "§6.16 regla 7 (el contador habla en español, no en aritmética) · FICHAS 27 (dictamen 6: «Decir qué documento falta, no «incompletos»»)",
+    "dice_el_sistema": "«El contador de sección habla en español, no en aritmética. «2 de 3 obligatorios · 0 de 2 documentos» obliga a traducir mentalmente qué falta.»",
+    "hay_en_el_build": "La pill de expediente dice «Falta 1 de 2 documentos» sin decir cuál; la ficha no tiene sección de documentos ni lista cuál falta (las secciones son Datos fiscales, Contactos, Actividad en otros módulos, Unidades, Historial). En 27_padron_clientes la pill nombra el documento en su texto.",
+    "selector": ".pill.p-warn, .marcas",
+    "linea": 785,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 785,
+     "cita": "Falta 1 de 2 documentos"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Dos lecturas: (A) el dictamen 6 vale para todo el padrón y la ficha debe nombrar el documento («Falta la constancia»); (B) la ficha 21 no lo cita en su tabla de decisiones (solo dictamen 5) y los documentos viven en otro lugar. No lo marco crítico por no poder atribuirlo a una decisión D-n con certeza."
+    },
+    "por_que_importa": "Quien abre la ficha para completar el expediente sabe que falta algo pero no qué, ni dónde subirlo."
+   },
+   {
+    "id": "v2-21ficha-12",
+    "severidad": "baja",
+    "regla": "§6.20 Ficha de detalle: el bloque de identidad manda el orden + §2.1 (excepción de 10,5 px)",
+    "dice_el_sistema": "«El indicador de la derecha declara su ancho; no se queda con lo que sobre.» · «10,5px en mayúsculas… para los rótulos de grupo de la barra lateral y las etiquetas de campo del modo tarjeta.»",
+    "hay_en_el_build": ".identidad{display:grid;grid-template-columns:1fr auto…} con el ancho gobernado desde el hijo (.princ{min-width:260px;max-width:360px}) y apilado a 960 px (no 1080); .campo .et y .princ .et a 10,5 px: etiquetas de datos de ficha fuera de la excepción nombrada.",
+    "selector": ".identidad, .princ, .campo .et",
+    "linea": 656,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 501,
+     "cita": ".campo .et{font-size:10.5px"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El sistema solo exceptúa «modo tarjeta»; las etiquetas de campo de una ficha (Código postal fiscal, Régimen fiscal) están en el mismo caso pero no nombradas. Documentar la excepción o subirlas a 12 px. v1: f1-21ficha-12."
+    },
+    "por_que_importa": "Menor: las etiquetas de los datos fiscales se leen a 10,5 px."
+   },
+   {
+    "id": "v2-21ficha-13",
+    "severidad": "media",
+    "regla": "§6.16 Formulario (rejilla de 230 px) + §10 trampa 2",
+    "dice_el_sistema": ".seccion .rejilla{…grid-template-columns:repeat(auto-fit,minmax(230px,1fr))…} — el mínimo de columna de un formulario es 230 px.",
+    "hay_en_el_build": ".campos usa minmax(190px,1fr) también para el formulario de edición fiscal; con la fila «ancho» del domicilio la rejilla queda en 5 columnas de 214,8 px a 1440 y el select «Régimen fiscal» mide 213 px (189 de contenido) para un texto de 201 px: «General de ley personas mc…» queda cortado.",
+    "selector": ".campos, #f-reg",
+    "linea": 499,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_a21_fiscales",
+     "detalle": "script aud2/a21_b.cjs tras pulsar «Editar datos fiscales»: gridTemplateColumns = 5×214,797 px; select #f-reg clientWidth 213, relleno 24, texto medido 201 px (1440); captura propia aud2/21-edit-1440.png"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "El editor en línea cumple D9 y el foco funciona; el truncamiento se corrige con un valor (230 px o span de dos columnas). Mejora sugerida, no exigida."
+    },
+    "por_que_importa": "Al corregir los datos fiscales —lo que evita el rechazo del timbrado (pp-109)— el régimen actual no se lee completo."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [
+  {
+   "id_v1": "f1-21ficha-04",
+   "evidencia": "Las seis reglas táctiles llevan ahora :root[data-tacto=\"dedo\"] (línea 283 y vecinas); con data-tacto=\"dedo\" puesto los .iconbtn miden 46 px (aud2/common_a.cjs)."
+  },
+  {
+   "id_v1": "f1-21ficha-06",
+   "evidencia": "lt12_medido = 0 (brief); .ctrl .ayuda, .ctrl .mal, .pill y .p-type pasaron a var(--fs-meta). Quedan etiquetas en mayúsculas a 10,5 px (ver v2-21ficha-12)."
+  },
+  {
+   "id_v1": "f1-21ficha-07",
+   "evidencia": "contraste: 0 fallos en claro y oscuro sobre 195 nodos de texto (brief)."
+  },
+  {
+   "id_v1": "f1-21ficha-08",
+   "evidencia": "--text-3 pasó de #66717F a #5C6675 (línea 70 de la entrega)."
+  }
+ ],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 4,
+   "responsive": 3,
+   "integridad": 3
+  },
+  "justificacion": "Se mantiene en 3 (v1: 3) pero con otro perfil: se cerraron contraste, tamaños, :root táctil y --text-3, y se añadieron D5, D9, D13 y D15 funcionando (edición fiscal en línea con foco). Siguen dos críticos medidos (4 enlaces de 15 px de alto; 15 enlaces del menú sin nombre a 1000 px), 4 id duplicados, dos banners, estados sin tarjeta ni anuncio, isotipo recortado y el FAB sobre «Editar». Responsive 3: sin scroll horizontal salvo un span oculto a 1280 (instrumento anchos).",
+  "evidencia": [
+   "tactil: 4 de 61 bajo 24 px; sidebar: 15/15 sin nombre; contraste: 0 fallos",
+   "propio_ids: 4 id duplicados; propio_landmarks: 2 banners",
+   "anchos: a 1280 solo span.desc oculto con dx 6"
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 2,
+   "hallazgo": "Las pills dicen estado comercial y de expediente a la vista, y el estado inactivo se anuncia con banda y botón «Reactivar»; pero «Guardar» en datos fiscales vuelve a la vista de lectura sin confirmar ni mostrar el resultado, y «Falta 1 de 2 documentos» no dice cuál.",
+   "selector": "#fiscal-guardar",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 1047,
+    "cita": "document.getElementById('fiscal-guardar').addEventListener('click',function(){fiscal(false);});"
+   }
+  },
+  {
+   "n": 2,
+   "heuristica": "Relación entre el sistema y el mundo real",
+   "severidad": 1,
+   "hallazgo": "«Falta capturarlo», «Sin domicilio fiscal no se puede timbrar una factura» y «De la empresa, sin sucursal» hablan el idioma del negocio; «Ficha 360°» es jerga de producto.",
+   "selector": ".fiscal-falta",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 808,
+    "cita": "Falta capturarlo"
+   }
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 1,
+   "hallazgo": "La edición fiscal tiene Cancelar, devuelve el foco al botón que la abrió y el historial registra quién cambió qué; el estado inactivo no ofrece ningún control de edición salvo «Reactivar» (D15).",
+   "selector": "#fiscal-cancelar",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 1046,
+    "cita": "document.getElementById('fiscal-cancelar').addEventListener('click',function(){fiscal(false);});"
+   }
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 2,
+   "hallazgo": "Tres iconos que significan otra cosa (cadena para correos, tarjeta para teléfonos, flecha abajo en las migas), «Editar cliente» / «Editar datos fiscales» / «Editar» por contacto con tres tamaños y posiciones, y dos pills de expediente con redacción distinta a 27.",
+   "selector": ".migas, .contacto header",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 774,
+    "cita": "<use href=\"#i-down\"/></svg><span>Comercializadora Vértice del Bajío</span>"
+   }
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 2,
+   "hallazgo": "El formulario fiscal limita el código postal (inputmode numeric, maxlength 5) pero ningún campo es required ni valida el domicilio vacío: se puede guardar «Falta capturarlo» otra vez sin aviso.",
+   "selector": "#f-cp, #f-dom",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 814,
+    "cita": "<input type=\"text\" id=\"f-cp\" value=\"76090\" inputmode=\"numeric\" maxlength=\"5\" autocomplete=\"off\">"
+   }
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocimiento antes que recuerdo",
+   "severidad": 1,
+   "hallazgo": "Cada dato lleva su etiqueta visible y los contactos muestran rol y sucursal; el cupo «2 de 4» da el límite sin pedir recordarlo.",
+   "selector": ".cupo",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 834,
+    "cita": "<span class=\"cupo tnum\">2 de 4</span>"
+   }
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 1,
+   "hallazgo": "La edición en línea evita salir de la ficha (D9), se puede exportar la ficha (D4) y hacer principal a otro contacto en un clic; no hay atajo de teclado ni edición de otros bloques en línea.",
+   "selector": "#fiscal-editar",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 810,
+    "cita": "id=\"fiscal-editar\" aria-controls=\"fiscal-form\" aria-expanded=\"false\""
+   }
+  },
+  {
+   "n": 8,
+   "heuristica": "Estética y diseño minimalista",
+   "severidad": 3,
+   "hallazgo": "Una .ayuda fija bajo cada título de sección (cuatro) y el párrafo de 453 caracteres de Contactos; la tarjeta de Datos fiscales gasta 117 px para 31 px de datos.",
+   "selector": ".ayuda, .grupo-t",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "propio_a21_fiscales",
+    "detalle": "aud2/a21_a.cjs: tarjeta 117,5 px; campos 31,5 px; ayuda Contactos 453 caracteres"
+   }
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de errores",
+   "severidad": 1,
+   "hallazgo": "El error de carga cumple §6.4 regla 3 (qué pasó, qué no se perdió, qué hacer, referencia PAD-20260821-1147) y evita pedir recapturar.",
+   "selector": ".state-error",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 996,
+    "cita": "<b>Nada se perdió ni se modificó</b>"
+   }
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 2,
+   "hallazgo": "La ayuda es texto fijo; no hay toggletip (§6.23) sobre «Contacto principal» ni sobre los topes de las listas.",
+   "selector": ".ayuda",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 825,
+    "cita": "<p class=\"ayuda\"><b>El cliente tiene un contacto principal, uno solo.</b>"
+   }
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-109",
+    "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+    "cobertura": "cubre",
+    "evidencia": "«Los datos fiscales del cliente se transcriben a mano… Un error en la razón social o el RFC provoca el rechazo fiscal»: la sección «Datos fiscales» con edición en línea y el RFC como dato fijo (no se edita) corrige en el origen, y el historial deja rastro. Falta que «Falta capturarlo» valide al guardar."
+   },
+   {
+    "pp": "pp-111",
+    "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+    "cobertura": "cubre",
+    "evidencia": "«no existe un padrón único del que tomarlos» (VIN y razón social): la sección «Unidades» (VIN, placas, descripción) junto a la razón social da el dato en un solo sitio (D5)."
+   },
+   {
+    "pp": "pp-045",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "cubre",
+    "evidencia": "«los cambios de una parte no se reflejan para la otra»: el «Historial de cambios» con autor y fecha es, según la propia pantalla, «lo que distingue un padrón de una hoja de cálculo compartida» (dictamen 40)."
+   },
+   {
+    "pp": "pp-044",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "ignora",
+    "evidencia": "«Hay que buscar en el historial de WhatsApp para encontrar un documento»: la ficha muestra «Falta 1 de 2 documentos» pero no lista ni enlaza los documentos del expediente."
+   }
+  ],
+  "usabilidad_para_el_area": "Para comercial y finanzas la ficha concentra bien lo que se pide: razón social, RFC, estado del expediente, contacto principal, datos fiscales corregibles en línea, unidades e historial. La carencia más clara para el área es que el expediente se resume en una pill sin documentos accionables; y los bloques de ayuda fija alargan una pantalla que se consulta de paso."
+ },
+ "cobertura": [
+  {
+   "patron": "Bloque de lectura con edición en línea (datos fiscales)",
+   "propuesta_de_regla": "La acción de editar un bloque vive en su cabecera, a la altura del rótulo, no en una fila propia al final; el bloque mide lo que miden sus datos; al abrir la edición el foco va al primer campo y al cerrar vuelve al botón (D9); el formulario usa la rejilla de §6.16 (mínimo 230 px)."
+  },
+  {
+   "patron": "Banda de estado inactivo (.banda.b-pause)",
+   "propuesta_de_regla": "§6.9 define cuatro variantes; añadir la quinta «pause» (--pause-bg/--pause-ink) para estados inactivos, con icono de pausa, una frase y como máximo una acción («Reactivar»)."
+  },
+  {
+   "patron": "Tabla concepto → icono para dominio de contacto",
+   "propuesta_de_regla": "§6.5 fija una lista corta: correo = mail, teléfono = call, dirección = location_on, domicilio de agencia = apartment, migas = chevron_right; un icono de otro significado (cadena, tarjeta, flecha abajo) no se reutiliza."
+  },
+  {
+   "patron": "Botón flotante del asistente y su zona segura",
+   "propuesta_de_regla": "Reservar 68 px abajo y a la derecha en todo contenedor de scroll; ninguna acción de tarjeta o fila se ancla dentro de ese cuadro."
+  }
+ ],
+ "sin_datos": [
+  "No sé si la ficha debe mostrar una sección de documentos del expediente: FICHAS 21 no la lista y ningún D-n la decide; por eso v2-21ficha-11 queda como pregunta de diseño.",
+  "Con la ficha inactiva (D15) y con el estado «sin contactos» no medí el efecto de la edición fiscal (no se accede al botón).",
+  "Modo oscuro: solo la medición de contraste del brief (0 fallos); no se inspeccionó visualmente. Rendimiento: no evaluado.",
+  "Cumplimiento del aviso del 28-sep verificado en el HTML: D3 (grupo derivado en la identidad), D4 (botón «Exportar la ficha»), D5 («Unidades»), D9 (edición fiscal en línea con foco), D13 («De la empresa»), D15 (banda «Cliente inactivo» con «Reactivar»). No encontré contradicciones con D1–D18."
+ ]
+}
