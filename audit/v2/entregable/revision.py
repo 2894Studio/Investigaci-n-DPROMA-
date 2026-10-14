@@ -354,11 +354,6 @@ def ref(parte_titulo):
         if t.startswith(parte_titulo): return str(i)
     raise KeyError(parte_titulo)
 PCT = {'pide': 'Se pide', 'rec': 'Recomendado', 'dis': 'Propuesta de diseño', 'menor': 'Menor'}
-indice_html = ''
-for k in 'ABCD':
-    indice_html += f'<h3 class="idx-parte">{PARTES[k][0]} · {PARTES[k][1]}</h3><ol class="indice" start="{[i for p, i, t, g in indice if p == k][0]}">' + ''.join(
-        f'<li><a href="#c{i}"><span class="n">{i}</span><span class="t">{t}</span><span class="g g-{g if g != "menor" else "rec"}">{PCT[g]}</span></a></li>' for p, i, t, g in indice if p == k) + '</ol>'
-
 def c(t): return '<a href="#c' + ref(t) + '">cambio ' + ref(t) + '</a>'
 MEDIDAS = [
  ('Botones, enlaces y casillas más pequeños de 24 × 24 px', '134', '29 de 50', 'Cuesta acertarlos con ratón impreciso o con tableta, y una pulsación errada puede activar otra cosa.', 'Ver ' + c('Los destinos de pulsación')),
@@ -378,17 +373,12 @@ tabla_med = ('<table class="t t-med"><colgroup><col style="width:27%"><col style
   '<thead><tr><th>Qué se contó</th><th class="r">Cuántos</th><th>En cuántas pantallas</th><th>Por qué importa</th><th>Dónde se resuelve</th></tr></thead><tbody>'
   + ''.join(f'<tr><td>{a}</td><td class="r">{b}</td><td>{c_}</td><td>{d}</td><td>{e}</td></tr>' for a, b, c_, d, e in MEDIDAS) + '</tbody></table>')
 
-NO_SE_PIDE = [
- ('Iconos como sprite SVG (<code>&lt;use href="#i-…"&gt;</code>)', 'Se adopta. Funciona sin red y sin el parpadeo de una fuente que carga tarde. Quien debe corregirse es el sistema: §6.5 pedía Material Symbols por <code>&lt;link&gt;</code>, y eso contradice a D116.'),
- ('<code>.banda.b-info</code>', 'Se adopta el nombre de clase.'),
- ('Agenda de instaladores propia', 'Se queda. Solo cambio mínimo (cambio ' + ref('Agenda de instaladores') + ').'),
- ('Panel «Con qué filtros» como registro', 'Se queda como registro de auditoría, sin controles.'),
- ('<code>.grp</code> a 10,5 px sin mayúsculas', 'Contradicción del sistema: §2.1 lo limita a mayúsculas y §7.2 lo usa sin ellas. La resuelve Studio.'),
- ('Antigüedad de saldo por tramos', 'Contradicción del sistema entre §1.4 y §12.5. La resuelve Studio.')]
-tabla_no = ('<table class="t"><colgroup><col style="width:34%"><col style="width:66%"></colgroup><thead><tr><th>Decisión de DPROMA</th><th>Qué ocurre</th></tr></thead><tbody>'
-  + ''.join(f'<tr><td>{a}</td><td>{b}</td></tr>' for a, b in NO_SE_PIDE) + '</tbody></table>')
+lista_no = ('<ul class="plano">'
+  '<li><b>Los iconos como sprite SVG</b> (<code>&lt;use href="#i-…"&gt;</code>) se mantienen. Funcionan sin red y sin el parpadeo de una fuente que carga tarde.</li>'
+  '<li><b>La clase <code>.banda.b-info</code></b> se mantiene.</li>'
+  '<li><b>La agenda de instaladores propia</b> se mantiene. Solo lleva el cambio mínimo del cambio ' + ref('Agenda de instaladores') + '.</li>'
+  '<li><b>El panel «Con qué filtros»</b> se mantiene como registro de auditoría, sin controles.</li></ul>')
 
-partes_html = [x.replace('@@padron@@', ref('El padrón con todos')) for x in partes_html]
 # ---------------------------------------------------------------- documento
 CSS = open(os.path.join(AQUI, 'revision.css'), encoding='utf-8').read()
 DOC = f'''<!doctype html>
@@ -401,7 +391,7 @@ DOC = f'''<!doctype html>
 <style>{CSS}</style>
 </head>
 <body>
-<nav class="sitio" aria-label="Navegación"><a class="marca" href="/">2894 <span>Studio × DPROMA</span></a><span class="enlaces"><a href="/entregables">← Entregables</a><a href="#indice">Índice</a><a href="/entregables/revisiones/{PDF}">PDF</a></span></nav>
+<nav class="sitio" aria-label="Navegación"><a class="marca" href="/">2894 <span>Studio × DPROMA</span></a><span class="enlaces"><a href="/entregables">← Entregables</a><a href="#indice">Cómo leer</a><a href="/entregables/revisiones/{PDF}">PDF</a></span></nav>
 
 <main>
 <section class="portada">
@@ -433,36 +423,20 @@ DOC = f'''<!doctype html>
   <p>Antes de revisar nada a mano, un programa abrió cada pantalla en un navegador y contó lo que se puede contar sin criterio humano: botones pequeños, contrastes, menús sin nombre. Sirve para saber qué tan extendido está cada problema.</p>
   <p class="nota">Que algo se cuente no significa que sea un error: son candidatos. Los cambios de las partes A y B son los que una persona reprodujo en el archivo y otra intentó refutar.</p>
   {tabla_med}
-  <h2 class="idx">Los {n} cambios</h2>
-  {indice_html}
 </section>
 
 {chr(10).join(partes_html)}
 
 <section class="parte" id="no-se-pide">
-  <header class="ph"><span class="eyebrow">Parte E</span><h2>Lo que no se pide, y por qué</h2><p class="lede">De los 268 puntos de cumplimiento revisados, 128 son decisiones de DPROMA que se adoptan tal como están y pasan a documentarse en el sistema de diseño. Estas son las que más se notan.</p></header>
-  {tabla_no}
+  <header class="ph"><span class="eyebrow">Parte E</span><h2>Lo que no hay que tocar</h2><p class="lede">Cuatro decisiones de DPROMA que se mantienen tal como están.</p></header>
+  {lista_no}
 </section>
 
 <section class="parte" id="abierto">
-  <header class="ph"><span class="eyebrow">Parte F</span><h2>Lo que falta y lo que queda abierto</h2><p class="lede">Cinco puntos que ninguna medición resuelve y un aviso sobre la ficha. Dos piden un archivo, uno pide una respuesta de DPROMA y dos son decisiones de diseño sin resolver.</p></header>
-  <article class="cambio abierto"><header><h3><code>49_alta_orden</code> no viene en el ZIP</h3></header><p class="que">El PDF de cambios dice que se actualizó, y no está entre las 50 pantallas. Dos observaciones sobre esa pantalla (la caja de «Croquis y anexos» cortada y la sombra sobre la barra de acciones) quedan sin respuesta hasta recibirla.</p></article>
-  <article class="cambio abierto"><header><h3><code>SUPUESTOS.md</code> no viene en el ZIP</h3></header><p class="que"><code>FICHAS_TECNICAS.md</code> remite a él para las decisiones sin ratificar (S-25, S-28, S-30, S-31…). Sin ese archivo no se puede saber qué se dio por bueno y qué sigue pendiente.</p></article>
+  <header class="ph"><span class="eyebrow">Parte F</span><h2>Lo que necesitamos de DPROMA</h2><p class="lede">Tres cosas que ninguna medición resuelve.</p></header>
+  <article class="cambio abierto"><header><h3>El archivo <code>49_alta_orden</code></h3></header><p class="que">El PDF de cambios dice que se actualizó, y no está entre las 50 pantallas. Dos observaciones sobre esa pantalla (la caja de «Croquis y anexos» cortada y la sombra sobre la barra de acciones) quedan sin respuesta hasta recibirla.</p></article>
+  <article class="cambio abierto"><header><h3>El archivo <code>SUPUESTOS.md</code></h3></header><p class="que"><code>FICHAS_TECNICAS.md</code> remite a él para las decisiones sin ratificar (S-25, S-28, S-30, S-31…) y no viene en el ZIP. Sin ese archivo no podemos saber qué se dio por bueno y qué sigue pendiente.</p></article>
   <article class="cambio abierto"><header><h3>¿Qué manda sobre el plazo de los tickets?</h3></header><p class="que">La ficha de <code>24_tickets</code> en la tanda 3 dice que se retiró el reloj de plazo y que la antigüedad va en gris, igual en los seis renglones. La tanda 4 habla de que tickets conserva su propio semáforo de plazo. El archivo dibuja el plazo: «Vence hoy», con una regla de cálculo de 420 caracteres. El cambio {ref('Tickets TI')} depende de cuál sea la respuesta.</p></article>
-  <article class="cambio abierto"><header><h3>«Acciones» alineada con su casilla</h3></header><p class="que">En el padrón, el encabezado «Acciones» es solo para lectores de pantalla y los botones se alinean a la derecha. No hay una solución evaluada para alinearla con su casilla.</p></article>
-  <article class="cambio abierto"><header><h3>El botón flotante tapa la última fila</h3></header><p class="que">El botón del asistente cubre «Siguientes» en el paginador del padrón a 1280 px. El sistema no documenta una zona segura para él, y el mismo botón está en <code>21</code>, <code>24</code>, <code>27</code> y <code>41</code>.</p></article>
-  <div class="aviso"><b>Nueve arreglos que la ficha da por hechos y que el archivo no tiene.</b> <code>FICHAS_TECNICAS.md</code> lista correcciones de accesibilidad «encontradas y corregidas», verificadas con axe-core. Se buscó cada una en el ZIP y las nueve faltan. Cinco son el <code>&lt;header class="p4"&gt;</code> que duplicaba <code>role="banner"</code> y debía ser <code>&lt;div class="p4"&gt;</code>: <code>26</code>, <code>33</code>, <code>42</code>, <code>43</code> y <code>44</code>, todos con la etiqueta <code>header</code> aún presente. Tres son <code>--text-3-fuerte</code> en <code>24</code>, <code>33</code> y <code>01</code>, que no aparece ni una vez; en esos tres archivos <code>--text-3</code> sigue en <code>#66717F</code> (4,21:1). La novena es <code>57</code>: la ficha dice que sus dos variantes pasaron de <code>role="menu"</code> a <code>role="group"</code>, y el archivo conserva <code>role="menu"</code> en las dos. Lo más probable es que las correcciones vivan en otra copia del código.</div>
-</section>
-
-<section class="parte" id="firmeza">
-  <header class="ph"><span class="eyebrow">Parte G</span><h2>Qué tan firme es todo esto</h2><p class="lede">Bastante en lo medido y menos en lo exhaustivo. Conviene decir las dos cosas.</p></header>
-  <ul class="plano">
-    <li><b>Medido en el navegador, con las fuentes reales.</b> Los medidores de contraste, tamaño táctil, menú y espaciado se probaron antes con HTML de respuesta conocida y acertaron 15 de 15.</li>
-    <li><b>Probado por otra persona.</b> 119 afirmaciones altas o críticas pasaron por revisores que intentaron refutarlas con medición propia: 110 confirmadas, 9 exageradas y ya corregidas, ninguna refutada.</li>
-    <li><b>No es una lista exhaustiva.</b> Una segunda pasada ciega sobre dos pantallas coincidió en solo el 43 % de las reglas citadas y reprodujo 5 de los 10 hallazgos altos del original, además de encontrar otros nuevos. Lo que ambas pasadas hallan es sólido; lo demás puede existir.</li>
-    <li><b>Veintisiete pantallas solo con medición mecánica.</b> Sus hallazgos son candidatos hasta que alguien los mire. Las sustituciones de la parte A se contaron además sobre las 50 por búsqueda en el código.</li>
-    <li><b>Todo se refiere a los archivos recibidos.</b> No a lo que DPROMA tenga en otra carpeta o rama.</li>
-  </ul>
 </section>
 </main>
 <footer class="pie"><span>SIO-DPROMA · 2894 Studio</span><span>{TITULO}</span></footer>
