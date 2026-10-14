@@ -19,7 +19,8 @@ for n, f in sorted(filas.items()):
     if not os.path.exists(p): res[n] = {'estado': 'archivo_ausente_del_zip', 'codigos': f['codigos']}; continue
     src = open(p, encoding='utf-8', errors='replace').read(); css = estilos(src)
     css_nocom = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
-    tam = [float(x) for x in re.findall(r'font-size\s*:\s*([\d.]+)px', css_nocom)]
+    inl = ' '.join(re.findall(r'style="([^"]*)"', src))
+    tam = [float(x) for x in re.findall(r'font-size\s*:\s*([\d.]+)px', css_nocom + ' ' + inl)]
     lt12 = sum(1 for x in tam if x < 12 and x != 10.5); n105 = sum(1 for x in tam if x == 10.5)
     r = {}
     chk = {

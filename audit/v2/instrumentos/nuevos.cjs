@@ -134,7 +134,11 @@ const MEDIR = (PAL) => {
 
   // ---------- I6: presupuesto de color (familias semánticas visibles)
   {
-    const fam = {}; const near = (c, hex) => { const p = parse(hex); return p && Math.abs(c.r - p.r) < 3 && Math.abs(c.g - p.g) < 3 && Math.abs(c.b - p.b) < 3; };
+    const fam = {}; const probe = document.createElement('i'); document.body.appendChild(probe);
+    const propio = n => { const v = getComputedStyle(document.documentElement).getPropertyValue('--' + n).trim(); if (!v) return null; probe.style.color = ''; probe.style.color = v; return getComputedStyle(probe).color; };
+    PAL = JSON.parse(JSON.stringify(PAL)); for (const f of ['ok', 'warn', 'err', 'block', 'pause']) for (const suf of ['', '-bg', '-ink', '-fill']) { const c = propio(f + suf); if (c) PAL[f].push(c); }
+    probe.remove();
+    const near = (c, hex) => { const p = parse(hex); return p && Math.abs(c.r - p.r) < 3 && Math.abs(c.g - p.g) < 3 && Math.abs(c.b - p.b) < 3; };
     const marca = (c) => { for (const [k, lista] of Object.entries(PAL)) if (lista.some(h => near(c, h))) return k; return null; };
     for (const el of vis) { const cs = getComputedStyle(el);
       for (const prop of ['backgroundColor', 'color', 'borderTopColor']) { const c = parse(cs[prop]); if (!c || c.a < 0.5) continue; const k = marca(c); if (k) { fam[k] = (fam[k] || 0) + 1; } } }
@@ -172,7 +176,7 @@ const MEDIR = (PAL) => {
   {
     const f = []; let celdas = 0;
     for (const td of document.querySelectorAll('tbody td')) { if (!visible(td)) continue; celdas++;
-      const t = (td.innerText || '').trim(); const lh = parseFloat(getComputedStyle(td).lineHeight) || 18; const lineas = Math.round(rect(td).height / lh);
+      const t = (td.innerText || '').trim(); const rg = document.createRange(); rg.selectNodeContents(td); const lineas = new Set(Array.from(rg.getClientRects()).filter(q => q.width > 0).map(q => Math.round(q.top / 4))).size;
       if (t.length > 60 || lineas > 3) f.push({ celda: nombre(td), caracteres: t.length, lineas, texto: t.slice(0, 40) }); }
     f.sort((a, b) => b.caracteres - a.caracteres);
     out.I9_celdas = { celdas, largas: f.length, detalle: f.slice(0, 6) };

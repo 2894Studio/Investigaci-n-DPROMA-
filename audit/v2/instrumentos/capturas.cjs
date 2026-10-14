@@ -6,7 +6,8 @@ const M = process.env.MDIR, PORT = process.env.PORT, OUT = process.env.OUT; fs.m
   for (const [w, sufijo, full] of [[1440, '1440', true], [1280, '1280-fold', false]]) {
     const ctx = await b.newContext({ viewport: { width: w, height: 800 }, reducedMotion: 'reduce' }); const p = await ctx.newPage(); await require('./lib.cjs').preparar(p);
     for (const n of process.env.NOMBRES.split(',')) { await p.goto(`http://127.0.0.1:${PORT}/${n}.html`, { waitUntil: 'load' }); await p.waitForTimeout(500);
-      await p.screenshot({ path: `${OUT}/${n}--${sufijo}.png`, fullPage: full }); }
+      if (full) { const H = await p.evaluate(() => Math.max(...Array.from(document.querySelectorAll('*')).map(e => e.scrollHeight), document.documentElement.scrollHeight)); await p.setViewportSize({ width: w, height: Math.min(Math.max(H, 800), 5000) }); await p.waitForTimeout(250); }
+      await p.screenshot({ path: `${OUT}/${n}--${sufijo}.png` }); if (full) await p.setViewportSize({ width: w, height: 800 }); }
     await ctx.close();
   }
   await b.close(); console.log('capturas ok');
