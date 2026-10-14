@@ -1,0 +1,438 @@
+{
+  "pantalla": "51_acceso",
+  "tier": "A",
+  "sha256": "0c1242a2f17aec7c70f10f0250b203ffcf87d66dba61d2f47db2d8e85bc2afff",
+  "estado_entrega": "no_evaluado (sin brief)",
+  "estado_vs_pdf": "no_evaluado",
+  "estados_auditados": [
+    "con datos",
+    "cargando (solo leído)",
+    "vacío",
+    "error"
+  ],
+  "capturas": [
+    "51_acceso--1440.png",
+    "51_acceso--1280-fold.png"
+  ],
+  "observaciones_resueltas": [
+    {
+      "hoja": null,
+      "texto_usuario": "no respeta espaciado e interlineado",
+      "veredicto": "parcial",
+      "evidencia": [
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep51",
+            "detalle": "gap computado 'normal'; huecos marca→botón=0px, botón→nota=0px, nota→nota=0px a 1440, 1000 y 390"
+          },
+          "dato": "Espaciado: confirmado. `.caja-acc` usa `gap:var(--sp-5)` y --sp-5 no está declarado, así que el gap es 0: el subtítulo, el botón y los dos párrafos están pegados. Con --sp-5:20px definido los huecos son de 20px y la tarjeta pasa de 305,5 a 369,5px (captura contrafactual propia)."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep51",
+            "detalle": "--fs-h2 vacío: .wm computa 14px"
+          },
+          "dato": "Jerarquía: el wordmark SIO-DPROMA sale a 14px por otro token inexistente (--fs-h2); contribuye a que el bloque de marca se vea apretado."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep51b",
+            "detalle": "line-height computado: .sin-campos 18,4px sobre 11,5px = 1,6; .marca-acc p 1,55"
+          },
+          "dato": "Interlineado: no confirmado como defecto en sí. Los line-height declarados (1,55 y 1,6) están dentro de lo que usa el sistema; lo que se percibe como interlineado es la falta de separación entre bloques (0px). Lo único tipográfico mal es el tamaño de 11,5px de las notas (hallazgo 05)."
+        }
+      ],
+      "causa_raiz": "`--sp-5` (y `--fs-h2`) usados en el CSS pero no declarados en el :root del archivo; el :root es una copia anterior a 2.15.0 (§3: «un token que no existe falla en silencio»; §10: usados−declarados debe ser vacío).",
+      "solucion_propuesta": "Declarar `--sp-5:20px` en el :root (y sustituir `--fs-h2` por `--fs-title`); comprobar usados−declarados antes de entregar. Con eso la tarjeta recupera 20px entre marca, botón y avisos. Opcional: subir `.sin-campos` a 12px.",
+      "tipo_de_cambio": "sencillo",
+      "critico": {
+        "es": false,
+        "criterio": null
+      },
+      "decision": {
+        "valor": "ajustar_sistema",
+        "motivo": "No crítico, pero es un arreglo de una línea que cambia mucho la pantalla de entrada y delata una causa raíz (base de tokens desactualizada); el sistema debe hacer obligatoria la comprobación de tokens declarados."
+      }
+    }
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "cumple_parcialmente",
+    "hallazgos": [
+      {
+        "id": "v2-51acceso-01",
+        "severidad": "alta",
+        "regla": "§3 Espaciado y radios (--sp-5 y «un token que no existe falla en silencio»)",
+        "dice_el_sistema": "Un var() que no resuelve no cae a un valor por omisión: invalida la declaración entera",
+        "hay_en_el_build": "`.caja-acc{... gap:var(--sp-5)}` pero el :root solo declara --sp-1,2,3,4,6,8,12; gap computado = normal (0px). Huecos medidos entre bloques de la tarjeta: marca→botón 0px, botón→nota 0px, nota→nota 0px (el subtítulo «Sistema Integral de Operaciones» toca el borde del botón en y=353,4). Con --sp-5:20px inyectado los tres huecos pasan a 20px y la tarjeta crece de 305,5 a 369,5px.",
+        "selector": ".caja-acc",
+        "linea": 639,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 639,
+          "cita": "gap:var(--sp-5);"
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep51",
+            "detalle": "gaps marca_btn=0, btn_s1=0, s1_s2=0 a 1440/1000/390; contrafactual con --sp-5:20px => 20/20/20"
+          },
+          {
+            "tipo": "codigo",
+            "linea": 22,
+            "cita": "--sp-6: 24px; --sp-8: 32px; --sp-12: 48px;"
+          },
+          {
+            "tipo": "captura",
+            "archivo": "51_acceso--1440.png",
+            "region": "subtítulo, botón y primer párrafo pegados sin aire entre sí"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "No es crítico (no impide entrar ni falla accesibilidad), pero es un arreglo de dos líneas (:root con --sp-5:20px) y es la causa de la observación de la persona. El sistema ya documenta --sp-5 (§3) y la trampa de copiar reglas sin su token (§10): lo que falla es que el :root del archivo es una copia antigua; conviene que el bloque canónico de tokens y la comprobación usados−declarados sean obligatorios al entregar."
+        },
+        "por_que_importa": "La pantalla de entrada es la primera que ve cualquier persona: logo, botón y avisos legales quedan apilados sin separación, el botón primario parece pegado al subtítulo y el aviso de privacidad se lee como continuación del botón."
+      },
+      {
+        "id": "v2-51acceso-02",
+        "severidad": "media",
+        "regla": "§2 Tipografía / §1.2.1 Logotipo (lockup Isotipo + «SIO-DPROMA» en --font-brand)",
+        "dice_el_sistema": "Marca: Michroma / Ethnocentric Rg (--font-brand), solo para el wordmark «SIO-DPROMA»",
+        "hay_en_el_build": "`.marca-acc .wm{font-size:var(--fs-h2);...}`: --fs-h2 no existe en el :root, así que la declaración se invalida y el wordmark computa 14px/700 en Inter (el mismo tamaño que el botón). No usa --font-brand (la clase .wordmark que sí lo hace no se aplica; document.fonts: Michroma «unloaded»). El nombre del producto queda sin jerarquía: 14px frente a 13px del subtítulo.",
+        "selector": ".marca-acc .wm",
+        "linea": 643,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 643,
+          "cita": "font-size:var(--fs-h2)"
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep51b",
+            "detalle": "getComputedStyle(.wm): fontSize 14px, fontWeight 700, fontFamily Inter; --fs-h2 vacío en :root"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "El sistema no define ningún token --fs-h2 (§2 solo lista meta/dense/base/sub/title/kpi) y dice que los títulos de estado del acceso van a 21px fijo; el cliente usó un token inexistente. Hay que fijar el tamaño del wordmark del acceso (p. ej. --fs-title 20px) y que use --font-brand."
+        },
+        "por_que_importa": "La marca del producto, en la única pantalla donde es protagonista, sale como texto de cuerpo."
+      },
+      {
+        "id": "v2-51acceso-03",
+        "severidad": "media",
+        "regla": "§1.2.1 Logotipo: uso y restricciones (usos incorrectos, punto 5)",
+        "dice_el_sistema": "No reconstruir el isotipo a mano con herramientas de icono del sistema ... siempre el asset oficial (`img/marca/dproma-isotipo.svg` o el `<symbol>` ya declarado)",
+        "hay_en_el_build": "El bloque de marca usa `#i-shield` (escudo genérico de 44px, trazo en --accent) en vez del `<symbol id=\"dproma-mark\">`, que sí está declarado en el sprite del mismo archivo (línea 661) pero no se invoca en ninguna parte.",
+        "selector": ".marca-acc svg.ico",
+        "linea": 667,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 667,
+          "cita": "<use href=\"#i-shield\"/>"
+        },
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Puede ser deliberado (acceso sin cromo) y no hay ficha técnica en esta réplica para saberlo; el sistema (§1.2.1) lista el acceso como lugar del lockup isotipo + SIO-DPROMA, así que a integrar se sustituye el escudo por el isotipo con sus medidas en el <use> (§10)."
+        },
+        "por_que_importa": "La pantalla que presenta el producto no lleva su isotipo oficial; un escudo genérico se parece a cualquier acceso de otra empresa."
+      },
+      {
+        "id": "v2-51acceso-04",
+        "severidad": "alta",
+        "regla": "§6.4 Vistas de estado de una pantalla (regla 6: `.state > .ico`) y §6.2 Botones",
+        "dice_el_sistema": "El selector correcto es `.state > .ico` (hijo directo): solo alcanza al ícono que cuelga directo de `.state`",
+        "hay_en_el_build": "`.state .ico{width:30px;height:30px;color:var(--text-3)}` (descendiente). En las vistas Vacío y Error los iconos de los botones («Pedirlo a Sistemas», «Salir», «Reintentar») miden 30×30px en vez de 13px (.ico-sm pierde por especificidad) y heredan --text-3 (rgb 102,113,127) sobre el relleno --accent #3E7A4C: contraste 1,03:1 (el mismo caso que describe §6.4). Botones de 48px de alto en vez de los 36px del suelo.",
+        "selector": ".state .ico",
+        "linea": 609,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 609,
+          "cita": ".state .ico{width:30px;height:30px;color:var(--text-3)}"
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep51c/b",
+            "detalle": "data-state=empty: icono de .btn.p = 30x30, color rgb(102,113,127), botón 48px; ratio calculado 1,03:1 contra #3E7A4C"
+          },
+          {
+            "tipo": "captura",
+            "archivo": "(captura propia rep51-empty.png, no incluida entre las del orquestador)",
+            "region": "icono gris enorme dentro del botón verde «Pedirlo a Sistemas»"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "Dos lecturas. (a) Crítico por criterio 1: contraste de un gráfico 1,03:1 < 3:1 en un control. (b) No crítico: el icono es redundante con la etiqueta de texto del botón (que sí cumple, 4,89:1), así que nadie pierde información. Me quedo con (b) porque el nombre accesible no depende del icono; si la persona prefiere la lectura estricta, pasa a exigir_cambio. El arreglo es de una línea (`.state > .ico`) y el propio archivo 55 ya lo trae corregido, lo que apunta a que la base de 51 es una copia anterior."
+        },
+        "por_que_importa": "En las dos vistas donde la persona está atascada (sin acceso / error de servidor) el botón de salida lleva un glifo gris casi invisible y desproporcionado."
+      },
+      {
+        "id": "v2-51acceso-05",
+        "severidad": "media",
+        "regla": "§2.1 El suelo son 12px",
+        "dice_el_sistema": "`--fs-meta` es el tamaño más pequeño del sistema. Nada baja de ahí",
+        "hay_en_el_build": "`.sin-campos{font-size:11.5px;...}` (computado 11.5px, interlineado 18,4px) compone los dos párrafos bajo el botón: «No hay usuario ni contraseña que escribir…» y el aviso de privacidad con su enlace (dato legal). `.state .ref` a 11px (línea 612) y `.demo .et-g` 10.5px (andamio, excluido). §2.1 cita literalmente «las notas al pie a 11,5px» como lo que se corrigió.",
+        "selector": ".sin-campos",
+        "linea": 650,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 650,
+          "cita": "font-size:11.5px"
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep51b",
+            "detalle": "getComputedStyle(.sin-campos).fontSize = 11.5px"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "No es crítico (el contraste 4,82:1 cumple) y no hay criterio medible de accesibilidad por tamaño; el 55 de la misma entrega ya subió todo a 12px, así que es la base antigua. Sube a --fs-meta (12px) y de paso el .ref."
+        },
+        "por_que_importa": "Es el texto que explica cómo se entra y cómo se tratan los datos personales, en el tamaño más pequeño de la pantalla."
+      },
+      {
+        "id": "v2-51acceso-06",
+        "severidad": "baja",
+        "regla": "§1.1 Superficies y texto (--text-3 cambió de valor)",
+        "dice_el_sistema": "`--text-3` cambió de valor. Era `#66717F` ... `#5C6675` cumple en las tres",
+        "hay_en_el_build": "`--text-3: #66717F;` en el :root claro. Sobre --surface 4,82:1 y sobre --bg 4,53:1 (cumple); el problema documentado es --surface-2 (4,21:1). En esta pantalla --text-3 solo cae sobre --surface y --bg (.sin-campos, .ref), así que hoy no incumple; es una base sin actualizar a 2.15.0 (también faltan --on-state, --surface-hover, --border-ctrl, --serie-3/4, --marca-*).",
+        "selector": ":root",
+        "linea": 68,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 68,
+          "cita": "--text-3: #66717F;"
+        },
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "Sin efecto medible aquí; se actualiza el bloque de tokens al canónico 2.15.0 junto con --sp-5."
+        },
+        "por_que_importa": "Es el síntoma de que el archivo parte de una copia anterior del sistema: de ahí salen también los hallazgos 01, 04 y 05."
+      },
+      {
+        "id": "v2-51acceso-07",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado de una pantalla (el estado va dentro de una tarjeta; una sola superficie para las cuatro vistas)",
+        "dice_el_sistema": "En el acceso la tarjeta ya es el contenedor de las cuatro vistas",
+        "hay_en_el_build": "Las vistas «con datos» y «cargando» viven dentro de `.caja-acc`, pero «vacío» y «error» son `.state` sueltos sobre el fondo --bg, sin superficie, medallón ni sombra (captura propia con data-state=error/empty). La pantalla cambia de forma al cambiar de estado: la tarjeta de 420px centrada pasa a un bloque de texto de 480px de ancho que en Error arranca a ~y=105 y llega a y=664. Los títulos son `<b>`, no encabezados.",
+        "selector": ".state-empty, .state-error",
+        "linea": 682,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 682,
+          "cita": "<div class=\"state state-empty\">"
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep51b",
+            "detalle": "capturas rep51-empty.png y rep51-err.png (data-state forzado): sin tarjeta"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "No crítico y rediseñable con poco: envolver las dos vistas en la misma `.caja-acc` (con medallón sólido §1.4.1) resuelve también la jerarquía. Se deja a Studio al integrar; no se le exige al cliente."
+        },
+        "por_que_importa": "Quien llega a «Tu cuenta entró, pero no tiene acceso» o al error ve una pantalla distinta de la del botón, sin la referencia visual de la tarjeta, y con el texto más largo de todo el acceso en gris sobre gris."
+      },
+      {
+        "id": "v2-51acceso-08",
+        "severidad": "baja",
+        "regla": "§6.4 Vistas de estado, reglas 1 y 2 (aviso por aria-live y encabezado real) / §11 Checklist (Estructura)",
+        "dice_el_sistema": "Cada estado lleva un encabezado real, no un `<b>`",
+        "hay_en_el_build": "No hay ningún h1/h2/h3 en la pantalla (conteo 0). Los títulos de estado son `<b>` (líneas 684 y 690); el conmutador de estado solo cambia `data-state` sin `aria-live` ni mover el foco al `<main tabindex=-1>`. La vista «cargando» sí lleva role=status.",
+        "selector": "main#contenido",
+        "linea": 664,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 664,
+          "cita": "<main id=\"contenido\" data-state=\"ok\" tabindex=\"-1\">"
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "codigo",
+            "linea": 690,
+            "cita": "<b>No pudimos preguntar si tu cuenta es válida</b>"
+          },
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep51",
+            "detalle": "document.querySelectorAll('h1,h2').length = 0"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "En una maqueta el conmutador es andamio (data-andamio); la implementación real debe anunciar el cambio. Se señala para integración."
+        },
+        "por_que_importa": "Con lector de pantalla no se anuncia el paso a «error» ni hay un encabezado desde el que navegar."
+      },
+      {
+        "id": "v2-51acceso-09",
+        "severidad": "baja",
+        "regla": "§3 Espaciado y radios (tabla --r-modal) y §6.4 (tarjeta del acceso: 16px y sombra elevada)",
+        "dice_el_sistema": "La tarjeta del acceso tiene 16px de radio y sombra elevada",
+        "hay_en_el_build": "`.caja-acc` usa `border-radius:var(--r-card)` (computado 10px) y `--sh-float`; §3 reserva --r-modal (16px) para «la tarjeta flotante del acceso».",
+        "selector": ".caja-acc",
+        "linea": 640,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 640,
+          "cita": "border-radius:var(--r-card)"
+        },
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "sin_accion",
+          "motivo": "Diferencia estética menor; se resuelve a favor del cliente salvo que se rehaga la tarjeta (hallazgo 07), momento en que se alinea con --r-modal."
+        },
+        "por_que_importa": "Pequeña: la tarjeta del acceso no se parece a la del resto de estados que documenta el sistema."
+      },
+      {
+        "id": "v2-51acceso-10",
+        "severidad": "baja",
+        "regla": "§6.1 Botón primario del acceso (`.gbtn`) y §11 Checklist (botón ocupado)",
+        "dice_el_sistema": "Se bloquea en el manejador de JS, no solo con CSS",
+        "hay_en_el_build": "El botón es `.btn-google` (no `.gbtn`): sin sombra de reposo, sin `aria-busy`, sin spinner ni manejador de clic; el script además lanza `TypeError: Cannot read properties of null (reading 'addEventListener')` al cargar porque busca `#tema`, que no existe en esta pantalla (pageerror capturado con Playwright).",
+        "selector": ".btn-google",
+        "linea": 672,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 672,
+          "cita": "<button class=\"btn-google\" type=\"button\">"
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "codigo",
+            "linea": 727,
+            "cita": "bt.addEventListener('click'"
+          },
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep51d",
+            "detalle": "page.on('pageerror'): TypeError null addEventListener"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "sin_accion",
+          "motivo": "Es maqueta; el comportamiento real se implementa en la app. El error de JS es andamio copiado de una pantalla con cromo y no afecta el uso, pero conviene que el bloque de script no se copie a pantallas sin cromo."
+        },
+        "por_que_importa": "Sin protección contra doble envío en la implementación real, cuatro Intro lanzarían cuatro inicios de sesión (el caso que cita §6.1)."
+      }
+    ]
+  },
+  "cerrados_desde_v1": [],
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": {
+        "puntos": 3,
+        "nota": "Botón de 48px, foco visible 2px --accent (medido), contraste de texto 4,53–15,2:1; pero iconos de botón a 1,03:1 en Vacío/Error, 11,5px en el aviso legal y sin encabezados ni aria-live."
+      },
+      "rendimiento": {
+        "puntos": null,
+        "nota": "no_evaluado (réplica: no se midió carga ni coste de render)"
+      },
+      "theming": {
+        "puntos": 2,
+        "nota": "Dos temas definidos, pero el :root es anterior a 2.15.0 (--text-3 antiguo, sin --on-state/--surface-hover/--border-ctrl) y usa dos tokens inexistentes (--sp-5, --fs-h2)."
+      },
+      "responsive": {
+        "puntos": 3,
+        "nota": "A 1000 y 390px la tarjeta se mantiene centrada, sin desborde horizontal (scrollWidth = ancho de ventana); no hay menú en esta pantalla."
+      },
+      "integridad": {
+        "puntos": 1,
+        "nota": "Dos var() sin declarar, selector descendiente `.state .ico` que rompe los iconos de botón, wordmark sin --font-brand, TypeError al cargar el script."
+      }
+    },
+    "justificacion": "La estructura y el copy del flujo (una sola acción, ocho tipos de error) son buenos, pero la ejecución visual es floja: bloques sin separación, marca sin jerarquía y vistas de estado que no comparten contenedor. Casi todo sale de una base de CSS desactualizada, por lo que es corregible con cambios sencillos.",
+    "evidencia": [
+      "51_acceso--1440.png: marca, botón y notas pegados",
+      "script propio rep51.cjs: gaps 0/0/0 y contrafactual con --sp-5",
+      "captura propia con data-state=empty: iconos grises de 30px en botones"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — réplica"
+  },
+  "cobertura": [],
+  "sin_datos": [
+    "No hay ficha técnica ni brief: no se puede atribuir ninguna decisión a DPROMA (D-n, FICHAS).",
+    "estado_vs_pdf y estado_vs_v1 no evaluados (réplica ciega).",
+    "F4 (Nielsen) y F5 (investigación) no evaluados — réplica.",
+    "Contraste de las vistas en tema oscuro no medido.",
+    "La vista «cargando» solo se leyó en código (esqueleto 44px/60%/100%/86%); no se midió su alto frente al contenido."
+  ]
+}
