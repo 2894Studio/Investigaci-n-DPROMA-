@@ -1,0 +1,396 @@
+{
+ "pantalla": "48_asistencia_rhl",
+ "tier": "B",
+ "sha256": "388315c692a31b1a7ff044a0a958d90aa8fda821e07196b0dee5a544eb4a7e20",
+ "estado_entrega": "nueva",
+ "estado_vs_pdf": "alineado",
+ "estados_auditados": [
+  "ok",
+  "vacío",
+  "error",
+  "cargando"
+ ],
+ "capturas": [
+  "48_asistencia_rhl--1440.png",
+  "48_asistencia_rhl--1280-fold.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 5,
+   "texto_usuario": "RHL incidentes: el interlineado da sensación de desorden.",
+   "veredicto": "parcial",
+   "evidencia": [
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "grep (scratchpad)",
+      "detalle": "grep -n -i \"bandeja|horarios|incidencia\" 48_asistencia_rhl.html: «bandeja» solo en reglas CSS heredadas (`.bandeja`, líneas 526-532, sin elemento en el marcado); «incidencia» solo en el botón «Justificar incidencia» (676), el ítem de menú «Incidencias de servicio» (663) y el texto del error (751); «horarios» solo en el botón «Ver horarios vigentes» (746)"
+     },
+     "dato": "ALCANCE. El archivo 48 no tiene ningún panel de «incidentes»: tiene cuatro indicadores, un aviso, el registro de asistencia (6 filas, tres de ellas con incidencia: Retardo, Fuera de línea, Falta) y una nota. La FICHA dice que la maqueta original aporta «la bandeja de incidencias» y «los horarios», y 48 no contiene ni una ni otra. La bandeja con ese nombre («Bandeja de incidencias pendientes», `<h3 id=\"h-inc\">`, línea 415) está en `13_panel_asistencia_rhl.html`, dentro del mismo paquete y servida en :8732. Se mide aquí lo que el brief asigna (48) y, aparte, el 13."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "m48.cjs (scratchpad/b2)",
+      "detalle": "getComputedStyle y Range.getClientRects de cada celda del registro a 1440/1280/390; brief I5_ritmo"
+     },
+     "dato": "REGISTRO DE 48 — INTERLINEADO. Dentro de las filas hay dos valores: `.dos` (nombre + área) a `line-height:1.35` (b 17,55 px, small 16,2 px) y todo lo demás en `normal` (td 13 px, `.geo .d1`, `.d2`, `.pill`, `.mod`, `.btn.mini`; `body` computa `normal`). Los dos bloques de dos líneas de una misma fila no coinciden: la primera línea del nombre cae en y=455,0 y la de la ubicación en y=456,3 (1,3 px) y el paso entre sus dos líneas es 19,5 px (`.dos`) frente a 18 px (`.geo`). Brief I5: 5 interlineados distintos en la pantalla (1,25×18, 1,35×12, 1,4×4, 1,55×4, 1,5×2) sin contar `normal`."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "m48.cjs + e48.cjs (scratchpad/b2)",
+      "detalle": "centro vertical de la primera línea de cada una de las 6 celdas de una fila; después con `vertical-align:top` y `baseline` inyectado en la página (sin tocar el archivo)"
+     },
+     "dato": "REGISTRO DE 48 — ALINEACIÓN. `td`/`th` van en `vertical-align:middle` con `padding:8px 16px` y `height:auto`: filas de 52,2–52,7 px donde unas celdas tienen dos líneas y otras una. El centro de la primera línea de las seis celdas de una fila se dispersa 9,9 px en las seis filas (nombre y ubicación arriba, modalidad/hora/estado/botón 10 px más abajo): hay tres «alturas» de texto por fila. Inyectando `vertical-align:top` la dispersión baja a 6 px; con `baseline` baja a 1 px (la fila crece de 52,7 a 58,2 px). `54_bitacora_descargas` (misma familia) ya usa `vertical-align:top` en sus celdas (`.bit tbody th,.bit td{…vertical-align:top}`)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "m48.cjs",
+      "detalle": "getComputedStyle de padding/gap/margin en `.asis tbody *`, comparado con la escala `--sp-*` (4, 8, 12, 16, 20, 24, 32, 48)"
+     },
+     "dato": "ESPACIADO FUERA DE ESCALA. Valores fuera de `--sp-*` en el registro: gap 2 px (`.dos`, `.geo`), `.mod` padding 2px 8px y gap 5, `.pill` padding 3px 9px y gap 5, `.btn.mini` padding 5px 10px y gap 6, `.acciones` gap 6. Todos salvo el gap de 2 px son literalmente la receta del sistema (§6.10: `padding:3px 9px`, `gap:5px`; §6.2: `.btn.mini{…padding:5px 10px…}`): el brief I5 (176 apariciones: 6px×82, 5px×36, 9px×36, 3px×14, 7px×8) mide sobre todo componentes copiados tal cual del sistema, no una desviación del cliente."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "m13.cjs + n13.cjs (scratchpad/b2)",
+      "detalle": "Playwright 1440×900 sobre http://127.0.0.1:8732/13_panel_asistencia_rhl.html; getComputedStyle y getBoundingClientRect de `article[aria-labelledby=h-inc]`; captura propia 13-inc.png"
+     },
+     "dato": "BANDEJA DE INCIDENCIAS (en 13, no en 48) — SENSACIÓN CONFIRMADA CON OTRA CAUSA. La regla `.inc .body span{color:var(--text-2);font-size:var(--fs-meta);display:block;margin-top:1px}` (línea 181) es un selector de descendiente: además de la línea de subtítulo alcanza a los `<span translate=\"no\">` incrustados («ORD-202607-0119», «Almacén CDMX»), que pasan a `display:block` (medido: display block, margin-top 1px). Dos de las cuatro incidencias se parten en tres líneas a mitad de frase («Checado a 340 m del / Almacén CDMX / · foto adjunta…»; subtítulo de 46 px frente a 15 px). Además: separación título→subtítulo→botones de 1 px, título a 1,35 y el resto en `normal`, `padding:10px 0` y gap 10 px (fuera de escala), botones a 11,5 px; alturas de incidencia 81/112/112/79 px."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "captura",
+      "archivo": "48_asistencia_rhl--1440.png",
+      "region": "filas 1–6 del registro: nombre y ubicación a una altura, modalidad/hora/estado/«Ver detalle» más abajo"
+     },
+     "dato": "Lo que se ve en 48: la escalera de alturas de texto de cada fila (consecuencia de `vertical-align:middle` con celdas de una y de dos líneas), no una separación entre líneas inconsistente; las dos líneas de `.dos` y `.geo` se leen bien."
+    }
+   ],
+   "causa_raiz": "Tres causas, de más a menos general. (1) El sistema 2.15.0 no define ningún interlineado: solo hay `line-height` dentro de cinco reglas de componente (1,4 `.cifras .apoyo`, 1,5 `.paso-txt`/`.note`/`.ayuda`, 1,55 `.banda`, 1,6 `.tarjeta-estado p`), sin token ni valor por omisión del `body`; cada pantalla fija los suyos y el resto queda en `normal`. (2) La receta de tabla de §6.11 usa `vertical-align:middle` y fila de 40 px pensada para celdas de una línea; con celdas mixtas de una y dos líneas (48) las primeras líneas no comparten altura. (3) En el 13, un selector de descendiente (`.inc .body span`) convierte en bloque los `span` incrustados y parte frases.",
+   "solucion_propuesta": "Para 48: `.asis tbody th,.asis td{vertical-align:top}` (lo que ya hace `54 .bit td`) o `baseline`, y `.geo{line-height:1.35}` igual que `.dos` (o ambos por un token). Para 13: `.inc .body > span` (hijo directo) y `display:flex;flex-direction:column;gap:var(--sp-1)` en `.inc .body` en lugar de `margin-top:1px`; `padding:var(--sp-3) 0`. Para el sistema: definir tres tokens de interlineado a partir de lo que ya se usa —`--lh-tight:1.25` (títulos y etiquetas), `--lh-cell:1.4` (celdas de dos líneas y tablas), `--lh-prose:1.55` (avisos y párrafos)— y fijar `body{line-height:var(--lh-cell)}` para que nada se quede en `normal` (valores derivados de lo medido, sin validar contra el resto de pantallas).",
+   "tipo_de_cambio": "sencillo",
+   "critico": {
+    "es": false,
+    "criterio": null
+   },
+   "decision": {
+    "valor": "ajustar_sistema",
+    "motivo": "Es una sensación real pero no crítica. La causa raíz que se repite en todas las pantallas es nuestra (sin escala de interlineado, receta de tabla con `middle`); los arreglos del cliente (selector hijo en 13, `vertical-align` en 48) son de una línea y no se exigen (Regla 1), se evalúan con solución concreta (Regla 2). Se confirma la sensación en el 13 y solo parcialmente en 48 (escalera de alturas, no interlineado roto)."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-48asis-buscador-16px",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles + §10 trampa 4 (el destino táctil es la región que acepta la pulsación)",
+    "dice_el_sistema": "El destino táctil es la región que acepta la pulsación, no el elemento.",
+    "hay_en_el_build": "`<div class=\"search\">` envuelve al `<input id=\"buscar\">`; el input mide 329×16 px (brief tactil_bajo24: 1 de N bajo 24 px). Medición propia (cromo.cjs): el padre es un DIV de 34 px de alto, el input no está dentro de ningún `<label>`; pulsar en el relleno de la pastilla no enfoca el campo.",
+    "selector": ".search > input#buscar",
+    "linea": 677,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 677,
+     "cita": "<div class=\"search\"><svg class=\"ico ico-sm\" aria-hidden=\"true\"><use href=\"#i-search\"/></svg><input id=\"buscar\""
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino táctil < 24 px medido (criterio 1). El arreglo ya está prescrito en §10: cambiar el `<div class=\"search\">` por `<label class=\"search\" for=\"buscar\">`; el campo pasa a ser la pastilla entera (34 px) sin tocar el diseño."
+    },
+    "por_que_importa": "Quien pulsa en la pastilla (34 px) no enfoca el buscador: solo responde la franja de 16 px que ocupa el texto. Con dedo o con temblor, el primer toque suele caer en el vacío."
+   },
+   {
+    "id": "v2-48asis-menu-colapsado-sin-nombre",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación — modo colapsado (860–1100 px): el rótulo no desaparece",
+    "dice_el_sistema": "En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+    "hay_en_el_build": "A 1000 px la barra lateral mide 64 px y `.side .et{display:none}`: los 15 enlaces `.it` quedan sin nombre accesible (brief menu_1000px: total 15, sinNombre 15; medición propia con ariaSnapshot: `- link:` sin nombre en los 15). Ningún `.it` lleva `aria-label` ni `title`.",
+    "selector": ".side .it",
+    "linea": 288,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 288,
+     "cita": ".side .et,.grp,.side .wordmark{display:none}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1). Arreglo de una línea por enlace: `aria-label` y `title` con el rótulo (o mover el texto a `.sr` en lugar de `display:none`). El mismo cromo está copiado en todas las pantallas: conviene arreglarlo en la plantilla."
+    },
+    "por_que_importa": "En un portátil de 860–1100 px (o con zoom) quien usa lector de pantalla oye «enlace, enlace, enlace» en toda la navegación principal, y quien ve solo tiene iconos sin etiqueta emergente."
+   },
+   {
+    "id": "v2-48asis-isotipo-viewbox",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 — un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` descoloca la marca",
+    "dice_el_sistema": "Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.",
+    "hay_en_el_build": "El `<svg>` del logo (y el del botón flotante, si lo hay) repite `viewBox=\"740 0 970 932\"` y su `<use>` no lleva medidas. Medición propia (cromo.cjs): el `<use>` queda en x=-22,5 frente al `<svg>` en x=10, un desplazamiento de 32,5 px (el que §10 predice); la parte que cae dentro de la caja de 44 px es ≈ 24 % de la marca.",
+    "selector": ".side .logo svg, .fab svg",
+    "linea": 663,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 663,
+     "cita": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Es un fallo de implementación conocido y de una línea (quitar `viewBox`, poner `width`/`height` en el `<use>`); se recomienda corregirlo en la plantilla del cromo (regla 2), no se exige pantalla por pantalla."
+    },
+    "por_que_importa": "La marca de DPROMA aparece recortada a una cuarta parte en la esquina superior de todas las pantallas."
+   },
+   {
+    "id": "v2-48asis-grp-105-sin-mayusculas",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px — la excepción de 10,5 px es «en mayúsculas» (contradicción interna del sistema con §7.2)",
+    "dice_el_sistema": "Se admite una excepción, y solo una: 10,5px en mayúsculas",
+    "hay_en_el_build": "Los 5 `p.grp` de la barra lateral van a 10,5 px sin `text-transform:uppercase` (brief C2_105_no_mayusculas: 5 fallos; en la captura se leen «Principal», «Operación»…). Es la copia literal de la receta de §7.2 (línea 1942 del sistema: `.grp{margin:14px 8px 4px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}`, sin `text-transform`).",
+    "selector": "p.grp",
+    "linea": 235,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 235,
+     "cita": ".grp{margin:9px 8px 2px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "La causa raíz es nuestra: §2.1 permite 10,5 px solo en mayúsculas pero el CSS de §7.2 no las pone. Hay que corregir §7.2 (añadir `text-transform:uppercase`) o ampliar la excepción de §2.1; el cliente copió lo que decía el documento."
+    },
+    "por_que_importa": "Cinco rótulos de grupo por pantalla quedan por debajo del suelo de 12 px sin la compensación (mayúsculas) que justifica la excepción."
+   },
+   {
+    "id": "v2-48asis-estados-no-se-anuncian",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado, regla 1 — el cambio se anuncia y mueve el foco",
+    "dice_el_sistema": "El cambio se anuncia y mueve el foco.",
+    "hay_en_el_build": "El único código que cambia de vista es `cont.setAttribute('data-state',…)`. Medición propia (st.cjs): tras activar «Error», `document.activeElement` es BODY; no existe ninguna región `aria-live` visible (solo el `role=\"status\"` del esqueleto, oculto en ok).",
+    "selector": "main#contenido",
+    "linea": 784,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 784,
+     "cita": "cont.setAttribute('data-state',b.dataset.set);"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico por la lista de la Regla 1; la regla de §6.4 está escrita con el JS que lo resuelve (`live.textContent` + `main.focus()`), por lo que es una adición sencilla al script compartido de las maquetas. Se recomienda a nivel de plantilla."
+    },
+    "por_que_importa": "Quien navega con lector de pantalla no se entera de que la pantalla pasó de «cargando» a «error» o «vacío»: el foco se queda donde estaba y no se anuncia nada."
+   },
+   {
+    "id": "v2-48asis-estados-sin-tarjeta-ni-encabezado",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado — el estado va dentro de una tarjeta, con medallón y encabezado real",
+    "dice_el_sistema": "El estado va dentro de una tarjeta, no suelto sobre el fondo.",
+    "hay_en_el_build": "Medición propia (st.cjs, estado Error): `.state-error` con fondo rgba(0,0,0,0), sombra none, radio 0; sin `.tarjeta-estado` ni `.estado-ico`; icono de 30 px sin medallón; el título es `<b>` (0 `h1`-`h3` dentro del estado).",
+    "selector": ".state, .state b",
+    "linea": 608,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 608,
+     "cita": ".state > .ico{width:30px;height:30px;color:var(--text-3)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico; son tres vistas secundarias. Se documenta que la receta de 2.15.0 (§6.4) no llegó a estas maquetas y se recomienda adoptarla en la plantilla compartida ARQ-ESTADOS."
+    },
+    "por_que_importa": "Sin tarjeta el mensaje se lee como una pantalla que no terminó de cargar; sin encabezado real no se puede saltar a él con el lector de pantalla."
+   },
+   {
+    "id": "v2-48asis-esqueleto-texto-y-sin-aplanar",
+    "severidad": "alta",
+    "regla": "§6.7 Esqueleto de carga — sin texto real dentro de las barras; con reduced-motion se aplana el fondo",
+    "dice_el_sistema": "Hay que aplanar el fondo, no solo parar la animación.",
+    "hay_en_el_build": "`@media (prefers-reduced-motion:reduce){.skel{animation:none}}` detiene la animación pero deja el degradado congelado (el sistema pide `background:var(--surface-2)`). Además las 30 barras `.skel` llevan texto real dentro (p. ej. «colaborador y área», medición propia st.cjs) bajo un `role=\"status\"` (§6.7: «sin texto real dentro de las barras»).",
+    "selector": ".skel",
+    "linea": 603,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 603,
+     "cita": "@media (prefers-reduced-motion:reduce){.skel{animation:none}}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico (estado transitorio). Dos líneas por maqueta; se recomienda corregir la plantilla ARQ-ESTADOS."
+    },
+    "por_que_importa": "Con «menos movimiento» las barras quedan a medio pintar; un lector de pantalla puede recitar el texto de relleno."
+   },
+   {
+    "id": "v2-48asis-controles-sin-accion",
+    "severidad": "media",
+    "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+    "dice_el_sistema": "Un control con pinta de interactivo tiene que interactuar.",
+    "hay_en_el_build": "Medición propia (clk.cjs): los 4 `.schip` y «Compacta» conservan `aria-pressed=\"false\"` tras el clic; el script solo gestiona el conmutador de estados de demo, el tema y el menú.",
+    "selector": ".schip[data-f], .seg button",
+    "linea": 784,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 784,
+     "cita": "cont.setAttribute('data-state',b.dataset.set);"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Es una maqueta sin lógica de filtrado; el sistema lo prevé («se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero»). Se adopta y se promueve a control real cuando exista el filtrado."
+    },
+    "por_que_importa": "Quien prueba la maqueta pulsa y no pasa nada: el control promete un comportamiento que no existe."
+   },
+   {
+    "id": "v2-48asis-tabla-min-width-1080",
+    "severidad": "media",
+    "regla": "§6.11 regla 5 — ninguna columna desaparece en silencio (el desplazamiento horizontal es lo admitido)",
+    "dice_el_sistema": "5. **Ninguna columna desaparece en silencio.** Ocultar por `@media` sin avisar deja a quien",
+    "hay_en_el_build": "`.asis table{min-width:1080px}` frente a una caja de 1044 px a 1280: 36 px ocultos y «Ver detalle» (la única acción de la fila) se corta a «Ver detal» (captura 48_asistencia_rhl--1280-fold.png; brief anchos: scroll-x dx 36 a 1280 y 120 a 1024). Medición propia (t48.cjs): con `min-width:0` la tabla mide 1044 px a 1280, sin desborde, y las columnas solo ceden 4–8 px: el 1080 no lo exige el contenido.",
+    "selector": ".asis table",
+    "linea": 649,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 649,
+     "cita": ".asis table{min-width:1080px}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "El sistema admite el desplazamiento horizontal, así que no es incumplimiento. Mejora sencilla (Regla 2): bajar `min-width` a ~1040 o quitarlo para que a 1280 cuadre sin desplazar."
+    },
+    "por_que_importa": "En el ancho de portátil más habitual la acción de cada fila queda cortada hasta que se desplaza la tabla."
+   },
+   {
+    "id": "v2-48asis-gap-2px-fuera-de-escala",
+    "severidad": "baja",
+    "regla": "§3 Espaciado — escala base de 4px (`--sp-1`…`--sp-12`)",
+    "dice_el_sistema": "Escala base de 4px. El nombre del token es un identificador, no el multiplicador — no hay",
+    "hay_en_el_build": "`.dos{…gap:2px;line-height:1.35…}` y `.geo{display:flex;flex-direction:column;gap:2px}`: el único valor fuera de `--sp-*` que es propio del cliente (el resto de los 5 valores del brief I5 son recetas del sistema: §6.10 `padding:3px 9px`, §6.2 `padding:5px 10px`).",
+    "selector": ".dos, .geo",
+    "linea": 653,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 653,
+     "cita": ".geo{display:flex;flex-direction:column;gap:2px}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Nuestra escala empieza en 4 px y no tiene valor para «dos líneas pegadas»; el cliente tomó 2 px. Se resuelve añadiendo un paso o aceptando `--sp-1` (4 px) en esas dos reglas."
+    },
+    "por_que_importa": "Muy poco: el espacio entre las dos líneas de una celda es de 2 px, a medio camino de nada en la escala."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [
+  {
+   "id_v1": "f1-13asistencia-03",
+   "evidencia": "`--text-3: #5C6675;` en la línea 68 del archivo (valor de 2.15.0; el brief no lo lista entre tokens_valores_divergentes)."
+  },
+  {
+   "id_v1": "f1-13asistencia-04",
+   "evidencia": "Brief lt12_medido 0. Las únicas declaraciones < 12 px que quedan son 10,5 px en `.grp` (línea 235), la etiqueta de modo tarjeta (línea 427) y `.campo .et` (línea 498); el resto de los 11 px/11,5 px de v1 (thead th, .pill, .mini-btn, .panel .sub…) ya no existe."
+  },
+  {
+   "id_v1": "f1-13asistencia-06",
+   "evidencia": "No hay `<aside class=\"demo\">`: la barra de estados es `<div class=\"demo\" data-andamio role=\"group\">` (andamiaje marcado, §9)."
+  },
+  {
+   "id_v1": "f1-13asistencia-07",
+   "evidencia": "Ya no existe `.tinote`; la nota que queda es `<p class=\"nota\">` de una frase («Un «Falta» no es una decisión disciplinaria…», 115 caracteres)."
+  }
+ ],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 3
+  },
+  "justificacion": "Accesibilidad 2: contraste sin fallos en los dos temas (brief: 0/102 nodos), suelo de 12 px cumplido, `<table>` con caption, `th scope=row` y `h1`, estado dicho con icono + texto; pero dos críticos medidos que son del cromo (menú sin nombre a 1000 px y buscador de 16 px) y los cambios de vista no se anuncian. Theming 3: `--text-3`, `--surface-hover` y el resto de tokens clave al día; solo difieren los pares -ink/-bg de 2.15.0. Responsive 3: modo tarjeta ≤ 860 con `data-et`, pero `min-width:1080` obliga a desplazar a 1280 y corta «Ver detalle». Integridad 3: tabla bien construida y vistas de estado con contenido propio (qué pasó, qué no se perdió); los cuatro indicadores y «Compacta» no hacen nada y la FICHA cita una bandeja de incidencias y unos horarios que el archivo no contiene. Rendimiento no evaluado.",
+  "evidencia": [
+   "m48.cjs, e48.cjs, t48.cjs, clk.cjs, st.cjs, cromo.cjs (scratchpad/b2)",
+   "briefs2/48_asistencia_rhl.json",
+   "48_asistencia_rhl--1440.png, 48_asistencia_rhl--1280-fold.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — Tier B"
+ },
+ "cobertura": [
+  {
+   "patron": "Interlineado de interfaz: el sistema no tiene escala ni valor por omisión. Hay `line-height` solo dentro de cinco componentes (1,4; 1,5; 1,55; 1,6) y las pantallas fijan además 1,25, 1,3 y 1,35 por su cuenta; lo demás computa `normal`. El brief I5 cuenta 4–5 interlineados distintos por pantalla en las cuatro de este lote.",
+   "propuesta_de_regla": "§3.2 **Interlineado.** Tres valores, no más: `--lh-tight:1.25` para títulos y etiquetas de una línea; `--lh-cell:1.4` para celdas de tabla y bloques de dos líneas; `--lh-prose:1.55` para avisos y párrafos. El `body` lleva `line-height:var(--lh-cell)` para que ningún texto compute `normal`. Dos bloques de dos líneas en la misma fila de una tabla llevan el mismo valor, y una tabla con celdas de una y de dos líneas alinea las primeras líneas (`vertical-align:top`) en lugar de centrarlas. (Propuesta derivada de los valores en uso; falta validarla contra el resto de pantallas.)"
+  }
+ ],
+ "sin_datos": [
+  "Qué pantalla vio exactamente la persona en su hoja 5: la frase «RHL incidentes» coincide con la «Bandeja de incidencias pendientes» de 13_panel_asistencia_rhl.html, que 48 no contiene. Si vio 13, la sensación se confirma con las causas de arriba; si vio 48, se confirma solo en forma de escalera de alturas.",
+  "Dónde fueron a parar la bandeja de incidencias y los horarios que la FICHA de 48 da como fuentes: no están en el archivo y no hay dato de que vivan en otra pantalla (35_incidencias.html no se ha leído en este lote).",
+  "Instrumentos del brief para 48: I3 marca `caption` y `span.sr` como recortados (falsos positivos conocidos: texto solo para lectores de pantalla); I9 y I4 sin hallazgos."
+ ]
+}
