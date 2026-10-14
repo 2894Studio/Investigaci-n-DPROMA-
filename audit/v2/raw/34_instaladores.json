@@ -1,0 +1,585 @@
+{
+ "pantalla": "34_instaladores",
+ "tier": "B",
+ "sha256": "57a992766d655408f4c6881f0852a62a953ba9719cd682328cee43480eb1d493",
+ "estado_entrega": "modificada",
+ "estado_vs_pdf": "NO_ALINEADO",
+ "estados_auditados": [
+  "ok",
+  "vacío",
+  "error",
+  "cargando"
+ ],
+ "capturas": [
+  "34_instaladores--1440.png",
+  "34_instaladores--1280-fold.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 14,
+   "texto_usuario": "Agenda: ¿vale cambiarla por la del sistema? ¿Combinables? ¿Cuál es más efectiva?",
+   "veredicto": "sin_datos",
+   "evidencia": [
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 721,
+      "cita": "<div class=\"agenda\"><table><caption>Agenda semanal de instaladores</caption>"
+     },
+     "dato": "ESTRUCTURA. Son dos `<table>` (semana `.agenda table`, día `.dia-caja table`), no una rejilla de `<div>`. Semana: `<caption>` presente, 8 `<th scope=\"col\">` (instalador + 7 días), 4 `<th scope=\"row\">` (un instalador por fila), 28 `<td>`; cada `<td>` lleva un `<div class=\"cel\">` solo para apilar visitas (flex-column). Día: 5 `th scope=col` (hora + 4 personas), 8 `th scope=row` (07:00–14:00), 32 `td`. Medido con m34.cjs."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 641,
+      "cita": ".agenda table{min-width:1040px;table-layout:fixed}"
+     },
+     "dato": "COLUMNAS. `table-layout:fixed`, `min-width:1040px`; primera columna 210 px (`.agenda thead th:first-child{…width:210px}`), siete columnas de día de 135 px a 1440; la columna del domingo `.dom-col` va en `--pause-bg`. La primera columna es `position:sticky;left:0` (regla global `tbody th:first-child,thead th:first-child`). Día: `min-width:760px`, hora 86 px + 4 columnas de 267 px a 1440."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "anchos_1440_1280_1024",
+      "detalle": "brief: scroll-x en div.agenda a 1024 (dx 114) y 1280 (dx 30), ninguno a 1440; + m34.cjs"
+     },
+     "dato": "DENSIDAD. 1440: tabla 1154 px, cabe entera (4 filas × 92 px = 400 px, 9 visitas `a.vt` de 118×38 px, 19 huecos «—» de 28 celdas = 68 %). 1280: caja visible 1010 px frente a 1040 de tabla → 30 px ocultos; la columna Domingo (119 px) se ve cortada («DOMINGO 3») y su visita «11:00 Cerro Azul» (la única en ámbar que el aviso superior manda corregir) queda partida (captura 34_instaladores--1280-fold.png). 1024: caja 926 px → 114 px ocultos; de la columna Domingo solo se ven ≈ 5 px (izq 1002, borde de la caja 1007). En el pliegue de 1280×800 la cuarta fila asoma cortada."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "m34.cjs",
+      "detalle": "conteo de elementos con texto cuyo font-size calculado < 12 px dentro de la agenda"
+     },
+     "dato": "NODOS < 12 px. Vista semana: 53 de 62 nodos de texto: 8 `th` a 10,5 px, 9 `.vt b` a 10,5, 13 `span` a 10,5 (9 `.vt span` + 4 «órdenes abiertas»), 19 `.libre` a 10,5 y 4 `small` a 11. Vista día: 19 de 23 (13 `th` a 11 px, 3 `.bloque-cita span` a 11, 3 `.dur` a 10,5). El brief da `lt12_medido: 18` porque su instrumento solo cuenta el primer viewport de 900 px; en el archivo hay 34 declaraciones `font-size`/`font` < 12 px (conteo propio por regex) y el PDF declara 0."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "v34.cjs (scratchpad/b2)",
+      "detalle": "getComputedStyle + ariaSnapshot + clics programáticos"
+     },
+     "dato": "SEMÁNTICA. La cita es `<a class=\"vt\" href=\"#\">` de 118×38 px (≥ 24 px) cuyo nombre es «08:00 Vértice del Bajío» (sin día ni persona: el contexto lo da la tabla); `.libre` es un «—» sin texto para lector de pantalla (aria-label null, sin `.sr`); `<caption>` visualmente oculto (patrón correcto). Al cambiar Día/Semana el script solo escribe `data-vista`: no hay `aria-live` ni mueve el foco. El botón «Quincena» no tiene `data-vista` ni manejador (clic sin efecto, medido). La visita «Sin instalador» cuelga de la fila de Mauricio Ríos en la semana y de la columna M. Ríos en el día: el sistema de coordenadas de la tabla le atribuye una visita que el propio aviso dice que no tiene responsable."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 415,
+      "cita": ".tabla-caja{overflow-x:visible}"
+     },
+     "dato": "COMPORTAMIENTO EN ESTRECHO. El modo tarjeta de ≤ 860 px está escrito solo para `.tabla-caja`; `.agenda` y `.dia-caja` no llevan esa clase, así que las reglas no las alcanzan (aunque cada `td` trae `data-et`). A 390 px: caja de 356 px con 1040 de tabla (684 px ocultos); la columna fija de instalador ocupa 210 px = 59 % de la caja, quedan 146 px para ver un día de 135; la vista por omisión sigue siendo «semana». La vista día a 390 px también desplaza (760 frente a 356). Sin desborde de página (scrollW 390)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "k34.cjs (scratchpad/b2)",
+      "detalle": "copia en memoria con 36 filas; main.scrollTop=700; se lee el top de `thead th`"
+     },
+     "dato": "ESCALA. `.agenda{overflow-x:auto}` obliga a `overflow-y:auto` calculado, así que el `thead` sticky (`top:0`) se pega a la caja de la agenda y no al scroll de la página: con 36 filas clonadas en memoria y scroll de 700 px la cabecera de días queda en top −268 px (fuera de pantalla). El aviso de la propia pantalla dice que «pasando de ocho» hay que desplazar."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 683,
+      "cita": ".bloque-cita{border-radius:var(--r-ctrl);padding:var(--sp-2) var(--sp-3);font-size:11px;line-height:1.4;"
+     },
+     "dato": "VISTA DÍA y §13.9. El alto de cada `.bloque-cita` no lo fija un dato externo: no declara `height`. Los bloques de «4 h», «5 h» y «3 h» miden los tres 68 px y las filas con bloque miden 85 px frente a 35 px las vacías (m34.cjs: filasH [35,85,85,85,35,35,35,35]): el eje de la hora no es lineal y la duración solo está escrita en texto. Por tanto §13.9 (bloque cuyo alto fija un dato externo; `flex-shrink:0` en cada línea y retirar líneas por prioridad) **no toca a esta agenda tal como está**; tocaría a cualquier agenda con bloques de alto = duración × escala, que es el caso del «calendario de instalaciones» que §13.9 cita como origen de la regla."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 678,
+      "cita": ".dia-caja td,.dia-caja tbody th{vertical-align:top;height:auto;white-space:normal;"
+     },
+     "dato": "REGLAS DEL SISTEMA QUE LA TOCAN: §2.1 (suelo de 12 px: 53 de 62 nodos por debajo), §6.11 (tabla densa: `<caption>`, `th scope=row`, primera columna fija ✓; modo tarjeta solo para `.tabla-caja`; regla 4 cabecera no se corta ✗ a 1280/1024), §7.3 (destino ≥ 24 px ✓ 38 px), §1.7 (`--text-3` #66717F sobre `--surface-2` = 4,21:1 en `.bloque-cita .dur`, ver hallazgo de contraste), §1.3 (`--pause-bg` para el domingo y `--warn` para la visita en domingo), §6.12 regla 8 (Quincena sin vista), §13.9 (solo si el alto = duración). El sistema 2.15.0 **no tiene componente de agenda**: su índice termina en §6.23 y las únicas menciones a «calendario» están dentro de §13.9 (líneas 2655 y 2662 de sistema-diseno.md). La propuesta §6.24 de nuestro documento anterior (audit/raw/34_instaladores.json, cobertura) no está en 2.15.0: describe `<table>` con `<caption>`, `th scope` en ambos ejes, primera columna fija, destino ≥ 24 px, texto ≥ 12 px, hueco con texto para lector, sin modo tarjeta (vista día por debajo de 860 px) y `aria-live` al cambiar de rango. Contra esa propuesta el build cumple: `<table>`, `caption`, `th scope` en ambos ejes, columna fija, destino 38 px; no cumple: texto ≥ 12 px, hueco con texto para lector, vista día en estrecho, `aria-live`, fila de «sin asignar»."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "m34.cjs",
+      "detalle": "recuento de `a.vt` en la vista semana frente a `.resumen` y a la vista día"
+     },
+     "dato": "COHERENCIA DE LOS DATOS DE LA MAQUETA. El resumen dice «11 visitas esta semana» y el chip «Todas 11»; la rejilla semanal dibuja 9 `a.vt`. La vista día del «Lunes 24» dice «3 visitas» (Olvera 08:00, Beltrán 09:00 y una sin instalador a las 10:00) pero la semana pone en lunes solo una (Olvera 08:00) y la visita sin instalador en miércoles. Las dos vistas no cuentan la misma semana."
+    }
+   ],
+   "causa_raiz": "no determinada: la pregunta es una comparación entre dos componentes y su decisión es de la Fase 4a. Condicionantes medidos: (1) el sistema 2.15.0 no define una agenda, solo cita un calendario de instalaciones en §13.9; (2) la agenda del cliente es una `<table>` correcta en semántica pero fuera del suelo de 12 px, sin modo estrecho propio y con desborde a 1280 y 1024; (3) el alto de sus bloques no depende de la duración, por lo que §13.9 hoy no le aplica.",
+   "solucion_propuesta": null,
+   "tipo_de_cambio": "no_evaluado (comparación y decisión: Fase 4a)",
+   "critico": {
+    "es": false,
+    "criterio": null
+   },
+   "decision": {
+    "valor": "decidir_diseño",
+    "motivo": "Pregunta de diseño abierta. Este informe solo describe con datos la agenda actual y las reglas que la tocan; no compara con la agenda del sistema (no hay maqueta ni especificación de ella en mi brief) ni decide cuál es más efectiva."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-34inst-01",
+    "severidad": "alta",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "Nada baja de ahí.",
+    "hay_en_el_build": "La agenda entera está por debajo del suelo: `.vt` 10,5 px, `.libre` 10,5, `.agenda thead th` 10,5, «órdenes abiertas» 10,5; `.dia-caja thead th`/`tbody th`/`.bloque-cita` 11 px (53 de 62 nodos de texto en la semana y 19 de 23 en el día, medición m34.cjs). El archivo conserva 34 declaraciones < 12 px; el PDF del cliente declara 0.",
+    "selector": ".agenda thead th, .vt, .libre, .bloque-cita",
+    "linea": 648,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 648,
+     "cita": ".vt{display:block;border-radius:var(--r-ctrl);padding:5px 7px;font-size:10.5px;line-height:1.35;"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "No es crítico por la lista de la Regla 1, pero el PDF declara 0 declaraciones < 12 px y el archivo trae 34: no aplicado, no regresión. La causa raíz es nuestra: el sistema no tiene agenda y §2.1 se escribió pensando en tablas de registros; la propuesta §6.24 fija «ningún texto de la rejilla baja de 12 px». Se pide al cliente aplicar lo que él mismo declaró (`.vt` y `.libre` a `--fs-meta`) sin pedirle un cambio nuevo."
+    },
+    "por_que_importa": "La agenda es lo que se consulta todos los días y es lo más pequeño de la pantalla: nombres de cliente y horas a 10,5 px."
+   },
+   {
+    "id": "v2-34inst-buscador-16px",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles + §10 trampa 4 (el destino táctil es la región que acepta la pulsación)",
+    "dice_el_sistema": "El destino táctil es la región que acepta la pulsación, no el elemento.",
+    "hay_en_el_build": "`<div class=\"search\">` envuelve al `<input id=\"buscar\">`; el input mide 329×16 px (brief tactil_bajo24: 1 de N bajo 24 px). Medición propia (cromo.cjs): el padre es un DIV de 34 px de alto, el input no está dentro de ningún `<label>`; pulsar en el relleno de la pastilla no enfoca el campo.",
+    "selector": ".search > input#buscar",
+    "linea": 711,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 711,
+     "cita": "<div class=\"search\"><svg class=\"ico ico-sm\" aria-hidden=\"true\"><use href=\"#i-search\"/></svg><input id=\"buscar\""
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino táctil < 24 px medido (criterio 1). El arreglo ya está prescrito en §10: cambiar el `<div class=\"search\">` por `<label class=\"search\" for=\"buscar\">`; el campo pasa a ser la pastilla entera (34 px) sin tocar el diseño."
+    },
+    "por_que_importa": "Quien pulsa en la pastilla (34 px) no enfoca el buscador: solo responde la franja de 16 px que ocupa el texto. Con dedo o con temblor, el primer toque suele caer en el vacío."
+   },
+   {
+    "id": "v2-34inst-menu-colapsado-sin-nombre",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación — modo colapsado (860–1100 px): el rótulo no desaparece",
+    "dice_el_sistema": "En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+    "hay_en_el_build": "A 1000 px la barra lateral mide 64 px y `.side .et{display:none}`: los 15 enlaces `.it` quedan sin nombre accesible (brief menu_1000px: total 15, sinNombre 15; medición propia con ariaSnapshot: `- link:` sin nombre en los 15). Ningún `.it` lleva `aria-label` ni `title`.",
+    "selector": ".side .it",
+    "linea": 288,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 288,
+     "cita": ".side .et,.grp,.side .wordmark{display:none}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1). Arreglo de una línea por enlace: `aria-label` y `title` con el rótulo (o mover el texto a `.sr` en lugar de `display:none`). El mismo cromo está copiado en todas las pantallas: conviene arreglarlo en la plantilla."
+    },
+    "por_que_importa": "En un portátil de 860–1100 px (o con zoom) quien usa lector de pantalla oye «enlace, enlace, enlace» en toda la navegación principal, y quien ve solo tiene iconos sin etiqueta emergente."
+   },
+   {
+    "id": "v2-34inst-text3-contraste-hover-y-dia",
+    "severidad": "alta",
+    "regla": "§1.1 valor de `--text-3` + §1.7 se mide también sobre `--surface-2`",
+    "dice_el_sistema": "si el elemento puede caer sobre `--surface-2`, se mide también ahí.",
+    "hay_en_el_build": "`--text-3:#66717F` (sin cambio; 2.15.0 pide #5C6675). Medición propia (v34.cjs, d34.cjs): al pasar el cursor por una fila de la agenda el fondo del `<th>` es rgb(231,237,243) y «Interno · Querétaro» (11 px) y «órdenes abiertas» (10,5 px) van en rgb(102,113,127): 4,21:1 (<4,5). En la vista día, `.bloque-cita .dur` («4 h», «5 h», 10,5 px) es `--text-3` sobre `--surface-2` fijo: 4,21:1 permanente. El instrumento de contraste del brief (0 fallos) no ve ninguno de los dos porque solo mide la vista semana sin hover.",
+    "selector": ".dos small, .carga span, .bloque-cita .dur",
+    "linea": 68,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 68,
+     "cita": "--text-3: #66717F;"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Texto < 4,5:1 medido (criterio 1) y valor ya corregido en 2.15.0: un solo token (`--text-3:#5C6675`, 4,93:1 sobre `--surface-2`). El PDF no lo aplicó (C1 NO_confirmado)."
+    },
+    "por_que_importa": "La duración de cada cita en la vista día y el dato secundario de cada instalador al pasar el cursor son texto pequeño con contraste insuficiente."
+   },
+   {
+    "id": "v2-34inst-state-ico-hereda-gris",
+    "severidad": "media",
+    "regla": "§6.4 regla 6 — `.state .ico` apunta solo al ícono grande, nunca a los de sus botones; §1.4.1",
+    "dice_el_sistema": "`.state .ico` apunta solo al ícono grande, nunca a los de sus botones.",
+    "hay_en_el_build": "`.state .ico{width:30px;height:30px;color:var(--text-3)}` (selector descendiente). Medición propia (v34.cjs): en la vista vacía el icono de «Ver la semana siguiente» (`.btn.p`, fondo rgb(62,122,76)) es rgb(102,113,127) = 1,03:1; igual en «Reintentar» (vista error). El brief I1 da 2 fallos y son reales (en las otras tres pantallas I1 no es real, ver sus informes).",
+    "selector": ".state .ico (dentro de .btn.p)",
+    "linea": 609,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 609,
+     "cita": ".state .ico{width:30px;height:30px;color:var(--text-3)}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "No es crítico: el icono es decorativo y el botón conserva su texto (4,89:1); si se lee «contraste < 3:1 en controles» de forma literal sí lo sería (segunda lectura). La corrección existe desde 2.15.0 (`.state > .ico`); falta que llegue a la plantilla del cliente: una línea."
+    },
+    "por_que_importa": "El botón principal de las vistas vacío y error pierde su icono (1,03:1): el verde del botón se come el glifo."
+   },
+   {
+    "id": "v2-34inst-controles-sin-accion",
+    "severidad": "media",
+    "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+    "dice_el_sistema": "Un control con pinta de interactivo tiene que interactuar.",
+    "hay_en_el_build": "Medición propia (v34.cjs, clic programático): `.schip.c-err`, `.ciudades .f` «Celaya» y `.seg` «Quincena» conservan `aria-pressed=\"false\"` y `data-vista=\"semana\"` tras el clic. El script solo escucha `.seg [data-vista]` (Día y Semana); «Quincena» no tiene `data-vista`; los tres `.schip` y los cuatro `.f` no tienen manejador.",
+    "selector": ".schip[data-f], .ciudades .f, .seg button (Quincena)",
+    "linea": 793,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 793,
+     "cita": "document.querySelectorAll('.seg [data-vista]').forEach(function(b){"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Es una maqueta sin lógica de filtrado; el sistema lo prevé («se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero»). Se adopta y se promueve a control real cuando exista el filtrado."
+    },
+    "por_que_importa": "Quien prueba la maqueta pulsa y no pasa nada: el control promete un comportamiento que no existe."
+   },
+   {
+    "id": "v2-34inst-todas-resaltado",
+    "severidad": "media",
+    "regla": "§6.12 regla 1 — un filtro se resalta solo si su valor difiere del predeterminado",
+    "dice_el_sistema": "Un filtro se resalta solo si su valor difiere del predeterminado.",
+    "hay_en_el_build": "`<button class=\"f\" type=\"button\" aria-pressed=\"true\">Todas<span class=\"n\">11</span></button>`: «Ciudad: Todas» sale con `.f[aria-pressed=\"true\"]{border-color:var(--accent);background:var(--accent-soft)}` (captura 34_instaladores--1440.png, pastilla verde «Todas 11»).",
+    "selector": ".ciudades .f[aria-pressed=\"true\"]",
+    "linea": 712,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 712,
+     "cita": "<button class=\"f\" type=\"button\" aria-pressed=\"true\">Todas<span class=\"n\">11</span></button>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Menor; se documenta. Si el filtro pasa a ser real, «Todas» deja de resaltarse."
+    },
+    "por_que_importa": "El resalte deja de significar «aquí hay algo puesto»."
+   },
+   {
+    "id": "v2-34inst-avisos-largos",
+    "severidad": "media",
+    "regla": "§8 Voz de producto — `.banda` una frase y ningún bloque visible pasa de ~140 caracteres",
+    "dice_el_sistema": "Ningún bloque de texto siempre visible pasa de ~140 caracteres.",
+    "hay_en_el_build": "Brief C11_texto_largo: `div.banda.b-warn` 279 caracteres y `div.banda.b-info` 269, ambos visibles y de dos a tres frases; `p.nota` de la vista día 330 (visible solo en esa vista). La ficha del cliente dice que que los avisos vayan arriba de la agenda es decisión suya y que «un cero de carga no es \"está libre\"» sale literal de `Instaladores.tsx:6-12`.",
+    "selector": "div.banda.b-warn, div.banda.b-info, .v-dia > .nota",
+    "linea": 717,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 717,
+     "cita": "<div class=\"banda b-info\"><svg class=\"ico\" aria-hidden=\"true\"><use href=\"#i-alert\"/></svg><p><b>Un cero de carga no quiere decir «está libre».</b>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Dos lecturas: (a) §8 se rompe (279/269 caracteres frente a ~140, varias frases); (b) el contenido y su colocación arriba son decisión de producto del cliente (FICHA). Conciliación: dejar la primera frase en la `.banda` y mover el resto a un toggletip (§6.23) sobre el nombre con carga cero."
+    },
+    "por_que_importa": "Dos bloques de texto de 270 caracteres empujan la agenda hacia abajo: a 1280×800 la agenda empieza en y=470 y solo se ven tres filas."
+   },
+   {
+    "id": "v2-34inst-cero-como-cero",
+    "severidad": "media",
+    "regla": "§6.22 Ámbito de datos — dos vacíos distintos: «Nunca un 0» para lo que no se alcanza",
+    "dice_el_sistema": "Vista vacía de §6.4, con el ámbito diciendo qué sí alcanza. **Nunca un 0**: un cero afirma que se midió |",
+    "hay_en_el_build": "La fila de Sandra Elizalde Ruvalcaba muestra `<span class=\"n tnum\">0</span>` + «órdenes abiertas» con la barra al 0 %, y la banda superior explica que ese cero es «de lo que tú alcanzas a ver».",
+    "selector": ".carga .n, .banda.b-info",
+    "linea": 733,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 733,
+     "cita": "<span class=\"n tnum\">0</span>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "La FICHA fija como decisión de producto que el cero va acotado a lo visible (`Instaladores.tsx:6-12`); §6.22 prescribe no dibujar un 0 cuando el dato no se alcanza. Conflicto entre una decisión documentada del cliente y una regla del sistema: pregunta abierta (p. ej. «— de tu alcance» en lugar de 0)."
+    },
+    "por_que_importa": "Un cero con barra vacía se lee como «libre»; la propia pantalla necesita un aviso de 269 caracteres para desmentirlo."
+   },
+   {
+    "id": "v2-34inst-carga-ambar",
+    "severidad": "media",
+    "regla": "§1 Decisión previa a elegir color + §1.4 las series no reutilizan colores de estado",
+    "dice_el_sistema": "Una serie de gráfica nunca reutiliza un color de estado.",
+    "hay_en_el_build": "`.carga .bar i{…background:var(--serie-1)}` y `.carga .bar i.alto{background:var(--warn)}`: la misma barra pasa de la paleta categórica al ámbar del semáforo según un umbral (66 % azul, 83 % ámbar en la captura) que no se rotula en ninguna parte. Además `--serie-1:#2C6CA8` y `--serie-2:#7A5FA8` son los valores anteriores que 2.15.0 sustituye por ΔE (brief tokens_valores_divergentes).",
+    "selector": ".carga .bar i, .carga .bar i.alto",
+    "linea": 661,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 661,
+     "cita": ".carga .bar i.alto{background:var(--warn)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Dos lecturas: (a) una carga alta es un juicio y `--warn` es legítimo (§1: «si el dato tiene juicio → semáforo»), pero falta decir cuál es el umbral; (b) una cantidad se mezcla con un estado en el mismo componente. Se resuelve rotulando el umbral o usando un solo color y mostrando el número."
+    },
+    "por_que_importa": "El ámbar aparece sin que quien lo lee sepa a partir de cuántas órdenes."
+   },
+   {
+    "id": "v2-34inst-isotipo-viewbox",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 — un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` descoloca la marca",
+    "dice_el_sistema": "Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.",
+    "hay_en_el_build": "El `<svg>` del logo (y el del botón flotante, si lo hay) repite `viewBox=\"740 0 970 932\"` y su `<use>` no lleva medidas. Medición propia (cromo.cjs): el `<use>` queda en x=-22,5 frente al `<svg>` en x=10, un desplazamiento de 32,5 px (el que §10 predice); la parte que cae dentro de la caja de 44 px es ≈ 24 % de la marca.",
+    "selector": ".side .logo svg, .fab svg",
+    "linea": 697,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 697,
+     "cita": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Es un fallo de implementación conocido y de una línea (quitar `viewBox`, poner `width`/`height` en el `<use>`); se recomienda corregirlo en la plantilla del cromo (regla 2), no se exige pantalla por pantalla."
+    },
+    "por_que_importa": "La marca de DPROMA aparece recortada a una cuarta parte en la esquina superior de todas las pantallas."
+   },
+   {
+    "id": "v2-34inst-grp-105-sin-mayusculas",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px — la excepción de 10,5 px es «en mayúsculas» (contradicción interna del sistema con §7.2)",
+    "dice_el_sistema": "Se admite una excepción, y solo una: 10,5px en mayúsculas",
+    "hay_en_el_build": "Los 5 `p.grp` de la barra lateral van a 10,5 px sin `text-transform:uppercase` (brief C2_105_no_mayusculas: 5 fallos; en la captura se leen «Principal», «Operación»…). Es la copia literal de la receta de §7.2 (línea 1942 del sistema: `.grp{margin:14px 8px 4px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}`, sin `text-transform`).",
+    "selector": "p.grp",
+    "linea": 235,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 235,
+     "cita": ".grp{margin:9px 8px 2px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "La causa raíz es nuestra: §2.1 permite 10,5 px solo en mayúsculas pero el CSS de §7.2 no las pone. Hay que corregir §7.2 (añadir `text-transform:uppercase`) o ampliar la excepción de §2.1; el cliente copió lo que decía el documento."
+    },
+    "por_que_importa": "Cinco rótulos de grupo por pantalla quedan por debajo del suelo de 12 px sin la compensación (mayúsculas) que justifica la excepción."
+   },
+   {
+    "id": "v2-34inst-estados-no-se-anuncian",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado, regla 1 — el cambio se anuncia y mueve el foco",
+    "dice_el_sistema": "El cambio se anuncia y mueve el foco.",
+    "hay_en_el_build": "El único código que cambia de vista es `cont.setAttribute('data-state',…)`. Medición propia (st.cjs): tras activar «Error», `document.activeElement` es BODY; no existe ninguna región `aria-live` visible (solo el `role=\"status\"` del esqueleto, oculto en ok).",
+    "selector": "main#contenido",
+    "linea": 829,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 829,
+     "cita": "cont.setAttribute('data-state',b.dataset.set);"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico por la lista de la Regla 1; la regla de §6.4 está escrita con el JS que lo resuelve (`live.textContent` + `main.focus()`), por lo que es una adición sencilla al script compartido de las maquetas. Se recomienda a nivel de plantilla."
+    },
+    "por_que_importa": "Quien navega con lector de pantalla no se entera de que la pantalla pasó de «cargando» a «error» o «vacío»: el foco se queda donde estaba y no se anuncia nada."
+   },
+   {
+    "id": "v2-34inst-estados-sin-tarjeta-ni-encabezado",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado — el estado va dentro de una tarjeta, con medallón y encabezado real",
+    "dice_el_sistema": "El estado va dentro de una tarjeta, no suelto sobre el fondo.",
+    "hay_en_el_build": "Medición propia (st.cjs, estado Error): `.state-error` con fondo rgba(0,0,0,0), sombra none, radio 0; sin `.tarjeta-estado` ni `.estado-ico`; icono de 30 px sin medallón; el título es `<b>` (0 `h1`-`h3` dentro del estado).",
+    "selector": ".state, .state b",
+    "linea": 609,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 609,
+     "cita": ".state .ico{width:30px;height:30px;color:var(--text-3)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico; son tres vistas secundarias. Se documenta que la receta de 2.15.0 (§6.4) no llegó a estas maquetas y se recomienda adoptarla en la plantilla compartida ARQ-ESTADOS."
+    },
+    "por_que_importa": "Sin tarjeta el mensaje se lee como una pantalla que no terminó de cargar; sin encabezado real no se puede saltar a él con el lector de pantalla."
+   },
+   {
+    "id": "v2-34inst-esqueleto-texto-y-sin-aplanar",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga — sin texto real dentro de las barras; con reduced-motion se aplana el fondo",
+    "dice_el_sistema": "Hay que aplanar el fondo, no solo parar la animación.",
+    "hay_en_el_build": "`@media (prefers-reduced-motion:reduce){.skel{animation:none}}` detiene la animación pero deja el degradado congelado (el sistema pide `background:var(--surface-2)`). Además las 6 barras `.skel` llevan texto real dentro (p. ej. «aviso de visitas sin asignar», medición propia st.cjs) bajo un `role=\"status\"` (§6.7: «sin texto real dentro de las barras»).",
+    "selector": ".skel",
+    "linea": 604,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 604,
+     "cita": "@media (prefers-reduced-motion:reduce){.skel{animation:none}}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico (estado transitorio). Dos líneas por maqueta; se recomienda corregir la plantilla ARQ-ESTADOS."
+    },
+    "por_que_importa": "Con «menos movimiento» las barras quedan a medio pintar; un lector de pantalla puede recitar el texto de relleno."
+   },
+   {
+    "id": "v2-34inst-buscador-doble-anillo",
+    "severidad": "baja",
+    "regla": "§1.7 Un control compuesto lleva un solo anillo de foco, y lo lleva el envoltorio",
+    "dice_el_sistema": "La regla general: si un contenedor reacciona a `:focus-within`",
+    "hay_en_el_build": "`.search:focus-within` dibuja `box-shadow:0 0 0 1px var(--accent)` y `.search input:focus-visible` dibuja además el `outline` estándar: dos líneas verdes concéntricas al enfocar.",
+    "selector": ".search, .search input",
+    "linea": 332,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 332,
+     "cita": ".search:focus-within{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Cosmético; se corrige junto con el cambio a `<label class=\"search\">`."
+    },
+    "por_que_importa": "Dos anillos de foco alrededor de la misma caja leen como un defecto de acabado."
+   },
+   {
+    "id": "v2-34inst-domingo-recortado-1280",
+    "severidad": "media",
+    "regla": "§6.11 regla 4 — la cabecera no se corta; regla 5 — ninguna columna desaparece en silencio",
+    "dice_el_sistema": "5. **Ninguna columna desaparece en silencio.** Ocultar por `@media` sin avisar deja a quien",
+    "hay_en_el_build": "A 1280 px la caja de la agenda (1010 px) es más estrecha que `min-width:1040px`: 30 px ocultos, la cabecera «DOMINGO 3» queda cortada y la visita en ámbar del domingo queda partida; a 1024 px solo asoman ≈ 5 px de esa columna (brief anchos_1440_1280_1024 + medición m34.cjs). Con 1040 de `min-width` y una primera columna de 210 px sobran 30 px a 1280.",
+    "selector": ".agenda table, th.dom-col",
+    "linea": 641,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 641,
+     "cita": ".agenda table{min-width:1040px;table-layout:fixed}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "La regla 5 admite desplazamiento horizontal, así que no es incumplimiento; pero el elemento cortado es justo el que el aviso manda corregir. Opciones concretas: bajar la primera columna a 180 px (con 7 × 135 queda 1125 > 1010: no basta) o reducir `min-width` a ~960 (7 × 107 + 210); decisión de la Fase 4a junto con la pregunta de la agenda."
+    },
+    "por_que_importa": "En el ancho de portátil más común el domingo, que es donde caen los errores de programación, queda a medio ver."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 2,
+   "responsive": 2,
+   "integridad": 2
+  },
+  "justificacion": "Accesibilidad 1: dos fallos críticos medidos (15 enlaces del menú sin nombre a 1000 px; buscador de 16 px de alto), `--text-3` a 4,21:1 en la vista día y al pasar el cursor, 53 de 62 nodos de texto de la agenda bajo el suelo de 12 px, iconos de botón a 1,03:1 en dos estados y cambios de vista no anunciados. Lo bueno: `<table>` con `<caption>` y `th scope` en ambos ejes, citas de 38 px de alto. Theming 2: `--text-3`, `--serie-1/2` y los pares -ink/-bg arrastran valores de antes de 2.15.0 (brief tokens_valores_divergentes), ninguna variable usada sin declarar. Responsive 2: la agenda no tiene modo estrecho (390 px: 684 px ocultos, la columna fija se come el 59 %), desborda a 1280 y 1024 y su cabecera sticky no se pega al scroll de la página. Integridad 2: Quincena y todos los filtros sin acción, 9 visitas dibujadas frente a «11», vista día y semana con datos distintos, y la visita sin instalador colgada de una persona. Rendimiento no evaluado (maqueta estática).",
+  "evidencia": [
+   "m34.cjs, v34.cjs, d34.cjs, k34.cjs, cromo.cjs, st.cjs (scratchpad/b2)",
+   "briefs2/34_instaladores.json: mediciones_v2",
+   "34_instaladores--1440.png, 34_instaladores--1280-fold.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — Tier B"
+ },
+ "cobertura": [],
+ "sin_datos": [
+  "La agenda «del sistema» con la que compara la pregunta del usuario: no está en mi brief ni en sistema-diseno.md 2.15.0 (sin componente de agenda; §13.9 solo la cita como origen de la regla). No se puede decir si son combinables ni cuál es más efectiva: es de la Fase 4a.",
+  "Qué hace «Quincena» (no tiene vista dibujada) y cómo se compone la agenda a más de 8 instaladores: la maqueta no lo dibuja (solo hay cuatro).",
+  "Fuente de los 11 visitas del resumen y de los 3 de la vista día: los datos de la maqueta no cuadran entre sí; no hay fuente que lo explique (FICHA solo cita Instaladores.tsx para el cero de carga)."
+ ]
+}
