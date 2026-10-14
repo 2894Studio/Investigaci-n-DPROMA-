@@ -240,7 +240,7 @@ Cada brief parte de lo que dibujó el cliente, evalúa al menos dos opciones (la
 | Brief | Observación | Veredicto de viabilidad | Recomendación |
 |---|---|---|---|
 | [`24-tickets-zona-superior.md`](briefs-diseno/24-tickets-zona-superior.md) | 9 y 10 · Tickets TI, zona superior | **viable con condiciones** | Un solo bloque ámbar (el plazo) a ancho declarado junto a los datos; la regla de cierre en una banda neutra de una frase; el resto a toggletip; `padding-bottom` en la cabecera. |
-| [`27-acordeon-sucursales.md`](briefs-diseno/27-acordeon-sucursales.md) | 12 · acordeón de sucursales | **viable** | Cinco filas hijas que abren; lista de 560 px sin tarjeta; estado solo si la sucursal no puede recibir órdenes; «Ver órdenes» junto a cada una. Botones fuera de vista a 1280: de 4 a 0. |
+| [`27-acordeon-sucursales.md`](briefs-diseno/27-acordeon-sucursales.md) | 12 · acordeón de sucursales | **viable** | Cinco filas hijas que abren; la fila hija ocupa el ancho visible de la tabla con «Ver órdenes» al final de cada fila (revisado tras un comentario: el brief proponía una lista de 560 px); estado solo si la sucursal está bloqueada. |
 | [`27-etiquetas-de-estado.md`](briefs-diseno/27-etiquetas-de-estado.md) | 3 · etiquetas de estado del padrón | **viable con condiciones** | Un estado por eje (Completos · Pendientes · Sin calcular; Activo · Inactivo); el documento que falta es una línea, no un estado; sin «Por vencer» hasta D7. |
 | [`28-mi-dia.md`](briefs-diseno/28-mi-dia.md) | 13 · Mi día | **B viable; C viable con condiciones** | `.p4{padding-bottom:var(--sp-3)}`, declarar `--sp-5`, aire al final de la lista y resumen oculto en vacío/error. La opción C recupera los 12 px de pliegue subiendo la fecha a la cabecera, pero requiere decisión de producto. |
 | [`34-agenda.md`](briefs-diseno/34-agenda.md) | 14 · agenda de instaladores | **viable con condiciones** | No cambiarla: ningún fallo crítico depende de ella. Cambio mínimo: texto ≥12 px, fila «Sin asignar», domingo visible a 1280, cabecera fija, `--text-3`. La «agenda del sistema» no existe en 2.15.0. |
@@ -248,6 +248,30 @@ Cada brief parte de lo que dibujó el cliente, evalúa al menos dos opciones (la
 | [`54-panel-con-que-filtros.md`](briefs-diseno/54-panel-con-que-filtros.md) | 18 · panel «CON QUÉ FILTROS» | **viable con condiciones** | Dos grupos en la misma celda; marca «Dato personal» con escudo sin color de estado; valores literales («Querétaro y Celaya», no «2 de 5»). Incluye la regla de sistema para la marca de sensibilidad. |
 
 **Dos hechos que cambian la lectura de la observación 3:** las etiquetas «Falta documento» e «Incompleto» no existen en `27_padron_clientes` del ZIP (`grep` = 0); «Incompleto» solo aparece en `06_padron_clientes`, un prototipo anterior. Probablemente tu captura es de otra versión. Y los briefs de `24` y `27` parten de la copia que trae el ZIP (Anexo A).
+
+### 7.3 Padrón de clientes con todos los ajustes a la vez
+
+Se combinaron sobre el archivo real de `27_padron_clientes` el acordeón de sucursales, los estados de documentos por eje, el aire bajo la cabecera, el buscador a 24 px, las acciones de fila ancladas a la derecha y la retirada del banner de duplicados (D8). Es un prototipo (`briefs-diseno/prototipos/27-padron-combinado.html`), no un cambio aplicado.
+
+| Medido en el navegador | Ancho | Archivo del ZIP | Con los ajustes |
+|---|---:|---:|---:|
+| «Ver órdenes» a la vista | 1440 px | 4/4 | 4/4 |
+| Botones de fila completos | 1440 px | 18/18 | 18/18 |
+| «Ver órdenes» a la vista | 1280 px | 0/4 | 4/4 |
+| Botones de fila completos | 1280 px | 6/18 | 18/18 |
+| «Ver órdenes» a la vista | 1024 px | 0/4 | 4/4 |
+| Botones de fila completos | 1024 px | 0/18 | 18/18 |
+
+**Estado de cada parte de las observaciones del padrón tras los briefs:**
+
+| Observación | Parte | Estado |
+|---|---|---|
+| 3 | Estados demasiado específicos | Resuelta (brief de etiquetas): un estado por eje |
+| 3 | Acciones cortadas en todas las filas | Resuelta en el prototipo combinado anclando la columna de acciones a la derecha. **Propuesta nuestra, sin brief propio** |
+| 3 | «Acciones» alineada a la izquierda de su casilla | **Sin resolver**: no hay solución evaluada |
+| 12 | Acordeón de sucursales | Resuelto (brief del acordeón, revisado: fila a todo el ancho visible con «Ver órdenes» al final) |
+| — | Banner de duplicados (D8) y chip «por vencer» (D7) | Retirados en el prototipo: el aviso del ingeniero los deja pospuestos |
+| — | Botón flotante sobre la última fila | **Sin resolver** |
 
 ## 8 · Qué tan fiable es esta auditoría
 

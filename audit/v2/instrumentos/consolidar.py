@@ -178,7 +178,7 @@ P('| Brief | Observación | Veredicto de viabilidad | Recomendación |\n|---|---
 OBSB = {'24-tickets-zona-superior.md': '9 y 10 · Tickets TI, zona superior', '27-acordeon-sucursales.md': '12 · acordeón de sucursales', '27-etiquetas-de-estado.md': '3 · etiquetas de estado del padrón', '28-mi-dia.md': '13 · Mi día',
         '34-agenda.md': '14 · agenda de instaladores', '47-asistente.md': '17 · Asistente', '54-panel-con-que-filtros.md': '18 · panel «CON QUÉ FILTROS»'}
 RECB = {'24-tickets-zona-superior.md': 'Un solo bloque ámbar (el plazo) a ancho declarado junto a los datos; la regla de cierre en una banda neutra de una frase; el resto a toggletip; `padding-bottom` en la cabecera.',
- '27-acordeon-sucursales.md': 'Cinco filas hijas que abren; lista de 560 px sin tarjeta; estado solo si la sucursal no puede recibir órdenes; «Ver órdenes» junto a cada una. Botones fuera de vista a 1280: de 4 a 0.',
+ '27-acordeon-sucursales.md': 'Cinco filas hijas que abren; la fila hija ocupa el ancho visible de la tabla con «Ver órdenes» al final de cada fila (revisado tras un comentario: el brief proponía una lista de 560 px); estado solo si la sucursal está bloqueada.',
  '27-etiquetas-de-estado.md': 'Un estado por eje (Completos · Pendientes · Sin calcular; Activo · Inactivo); el documento que falta es una línea, no un estado; sin «Por vencer» hasta D7.',
  '28-mi-dia.md': '`.p4{padding-bottom:var(--sp-3)}`, declarar `--sp-5`, aire al final de la lista y resumen oculto en vacío/error. La opción C recupera los 12 px de pliegue subiendo la fecha a la cabecera, pero requiere decisión de producto.',
  '34-agenda.md': 'No cambiarla: ningún fallo crítico depende de ella. Cambio mínimo: texto ≥12 px, fila «Sin asignar», domingo visible a 1280, cabecera fija, `--text-3`. La «agenda del sistema» no existe en 2.15.0.',
@@ -191,6 +191,22 @@ for f in bd:
     ver_txt = ('B viable; C viable con condiciones' if nm == '28-mi-dia.md' else (m[0] if m else '(ver archivo)'))
     P(f'| [`{nm}`](briefs-diseno/{nm}) | {OBSB.get(nm, nm)} | **{ver_txt}** | {RECB.get(nm, "(ver archivo)")} |')
 P('\n**Dos hechos que cambian la lectura de la observación 3:** las etiquetas «Falta documento» e «Incompleto» no existen en `27_padron_clientes` del ZIP (`grep` = 0); «Incompleto» solo aparece en `06_padron_clientes`, un prototipo anterior. Probablemente tu captura es de otra versión. Y los briefs de `24` y `27` parten de la copia que trae el ZIP (Anexo A).\n')
+pc = L(f'{R}/mediciones/v2/padron-combinado.json')
+P('### 7.3 Padrón de clientes con todos los ajustes a la vez\n')
+P('Se combinaron sobre el archivo real de `27_padron_clientes` el acordeón de sucursales, los estados de documentos por eje, el aire bajo la cabecera, el buscador a 24 px, las acciones de fila ancladas a la derecha y la retirada del banner de duplicados (D8). Es un prototipo (`briefs-diseno/prototipos/27-padron-combinado.html`), no un cambio aplicado.\n')
+P('| Medido en el navegador | Ancho | Archivo del ZIP | Con los ajustes |\n|---|---:|---:|---:|')
+for w in (1440, 1280, 1024):
+    o, n_ = pc[f'original-{w}'], pc[f'combinado-{w}']
+    P(f'| «Ver órdenes» a la vista | {w} px | {o["verOrdenes"].replace(" dentro","")} | {n_["verOrdenes"].replace(" dentro","")} |')
+    P(f'| Botones de fila completos | {w} px | {o["accionesFila"].replace(" dentro","")} | {n_["accionesFila"].replace(" dentro","")} |')
+P('\n**Estado de cada parte de las observaciones del padrón tras los briefs:**\n')
+P('| Observación | Parte | Estado |\n|---|---|---|')
+P('| 3 | Estados demasiado específicos | Resuelta (brief de etiquetas): un estado por eje |')
+P('| 3 | Acciones cortadas en todas las filas | Resuelta en el prototipo combinado anclando la columna de acciones a la derecha. **Propuesta nuestra, sin brief propio** |')
+P('| 3 | «Acciones» alineada a la izquierda de su casilla | **Sin resolver**: no hay solución evaluada |')
+P('| 12 | Acordeón de sucursales | Resuelto (brief del acordeón, revisado: fila a todo el ancho visible con «Ver órdenes» al final) |')
+P('| — | Banner de duplicados (D8) y chip «por vencer» (D7) | Retirados en el prototipo: el aviso del ingeniero los deja pospuestos |')
+P('| — | Botón flotante sobre la última fila | **Sin resolver** |\n')
 P('## 8 · Qué tan fiable es esta auditoría\n')
 P(f'- **Validadores deterministas** (no son agentes): {len(raw)} de {len(raw)} fichas con 0 errores (JSON, § existentes en la 2.15.0, clases y ids presentes en el HTML, citas literales en su línea, `pp-NNN` reales, hashes). Una ficha de prueba rota a propósito dispara los 8 errores inyectados.')
 ci = L(f'{R}/mediciones/v2/citas.json')

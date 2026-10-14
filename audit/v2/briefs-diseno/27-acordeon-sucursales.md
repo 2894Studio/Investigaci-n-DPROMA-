@@ -1,5 +1,9 @@
 # Brief de diseño · Padrón de clientes (`27_padron_clientes`) · acordeón de sucursales
 
+> **Revisión del 14-oct (posterior al brief, tras una observación de la dirección del proyecto).** La opción recomendada de este brief dejaba la lista de sucursales en 560 px, con «Ver órdenes» junto al nombre y las líneas divisorias cortadas a mitad de la fila: se veía a medias. **La versión vigente es esta:** la fila hija ocupa el **ancho visible** de la tabla (`.suc-lista{position:sticky;left:0;width:100cqw}` con `container-type:inline-size` en `.tabla-caja`), las líneas llegan al final de la fila y «Ver órdenes» queda **al final de cada fila**. El ancho se fija al área visible, no al de la tabla, para que el botón no se salga de vista al deslizar. Medido en el prototipo (`mediciones/v2/padron-combinado.json`): «Ver órdenes» a la vista a 1280 px **4 de 4** (original: 0 de 4) y a 1024 px **4 de 4** (original: 0 de 4). **Quedan sustituidos por esta revisión** el CSS `max-width:560px` de §4.2, la fila de 560 px de la tabla de §3 y la regla de §7 («unos 560 px, alineada a la izquierda»). El resto del brief sigue vigente.
+> **Cambio relacionado, no incluido en este brief:** para la observación 3 (acciones cortadas) el prototipo combinado ancla además la columna de acciones a la derecha (`position:sticky;right:0`). Medido: botones de fila completos a 1280 px **18 de 18** (original: 6 de 18) y a 1024 px **18 de 18** (original: 0 de 18). Es una propuesta nuestra, sin brief propio.
+
+
 | | |
 |---|---|
 | **Pantalla** | `27_padron_clientes.html` (paquete `Actualizacion-12-10-26`, 931 líneas) |
