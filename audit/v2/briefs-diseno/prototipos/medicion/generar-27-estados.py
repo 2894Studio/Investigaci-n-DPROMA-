@@ -33,6 +33,10 @@ sub(c1, f'<button class="schip c-warn" type="button" aria-pressed="false" data-f
 c2 = re.search(r'<button class="schip c-warn"[^>]*data-f="documento-por-vencer">.*?</button>', s, flags=re.S).group(0)
 sub(c2, '')
 
+# 3b. «Inactivo» es el estado --pause del semáforo (§1.3), no un neutro
+sub('<span class="pill p-neutro"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-pause"/></svg>Inactivo</span>',
+    '<span class="pill p-pause"><svg class="ico ico-xs" aria-hidden="true"><use href="#i-pause"/></svg>Inactivo</span>')
+
 # 4. Las dos notas que explicaban estados salen de la pantalla (su contenido vive en el toggletip de la cabecera)
 n1 = re.search(r'<p class="nota"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg><span><b>Los dos documentos son opcionales.*?</p>\n', s, flags=re.S).group(0)
 sub(n1, '')

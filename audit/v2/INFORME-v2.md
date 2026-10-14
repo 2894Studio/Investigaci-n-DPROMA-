@@ -4,7 +4,7 @@
 
 ## 1 · Resumen ejecutivo
 
-1. **El ZIP trae 50 pantallas, pero no son las mismas 50 que lista el PDF.** El PDF las reparte en dos carpetas del repo del cliente: `html_v2/` (21 pantallas) y `sistema/` (29 pantallas). Las 21 de `html_v2/` están en el ZIP **y muestran los cambios** que el PDF declara. De las 29 de `sistema/`, 10 **no están** y 19 están, pero **sin** los cambios declarados (parecen la copia anterior). La coincidencia es total (50 de 50 pantallas), así que lo más probable es que el ZIP sea la carpeta `html_v2/` y falte la carpeta `sistema/` actualizada. Está por confirmar con el cliente.
+1. **Alcance.** Se audita lo que contiene el ZIP: 50 pantallas. El listado de pantallas del PDF del cliente no se usa como criterio. Sí se contrastó, a modo informativo, lo que el PDF declara contra los archivos (Anexo A): 40 de sus 50 pantallas están en el ZIP y en 19 de ellas no se ven los cambios declarados.
 2. **Qué se auditó.** 50 pantallas en el ZIP: **23** a fondo (observaciones, F1, F3; F4 y F5 en las de nivel A), con instrumentos medidos y fixtures validados; las otras 27 solo con regresión mecánica. 6 son idénticas a v1.
 3. **Calidad de la propia auditoría.** 119 afirmaciones altas o críticas pasaron por verificadores que intentaron refutarlas con medición propia: **110 confirmadas, 9 exageradas, 0 refutadas** (precisión 92.4 %). Una réplica ciega de 2 pantallas **no** alcanzó el umbral de concordancia que nos fijamos (§8): una sola pasada no agota lo que hay.
 4. **Lo que sí está medido, en una línea cada uno.**
@@ -16,21 +16,11 @@
 5. **Rediseños críticos** (Tickets TI, acordeón de sucursales, Asistente, Mi día): diagnóstico y brief con veredicto de viabilidad en §7.
 6. **Lo que se le pide al cliente** se limita a críticos y regresiones (§5); el resto se adopta y se documenta en nuestro sistema (§6).
 
-## 2 · Qué se recibió frente a lo que se declara
+## 2 · Qué contiene el ZIP
 
-La columna «Carpeta» sale del propio PDF (`html_v2/` o `sistema/`). El análisis sale de `claims.py` (lectura estática de cada código C1–C18 del PDF contra su archivo) y de comparar hashes con v1. C11, C13, C14, C15 y C18 no se pueden verificar mecánicamente; C2 se mide en navegador.
+El ZIP trae 50 pantallas HTML (más `_sio-tokens.css`, `FICHAS_TECNICAS.md` y el aviso del padrón). Frente a v1: **6 idénticas** (10_dprimi_asistente, 11_app_login_2fa_offline, 12_app_checado_asistencia, 13_panel_asistencia_rhl, 14_app_checado_oficina, 56_frontera_error), **8 nuevas** (02_dashboard, 03_kanban_gestoria, 04_app_personal, 05_app_cliente, 06_padron_clientes, 07_orden_instalacion, 38_vehicular_detalle, 48_asistencia_rhl) y 36 modificadas. De las 52 de v1, 10 no están en este ZIP (31_orden_detalle, 49_alta_orden, 52_vehicular_bandeja, 53_tramite_detalle, facturacion, viaticos-adeudos-nomina, viaticos-alta-solicitud, viaticos-discrepancia-cfdi, viaticos-reembolso, viaticos-remanente); sus observaciones (4 y 15, `49_alta_orden`) quedan sin datos.
 
-| Grupo | N | Pantallas |
-|---|---:|---|
-| Listadas en el PDF y **ausentes del ZIP** | 10 | 31_orden_detalle, 49_alta_orden, 52_vehicular_bandeja, 53_tramite_detalle, facturacion, viaticos-adeudos-nomina, viaticos-alta-solicitud, viaticos-discrepancia-cfdi, viaticos-reembolso, viaticos-remanente |
-| Listadas, presentes, **sin los cambios declarados** | 19 | 01_login, 08_detalle_tramite, 22_gestoria, 24_tickets, 26_estados_de_pantalla, 30_ordenes_listado, 32_cfe_bandeja, 33_cfe_detalle, 34_instaladores, 36_recetas_despacho, 42_alta_tramite_gestoria, 43_alta_tramite_vehicular, 44_alta_tramite_cfe, 45_autorizacion_compra, 46_cuentas_por_cobrar, 51_acceso, 56_frontera_error, 57_menu_cuenta, 58_altas_como_modal |
-| Listadas, presentes, **cambios confirmados** | 21 | 07_orden_instalacion, 09_app_checklist_instalacion, 20_tablero, 21_ficha_cliente, 23_viaticos, 25_consumo_de_material, 27_padron_clientes, 28_instalador_mi_dia, 29_instalador_orden, 35_incidencias, 37_concluidos, 38_vehicular_detalle, 39_viatico_detalle, 40_usuarios, 41_alta_cliente, 47_asistente, 48_asistencia_rhl, 50_compras_almacen, 54_bitacora_descargas, 55_verificacion_pedido, 59_editar_cliente |
-| En el ZIP y nuevas respecto a v1 | 8 | 02_dashboard, 03_kanban_gestoria, 04_app_personal, 05_app_cliente, 06_padron_clientes, 07_orden_instalacion, 38_vehicular_detalle, 48_asistencia_rhl |
-| Idénticas byte a byte a v1 | 6 | 10_dprimi_asistente, 11_app_login_2fa_offline, 12_app_checado_asistencia, 13_panel_asistencia_rhl, 14_app_checado_oficina, 56_frontera_error |
-
-Nota sobre C1 (nada menor de 12 px): se midió en las hojas `<style>`. Además, 8 pantallas tienen `font-size` menor de 12 px en atributos `style=""` (23_viaticos, 33_cfe_detalle, 36_recetas_despacho, 37_concluidos, 38_vehicular_detalle, 39_viatico_detalle, 45_autorizacion_compra, 46_cuentas_por_cobrar); no es claro si el PDF contaba esos atributos, así que no se usa para clasificar.
-
-**Consecuencia directa.** Las observaciones 4 y 15 (`49_alta_orden`, que vive en `sistema/icev/`) no se pueden auditar sobre v2. Tickets TI, Acceso, Altas como modal, Cuentas por cobrar y Agenda de instaladores son pantallas de `sistema/`: lo que se auditó de ellas es la copia que trae el ZIP, que puede no ser la que viste en tus capturas.
+Auditoría a fondo: 23 pantallas. Solo regresión mecánica: 27.
 
 ## 3 · Regresión mecánica v1 → v2 (mismo arnés, mismas fuentes)
 
@@ -223,6 +213,8 @@ Contradicciones internas de nuestro sistema que los auditores encontraron (a res
 
 ### 7.2 Briefs de diseño (Fase 4)
 
+**`24-tickets-zona-superior.md`** — veredicto: **Alcance dentro del sistema actual.** Sí. Todo con tokens existentes (`--warn-*`, `--err-*`, `--ok-*`, `--surface-2`, `--sp-*`, `--fs-meta`, `--fs-title`) y componentes documentados: `.banda` (§6.9), indicador de §6.20, toggletip §6.23. El único elemento no presente en las maquetas del cliente es el toggletip (ninguna lo implementa: `grep infob` en el paquete solo devuelve `.infobox` de otro componente). **Esfuerzo.
+
 **`28-mi-dia.md`** — veredicto: **B: viable.** **C: viable con condiciones.** (Veredicto de la pantalla: **viable**; lo exigible es B.) | Criterio | Respuesta | |---|---| | **Alcance dentro del sistema** | Sí. B usa solo tokens existentes (`--sp-3`, `--sp-4`, `--sp-5`, `--sp-6`, `--sh-modal`) y §3.1 tal como está escrito. C añade únicamente `.pill.p-block` (§6.10) con el icono que la propia pantalla ya usa en la cita (`#i-pause`). Cero componentes 
 
 **`34-agenda.md`** — veredicto: **Mantener la agenda del cliente con cambio mínimo (A′): `viable con condiciones`.** - Alcance: dentro del sistema actual; 0 componentes nuevos; CSS y HTML de un archivo; sin JS nuevo. - Esfuerzo: K1–K3 de una línea cada uno; S1–S6 en un solo archivo (+44/−22 líneas). - Compatibilidad con decisiones citadas literal: respeta L366, L367, L369–371 y L910–912. - **Condiciones**: (a) que el cliente acepte la fila «Sin asi
@@ -244,11 +236,27 @@ Contradicciones internas de nuestro sistema que los auditores encontraron (a res
 
 ## 9 · Pendientes
 
-1. **Confirmar con el cliente si el ZIP es solo la carpeta `html_v2/`** y pedir la carpeta `sistema/` actualizada: 10 pantallas ausentes (entre ellas `49_alta_orden`) y 19 con la copia anterior.
+1. **Opcional:** si más adelante se consigue la carpeta `sistema/` del cliente, re-medir esas pantallas; este informe se limita al ZIP recibido.
 2. **Confirmar identidades inferidas**: la hoja 1 es `22` o `32` (ambas tienen el defecto); la hoja 2 es `05_app_cliente` (coincide el nombre «Laura Núñez»); la hoja 5 es `13_panel_asistencia_rhl`, no `48`.
 3. **Decidir** las preguntas de diseño abiertas (§7.2) y qué rama de la 2.15.0 es la base para documentar las divergencias.
 4. **Corregir en nuestro sistema** las contradicciones de §6 antes de subir versión.
 
-## Anexo · Cómo reproducir
+## Anexo A · Contraste informativo con el PDF del cliente
+
+La columna «Carpeta» sale del propio PDF (`html_v2/` o `sistema/`). El análisis sale de `claims.py` (lectura estática de cada código C1–C18 del PDF contra su archivo) y de comparar hashes con v1. C11, C13, C14, C15 y C18 no se pueden verificar mecánicamente; C2 se mide en navegador.
+
+| Grupo | N | Pantallas |
+|---|---:|---|
+| Listadas en el PDF y **ausentes del ZIP** | 10 | 31_orden_detalle, 49_alta_orden, 52_vehicular_bandeja, 53_tramite_detalle, facturacion, viaticos-adeudos-nomina, viaticos-alta-solicitud, viaticos-discrepancia-cfdi, viaticos-reembolso, viaticos-remanente |
+| Listadas, presentes, **sin los cambios declarados** | 19 | 01_login, 08_detalle_tramite, 22_gestoria, 24_tickets, 26_estados_de_pantalla, 30_ordenes_listado, 32_cfe_bandeja, 33_cfe_detalle, 34_instaladores, 36_recetas_despacho, 42_alta_tramite_gestoria, 43_alta_tramite_vehicular, 44_alta_tramite_cfe, 45_autorizacion_compra, 46_cuentas_por_cobrar, 51_acceso, 56_frontera_error, 57_menu_cuenta, 58_altas_como_modal |
+| Listadas, presentes, **cambios confirmados** | 21 | 07_orden_instalacion, 09_app_checklist_instalacion, 20_tablero, 21_ficha_cliente, 23_viaticos, 25_consumo_de_material, 27_padron_clientes, 28_instalador_mi_dia, 29_instalador_orden, 35_incidencias, 37_concluidos, 38_vehicular_detalle, 39_viatico_detalle, 40_usuarios, 41_alta_cliente, 47_asistente, 48_asistencia_rhl, 50_compras_almacen, 54_bitacora_descargas, 55_verificacion_pedido, 59_editar_cliente |
+| En el ZIP y nuevas respecto a v1 | 8 | 02_dashboard, 03_kanban_gestoria, 04_app_personal, 05_app_cliente, 06_padron_clientes, 07_orden_instalacion, 38_vehicular_detalle, 48_asistencia_rhl |
+| Idénticas byte a byte a v1 | 6 | 10_dprimi_asistente, 11_app_login_2fa_offline, 12_app_checado_asistencia, 13_panel_asistencia_rhl, 14_app_checado_oficina, 56_frontera_error |
+
+Nota sobre C1 (nada menor de 12 px): se midió en las hojas `<style>`. Además, 8 pantallas tienen `font-size` menor de 12 px en atributos `style=""` (23_viaticos, 33_cfe_detalle, 36_recetas_despacho, 37_concluidos, 38_vehicular_detalle, 39_viatico_detalle, 45_autorizacion_compra, 46_cuentas_por_cobrar); no es claro si el PDF contaba esos atributos, así que no se usa para clasificar.
+
+**Lectura.** Las observaciones 4 y 15 (`49_alta_orden`, que vive en `sistema/icev/`) no se pueden auditar sobre v2. Tickets TI, Acceso, Altas como modal, Cuentas por cobrar y Agenda de instaladores son pantallas de `sistema/`: lo que se auditó de ellas es la copia que trae el ZIP, que puede no ser la que viste en tus capturas.
+
+## Anexo B · Cómo reproducir
 
 `audit/v2/instrumentos/` (medidores, `verificar-fixtures.sh`, `validar.py`, `concordancia.py`, `consolidar.py`), `audit/v2/mediciones/` (JSON de v1 y v2), `audit/v2/raw/` (una ficha por pantalla), `audit/v2/verif/` y `audit/v2/replica/`. Todas las cifras de este documento salen de esos archivos.
