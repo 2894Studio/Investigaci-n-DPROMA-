@@ -149,6 +149,12 @@ for n, h in regres:
     P(f'| `{n}` | {(h.get("por_que_importa") or "")[:200]} | {h["regla"].split(" (")[0][:60]} | {v.get("veredicto") or "no verificada (severidad no alta)"}{corr} |')
 P('')
 
+P('### 5.4 Arreglos de accesibilidad que el propio cliente documentó y que v2 deshace\n')
+rf = L(f'{R}/mediciones/v2/regresion-fichas.json')
+P(f'`FICHAS_TECNICAS.md` («Defectos reales de accesibilidad encontrados y corregidos», verificados con axe-core) lista arreglos ya hechos en v1. Se comprobó cada uno en el ZIP: **{sum(o["perdido"] for o in rf)} de {len(rf)} se han perdido** (el patrón de v1 ya no está). Parece que la actualización se aplicó sobre copias anteriores a esos arreglos.\n')
+P('| Pantalla | Arreglo documentado | v1 | v2 | ¿Perdido? |\n|---|---|---:|---:|:-:|')
+for o in rf: P(f'| `{o["pantalla"]}` | {o["arreglo"]} | {o["ocurrencias_v1"]} | {o["ocurrencias_v2"]} | {"**sí**" if o["perdido"] else "no"} |')
+P('\n(Ocurrencias = veces que aparece la construcción en el archivo; para el arreglo de `header` y `role="menu"`, 0 es lo correcto; para `--text-3-fuerte`, lo correcto es >0.) Además, en `24`, `33` y `01` el `--text-3` sigue en `#66717F` (4,21:1 sobre `--surface-2`), así que esos textos quedan sin ninguno de los dos arreglos: ni `--text-3-fuerte` ni el `#5C6675` nuevo. Esto amplía las 7 regresiones de §5.3, que solo cubrían las pantallas auditadas a fondo.\n')
 P('## 6 · Lo que se adopta del cliente y se documenta en nuestro sistema\n')
 P(f'De los {sum(dec.values())} hallazgos de F1: **{dec["adoptar_cliente"]} se adoptan** (el cliente decide), **{dec["exigir_cambio"]} se le exigen**, **{dec["ajustar_sistema"]} piden ajustar nuestro sistema**, {dec["decidir_diseño"]} son decisiones de diseño abiertas y {dec["sin_accion"]} no requieren acción. Estado frente a v1: {estv1["persiste"]} persisten, {estv1["nuevo"]} son nuevos, {estv1["regresion"]} son regresiones.\n')
 P('Patrones que el cliente usa y nuestro sistema no documenta (propuestas de regla en cada ficha, campo `cobertura`):\n')

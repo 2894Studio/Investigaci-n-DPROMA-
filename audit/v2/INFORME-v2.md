@@ -121,6 +121,24 @@ Criterios de «crítico» (acordados): (1) fallo de accesibilidad medido, (2) im
 | `51_acceso` | La pantalla de entrada se queda sin ningun encabezado: quien navega por encabezados no encuentra la pagina y el titulo de la ventana es lo unico que la nombra. | §6.4 regla 2 «Cada estado lleva un encabezado real» + FICHAS | confirmada |
 | `58_altas_como_modal` | La pagina pierde su titulo: no hay encabezado de nivel 1 ni nombre visible, y el subtitulo que reconocia que el modal ya solo gobierna cuatro altas desaparece. | §6.4 regla 2 | confirmada |
 
+### 5.4 Arreglos de accesibilidad que el propio cliente documentó y que v2 deshace
+
+`FICHAS_TECNICAS.md` («Defectos reales de accesibilidad encontrados y corregidos», verificados con axe-core) lista arreglos ya hechos en v1. Se comprobó cada uno en el ZIP: **9 de 9 se han perdido** (el patrón de v1 ya no está). Parece que la actualización se aplicó sobre copias anteriores a esos arreglos.
+
+| Pantalla | Arreglo documentado | v1 | v2 | ¿Perdido? |
+|---|---|---:|---:|:-:|
+| `26_estados_de_pantalla` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 0 | 1 | **sí** |
+| `33_cfe_detalle` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 0 | 1 | **sí** |
+| `42_alta_tramite_gestoria` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 0 | 1 | **sí** |
+| `43_alta_tramite_vehicular` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 0 | 1 | **sí** |
+| `44_alta_tramite_cfe` | `<header class="p4">` duplicaba role="banner" → `<div class="p4">` | 0 | 1 | **sí** |
+| `24_tickets` | `--text-3-fuerte` en textos que no pasaban 4,5:1 | 6 | 0 | **sí** |
+| `33_cfe_detalle` | `--text-3-fuerte` en textos que no pasaban 4,5:1 | 5 | 0 | **sí** |
+| `01_login` | `--text-3-fuerte` en textos que no pasaban 4,5:1 | 2 | 0 | **sí** |
+| `57_menu_cuenta` | sin `role="menu"` mal aplicado (aria-required-children) | 0 | 2 | **sí** |
+
+(Ocurrencias = veces que aparece la construcción en el archivo; para el arreglo de `header` y `role="menu"`, 0 es lo correcto; para `--text-3-fuerte`, lo correcto es >0.) Además, en `24`, `33` y `01` el `--text-3` sigue en `#66717F` (4,21:1 sobre `--surface-2`), así que esos textos quedan sin ninguno de los dos arreglos: ni `--text-3-fuerte` ni el `#5C6675` nuevo. Esto amplía las 7 regresiones de §5.3, que solo cubrían las pantallas auditadas a fondo.
+
 ## 6 · Lo que se adopta del cliente y se documenta en nuestro sistema
 
 De los 268 hallazgos de F1: **128 se adoptan** (el cliente decide), **58 se le exigen**, **58 piden ajustar nuestro sistema**, 22 son decisiones de diseño abiertas y 2 no requieren acción. Estado frente a v1: 198 persisten, 63 son nuevos, 7 son regresiones.
