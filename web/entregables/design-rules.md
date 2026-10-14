@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.15.0
-last_updated: 2026-10-09
+version: 2.16.0
+last_updated: 2026-10-14
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -205,6 +205,10 @@ solo fuera de `SIO-DPROMA`.
 Cinco estados, no dos. Un cliente no está solo bien o mal: puede estar en espera de un
 documento (`warn`), bloqueado por una condición que no depende de quien mira (`block`), o
 simplemente inactivo (`pause`), que no es un error.
+
+**`warn` mientras se pueda seguir trabajando el registro; `err` solo cuando ya impide operar en
+esa pantalla.** Un documento que falta es `warn` si el cliente se sigue pudiendo editar y
+consultar, y solo bloquea la acción puntual que lo exige (programar, facturar).
 
 | Estado | Significa | Claro | Oscuro |
 |---|---|---|---|
@@ -461,9 +465,22 @@ La regla práctica: **si un dato se lee todos los días, va a 12–13px como mí
 12px no queda nada; si algo parece necesitarlo, la respuesta es que sobra en esa pantalla, no
 que haya que encogerlo.
 
-Se admite una excepción, y solo una: 10,5px en mayúsculas con `letter-spacing` para los
-**rótulos de grupo** de la barra lateral y las etiquetas de campo del modo tarjeta. Son cuatro
-o cinco palabras que se leen una vez para orientarse, no datos.
+Se admite una excepción, y solo una: 10,5px con `letter-spacing` para los **rótulos de grupo** de
+la barra lateral —en mayúsculas o en caja de frase, según el rótulo— y las etiquetas de campo del
+modo tarjeta. Son cuatro o cinco palabras que se leen una vez para orientarse, no datos. No
+alcanza a nada más: una etiqueta de prioridad, una fecha relativa o un badge no entran en ella,
+aunque midan lo mismo.
+
+### 2.2 Escala de interlineado
+
+```css
+--lh-compacto:1.25;  /* títulos y datos de una línea */
+--lh-texto:1.5;      /* texto de varias líneas */
+--lh-lectura:1.6;    /* párrafos largos */
+```
+
+Un texto de más de una línea no se deja en `normal`. La escala recoge los valores que el sistema
+ya usaba sueltos en cinco componentes distintos, redondeados a tres pasos con nombre.
 
 ---
 
@@ -547,6 +564,11 @@ correcto en una rejilla de dashboard —evita que una tarjeta corta se estire ha
 la más larga—, pero cuando tres tarjetas se comparan entre sí, tamaños distintos sugieren
 importancia distinta. Para ese caso la fila lleva `align-items:stretch` y el mismo número de
 columnas por tarjeta.
+
+**Caso medido: una cabecera con solo título.** 36 de las 50 pantallas construidas no incorporan
+esta regla en su bloque de cabecera; una de ellas mide 38px de alto con 12px de aire arriba del
+título y ninguno abajo. Se comprueba midiendo: el control más bajo pegado a la línea divisoria,
+a 0px, es el síntoma.
 
 ## 4. Sombra y superficie translúcida
 
@@ -646,7 +668,7 @@ boton.addEventListener('click', function(){
   background:var(--surface);color:var(--text);font:600 var(--fs-dense) var(--font-ui);cursor:pointer}
 .btn.p{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .btn.mini{min-height:28px;padding:5px 10px;font-size:var(--fs-meta)}
-.btn .msi{font-size:17px}
+.btn .ico{font-size:17px}
 ```
 
 En la pantalla de acceso los botones van a 44px de alto, por encima del mínimo, porque son las
@@ -665,10 +687,10 @@ regla de bloque pintaba de gris todos los iconos dentro de un estado, incluido e
 
 ```css
 /* MAL: alcanza también al icono del botón que hay dentro */
-.estado .msi{ color:var(--text-3) }
+.estado .ico{ color:var(--text-3) }
 /* BIEN: el botón se defiende */
-.estado .msi{ color:var(--text-3) }
-.estado .btn .msi{ color:inherit }
+.estado .ico{ color:var(--text-3) }
+.estado .btn .ico{ color:inherit }
 ```
 
 ### 6.3 Tarjeta (`.tarjeta`) — una sola receta de superficie
@@ -733,6 +755,18 @@ disponible de su tarjeta se declara con `flex:1` (o `width:100%` en grid), nunca
 `max-width` que sobrevivió a un rediseño de layout. Se comprueba midiendo el `getBoundingClientRect()`
 del hijo contra el de la tarjeta: si el hijo no llega al borde interior, algo lo está capando.
 
+**Tarjeta con pie.** Dos zonas hermanas, cada una con su propio relleno: el cuerpo (`.interior`)
+y el pie, una banda `--surface-2` con borde superior, como la cabecera pero al final. El pie no
+se sangra con márgenes negativos.
+
+```css
+.tarjeta > .pie{padding:var(--sp-3) var(--sp-4);background:var(--surface-2);
+  border-top:1px solid var(--border)}
+```
+
+Un pie dice una sola cosa: la procedencia son enlaces de lectura; el paso a seguir, botones
+`.btn.mini`. Se distinguen por la forma, no solo por el rótulo.
+
 ### 6.4 Vistas de estado de una pantalla
 
 Toda pantalla que pida datos tiene cuatro formas de presentarse: **con datos, cargando, vacía y
@@ -783,7 +817,7 @@ glifo gris. El contenedor centra; la tarjeta de dentro es la que tiene forma.
 .estado-ico{width:52px;height:52px;border-radius:50%;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   background:var(--accent);color:var(--on-state)}
-.estado-ico .msi{font-size:28px}
+.estado-ico .ico{font-size:28px}
 .tarjeta-estado.es-err .estado-ico{background:var(--err)}
 .tarjeta-estado p{color:var(--text-2);font-size:var(--fs-dense);line-height:1.6;max-width:36ch}
 .tarjeta-estado .ref{color:var(--text-3);font-size:var(--fs-meta);font-variant-numeric:tabular-nums}
@@ -807,7 +841,7 @@ parece a ningún otro botón del sistema.
 ```html
 <div class="state state-error">
   <div class="tarjeta-estado es-err">
-    <span class="estado-ico"><span class="msi" aria-hidden="true" translate="no">error</span></span>
+    <span class="estado-ico"><svg class="ico" aria-hidden="true"><use href="#i-error"/></svg></span>
     <h2>No se pudo cargar el padrón</h2>
     <p>…qué pasó · qué no se perdió · qué hacer…</p>
     <p class="ref" translate="no">Referencia del error: PAD-20260821-1655</p>
@@ -881,78 +915,55 @@ padrón llegaron así pese a que este apartado ya lo prescribía.
    roto. Selector correcto: `.state > .ico` (hijo directo). Caso real: Viáticos, Viático
    detalle, Cuentas por cobrar y Autorización de compra copiaron el selector descendiente;
    Administración Vehicular ya tenía el hijo directo.
+7. **El título de la cabecera persiste en cualquier estado; el resumen de datos, no.** En vacío,
+   error y cargando se retira el resumen — decir «2 citas» sobre «no tienes ninguna» contradice
+   la pantalla.
+8. **Un hilo que recibe mensajes se anuncia con `role="log"`** (§6.25).
 
-### 6.5 Iconos (`.msi`)
+### 6.5 Iconos (`.ico`, sprite SVG)
 
-Material Symbols Rounded, variante rellena (`FILL@1`). Buscar y elegir el icono en
-[fonts.google.com/icons](https://fonts.google.com/icons) — filtrar por estilo **Rounded** (no
-Outlined ni Sharp, para que combine con el resto) y copiar el nombre exacto que aparece debajo
-del icono (p. ej. `account_circle`), que es el mismo que va en el HTML y en `icon_names`.
+Sprite SVG en línea, no Material Symbols por `<link>` — ese patrón se retira por el mismo motivo
+que ya sacó a las tipografías de un CDN (§2): si el CDN no responde, falla en silencio y la
+pantalla se queda mostrando el nombre del icono en letras, sin ningún error visible. Las 50
+pantallas construidas ya usan el sprite; ninguna usa Material Symbols.
 
-Se cargan por subconjunto —solo los nombres que se usan— para no pedir la fuente completa. Al
-añadir un icono nuevo, se añade su nombre a la lista `icon_names` del `<link>` existente; no se
-crea un `<link>` aparte:
+Un `<svg>` oculto al inicio del `<body>` declara cada icono como `<symbol>`, y se usa con `<use>`:
 
 ```html
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0&icon_names=add,check_circle,error,schedule&display=block" rel="stylesheet">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs><symbol id="i-check_circle" viewBox="0 0 24 24">…</symbol></defs>
+</svg>
+<svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg>Reintentar
 ```
-
-Los cuatro ejes (`opsz,wght,FILL,GRAD@24,500,1,0`) fijan el aspecto de todos los iconos que
-pidas con ese `<link>` — tamaño óptico 24, peso 500, relleno activado, grado neutro. No hace
-falta tocarlos por icono; se heredan en `font-variation-settings` de `.msi`.
 
 ```css
-.msi{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;
-  font-size:20px;line-height:1;display:inline-block;white-space:nowrap;direction:ltr;
-  width:1em;height:1em;overflow:hidden;  /* si el icono no está en el subconjunto o la fuente
-    no carga, el navegador pinta el nombre en letras — la caja fija de 1em×1em evita que eso
-    rompa el layout */
-  text-transform:none;letter-spacing:normal;font-feature-settings:'liga';
-  font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24}
-.msi-sm{font-size:17px} .msi-lg{font-size:24px}
+.ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ico-sm{width:13px;height:13px}
+.ico-xs{width:11px;height:11px}
 ```
 
-**El subconjunto se regenera cada vez que cambia el markup.** Es el fallo más fácil de cometer y
-el más difícil de ver: se añade un icono al HTML, se olvida añadirlo a `icon_names`, y el
-navegador pinta el nombre en letras. Pasó con `close`, `edit`, `pause_circle` y
-`progress_activity` en el diálogo, porque la lista se generó antes de escribir el markup.
+Tres tamaños: 18px suelto, 13px en fila densa o etiqueta, 11px dentro de un control ya diminuto
+(el toggletip, §6.23, que usa `i-info`).
 
-La comprobación es exacta y cuesta una línea — todo icono usado tiene que estar en la lista:
+**Comprobación:** todo `<use href="#i-…">` apunta a un `<symbol>` que existe — un nombre que no
+está en el sprite no da error, simplemente no dibuja nada:
 
 ```js
-const enLista = decodeURIComponent(
-  document.querySelector('link[href*="icon_names="]').href.split('icon_names=')[1].split('&')[0]
-).split(',');
-[...document.querySelectorAll('.msi')].map(e => e.textContent.trim())
-  .filter(n => !enLista.includes(n));      // tiene que salir vacío
+[...document.querySelectorAll('use')]
+  .filter(u => !document.querySelector(u.getAttribute('href')));  // tiene que salir vacío
 ```
 
-Y al generar la lista, **solo los nombres del markup**, más los que el conmutador de tema
-intercambia. Un barrido suelto del JS cuela cualquier cadena en minúsculas —`seleccionado`,
-`comfy`, `tr`— y un nombre inválido no degrada: devuelve **400** y se quedan sin cargar todos
-los iconos de la página.
+**Un icono nunca es la única forma de entender un control.** Y no basta con que sea «claro»: se
+sostiene solo cuando es universal y su significado no cambia de contexto. En el padrón, la
+tercera acción de cada fila era un marcador en unas filas, un enlace en otras y una flecha
+circular en la inactiva — tres significados en la misma posición. Ver §6.14.
 
-**Un glifo se dimensiona con `font-size`, nunca con `width`/`height`.** La caja de `.msi` ya es
-`1em × 1em` con `overflow:hidden`, así que fijarle 12px de ancho no encoge el dibujo: lo recorta.
-Es el resto típico de cuando el icono era un `<svg>`, y le pasó a la flecha de orden de las
-cabeceras de tabla.
-
-**`text-transform:none` y `letter-spacing:normal` no son adorno: son lo que hace que el icono
-sea un icono.** El glifo se pide por ligadura —el navegador lee las letras `location_on` y las
-sustituye por el dibujo—, así que cualquier ancestro que transforme ese texto rompe la
-correspondencia y pinta el nombre en letras. Y los dos ancestros que lo hacen son de los más
-comunes del sistema: las cabeceras de tabla (`text-transform:uppercase` + `letter-spacing:.04em`)
-y los rótulos en mayúsculas. Pasó de verdad: la flecha de orden de cada columna y el icono del
-encabezado de sucursales salían como «ARROW_DOWNWARD» y «LOCATION_ON» recortados a un cuadrado.
-
-Se ve en cuanto se abre la pantalla, pero solo si la fuente carga. Con la fuente bloqueada, el
-fallo se confunde con el respaldo de la caja de 1em, que hace exactamente lo mismo. De ahí que
-la comprobación de iconos tenga que hacerse con red.
-
-Siempre `aria-hidden="true"` y `translate="no"` (el nombre del icono no se traduce):
+Siempre `aria-hidden="true"`. Si un icono va sin texto visible, lleva **como mínimo** etiqueta
+emergente y `aria-label`:
 
 ```html
-<span class="msi" aria-hidden="true" translate="no">refresh</span>Reintentar
+<svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg>Reintentar
 ```
 
 **Un icono nunca es la única forma de entender un control.** Y no basta con que el icono sea
@@ -965,7 +976,7 @@ Si un icono va sin texto visible, lleva **como mínimo** etiqueta emergente y `a
 ```html
 <button class="iconbtn" aria-label="Ver la ficha de Grupo Automotriz Vértice"
         title="Ver ficha">
-  <span class="msi" aria-hidden="true" translate="no">visibility</span>
+  <svg class="ico" aria-hidden="true"><use href="#i-visibility"/></svg>
 </button>
 ```
 
@@ -1069,7 +1080,7 @@ alerta.
 .note{display:flex;gap:9px;align-items:flex-start;padding:10px 12px;
   background:var(--accent-soft);border-radius:var(--r-ctrl);
   font-size:var(--fs-meta);color:var(--text-2);line-height:1.5}
-.note .msi{font-size:17px;color:var(--accent)}
+.note .ico{font-size:17px;color:var(--accent)}
 ```
 
 **`.banda`** — aviso de ancho completo que califica lo que viene debajo. Cuatro variantes.
@@ -1078,11 +1089,11 @@ alerta.
 .banda{display:flex;gap:var(--sp-3);align-items:flex-start;padding:var(--sp-3) var(--sp-4);
   border-radius:var(--r-ctrl);border:1px solid transparent;font-size:var(--fs-dense);
   line-height:1.55}
-.banda .msi{flex-shrink:0}
-.banda-info{background:var(--surface-2);color:var(--text-2);border-color:var(--border)}
-.banda-warn{background:var(--warn-bg);color:var(--warn-ink)}
-.banda-err {background:var(--err-bg); color:var(--err-ink)}
-.banda-ok  {background:var(--ok-bg);  color:var(--ok-ink)}
+.banda .ico{flex-shrink:0}
+.banda.b-info{background:var(--surface-2);color:var(--text-2);border-color:var(--border)}
+.banda.b-warn{background:var(--warn-bg);color:var(--warn-ink)}
+.banda.b-err {background:var(--err-bg); color:var(--err-ink)}
+.banda.b-ok  {background:var(--ok-bg);  color:var(--ok-ink)}
 ```
 
 **El icono tiene que coincidir con la variante.** El alta de cliente abría con un triángulo de
@@ -1099,6 +1110,12 @@ después ni al pie. En la ficha, la advertencia de que las listas están recorta
 más, al mismo nivel visual que el resto. Va con `role="status"`, icono y contraste propio, antes
 del encabezado.
 
+**`.banda` no lleva margen propio**, salvo como hijo directo de la zona que la aloja. Un selector
+de margen escrito para un contenedor alcanza también a sus descendientes: en Tickets,
+`.detalle .banda` sumaba margen a una banda que ya vivía dentro de un bloque con su propio
+relleno. Y una regla de permisos —quién puede hacer algo— informa, no advierte: va en
+`.banda.b-info`, no en `b-warn`.
+
 ### 6.10 Etiqueta de estado (`.pill`) y de clasificación (`.p-type`)
 
 Dos familias que se parecen y **no son lo mismo**. Confundirlas es el problema transversal más
@@ -1112,13 +1129,23 @@ Lleva color + **icono + texto**, nunca color a secas.
 ```css
 .pill{display:inline-flex;align-items:center;gap:5px;border-radius:var(--r-ctrl);
   padding:3px 9px;font-size:var(--fs-meta);font-weight:700;white-space:nowrap}
-.pill .msi{font-size:15px}
+.pill .ico{font-size:15px}
 .p-ok{background:var(--ok-bg);color:var(--ok-ink)}
 .p-warn{background:var(--warn-bg);color:var(--warn-ink)}
 .p-err{background:var(--err-bg);color:var(--err-ink)}
 .p-block{background:var(--block-bg);color:var(--block-ink)}
 .p-pause{background:var(--pause-bg);color:var(--pause-ink)}
+.p-neutro{background:var(--surface-2);color:var(--text-2)}
 ```
+
+**Un estado por eje, no uno por causa.** «Falta 1», «Falta otro», «Por vencer», «Faltan los 2» no
+son cuatro estados: son el mismo estado (expediente incompleto) con un detalle de causa, que va
+como dato bajo la etiqueta, no como una pastilla nueva por cada variante.
+
+**`.p-neutro` = «sin dato», ni bueno ni malo** — «Sin calcular», «Sin sucursales». Se mide igual
+que el resto: 5,97:1 en claro, 7,10:1 en oscuro. No es el mismo concepto que el punto neutro por
+omisión de `.p-type` (abajo): aquel es el reposo de una clasificación; este es un estado
+explícito de ausencia de dato.
 
 **`.p-type` = clasificación.** Lo que la cosa **es**: empresa, agencia, persona física, grupo al
 que pertenece. No cambia solo y no tiene connotación de bueno ni malo, así que usa las series de
@@ -1145,6 +1172,9 @@ Cuando haya que poner varias etiquetas seguidas, **se agrupan por significado y 
 visualmente**: primero clasificación, después estado, con una separación clara entre ambos
 grupos y, si el sitio lo permite, un rótulo por grupo.
 
+**«Inactivo» es `.p-pause`, nunca `.p-neutro`.** §1.3 ya distingue los dos: inactivo es un estado
+real que no es un error; «sin dato» es otra cosa.
+
 ### 6.11 Tabla densa
 
 El arquetipo del padrón. Es la pantalla más usada del módulo, así que cada gramo de carga visual
@@ -1160,7 +1190,7 @@ se multiplica.
       <tr>
         <th scope="col" aria-sort="none">
           <button data-col="razon">Razón social / RFC
-            <span class="msi sort" aria-hidden="true" translate="no">arrow_downward</span></button>
+            <svg class="ico sort" aria-hidden="true"><use href="#i-arrow_downward"/></svg></button>
         </th>
         <th scope="col">Tipo</th>
       </tr>
@@ -1238,6 +1268,19 @@ thead th:first-child{z-index:7}
     mismo — la fila es la única entrada; un botón se queda solo si hace algo que la fila no hace
     (Aprobar, Rechazar). Caso real: Viáticos y Cuentas por cobrar tenían folio-como-link **y**
     botón «Ver detalle»; se quitó el botón y la fila completa absorbió la navegación.
+12. **`overflow-x:auto` en `.tabla-caja` anula el `position:sticky` de la cabecera contra la
+    página.** Un contenedor con scroll horizontal se vuelve el ámbito de cualquier `sticky` de
+    sus hijos: la cabecera queda fija contra esa caja, no contra la ventana. Una tabla con
+    cabecera fija y desplazamiento horizontal fija la altura de su caja (`max-height`) y
+    desplaza la caja entera; si no, renuncia a la cabecera fija.
+
+**Columna de acciones anclada a la derecha.** Cuando la tabla desplaza en horizontal, la columna
+de acciones por fila se congela igual que la primera:
+
+```css
+tbody tr:not(.hijas) > td:last-child,
+thead th:last-child{position:sticky;right:0;z-index:4;background:var(--surface)}
+```
 
 **Modo tarjeta por debajo de 860px.** La tabla pasa a lista de tarjetas; cada celda muestra su
 rótulo desde `data-et`:
@@ -1262,12 +1305,16 @@ No se veía qué era resumen y qué era control.
 
 ```
 ┌ Resumen ───────────────────────────────────────────┐
-│  ✓ 1.189 activos   ⏱ 42 incompletos   ⏸ 17 inactivos│   ← lectura (y atajo)
+│  ✓ 1.189 activos   ⏱ 42 con documentos pendientes   ⏸ 17 inactivos│   ← lectura (y atajo)
 └────────────────────────────────────────────────────┘
 ┌ Filtros ───────────────────────────────────────────┐
 │  Tipo ▾   Estado: Activos ▾   Origen ▾   Quitar todos│  ← control
 └────────────────────────────────────────────────────┘
 ```
+
+**El chip dice lo mismo que la pastilla que filtra, con su color.** «Incompleto» afirma un
+bloqueo que no siempre existe; el contador usa la misma palabra y color que la pastilla de
+estado equivalente.
 
 **Nueve reglas.**
 
@@ -1377,11 +1424,11 @@ Con **más de dos**, o si cambian según la fila: menú `⋯` con las opciones *
 ```html
 <button class="iconbtn" aria-haspopup="menu" aria-expanded="false" aria-controls="m-gav"
         aria-label="Más acciones para Grupo Automotriz Vértice">
-  <span class="msi" aria-hidden="true" translate="no">more_horiz</span>
+  <svg class="ico" aria-hidden="true"><use href="#i-more_horiz"/></svg>
 </button>
 <div class="menu" id="m-gav" role="menu" hidden>
   <button role="menuitem">Ver órdenes</button>
-  <button role="menuitem">Reenviar liga de registro</button>
+  <button role="menuitem">Exportar la ficha</button>
   <button role="menuitem" class="destructiva">Desactivar</button>
 </div>
 ```
@@ -1397,9 +1444,9 @@ conviene extenderlo a otros datos que hoy obligan a abrir la ficha.
 <tr>
   <th scope="row">
     <button class="suc-btn" aria-expanded="false" aria-controls="suc-gav">
-      <span class="msi msi-sm" aria-hidden="true" translate="no">location_on</span>
+      <svg class="ico ico-sm" aria-hidden="true"><use href="#i-location_on"/></svg>
       <span class="tnum">4</span>
-      <span class="msi msi-sm chev" aria-hidden="true" translate="no">expand_more</span>
+      <svg class="ico ico-sm chev" aria-hidden="true"><use href="#i-expand_more"/></svg>
     </button>
   </th>
 </tr>
@@ -1411,6 +1458,19 @@ botones de sucursales del padrón apuntaban a identificadores inexistentes y anu
 «contraído» sobre un control que no hacía nada.
 
 Cierra con Escape, y al cerrar el foco vuelve al botón que lo abrió.
+
+**Diseño visual de la fila hija.** Vivía en un `<td colspan="7">` sin más regla, y la acción de
+cada renglón caía fuera de la vista a 1280px. La fila hija ocupa el ancho **visible** de la
+tabla, no el de su `colspan`:
+
+```css
+.tabla-caja{container-type:inline-size}
+.suc-lista{list-style:none;position:sticky;left:0;width:100cqw}
+```
+
+La acción va al final de cada renglón, siempre a la vista aunque la tabla desplace. Es una
+banda, no una tarjeta — ni la tabla principal ni su fila hija se envuelven en `.tarjeta` (§6.3).
+El estado de la fila hija se muestra solo cuando es una excepción; repetirlo en todas no aporta.
 
 ### 6.16 Formulario
 
@@ -1461,7 +1521,7 @@ Cierra con Escape, y al cerrar el foco vuelve al botón que lo abrió.
      <label for="dom">Domicilio fiscal <span class="req" aria-hidden="true">*</span></label>
      <input type="text" id="dom" aria-required="true" aria-invalid="true" aria-describedby="e-dom">
      <span class="mal" id="e-dom">
-       <span class="msi msi-sm" aria-hidden="true" translate="no">error</span>
+       <svg class="ico ico-sm" aria-hidden="true"><use href="#i-error"/></svg>
        Falta el domicilio fiscal. Sin él no se puede timbrar una factura a este cliente.</span>
    </div>
    ```
@@ -1619,7 +1679,7 @@ modo dedo activado, no leyendo el archivo.**
 <button class="iconbtn" type="button" title="Copiar"
         aria-label="Copiar r.mendieta@verticebajio.example"
         data-copiar="r.mendieta@verticebajio.example">
-  <span class="msi msi-sm" aria-hidden="true" translate="no">content_copy</span>
+  <svg class="ico ico-sm" aria-hidden="true"><use href="#i-content_copy"/></svg>
 </button>
 ```
 
@@ -1650,6 +1710,19 @@ se abre desde `file://`, y un mensaje si tampoco eso funciona.
 **Contraste**: el icono es un elemento gráfico, mínimo 3:1. Medido en reposo 6,84:1 en claro y
 7,80:1 en oscuro; confirmado 5,04:1 y 5,67:1.
 
+#### El botón flotante del asistente (`.fab`) y su zona segura
+
+Presente en 31 de las 50 pantallas:
+
+```css
+.fab{position:absolute;right:max(26px,env(safe-area-inset-right));
+  bottom:max(26px,env(safe-area-inset-bottom));width:52px;height:52px;border-radius:50%}
+@media (max-width:480px){.fab{right:max(16px,env(safe-area-inset-right));
+  bottom:max(16px,env(safe-area-inset-bottom));width:46px;height:46px}}
+```
+
+**Zona segura:** el contenedor que desplaza reserva, al final, un `padding-bottom` que cubra el
+botón más su margen (≥90px) — ningún control ni dato de la última fila queda bajo el botón.
 
 ### 6.20 Ficha de detalle: el bloque de identidad manda el orden
 
@@ -1756,6 +1829,12 @@ valor sin selección múltiple para un campo con varios valores posibles no es u
 deuda pendiente de migrar a este componente — Padrón de clientes lo tuvo así (Tipo, Estado,
 Documentos, Actividad) hasta que migró a este componente, conservando los mismos cuatro campos.
 
+**Lo que se registra se escribe literal.** Un registro inmutable guarda valores, no cuentas:
+«Querétaro y Celaya», no «2 de 5».
+
+**Un filtro histórico no es un filtro aplicado.** Va sin «×», sin `aria-pressed` y sin cursor de
+puntero, aunque nombre dimensión y valor igual que una pastilla aplicada.
+
 ---
 
 ### 6.22 Ámbito de datos (`.ambito`)
@@ -1774,7 +1853,7 @@ texto en tinta auxiliar.
 ```css
 .ambito{display:inline-flex;align-items:center;gap:5px;
   font-size:var(--fs-meta);font-weight:600;color:var(--text-3)}
-.ambito .msi{font-size:14px}
+.ambito .ico{font-size:14px}
 ```
 
 **No lleva token de color propio, y no hacía falta añadirlo.** `--text-3` pasa 4,5:1 sobre las
@@ -1827,9 +1906,11 @@ puede convivir con dedos y lectores de pantalla igual de bien que con el ratón.
 .infob:hover,.infob[aria-expanded="true"]{background:var(--surface-2);color:var(--text-2)}
 [data-tacto="dedo"] .infob{width:46px;height:46px}
 .tip{position:absolute;right:0;top:calc(100% + 6px);z-index:30;width:220px;max-width:60vw;
-  background:var(--text);color:var(--surface);font:500 11.5px/1.5 var(--font-ui);
+  background:var(--text);color:var(--surface);font:500 var(--fs-meta)/1.5 var(--font-ui);
   border-radius:var(--r-ctrl);padding:var(--sp-2) var(--sp-3);box-shadow:var(--sh-float)}
 ```
+
+`.tip` iba a 11,5px, por debajo del suelo de §2.1. Corregido a `var(--fs-meta)` (12px).
 
 **Seis reglas.**
 
@@ -1855,6 +1936,21 @@ puede convivir con dedos y lectores de pantalla igual de bien que con el ratón.
    debajo, no oculta detrás de un icono — el criterio de §8 sigue mandando: si la frase explica
    una consecuencia para quien mira, va en pantalla; el toggletip es para cuando ese texto no
    cabe sin romper una fila de ficha, no una forma de esconder texto que sí cabría.
+
+### 6.24 Agenda (rejilla persona × día)
+
+Tabla de comparación entre filas: `<caption>`, `th scope` en los dos ejes, primera columna fija
+(§6.11). **No pasa a modo tarjeta** — convertirla destruye la comparación. Nada baja de 12px; el
+nombre se parte en dos líneas, no se corta con puntos suspensivos. Lo no asignado tiene su propia
+fila. Una visita que dura varias franjas marca cada franja, sin fusionar filas. El calendario
+laborable es un dato, no una clase del componente. La excepción de 10,5px (§2.1) no alcanza aquí.
+
+### 6.25 Hilo de conversación
+
+El contenedor de mensajes lleva `role="log"`, nombre y `tabindex="0"` si desplaza. Cada turno se
+rotula con quién habla y cuándo; el tono no identifica al hablante (las superficies miden entre
+1,06 y 1,15:1 entre sí). Una respuesta en curso es una tarjeta `role="status"` con barras sin
+texto; una fallida dice qué pasó, qué no se perdió y qué hacer (§6.4, regla 3).
 
 ---
 
@@ -2005,11 +2101,11 @@ Todo lo que lleve `data-andamio` se retira en la versión real. Un solo selector
 
 ---
 
-## 10. Diez trampas comprobadas
+## 10. Once trampas comprobadas
 
 No son teoría: las seis primeras aparecieron aplicando este documento al módulo de clientes, las
-tres siguientes revisando esta misma página, y la décima auditando las pantallas de Viáticos y
-Padrón. Todas se ven solo si se comprueba en el navegador, no leyendo la hoja de estilos.
+tres siguientes revisando esta misma página, la décima auditando Viáticos y Padrón, y la
+undécima construyendo el asistente. Todas se ven solo comprobando en el navegador.
 
 **El tamaño se mide en el navegador, no en el CSS.** La regla de los 12px se puede burlar sin
 querer con la forma abreviada `font:`, donde el tamaño no aparece como `font-size`. Los avatares
@@ -2088,6 +2184,11 @@ todavía. Antes de escribir `.algo{...}` se busca si ya existe; si sí, la regla
 declaración existente, o se usa un nombre más específico. Nombres de una sola palabra genérica
 (`.resumen`, `.nota`, `.f`, `.leg`, `.cg`) son los que más se repiten sin querer.
 
+**Un modificador corto hereda el `display` y el `gap` de un nombre de contenedor que ya existe.**
+En el asistente, `.cuerpo` se reutilizó como modificador nuevo sin ver que la maqueta ya lo usaba
+como contenedor de página (`display:flex;gap:16px`), y los heredó sin querer. Antes de nombrar
+una clase corta, se busca si ya existe en el archivo.
+
 ---
 
 ## 11. Checklist al añadir un componente nuevo
@@ -2138,10 +2239,8 @@ declaración existente, o se usa un nombre más específico. Nombres de una sola
 - ¿El selector cubre por exclusión, de modo que no deje fuera un tipo que se añada después?
 - ¿Ninguna vista de estado lleva `hidden` en el HTML, que anularía la regla del estado?
 - ¿El destino de 24px es el contenedor que acepta la pulsación, y ese contenedor es pulsable?
-- ¿Los iconos se vieron con la fuente cargada? Sin red, un glifo roto y el respaldo de la caja
-  de 1em se ven igual.
-- ¿Se regeneró `icon_names` después del último cambio de markup, y todo icono usado está dentro?
-- ¿Ningún icono se dimensiona con `width`/`height` en vez de con `font-size`?
+- ¿Todo `<use href="#i-…">` apunta a un `<symbol>` que existe en el sprite? (§6.5)
+- ¿Ningún icono se dimensiona estirando su `viewBox`, solo con `.ico`/`.ico-sm`/`.ico-xs`?
 - ¿El esqueleto mide **lo mismo de alto** que el contenido que sustituye, y no solo lo mismo
   de ancho? Se comprueba midiendo las dos cajas.
 - ¿Los botones llegan a su suelo (36px, 28px en `.mini`) con `min-height` declarado, y no por
@@ -2150,6 +2249,10 @@ declaración existente, o se usa un nombre más específico. Nombres de una sola
   Se comprueba midiendo: la caja del `<use>` debe empezar donde empieza la del `<svg>`.
 - ¿Todo token `var(--x)` que usa el archivo está declarado **en ese mismo archivo**? Copiar una
   regla de otra pantalla es la vía habitual de colar uno que no existe aquí.
+- ¿La cabecera mide ≥ 12px bajo su última línea, medida sola?
+- Si la pantalla gana aire en la cabecera, ¿se volvió a medir qué queda sobre la barra fija a
+  390 × 844?
+- ¿Algún `margin` negativo compensa el relleno de un contenedor?
 
 ---
 
@@ -2472,6 +2575,10 @@ la misma fila que los filtros, nunca en su propio bloque separado (§6.12, regla
 Si la tarjeta crece, su contenido crece con ella — `flex:1` en el hijo, nunca un `max-width`
 heredado de otro contexto. Es la misma regla que §6.3.
 
+**Excepción: una lista de renglones cortos sobre una banda se acota, no crece.** Caso inverso:
+la fila hija de §6.15 se limita al área visible (`width:100cqw`), no a un ancho fijo, porque un
+ancho fijo deja las líneas a medias y la acción fuera de la vista.
+
 ### 13.4 Comparar exige igualar
 
 Por omisión, `align-items:start`: cada tarjeta a su alto real. `align-items:stretch` se reserva
@@ -2585,3 +2692,4 @@ sin su ancho final, el cálculo no refleja el resultado visible y no retira nada
 | 2.13.3 | 2026-10-05 | Auditoría de cierre: se contrastó cada criterio de corrección usado en sesión contra lo que el sistema deja escrito, y se encontraron dos huecos reales. §6.11 gana la regla 11 — si la fila entera navega, ningún botón ni ícono dentro de ella repite esa acción (Viáticos y Cuentas por cobrar tenían folio-link **y** botón «Ver detalle» a la vez; se quitó el botón). §13.8 (cierre garantizado) gana su límite: el mecanismo solo se ve bien cuando el relleno sobrante cae en espacio invisible (el final de una lista) — si la columna corta cierra con contenido estructurado (una tabla) y la diferencia es grande, `flex:1` deja un rectángulo vacío notorio en vez de un cierre limpio. Caso real al revés de Viático detalle: en Autorización de compra el mismo mecanismo, aplicado a una diferencia de ~155px sobre una tabla, produjo justo ese rectángulo; se revirtió a `align-items:start`. Las demás correcciones de la sesión (voz de producto, folio, semáforo, `.banda` vs. clase nueva, filtros §6.21) ya estaban cubiertas — se verificó, no se repitió. |
 | 2.13.4 | 2026-10-09 | Bug real reportado por el cliente: el ícono del botón verde en un estado vacío (Cuentas por cobrar, "Marca A no tiene saldo por cobrar") salía gris en vez de blanco, sin contraste contra el fondo. Causa: `.state .ico{color:var(--text-3)}` es un selector descendiente que alcanza también a los íconos pequeños de los botones dentro de `.acc`, aplastando el color que heredaban de `.btn.p`. Mismo bug activo en Viáticos, Viático detalle, Cuentas por cobrar y Autorización de compra — las cuatro copiaron el bloque `ARQ-ESTADOS` con el selector descendiente; Administración Vehicular ya tenía el fix (`.state > .ico`, hijo directo) desde el principio. Corregido en las cuatro pantallas. §6.4 gana la regla 6, documentando el selector correcto y el caso real. |
 | 2.15.0 | 2026-10-09 | Añade §13.9: un bloque cuyo alto lo fija un dato externo (una duración, no el contenido ni el layout) necesita un plan explícito de qué línea de contenido se retira primero si no cabe — crecer el contenedor falsearía el dato que ese alto representa. A partir del calendario de instalaciones: sus bloques de evento recortaban texto a media línea con `overflow:hidden`, y en los casos más ajustados el contenido ni desbordaba — se aplastaba por `flex-shrink:1`, el valor por omisión en un hijo de `flex-direction:column`, hasta quedar ilegible sin disparar ningún indicador de desborde. Añade §1.2.1: normas de uso del logotipo, traducidas del manual de marca que entregó el cliente (LAIÖN, 15/03/2026) — dos lockups que no se mezclan (isotipo+«SIO-DPROMA» del producto vs. isotipo+«DPROMA» corporativo), variante por fondo, usos incorrectos, y una aclaración de qué tipografía del manual aplica dentro del producto (ninguna de las dos: sigue siendo Inter) y cuál solo fuera de él. Área de seguridad y tamaño mínimo no venían en el manual con una medida exacta — se fijan aquí por convención. Se incorporan los assets oficiales a `web/entregables/img/marca/` (isotipo, lockup color, lockup reversa). |
+| 2.16.0 | 2026-10-14 | §6.5 pasa a documentar los iconos como sprite SVG (`.ico`) y retira la carga de Material Symbols por `<link>`; §6.9 adopta `.banda.b-info` y las otras tres variantes y fija que `.banda` no lleva margen propio; §2.1 acota el 10,5px a los rótulos de grupo y las etiquetas del modo tarjeta; §6.23 lleva `.tip` a la escala de texto. Reglas nuevas: un estado por eje y `.p-neutro` (§6.10), escala de interlineado (§2), botón flotante y su zona segura, diseño de la fila hija en la fila desplegable (§6.15), cabecera en vacío y error (§6.4), tarjeta con pie (§6.3), agenda (§6.24) e hilo de conversación (§6.25). §10 pasa a once trampas y §11 gana tres preguntas. |
