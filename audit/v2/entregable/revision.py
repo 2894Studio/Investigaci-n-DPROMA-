@@ -138,7 +138,7 @@ cambio(A, 'Con movimiento reducido, la conversación de Dprimi no desaparece', '
   '<code>10_dprimi_asistente</code> · <code>.enter</code> · líneas 337 y 339.',
   'Quien tiene activado «reducir movimiento» en su sistema abre la pantalla y no ve ninguna de las cuatro burbujas: toda la conversación queda transparente.',
   'La regla que quita la animación (línea 337) está escrita antes que <code>.enter{opacity:0;…}</code> (línea 339), con la misma especificidad, así que gana la segunda. Como la animación está anulada, nada lleva la opacidad a 1. Con la preferencia desactivada la pantalla se ve bien, por eso no salta a la vista.',
-  '',
+  a_d('m11', 'Conversación de Dprimi con el movimiento reducido activado: el panel está vacío', 'La misma conversación con las cuatro burbujas visibles', 'Antes — no se ve nada', 'Después — se ve la conversación', apilado=True),
   '/* antes: la regla de reducción va ANTES de .enter{opacity:0} */\n@media (prefers-reduced-motion:reduce){ .enter{animation:none !important;opacity:1;transform:none} }\n.enter{opacity:0;transform:translateY(6px);animation:enter … forwards}\n\n/* después: se mueve DESPUÉS */\n.enter{opacity:0;transform:translateY(6px);animation:enter … forwards}\n@media (prefers-reduced-motion:reduce){ .msg.enter{animation:none;opacity:1;transform:none} }',
   'Con <code>prefers-reduced-motion: reduce</code>, <code>getComputedStyle(.msg).opacity</code> pasa de 0 a 1 en las cuatro burbujas. Medido en Chromium; con la preferencia desactivada no cambia nada.')
 
@@ -282,6 +282,8 @@ cambio(C, 'Los destinos de pulsación llegan a 24 px', 'rec',
   '134 destinos bajo 24 px en 29 de las 50 pantallas.',
   'El buscador, el folio, las migas y las casillas son difíciles de acertar con ratón impreciso o con tableta, y en el padrón una casilla errada selecciona la fila equivocada antes de una acción masiva.',
   'No se exige como fallo de accesibilidad: con la excepción de espaciado de WCAG 2.5.8 se cumple en la mayoría de los casos, y es una divergencia de §7.3 (en <code>06</code>, <code>11</code> y los buscadores el espaciado no alcanza para salvarlos). Se recomienda porque es un cambio de una línea.',
+  a_d('d28', 'Listado de órdenes con el buscador y los folios marcados en rojo por medir menos de 24 px', 'El mismo listado con los destinos marcados en verde, de 24 px o más', 'Antes — en rojo, menos de 24 px', 'Después — en verde, 24 px o más', apilado=True)
+  + '<p class="nota">Ejemplo en <code>30_ordenes_listado</code>. En el resto de pantallas es igual; esta tabla dice dónde.</p>'
   '<table class="mini"><thead><tr><th>Pantalla</th><th>Elemento</th><th class="r">Medida</th></tr></thead><tbody>'
   '<tr><td><code>27</code>, <code>06</code></td><td>casillas <code>input.rowsel</code></td><td class="r">15 × 15 px</td></tr>'
   '<tr><td><code>42</code>, <code>44</code></td><td>casillas de «Documentos» (5 por pantalla)</td><td class="r">15 × 15 px</td></tr>'
@@ -300,7 +302,7 @@ cambio(C, 'El botón flotante no tapa «Crear expediente»', 'rec',
   '<code>42_alta_tramite_gestoria</code>, <code>43_alta_tramite_vehicular</code> y <code>44_alta_tramite_cfe</code> · <code>.fab</code> (línea 268) y <code>.barra-form</code> (línea 592).',
   'El botón redondo del asistente cae sobre la esquina del botón verde de la barra de acciones y le tapa el final del rótulo: «Cre…» en lugar de «Crear expediente». Cubre el 33 % del botón (el 38 % en «Ingresar a CFE» de <code>44</code>) y recibe el clic en esa zona. El botón verde sigue pulsable por el resto y con el teclado.',
   '<code>.fab</code> está en <code>position:absolute</code> a 26 px del borde, y <code>.barra-form</code> no reserva sitio a su derecha. <code>27_padron_clientes</code> ya resuelve lo mismo en su <code>.nota</code> con <code>padding-right:calc(var(--sp-6) + 68px)</code>.',
-  '',
+  a_d('f29', 'Barra de acciones con el botón redondo del asistente encima del final de «Crear expediente»', 'La misma barra con los botones desplazados a la izquierda del botón redondo', 'Antes — el círculo tapa «…ar expediente»', 'Después — el botón se lee entero', apilado=True),
   '.barra-form{padding-right:calc(var(--sp-6) + 68px)}\n@media (max-width:1280px){.barra-form{padding-right:calc(var(--sp-4) + 68px)}}',
   'El solape del botón primario con el <code>.fab</code> pasa de 52 × 20 px a 0 en las tres pantallas, a 1440, 1280 y 1024 px. Medido en Chromium con la regla inyectada.')
 
@@ -308,7 +310,7 @@ cambio(C, 'Los botones hermanos del portal del cliente se parecen', 'rec',
   '<code>05_app_cliente</code> · <code>.abtn</code> · líneas 246 a 249.',
   '«Contactar a DPROMA» y «Reagendar cita» no se ven iguales: en uno el icono está junto al texto y en el otro apartado, y el botón es más alto.',
   'Los dos son <code>.abtn</code> con el mismo CSS. El texto de «Contactar a DPROMA» (120 px) no cabe en la media celda de la rejilla, envuelve a dos líneas y el nodo de texto ocupa todo el ancho restante: el icono se queda a la izquierda, lejos de su palabra, y el botón sube de 44 a 52 px. Falta <code>white-space:nowrap</code> o un rótulo más corto.',
-  '', '.abtn{white-space:nowrap}   /* o rotular «Contactar» */',
+  a_d('b30', 'Portal del cliente: «Contactar a DPROMA» en dos líneas y con el icono lejos del texto', 'Los dos botones con el rótulo en una línea', 'Antes — dos líneas, botón más alto', 'Después — una línea, iguales', apilado=False), '.abtn{white-space:nowrap}   /* o rotular «Contactar» */',
   'Los dos botones miden 44 px de alto y el icono queda junto a su palabra.')
 
 # ================================================================ D · AVISO
@@ -317,19 +319,20 @@ cambio(D, 'El padrón dibuja lo que se pospuso: vigencia y duplicados', 'pide',
   '<code>27_padron_clientes</code> · D7 y D8 del aviso del 28 de septiembre.',
   'D7 pospone la vigencia por documento (no existe la columna) y D8 pospone los duplicados. En el estado por defecto, <code>27</code> pinta el chip «7 con un documento por vencer», la pastilla «Por vencer» con su fecha y un aviso de 30 días, y la tarjeta «Dos pares de razones sociales se parecen demasiado» con dos botones «Comparar y decidir». La ficha reconoce que <code>27</code> lo dibuja.',
   'Se retiran, como en el prototipo del cambio ' + '@@padron@@' + ', y se vuelven a dibujar cuando D7 y D8 dejen de estar pospuestas.',
-  '', None, 'En el estado por defecto no aparece ni «por vencer» ni «Comparar y decidir».')
+  a_d('p31', 'Padrón con el chip «7 con un documento por vencer» y la tarjeta de duplicados con «Comparar y decidir»', 'El mismo padrón sin el chip ni la tarjeta de duplicados', 'Antes — dibuja lo pospuesto', 'Después — se retira', apilado=True), None, 'En el estado por defecto no aparece ni «por vencer» ni «Comparar y decidir».')
 
 cambio(D, 'El padrón de la bandeja sigue dibujando «Reenviar liga de registro»', 'pide',
   '<code>06_padron_clientes</code> · botón de fila, línea 533 · D6 del aviso del 28 de septiembre.',
   'D6 dice que «Reenviar liga de registro» no se construye. En <code>06</code>, la fila «Autos del Valle SAPI» la dibuja como tercera acción de la columna Acciones (un botón con icono de cadena y <code>aria-label="Reenviar liga de registro a Autos del Valle"</code>). La misma pantalla trae «Liga de auto-registro» en la cabecera (línea 424) y en la nota inferior (línea 592). <code>FICHAS_TECNICAS.md</code> (líneas 124 y 701) dice que esa liga también cayó bajo el rechazo del punto 15.',
   '<code>06</code> es otra versión del padrón y no está en la tabla de arriba; por eso se comprobó aparte.',
-  '', None,
+  a_d('l32', 'Padrón con «Liga de auto-registro» en la cabecera y un tercer icono de cadena en la fila de Autos del Valle', 'El mismo padrón sin la liga: la fila trae solo ver y editar', 'Antes — con «Reenviar liga»', 'Después — sin ella', apilado=True), None,
   'La fila tiene dos acciones (ver y editar), la cabecera no trae «Liga de auto-registro» y la nota inferior no la menciona.')
 
 cambio(D, 'La alta de cliente dice la frase del aviso', 'menor',
   '<code>41_alta_cliente</code> · D2.',
   'La sucursal es opcional, pero falta la frase literal «Sin sucursal no se le puede programar una orden; se puede añadir después desde la ficha». La sección dice el todo o nada y el estado vacío omite la consecuencia.',
-  'Es una omisión de texto; el fondo está bien.', '', None,
+  'Es una omisión de texto; el fondo está bien.',
+  a_d('a33', 'Sección Sucursal del alta de cliente sin la frase sobre qué pasa sin sucursal', 'La misma sección con la frase del aviso debajo del título', 'Antes — falta la frase', 'Después — con la frase', apilado=True), None,
   'La frase aparece en la sección «Sucursal» del alta.')
 
 PARTES = {
