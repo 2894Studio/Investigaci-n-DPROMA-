@@ -1,0 +1,180 @@
+{
+ "grupo": 5,
+ "verificaciones": [
+  {
+   "id": "v2-42altages-01",
+   "veredicto": "confirmada",
+   "medicion": "Línea 488 y cita literal existen (.migas a{color:var(--link);text-decoration:none;font-weight:600;border-radius:4px}). §7.3 última frase existe tal cual («un folio, una miga, «Ver en Maps»… llevan padding hasta llegar a 24px»). Medido a 1440/1280/1024: a «Gestoría» 49,3×15 px, display:block, padding 0; único enlace de la miga. Barrido de interactivos visibles fuera de [data-andamio]: 35, 6 bajo 24 (1 miga + 5 casillas), igual que el brief. Matiz: WCAG 2.5.8 admitiría la excepción de espaciado (nada a menos de 12 px del centro), pero el criterio crítico 1 del director es el literal «destino <24 px» y §7.3 nombra la miga expresamente; se cumple.",
+   "script": "verif5/m42.cjs, verif5/bajo24.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-42altages-02",
+   "veredicto": "confirmada",
+   "medicion": "Línea 701 y cita literal existen; §7.3 («Casillas de selección de 15×15px…») y §10 («Una casilla de 16px dentro de una <label> de 24×24 cumple, porque la etiqueta es el destino») existen. Medido: 5 input[type=checkbox] 15×15; cada <label> 998×16 a 1440 (978 a 1280, 894 a 1024), pitch vertical 24 px (huecos de 8). Con data-tacto=\"dedo\" en :root la casilla sigue 15×15 y la label 16 de alto (el modo dedo no tiene regla para casillas en este archivo). Matiz: «la mitad de lo que dice el sistema» es retórico (16 vs 24 = 2/3); WCAG 2.5.8 pasaría por espaciado, pero el criterio 1 del director y §7.3/§10 sí se incumplen.",
+   "script": "verif5/m42.cjs, verif5/bajo24.cjs",
+   "correccion": "Sustituir «mide la mitad» por «16 px de alto frente a los 24 px del §7.3»."
+  },
+  {
+   "id": "v2-42altages-03",
+   "veredicto": "confirmada",
+   "medicion": "Línea 288 y cita literal existen (dentro de @media (min-width:860.02px) and (max-width:1100px)). §7.2 («En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece») existe. Medido con ariaSnapshot de nav.side: a 861, 1000 y 1100 px .side=64 px, 15 '- link' sin nombre (0 aria-label, 0 title, 0 aria-labelledby, 0 texto visible, svg aria-hidden); a 859 (cajón) y 1101 los 15 enlaces tienen nombre. Sin tooltip: .it:hover solo cambia color, sin ::before/::after con content. Criterio 1 (control sin nombre accesible) se cumple. Nota de alcance: el bloque está marcado data-cromo (FICHAS_TECNICAS.md:1089 habla de un parser que recorta data-cromo), así que el arreglo probablemente va en el armazón compartido y no pantalla a pantalla.",
+   "script": "verif5/menu.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-42altages-04",
+   "veredicto": "exagerada",
+   "medicion": "Líneas 268 y 302 existen; z-index 20; .main es position:relative y overflow:hidden, el .fab es absolute en la esquina y .barra-form va al fondo de .main, así que el solape es permanente (no depende del scroll). Medido: fab 52×52 en (1362,822) a 1440; botón «Crear expediente» 155,6×34 en (1260,854): solape 52 de 155,6 px de ancho (33,4 %) y 20 de 34 px de alto a 1440, 1280 y 1024; a 768 px 46×30. elementFromPoint en el centro del solape devuelve .fab/.ring. Captura: el fab tapa las últimas letras del rótulo («expedie|nte»). 41_alta_cliente.html:599 tiene el margin-right:68px que 42 no tiene. PERO: el botón sigue siendo pulsable en su 66 % izquierdo y por teclado (Tab/Enter), el rótulo sigue legible en su mayoría (no queda «Crear expedie…», se ven casi todas las letras con el fab encima), y el fab es cromo (data-cromo) que vive en el armazón. El criterio crítico 2 («impide la tarea u oculta la acción primaria») no se cumple en sentido estricto: no impide ni oculta la acción, la solapa en su tercio final.",
+   "script": "verif5/m42.cjs (+ captura scratchpad/fab42_zoom.png)",
+   "correccion": "Defecto real de severidad alta, no crítico: solapamiento del botón flotante sobre el tercio derecho del botón primario (33 % de ancho, 20 de 34 px de alto) con captura de clics en esa zona; falta el hueco de 68 px que sí reserva 41_alta_cliente. Criterio 2 no se cumple: la acción sigue operable."
+  },
+  {
+   "id": "v2-42altages-05",
+   "veredicto": "confirmada",
+   "medicion": "Línea 581 y cita literal existen (selector real .ctrl input[type=text|date|number], .ctrl select, .ctrl textarea, líneas 579-581; los .btn llevan su propia regla). §1.1 (--border-ctrl: «control cuya única frontera visible es el borde») y §1.7 (elementos gráficos 3:1) existen. grep: --border-ctrl no declarado en :root (valor vacío en getComputedStyle). Medición por píxeles reales (el borde se pinta sobre el fondo --bg del propio campo, no sobre la superficie): campos 1,41:1 claro y 1,24:1 oscuro contra la superficie (1,32 y 1,36 contra el relleno interior); relleno --bg vs superficie 1,06 / 1,10; botones Cancelar/Guardar 1,33 claro y 1,40 oscuro. Todo muy bajo 3:1. Criterio 1 (control <3:1) se cumple.",
+   "script": "verif5/pix.cjs, verif5/b42.cjs",
+   "correccion": "Cifras: campos 1,41:1 claro / 1,24:1 oscuro (no 1,31/1,40: esas salen de componer el alfa sobre la superficie); botones 1,33 / 1,40. La conclusión no cambia."
+  },
+  {
+   "id": "v2-42altages-06",
+   "veredicto": "confirmada",
+   "medicion": "Línea 656 y cita literal existen; §10 («Un <symbol> ya trae su viewBox; repetirlo en el <svg>… descoloca la marca») existe. Medido a 1440: logo svg x=96 w=44; <use> x=63,5 w=43 → dx −32,5 px; fab svg x=1377 w=22; <use> x=1360,8 → dx −16,2 px; <use> sin width/height. Captura del cromo: solo una astilla verde, frente a 03_kanban (que sí pone medidas en el <use>) donde sale la Λ completa. No es crítico (es:false) y no se afirma.",
+   "script": "verif5/logo.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-42altages-07",
+   "veredicto": "confirmada",
+   "medicion": "Línea 588 y cita literal existen (.ctrl .ayuda{font-size:11px…}); §2.1 existe («--fs-meta es el tamaño más pequeño del sistema. Nada baja de ahí.»). Barrido a 1440, estado ok, sin [data-andamio]: 14 nodos de texto <12 px fuera de los 6 .grp (10,5 px, excepción permitida por §2.1): 10 a 11 px (5 de cromo: AR, «Administración de sistemas», 3 .idx; 5 en contenido: 3 .ayuda + 2 <b> dentro de .ayuda) y 4 a 11,5 px (los dos .aviso-canal visibles, b+span cada uno). Coincide con el autor. Matiz: la frase «lo que la ficha llama el corazón de la pantalla» no está literal en FICHAS_TECNICAS.md; la ficha dice que el canal decide el plazo y por eso se dice en el formulario (decisión sí documentada). 5 de los 14 nodos son cromo.",
+   "script": "verif5/fonts.cjs",
+   "correccion": "Quitar la atribución literal «corazón de la pantalla» a la ficha; la ficha solo dice que el aviso del canal va en el propio formulario."
+  },
+  {
+   "id": "v2-35incid-01",
+   "veredicto": "confirmada",
+   "medicion": "Línea 293 y cita literal existen (@media 860.02–1100). §7.2 existe tal cual. Medido con ariaSnapshot de nav.side: 861, 1000 y 1100 px → .side 64 px, 15 '- link' sin nombre, 0 aria-label, 0 title, 0 texto visible; a 859 y 1101 los 15 tienen nombre. Sin tooltip (.it:hover solo color). Criterio 1 (control sin nombre accesible) se cumple. Nota de alcance: el bloque está marcado data-cromo (FICHAS_TECNICAS.md:1089 habla de un parser que recorta data-cromo), así que el arreglo probablemente va en el armazón compartido y no pantalla a pantalla. La afirmación «mismo bloque en 33, 36 y 37» no se verificó aquí; sí está idéntico en 42, 40 y 56.",
+   "script": "verif5/menu.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-35incid-02",
+   "veredicto": "confirmada",
+   "medicion": "Línea 677 existe (<div class=\"search\"> con input#buscar, aria-label presente). §10 trampa 4 existe («un campo de búsqueda dentro de un <div> con forma de pastilla no cumple, porque pulsar la pastilla no hace nada»). Medido a 1440/1280/1024: div.search 380×34 (DIV, no label), input 329×16; clic en la pastilla a 6 px del borde derecho, en la lupa y a 3 px de la esquina → document.activeElement = BODY; clic en el centro → #buscar. Es el único destino <24 px junto a los 6 folios (7 de 50). Matiz: WCAG 2.5.8 pasaría por espaciado; el criterio 1 del director y §10 se incumplen igualmente.",
+   "script": "verif5/t35.cjs, verif5/bajo24.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-35incid-03",
+   "veredicto": "confirmada",
+   "medicion": "Línea 386 y cita literal existen (.folio sin padding/min-height). §7.3 existe. Medido: 6 a.folio 103,8×16 px a 1440/1280/1024; los 4 a.lnk de orden miden 56,4×48 (el folio ORD-… parte en 3 líneas). Interactivos <24: 7 de 50 (6 folios + input de búsqueda). Matiz: WCAG 2.5.8 pasaría por espaciado (filas a 65 px); §7.3 nombra el folio expresamente y el criterio 1 del director se cumple.",
+   "script": "verif5/t35.cjs, verif5/bajo24.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-35incid-04",
+   "veredicto": "confirmada",
+   "medicion": "Línea 336 y cita literal existen. §1.1 existe. --border-ctrl declarado en líneas 95, 141 y 187 y 0 usos de var(--border-ctrl) en el archivo. Píxeles reales del borde izquierdo de .search: claro borde (213,217,220) vs superficie (250,252,253) = 1,38:1; oscuro borde (40,47,55) vs superficie (23,31,44) = 1,22:1; relleno --bg vs superficie 1,06 / 1,10. El autor dijo 1,40/1,24 (dentro de ±0,02). Criterio 1 (control <3:1) se cumple.",
+   "script": "verif5/pix.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-35incid-05",
+   "veredicto": "exagerada",
+   "medicion": "Línea 642 y cita literal existen (.inc table{min-width:1120px}). Cifras reproducen: tabla 1207 px; caja .tabla-caja (overflow-x:auto) 1204/1130/1044/960 px a 1440/1366/1280/1024 → dx 3/77/163/247; «Ver incidencia» right=1427; cabecera «Días hasta el cierre» a 1130–1307 queda cortada por el borde de la caja a 1280 (en captura «DÍAS HASTA EL CIERR»). PERO no es una cabecera truncada (§6.11 regla 4 habla de «ÚLTIMA O…», rótulo recortado): es un contenedor con desplazamiento horizontal, que la regla 5 del mismo §6.11 admite expresamente («O hay desplazamiento horizontal…»), con primera columna sticky como manda la decisión D-6 de FICHAS; y la ficha de 35 dice que las ocho columnas las decidió el diseñador. No se impide la tarea (la tabla desliza).",
+   "script": "verif5/m35.cjs",
+   "correccion": "Defecto residual real y de severidad media, no alta: a ≤1366 px las columnas «Días hasta el cierre» y «Acciones» quedan fuera de la primera vista sin pista distinta del corte en el borde. No es violación de §6.11 regla 4 ni 5 (hay desplazamiento horizontal con primera columna anclada). Cifras (1207/1044/163/247/77) correctas."
+  },
+  {
+   "id": "v2-35incid-12",
+   "veredicto": "confirmada",
+   "medicion": "Línea 663 y cita literal existen; §10 existe. Medido a 1440: logo svg x=96 w=44, <use> x=63,5 → dx −32,5; fab svg 22×21, <use> x=1360,8 vs 1377 → dx −16,2; <use> sin medidas. Captura: astilla verde en vez de la Λ. §1.2.1 usos incorrectos 5 («nunca una aproximación del isotipo»). No crítico (es:false, correcto).",
+   "script": "verif5/logo.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-03kanban-01",
+   "veredicto": "confirmada",
+   "medicion": "Línea 237 y cita literal existen (.state .ico{width:30px;height:30px;color:var(--text-3)}). §6.4 regla 6 («El selector correcto es .state > .ico (hijo directo)») y §1.4.1 existen. Estado error forzado: botón Reintentar (.btn.p) con svg 30×30, color rgb(102,113,127) sobre fondo compuesto rgb(62,122,76) = 1,03:1 claro; oscuro rgb(139,150,166) sobre rgb(74,143,90) = 1,31:1; el texto del mismo botón 4,89:1 / 4,87:1. Vista empty: solo «Quitar filtros» sin icono (no afectado). Criterio 1 se cumple en la letra (elemento gráfico de un control <3:1). Matiz que el autor ya anota: el icono es redundante con el texto, por lo que WCAG 1.4.11 no lo exigiría estrictamente, aunque el §1.4.1 del propio sistema lo trata como defecto («invisible»).",
+   "script": "verif5/ico.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-03kanban-02",
+   "veredicto": "confirmada",
+   "medicion": "Líneas 170 y 156 existen. §7.3 existe. Medido a 1440/1280/1024: 12 a.lnk de 119,5–124,1 × 16 px y 4 botones de orden (Folio 62,2, Trámite 80,1, Semáforo 93,6, Compromiso 110,3 × 20 px, padding 3px 5px, margin −3px −5px, min-height 0). El «17 de 50» incluye el botón «Deshacer» 69×20, que está dentro de #toast con opacity:0 y pointer-events:none (no visible ni pulsable en estado ok): los destinos reales son 16 de 49. §7.3 nombra explícitamente folio y botón de orden de cabecera; WCAG 2.5.8 pasaría por espaciado, pero el criterio 1 del director se cumple.",
+   "script": "verif5/m03.cjs, verif5/bajo24.cjs, verif5/und.cjs",
+   "correccion": "16 destinos <24 px (12 folios + 4 botones de orden) de 49 visibles, no 17 de 50: el 17.º es «Deshacer» en un toast invisible (opacity 0, pointer-events none). La conclusión no cambia."
+  },
+  {
+   "id": "v2-03kanban-03",
+   "veredicto": "confirmada",
+   "medicion": "Línea 373 existe (<col style=\"width:13%\">, tabla fija). A 1280: th de folio 137,3 px, scrollWidth 148 (recorte de 11 px) con overflow:hidden y text-overflow:ellipsis → «TRM-202606-0…»; a 1024: 133 px, sw 148; a 1440: 158/158, sin recorte. La captura 1280-fold lo muestra (12 de 15 caracteres). El folio es el identificador de fila (th scope=row). Matiz de atribución: la regla literal que mejor encaja es §6.11 regla 2 (en espíritu); la regla 4 trata de rótulos de cabecera, no del folio. No es crítico (es:false, correcto: el enlace sigue activo).",
+   "script": "verif5/m03.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-03kanban-04",
+   "veredicto": "confirmada",
+   "medicion": "Línea 182 (.sla font-size:11px) y 169 (.avatar 9px) existen; §2.1 existe. Barrido a 1440, estado ok: 47 nodos <12 px incluyendo 5 del conmutador demo (aside.demo, sin data-andamio en este archivo); sin ellos 42, igual que el autor: 24 a 11 px (17 .sla + 7 th), 12 avatares a 9 px, 3 a 11,5 px (.leg), 3 a 10,5 px (2 .grp + wordmark). Hay 11 px adicionales en .card .fol/.foot y .col-h .c (vista Kanban). Matiz: §2.1 admite 10,5 px en los rótulos de grupo del menú, así que 2 de los 3 de 10,5 son excepción permitida.",
+   "script": "verif5/fonts.cjs",
+   "correccion": "Descontar los 2 .grp (excepción §2.1): 40 nodos por debajo del suelo (39 si se excluye también el wordmark de marca), no 42."
+  },
+  {
+   "id": "v2-40usuarios-01",
+   "veredicto": "confirmada",
+   "medicion": "Línea 671 existe (<div class=\"search\"> con input#buscar, aria-label presente). §10 trampa 4 existe. Medido a 1440/1280/1024: div 380×34, input 329×16, sin <label>; clics en la pastilla (derecha, lupa, esquina) dejan el foco en BODY, solo el centro enfoca. Barrido: 47 interactivos visibles, 1 bajo 24 px (ese input), igual que el brief. Matiz: WCAG 2.5.8 pasaría por espaciado; criterio 1 del director y §10 se cumplen.",
+   "script": "verif5/t35.cjs, verif5/bajo24.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-40usuarios-02",
+   "veredicto": "confirmada",
+   "medicion": "Línea 291 y cita literal existen (@media 860.02–1100). §7.2 existe. ariaSnapshot de nav.side a 861/1000/1100 px: .side 64 px, 15 '- link' sin nombre, 0 aria-label/title/texto; a 859 y 1101 con nombre. Criterio 1 se cumple. Nota de alcance: el bloque está marcado data-cromo (FICHAS_TECNICAS.md:1089 habla de un parser que recorta data-cromo), así que el arreglo probablemente va en el armazón compartido y no pantalla a pantalla.",
+   "script": "verif5/menu.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-40usuarios-03",
+   "veredicto": "exagerada",
+   "medicion": "Línea 640 y cita literal existen. Cifras que reproducen: caja 1044 px (1280) y 960 (1024), tabla min-width 1120 → dx 76 y 160; a 1440 sin scroll; con min-width:0 a 1280 la tabla cabe (scrollWidth 1044). Pero: (1) la caja .tabla-caja tiene overflow-x:auto, o sea SÍ hay desplazamiento horizontal, que §6.11 regla 5 admite literalmente («O hay desplazamiento horizontal, o hay un aviso…»), y la primera columna es sticky (D-6); la regla 5 no se incumple. (2) «celda de 62 px» no reproduce: .acciones mide 168,5 px (td 200,5) a 1280 y 1024, y con min-width:0 la td mide 168,8 px. (3) «39 nodos fuera del borde» a 1024 no reproduce con mi conteo (21 th/td/button/a fuera). Lo que sí es cierto: a 1280 la cabecera «Acciones» solo asoma 124 px y los dos botones (88,8 + 87,5 px) se apilan en dos líneas (y 334 y 368) por no caber en 168,5 px, y quedan cortados por el borde («Car…», «Da…» en captura); a 1440 caben en una línea.",
+   "script": "verif5/m40.cjs, verif5/m40b.cjs",
+   "correccion": "No es violación de §6.11 regla 5 (hay desplazamiento horizontal, que la regla admite). Defecto residual de severidad media: a ≤1366 px la columna Acciones queda al borde y sus botones se apilan en dos líneas (el .acciones mide 168,5 px, no 62). Cifras 76/160/1044/960 correctas; «62 px» y «39 nodos» no reproducen."
+  },
+  {
+   "id": "v2-40usuarios-04",
+   "veredicto": "confirmada",
+   "medicion": "Línea 657 y cita literal existen; §10 y §1.2.1 existen. Medido a 1440: logo svg x=96 w=44, <use> x=63,5 w=43 → −32,5 px; <use> sin width; fab (línea 750) svg 22×21 con <use> a x=1360,8 vs 1377 → −16,2 px (lo medí, el autor no). Captura: hoja estrecha recortada en vez de la Λ. 03_kanban (con width en el <use>) sale completo. No crítico (es:false correcto).",
+   "script": "verif5/logo.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-56frontera-01",
+   "veredicto": "confirmada",
+   "medicion": "Línea 609 y cita literal existen (.state .ico{width:30px;height:30px;color:var(--text-3)}). §1.4.1 («Un selector que tiñe iconos por contexto se acota a hijo directo») y §6.4 regla 6 existen. Medido por estado forzado: empty → «Volver a cargar» (.btn.p) icono 30×30 rgb(102,113,127) sobre rgb(62,122,76) = 1,03:1 claro, 1,31:1 oscuro; error → «Ir al tablero» (.btn.p) 1,03 / 1,31; «Avisar a soporte» (.btn) icono también 30×30 gris pero 4,82:1/5,53:1 (legible, solo oversize). Estado ok sin botones en .state (no afectado). Los estados empty/error son los dos principales de esta pantalla (FICHAS:1171-1178). Criterio 1 se cumple en la letra; matiz: el icono es redundante con el texto del botón (4,89:1).",
+   "script": "verif5/ico.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-56frontera-02",
+   "veredicto": "confirmada",
+   "medicion": "Línea 288 y cita literal existen (@media 860.02–1100). §7.2 existe. ariaSnapshot de nav.side a 861/1000/1100: 64 px, 15 '- link' sin nombre, 0 aria-label/title/texto; a 859 y 1101 con nombre. Criterio 1 se cumple. Nota de alcance: el bloque está marcado data-cromo (FICHAS_TECNICAS.md:1089 habla de un parser que recorta data-cromo), así que el arreglo probablemente va en el armazón compartido y no pantalla a pantalla.",
+   "script": "verif5/menu.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-56frontera-03",
+   "veredicto": "confirmada",
+   "medicion": "Línea 667 y cita literal existen; §10 y §1.2.1 existen. Medido a 1440: logo svg x=96 w=44, <use> x=63,5 w=43 → −32,5 px; <use> sin width. Esta pantalla no tiene .fab. Captura: marca recortada. No crítico (es:false correcto).",
+   "script": "verif5/logo.cjs",
+   "correccion": null
+  },
+  {
+   "id": "v2-04apppers-01",
+   "veredicto": "confirmada",
+   "medicion": "Líneas 77 (--text-3:#66717F) y 281 (.listmsg .ref font-size:10.5px; color:var(--text-3)) existen. §1.7 («Texto normal 4,5:1 mínimo») existe; §1.1 documenta --text-3 = #5C6675. Estado Error forzado con el botón demo: span.ref «Referencia: SYNC-0119-ERR-408» 10,5 px peso 400, color rgb(102,113,127) sobre --err-bg rgb(244,232,231) = 4,14:1 en claro (a 1440 y a 390 px); #5C6675 daría 4,86:1 (calculado); oscuro 4,58:1 (pasa). Los demás textos del estado error pasan (p 5,02, b 13,08). El estado es alcanzable en uso real (fallo de sincronización), no solo andamio. Criterio 1 (texto <4,5:1) se cumple.",
+   "script": "verif5/m04.cjs",
+   "correccion": null
+  }
+ ]
+}
