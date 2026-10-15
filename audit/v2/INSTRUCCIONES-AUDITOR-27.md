@@ -5,6 +5,8 @@ medición automática; ahora tienen revisión a fondo. Es la primera revisión d
 **Solo revisas.** No modificas ninguna pantalla ni documento del cliente ni del repo. Lo único que escribes es
 `/home/user/Investigaci-n-DPROMA-/audit/v2/raw/<pantalla>.json`.
 
+Antes de empezar, lee también `audit/CRITERIOS-DE-REVISION.md`: lo que la persona que dirige el proyecto mira primero y cómo quiere la entrega.
+
 ## 0 · Las dos reglas de trabajo (decididas por la persona que dirige el proyecto)
 
 **Regla 1 — Prioridad al cliente, salvo que sea crítico.** Lo que el cliente hizo se adopta y se documenta en el sistema; **no se le
