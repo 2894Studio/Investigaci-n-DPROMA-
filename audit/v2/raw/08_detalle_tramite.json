@@ -1,0 +1,381 @@
+{
+ "pantalla": "08_detalle_tramite",
+ "tier": "B",
+ "modo": "cumplimiento",
+ "sha256": "ab7fabb89985fb35df17887d29a0d5f9fa222cc82137339d75f955e1032cdc8c",
+ "estado_vs_pdf": "NO_ALINEADO",
+ "estados_auditados": [
+  "ok"
+ ],
+ "capturas": [
+  "08_detalle_tramite--1440.png",
+  "08_detalle_tramite--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-08tramite-01",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles",
+    "dice_el_sistema": "«llevan padding hasta llegar a 24px»",
+    "hay_en_el_build": "Las migas «Trámites» y «Kanban» (`<a>` de la línea 377) miden 49,1×15 px y 42,9×15 px: `.crumb a{color:var(--text-3);text-decoration:none}` (línea 211) no declara padding ni `min-height`. Son los dos únicos destinos bajo 24 px de la pantalla (2 de 19).",
+    "selector": ".crumb a",
+    "linea": 211,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil_bajo24",
+     "detalle": "dossier: total 19, bajo24 2; a «Trámites» 49.1×15, a «Kanban» 42.9×15"
+    },
+    "critico": {
+     "es": true,
+     "criterio": "Falla de accesibilidad medida: destino táctil <24 px (migas a 15 px de alto)"
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Una declaración: `.crumb a{display:inline-flex;align-items:center;min-height:24px;padding:0 4px}`; §7.3 nombra expresamente la miga como enlace de fila principal que lleva padding hasta 24 px."
+    },
+    "por_que_importa": "La miga «Trámites» es la vía de vuelta a la lista desde el detalle. Lectura alternativa: son enlaces en una línea de texto con 6 px de separación y WCAG 2.5.8 admite esa excepción; el criterio 1 del proyecto y §7.3 no."
+   },
+   {
+    "id": "v2-08tramite-02",
+    "severidad": "alta",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "«Nada baja de ahí.»",
+    "hay_en_el_build": "42 nodos de texto visibles bajo 12 px (estilo calculado): 15 a 10,5 px (12 etiquetas de campo `.kv div span` en mayúsculas, línea 269; wordmark y `.grp`), 21 a 11 px (`.ev .who` y fechas de la bitácora, `.hint`, `.docs small`, `.lockrow`) y 6 a 11,5 px (`.fstep`, `.sladef`). El dossier mide 7 declaraciones bajo 12 px en el archivo; el PDF del cliente declara 0 tras el cambio (C1, C4, C6, C8, C9 «NO_confirmado»).",
+    "selector": ".kv div span, .ev .who, .hint, .fstep",
+    "linea": 269,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_fuentes_lt12",
+     "detalle": "scratchpad/lote27b/m_fuentes.cjs 08_detalle_tramite: 42 nodos <12 px (15 a 10.5, 21 a 11, 6 a 11.5). Dossier estado_vs_pdf: lt12_medido 7, lt12_pdf_despues 0"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta: `.kv div span`, `.ev .who`, `.hint`, `.docs small`, `.lockrow`, `.fstep` y `.sladef` a `var(--fs-meta)`; las etiquetas de campo de un detalle no son «etiquetas de campo del modo tarjeta» de la excepción de 10,5 px."
+    },
+    "por_que_importa": "Las etiquetas de campo y la autoría de cada evento de la bitácora son lo que se consulta para reconstruir un trámite. El PDF dice haberlo corregido y el archivo recibido no lo contiene."
+   },
+   {
+    "id": "v2-08tramite-03",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla",
+    "dice_el_sistema": "«Toda pantalla que pida datos tiene cuatro formas de presentarse»",
+    "hay_en_el_build": "El archivo solo dibuja el estado con datos: no hay `data-state`, `.state`, `.tarjeta-estado`, `.estado-ico` ni `aside.demo` (0 coincidencias de `tarjeta-estado|data-state|data-andamio`). La ficha del cliente dice lo contrario: «`.tarjeta-estado`/`.estado-ico` aplicados en vacío/error», y que a 08 «se le construyó» un arnés de cuatro estados copiado de 33.",
+    "selector": "main#contenido",
+    "linea": 408,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_grep_estados",
+     "detalle": "grep -c \"tarjeta-estado\\|estado-ico\\|data-state\\|data-andamio\" 08_detalle_tramite.html = 0 (02, 03, 06 y 30 sí traen data-state). Dossier: estado_vs_pdf NO_ALINEADO"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No se exige nada nuevo: se pide el archivo que la ficha declara (arnés con Con datos / Cargando / Vacío / Error y `.tarjeta-estado`). El archivo recibido no lo contiene: «no está aplicado»."
+    },
+    "por_que_importa": "Un detalle de trámite que carga por red necesita decir qué pasa cuando el trámite no existe o el servicio no responde; hoy la pantalla no lo dibuja. Y la ficha afirma una entrega que no coincide con el archivo."
+   },
+   {
+    "id": "v2-08tramite-04",
+    "severidad": "media",
+    "regla": "§8 Voz de producto",
+    "dice_el_sistema": "«si el texto explica una decisión, no va en pantalla»",
+    "hay_en_el_build": "Tres textos siempre visibles citan códigos y normas internas: «· inmutable, solo lectura (S11)» (línea 427), «Esta bitácora no admite ediciones ni borrados — cada acción nueva agrega un registro (trazabilidad ISO 9001, D13).» (línea 450) y «SLA del tipo \"Baja de placas · Puebla\": 7 días hábiles (configurable U-07)» (línea 405).",
+    "selector": ".panel h2 .hint, .lockrow, .sladef",
+    "linea": 427,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 427,
+     "cita": "· inmutable, solo lectura (S11)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta: dejar «Bitácora · solo lectura» y mover «no admite ediciones… ISO 9001, D13» al `title` o al toggletip (§6.23); quitar «(S11)», «D13» y «U-07» de la interfaz."
+    },
+    "por_que_importa": "Son referencias a reglas y decisiones del proyecto que quien usa la pantalla no puede resolver; es el caso «códigos internos» que §8 nombra."
+   },
+   {
+    "id": "v2-08tramite-05",
+    "severidad": "media",
+    "regla": "§1 Color (un color de estado no se reutiliza para una categoría)",
+    "dice_el_sistema": "«Un color de estado no se reutiliza para una categoría, ni al revés.»",
+    "hay_en_el_build": "(a) La etapa actual «En proceso» se pinta con `--warn` (línea 253) mientras la cabecera dice «SLA vencido hace 2 días» en `--err`: dos juicios de color distintos para el mismo trámite. (b) En la bitácora el evento «Documento agregado» usa `class=\"ev purple\"` (línea 436) con `.ev.purple .d{border-color:var(--block)…}` (línea 281): el violeta de «bloqueado por una condición externa» para un evento de documento; y el comentario lleva `border-left:3px solid var(--warn)` (línea 286).",
+    "selector": ".fstep.now, .ev.purple .d, .ev .note",
+    "linea": 253,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 253,
+     "cita": ".fstep.now{border-color:var(--warn);color:var(--warn-ink);background:var(--warn-bg)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Dos lecturas: el paso actual puede leerse como «en curso, ojo al plazo» y el violeta como acento del tipo de evento; el sistema exige que el color de estado diga estado. Solución concreta: etapas en neutro (hecha = icono de check en `--text-2`, actual = borde `--accent`), y los tipos de evento de la bitácora con `--serie-1..4` o icono sin color."
+    },
+    "por_que_importa": "El ámbar de «En proceso» compite con el rojo del SLA; el violeta en un evento de documento hace pensar en un bloqueo que no existe."
+   },
+   {
+    "id": "v2-08tramite-06",
+    "severidad": "media",
+    "regla": "§6.20 Ficha de detalle: el bloque de identidad manda el orden",
+    "dice_el_sistema": "«y a su derecha el indicador que decide la urgencia (el reloj de plazo, en Administración Vehicular)»",
+    "hay_en_el_build": "El plazo vencido se dice cinco veces: pastilla «SLA vencido hace 2 días» (línea 383), paso «En proceso · día 9 de 7» (línea 400), `.sladef` «SLA del tipo… 7 días hábiles» (línea 405), aviso «2 días sobre el SLA» (línea 457) y «22 naturales · 16 hábiles» (línea 482). No hay un solo indicador de plazo a la derecha del bloque de identidad. La ficha lo declara: «No se aplicó `.leyenda-sla`/`.sla`… Pendiente de decisión (no es contenido, es alcance): si vale una pasada aparte para migrar estas dos a `.reloj`».",
+    "selector": ".slabig, .fstep.now, .sladef, .warnbox",
+    "linea": 383,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 383,
+     "cita": "<span class=\"slabig s-err\">"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Decisión que el propio cliente dejó abierta (FICHAS, «Detalles — 08, 33»): migrar a `.reloj` (grid `.cab` de §6.20) o conservar las pastillas. Solución concreta si se migra: un único bloque de plazo a la derecha de la identidad con la cifra, el SLA del tipo y las fechas, y retirar el paso «día 9 de 7», el aviso y la línea de SLA."
+    },
+    "por_que_importa": "Cinco repeticiones del mismo dato diluyen el indicador que decide la urgencia: quien abre un trámite vencido lo lee cinco veces y ninguna es la principal."
+   },
+   {
+    "id": "v2-08tramite-07",
+    "severidad": "baja",
+    "regla": "§6.9 Avisos: inline (`.note`) y banda (`.banda`) y §8 Voz de producto (regla 1)",
+    "dice_el_sistema": "«Antes de escribir una clase nueva para un aviso de ancho completo»",
+    "hay_en_el_build": "`.warnbox` (línea 293) duplica `.banda.banda-err` con otro nombre (mismo `display:flex`, gap, relleno, `--err-bg`) y su texto tiene dos frases: «Requiere atención: 2 días sobre el SLA. Al mover de estado o pausar, la justificación es obligatoria y quedará en la bitácora.» (126 caracteres, línea 457).",
+    "selector": ".warnbox",
+    "linea": 293,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 293,
+     "cita": ".warnbox{background:var(--err-bg);border:1px solid var(--border);border-radius:var(--r-card);padding:12px 14px;"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta: `.banda.banda-err` con la primera frase («Requiere atención: 2 días sobre el SLA.»); la segunda ya la dicen los botones «Pausar (justificar)» y «Mover a En revisión…»."
+    },
+    "por_que_importa": "Dos nombres para el mismo componente y una segunda frase que repite lo que dicen los botones de al lado."
+   },
+   {
+    "id": "v2-08tramite-08",
+    "severidad": "media",
+    "regla": "§7.2 Cromo de aplicación",
+    "dice_el_sistema": "«Tres anchos: completa (≥1100px), colapsada a solo iconos (860–1100px) y cajón con velo»",
+    "hay_en_el_build": "`@media (max-width:900px){.side{display:none}…}` (línea 325) oculta el menú lateral y no hay botón de menú ni cajón: a 800 y 390 px la pantalla no tiene navegación (`nav.side` display:none, sin botón de «Abrir el menú»). Entre 900 y 1100 px el menú sigue a 224 px sin colapsar a iconos. Mediciones propias fuera de los tres anchos del dossier (1440, 1280 y 1024 sin scroll horizontal).",
+    "selector": "nav.side",
+    "linea": 325,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_responsive",
+     "detalle": "scratchpad/lote27b/m_resp.cjs: 08 a 800 px y 390 px: side display none, hayBotonMenu false, main = ancho completo, sin scroll de página"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico (los anchos del dossier pasan). Solución: añadir el cajón con velo de 30 (`#menu-btn` + `data-menu=\"abierto\"`) en lugar de `display:none`."
+    },
+    "por_que_importa": "En una tableta vertical la persona queda en el detalle sin forma de ir a otra sección que no sea la miga."
+   },
+   {
+    "id": "v2-08tramite-09",
+    "severidad": "baja",
+    "regla": "§6.20 Ficha de detalle: el bloque de identidad manda el orden",
+    "dice_el_sistema": "«Quién es el cliente va junto al expediente, no al final de la columna secundaria.»",
+    "hay_en_el_build": "El cliente es un par más de la cuadrícula «Información del trámite» (línea 418); no hay contacto (nombre, teléfono, correo) en ninguna parte, mientras el panel «Acciones» ofrece «Notificar al cliente» (línea 465).",
+    "selector": ".kv",
+    "linea": 418,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 418,
+     "cita": "<div><span>Cliente / sucursal</span><b>Flotillas GNP · Puebla Centro</b></div>"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Pregunta abierta: §6.20 se escribió para la ficha vehicular; si el trámite de gestoría necesita llamar al cliente, el bloque de contacto va bajo la identidad. Si la notificación es automática, el contacto puede no hacer falta."
+    },
+    "por_que_importa": "Quien notifica al cliente no ve a quién ni por qué canal."
+   },
+   {
+    "id": "v2-08tramite-10",
+    "severidad": "media",
+    "regla": "§2 Tipografía (fuentes autoalojadas, D116)",
+    "dice_el_sistema": "«Las fuentes se autoalojan — D116.»",
+    "hay_en_el_build": "Inter y Michroma se piden con `<link href=\"https://fonts.googleapis.com/css2?family=Inter…\">` (líneas 8 y 10) y no hay `@font-face` (barrido: font_face 0). Las fuentes de las capturas se inyectaron al renderizar.",
+    "selector": "head > link",
+    "linea": 10,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 10,
+     "cita": "fonts.googleapis.com/css2?family=Inter"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Sustituir los tres `<link>` por los dos `@font-face` de §2."
+    },
+    "por_que_importa": "Con el CDN caído la pantalla cae a system-ui sin error visible (incidente D116)."
+   },
+   {
+    "id": "v2-08tramite-11",
+    "severidad": "baja",
+    "regla": "§6.2 Botones (`.btn`, `.btn.p`, `.btn.mini`)",
+    "dice_el_sistema": "«Y el suelo hay que declararlo, no confiarlo al relleno.»",
+    "hay_en_el_build": "`.btn{…padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);…}` (líneas 216-218) sin `min-height`: los cinco botones del panel «Acciones» y «Subir documento» miden 34 px; los de la cabecera llegan a 36 px solo porque el contenedor flex los estira al alto del `iconbtn`.",
+    "selector": ".btn",
+    "linea": 216,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_fuentes_lt12",
+     "detalle": "scratchpad/lote27b/m_fuentes.cjs 08: button.btn 34×342 (panel), 36×156/36×169 (cabecera); minHeight calculado auto"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. `min-height:36px` en `.btn`."
+    },
+    "por_que_importa": "Las acciones del trámite (mover, reasignar, notificar) quedan 2 px bajo el suelo declarado."
+   },
+   {
+    "id": "v2-08tramite-12",
+    "severidad": "baja",
+    "regla": "§3 Espaciado y radios",
+    "dice_el_sistema": "«Escala base de 4px.»",
+    "hay_en_el_build": "I5: 8 valores fuera de la escala y 92 ocurrencias (6px×32, 10px×29, 7px×10, 9px×10, 14px×6, 5px×2, 18px×2, 40px×1) y 2 interlineados distintos (1,45×22, 1,5×3). Ejemplo: `.top{display:flex;flex-direction:column;gap:10px;padding:14px 24px;…}` (línea 208).",
+    "selector": ".wrap, .top, .panel …",
+    "linea": 208,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I5_ritmo",
+     "detalle": "dossier: valoresFueraDeEscala 8, ocurrencias 92, top 6px×32, 10px×29, 7px×10, 9px×10, 14px×6, 5px×2, 18px×2, 40px×1; interlineadosDistintos 2"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Candidato del instrumento. Mismo valor dominante que en 03, 06 y 30 (6 px) más 10 px: decidir token o ajuste (ver v2-02dashboard-14)."
+    },
+    "por_que_importa": "Ritmo irregular; sin consecuencia funcional."
+   },
+   {
+    "id": "v2-08tramite-13",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (excepción del 10,5 px)",
+    "dice_el_sistema": "«Se admite una excepción, y solo una: 10,5px en mayúsculas con letter-spacing para los rótulos de grupo de la barra lateral»",
+    "hay_en_el_build": "`.grp{…font-size:10.5px;…letter-spacing:.1em…}` (línea 198) sin `text-transform:uppercase`: «Gestoría» y «Operación» salen en mayúscula inicial (C2: 2 fallos).",
+    "selector": "p.grp",
+    "linea": 198,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "dossier: fallos 2: p.grp «Gestoría», p.grp «Operación»"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. `text-transform:uppercase` en `.grp`."
+    },
+    "por_que_importa": "El cromo se copia a todas las pantallas."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 2,
+   "integridad": 2
+  },
+  "justificacion": "Detalle de trámite bien jerarquizado: folio y semáforo grande arriba, información clave en cuadrícula, bitácora cronológica con icono + color + texto, acciones agrupadas en un panel, 0 fallos de contraste en ambos temas. Resta: migas de 15 px (crítico medido), 42 textos bajo 12 px pese a que el PDF declara 0, ausencia de los estados que la ficha dice haber construido, plazo repetido cinco veces sin indicador principal, códigos internos en la interfaz, etapas y eventos coloreados con el semáforo y menú que desaparece por debajo de 900 px.",
+  "evidencia": [
+   "08_detalle_tramite--1440.png",
+   "08_detalle_tramite--1280-fold.png",
+   "tactil_bajo24",
+   "propio_fuentes_lt12",
+   "propio_grep_estados"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Línea de tiempo de bitácora (`.tl` / `.ev`): punto con color + icono, texto, autoría y fecha en `tnum`, comentario en caja con filo",
+   "propuesta_de_regla": "La bitácora es una lista ordenada (`<ol>`) con un punto de 14 px por evento; el color del punto no es de semáforo salvo que el evento sea un cambio de estado de ese mismo semáforo; autoría y fecha van en `--fs-meta`; el comentario libre va en una caja `--surface-2` sin filo de color."
+  },
+  {
+   "patron": "Paso de flujo (`.fstep`): etapas del trámite como pastillas con flecha entre ellas y `aria-current=\"step\"` en la actual",
+   "propuesta_de_regla": "El avance por etapas es un `<ol>` con la etapa actual en `aria-current=\"step\"`; las etapas hechas llevan icono de check y texto («Recibido, hecho»), no solo color; el color de semáforo queda para el plazo."
+  },
+  {
+   "patron": "Botón de acción de riesgo con borde y texto `--err` (`.btn.w`: «Pausar (justificar)», «Marcar bloqueado por cliente»)",
+   "propuesta_de_regla": "Una acción que cambia el trámite a un estado `pause` o `block` no usa `--err` (el rojo es «falta lo que impide operar», §1.3): lleva el borde y el texto de su propio estado (`--pause-ink`, `--block-ink`) o el neutro del botón secundario, y siempre pide justificación en el diálogo."
+  },
+  {
+   "patron": "Acción primaria repetida en cabecera y panel de acciones («Mover a En revisión» dos veces)",
+   "propuesta_de_regla": "Una acción primaria vive en un solo sitio por pantalla: cabecera si es la acción del objeto, panel lateral si hay varias; no en los dos."
+  }
+ ],
+ "sin_datos": [
+  "PDF del cliente para 08: solo consta C1, C4, C6, C8, C9 «NO_confirmado» y C18 «no verificable mecánicamente»; no se dispone de su texto, así que no se puede decir qué declara cada código.",
+  "La ficha del cliente dice que 08 recibió un arnés de cuatro estados y símbolos `i-inbox`/`i-refresh`/`i-edit` en el sprite; el archivo no los contiene (ver v2-08tramite-03).",
+  "Interacciones (Mover, Pausar, Reasignar) y diálogos de justificación no existen en la maqueta: no se pudo evaluar si hay protección en las acciones con consecuencias (criterio 3).",
+  "Teclado, foco, lector de pantalla y `aria-current=\"step\"` no se probaron; el color de «hecho/ahora» del paso se evaluó solo por código y captura.",
+  "Rendimiento no evaluado. Tema oscuro medido con el instrumento de contraste: 0 fallos en 93 nodos."
+ ]
+}

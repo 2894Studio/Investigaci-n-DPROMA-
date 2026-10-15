@@ -1,0 +1,401 @@
+{
+ "pantalla": "57_menu_cuenta",
+ "tier": "B",
+ "modo": "cumplimiento",
+ "sha256": "c7fda14f899d88987ab43b9439779bbcb4f856411b9a6ff06f36098c9cee5faa",
+ "estado_vs_pdf": "NO_ALINEADO",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error"
+ ],
+ "capturas": [
+  "57_menu_cuenta--1440.png",
+  "57_menu_cuenta--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-57menucuenta-01",
+    "severidad": "alta",
+    "regla": "§1.4.1 Tinta sobre relleno sólido de color (un selector que tiñe iconos por contexto se acota a hijo directo) · §6.4 Vistas de estado (regla 6)",
+    "dice_el_sistema": "**Un selector que tiñe iconos por contexto se acota a hijo directo.**",
+    "hay_en_el_build": "`.state .ico{width:30px;height:30px;color:var(--text-3)}` (descendiente) alcanza el icono de los botones de las vistas empty y error: «Reintentar» (`.btn.p`, dos veces) pinta su glifo en rgb(102,113,127) sobre el verde rgb(62,122,76), 1,03:1 (I1_icono_vs_boton: 2 fallos). Medido con la vista forzada: los glifos de «Reintentar» y «Cerrar sesión» salen a 30×30 px en gris.",
+    "selector": ".state .ico",
+    "linea": 609,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I1_icono_vs_boton",
+     "detalle": "2 fallos: button.btn.p «Reintentar» ×2, colorIcono rgb(102,113,127), fondo rgb(62,122,76), ratio 1,03; script propio m6/ico56.cjs: svg de los botones 30×30 gris"
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Elemento gráfico de un control a 1,03:1 < 3:1 (criterio 1). Arreglo de un carácter: `.state > .ico`. Mismo bloque ARQ-ESTADOS que en 56 (archivo sin aplicar: NO_ALINEADO)."
+    },
+    "por_que_importa": "En la vista «No se pudo cerrar la sesión» —donde la persona está en un equipo compartido y tiene que reintentar— el icono del botón primario desaparece y el de «Cerrar sesión» sale gigante."
+   },
+   {
+    "id": "v2-57menucuenta-02",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (modo colapsado) · §6.5 Iconos",
+    "dice_el_sistema": "En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+    "hay_en_el_build": "A 1000 px el `.side` pasa a 64 px y `.side .et` se oculta con display:none: 15 de 15 enlaces `.it` quedan sin nombre accesible (instrumento menu_1000px: total 15, sinNombre 15). Comprobado además con script propio a 1000×800: innerText vacío y sin aria-label ni title en los 15.",
+    "selector": ".side .et",
+    "linea": 288,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "sidebar (menu_1000px)",
+     "detalle": "total 15, sinNombre 15, anchoSide 64 (dossier); script propio m6/medir.cjs a 1000×800: [innerText, aria-label, title] = [\"\",null,null] en los 15 `.side .it`"
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1 de la regla 1). Arreglo de una línea que no cambia el diseño: en vez de `display:none` sobre `.side .et`, aplicarle la receta `.sr` que el propio archivo ya declara (recorte de 1 px), o añadir `title` y `aria-label` a cada `.it`; `.grp` y `.wordmark` pueden seguir ocultos. Con `title` se cumple además lo que §7.2 pide («etiqueta emergente»)."
+    },
+    "por_que_importa": "Entre 860 y 1100 px (portátil con la ventana partida, tableta apaisada) toda la navegación es una columna de iconos sin nombre: un lector de pantalla anuncia 15 veces «enlace» y quien ve la pantalla no tiene ni etiqueta emergente. Mismo bloque ARQ-CROMO que en 39, 40, 50 y 56."
+   },
+   {
+    "id": "v2-57menucuenta-03",
+    "severidad": "alta",
+    "regla": "§10 Diez trampas comprobadas (un `<symbol>` ya trae su `viewBox`) · §1.2.1 Logotipo: uso y restricciones",
+    "dice_el_sistema": "repetirlo en el `<svg>` que lo invoca descoloca la marca",
+    "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>` con el `<symbol>` ya declarado con ese mismo viewBox: la caja del `<use>` empieza en x=63,5 y la del `<svg>` en x=96, un desfase de −32,5 px (medido a 1440×900). En la captura el isotipo del cromo es una hoja estrecha recortada, no la «Λ» completa.",
+    "selector": ".side .logo svg",
+    "linea": 686,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_logo",
+     "detalle": "script m6/medir.cjs: `.logo svg` x=96 w=44; su `<use>` x=63,5 w=43; svgViewBox \"740 0 970 932\", `<use>` sin width"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No entra en los 4 criterios críticos, así que no se exige. Arreglo propuesto de una línea, la receta del propio §10: quitar el `viewBox` del `<svg>` y poner las medidas en el `<use>` (`<use href=\"#dproma-mark\" width=\"44\" height=\"42\"/>`). Mejora la marca en todas las pantallas del paquete que copien este cromo."
+    },
+    "por_que_importa": "La marca de la aplicación, visible en cada pantalla, no se reconoce: §1.2.1 prohíbe deformar o recortar el isotipo oficial. Es el mismo bloque de cromo que en 39, 40, 50 y 56; en 10_dprimi_asistente el `<use>` lleva sus medidas y el isotipo sale completo."
+   },
+   {
+    "id": "v2-57menucuenta-04",
+    "severidad": "media",
+    "regla": "§3 Espaciado y radios (un token que no existe falla en silencio)",
+    "dice_el_sistema": "**un token que no existe falla en silencio**",
+    "hay_en_el_build": "`--sp-5` se usa y no se declara (tokens_usados_no_declarados: --sp-5): `.demo-cuenta{gap:var(--sp-5)}`, `.lienzo{padding:var(--sp-5)}` y `.lienzo .anclado{right:…;top:…}`. Medido: `.lienzo` padding 0 y `.demo-cuenta` gap normal; el menú de escritorio queda a 1 px del borde izquierdo y a 0 del superior de un lienzo de 860 px, en vez de a 20 px de la esquina derecha.",
+    "selector": ".lienzo .anclado",
+    "linea": 668,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "SP5",
+     "detalle": "declarado null, reglasQueLoUsan 3, elementosAfectados 4 (.demo-cuenta, .lienzo, .lienzo .anclado: padding 0px, gap normal); script propio m6/m3.cjs: lienzoPad 0px, menuIzqDentroLienzo 1, anclaTop 0px"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Una línea en `:root`: `--sp-5:20px` (§3 la lista como token del sistema). Con ella el lienzo recupera 20 px de aire y el menú se ancla donde el texto dice («cuelga del botón de cuenta, en la esquina»)."
+    },
+    "por_que_importa": "El texto del escenario dice que el menú cuelga de la esquina derecha de la barra superior y el dibujo lo pega a la izquierda: la maqueta no enseña lo que afirma."
+   },
+   {
+    "id": "v2-57menucuenta-05",
+    "severidad": "media",
+    "regla": "§3 Espaciado y radios (`--sp-6`: padding de sección)",
+    "dice_el_sistema": "Padding de sección, margen entre grupos",
+    "hay_en_el_build": "`<div class=\"pad\">` no tiene regla en el archivo (grep: ninguna `.pad`): `.demo-cuenta` queda a 0 px del borde izquierdo y del superior de `main`, pegado a la barra lateral y a la superior (captura 1440). 39 envuelve su contenido en `.cuerpo` (ARQ-P6), que sí aporta el relleno.",
+    "selector": ".pad",
+    "linea": 699,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_57",
+     "detalle": "script m6/m3.cjs: padPadding \"0px\"; .demo-cuenta left−main.left = 0, top−main.top = 0"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Usar `<div class=\"cuerpo\">` (padding `--sp-4` `--sp-6` `--sp-8`, ya declarado en ARQ-P6) en lugar de `.pad`."
+    },
+    "por_que_importa": "El texto de la maqueta toca la barra azul y la barra superior; es lo primero que se ve y parece un fallo de carga."
+   },
+   {
+    "id": "v2-57menucuenta-06",
+    "severidad": "media",
+    "regla": "§6.14 Menú de acciones por fila (roles y relación disparador–menú)",
+    "dice_el_sistema": "aria-haspopup=\"menu\" aria-expanded=\"false\" aria-controls=\"m-gav\"",
+    "hay_en_el_build": "Los dos `.menu-cuenta` son `role=\"menu\"` con cuatro `<button class=\"op\">` sin `role=\"menuitem\"` (medido: 0 menuitem de 4 botones en cada uno) y sin `id`; el disparador `.cromo-prof` lleva `aria-expanded=\"false\"` sin `aria-haspopup` ni `aria-controls`, aunque en la maqueta el menú se dibuja abierto. «Tema oscuro» es un botón con `aria-pressed` dentro de un menú.",
+    "selector": ".menu-cuenta",
+    "linea": 713,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 713,
+     "cita": "<div class=\"menu-cuenta\" role=\"menu\" aria-label=\"Cuenta de Alex Rai\">"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Alinear con el ejemplo de §6.14: `role=\"menuitem\"` en cada opción (y `menuitemcheckbox` o equivalente en el tema), `id` en el menú, `aria-haspopup=\"menu\"` y `aria-controls` en el disparador. Cierre con Escape y vuelta de foco al botón de cuenta, que la propia maqueta dice cumplir."
+    },
+    "por_que_importa": "Un lector de pantalla anuncia un «menú» vacío de elementos y el disparador no dice que abre uno: justo la pieza que debía garantizar que se puede cerrar sesión."
+   },
+   {
+    "id": "v2-57menucuenta-07",
+    "severidad": "media",
+    "regla": "§9 Andamiaje de maqueta · §8 Voz de producto (ningún bloque pasa de ~140 caracteres)",
+    "dice_el_sistema": "Todo lo que lleve `data-andamio` se retira en la versión real.",
+    "hay_en_el_build": "El cuerpo de la pantalla mezcla producto y explicación sin marcar: `p.nota` de 346 caracteres en cuatro frases («Esta maqueta existe por un fallo que ya le pasó al sistema anterior…»), dos `.escenario` con título y párrafo (133 y 188 caracteres) y otra `p.nota` de 188. Solo el conmutador lleva `data-andamio`; el instrumento C11 marca 2 de 2 sobre 140.",
+    "selector": "p.nota, .escenario > p",
+    "linea": 701,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C11_texto_largo",
+     "detalle": "revisados 2, sobre140 2: p.nota 346 caracteres (visible) y p.nota 188 caracteres; script propio m6/estados.cjs txtLens [346,133,188,188]"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Dos lecturas: (a) es andamio (explica por qué existe la maqueta, cita un fallo de otro sistema) y entonces va con `data-andamio` y rótulo, y el límite de 140 no aplica; (b) es producto y rompe §8. Propuesta: lectura (a); llevar el racional a la documentación y dejar solo el menú dibujado."
+    },
+    "por_que_importa": "Si no se marca, el equipo que construya copiará el párrafo («un fallo que ya le pasó al sistema anterior») a la interfaz o lo contará como texto de producto."
+   },
+   {
+    "id": "v2-57menucuenta-08",
+    "severidad": "baja",
+    "regla": "§10 Diez trampas comprobadas (un nombre de clase corto no se declara dos veces en el mismo archivo)",
+    "dice_el_sistema": "`.nota` y `.f` aparecieron declarados dos veces en el mismo archivo con reglas",
+    "hay_en_el_build": "`.nota` se declara en ARQ-P4 (`display:flex;gap:var(--sp-3);…;border-top:1px solid var(--border)`) y otra vez al final con otras propiedades: el segundo bloque no restablece `border-top`, y el `p.nota` visible tiene borde superior de 1 px (medido) que nadie pretendía.",
+    "selector": ".nota",
+    "linea": 676,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_57",
+     "detalle": "script m6/m3.cjs: getComputedStyle(p.nota).borderTopWidth = \"1px\"; `.nota` declarada en las líneas 398 y 676"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Renombrar la segunda (`.nota-maqueta`) o fundir ambas; con la nota marcada como andamio (hallazgo 07) el problema desaparece."
+    },
+    "por_que_importa": "Efecto visual pequeño hoy (un filete de 1 px sobre la nota); es el patrón exacto que §10 documenta como trampa."
+   },
+   {
+    "id": "v2-57menucuenta-09",
+    "severidad": "baja",
+    "regla": "§6.5 Iconos (el significado no cambia de contexto)",
+    "dice_el_sistema": "se sostiene solo cuando es universal **y su significado no cambia de contexto**",
+    "hay_en_el_build": "«Cerrar sesión» usa el glifo `#i-link` (cadena de enlace) en las tres apariciones (menú de escritorio, hoja móvil y botón de la vista empty).",
+    "selector": ".op.salir .ico",
+    "linea": 722,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 722,
+     "cita": "<use href=\"#i-link\"/></svg>Cerrar sesión</button>"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Añadir un glifo de salida (`log-out`) a la tabla de iconos; el texto ya acompaña, así que no es crítico."
+    },
+    "por_que_importa": "El icono de enlace significa «copiar enlace» o «vínculo» en otras pantallas; en la acción más delicada del menú sugiere otra cosa."
+   },
+   {
+    "id": "v2-57menucuenta-10",
+    "severidad": "media",
+    "regla": "§2.1 El suelo son 12px · §2 Tipografía (D116)",
+    "dice_el_sistema": "`--fs-meta` es el tamaño más pequeño del sistema. **Nada baja de ahí.**",
+    "hay_en_el_build": "Archivo NO_ALINEADO con el PDF: C1, C3–C7 y C10 «NO_confirmado»; lt12_medido 15 frente a 0 declarado. Visibles bajo 12 px: `.cromo-av` (`font:700 11px`) y `.cromo-quien small` 11px; `.state .ref` 11px. Además no declara `@font-face` (font_face 0), `--text-3` sigue en #66717F y `--serie-1/2` con valores anteriores.",
+    "selector": ".cromo-av, .cromo-quien small",
+    "linea": 258,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "claims (lt12_medido)",
+     "detalle": "estado_vs_pdf_del_cliente: lt12_medido 15, lt12_pdf_despues 0; script propio m6/medir.cjs: menor12 → span.cromo-av 11, small 11; barrido font_face 0"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "El PDF ya declara estos cambios: se adopta lo declarado y se pide el archivo que lo contenga. Para las fuentes (§2, D116): dos `@font-face`, como en 39 y 40."
+    },
+    "por_que_importa": "El rol del usuario en la barra superior se lee a 11 px y la pantalla depende de una fuente que el archivo no declara; lo auditado no es lo que el PDF dice."
+   },
+   {
+    "id": "v2-57menucuenta-11",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla",
+    "dice_el_sistema": "**El estado va dentro de una tarjeta, no suelto sobre el fondo.**",
+    "hay_en_el_build": "Las vistas vacío y error son `.state` suelto sobre `--bg`: icono de 30px en `--text-3`, sin `.tarjeta-estado` ni medallón, y el título es un `<b>`, no un encabezado (regla 2 de §6.4). Además `.state b{font-size:var(--fs-base)}` alcanza también a los `<b>` de énfasis dentro de los `<p>`: medido con la vista error forzada, `<p>` a 13px y su `<b>` a 14px (estado error de esta pantalla).",
+    "selector": ".state",
+    "linea": 605,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 610,
+     "cita": ".state b{font-size:var(--fs-base)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No crítico y el bloque ARQ-ESTADOS es del cliente. La receta de §6.4 lo resuelve sin tocar el contenido: envolver el contenido de `.state` en `.tarjeta-estado` con medallón sólido, cambiar `<b>` por `<h2>` y acotar el selector a `.state > h2`. Decidir si se adopta la receta del sistema o se documenta el estado plano del cliente."
+    },
+    "por_que_importa": "Sin superficie, un mensaje centrado en una zona de contenido enorme se lee como una pantalla que no terminó de cargar (§6.4), y el énfasis inflado rompe el ritmo de la frase justo en los textos que más se leen el día que algo falla. Mismo bloque en 39, 40, 50 y 56."
+   },
+   {
+    "id": "v2-57menucuenta-12",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga (`.skel`)",
+    "dice_el_sistema": "**Sin texto real dentro de las barras.**",
+    "hay_en_el_build": "Las barras `.skel` de la vista loading llevan «x» dentro (con `color:transparent`); mide 282 px frente a los 811 px del estado ok; en reduced-motion solo `animation:none`.",
+    "selector": ".skel",
+    "linea": 755,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_estados",
+     "detalle": "script m6/estados.cjs: .state-loading 282 px, .state-ok 811 px; texto «x» en la línea citada"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Vaciar las barras, igualar el alto, `background:var(--surface-2)` bajo reduced-motion. Mismo bloque en 39, 40, 50 y 56."
+    },
+    "por_que_importa": "Un lector de pantalla puede leer «x» como contenido."
+   },
+   {
+    "id": "v2-57menucuenta-13",
+    "severidad": "baja",
+    "regla": "§3 Espaciado y radios (escala base de 4px)",
+    "dice_el_sistema": "Escala base de 4px.",
+    "hay_en_el_build": "I5_ritmo: 3 valores fuera de escala, 69 ocurrencias (9px×36, 6px×32, 120px×1: `.hoja-abajo{margin-top:120px}`); 2 interlineados distintos (1.25×17, 1.55×7)",
+    "selector": "(varios)",
+    "linea": null,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I5_ritmo",
+     "detalle": "I5_ritmo: 3 valores fuera de escala, 69 ocurrencias (9px×36, 6px×32, 120px×1: `.hoja-abajo{margin-top:120px}`); 2 interlineados distintos (1.25×17, 1.55×7)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El propio sistema usa 3, 5, 6 y 9 px en sus recetas (`.pill` padding:3px 9px, `.ctrl` gap:5px, `.pasos` padding:9px 0, `.it` padding:9px 10px): la escala declarada no describe lo que el sistema dibuja. Documentar esos medios pasos como valores admitidos del cromo en vez de pedir al cliente que los cambie."
+    },
+    "por_que_importa": "No es un fallo visible sino ruido de medición: el instrumento marca cientos de ocurrencias en cada pantalla y tapa las desviaciones que sí importan."
+   },
+   {
+    "id": "v2-57menucuenta-14",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (excepción de 10,5px en mayúsculas) · §7.2 Cromo de aplicación",
+    "dice_el_sistema": "10,5px en mayúsculas con `letter-spacing` para los **rótulos de grupo** de la barra lateral",
+    "hay_en_el_build": "`.grp` a 10,5px sin `text-transform:uppercase`: «Principal», «Operación», «Trámites vehiculares»… salen en caja mixta (instrumento C2_105_no_mayusculas: 5 fallos; computado: font-size 10,5 y text-transform none).",
+    "selector": ".grp",
+    "linea": 235,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "5 fallos: p.grp «Principal», «Operación», «Trámites vehiculares», «Dirección y Administraci…», «Soporte»"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El `.grp` que el propio §7.2 enseña tampoco lleva `text-transform:uppercase`: el cliente copió el fragmento. Corregir el sistema (añadir uppercase al fragmento de §7.2) o, si se prefiere caja mixta, subir el rótulo a 12px y retirar la excepción; no se le pide nada al cliente."
+    },
+    "por_que_importa": "Los rótulos de grupo salen a 10,5px en caja mixta, justo el tamaño que §2.1 solo admite en mayúsculas: sistema y cliente se contradicen y el defecto se repite en cada pantalla con este cromo."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 2,
+   "responsive": 3,
+   "integridad": 1
+  },
+  "justificacion": "La idea es buena y bien razonada (en móvil el menú sube desde abajo con renglones de 52 px; cerrar sesión separada y en rojo; el error dice que sigues dentro). Pero la maqueta no la dibuja bien: falta `--sp-5` y la clase `.pad`, el menú de escritorio se pega al lado contrario, los roles ARIA del menú están incompletos, la explicación no está marcada como andamio, y el archivo no contiene los cambios del PDF (11 px, sin @font-face, `.state .ico` descendiente que deja ilegibles los iconos de los botones).",
+  "evidencia": [
+   "tokens_usados_no_declarados: --sp-5; SP5 3 reglas 4 elementos",
+   "I1_icono_vs_boton: 2 fallos (ratio 1,03)",
+   "estado_vs_pdf: NO_ALINEADO (lt12 15 vs 0)",
+   "C11: 2 de 2 sobre 140",
+   "captura 57_menu_cuenta--1440.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Menú de cuenta: popover de 280px bajo el botón de cuenta en escritorio y hoja inferior a lo ancho (renglones de 52px, tirador) en el teléfono; cabecera con avatar + nombre + rol, opciones con icono, separador y «Cerrar sesión» al final.",
+   "propuesta_de_regla": "El menú de cuenta se abre bajo el botón de cuenta en escritorio y sube desde abajo a ancho completo en el teléfono; renglones de 44px (52px en hoja inferior), `role=\"menu\"` con `menuitem`, cierra con Escape y clic fuera, y devuelve el foco al botón."
+  },
+  {
+   "patron": "Acción que no se deshace sin volver a entrar: «Cerrar sesión» en `--err-ink`, separada por un filete y al final del menú.",
+   "propuesta_de_regla": "Una acción que solo se deshace repitiendo un proceso largo (volver a entrar) va al final del grupo, separada por un filete y en `--err-ink` con icono y texto; el rojo aquí significa «destructivo», no «estado de error» (§1.3)."
+  }
+ ],
+ "sin_datos": [
+  "No evaluado: el comportamiento real del menú (Escape, clic fuera, vuelta de foco, tema en tres valores «Sigue al sistema»); la maqueta los describe en texto y no trae manejadores.",
+  "No evaluado: modo tarjeta y cajón (<860 px) de la propia pantalla, y tema oscuro visual (contraste oscuro medido: 0 fallos, 53 nodos). Hover/foco y rendimiento tampoco.",
+  "El instrumento I3 marca `main` como recortado (dy 217): es el scroll del shell, falso positivo conocido, no se trata como hallazgo.",
+  "El instrumento I1 marca los dos botones con `oculto: true` (vista oculta al medir); el defecto se comprobó con la vista forzada visible y es real.",
+  "La ficha cita un fallo real de otro sistema (`4dc37af`) como motivo de la pantalla; no se puede comprobar desde el archivo y no se usa como evidencia.",
+  "Las fuentes reales (Inter, Michroma) se inyectaron al renderizar: las capturas llevan Inter aunque el archivo no la declare (ver hallazgo 10)."
+ ]
+}

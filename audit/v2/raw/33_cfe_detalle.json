@@ -1,0 +1,358 @@
+{
+  "pantalla": "33_cfe_detalle",
+  "tier": "B",
+  "modo": "cumplimiento",
+  "sha256": "f82ae9022abe6904a14f98b92b3aa2217d830e56bc822782b87383328e265226",
+  "estado_vs_pdf": "NO_ALINEADO",
+  "estados_auditados": [
+    "con datos",
+    "cargando",
+    "vacío",
+    "error"
+  ],
+  "capturas": [
+    "33_cfe_detalle--1280-fold.png",
+    "33_cfe_detalle--1440.png"
+  ],
+  "observaciones_resueltas": [],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "v2-33cfe-01",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto",
+        "dice_el_sistema": "Era `#66717F`, medido contra `--bg` y `--surface`, donde cumple",
+        "hay_en_el_build": "`--text-3: #66717F` (valor anterior a 2.15.0). Dos pares caen bajo 4,5:1: `span.cuando` (fecha de cada observación, 11 px) sobre `--surface-2`: 4,21:1, y `span.quien` («Respondió …», 11 px) sobre el fondo de respuesta: 4,24:1. aud5-medir.cjs: 5 nodos (3 `.cuando`, 2 `.quien`); en oscuro 0 fallos.",
+        "selector": "span.cuando, span.quien",
+        "linea": 68,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "contraste (mediciones_v2.contraste.claro)",
+          "detalle": "span.cuando 17 ago 2026 rgb(102,113,127) sobre rgb(231,237,243): 4,21:1; span.quien rgb(102,113,127) sobre rgb(231,239,235): 4,24:1; 11 px, peso 400, mínimo 4,5"
+        },
+        "critico": {
+          "es": true,
+          "criterio": "1 · contraste medido 4,21:1 y 4,24:1 en texto de 11 px"
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Criterio 1 (texto < 4,5:1). El PDF y la FICHA dicen que ya está corregido con `--text-3-fuerte` («`.resp .quien` ... corregida a `--text-3-fuerte`»), pero el archivo recibido no contiene esa variable (grep: 0 coincidencias) ni los cambios: no está aplicado. Arreglo de una línea y de raíz: `--text-3:#5C6675` (4,93:1 sobre `--surface-2` y 4,97:1 sobre el fondo de respuesta). Se le pide el archivo correcto, no un rediseño."
+        },
+        "por_que_importa": "Las fechas y el autor de cada respuesta de CFE son lo que se mira para saber cuánto lleva abierta una observación, y están en el gris más bajo del sistema sobre el fondo gris de la cabecera: se leen con esfuerzo con luz de oficina. La FICHA lo reconoce como «defecto abierto»; la versión 2.15.0 ya lo cubre cambiando el token."
+      },
+      {
+        "id": "v2-33cfe-02",
+        "severidad": "alta",
+        "regla": "§7.2 Cromo de aplicación",
+        "dice_el_sistema": "En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+        "hay_en_el_build": "A 1000 px el menú mide 64 px y sus 15 enlaces quedan sin nombre accesible (menu_1000px: total 15, sinNombre 15). `.side .et,.grp,.side .wordmark{display:none}` saca el texto del árbol de accesibilidad y los `<a class=\"it\">` no llevan `title` ni `aria-label` (aud5-medir2.cjs: conTitle 0).",
+        "selector": ".side .et",
+        "linea": 288,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "sidebar",
+          "detalle": "dossier: hayMenu true, total 15, sinNombre 15, anchoSide 64; reproducido con aud5-medir2.cjs a 1000x800 (nombre accesible = aria-label, texto no oculto o title): 15 de 15 vacíos"
+        },
+        "critico": {
+          "es": true,
+          "criterio": "1 · control sin nombre accesible (15 enlaces de navegación con el menú colapsado)"
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Es el criterio 1 de la Regla 1 (control sin nombre accesible). Arreglo de una línea: dejar el rótulo en el DOM con la clase `.sr` en lugar de `display:none` en `.et` (o `aria-label`/`title` en cada `.it`), que es lo que §7.2 pide con la «etiqueta emergente»."
+        },
+        "por_que_importa": "Entre 860 y 1100 px (portátil con la ventana a medias, tableta en horizontal) quien usa lector de pantalla o conmutador oye «enlace» quince veces sin saber a dónde lleva ninguno, y quien ve solo iconos no recibe la etiqueta emergente que §7.2 exige. Mismo bloque de cromo en 33, 35, 36 y 37."
+      },
+      {
+        "id": "v2-33cfe-03",
+        "severidad": "alta",
+        "regla": "§7.3 Objetivos táctiles",
+        "dice_el_sistema": "llevan padding hasta llegar a 24px",
+        "hay_en_el_build": "Seis enlaces miden 15 a 16 px de alto: la miga «Trámites CFE» (15 px), «ORD-202608-0421» y los cuatro enlaces de documentos (16 px). `.lnk` y `.migas a` no declaran altura mínima.",
+        "selector": "a.lnk, .migas a",
+        "linea": 222,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "tactil_bajo24",
+          "detalle": "dossier: total 30, bajo24 6 (a «Trámites CFE» 77x15; a.lnk «ORD-202608-0421» 122x16, solicitud-factibilidad 155x16, unifilar-v2.pdf 90x16, croquis.pdf 72x16, acuse-12ago.pdf 107x16)"
+        },
+        "critico": {
+          "es": true,
+          "criterio": "1 · destino táctil < 24 px (6 enlaces de 15 a 16 px)"
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Criterio 1 (destino táctil < 24 px). Arreglo: `.lnk,.migas a{display:inline-flex;align-items:center;min-height:24px}`, exactamente lo que ya hace `.folio` en 37_concluidos (línea 384). Lectura 2: la excepción de espaciado de WCAG 2.5.8 admite enlaces menores si no hay otro destino a menos de 24 px, y aquí están separados; pero §7.3 nombra expresamente la miga y el identificador de fila y la Regla 1 fija el umbral en 24 px."
+        },
+        "por_que_importa": "Los enlaces a los documentos y a la orden ligada son lo que se pulsa para resolver una observación de CFE; a 16 px de alto exigen precisión de ratón y fallan con tableta o temblor de pulso."
+      },
+      {
+        "id": "v2-33cfe-04",
+        "severidad": "alta",
+        "regla": "§10 Diez trampas comprobadas",
+        "dice_el_sistema": "Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.",
+        "hay_en_el_build": "El isotipo del cromo y el del botón flotante se escriben con `viewBox=\"740 0 970 932\"` en el `<svg>` y un `<use href=\"#dproma-mark\"/>` sin medidas. Medido: el `<use>` queda desplazado -32,5 px (logo 44x42) y -16,2 px (botón flotante 22x21) respecto de su `<svg>`; en las capturas la marca sale como una astilla verde recortada, no como la Λ.",
+        "selector": ".side .logo svg",
+        "linea": 677,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 677,
+          "cita": "<div class=\"logo\"><svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "No es decisión de producto sino un defecto de copia del cromo (ARQ-CROMO). Lo corregimos nosotros al integrar: quitar `viewBox` del `<svg>` y poner `width`/`height` en el `<use>`, tal como §10 lo escribe. Medición: aud5-medir2.cjs (caja del `<use>` contra la del `<svg>`)."
+        },
+        "por_que_importa": "La marca es lo primero que ve cualquiera en el cromo y está en las cinco pantallas de este lote (en 07 está bien escrita, con medidas en el `<use>`). Con la marca recortada la pantalla se lee como inacabada y §1.2.1 (nunca una aproximación del isotipo) deja de cumplirse sin que nadie lo decida. Mismo bloque en 33, 35, 36 y 37."
+      },
+      {
+        "id": "v2-33cfe-05",
+        "severidad": "alta",
+        "regla": "§2.1 El suelo son 12px",
+        "dice_el_sistema": "Nada baja de ahí.",
+        "hay_en_el_build": "31 elementos con texto bajo 12 px (aud5-medir.cjs, sin contar los 6 rótulos de menú): `span.cuando`/`.quien`/`small` a 11 px, la pastilla de estado `.cfe-sem` («CFE va tarde · 4 d») a 11 px, 13 `span.et` de campo a 10,5 px, los chips de origen `.origen` a 10,5 px y varios párrafos a 11,5 px. El dossier cuenta 18 (lt12_medido 18).",
+        "selector": ".cfe-sem, .campo .et, .cuando, .quien",
+        "linea": 510,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 510,
+          "cita": ".bitacora .ev .cuando{font-size:11px;color:var(--text-3);font-variant-numeric:tabular-nums}"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "El PDF declara lt12 = 0 después de la corrección (estado NO_ALINEADO: el archivo recibido conserva los 18). No se pide nada nuevo: se verifica cuando llegue el archivo que el PDF describe. El semáforo de dependencia (`.cfe-sem`) y las etiquetas de campo son lo que se lee a diario."
+        },
+        "por_que_importa": "El estado del trámite y las etiquetas de cada dato (cliente, obra, fechas) son lo que se consulta en cada visita; por debajo de 12 px con mayúsculas y espaciado pierden legibilidad justo en los datos que se comparan."
+      },
+      {
+        "id": "v2-33cfe-06",
+        "severidad": "alta",
+        "regla": "§6.4 Vistas de estado de una pantalla",
+        "dice_el_sistema": "correcto es `.state > .ico` (hijo directo)",
+        "hay_en_el_build": "`.state .ico{width:30px;height:30px;color:var(--text-3)}` alcanza también a los iconos de los botones de las vistas vacío y error: el glifo de «Ver los documentos entregados» y de «Reintentar» queda en `rgb(102,113,127)` sobre el verde de acento: 1,03:1 (I1_icono_vs_boton, 2 fallos). Además los iconos de botón se agrandan a 30 px (el «+» de «Añadir una nota interna»).",
+        "selector": ".state .ico",
+        "linea": 609,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "I1_icono_vs_boton",
+          "detalle": "dossier: button.btn.p «Ver los documentos entre…» y «Reintentar»: colorIcono rgb(102,113,127), fondo rgb(62,122,76), ratio 1,03; aud5-medir2.cjs (estado_empty/estado_error): iconColor rgb(102,113,127) frente a btnColor rgb(247,250,249); captura propia aud5-shots/33_cfe_detalle-empty-1280.png"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "No crítico: el botón sigue leyéndose por su texto blanco y el icono es decorativo (`aria-hidden`); lectura 2: §6.2 y §1.4.1 lo cuentan como fallo de elemento gráfico (3:1). Arreglo de un selector, ya documentado: `.state > .ico`. Lo corregimos nosotros al integrar; §6.4 (regla 6) documenta este mismo caso en otras pantallas que copiaron el bloque ARQ-ESTADOS."
+        },
+        "por_que_importa": "En la vista de error, la única acción («Reintentar») pierde su icono sobre el verde, y en la vacía los iconos de botón se desproporcionan; el botón primario de un estado es el camino de salida y no debe verse roto."
+      },
+      {
+        "id": "v2-33cfe-07",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado de una pantalla",
+        "dice_el_sistema": "**El estado va dentro de una tarjeta, no suelto sobre el fondo.**",
+        "hay_en_el_build": "Las vistas vacío y error son un `<div class=\"state state-empty\">` con un glifo gris de 30 px sobre el fondo de página: no hay `.tarjeta-estado` ni medallón `.estado-ico` (grep: 0 coincidencias en el archivo). La FICHA dice lo contrario: «`.tarjeta-estado`/`.estado-ico` aplicados en vacío/error en ambos».",
+        "selector": ".state-empty, .state-error",
+        "linea": 755,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 755,
+          "cita": "<div class=\"state state-empty\">"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Estado NO_ALINEADO: el archivo no contiene lo que el PDF y la FICHA declaran. Se verifica cuando llegue el archivo correcto; no se pide un cambio nuevo."
+        },
+        "por_que_importa": "Un mensaje centrado sin superficie ni medallón se lee como una pantalla que no terminó de cargar, no como una respuesta del sistema («Este trámite no tiene observaciones. Es la situación buena» pasa desapercibido)."
+      },
+      {
+        "id": "v2-33cfe-08",
+        "severidad": "media",
+        "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional",
+        "dice_el_sistema": ".p4{ padding-bottom: var(--sp-3) }",
+        "hay_en_el_build": "La cabecera `header.p4` cierra a 0 px de su borde inferior (I2_holgura_inferior: gap 0, 3 controles): `.p4-t` declara `padding:var(--sp-3) var(--sp-6) 0` y `.p4` no tiene relleno propio, así que los tres botones («Exportar PDF», «Subir documento», «Responder observación») tocan la línea de la cabecera.",
+        "selector": "header.p4",
+        "linea": 308,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "I2_holgura_inferior",
+          "detalle": "dossier: barra header.p4, gap 0, altoBarra 47, controles 3; captura 33_cfe_detalle--1440.png: botones pegados al borde inferior de la cabecera"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "`.p4{padding-bottom:var(--sp-3)}` (§3.1). Cambio de una línea que hacemos al integrar; es el mismo ARQ-P4 de 36."
+        },
+        "por_que_importa": "La acción primaria de la pantalla («Responder observación») queda aplastada contra el borde de la cabecera; se ve apretada comparada con el resto de la ficha."
+      },
+      {
+        "id": "v2-33cfe-09",
+        "severidad": "media",
+        "regla": "§8 Voz de producto",
+        "dice_el_sistema": "Ningún bloque de texto siempre visible pasa de ~140 caracteres.",
+        "hay_en_el_build": "El pie de «Observaciones» es un `<p>` de 235 caracteres en tres frases que explica por qué se enseña el origen («El origen de cada observación se enseña siempre, y no es decoración…»); la banda `.explica` de arriba tiene 142 caracteres en dos frases. aud5-medir3.cjs: p.explica 142, p.ot 153, p.tx 158, p 235.",
+        "selector": "p (pie de observaciones), p.explica",
+        "linea": 730,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 730,
+          "cita": "<p style=\"font-size:11.5px;color:var(--text-2);line-height:1.55;margin-top:var(--sp-3)\"><b>El origen de cada observación se enseña siempre, y no es decoración.</b>"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Solo el párrafo de 235 caracteres incumple sin respaldo: la FICHA documenta la franja `.explica` como decisión del cliente («La franja que explica qué mide el semáforo», `cfe.css:225-231`) pero no el pie. Propuesta: dejar `.explica` en una frase («Este semáforo mide a CFE, no a nosotros.») y pasar el resto del pie a un toggletip (§6.23) en la etiqueta de origen."
+        },
+        "por_que_importa": "Texto que explica una decisión de diseño pesa más que la propia lista de observaciones y se queda en pantalla siempre; quien consulta a diario deja de leerlo y el aviso que sí importa («CFE va tarde significa…») se pierde entre el resto."
+      },
+      {
+        "id": "v2-33cfe-10",
+        "severidad": "baja",
+        "regla": "§1.4 Series de gráfica",
+        "dice_el_sistema": "`--serie-2` | naranja | `#eb6834`",
+        "hay_en_el_build": "`--serie-1: #2C6CA8` y `--serie-2: #7A5FA8` (líneas 89–90) frente a `#2a78d6` y `#eb6834` de la versión 2.15.0 (tokens_valores_divergentes). `.o-rhl` mezcla `--serie-2`, así que el chip «RHL» sale violeta en lugar de naranja. `--text-3` es el valor antiguo (v2-33cfe-01): el archivo no lleva la paleta de 2.15.0.",
+        "selector": ".o-rhl",
+        "linea": 661,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "tokens_valores_divergentes",
+          "detalle": "dossier: --serie-1 declarado #2C6CA8 (canónico #2a78d6), --serie-2 declarado #7A5FA8 (canónico #eb6834); .o-rhl usa color-mix con --serie-2"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Parte del NO_ALINEADO: se resuelve con el archivo que el PDF describe. Sin acción aparte."
+        },
+        "por_que_importa": "El chip RHL (nota interna) y las clasificaciones de serie no se reconocen igual que en el resto del sistema, pero no hay pérdida de información."
+      },
+      {
+        "id": "v2-33cfe-11",
+        "severidad": "baja",
+        "regla": "§2.1 El suelo son 12px",
+        "dice_el_sistema": "Se admite una excepción, y solo una: 10,5px en mayúsculas con `letter-spacing` para los",
+        "hay_en_el_build": "Los rótulos de grupo del menú (`p.grp`) van a 10,5 px sin `text-transform:uppercase` (se ven «Principal», «Operación», no en mayúsculas). Instrumento C2_105_no_mayusculas: 5 elementos en esta pantalla.",
+        "selector": "p.grp",
+        "linea": 235,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "C2_105_no_mayusculas",
+          "detalle": "dossier: p.grp a 10,5 px con texto no en mayúsculas; confirmado en aud5-medir.cjs (font-size 10,5 px, text-transform none)"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "La causa raíz es nuestra: el CSS de `.grp` que §7.2 publica tampoco lleva `text-transform:uppercase`, así que el cliente copió lo documentado. O §7.2 añade las mayúsculas, o §2.1 admite 10,5 px también sin ellas (o se sube a 12 px). Se decide una vez en el sistema."
+        },
+        "por_que_importa": "Cinco o seis rótulos por pantalla bajo el suelo de 12 px que §2.1 declara sin excepción más que la de las mayúsculas; no afecta a la lectura de datos, pero la inconsistencia entre §2.1 y §7.2 la heredan todas las pantallas con cromo."
+      },
+      {
+        "id": "v2-33cfe-12",
+        "severidad": "baja",
+        "regla": "§6.5 Iconos (`.msi`)",
+        "dice_el_sistema": "Si un icono va sin texto visible, lleva **como mínimo** etiqueta emergente y `aria-label`:",
+        "hay_en_el_build": "El botón de tema y el del menú (línea 678) son solo icono. Llevan `aria-label` pero ningún `title`.",
+        "selector": "button.iconbtn",
+        "linea": 681,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 681,
+          "cita": "<button class=\"iconbtn\" type=\"button\" id=\"tema\" aria-label=\"Cambiar a tema claro\" aria-pressed=\"false\">"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Añadir `title` con el mismo texto del `aria-label`. Cambio mecánico que hacemos nosotros; el nombre accesible ya existe, solo falta la etiqueta emergente para quien ve."
+        },
+        "por_que_importa": "Quien ve el icono pero no lo reconoce (descarga, tema, menú) no tiene etiqueta emergente que se lo diga; el nombre accesible sí está, así que no bloquea."
+      }
+    ]
+  },
+  "cerrados_desde_v1": [],
+  "f3_boost_ui": {
+    "puntuacion": 2,
+    "dimensiones": {
+      "accesibilidad": 1,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 3,
+      "integridad": 2
+    },
+    "justificacion": "Ficha muy bien razonada (FICHA: la maqueta documenta, no reinventa; semáforo de dependencia, origen visible), pero el archivo NO está alineado con el PDF: conserva `--text-3` antiguo (2 fallos de contraste), menú colapsado sin nombre, 6 enlaces bajo 24 px, 18 textos bajo 12 px, marca recortada y estados sin tarjeta.",
+    "evidencia": [
+      "dossier: contraste 2 fallos (4,21:1 y 4,24:1), menú sinNombre 15, táctil bajo24 6, lt12 18",
+      "aud5-medir2.cjs: marca dx -32,5 / -16,2 px",
+      "dossier I1: icono de botón 1,03:1",
+      "claro/oscuro: el oscuro pasa contraste (0 fallos)"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado"
+  },
+  "cobertura": [
+    {
+      "patron": "Semáforo de dependencia externa `.cfe-sem`: pastilla con pestaña izquierda de 5 px y borde de color, distinta de las pastillas de estado propias (FICHA: `D138.2`, `cfe.css:190-198`).",
+      "propuesta_de_regla": "Un indicador que mide a un tercero (CFE) se distingue del semáforo propio por forma, no solo por color: pestaña izquierda de 5 px, texto que nombra a quien se mide («CFE va tarde · 4 d»). Nunca el mismo color con responsabilidad opuesta."
+    },
+    {
+      "patron": "Chip de origen `.origen` (CFE / RHL) en cada observación y estado «sin responder» derivado de la ausencia de respuesta.",
+      "propuesta_de_regla": "Cuando una lista mezcla registros de origen distinto, el origen se enseña siempre como chip con icono y texto en la cabecera de cada registro; el estado «atendida» se deriva de que exista respuesta y no se ofrece una casilla para marcarlo."
+    },
+    {
+      "patron": "Migas de pan con un icono de flecha hacia abajo (`#i-down`) como separador.",
+      "propuesta_de_regla": "El separador de migas es un chevron hacia la derecha (decorativo, `aria-hidden`); una flecha hacia abajo se lee como «descargar» o «desplegar»."
+    }
+  ],
+  "sin_datos": [
+    "Rendimiento: no evaluado (no hay trazas de carga ni peso real; las fuentes se inyectan al renderizar).",
+    "Estados de foco, orden de tabulación y comportamiento con teclado: no recorridos; solo se evaluó lo medible estáticamente.",
+    "Falsos positivos descartados del dossier: I3 recorte en `main`, `caption` y `.sr` (scroll del shell y texto solo para lector de pantalla); I2 gap 6,5 px en celdas `td` con un control.",
+    "I5 ritmo vertical (valores 5, 6, 7, 9, 10 px fuera de escala): sin § del sistema que fije una tolerancia ni decisión del cliente que lo contradiga; no se convierte en hallazgo.",
+    "tokens_valores_divergentes de --ok-ink/--warn-ink/--err-ink/--block-ink/--pause-ink y sus -bg: el 'canónico' del dossier no tiene respaldo en el texto de §1.3; los valores declarados por el cliente reproducen exactamente los contrastes documentados en §1.3 (ok 5,04:1; warn 5,25:1; err 5,02:1; block 5,41:1; pause 6,30:1, medidos con la fórmula de §1.7), así que no se cuentan como divergencia.",
+    "Significado de los códigos C1-C18 del PDF: no se dispone del PDF; solo se usa el estado alineado/NO_ALINEADO del dossier.",
+    "FICHA: `.tarjeta-estado`/`.estado-ico` y `--text-3-fuerte` figuran como aplicados; el archivo no los contiene.",
+    "Hover y foco de los enlaces y botones: no medidos."
+  ]
+}

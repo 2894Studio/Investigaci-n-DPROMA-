@@ -12,6 +12,7 @@ WEB = os.path.join(REPO, 'web', 'entregables')
 IMG = '/entregables/img/revision/'
 MED = json.load(open(os.path.join(REPO, 'web', 'entregables', 'img', 'revision', '_medidas.json')))
 ARIA = json.load(open(os.path.join(AQUI, 'ev-datos.json')))
+BAR = json.load(open(os.path.join(AQUI, '..', 'mediciones', 'v2', 'barrido.json')))
 E = html.escape
 TITULO = 'Revisión de pantallas SIO DPROMA'
 PDF = 'SIO-DPROMA-revision-de-pantallas-oct2026.pdf'
@@ -48,7 +49,7 @@ def archivos(lista):
 # ================================================================ A · SE PIDE
 A = 'A'
 cambio(A, 'El menú lateral dice a dónde lleva cada enlace', 'pide',
-  '19 de las 23 pantallas revisadas a fondo. La medición automática lo encuentra en 35 de las 42 que llevan menú, y la regla <code>.side .et</code> está en 36 archivos. Revisadas: ' + archivos(['20', '21', '22', '23', '24', '25', '26', '27', '28', '32', '34', '41', '46', '47', '48', '54', '55', '58', '59']),
+  'La regla <code>.side .et{display:none}</code> está en 36 archivos, y en 35 de ellos los enlaces del menú no llevan nombre propio. Lista completa, con línea, en el anexo.',
   'Entre 861 y 1100 px la barra lateral se reduce a iconos y los quince enlaces del menú se quedan sin nombre. Quien navega con lector de pantalla oye «enlace» quince veces seguidas y no sabe a dónde va ninguno.',
   '<code>.side .et{display:none}</code> quita el texto de la vista y también del árbol de accesibilidad, y los enlaces <code>.it</code> no llevan <code>aria-label</code> ni <code>title</code>. El sistema pide que la etiqueta no desaparezca (§7.2).',
   par(panel('Antes — lo que anuncia un lector de pantalla', pre(arbol('ariaantes')), 'antes'), panel('Después — con el texto oculto solo a la vista', pre(arbol('ariadespues')), 'despues')),
@@ -56,7 +57,7 @@ cambio(A, 'El menú lateral dice a dónde lleva cada enlace', 'pide',
   'A 1000 px, <code>ariaSnapshot()</code> del <code>.side</code> debe devolver <code>link "Tablero"</code>, <code>link "Padrón de clientes"</code>… y ningún <code>link:</code> vacío. Medido en <code>27_padron_clientes</code>.')
 
 cambio(A, 'El icono del botón verde deja de verse gris', 'pide',
-  'Seis archivos con el fallo medido: ' + archivos(['22', '24', '26', '32', '51', '58']) + '. La regla descendiente <code>.state .ico{…}</code> aparece en 21 de las 50 pantallas.',
+  'La regla descendiente <code>.state .ico{…}</code> está en 21 de las 50 pantallas. El fallo se midió en ' + archivos(['22', '24', '26', '32', '51', '58']) + '. Lista completa, con línea, en el anexo.',
   'En el estado de error de gestoría, el botón verde «Reintentar» lleva un icono gris que casi desaparece sobre el verde.',
   '<code>.state .ico</code> alcanza a cualquier <code>.ico</code> del bloque y no solo al grande que cuelga del estado, así que el icono pequeño del botón hereda el gris. El PDF de cambios lo da por corregido (C3); en estos archivos la regla antigua sigue ahí.',
   a_d('obs01', 'Estado de error de gestoría: el botón Reintentar con el icono gris sobre el verde', 'El mismo botón con el icono blanco', 'Antes — icono gris, 1,03:1', 'Después — icono blanco, 4,89:1'),
@@ -64,8 +65,8 @@ cambio(A, 'El icono del botón verde deja de verse gris', 'pide',
   'El icono del botón mide 4,89:1 contra el verde. El mínimo para un gráfico es 3:1.')
 
 cambio(A, 'El gris del texto auxiliar llega a 4,5:1', 'pide',
-  '29 de las 50 pantallas declaran <code>--text-3: #66717F</code>; las otras 20 ya traen <code>#5C6675</code>. El fallo se midió en ' + archivos(['13', '24', '26', '34']) + '.',
-  'El texto auxiliar (rótulos pequeños, el departamento bajo un nombre) queda por debajo del mínimo cuando cae sobre el fondo de una fila con el cursor encima.',
+  '29 de las 50 pantallas declaran <code>--text-3: #66717F</code>; las otras 20 ya traen <code>#5C6675</code>. El fallo se midió en ' + archivos(['02', '04', '13', '24', '26', '30', '33', '34', '36']) + '. Lista completa, con línea, en el anexo.',
+  'El texto auxiliar (rótulos pequeños, el departamento bajo un nombre) queda por debajo del mínimo cuando cae sobre el fondo de una fila con el cursor encima, o sobre el fondo rosado de un aviso de error. Casos medidos: «Referencia: SYNC-0119-ERR-408» en <code>04</code> (4,14:1, línea 281), la hora de las alertas bajo el cursor en <code>02</code> y <code>30</code> y el SKU bajo el cursor en <code>36</code> (4,21:1), y <code>.cuando</code> y <code>.quien</code> en <code>33</code> (4,21:1 y 4,24:1).',
   'El token conserva el valor anterior. <code>_sio-tokens.css</code>, que viene en el mismo paquete, ya declara <code>#5C6675</code> y lo documenta con 4,93:1.',
   par(panel('Antes — <code>#66717F</code> sobre <code>--surface-2</code>', '<div class="muestra" style="background:#E7EDF3;color:#66717F">Texto auxiliar de ejemplo · <b>4,21:1</b> · no llega a 4,5:1</div>', 'antes'),
       panel('Después — <code>#5C6675</code> sobre <code>--surface-2</code>', '<div class="muestra" style="background:#E7EDF3;color:#5C6675">Texto auxiliar de ejemplo · <b>4,93:1</b> · cumple</div>', 'despues')),
@@ -81,11 +82,24 @@ cambio(A, 'Las fuentes dejan de pedirse a Google', 'pide',
   'El archivo no debe contener <code>fonts.googleapis.com</code> ni <code>fonts.gstatic.com</code>. El <code>@font-face</code> es el de <code>27_padron_clientes</code>, líneas 9 y 10.')
 
 cambio(A, 'Cada campo del formulario tiene un identificador único', 'pide',
-  '<code>58_altas_como_modal</code> y <code>59_editar_cliente</code>.',
-  'En <code>58</code>, los 14 <code>id</code> del formulario «Nuevo cliente» (<code>rs</code>, <code>rfc</code>, <code>tipo</code>, <code>cp</code>, <code>reg</code>, <code>dom</code>, <code>csf</code>, <code>idr</code>, <code>grp</code>, <code>mar</code>, <code>per</code>, <code>rol</code>, <code>cor</code>, <code>tel</code>) se repiten en la versión de teléfono. Cada <code>label for</code> resuelve al primero, así que 12 de los 14 controles del teléfono se quedan sin nombre. <code>59</code> repite el mismo defecto.',
+  'Tres archivos: <code>58_altas_como_modal</code>, <code>59_editar_cliente</code> y <code>21_ficha_cliente</code>. Es el resultado de buscar identificadores repetidos en las 50 pantallas.',
+  'En <code>58</code>, los 14 <code>id</code> del formulario «Nuevo cliente» (<code>rs</code>, <code>rfc</code>, <code>tipo</code>, <code>cp</code>, <code>reg</code>, <code>dom</code>, <code>csf</code>, <code>idr</code>, <code>grp</code>, <code>mar</code>, <code>per</code>, <code>rol</code>, <code>cor</code>, <code>tel</code>) se repiten en la versión de teléfono. Cada <code>label for</code> resuelve al primero, así que 12 de los 14 controles del teléfono se quedan sin nombre. En <code>59</code>, <code>nombre-legal</code> y <code>rfc-ro</code> aparecen cuatro veces cada uno, y el <code>label for</code> resuelve al primero. En <code>21</code>, <code>tope-CORREO</code>, <code>tope-TELEFONO</code>, <code>tope-DIRECCION</code> (destinos de <code>aria-describedby</code>) y <code>l-DIRECCION-16</code> aparecen dos veces; el efecto es menor porque el contenido repetido es idéntico.',
   None, '',
   '/* en la versión de teléfono */\n<label for="rs-tel">Razón social</label>\n<input id="rs-tel" …>',
   '<code>document.querySelectorAll(\'[id]\')</code> no debe devolver identificadores repetidos (§11).')
+
+cambio(A, 'Los bordes de campos y casillas se distinguen del fondo', 'pide',
+  '<code>55_verificacion_pedido</code> · <code>.ren .caja</code> · línea 665, y los campos de nueve pantallas más (tabla de abajo).',
+  'Las casillas sin marcar de <code>55</code> casi se funden con el fondo, y son justo las que el instalador necesita ver para saber qué le falta. En las otras nueve pantallas, el borde de buscadores, listas y cuadros de texto da entre 1,3:1 y 1,5:1 contra la tarjeta que los contiene: sin el borde, el campo no se ve.',
+  'Todas pintan el borde con <code>--border</code> o <code>--border-2</code>, que es el borde de una tarjeta. El sistema tiene <code>--border-ctrl</code> (3,06:1) para el control cuya única frontera es el borde (§1.1). Seis archivos ya lo declaran y no lo usan (<code>07</code>, <code>35</code>, <code>37</code>, <code>38</code>, <code>40</code>, <code>50</code>); <code>33</code>, <code>36</code>, <code>42</code>, <code>43</code>, <code>44</code> y <code>45</code> no traen los tokens de la versión 2.15.0 y hay que declararlo primero.',
+  a_d('ev55', 'Tres renglones sin marcar con la casilla en gris claro', 'Los mismos renglones con la casilla en gris oscuro', 'Antes — borde a 1,70:1', 'Después — borde a 3,1:1')
+  + '<table class="mini"><thead><tr><th>Pantalla</th><th>Regla</th><th class="r">Línea</th><th class="r">Hoy</th></tr></thead><tbody>'
+  '<tr><td><code>55</code></td><td><code>.ren .caja</code></td><td class="r">665</td><td class="r">1,70:1</td></tr>'
+  '<tr><td><code>07</code></td><td><code>.in</code> (campos de texto)</td><td class="r">263</td><td class="r">1,50:1 y 1,32:1 en solo lectura</td></tr>'
+  '<tr><td><code>35</code>, <code>36</code>, <code>37</code></td><td><code>.search</code> (buscador)</td><td class="r">336 · 331 · 334</td><td class="r">1,40:1 claro, 1,24:1 oscuro</td></tr>'
+  '<tr><td><code>38</code>, <code>42</code>, <code>43</code>, <code>44</code>, <code>45</code></td><td><code>.ctrl input, .ctrl select, .ctrl textarea, .btn</code></td><td class="r">583 · 581</td><td class="r">1,41:1 claro, 1,24:1 oscuro</td></tr></tbody></table>',
+  '/* antes */\n.ren .caja{… border:2px solid var(--border-2); …}\n.ctrl input,.ctrl select,.ctrl textarea{border:1px solid var(--border); …}\n\n/* después. Si el archivo no declara --border-ctrl, se añade junto a --border, con los valores del §1.1:\n   claro rgba(27,36,48,.5) · oscuro rgba(231,236,242,.37) */\n.ren .caja{… border:2px solid var(--border-ctrl); …}\n.ctrl input,.ctrl select,.ctrl textarea{border:1px solid var(--border-ctrl); …}',
+  'El borde de cada control pasa de 1,3–1,7:1 a 3,06:1 contra su fondo (mínimo 3:1 para un control). Los botones secundarios de <code>.ctrl .btn</code> llevan el mismo borde y se corrigen con la misma línea.')
 
 cambio(A, 'El contador de Asistencia se lee con claridad', 'pide',
   '<code>13_panel_asistencia_rhl</code> · <code>.it .n</code> · línea 95.',
@@ -94,14 +108,6 @@ cambio(A, 'El contador de Asistencia se lee con claridad', 'pide',
   a_d('ev13', 'Menú lateral con el contador 4 en texto oscuro sobre rojo', 'El mismo contador con texto claro', 'Antes — 3,40:1', 'Después — 4,94:1'),
   '/* antes */\n.it .n{margin-left:auto;background:var(--err);color:#2A1512;…}\n\n/* después */\n.it .n{margin-left:auto;background:var(--err);color:#FAFCFD;…}',
   'El contador pasa de 3,40:1 a 4,94:1 (mínimo 4,5:1 para texto normal).')
-
-cambio(A, 'Las casillas sin marcar se distinguen con sol', 'pide',
-  '<code>55_verificacion_pedido</code> · <code>.ren .caja</code> · línea 665.',
-  'Las casillas que aún no se han marcado casi se funden con el fondo. Son justo las que el instalador necesita ver para saber qué le falta.',
-  'El borde usa <code>--border-2</code>, que contra el fondo da 1,70:1. El archivo ya declara <code>--border-ctrl</code> (línea 90), el token para el borde de un control, y esta regla no lo usa: con él llega a 3,1:1. La casilla marcada ya cumple, con 5,78:1.',
-  a_d('ev55', 'Tres renglones sin marcar con la casilla en gris claro', 'Los mismos renglones con la casilla en gris oscuro', 'Antes — borde a 1,70:1', 'Después — borde a 3,1:1'),
-  '/* antes */\n.ren .caja{… border:2px solid var(--border-2); …}\n\n/* después */\n.ren .caja{… border:2px solid var(--border-ctrl); …}',
-  'El borde pasa de 1,70:1 a 3,1:1 contra el fondo (mínimo 3:1 para un control).')
 
 cambio(A, 'Los formularios del diálogo desplazan en lugar de aplastarse', 'pide',
   '<code>58_altas_como_modal</code> · <code>.modal .seccion</code> · línea 692.',
@@ -118,6 +124,23 @@ cambio(A, 'La página de diálogos deja de recomendar lo que ya se decidió no h
   '',
   None,
   'La sección «Nuevo cliente» lleva una marca visible de «Superada por D1» o se retira la recomendación.')
+
+cambio(A, 'El paso en curso del envío se lee con claridad', 'pide',
+  '<code>29_instalador_orden</code> · <code>.paso-envio .ahora</code> · línea 742.',
+  'En la tarjeta de fotos, el paso en curso del envío («2 · enviando 62 %») sale en verde sobre el fondo gris de la tarjeta. Es lo que le dice al instalador si la foto ya salió, y con luz de exterior cuesta leerlo.',
+  '<code>--accent</code> es el color de las acciones, no el del texto: da 4,35:1 en tema claro y 3,85:1 en oscuro. Para texto verde el sistema tiene <code>--link</code>, que sobre el mismo fondo da 5,41:1 y 7,06:1.',
+  par(panel('Antes — <code>--accent</code> sobre <code>--surface-2</code>', '<div class="muestra" style="background:#E7EDF3;color:#3E7A4C"><b>2 · enviando 62 %</b> · <b>4,35:1</b> · no llega a 4,5:1</div>', 'antes'),
+      panel('Después — <code>--link</code> sobre <code>--surface-2</code>', '<div class="muestra" style="background:#E7EDF3;color:#2F6B3C"><b>2 · enviando 62 %</b> · <b>5,41:1</b> · cumple</div>', 'despues')),
+  '/* antes */\n.paso-envio .ahora{color:var(--accent);font-weight:700}\n\n/* después */\n.paso-envio .ahora{color:var(--link);font-weight:700}',
+  'El texto pasa de 4,35:1 a 5,41:1 en claro y de 3,85:1 a 7,06:1 en oscuro (mínimo 4,5:1).')
+
+cambio(A, 'Con movimiento reducido, la conversación de Dprimi no desaparece', 'pide',
+  '<code>10_dprimi_asistente</code> · <code>.enter</code> · líneas 337 y 339.',
+  'Quien tiene activado «reducir movimiento» en su sistema abre la pantalla y no ve ninguna de las cuatro burbujas: toda la conversación queda transparente.',
+  'La regla que quita la animación (línea 337) está escrita antes que <code>.enter{opacity:0;…}</code> (línea 339), con la misma especificidad, así que gana la segunda. Como la animación está anulada, nada lleva la opacidad a 1. Con la preferencia desactivada la pantalla se ve bien, por eso no salta a la vista.',
+  a_d('m11', 'Conversación de Dprimi con el movimiento reducido activado: el panel está vacío', 'La misma conversación con las cuatro burbujas visibles', 'Antes — no se ve nada', 'Después — se ve la conversación', apilado=True),
+  '/* antes: la regla de reducción va ANTES de .enter{opacity:0} */\n@media (prefers-reduced-motion:reduce){ .enter{animation:none !important;opacity:1;transform:none} }\n.enter{opacity:0;transform:translateY(6px);animation:enter … forwards}\n\n/* después: se mueve DESPUÉS */\n.enter{opacity:0;transform:translateY(6px);animation:enter … forwards}\n@media (prefers-reduced-motion:reduce){ .msg.enter{animation:none;opacity:1;transform:none} }',
+  'Con <code>prefers-reduced-motion: reduce</code>, <code>getComputedStyle(.msg).opacity</code> pasa de 0 a 1 en las cuatro burbujas. Medido en Chromium; con la preferencia desactivada no cambia nada.')
 
 # ================================================================ B · PROPUESTAS
 B = 'B'
@@ -258,22 +281,44 @@ cambio(C, 'Cuentas por cobrar: las tarjetas de indicadores no se estiran', 'rec'
 cambio(C, 'Los destinos de pulsación llegan a 24 px', 'rec',
   '134 destinos bajo 24 px en 29 de las 50 pantallas.',
   'El buscador, el folio, las migas y las casillas son difíciles de acertar con ratón impreciso o con tableta, y en el padrón una casilla errada selecciona la fila equivocada antes de una acción masiva.',
-  'No se exige como fallo de accesibilidad: con la excepción de espaciado de WCAG 2.5.8 se cumple, y es una divergencia de §7.3. Se recomienda porque es un cambio de una línea.',
+  'No se exige como fallo de accesibilidad: con la excepción de espaciado de WCAG 2.5.8 se cumple en la mayoría de los casos, y es una divergencia de §7.3 (en <code>06</code>, <code>11</code> y los buscadores el espaciado no alcanza para salvarlos). Se recomienda porque es un cambio de una línea.',
+  a_d('d28', 'Listado de órdenes con el buscador y los folios marcados en rojo por medir menos de 24 px', 'El mismo listado con los destinos marcados en verde, de 24 px o más', 'Antes — en rojo, menos de 24 px', 'Después — en verde, 24 px o más', apilado=True)
+  + '<p class="nota">Ejemplo en <code>30_ordenes_listado</code>. En el resto de pantallas es igual; esta tabla dice dónde.</p>'
   '<table class="mini"><thead><tr><th>Pantalla</th><th>Elemento</th><th class="r">Medida</th></tr></thead><tbody>'
-  '<tr><td><code>27</code></td><td>casillas <code>.selfila input.rowsel</code></td><td class="r">15 × 15 px</td></tr>'
-  '<tr><td><code>27</code></td><td>buscador <code>#buscar</code></td><td class="r">329 × 16 px</td></tr>'
+  '<tr><td><code>27</code>, <code>06</code></td><td>casillas <code>input.rowsel</code></td><td class="r">15 × 15 px</td></tr>'
+  '<tr><td><code>42</code>, <code>44</code></td><td>casillas de «Documentos» (5 por pantalla)</td><td class="r">15 × 15 px</td></tr>'
+  '<tr><td><code>27</code>, <code>30</code>, <code>35</code>, <code>36</code>, <code>37</code>, <code>40</code>, <code>47</code>, <code>50</code></td><td>buscador <code>.search input</code>, dentro de un <code>&lt;div&gt;</code></td><td class="r">216 a 329 × 16 px</td></tr>'
+  '<tr><td><code>03</code>, <code>30</code>, <code>35</code>, <code>50</code></td><td>folios <code>a.folio</code> y <code>a.lnk</code></td><td class="r">119 a 127 × 16 px</td></tr>'
+  '<tr><td><code>08</code>, <code>33</code>, <code>38</code>, <code>39</code>, <code>42</code>, <code>43</code>, <code>44</code>, <code>45</code></td><td>migas <code>.migas a</code> y <code>.crumb a</code></td><td class="r">43 a 123 × 15 px</td></tr>'
+  '<tr><td><code>06</code></td><td>acciones de la barra de selección <code>.selbar a</code></td><td class="r">67 a 120 × 16 px</td></tr>'
+  '<tr><td><code>11</code></td><td>«Reenviarlo» <code>#resend</code> (el código 2FA no llegó)</td><td class="r">64,7 × 22 px</td></tr>'
   '<tr><td><code>27</code></td><td>botones de orden de la cabecera</td><td class="r">160 × 21 px</td></tr>'
-  '<tr><td><code>47</code></td><td>buscador <code>.hist .search</code></td><td class="r">216 × 16 px</td></tr>'
   '<tr><td><code>47</code></td><td>enlaces <code>.fuentes a</code></td><td class="r">780 × 19,8 px</td></tr>'
   '<tr><td><code>58</code></td><td>correo y teléfono <code>.ctrl input</code></td><td class="r">335 × 19 px</td></tr></tbody></table>',
-  'input[type="search"],.folio,.migas a{min-height:24px;padding-block:var(--sp-1)}',
+  '.folio,.lnk,.migas a,.crumb a{display:inline-flex;align-items:center;min-height:24px}\n/* el buscador: el contenedor pasa de <div class="search"> a <label class="search"> para que pulsarlo enfoque el campo (§10, trampa 4) */\n.search{min-height:34px}\ninput[type="checkbox"]{width:24px;height:24px}',
   'Ningún destino de pulsación mide menos de 24 px de alto.')
+
+cambio(C, 'El botón flotante no tapa «Crear expediente»', 'rec',
+  '<code>42_alta_tramite_gestoria</code>, <code>43_alta_tramite_vehicular</code> y <code>44_alta_tramite_cfe</code> · <code>.fab</code> (línea 268) y <code>.barra-form</code> (línea 592).',
+  'El botón redondo del asistente cae sobre la esquina del botón verde de la barra de acciones y le tapa el final del rótulo: «Cre…» en lugar de «Crear expediente». Cubre el 33 % del botón (el 38 % en «Ingresar a CFE» de <code>44</code>) y recibe el clic en esa zona. El botón verde sigue pulsable por el resto y con el teclado.',
+  '<code>.fab</code> está en <code>position:absolute</code> a 26 px del borde, y <code>.barra-form</code> no reserva sitio a su derecha. <code>27_padron_clientes</code> ya resuelve lo mismo en su <code>.nota</code> con <code>padding-right:calc(var(--sp-6) + 68px)</code>.',
+  a_d('f29', 'Barra de acciones con el botón redondo del asistente encima del final de «Crear expediente»', 'La misma barra con los botones desplazados a la izquierda del botón redondo', 'Antes — el círculo tapa «…ar expediente»', 'Después — el botón se lee entero', apilado=True),
+  '.barra-form{padding-right:calc(var(--sp-6) + 68px)}\n@media (max-width:1280px){.barra-form{padding-right:calc(var(--sp-4) + 68px)}}',
+  'El solape del botón primario con el <code>.fab</code> pasa de 52 × 20 px a 0 en las tres pantallas, a 1440, 1280 y 1024 px. Medido en Chromium con la regla inyectada.')
+
+cambio(C, 'Padrón (06): las acciones y los estados caben sin cortarse', 'rec',
+  '<code>06_padron_clientes</code> · <code>&lt;colgroup&gt;</code> de la tabla (líneas 474 a 478) y celdas <code>.pill</code> de «Datos fiscales» (línea 527) y «Estado» (línea 529).',
+  'En la columna Acciones, el primer icono (ver ficha) queda con el borde izquierdo mordido en las seis filas. Las pastillas de estado se cortan a mitad de palabra: «Falta carátula banc…» y «Registro inco…». A 1280 px quedan cortados 5 iconos y 7 pastillas; a 1024 px, 12 pastillas, hasta «Activo» y «Completos».',
+  'Tres columnas están más estrechas que su contenido. Acciones mide 104 px y sus tres botones necesitan 120 (3 × 28 px, dos huecos de 6 px y 24 px de relleno): como la celda corta lo que sobra, se pierde el borde del primero. Las columnas de estado miden un porcentaje del ancho (10 % y 14 %) y no alcanzan para el rótulo: «Registro incompleto» pide 203 px y recibe 111. Además, «Falta carátula bancaria» y «Registro incompleto» dicen lo mismo en dos columnas seguidas.',
+  a_d('t06', 'Tabla del padrón con el primer icono de acciones mordido y las pastillas «Falta carátula banc…» y «Registro inco…» cortadas', 'La misma tabla con los iconos completos y las pastillas «Incompletos» y «Registro incompleto» enteras', 'Antes — iconos y pastillas cortados', 'Después — todo cabe', apilado=True),
+  '/* 1 · Acciones: 3 × 28 + 2 × 6 + 24 = 120 px */\n<col style="width:128px">                 /* antes: 104px */\n\n/* 2 · anchos en píxeles para las columnas de pastillas */\ntipo 140 · sucursales 130 · datos fiscales 150 · última orden 112 · estado 205\n\n/* 3 · el estado por documento, corto; el detalle va al title y a la ficha */\n<span class="pill p-warn" title="Falta carátula bancaria">… Incompletos</span>\n\n/* 4 · con menos ancho, se ocultan columnas secundarias en vez de cortar */\n@media (max-width:1366px){.col-contacto{display:none}}\n@media (max-width:1100px){ /* columna «Última orden» */ display:none }',
+  'A 1440, 1366, 1280, 1180, 1100 y 1024 px, ningún icono ni pastilla queda cortado (antes: 5 iconos a 1440, 1366 y 1280, y entre 2 y 12 pastillas en todos los anchos). Medido en Chromium con los cambios inyectados. «Registro incompleto» se mantiene porque es el vocabulario que DPROMA confirmó en su versión 1 (comentario de la línea 165). Lo que cambia es el estado de datos fiscales: pasa de «Falta carátula bancaria» a «Incompletos», con el detalle al pasar el cursor.')
 
 cambio(C, 'Los botones hermanos del portal del cliente se parecen', 'rec',
   '<code>05_app_cliente</code> · <code>.abtn</code> · líneas 246 a 249.',
   '«Contactar a DPROMA» y «Reagendar cita» no se ven iguales: en uno el icono está junto al texto y en el otro apartado, y el botón es más alto.',
   'Los dos son <code>.abtn</code> con el mismo CSS. El texto de «Contactar a DPROMA» (120 px) no cabe en la media celda de la rejilla, envuelve a dos líneas y el nodo de texto ocupa todo el ancho restante: el icono se queda a la izquierda, lejos de su palabra, y el botón sube de 44 a 52 px. Falta <code>white-space:nowrap</code> o un rótulo más corto.',
-  '', '.abtn{white-space:nowrap}   /* o rotular «Contactar» */',
+  a_d('b30', 'Portal del cliente: «Contactar a DPROMA» en dos líneas y con el icono lejos del texto', 'Los dos botones con el rótulo en una línea', 'Antes — dos líneas, botón más alto', 'Después — una línea, iguales', apilado=False), '.abtn{white-space:nowrap}   /* o rotular «Contactar» */',
   'Los dos botones miden 44 px de alto y el icono queda junto a su palabra.')
 
 # ================================================================ D · AVISO
@@ -282,19 +327,27 @@ cambio(D, 'El padrón dibuja lo que se pospuso: vigencia y duplicados', 'pide',
   '<code>27_padron_clientes</code> · D7 y D8 del aviso del 28 de septiembre.',
   'D7 pospone la vigencia por documento (no existe la columna) y D8 pospone los duplicados. En el estado por defecto, <code>27</code> pinta el chip «7 con un documento por vencer», la pastilla «Por vencer» con su fecha y un aviso de 30 días, y la tarjeta «Dos pares de razones sociales se parecen demasiado» con dos botones «Comparar y decidir». La ficha reconoce que <code>27</code> lo dibuja.',
   'Se retiran, como en el prototipo del cambio ' + '@@padron@@' + ', y se vuelven a dibujar cuando D7 y D8 dejen de estar pospuestas.',
-  '', None, 'En el estado por defecto no aparece ni «por vencer» ni «Comparar y decidir».')
+  a_d('p31', 'Padrón con el chip «7 con un documento por vencer» y la tarjeta de duplicados con «Comparar y decidir»', 'El mismo padrón sin el chip ni la tarjeta de duplicados', 'Antes — dibuja lo pospuesto', 'Después — se retira', apilado=True), None, 'En el estado por defecto no aparece ni «por vencer» ni «Comparar y decidir».')
+
+cambio(D, 'El padrón de la bandeja sigue dibujando «Reenviar liga de registro»', 'pide',
+  '<code>06_padron_clientes</code> · botón de fila, línea 533 · D6 del aviso del 28 de septiembre.',
+  'D6 dice que «Reenviar liga de registro» no se construye. En <code>06</code>, la fila «Autos del Valle SAPI» la dibuja como tercera acción de la columna Acciones (un botón con icono de cadena y <code>aria-label="Reenviar liga de registro a Autos del Valle"</code>). La misma pantalla trae «Liga de auto-registro» en la cabecera (línea 424) y en la nota inferior (línea 592). <code>FICHAS_TECNICAS.md</code> (líneas 124 y 701) dice que esa liga también cayó bajo el rechazo del punto 15.',
+  '<code>06</code> es otra versión del padrón y no está en la tabla de arriba; por eso se comprobó aparte.',
+  a_d('l32', 'Padrón con «Liga de auto-registro» en la cabecera y un tercer icono de cadena en la fila de Autos del Valle', 'El mismo padrón sin la liga: la fila trae solo ver y editar', 'Antes — con «Reenviar liga»', 'Después — sin ella', apilado=True), None,
+  'La fila tiene dos acciones (ver y editar), la cabecera no trae «Liga de auto-registro» y la nota inferior no la menciona.')
 
 cambio(D, 'La alta de cliente dice la frase del aviso', 'menor',
   '<code>41_alta_cliente</code> · D2.',
   'La sucursal es opcional, pero falta la frase literal «Sin sucursal no se le puede programar una orden; se puede añadir después desde la ficha». La sección dice el todo o nada y el estado vacío omite la consecuencia.',
-  'Es una omisión de texto; el fondo está bien.', '', None,
+  'Es una omisión de texto; el fondo está bien.',
+  a_d('a33', 'Sección Sucursal del alta de cliente sin la frase sobre qué pasa sin sucursal', 'La misma sección con la frase del aviso debajo del título', 'Antes — falta la frase', 'Después — con la frase', apilado=True), None,
   'La frase aparece en la sección «Sucursal» del alta.')
 
 PARTES = {
- 'A': ('Parte A', 'Lo que se pide', 'Nueve cambios. Los cinco primeros son sustituciones que se repiten en muchos archivos; los cuatro siguientes son problemas propios de una pantalla o una contradicción con el aviso del 28 de septiembre. Cada uno cumple alguna de las cinco condiciones de crítico.'),
+ 'A': ('Parte A', 'Lo que se pide', 'Once cambios. Los seis primeros son sustituciones que se repiten en muchos archivos; los cinco siguientes son problemas propios de una pantalla o una contradicción con el aviso del 28 de septiembre. Cada uno cumple alguna de las cinco condiciones de crítico.'),
  'B': ('Parte B', 'Propuestas de diseño', 'Ocho rediseños. Cada uno parte de lo que dibujó DPROMA, evalúa al menos dos opciones (la primera siempre es el mínimo cambio sobre su dibujo) y se probó en el navegador a 1440, 1280, 1024 y 390 px. Son prototipos: ningún archivo de DPROMA se modificó.'),
- 'C': ('Parte C', 'Mejoras sencillas', 'Diez cambios que no se exigen. Cada uno mejora algo visible y, varias veces, delata una causa que se repite en otras pantallas.'),
- 'D': ('Parte D', 'El aviso del 28 de septiembre', 'Se comprobaron los doce puntos del aviso contra las cinco pantallas del padrón. Casi todo está donde debe. Tres cosas no, y las tres tienen que ver con lo que se pospuso.'),
+ 'C': ('Parte C', 'Mejoras sencillas', 'Doce cambios que no se exigen. Cada uno mejora algo visible y, varias veces, delata una causa que se repite en otras pantallas.'),
+ 'D': ('Parte D', 'El aviso del 28 de septiembre', 'Se comprobaron los doce puntos del aviso contra las cinco pantallas del padrón. Casi todo está donde debe. Tres cosas no, y las tres tienen que ver con lo que se pospuso. Aparte, una pantalla que la tabla no cubre, <code>06</code>, sigue dibujando lo que el aviso rechazó.'),
 }
 
 # ---------------------------------------------------------------- render
@@ -379,6 +432,22 @@ lista_no = ('<ul class="plano">'
   '<li><b>La agenda de instaladores propia</b> se mantiene. Solo lleva el cambio mínimo del cambio ' + ref('Agenda de instaladores') + '.</li>'
   '<li><b>El panel «Con qué filtros»</b> se mantiene como registro de auditoría, sin controles.</li></ul>')
 
+def anexo_html():
+    P = BAR['por_archivo']
+    def chips(items):
+        return ' '.join(f'<code>{a}{(":" + str(l)) if l else ""}</code>' for a, l in items)
+    filas = [
+     ('1', 'Menú lateral sin nombre (<code>.side .et{display:none}</code>)', [(a, P[a]['menu_et_display_none'][0]) for a in BAR['resumen']['menu_et_display_none']]),
+     ('2', 'Icono gris (<code>.state .ico</code> descendiente)', [(a, P[a]['state_ico_descendiente'][0]) for a in BAR['resumen']['state_ico_descendiente']]),
+     ('3', 'Gris de texto (<code>--text-3: #66717F</code>)', [(a, P[a]['text3_linea']) for a in BAR['resumen']['text3_66717F']]),
+     ('4', 'Fuentes por <code>&lt;link&gt;</code> a Google', [(a, P[a]['google_fonts_link'][0]) for a in BAR['resumen']['google_fonts_link']]),
+     ('5', 'Identificadores repetidos', [(a + ' (' + ', '.join(f'{k} ×{v}' for k, v in P[a]['ids_repetidos'].items()) + ')', None) for a in BAR['resumen']['ids_repetidos']]),
+     (ref('Las cajas de cabecera'), 'Cabecera <code>.p4</code> sin relleno inferior', [(a, P[a]['p4_sin_padding_bottom'][0]) for a in BAR['resumen']['p4_sin_padding_bottom']]),
+    ]
+    cuerpo = ''.join(f'<tr><td class="r">{n}</td><td>{t}<br><span class="cuenta">{len(it)} archivos</span></td><td class="chips">{chips(it)}</td></tr>' for n, t, it in filas)
+    return ('<table class="t t-anexo"><colgroup><col style="width:10%"><col style="width:24%"><col style="width:66%"></colgroup>'
+            '<thead><tr><th class="r">Cambio</th><th>Qué se busca</th><th>Archivos, con la línea de la regla</th></tr></thead><tbody>' + cuerpo + '</tbody></table>')
+
 # ---------------------------------------------------------------- documento
 CSS = open(os.path.join(AQUI, 'revision.css'), encoding='utf-8').read()
 DOC = f'''<!doctype html>
@@ -406,10 +475,10 @@ DOC = f'''<!doctype html>
 
 <section class="como" id="indice">
   <header class="ph"><span class="eyebrow">Antes de empezar</span><h2>Cómo leer este informe</h2></header>
-  <p class="lede">Llegaron 50 pantallas HTML y se midieron todas en el navegador, con las fuentes reales. Veintitrés se revisaron una por una; las otras veintisiete pasaron solo por los medidores automáticos. Es la primera revisión de estas pantallas: describe lo que hay en los archivos recibidos.</p>
+  <p class="lede">Llegaron 50 pantallas HTML y se midieron todas en el navegador, con las fuentes reales. Las cincuenta se revisaron una por una, y cada defecto grave lo volvió a medir otra persona con intención de refutarlo. Es la primera revisión de estas pantallas: describe lo que hay en los archivos recibidos.</p>
   <div class="stats">
-    <div class="stat"><b>5</b><h3>sustituciones que se repiten en muchos archivos</h3><p>Se aplican igual en cada uno: la regla del menú lateral está en 36 archivos y la del icono gris en 21. Son los cambios 1 a 5.</p></div>
-    <div class="stat"><b>4</b><h3>cambios propios de una pantalla</h3><p>Afectan a las pantallas 13, 55 y 58. Otras tres (27, 28 y 47) tienen su problema en la parte B, porque se arreglan con un rediseño. Son los cambios 6 a 9.</p></div>
+    <div class="stat"><b>6</b><h3>sustituciones que se repiten en muchos archivos</h3><p>Se aplican igual en cada uno: la regla del menú lateral está en 36 archivos y la del icono gris en 21. Son los cambios 1 a 6.</p></div>
+    <div class="stat"><b>5</b><h3>cambios propios de una pantalla</h3><p>Afectan a las pantallas 10, 13, 29 y 58. Otras tres (27, 28 y 47) tienen su problema en la parte B, porque se arreglan con un rediseño. Son los cambios 7 a 11.</p></div>
     <div class="stat"><b>134</b><h3>destinos de pulsación bajo 24 px</h3><p>En 29 pantallas. No se exige, pero es lo más repetido: cambio {ref('Los destinos de pulsación')}.</p></div>
   </div>
   <p>Cada cambio lleva una etiqueta que dice cuánto pesa:</p>
@@ -433,10 +502,16 @@ DOC = f'''<!doctype html>
 </section>
 
 <section class="parte" id="abierto">
-  <header class="ph"><span class="eyebrow">Parte F</span><h2>Lo que necesitamos de DPROMA</h2><p class="lede">Tres cosas que ninguna medición resuelve.</p></header>
+  <header class="ph"><span class="eyebrow">Parte F</span><h2>Lo que necesitamos de DPROMA</h2><p class="lede">Cuatro cosas que ninguna medición resuelve.</p></header>
   <article class="cambio abierto"><header><h3>El archivo <code>49_alta_orden</code></h3></header><p class="que">El PDF de cambios dice que se actualizó, y no está entre las 50 pantallas. Dos observaciones sobre esa pantalla (la caja de «Croquis y anexos» cortada y la sombra sobre la barra de acciones) quedan sin respuesta hasta recibirla.</p></article>
   <article class="cambio abierto"><header><h3>El archivo <code>SUPUESTOS.md</code></h3></header><p class="que"><code>FICHAS_TECNICAS.md</code> remite a él para las decisiones sin ratificar (S-25, S-28, S-30, S-31…) y no viene en el ZIP. Sin ese archivo no podemos saber qué se dio por bueno y qué sigue pendiente.</p></article>
+  <article class="cambio abierto"><header><h3>¿Qué asistente manda: <code>10_dprimi_asistente</code> o <code>47_asistente</code>?</h3></header><p class="que"><code>FICHAS_TECNICAS.md</code> presenta <code>47</code> como el asistente que sustituye a <code>10</code>, y fija que «el asistente consulta y no modifica» (S-19, una decisión sin ratificar). <code>10</code> sigue en el paquete y ofrece acciones que escriben: «Notificar a los responsables» y «Confirmar y enviar» un reporte por correo a Dirección. Hace falta saber si <code>10</code> se retira o si el asistente puede modificar datos.</p></article>
   <article class="cambio abierto"><header><h3>¿Qué manda sobre el plazo de los tickets?</h3></header><p class="que">La ficha de <code>24_tickets</code> en la tanda 3 dice que se retiró el reloj de plazo y que la antigüedad va en gris, igual en los seis renglones. La tanda 4 habla de que tickets conserva su propio semáforo de plazo. El archivo dibuja el plazo: «Vence hoy», con una regla de cálculo de 420 caracteres. El cambio {ref('Tickets TI')} depende de cuál sea la respuesta.</p></article>
+</section>
+
+<section class="parte" id="anexo">
+  <header class="ph"><span class="eyebrow">Anexo</span><h2>Archivos de cada sustitución</h2><p class="lede">Resultado de buscar cada regla en el código de las 50 pantallas, con la línea donde está. Sirve para aplicar cada cambio de una vez en todos los archivos, y para comprobar después que ninguno se quedó atrás.</p></header>
+  {anexo_html()}
 </section>
 </main>
 <footer class="pie"><span>SIO-DPROMA · 2894 Studio</span><span>{TITULO}</span></footer>
