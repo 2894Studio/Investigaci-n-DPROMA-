@@ -306,6 +306,14 @@ cambio(C, 'El botón flotante no tapa «Crear expediente»', 'rec',
   '.barra-form{padding-right:calc(var(--sp-6) + 68px)}\n@media (max-width:1280px){.barra-form{padding-right:calc(var(--sp-4) + 68px)}}',
   'El solape del botón primario con el <code>.fab</code> pasa de 52 × 20 px a 0 en las tres pantallas, a 1440, 1280 y 1024 px. Medido en Chromium con la regla inyectada.')
 
+cambio(C, 'Padrón (06): las acciones y los estados caben sin cortarse', 'rec',
+  '<code>06_padron_clientes</code> · <code>&lt;colgroup&gt;</code> de la tabla (líneas 474 a 478) y celdas <code>.pill</code> de «Datos fiscales» (línea 527) y «Estado» (línea 529).',
+  'En la columna Acciones, el primer icono (ver ficha) queda con el borde izquierdo mordido en las seis filas. Las pastillas de estado se cortan a mitad de palabra: «Falta carátula banc…» y «Registro inco…». A 1280 px quedan cortados 5 iconos y 7 pastillas; a 1024 px, 12 pastillas, hasta «Activo» y «Completos».',
+  'Tres columnas están más estrechas que su contenido. Acciones mide 104 px y sus tres botones necesitan 120 (3 × 28 px, dos huecos de 6 px y 24 px de relleno): como la celda corta lo que sobra, se pierde el borde del primero. Las columnas de estado miden un porcentaje del ancho (10 % y 14 %) y no alcanzan para el rótulo: «Registro incompleto» pide 203 px y recibe 111. Además, «Falta carátula bancaria» y «Registro incompleto» dicen lo mismo en dos columnas seguidas.',
+  a_d('t06', 'Tabla del padrón con el primer icono de acciones mordido y las pastillas «Falta carátula banc…» y «Registro inco…» cortadas', 'La misma tabla con los iconos completos y las pastillas «Incompletos» y «Registro incompleto» enteras', 'Antes — iconos y pastillas cortados', 'Después — todo cabe', apilado=True),
+  '/* 1 · Acciones: 3 × 28 + 2 × 6 + 24 = 120 px */\n<col style="width:128px">                 /* antes: 104px */\n\n/* 2 · anchos en píxeles para las columnas de pastillas */\ntipo 140 · sucursales 130 · datos fiscales 150 · última orden 112 · estado 205\n\n/* 3 · el estado por documento, corto; el detalle va al title y a la ficha */\n<span class="pill p-warn" title="Falta carátula bancaria">… Incompletos</span>\n\n/* 4 · con menos ancho, se ocultan columnas secundarias en vez de cortar */\n@media (max-width:1366px){.col-contacto{display:none}}\n@media (max-width:1100px){ /* columna «Última orden» */ display:none }',
+  'A 1440, 1366, 1280, 1180, 1100 y 1024 px, ningún icono ni pastilla queda cortado (antes: 5 iconos a 1440, 1366 y 1280, y entre 2 y 12 pastillas en todos los anchos). Medido en Chromium con los cambios inyectados. «Registro incompleto» se mantiene porque es el vocabulario que DPROMA confirmó en su versión 1 (comentario de la línea 165). Lo que cambia es el estado de datos fiscales: pasa de «Falta carátula bancaria» a «Incompletos», con el detalle al pasar el cursor.')
+
 cambio(C, 'Los botones hermanos del portal del cliente se parecen', 'rec',
   '<code>05_app_cliente</code> · <code>.abtn</code> · líneas 246 a 249.',
   '«Contactar a DPROMA» y «Reagendar cita» no se ven iguales: en uno el icono está junto al texto y en el otro apartado, y el botón es más alto.',
@@ -338,7 +346,7 @@ cambio(D, 'La alta de cliente dice la frase del aviso', 'menor',
 PARTES = {
  'A': ('Parte A', 'Lo que se pide', 'Once cambios. Los seis primeros son sustituciones que se repiten en muchos archivos; los cinco siguientes son problemas propios de una pantalla o una contradicción con el aviso del 28 de septiembre. Cada uno cumple alguna de las cinco condiciones de crítico.'),
  'B': ('Parte B', 'Propuestas de diseño', 'Ocho rediseños. Cada uno parte de lo que dibujó DPROMA, evalúa al menos dos opciones (la primera siempre es el mínimo cambio sobre su dibujo) y se probó en el navegador a 1440, 1280, 1024 y 390 px. Son prototipos: ningún archivo de DPROMA se modificó.'),
- 'C': ('Parte C', 'Mejoras sencillas', 'Once cambios que no se exigen. Cada uno mejora algo visible y, varias veces, delata una causa que se repite en otras pantallas.'),
+ 'C': ('Parte C', 'Mejoras sencillas', 'Doce cambios que no se exigen. Cada uno mejora algo visible y, varias veces, delata una causa que se repite en otras pantallas.'),
  'D': ('Parte D', 'El aviso del 28 de septiembre', 'Se comprobaron los doce puntos del aviso contra las cinco pantallas del padrón. Casi todo está donde debe. Tres cosas no, y las tres tienen que ver con lo que se pospuso. Aparte, una pantalla que la tabla no cubre, <code>06</code>, sigue dibujando lo que el aviso rechazó.'),
 }
 
