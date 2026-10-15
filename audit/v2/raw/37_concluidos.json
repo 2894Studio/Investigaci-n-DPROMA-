@@ -1,0 +1,402 @@
+{
+  "pantalla": "37_concluidos",
+  "tier": "B",
+  "modo": "cumplimiento",
+  "sha256": "4b97e8433005421a472f3be148fc61013875e88e66e86e2edc65ea83868289d4",
+  "estado_vs_pdf": "alineado",
+  "estados_auditados": [
+    "con datos",
+    "cargando",
+    "vacío",
+    "error"
+  ],
+  "capturas": [
+    "37_concluidos--1280-fold.png",
+    "37_concluidos--1440.png"
+  ],
+  "observaciones_resueltas": [],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "v2-37conc-01",
+        "severidad": "alta",
+        "regla": "§7.2 Cromo de aplicación",
+        "dice_el_sistema": "En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+        "hay_en_el_build": "A 1000 px el menú mide 64 px y sus 15 enlaces quedan sin nombre accesible (menu_1000px: total 15, sinNombre 15). `.side .et,.grp,.side .wordmark{display:none}` saca el texto del árbol de accesibilidad y los `<a class=\"it\">` no llevan `title` ni `aria-label` (aud5-medir2.cjs: conTitle 0).",
+        "selector": ".side .et",
+        "linea": 291,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "menu_1000px",
+          "detalle": "dossier: hayMenu true, total 15, sinNombre 15, anchoSide 64; reproducido con aud5-medir2.cjs a 1000x800 (nombre accesible = aria-label, texto no oculto o title): 15 de 15 vacíos"
+        },
+        "critico": {
+          "es": true,
+          "criterio": "1 · control sin nombre accesible (15 enlaces de navegación con el menú colapsado)"
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Es el criterio 1 de la Regla 1 (control sin nombre accesible). Arreglo de una línea: dejar el rótulo en el DOM con la clase `.sr` en lugar de `display:none` en `.et` (o `aria-label`/`title` en cada `.it`), que es lo que §7.2 pide con la «etiqueta emergente»."
+        },
+        "por_que_importa": "Entre 860 y 1100 px (portátil con la ventana a medias, tableta en horizontal) quien usa lector de pantalla o conmutador oye «enlace» quince veces sin saber a dónde lleva ninguno, y quien ve solo iconos no recibe la etiqueta emergente que §7.2 exige. Mismo bloque de cromo en 33, 35, 36 y 37."
+      },
+      {
+        "id": "v2-37conc-02",
+        "severidad": "alta",
+        "regla": "§10 Diez trampas comprobadas",
+        "dice_el_sistema": "con forma de pastilla **no** cumple, porque pulsar la pastilla",
+        "hay_en_el_build": "El buscador es `<div class=\"search\">` (no una `<label>`) que contiene un `<input type=\"search\">` de 16 px de alto: el destino real mide 16 px (tactil_bajo24: input «Buscar…» h 16). La pastilla mide 34 px pero pulsarla fuera del texto no enfoca el campo (enLabel: false).",
+        "selector": "div.search > input",
+        "linea": 669,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 669,
+          "cita": "<div class=\"search\"><svg class=\"ico ico-sm\" aria-hidden=\"true\"><use href=\"#i-search\"/></svg><input id=\"buscar\" type=\"search\""
+        },
+        "critico": {
+          "es": true,
+          "criterio": "1 · destino táctil < 24 px (el campo de búsqueda mide 16 px y su contenedor no es una etiqueta)"
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Criterio 1 (destino táctil < 24 px). Arreglo: `<label class=\"search\">` en lugar de `<div>` (o `min-height:24px` en el input), tal como §10 lo describe. Cambio de una etiqueta."
+        },
+        "por_que_importa": "Quien pulsa el borde o la lupa del buscador no recibe foco y cree que el campo no responde; con ratón en pantalla táctil el destino real es una franja de 16 px."
+      },
+      {
+        "id": "v2-37conc-03",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto",
+        "dice_el_sistema": "para el control cuya única frontera visible es el borde",
+        "hay_en_el_build": "`.search{background:var(--bg);border:1px solid var(--border)...}`: la frontera del buscador mide 1,40:1 en claro y 1,24:1 en oscuro contra la superficie (el relleno `--bg` 1,06:1). `--border-ctrl` está declarado (línea 93) y no se usa.",
+        "selector": "div.search",
+        "linea": 334,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 334,
+          "cita": "border:1px solid var(--border);border-radius:var(--r-pill);padding:8px 14px;color:var(--text-3)}"
+        },
+        "critico": {
+          "es": true,
+          "criterio": "1 · contraste < 3:1 en controles (frontera del buscador 1,40:1 claro, 1,24:1 oscuro)"
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Criterio 1 (contraste < 3:1 en controles). `border:1px solid var(--border-ctrl)` (3,06:1). Lectura 2: es la receta de buscador que traía el paquete anterior y el propio §1.7 muestra el `.search` con otro borde solo en foco; pero §1.1 define `--border-ctrl` precisamente para este caso."
+        },
+        "por_que_importa": "El buscador es el control con el que se acota la tabla y su frontera se pierde contra la barra de filtros; con poco contraste de pantalla no se ve dónde escribir."
+      },
+      {
+        "id": "v2-37conc-04",
+        "severidad": "alta",
+        "regla": "§6.11 Tabla densa",
+        "dice_el_sistema": "**La cabecera no se corta.**",
+        "hay_en_el_build": "`.conc table{min-width:1120px}`: a 1280 px la caja mide 1044 y el botón «Ver expediente» sale cortado («Ver exp…», borde derecho a 1340 con la caja en 1280) y los botones de las filas archivadas («Desarchivar») se apilan y se cortan (captura 37_concluidos--1280-fold.png). Dossier: scroll-x de `div.tabla-caja` dx 76 a 1280 px y 160 a 1024; a 1440 cabe.",
+        "selector": ".conc table",
+        "linea": 640,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "anchos_1440_1280_1024",
+          "detalle": "dossier: div.tabla-caja scroll-x 1280 dx 76, 1024 dx 160, 1440 sin desborde; aud5-medir2.cjs a 1280: cw 1044, sw 1120, «Archivar» right 1224, «Ver expediente» right 1340"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "No crítico: se alcanza todo con desplazamiento horizontal (§6.11 regla 5 lo admite) y la columna de acciones es la última. Solución concreta: retirar «Ver expediente», que repite el folio (v2-37conc-05): la columna de acciones pasa de unos 236 px a unos 120 y, bajando `min-width`, la tabla cabe a 1280 px (necesita ~1004 px de 1044). «Archivar»/«Desarchivar» sí hacen algo que la fila no hace y se quedan."
+        },
+        "por_que_importa": "En un portátil a 1280 px la acción por fila queda a medias de pantalla, y para «Desarchivar» hay que desplazar la tabla."
+      },
+      {
+        "id": "v2-37conc-05",
+        "severidad": "media",
+        "regla": "§6.11 Tabla densa",
+        "dice_el_sistema": "Si la fila entera navega, nada más dentro de ella repite esa acción.",
+        "hay_en_el_build": "Cada fila lleva el folio como `<a class=\"folio\">` y un botón «Ver expediente» que abre lo mismo; la fila no es clicable.",
+        "selector": "button.btn.mini «Ver expediente»",
+        "linea": 683,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 683,
+          "cita": "<td data-et=\"Acciones\"><div class=\"acciones\"><button class=\"btn mini\" type=\"button\">Archivar</button><button class=\"btn mini\" type=\"button\">Ver expediente</button></div></td>"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Mismo planteamiento que v2-35incid-06: fila clicable y botón fuera; «Archivar» se conserva. Decisión abierta."
+        },
+        "por_que_importa": "Dos formas de abrir el expediente junto a una acción que cambia su estado aumentan el riesgo de pulsar la equivocada, y gastan 110 px que la tabla no tiene a 1280 px."
+      },
+      {
+        "id": "v2-37conc-06",
+        "severidad": "media",
+        "regla": "§2.1 El suelo son 12px",
+        "dice_el_sistema": "Nada baja de ahí.",
+        "hay_en_el_build": "Las dos líneas de apoyo de la columna «Acuse» son `<span style=\"font-size:11px;color:var(--text-3)\">` en línea (6 filas: «Concluido hace 3 días», «Entregado el 15 ago 2026» …): 11 px. El dossier las pasa por alto (lt12_medido 0) porque el tamaño está en el atributo `style`; aud5-medir.cjs las cuenta (span 11px ×6).",
+        "selector": "td[data-et=\"Acuse\"] span",
+        "linea": 680,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 680,
+          "cita": "<span style=\"font-size:11px;color:var(--text-3)\">Concluido hace 3 días</span>"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Subir a `--fs-meta` (12 px) y, de paso, sacarlo del `style` a una clase (`.acuse .f`). Cambio mecánico que hacemos al integrar."
+        },
+        "por_que_importa": "«Concluido hace 3 días» es justo el dato que marca el trabajo pendiente (concluido sin acuse entregado, decisión del cliente en la FICHA) y está en el texto más pequeño de la fila."
+      },
+      {
+        "id": "v2-37conc-07",
+        "severidad": "media",
+        "regla": "§6.12 Resumen de estatus y barra de filtros",
+        "dice_el_sistema": "**Un control con pinta de interactivo tiene que interactuar.**",
+        "hay_en_el_build": "Las tres pastillas `.schip` («1 sin acuse entregado», «5 con acuse», «3 archivados») llevan `aria-pressed=\"false\"` y no hay manejador: pulsarlas no filtra la tabla. Igual «Cómoda»/«Compacta».",
+        "selector": "button.schip",
+        "linea": 670,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 670,
+          "cita": "<div class=\"p4-f\"><button class=\"schip c-warn\" type=\"button\" aria-pressed=\"false\" data-f=\"warn\">"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Conectar el filtrado o presentarlas como cifras de lectura en la maqueta (§6.12 regla 8)."
+        },
+        "por_que_importa": "Quien pulsa «1 sin acuse entregado» esperando ver el trámite pendiente no obtiene respuesta: el control promete y no cumple."
+      },
+      {
+        "id": "v2-37conc-08",
+        "severidad": "media",
+        "regla": "§6.12 Resumen de estatus y barra de filtros",
+        "dice_el_sistema": "**El orden fijo es resumen → buscador + filtros en una sola fila → tabla.**",
+        "hay_en_el_build": "Buscador (`.p4-b`) y pastillas (`.p4-f`) van en dos filas separadas bajo el título, a 135 y 181 px.",
+        "selector": ".p4-b, .p4-f",
+        "linea": 669,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 669,
+          "cita": "<div class=\"p4-b\"><div class=\"search\">"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "§13.1: una sola fila (buscador a la izquierda con `flex:1;min-width:200px`, pastillas a continuación). Mismo ARQ-P4 que 35."
+        },
+        "por_que_importa": "Tres bandas de cabecera antes del primer dato; el buscador flota sin relación visible con los filtros."
+      },
+      {
+        "id": "v2-37conc-09",
+        "severidad": "media",
+        "regla": "§6.11 Tabla densa",
+        "dice_el_sistema": "**Y la primera pregunta es si hace falta ofrecerla.**",
+        "hay_en_el_build": "«Cómoda/Compacta» se ofrece; `.denso` solo recorta la altura (y no se aplica a ninguna tabla).",
+        "selector": ".denso, .seg",
+        "linea": 383,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 383,
+          "cita": ".denso tbody th,.denso td{height:var(--row-compact);padding:var(--sp-1) var(--sp-4);font-size:var(--fs-dense)}"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Retirar el conmutador (propuesta) o definir qué contenido pierde la compacta (§6.11 regla 6)."
+        },
+        "por_que_importa": "Un par de botones permanentes sin efecto para una tabla de seis filas por página."
+      },
+      {
+        "id": "v2-37conc-10",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado de una pantalla",
+        "dice_el_sistema": "**El estado va dentro de una tarjeta, no suelto sobre el fondo.**",
+        "hay_en_el_build": "Vacío y error son `<div class=\"state state-empty\">` con glifo de 30 px sin tarjeta ni medallón (grep: 0); bajo el cromo se ven además las pastillas con cifras (1, 5, 3) que contradicen el «Todavía no hay trámites concluidos». El icono sí cumple `.state > .ico` (línea 611).",
+        "selector": ".state-empty, .state-error",
+        "linea": 730,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 730,
+          "cita": "<div class=\"state state-empty\">"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Se adopta como el resto de ARQ-ESTADOS del lote; si el sistema impone la tarjeta se aplica al bloque común. La contradicción de cifras es de la maqueta (los chips no se ocultan en vacío) y se corrige con datos reales."
+        },
+        "por_que_importa": "Un mensaje sin superficie junto a cifras que dicen otra cosa se lee como una pantalla a medio cargar."
+      },
+      {
+        "id": "v2-37conc-11",
+        "severidad": "baja",
+        "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional",
+        "dice_el_sistema": ".p4{ padding-bottom: var(--sp-3) }",
+        "hay_en_el_build": "`.p4` sin relleno inferior; hoy cierra por `.p4-f` (I2 sin fallo en la cabecera): latente si se retiran los chips.",
+        "selector": ".p4",
+        "linea": 311,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 311,
+          "cita": ".p4{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "`padding-bottom:var(--sp-3)` en `.p4` al tocar el bloque."
+        },
+        "por_que_importa": "Sin consecuencia visible hoy."
+      },
+      {
+        "id": "v2-37conc-12",
+        "severidad": "alta",
+        "regla": "§10 Diez trampas comprobadas",
+        "dice_el_sistema": "Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.",
+        "hay_en_el_build": "El isotipo del cromo y el del botón flotante se escriben con `viewBox=\"740 0 970 932\"` en el `<svg>` y un `<use href=\"#dproma-mark\"/>` sin medidas. Medido: el `<use>` queda desplazado -32,5 px (logo 44x42) y -16,2 px (botón flotante 22x21) respecto de su `<svg>`; en las capturas la marca sale como una astilla verde recortada, no como la Λ.",
+        "selector": ".side .logo svg",
+        "linea": 655,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 655,
+          "cita": "<div class=\"logo\"><svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "No es decisión de producto sino un defecto de copia del cromo (ARQ-CROMO). Lo corregimos nosotros al integrar: quitar `viewBox` del `<svg>` y poner `width`/`height` en el `<use>`, tal como §10 lo escribe. Medición: aud5-medir2.cjs (caja del `<use>` contra la del `<svg>`)."
+        },
+        "por_que_importa": "La marca es lo primero que ve cualquiera en el cromo y está en las cinco pantallas de este lote (en 07 está bien escrita, con medidas en el `<use>`). Con la marca recortada la pantalla se lee como inacabada y §1.2.1 (nunca una aproximación del isotipo) deja de cumplirse sin que nadie lo decida. Mismo bloque en 33, 35, 36 y 37."
+      },
+      {
+        "id": "v2-37conc-13",
+        "severidad": "baja",
+        "regla": "§2.1 El suelo son 12px",
+        "dice_el_sistema": "Se admite una excepción, y solo una: 10,5px en mayúsculas con `letter-spacing` para los",
+        "hay_en_el_build": "Los rótulos de grupo del menú (`p.grp`) van a 10,5 px sin `text-transform:uppercase` (se ven «Principal», «Operación», no en mayúsculas). Instrumento C2_105_no_mayusculas: 5 elementos.",
+        "selector": "p.grp",
+        "linea": 238,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "C2_105_no_mayusculas",
+          "detalle": "dossier: p.grp a 10,5 px con texto no en mayúsculas; confirmado en aud5-medir.cjs (font-size 10,5 px, text-transform none)"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "La causa raíz es nuestra: el CSS de `.grp` que §7.2 publica tampoco lleva `text-transform:uppercase`, así que el cliente copió lo documentado. O §7.2 añade las mayúsculas, o §2.1 admite 10,5 px también sin ellas (o se sube a 12 px). Se decide una vez en el sistema."
+        },
+        "por_que_importa": "Cinco o seis rótulos por pantalla bajo el suelo de 12 px que §2.1 declara sin excepción más que la de las mayúsculas; no afecta a la lectura de datos, pero la inconsistencia entre §2.1 y §7.2 la heredan todas las pantallas con cromo."
+      },
+      {
+        "id": "v2-37conc-14",
+        "severidad": "baja",
+        "regla": "§6.5 Iconos (`.msi`)",
+        "dice_el_sistema": "Si un icono va sin texto visible, lleva **como mínimo** etiqueta emergente y `aria-label`:",
+        "hay_en_el_build": "El botón «Exportar», el de tema y el del menú son solo icono. Llevan `aria-label` pero ningún `title`.",
+        "selector": "button.iconbtn",
+        "linea": 668,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 668,
+          "cita": "<button class=\"iconbtn\" type=\"button\" aria-label=\"Exportar\">"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Añadir `title` con el mismo texto del `aria-label`. Cambio mecánico que hacemos nosotros; el nombre accesible ya existe, solo falta la etiqueta emergente para quien ve."
+        },
+        "por_que_importa": "Quien ve el icono pero no lo reconoce (descarga, tema, menú) no tiene etiqueta emergente que se lo diga; el nombre accesible sí está, así que no bloquea."
+      }
+    ]
+  },
+  "cerrados_desde_v1": [],
+  "f3_boost_ui": {
+    "puntuacion": 3,
+    "dimensiones": {
+      "accesibilidad": 2,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 2,
+      "integridad": 3
+    },
+    "justificacion": "Archivo alineado con el PDF y con la decisión «archivar no es borrar» bien dicha en palabras (Archivar/Desarchivar, pie explicativo, atenuado); folio ya con 24 px. Lo resta: menú sin nombre, buscador con destino de 16 px y frontera de 1,4:1, textos de apoyo a 11 px en línea, tabla que no cabe a 1280 px y marca recortada.",
+    "evidencia": [
+      "dossier: contraste 0 fallos, menú sinNombre 15, táctil bajo24 1 (buscador)",
+      "aud5-medir.cjs: 6 spans de 11 px en la columna Acuse",
+      "dossier anchos: scroll-x tabla 1280 dx 76",
+      "aud5-medir2.cjs: folio h 24, marca dx -32,5"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado"
+  },
+  "cobertura": [
+    {
+      "patron": "Celda «Acuse» con estado (icono + texto: «Falta entregar acuse» / «Acuse entregado») y fecha de apoyo en una segunda línea (`.acuse`).",
+      "propuesta_de_regla": "Una celda de estado con apoyo lleva el estado en `.pill` o icono + texto a `--fs-meta` y la fecha debajo a 12 px mínimo en `--text-3`; el estado pendiente usa `--warn-ink` con reloj, nunca solo el color."
+    },
+    {
+      "patron": "Filas archivadas en la misma tabla con borde izquierdo (`.arch th:first-child{box-shadow:inset 3px 0 0 var(--border-fuerte)}`) y pastilla «Archivado».",
+      "propuesta_de_regla": "Un registro archivado permanece en la tabla, distinguido por un borde izquierdo de `--border-fuerte` y una pastilla neutra; la acción inversa se llama «Desarchivar» y nunca «Restaurar» ni «Eliminar» (el riesgo vive en las palabras, D80)."
+    }
+  ],
+  "sin_datos": [
+    "Rendimiento: no evaluado (no hay trazas de carga ni peso real; las fuentes se inyectan al renderizar).",
+    "Estados de foco, orden de tabulación y comportamiento con teclado: no recorridos; solo se evaluó lo medible estáticamente.",
+    "Falsos positivos descartados del dossier: I3 recorte en `main`, `caption` y `.sr` (scroll del shell y texto solo para lector de pantalla); I2 gap 6,5 px en celdas `td` con un control.",
+    "I5 ritmo vertical (valores 5, 6, 7, 9, 10 px fuera de escala): sin § del sistema que fije una tolerancia ni decisión del cliente que lo contradiga; no se convierte en hallazgo.",
+    "tokens_valores_divergentes de --ok-ink/--warn-ink/--err-ink/--block-ink/--pause-ink y sus -bg: el 'canónico' del dossier no tiene respaldo en el texto de §1.3; los valores declarados por el cliente reproducen exactamente los contrastes documentados en §1.3 (ok 5,04:1; warn 5,25:1; err 5,02:1; block 5,41:1; pause 6,30:1, medidos con la fórmula de §1.7), así que no se cuentan como divergencia.",
+    "Significado de los códigos C1-C18 del PDF: no se dispone del PDF; solo se usa el estado alineado/NO_ALINEADO del dossier.",
+    "Filas archivadas: la FICHA dice «atenuados»; en el código solo hay borde izquierdo y pastilla (sin opacidad), no se tomó como defecto porque cumple la intención de distinguirlas.",
+    "No se midió el estado compacto."
+  ]
+}

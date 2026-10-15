@@ -1,0 +1,401 @@
+{
+ "pantalla": "38_vehicular_detalle",
+ "tier": "B",
+ "modo": "cumplimiento",
+ "sha256": "bd00481a65274cd4cf958962de8d6abede27fb9a0637d7fc5b30ee5cb9072c90",
+ "estado_vs_pdf": "alineado",
+ "estados_auditados": [
+  "ok (1440 y 1280, claro y oscuro)",
+  "cargando, vacío y error (renderizados con el conmutador a 1280; error y oscuro revisados en captura, el resto en código)"
+ ],
+ "capturas": [
+  "38_vehicular_detalle--1440.png",
+  "38_vehicular_detalle--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-38vehdet-01",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles (la miga es destino primario) + criterio crítico 1",
+    "dice_el_sistema": "Y los enlaces que son el elemento primario de su fila (un folio, una miga, «Ver en Maps») no son texto en prosa: llevan padding hasta llegar a 24px.",
+    "hay_en_el_build": "`.migas a{color:var(--link);text-decoration:none;font-weight:600;border-radius:4px}` no lleva padding ni altura mínima: la miga «Trámites vehiculares» mide 120.6×15 px (brief tactil_bajo24: bajo24 1; mi medición a 1440, 1280 y 1024: igual).",
+    "selector": ".migas > a",
+    "linea": 490,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil_bajo24",
+     "detalle": "brief tactil_bajo24: muestra `a` «Trámites vehiculares» w 120.6 h 15. script mi5/m.cjs (Playwright, 1440/1280/1024, `lib.preparar`): `.migas a` 120.6×15 a los tres anchos."
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino táctil medido < 24 px y §7.3 nombra a la miga expresamente. Dos lecturas: WCAG 2.5.8 admite un destino pequeño si el círculo de 24 px centrado en él no toca otro destino, y aquí los vecinos no son enlaces; pero el criterio fijado por la persona es 24 px y §7.3 lo repite. Arreglo sin efecto visual: `.migas a{padding:4px 0;margin:-4px 0}`."
+    },
+    "por_que_importa": "Es el camino de vuelta al listado desde esta pantalla; con 15 px de alto se falla con el dedo y con el ratón."
+   },
+   {
+    "id": "v2-38vehdet-02",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (modo colapsado) + criterio crítico 1 (control sin nombre accesible)",
+    "dice_el_sistema": "En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+    "hay_en_el_build": "Entre 861 y 1100 px `.side .et,.grp,.side .wordmark{display:none}` retira el texto de los 15 `a.it`; el icono es `<svg aria-hidden=\"true\">` y el enlace no lleva `aria-label` ni `title` (mi barrido: 0 de 15 enlaces con `title` o `aria-label`; barrido del brief: menu_enlaces_sin_nombre_propio 15). No hay etiqueta emergente.",
+    "selector": ".side .et (en @media 860.02–1100 px) / a.it",
+    "linea": 291,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "menu_1000px",
+     "detalle": "menu_1000px: hayMenu true, total 15, sinNombre 15, anchoSide 64. Cita del código en la línea 291: `.side .et,.grp,.side .wordmark{display:none}`."
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible, medido (criterio 1). Lo que el cliente decidió —colapsar a iconos— se adopta; lo que se exige es que el nombre siga existiendo. Arreglo de una línea en el cromo: `.et` pasa a la clase de solo lectores (`.sr`) en lugar de `display:none` y cada `a.it` lleva `title`. Es el mismo bloque ARQ-CROMO en las cinco pantallas de este lote."
+    },
+    "por_que_importa": "Quien navega con lector de pantalla entre 861 y 1100 px (portátil con la ventana reducida, tableta apaisada) oye «enlace» quince veces sin saber a qué módulo va cada uno."
+   },
+   {
+    "id": "v2-38vehdet-03",
+    "severidad": "alta",
+    "regla": "§1.1 `--border-ctrl` (borde de control cuya única frontera es el borde) + §1.7 elementos gráficos a 3:1",
+    "dice_el_sistema": "«para el control cuya única frontera visible es el borde: un input vacío, una tarjeta sin relleno propio» · «Texto normal 4,5:1 mínimo; texto grande (≥24px, o ≥18,66px en negrita) y elementos gráficos 3:1.»",
+    "hay_en_el_build": "Los campos (`select#ne`, `textarea#cm`) pintan su frontera con `border:1px solid var(--border)` = rgba(27,36,48,.14): medido contra la superficie sobre la que caen da 1,31:1 en claro y 1,40:1 en oscuro (rgba(231,236,242,.12) sobre rgb(23,31,44)); el relleno del campo (`--bg`) frente a esa superficie da 1,06:1, así que no lo salva. Los dos botones secundarios de la cabecera («Exportar PDF», «Enviar a dependencia») llevan el mismo borde sobre un relleno igual al de la cabecera (borde 1,31:1; relleno 1,00:1). El `:root` ya declara `--border-ctrl:rgba(27,36,48,.5)` (línea 93) pero ninguna regla lo usa (grep de `var(--border-ctrl)`: 0).",
+    "selector": ".ctrl input, .ctrl select, .ctrl textarea, .btn",
+    "linea": 583,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 583,
+     "cita": "border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:var(--r-ctrl);"
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Contraste < 3:1 medido en el borde de un control cuya única frontera es el borde (criterio 1, lectura literal): `.ctrl input,.ctrl select,.ctrl textarea{border:1px solid var(--border-ctrl)}` (valores de §1.1: rgba(27,36,48,.5) / rgba(231,236,242,.37)) y `.btn{border:1px solid var(--border-2)}` (§6.2). Segunda lectura, menos dramática: los selects y los botones llevan un texto que los identifica y WCAG 1.4.11 no exige el borde cuando el rótulo ya hace de indicador; en los campos de texto vacíos sí, porque ahí solo queda el borde."
+    },
+    "por_que_importa": "Un campo vacío o un select quedan casi del color de la tarjeta: con luz de oficina o en un monitor barato cuesta ver dónde se escribe."
+   },
+   {
+    "id": "v2-38vehdet-04",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 (isotipo) + §1.2.1 Logotipo",
+    "dice_el_sistema": "Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.",
+    "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>` en el cromo y el mismo patrón en el botón del asistente (`.fab svg`, 22×21): medido a 1440, el `<use>` del logo empieza en x=63,5 frente a x=96 de su `<svg>` (−32,5 px) y el del asistente en x=1360,8 frente a 1377 (−16,2 px); la captura muestra solo una astilla de la «Λ».",
+    "selector": ".side .logo svg, .fab svg",
+    "linea": 671,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 671,
+     "cita": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Corrección sencilla y global en la plantilla del cromo (ARQ-CROMO), ya documentada en §10: medidas en el `<use>` y sin `viewBox` en el `<svg>`. Se arregla una vez en la plantilla y llega a las 50 pantallas; el cliente copia el bloque tal como se lo dimos."
+    },
+    "por_que_importa": "La marca aparece recortada en el cromo de cada pantalla y en el botón del asistente."
+   },
+   {
+    "id": "v2-38vehdet-05",
+    "severidad": "media",
+    "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional",
+    "dice_el_sistema": "«el relleno de un contenedor lo declara el contenedor» · «.p4{ padding-bottom: var(--sp-3) }»",
+    "hay_en_el_build": "`.p4{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}` sin `padding-bottom` (los hijos solo declaran el superior): los botones de acción quedan a 1 px del borde de la cabecera (I2_holgura_inferior: header.p4, gap 0, altoBarra 49, controles 3; mi medición a 1440: `.btn` termina a 1 px del borde). La captura lo muestra: el borde inferior toca los botones.",
+    "selector": "header.p4",
+    "linea": 311,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I2_holgura_inferior",
+     "detalle": "I2: barra header.p4 gap 0 altoBarra 49 controles 3."
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Es el bloque ARQ-P4 de la plantilla (idéntico en las cinco pantallas): se corrige en la plantilla con `.p4{padding-bottom:var(--sp-3)}` y llega a todas. No se le pide nada al cliente."
+    },
+    "por_que_importa": "La cabecera de la pantalla es lo primero que se ve y los botones primarios parecen pegados a la raya."
+   },
+   {
+    "id": "v2-38vehdet-06",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px + §8 Voz de producto (límite de ~140 caracteres)",
+    "dice_el_sistema": "«`--fs-meta` es el tamaño más pequeño del sistema.» · «Ningún bloque de texto siempre visible pasa de ~140 caracteres.»",
+    "hay_en_el_build": "`<p style=\"font-size:11.5px;color:var(--text-3);line-height:1.5;margin-top:var(--sp-3)\">` bajo los campos de la tarjeta «Expediente»: 174 caracteres a 11,5 px (estilo calculado) en dos frases. El brief da lt12_medido 0 y C11 «revisados 2, sobre140 0», coherente con el PDF, pero el instrumento no cuenta este párrafo (estilo en línea, sin `.nota` ni `.banda`).",
+    "selector": "Expediente > p (style en línea)",
+    "linea": 711,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 711,
+     "cita": "font-size:11.5px;color:var(--text-3);line-height:1.5;margin-top:var(--sp-3)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico. La frase es decisión documentada del cliente (FICHA 38: «la frase que dice que el número de serie se consulta desde el expediente y queda registrado quién lo miró», con S52): se conserva. Se le pide forma, no contenido: una frase y `var(--fs-meta)`, p. ej. «El número de serie no se muestra aquí: se consulta en el expediente y queda registro de quién lo miró.» (100 caracteres)."
+    },
+    "por_que_importa": "Es texto de referencia al pie de la ficha, no un dato diario; el coste es bajo, pero es la única infracción de 12 px que el instrumento no ve."
+   },
+   {
+    "id": "v2-38vehdet-07",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (la excepción de 10,5 px)",
+    "dice_el_sistema": "«10,5px en mayúsculas con `letter-spacing` para los **rótulos de grupo** de la barra lateral y las etiquetas de campo del modo tarjeta»",
+    "hay_en_el_build": "`.campo .et{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;…}`: los ocho rótulos de la tarjeta «Expediente» (CLIENTE, TRÁMITE, PLACA, RECIBIDO, ADMITIDO, FECHA COMPROMISO, GESTOR, CANAL DE ENTRADA) van a 10,5 px en mayúsculas con letter-spacing (mi barrido: fs 10,5, textTransform uppercase, ×8). Cumplen la forma de la excepción; no son «rótulos de grupo de la barra lateral» ni «etiquetas de campo del modo tarjeta» de una tabla.",
+    "selector": ".campo .et",
+    "linea": 501,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 501,
+     "cita": ".campo .et{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Dos lecturas: (A) «modo tarjeta» se entiende como cualquier ficha de campos y la excepción cubre estas etiquetas; (B) la excepción solo nombra dos casos y estos rótulos se leen a diario (¿qué trámite es?, ¿cuándo vence?). Pregunta de diseño para el sistema: ampliar la excepción a «rótulos de ficha de detalle» o subirlos a 12 px en mayúsculas. No se le pide nada al cliente."
+    },
+    "por_que_importa": "Son los rótulos de los datos que se consultan cada vez que se abre un trámite."
+   },
+   {
+    "id": "v2-38vehdet-08",
+    "severidad": "baja",
+    "regla": "§6.9 Avisos (el icono coincide con la variante) + §8 (una frase, sin punto y coma)",
+    "dice_el_sistema": "«El icono tiene que coincidir con la variante.» · «`.nota` y `.banda` llevan como máximo una frase, sin punto y coma ni raya explicativa después del primer punto.»",
+    "hay_en_el_build": "`<div class=\"banda b-info\"…><svg class=\"ico\"…><use href=\"#i-alert\"/>` : banda neutra (`--surface-2`) con el triángulo de advertencia (`#i-alert`) y el texto «El botón de «Enviar a dependencia» está disponible; si el servidor lo rechaza, dirá el motivo.» (97 caracteres, con punto y coma).",
+    "selector": ".checklist ~ .banda.b-info",
+    "linea": 722,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 722,
+     "cita": "class=\"banda b-info\" style=\"margin-top:var(--sp-4)\"><svg class=\"ico\" aria-hidden=\"true\"><use href=\"#i-alert\"/>"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico. La nota es decisión documentada (FICHA 38: botón habilitado aunque falte un punto, «con una nota que explica por qué la pantalla no se adelanta a la decisión del servidor»): se conserva. Se pide forma: un icono neutro (`#i-shield` ya está declarado) y sin punto y coma, ««Enviar a dependencia» está disponible: si el servidor lo rechaza, dirá el motivo.»."
+    },
+    "por_que_importa": "Señal mixta: un triángulo de advertencia sobre un aviso que dice que todo está disponible."
+   },
+   {
+    "id": "v2-38vehdet-09",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla (tarjeta + medallón)",
+    "dice_el_sistema": "«El estado va dentro de una tarjeta, no suelto sobre el fondo.» · «El medallón carga el peso visual del icono.»",
+    "hay_en_el_build": "Las vistas de vacío y de error son un `div.state` con un glifo de 30 px sin medallón y un `<b>`/`<p>` centrados directamente sobre el fondo de la zona de contenido (`.state{display:none;flex-direction:column;align-items:center;…}`), sin `.tarjeta-estado`, sin `.estado-ico`, sin `--r-modal` ni `--sh-modal`. Renderizado a 1280 (conmutador de maqueta): un bloque de texto flotando en ~500 px de fondo liso.",
+    "selector": ".state.state-empty, .state.state-error",
+    "linea": 607,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 607,
+     "cita": ".state{display:none;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-2);"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico. Es el componente que §6.4 prescribe y que el PDF/ficha dicen aplicado en las altas; el cambio es de marcado y CSS, sin tocar texto ni acciones. Los tokens que necesita (`--on-state`, `--err`) ya están declarados en 38 y se declaran con una línea en las demás."
+    },
+    "por_que_importa": "Un mensaje centrado sin superficie no se lee como una respuesta del sistema sino como una pantalla que no terminó de cargar."
+   },
+   {
+    "id": "v2-38vehdet-10",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla (reglas 1 y 2: anuncio y encabezado real)",
+    "dice_el_sistema": "«El cambio se anuncia y mueve el foco.» · «no un `<b>`. Es lo que permite navegar la página saltando de encabezado en encabezado.»",
+    "hay_en_el_build": "`<b>No se pudo cargar el trámite</b>`: el título del estado es un `<b>` y no un encabezado; en el archivo no existe ningún `aria-live` (grep: 0) y el único código que cambia de vista es `cont.setAttribute('data-state',b.dataset.set);` (línea 788), que no anuncia ni mueve el foco a `<main tabindex=\"-1\">`.",
+    "selector": ".state b / main#contenido",
+    "linea": 754,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 754,
+     "cita": "<b>No se pudo cargar el trámite</b>"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico. Dos lecturas: el conmutador es andamio de maqueta y el cambio real vendrá de la carga de datos; pero el marcado del estado (encabezado y región viva) es del producto y es lo que hay que dejar bien desde la maqueta: `<h2>` en lugar de `<b>`, un `<p class=\"sr\" aria-live=\"polite\">` y `main.focus()` al cambiar."
+    },
+    "por_que_importa": "Quien usa lector de pantalla no se entera de que la pantalla pasó a error ni de cuál es el título de la vista."
+   },
+   {
+    "id": "v2-38vehdet-11",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado (regla 4: el error no se lleva por delante lo que había)",
+    "dice_el_sistema": "«El error no se lleva por delante lo que había.» · «En el alta de cliente, el estado de error ocultaba el formulario entero mientras el mensaje afirmaba que lo capturado seguía en el borrador»",
+    "hay_en_el_build": "El estado de error sustituye toda la zona de contenido (`main[data-state=\"error\"] .state-error{display:flex}`; `.state-ok` queda oculto) y su propio texto admite la pérdida: «Si estabas escribiendo un comentario de cambio de estatus, no se guardó: cópialo antes de recargar.» El comentario vive en la tarjeta «Cambiar estatus», que desaparece con el resto. Es el patrón que §6.4 cita como mal ejemplo, con la diferencia de que aquí el mensaje no promete conservarlo.",
+    "selector": ".state.state-error",
+    "linea": 755,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 755,
+     "cita": "Si estabas escribiendo un comentario de cambio de estatus, no se guardó: cópialo antes de recargar."
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No crítico. Dos lecturas: (A) el error de este estado es de carga o de envío y el cliente ya dice qué no se perdió; (B) el estado de error reemplaza la zona de contenido, así que el trabajo que había en pantalla desaparece justo cuando el mensaje promete que sigue ahí. Pregunta de diseño: ¿el error va como `.banda-err` encima del formulario con los campos visibles (§6.4 regla 4) o se mantiene la vista de error aparte? La maqueta no permite ver lo segundo."
+    },
+    "por_que_importa": "En el momento de más incertidumbre se retira la prueba de que lo capturado sigue ahí."
+   },
+   {
+    "id": "v2-38vehdet-12",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga (texto dentro de las barras, aplanar el fondo, mismo alto)",
+    "dice_el_sistema": "«Sin texto real dentro de las barras.» · «`animation:none` a secas no retira el degradado: lo **congela** en la posición 0» · «Y el mismo alto, que es la mitad que se olvida.»",
+    "hay_en_el_build": "El esqueleto lleva texto real dentro de las barras (`<span class=\"skel\" style=\"width:30%\">Expediente</span>`, con `color:transparent`: invisible pero dentro del árbol de accesibilidad) pese a que el contenedor ya trae `role=\"status\" aria-label=\"Cargando\"`; la regla de movimiento reducido es `@media (prefers-reduced-motion:reduce){.skel{animation:none}}` (línea 606), que congela el degradado en la posición 0 en lugar de aplanarlo; y el esqueleto mide 404 px frente a los 977 px de contenido real (scrollHeight de `main` en estado ok, 1280×800): al llegar los datos la pantalla salta 573 px.",
+    "selector": ".skel, .state-loading",
+    "linea": 745,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 745,
+     "cita": "<span class=\"skel\" style=\"width:30%\">Expediente</span>"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico: las barras son decorativas y el esqueleto es de la vista de carga. Arreglo sencillo y común a las cinco pantallas (bloque ARQ-ESTADOS): barras vacías, `.skel{animation:none;background:var(--surface-2)}` en movimiento reducido y `min-height` por caja para acercarlo al alto real."
+    },
+    "por_que_importa": "Un lector de pantalla puede leer «Cliente y trámite… pasos del trámite…» mientras carga, y quien pide menos movimiento recibe una rampa de grises a medio pintar."
+   },
+   {
+    "id": "v2-38vehdet-13",
+    "severidad": "media",
+    "regla": "§13 Composición y grid (zona de contenido) + §7.3 (destino alcanzable) · el sistema no documenta el botón flotante",
+    "dice_el_sistema": "Sin regla: la búsqueda de «flotante» y «FAB» en sistema-diseno.md solo da «barra flotante» (sombra, §1.6 y §4), «tarjeta flotante» (radio, §3) y el conmutador de maqueta (§9); ninguna regla define el botón del asistente ni su zona segura.",
+    "hay_en_el_build": "`.fab{position:absolute;right:max(26px,…);bottom:max(26px,…);width:52px;height:52px}` queda sobre la columna derecha de la zona de contenido mientras se lee: a 1280 cubre el final de «…resolución en ocho días hábiles.» del comentario de la bitácora y a 1440 el «22 de» de «El plazo queda fijado al 22 de agosto». Al final del desplazamiento no solapa nada (medido: el cuerpo reserva 64 px), así que es un tapado intermitente, no permanente.",
+    "selector": ".fab",
+    "linea": 271,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "captura",
+     "archivo": "38_vehicular_detalle--1280-fold.png",
+     "region": "esquina inferior derecha: el botón flotante tapa «ocho días hábiles.» del texto de la bitácora"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Causa raíz en el sistema: no define la zona segura del botón del asistente, y cada pantalla lo resuelve ad hoc (41_alta_cliente reserva 68 px en su pie, línea 599; `.nota` aquí reserva 68 px de relleno derecho). Propuesta de regla en `cobertura`."
+    },
+    "por_que_importa": "Un botón fijo tapa contenido que no se puede mover: cada párrafo del lado derecho pasa por debajo de él al desplazarse."
+   },
+   {
+    "id": "v2-38vehdet-14",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (excepción de 10,5 px en mayúsculas) + §7.2",
+    "dice_el_sistema": "«10,5px en mayúsculas con `letter-spacing` para los **rótulos de grupo** de la barra lateral y las etiquetas de campo del modo tarjeta» · «.grp{margin:14px 8px 4px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}»",
+    "hay_en_el_build": "`.grp{margin:9px 8px 2px;font-size:10.5px;font-weight:700;letter-spacing:.1em;…}` sin `text-transform:uppercase`: los seis rótulos de grupo del menú («Principal», «Operación», «ICEV»…) se pintan en minúscula/capitalizado a 10,5 px (C2_105_no_mayusculas: fallos 5; mi barrido: `textTransform: none` en los 6). La excepción de §2.1 solo cubre 10,5 px en mayúsculas.",
+    "selector": "p.grp",
+    "linea": 238,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 238,
+     "cita": ".grp{margin:9px 8px 2px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Causa en el propio sistema: la receta de §7.2 escribe `.grp` con 10,5 px y letter-spacing pero sin `text-transform:uppercase`, así que quien la copia cumple §7.2 y rompe §2.1. Se corrige el sistema (añadir `text-transform:uppercase` a la receta de §7.2, o subir el rótulo a 12 px); el cliente no tiene que cambiar nada."
+    },
+    "por_que_importa": "Cinco o seis rótulos del cromo, en todas las pantallas, a un tamaño que el sistema solo admite en mayúsculas."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 4,
+   "responsive": 3,
+   "integridad": 3
+  },
+  "justificacion": "Es la pantalla del lote que más se acerca al sistema 2.15.0: PDF alineado (C1, C3–C8, C10 confirmados), `--text-3` y series nuevas, `.state > .ico` en hijo directo, `.btn` con `min-height:36px`, `:root[data-tacto]`, `@font-face` declarado, 0 fallos de contraste en los dos temas y sin scroll horizontal a 1440/1280/1024/768/390. Lo que baja la nota: tres fallos críticos de accesibilidad (miga de 15 px, menú colapsado sin nombre, bordes de campo a 1,31:1 con `--border-ctrl` declarado y sin usar), el isotipo descolocado y la cabecera sin relleno inferior.",
+  "evidencia": [
+   "brief: lt12 0, tactil bajo24 1 (miga 120,6×15), menu sinNombre 15, I1 0, I2 1 (header.p4 gap 0), I8 0, C11 0",
+   "mi5/m.cjs: bordes de select/textarea 1,31:1 (claro) y 1,40:1 (oscuro); isotipo −32,5 px; párrafo de 174 caracteres a 11,5 px",
+   "mi5/m2.cjs: esqueleto 404 px frente a 977 px de contenido; `.btn` 36 px; `data-tacto=\"dedo\"` lleva `.btn` e `.it` a 46 px"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Botón flotante del asistente (`.fab`, 52×52 px, esquina inferior derecha) sin zona segura",
+   "propuesta_de_regla": "El botón del asistente ocupa una zona segura de 68 px en el ángulo inferior derecho de la zona de contenido: ninguna acción primaria, texto de lectura ni pie de formulario entra en ella. Se reserva con `margin-right:68px` en `.barra-form .der` y con `padding-right:calc(var(--sp-6) + 68px)` en los bloques de lectura de la columna derecha; en movimiento reducido no anima. Toda pantalla con barra de acciones inferior lo comprueba medido a 1440, 1280 y 1024."
+  },
+  {
+   "patron": "Tira de etapas del trámite en horizontal (`.pasos` con círculo numerado, rótulo y conector `.lin` de 22 px)",
+   "propuesta_de_regla": "Una secuencia de etapas fija (recibido → admitido → en dependencia → concluido → entregado) se dibuja como tira: círculo de 22 px con el número, el rótulo a `--fs-meta` y un conector que encoge (`.lin{flex:1 1 8px;min-width:8px;max-width:22px}`) para que las cinco etapas quepan en una fila hasta ~560 px de ancho útil; la etapa actual lleva `--accent` y rótulo en negrita, las hechas `--ok-bg`/`--ok-ink`, las pendientes `--surface-2`. No se llama `.pasos`: ese nombre es el de §6.6 (lista vertical con conector). Medido (mi5/m9.cjs): la tira necesita 611 px; hay 668 px útiles a 1440 (cabe) y 579 a 1280, donde «5 Entregado» baja sola a una segunda fila y el conector queda colgando detrás de «Concluido» (captura 38_vehicular_detalle--1280-fold.png). Con los cuatro conectores encogiendo hasta 8 px la tira mide 555 px y cabe a 1280."
+  },
+  {
+   "patron": "Bitácora y lista de verificación dentro de una ficha de detalle (`.bitacora`, `.checklist`)",
+   "propuesta_de_regla": "Bitácora: punto de 22 px con icono a la izquierda (acento si lo hizo una persona, neutro si lo hizo el sistema), quién y qué en `--fs-dense`, fecha y hora a `--fs-meta` en `--text-3` con cifras tabulares y el comentario en una caja de `--surface` con borde, el más reciente arriba. Lista de verificación: marca de 20 px (`--ok-bg` hecho, `--surface-2` pendiente, `--err-bg` rechazado) con el icono del estado, título en 600 y la línea de validación a `--fs-meta`; «4 de 5» a la derecha de la cabecera de la tarjeta."
+  }
+ ],
+ "sin_datos": [
+  "I3_recorte marca `main` (dy 98): es el scroll del shell, falso positivo conocido; no hay recorte de contenido a 1440/1280/1024.",
+  "Acciones irreversibles: «Concluir», «Enviar a dependencia» y «Guardar el cambio» no muestran confirmación ni diálogo en la maqueta; la ficha dice que el candado vive en el servidor (`DetalleVehicular.tsx:4-14`) y que el comentario es obligatorio al cancelar o entregar a destiempo (S18). No puedo decir si falta una confirmación: no está dibujada.",
+  "Teclado, foco visible y lector de pantalla: solo leído en código (`:focus-visible` con `--accent`, `--chrome-focus` en el menú); no recorrí la pantalla con teclado ni con un lector.",
+  "Móvil: solo comprobé que no hay scroll horizontal ni solape del `.fab` con botones a 768 y 390 px; no evalué la composición por debajo de 1024 px.",
+  "Las divergencias de valor de tokens (`--ok-ink`, `--warn-bg`, `--surface-hover`…) frente al archivo canónico las cubre F2 (lo inyecta el orquestador); no las repito.",
+  "Rendimiento (F3): no evaluado."
+ ]
+}

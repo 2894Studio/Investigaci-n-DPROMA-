@@ -1,0 +1,473 @@
+{
+ "pantalla": "39_viatico_detalle",
+ "tier": "B",
+ "modo": "cumplimiento",
+ "sha256": "958e818cc6e02d43b80234c8cbb0536348519fc1f3056bb45aef77fc3d0266fe",
+ "estado_vs_pdf": "alineado",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error"
+ ],
+ "capturas": [
+  "39_viatico_detalle--1440.png",
+  "39_viatico_detalle--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-39viatico-01",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles",
+    "dice_el_sistema": "Y los enlaces que son el elemento primario de su fila (un folio, una miga, «Ver en Maps») no son texto en prosa: llevan padding hasta llegar a 24px.",
+    "hay_en_el_build": "El enlace «Viáticos» de `.migas` mide 47,2×15 px: es el único destino bajo 24 px de la pantalla (tactil_bajo24: 1 de 23). `.migas a` no declara padding ni altura mínima.",
+    "selector": ".migas a",
+    "linea": 490,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil_bajo24",
+     "detalle": "1 de 23 destinos bajo 24 px: a «Viáticos», w 47,2 × h 15 (dossier)"
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino táctil < 24 px medido (criterio 1). Una línea: `.migas a{display:inline-flex;align-items:center;min-height:24px}`. Se aplica la regla 1 y el texto de §7.3, que nombra la miga de forma expresa; una lectura de WCAG 2.5.8 con la excepción de espaciado podría tolerar un enlace aislado, pero el sistema no la adopta."
+    },
+    "por_que_importa": "La miga es el único camino de vuelta a la lista de viáticos desde el detalle; con dedo, puntero impreciso o temblor hay que acertar a una franja de 15 px. Es el bloque ARQ-P6 del cliente."
+   },
+   {
+    "id": "v2-39viatico-02",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (modo colapsado) · §6.5 Iconos",
+    "dice_el_sistema": "En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+    "hay_en_el_build": "A 1000 px el `.side` pasa a 64 px y `.side .et` se oculta con display:none: 15 de 15 enlaces `.it` quedan sin nombre accesible (instrumento menu_1000px: total 15, sinNombre 15). Comprobado además con script propio a 1000×800: innerText vacío y sin aria-label ni title en los 15.",
+    "selector": ".side .et",
+    "linea": 291,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "menu_1000px",
+     "detalle": "total 15, sinNombre 15, anchoSide 64 (dossier); script propio m6/medir.cjs a 1000×800: [innerText, aria-label, title] = [\"\",null,null] en los 15 `.side .it`"
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1 de la regla 1). Arreglo de una línea que no cambia el diseño: en vez de `display:none` sobre `.side .et`, aplicarle la receta `.sr` que el propio archivo ya declara (recorte de 1 px), o añadir `title` y `aria-label` a cada `.it`; `.grp` y `.wordmark` pueden seguir ocultos. Con `title` se cumple además lo que §7.2 pide («etiqueta emergente»)."
+    },
+    "por_que_importa": "Entre 860 y 1100 px (portátil con la ventana partida, tableta apaisada) toda la navegación es una columna de iconos sin nombre: un lector de pantalla anuncia 15 veces «enlace» y quien ve la pantalla no tiene ni etiqueta emergente. Mismo bloque ARQ-CROMO que en 40, 50, 56 y 57."
+   },
+   {
+    "id": "v2-39viatico-03",
+    "severidad": "alta",
+    "regla": "§10 Diez trampas comprobadas (un `<symbol>` ya trae su `viewBox`) · §1.2.1 Logotipo: uso y restricciones",
+    "dice_el_sistema": "repetirlo en el `<svg>` que lo invoca descoloca la marca",
+    "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>` con el `<symbol>` ya declarado con ese mismo viewBox: la caja del `<use>` empieza en x=63,5 y la del `<svg>` en x=96, un desfase de −32,5 px (medido a 1440×900). En la captura el isotipo del cromo es una hoja estrecha recortada, no la «Λ» completa. El botón flotante repite el patrón (`<svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\">`; no se midió por separado).",
+    "selector": ".side .logo svg",
+    "linea": 679,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_logo",
+     "detalle": "script m6/medir.cjs: `.logo svg` x=96 w=44; su `<use>` x=63,5 w=43; svgViewBox \"740 0 970 932\", `<use>` sin width"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No entra en los 4 criterios críticos, así que no se exige. Arreglo propuesto de una línea, la receta del propio §10: quitar el `viewBox` del `<svg>` y poner las medidas en el `<use>` (`<use href=\"#dproma-mark\" width=\"44\" height=\"42\"/>`). Mejora la marca en todas las pantallas del paquete que copien este cromo."
+    },
+    "por_que_importa": "La marca de la aplicación, visible en cada pantalla, no se reconoce: §1.2.1 prohíbe deformar o recortar el isotipo oficial. Es el mismo bloque de cromo que en 40, 50, 56 y 57; en 10_dprimi_asistente el `<use>` lleva sus medidas y el isotipo sale completo."
+   },
+   {
+    "id": "v2-39viatico-04",
+    "severidad": "media",
+    "regla": "§2.1 El suelo son 12px · §8 Voz de producto (ningún bloque pasa de ~140 caracteres)",
+    "dice_el_sistema": "**Ningún bloque de texto siempre visible pasa de ~140 caracteres.**",
+    "hay_en_el_build": "El párrafo de «La cuenta» («Comprobado» sólo suma lo que ya se revisó y se aceptó. Los $1,940 de los dos comprobantes en revisión no cuentan todavía — si contaran, la cuenta diría que está comprobado algo que nadie ha mirado.) tiene 198 caracteres, dos frases, y se pinta con `font-size:11.5px` en línea (computado: `p` y `b` a 11,5px). El conteo lt12 del dossier da 0 y C11 da «revisados 2, sobre140 0»: los dos revisados son las bandas (94 y 100 caracteres), este `<p>` no entró.",
+    "selector": "p (La cuenta)",
+    "linea": 736,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_medir",
+     "detalle": "script m6/medir.cjs: menor12 → [\"b\",11.5,\"«Comprobado» sólo suma…\"] y [\"p\",11.5,\"Los $1,940 de los dos…\"]; longitud 198 en m6/estados.cjs (txtLens [94,100,198])"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "La ficha documenta la decisión («“comprobado” sólo sume lo ya revisado y aceptado —y que la pantalla lo diga—»): se respeta la decisión y se acorta la frase. Propuesta: «Comprobado» suma solo lo ya aceptado; los $1,940 en revisión aún no cuentan. (77 caracteres) a `--fs-meta`, o el resto como toggletip (§6.23) sobre el rótulo «Comprobado»."
+    },
+    "por_que_importa": "Es la explicación de por qué «Por comprobar» no baja al subir comprobantes; a 11,5 px y en dos frases se lee como letra pequeña justo donde la cifra necesita contexto."
+   },
+   {
+    "id": "v2-39viatico-05",
+    "severidad": "media",
+    "regla": "§8 Voz de producto (nivel 3: educar sobre un caso que no aplica) · §6.9 Avisos: inline (`.note`) y banda (`.banda`)",
+    "dice_el_sistema": "un aviso de «un comprobante rechazado no se borra» en un registro sin ningún comprobante rechazado",
+    "hay_en_el_build": "`.banda.b-info` con «Un comprobante rechazado no se borra: se conserva con su motivo y su monto vuelve a «por comprobar»» en un viático cuyos tres comprobantes son «En revisión», «En revisión» y «Comprobado»: no hay ninguno rechazado. Además lleva el icono de triángulo (`#i-alert`) sobre una banda neutra, la señal mixta que §6.9 describe.",
+    "selector": ".banda.b-info",
+    "linea": 721,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 721,
+     "cita": "Un comprobante rechazado no se borra"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "La ficha cita el rechazo como decisión de producto (S17(d.2)/(d.3)) pero no pide el aviso fijo. Propuesta: toggletip (§6.23) en la cabecera «Comprobantes» o mostrar el aviso solo cuando exista un comprobante rechazado; si se queda, icono neutro (`i-info`) en vez de triángulo."
+    },
+    "por_que_importa": "Ocupa un bloque de 64 px dentro de la tarjeta de comprobantes con una frase que no describe nada de lo que hay en pantalla: es lo que §8 cita casi literalmente como ejemplo de texto que no debe estar."
+   },
+   {
+    "id": "v2-39viatico-06",
+    "severidad": "media",
+    "regla": "§6.16 Formulario (botón deshabilitado)",
+    "dice_el_sistema": "**Un botón deshabilitado no recibe el foco**, así que quien navega con teclado pasa de largo",
+    "hay_en_el_build": "«Subir comprobante» es `<button class=\"btn\" type=\"button\" disabled aria-describedby=\"pq-subir\">`: atributo `disabled` nativo, y la razón está en `#pq-subir` (3 líneas junto a los botones). El único estilo de bloqueo es `.btn[disabled]`.",
+    "selector": "button[disabled]",
+    "linea": 691,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 691,
+     "cita": "disabled aria-describedby=\"pq-subir\""
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "La ficha decide bien el fondo («el botón de subir salga deshabilitado con su porqué en vez de desaparecer»); falta el mecanismo. Usar `aria-disabled=\"true\"` (manteniendo el foco) y duplicar los estilos de `.btn[disabled]` en `.btn[aria-disabled=\"true\"]`, con el motivo ya enlazado por `aria-describedby`."
+    },
+    "por_que_importa": "Con teclado o lector de pantalla el botón no existe: quien tabula no sabe que hubo una acción de subir ni por qué no está disponible; solo lo lee quien recorre el texto de la cabecera."
+   },
+   {
+    "id": "v2-39viatico-07",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla",
+    "dice_el_sistema": "**El estado va dentro de una tarjeta, no suelto sobre el fondo.**",
+    "hay_en_el_build": "Las vistas vacío y error son `.state` suelto sobre `--bg`: icono de 30px en `--text-3`, sin `.tarjeta-estado` ni medallón, y el título es un `<b>`, no un encabezado (regla 2 de §6.4). Además `.state b{font-size:var(--fs-base)}` alcanza también a los `<b>` de énfasis dentro de los `<p>`: medido con la vista error forzada, `<p>` a 13px y su `<b>` a 14px (estado error de esta pantalla).",
+    "selector": ".state",
+    "linea": 607,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 612,
+     "cita": ".state b{font-size:var(--fs-base)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No crítico y el bloque ARQ-ESTADOS es del cliente. La receta de §6.4 lo resuelve sin tocar el contenido: envolver el contenido de `.state` en `.tarjeta-estado` con medallón sólido, cambiar `<b>` por `<h2>` y acotar el selector a `.state > h2`. Decidir si se adopta la receta del sistema o se documenta el estado plano del cliente."
+    },
+    "por_que_importa": "Sin superficie, un mensaje centrado en una zona de contenido enorme se lee como una pantalla que no terminó de cargar (§6.4), y el énfasis inflado rompe el ritmo de la frase justo en los textos que más se leen el día que algo falla. Mismo bloque en 40, 50, 56 y 57."
+   },
+   {
+    "id": "v2-39viatico-08",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga (`.skel`)",
+    "dice_el_sistema": "**Sin texto real dentro de las barras.**",
+    "hay_en_el_build": "Las barras `.skel` llevan texto dentro (con `color:transparent`, que sigue en el árbol de accesibilidad); el esqueleto mide 404 px frente a los 743 px del estado con datos (medido forzando data-state; §6.7 pide «el mismo alto»); y bajo `prefers-reduced-motion` solo se hace `animation:none`, que congela el degradado en la posición 0 en vez de aplanar el fondo.",
+    "selector": ".skel",
+    "linea": 749,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_estados",
+     "detalle": "script m6/estados.cjs: con #contenido[data-state=loading] se mide .state-loading (404 px frente a los 743 px del estado con datos); texto dentro de las barras leído en el marcado de la línea citada"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Vaciar las barras (el contenedor ya lleva `role=\"status\"` y `aria-label`), dar `min-height` por fila hasta igualar el alto de lo que sustituye (§6.7) y, bajo reduced-motion, `background:var(--surface-2)`."
+    },
+    "por_que_importa": "Al llegar los datos la pantalla salta cientos de píxeles, y un lector de pantalla puede leer el texto de relleno (una «x» o un folio inventado) como si fuera dato. Mismo bloque en 40 y 50."
+   },
+   {
+    "id": "v2-39viatico-09",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla (regla 1)",
+    "dice_el_sistema": "**El cambio se anuncia y mueve el foco.**",
+    "hay_en_el_build": "El conmutador de estados solo hace `cont.setAttribute('data-state',…)`: no hay ningún `aria-live` en la página (medido: ninguno) ni se envía el foco al `<main id=\"contenido\" tabindex=\"-1\">`, que queda preparado sin que nadie lo use.",
+    "selector": "#contenido",
+    "linea": 792,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 792,
+     "cita": "cont.setAttribute('data-state',b.dataset.set);"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "La parte del conmutador es andamio de maqueta, pero es la que se copia al producto: añadir un `<p class=\"sr\" aria-live=\"polite\">` con la frase del estado y `main.focus()` al cambiar, como en el fragmento de §6.4."
+    },
+    "por_que_importa": "Quien usa lector de pantalla no se entera de que la vista pasó de datos a cargando o a error. Mismo bloque en 40, 50, 56 y 57."
+   },
+   {
+    "id": "v2-39viatico-10",
+    "severidad": "media",
+    "regla": "§8 Voz de producto (ningún bloque pasa de ~140 caracteres)",
+    "dice_el_sistema": "**Ningún bloque de texto siempre visible pasa de ~140 caracteres.**",
+    "hay_en_el_build": "Vista vacía: un `<p>` de 251 caracteres en tres frases («La solicitud está aprobada y el dinero entregado, pero nadie ha subido ningún comprobante. El plazo son 3 días hábiles… la semana hábil va de lunes a sábado. Pasado el plazo, esta persona no puede pedir otro viático hasta comprobar.»). Vista error: 174 caracteres. Medido con la vista forzada (m6/estados.cjs: txtLens [251] y [174, 39]).",
+    "selector": ".state p",
+    "linea": 753,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_estados",
+     "detalle": "script m6/estados.cjs: longitud del `<p>` de .state-empty = 251; .state-error = [174, 39]"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "El contenido es de la ficha (S17) y es cierto; la regla pide una frase. Propuesta para el vacío: «Nadie ha subido comprobantes. Plazo: 3 días hábiles desde el regreso.» (69 caracteres) y la mecánica de la semana hábil como toggletip sobre «3 días hábiles»."
+    },
+    "por_que_importa": "La vista vacía de un detalle es la que más se abre por equivocación; tres frases de política la convierten en un texto que se salta."
+   },
+   {
+    "id": "v2-39viatico-11",
+    "severidad": "media",
+    "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional",
+    "dice_el_sistema": "**el relleno de un contenedor lo declara el contenedor**, no el hijo que casualmente va último",
+    "hay_en_el_build": "`.p4` no declara `padding-bottom` (barrido: p4_sin_padding_bottom [311]) y `.p4-t` lleva `padding: sp-3 sp-6 0`; como esta cabecera solo tiene fila de título, el cierre es 0: medido padding-bottom 0 y hueco 0 px entre la última línea de `#pq-subir` (3 líneas) y el borde inferior de la cabecera.",
+    "selector": "header.p4",
+    "linea": 311,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_medir",
+     "detalle": "script m6/medir.cjs: header.p4 bottom 125,25; max bottom de hijos 124,25; borde 1; hueco 0 px; padBottom \"0px\". I2_holgura_inferior del dossier da 0 fallos porque solo mira controles"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Una línea, la que ya prescribe §3.1: `.p4{padding-bottom:var(--sp-3)}`. Causa raíz en la plantilla ARQ-P4 del cliente (el barrido la marca también en 40, 50, 56 y 57), donde hoy la tapan las filas de chips."
+    },
+    "por_que_importa": "El texto de ayuda de la cabecera toca la línea inferior; en el resto de pantallas del paquete el defecto está latente y aparece en cuanto se retira la fila de filtros."
+   },
+   {
+    "id": "v2-39viatico-12",
+    "severidad": "media",
+    "regla": "§12.4.1 La fila de cifras (`.cifras`) · §6.3 Tarjeta (no se anidan tarjetas)",
+    "dice_el_sistema": "Eso es anidar tarjetas, que §6.3 prohíbe.",
+    "hay_en_el_build": "«La cuenta» pone cuatro cifras en `.cg` con `border:1px solid var(--border)`, radio `--r-card` y fondo `--bg` dentro de `.tarjeta`: medido borde 1 px y fondo rgb(242,245,247) sobre una tarjeta de `--surface`, es decir tarjetas dentro de una tarjeta. La cifra va a `--fs-sub` (16px), no al token de cifra.",
+    "selector": ".cg",
+    "linea": 655,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_cg",
+     "detalle": "script m6/m4.cjs: .cg borderTopWidth 1px, backgroundColor rgb(242, 245, 247), anidada en .tarjeta: true, .v font-size 16px"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Es exactamente el caso que §12.4.1 resolvió (≤4 cifras, `subgrid`, relleno `--surface-2`, borde transparente). Propuesta: pasar «La cuenta» a `.cifras` con rótulo + cifra; el rojo de «Por comprobar» se queda en la cifra (ver hallazgo 15)."
+    },
+    "por_que_importa": "Cuatro cajas con borde dentro de una caja con borde compiten con la jerarquía de la propia tarjeta; es una de las pocas pantallas donde el sistema ya tiene un componente hecho para esto."
+   },
+   {
+    "id": "v2-39viatico-13",
+    "severidad": "baja",
+    "regla": "§13.8 Cierre garantizado, no por casualidad",
+    "dice_el_sistema": "Caso real: en Viático detalle, la columna principal (Solicitud + Comprobantes) y la barra lateral",
+    "hay_en_el_build": "`.dosc` usa `align-items:start`; las dos columnas terminan con 29 px de diferencia a 1440 (796 / 825) y 104 px a 1280 (887 / 991). §13.8 cuenta Viático detalle como el caso de `stretch` + `flex:1` con cierre en el mismo píxel.",
+    "selector": ".dosc",
+    "linea": 640,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_columnas",
+     "detalle": "script m6/m4.cjs: colA bottom 796 / colB 825 a 1440; 887 / 991 a 1280; align-items start"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El propio §13.8 limita el mecanismo a diferencias de pocos píxeles; con 29 y 104 px, `align-items:start` es lo correcto. Corregir el sistema: §13.8 ya no debe presentar Viático detalle como cierre garantizado."
+    },
+    "por_que_importa": "El sistema describe como resuelto un caso que esta pantalla no tiene; quien construya la siguiente ficha de detalle copiará el mecanismo equivocado."
+   },
+   {
+    "id": "v2-39viatico-14",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (excepción de 10,5px en mayúsculas)",
+    "dice_el_sistema": "Se admite una excepción, y solo una: 10,5px en mayúsculas con `letter-spacing` para los",
+    "hay_en_el_build": "`.campo .et` y `.cg .et` (13 rótulos de campo: «Quién», «Departamento», «Aprobado», «Por comprobar»…) van a 10,5px, mayúsculas y letter-spacing .07em. §2.1 limita la excepción a los rótulos de grupo del menú y las etiquetas de campo del modo tarjeta de una tabla.",
+    "selector": ".campo .et, .cg .et",
+    "linea": 501,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_medir",
+     "detalle": "script m6/medir.cjs: menor12 → 13 `span.et` a 10,5px con text-transform uppercase («Quién», «Departamento», «Aprobado», «Por comprobar»…)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Dos lecturas: estricta (una ficha de detalle no es «modo tarjeta»: incumple) o amplia (una tarjeta de campos es lo mismo). Propuesta para el sistema: ampliar la excepción a «etiqueta de campo en mayúsculas con letter-spacing» o subirla a 12px; el cliente solo aplicó el criterio que más se parece."
+    },
+    "por_que_importa": "Es la etiqueta de cada dato de la ficha: se lee en cada visita, y el sistema dice «si un dato se lee todos los días, va a 12–13px como mínimo»."
+   },
+   {
+    "id": "v2-39viatico-15",
+    "severidad": "baja",
+    "regla": "§1.3 Semáforo — cinco estados, tres variantes cada uno",
+    "dice_el_sistema": "| `--err` | Falta lo que impide operar |",
+    "hay_en_el_build": "«Por comprobar $1,940» se pinta en `--err-ink` (`.cg.falta .v`) mientras el plazo vence el 17 ago, la cifra son $1,940 de comprobantes ya subidos y en revisión, que la propia pantalla dice que «no cuentan todavía». §1.3 reserva `--warn` para «falta algo, o vence pronto».",
+    "selector": ".cg.falta .v",
+    "linea": 660,
+    "certeza": "inferido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 660,
+     "cita": ".cg.falta .v{color:var(--err-ink)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Pregunta abierta: ¿«falta» sin plazo vencido es `--warn`? Si se pasa a `--warn-ink`, el rojo queda reservado para plazo vencido. No se afirma el defecto: depende de cómo defina producto «impide operar» (el vacío dice que tras el plazo la persona no puede pedir otro viático)."
+    },
+    "por_que_importa": "Un rojo antes de tiempo desgasta la señal del rojo real (plazo vencido); la lectura inversa es que la cifra sí es lo que bloquea un próximo viático."
+   },
+   {
+    "id": "v2-39viatico-16",
+    "severidad": "baja",
+    "regla": "§3 Espaciado y radios (escala base de 4px)",
+    "dice_el_sistema": "Escala base de 4px.",
+    "hay_en_el_build": "I5_ritmo: 4 valores fuera de escala, 116 ocurrencias (6px×36, 9px×36, 3px×30, 5px×14); 3 interlineados distintos (1.25×18, 1.55×6, 1.5×3)",
+    "selector": "(varios)",
+    "linea": null,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I5_ritmo",
+     "detalle": "I5_ritmo: 4 valores fuera de escala, 116 ocurrencias (6px×36, 9px×36, 3px×30, 5px×14); 3 interlineados distintos (1.25×18, 1.55×6, 1.5×3)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El propio sistema usa 3, 5, 6 y 9 px en sus recetas (`.pill` padding:3px 9px, `.ctrl` gap:5px, `.pasos` padding:9px 0, `.it` padding:9px 10px): la escala declarada no describe lo que el sistema dibuja. Documentar esos medios pasos como valores admitidos del cromo en vez de pedir al cliente que los cambie."
+    },
+    "por_que_importa": "No es un fallo visible sino ruido de medición: el instrumento marca cientos de ocurrencias en cada pantalla y tapa las desviaciones que sí importan."
+   },
+   {
+    "id": "v2-39viatico-17",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (excepción de 10,5px en mayúsculas) · §7.2 Cromo de aplicación",
+    "dice_el_sistema": "10,5px en mayúsculas con `letter-spacing` para los **rótulos de grupo** de la barra lateral",
+    "hay_en_el_build": "`.grp` a 10,5px sin `text-transform:uppercase`: «Principal», «Operación», «Trámites vehiculares»… salen en caja mixta (instrumento C2_105_no_mayusculas: 5 fallos; computado: font-size 10,5 y text-transform none).",
+    "selector": ".grp",
+    "linea": 238,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "5 fallos: p.grp «Principal», «Operación», «Trámites vehiculares», «Dirección y Administraci…», «Soporte»"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El `.grp` que el propio §7.2 enseña tampoco lleva `text-transform:uppercase`: el cliente copió el fragmento. Corregir el sistema (añadir uppercase al fragmento de §7.2) o, si se prefiere caja mixta, subir el rótulo a 12px y retirar la excepción; no se le pide nada al cliente."
+    },
+    "por_que_importa": "Los rótulos de grupo salen a 10,5px en caja mixta, justo el tamaño que §2.1 solo admite en mayúsculas: sistema y cliente se contradicen y el defecto se repite en cada pantalla con este cromo."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "La composición de la ficha (identidad arriba, cuenta y bitácora al lado, comprobantes con su estado) es clara y el estado «disabled con porqué» es una buena decisión de producto. Lo que la baja: dos críticos medidos de cromo/enlace, el isotipo recortado, un párrafo a 11,5 px y la plantilla de estados sin tarjeta. Contraste 0 fallos en claro y oscuro (99 nodos cada uno). Rendimiento no evaluado (no se midió).",
+  "evidencia": [
+   "contraste claro/oscuro 0 fallos (dossier)",
+   "anchos 1440/1280/1024 sin scroll horizontal ni nodos fuera del borde",
+   "tactil_bajo24: 1 de 23",
+   "menu_1000px: 15 de 15 sin nombre",
+   "captura 39_viatico_detalle--1440.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Separador de migas: la miga usa una flecha hacia abajo (`#i-down`) entre «Viáticos» y el folio.",
+   "propuesta_de_regla": "Las migas separan niveles con un chevron hacia la derecha de 13px en `--text-3`, `aria-hidden`; una flecha hacia abajo significa «ordenar» o «descargar» en el resto del sistema."
+  },
+  {
+   "patron": "Lista de comprobantes (`.comps`): fila con miniatura de 44px, título, metadatos, monto a la derecha y estado debajo del monto.",
+   "propuesta_de_regla": "Una lista de documentos con estado por línea no es una tabla densa: una fila por documento, miniatura de 44px, título en `--fs-dense` 600, metadatos en `--fs-meta` `--text-3`, monto y `.pill` alineados a la derecha; el estado nunca solo por color."
+  }
+ ],
+ "sin_datos": [
+  "No evaluado: modo tarjeta y cajón (<860 px). El dossier mide 1440/1280/1024 y las capturas son 1440 y 1280 (primer pliegue); no se revisó ningún ancho menor.",
+  "No evaluado: capturas del tema oscuro. El contraste oscuro se midió (0 fallos, 99 nodos) pero no se miró la pantalla en oscuro.",
+  "No evaluado: estados hover/foco/activo; solo se forzaron los cuatro estados de datos. Rendimiento no evaluado.",
+  "La cabecera repite el motivo del bloqueo dos veces (texto junto a los botones, `#pq-subir`, y la banda amarilla de debajo): no hay § que lo prohíba, queda como observación de diseño.",
+  "En la vista error la cabecera sigue mostrando el estado «Aprobado, comprobado a medias» y los botones del viático que no cargó: es consecuencia de que el andamio solo cambia `<main>`; no se trata como defecto.",
+  "Las fuentes reales (Inter, Michroma) se inyectaron al renderizar; esta pantalla sí declara `@font-face` con ruta relativa que no existe en el paquete."
+ ]
+}

@@ -1,0 +1,497 @@
+{
+ "pantalla": "50_compras_almacen",
+ "tier": "B",
+ "modo": "cumplimiento",
+ "sha256": "252d6214c3c4a170f44d16cedf09b488ea4f761c258f3fda73e46bac14e61b6a",
+ "estado_vs_pdf": "alineado",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error"
+ ],
+ "capturas": [
+  "50_compras_almacen--1440.png",
+  "50_compras_almacen--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-50compras-01",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles",
+    "dice_el_sistema": "Y los enlaces que son el elemento primario de su fila (un folio, una miga, «Ver en Maps») no son texto en prosa: llevan padding hasta llegar a 24px.",
+    "hay_en_el_build": "Los cinco folios (`a.folio`, «CO-202608-0148»…) miden 119×16 px: son 5 de los 6 destinos bajo 24 px (tactil_bajo24: 6 de 43). `.folio` aquí no declara `display:inline-flex` ni `min-height:24px`; 39 y 40 sí los llevan en el mismo bloque.",
+    "selector": "a.folio",
+    "linea": 381,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil_bajo24",
+     "detalle": "6 de 43 bajo 24 px: 5 × a.folio 119×16 (CO-202608-0148, -0151, -0147, -0144, -0139) y el input de búsqueda 329×16 (dossier)"
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino táctil < 24 px medido (criterio 1). Una línea: añadir `display:inline-flex;align-items:center;min-height:24px` a `.folio`, igual que en 39 y 40."
+    },
+    "por_que_importa": "El folio es lo que identifica cada compra y por donde se abre: es el destino más pulsado de la tabla y mide 16 px de alto."
+   },
+   {
+    "id": "v2-50compras-02",
+    "severidad": "alta",
+    "regla": "§10 Diez trampas comprobadas (el destino táctil es la región que acepta la pulsación) · §7.3 Objetivos táctiles",
+    "dice_el_sistema": "un campo de búsqueda dentro de un `<div>` con forma de pastilla **no** cumple, porque pulsar la pastilla no hace nada",
+    "hay_en_el_build": "`<div class=\"search\">` (380×34) contiene `<input id=\"buscar\" type=\"search\">` de 329×16, el sexto destino bajo 24 px. El contenedor es un DIV, no una `<label for>`; el input ya tiene `aria-label`.",
+    "selector": ".search input",
+    "linea": 670,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil_bajo24",
+     "detalle": "input type=search «Buscar compras de almacé…», 329×16; script propio m6/m2.cjs: pastilla [380,34], tag DIV"
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino táctil < 24 px medido (criterio 1). Una línea: `<div class=\"search\">` → `<label class=\"search\" for=\"buscar\">`. Mismo `.search` que en 40."
+    },
+    "por_que_importa": "Quien pulsa en la pastilla no consigue escribir; hay que acertar a una franja de 16 px."
+   },
+   {
+    "id": "v2-50compras-03",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (modo colapsado) · §6.5 Iconos",
+    "dice_el_sistema": "En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+    "hay_en_el_build": "A 1000 px el `.side` pasa a 64 px y `.side .et` se oculta con display:none: 15 de 15 enlaces `.it` quedan sin nombre accesible (instrumento menu_1000px: total 15, sinNombre 15). Comprobado además con script propio a 1000×800: innerText vacío y sin aria-label ni title en los 15.",
+    "selector": ".side .et",
+    "linea": 288,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "menu_1000px",
+     "detalle": "total 15, sinNombre 15, anchoSide 64 (dossier); script propio m6/medir.cjs a 1000×800: [innerText, aria-label, title] = [\"\",null,null] en los 15 `.side .it`"
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1 de la regla 1). Arreglo de una línea que no cambia el diseño: en vez de `display:none` sobre `.side .et`, aplicarle la receta `.sr` que el propio archivo ya declara (recorte de 1 px), o añadir `title` y `aria-label` a cada `.it`; `.grp` y `.wordmark` pueden seguir ocultos. Con `title` se cumple además lo que §7.2 pide («etiqueta emergente»)."
+    },
+    "por_que_importa": "Entre 860 y 1100 px (portátil con la ventana partida, tableta apaisada) toda la navegación es una columna de iconos sin nombre: un lector de pantalla anuncia 15 veces «enlace» y quien ve la pantalla no tiene ni etiqueta emergente. Mismo bloque ARQ-CROMO que en 39, 40, 56 y 57."
+   },
+   {
+    "id": "v2-50compras-04",
+    "severidad": "alta",
+    "regla": "§10 Diez trampas comprobadas (un `<symbol>` ya trae su `viewBox`) · §1.2.1 Logotipo: uso y restricciones",
+    "dice_el_sistema": "repetirlo en el `<svg>` que lo invoca descoloca la marca",
+    "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>` con el `<symbol>` ya declarado con ese mismo viewBox: la caja del `<use>` empieza en x=63,5 y la del `<svg>` en x=96, un desfase de −32,5 px (medido a 1440×900). En la captura el isotipo del cromo es una hoja estrecha recortada, no la «Λ» completa. El botón flotante repite el patrón (`<svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\">`; no se midió por separado).",
+    "selector": ".side .logo svg",
+    "linea": 656,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_logo",
+     "detalle": "script m6/medir.cjs: `.logo svg` x=96 w=44; su `<use>` x=63,5 w=43; svgViewBox \"740 0 970 932\", `<use>` sin width"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No entra en los 4 criterios críticos, así que no se exige. Arreglo propuesto de una línea, la receta del propio §10: quitar el `viewBox` del `<svg>` y poner las medidas en el `<use>` (`<use href=\"#dproma-mark\" width=\"44\" height=\"42\"/>`). Mejora la marca en todas las pantallas del paquete que copien este cromo."
+    },
+    "por_que_importa": "La marca de la aplicación, visible en cada pantalla, no se reconoce: §1.2.1 prohíbe deformar o recortar el isotipo oficial. Es el mismo bloque de cromo que en 39, 40, 56 y 57; en 10_dprimi_asistente el `<use>` lleva sus medidas y el isotipo sale completo."
+   },
+   {
+    "id": "v2-50compras-05",
+    "severidad": "media",
+    "regla": "§7.3 Objetivos táctiles (44px si el uso es en campo o tableta)",
+    "dice_el_sistema": "y 44px si es la acción principal de la pantalla o el uso es en campo o tableta.",
+    "hay_en_el_build": "La ficha clasifica la pantalla como «Pantalla de calle» («se coteja lo pedido contra lo recibido, renglón por renglón»), pero la acción principal de cada fila, «Revisar y decidir», es `.btn.mini` de 28 px (`min-height:28px`), y la página no activa `data-tacto=\"dedo\"` (dossier: dataTacto null), de modo que el bloque `:root[data-tacto=\"dedo\"] .btn{min-height:46px}` no actúa.",
+    "selector": ".btn.mini",
+    "linea": 323,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil_bajo24",
+     "detalle": "mediciones_v2.tactil_bajo24.dataTacto: null; reglaTactoSinRoot: 0 (la regla existe y lleva :root, pero nada pone data-tacto)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Decidir si la pantalla es de campo: si lo es, la acción primaria sube a `.btn` sin `.mini` (36 px) o a 44 px y la página arranca con `data-tacto=\"dedo\"`; si es de oficina, corregir la ficha. Ver sin_datos: la ficha y el archivo describen cosas distintas."
+    },
+    "por_que_importa": "Quien decide una compra de 48 mil pesos desde la calle lo haría con un botón de 28 px de alto y un enlace de 16 px."
+   },
+   {
+    "id": "v2-50compras-06",
+    "severidad": "media",
+    "regla": "§6.11 Tabla densa (regla 11: si la fila entera navega, nada más repite esa acción)",
+    "dice_el_sistema": "**Si la fila entera navega, nada más dentro de ella repite esa acción.**",
+    "hay_en_el_build": "Cada folio es `<a class=\"folio\" href=\"#\">` (abre la compra) y tres filas añaden además `<button class=\"btn mini\">Ver</button>`; la `.nota` de pie existe para explicar por qué en la compra propia solo aparece «Ver».",
+    "selector": "td .btn.mini",
+    "linea": 685,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 685,
+     "cita": "<button class=\"btn mini\" type=\"button\">Ver</button>"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Quitar «Ver» (el folio ya abre) y, con él, la `.nota`: las filas pendientes conservan «Revisar y decidir» y la propia queda sin botón, que es justo lo que la nota explica. La pantalla pierde una frase de justificación y un botón por fila."
+    },
+    "por_que_importa": "Dos formas de hacer lo mismo y una frase para disculpar la segunda: ruido en cada fila que no decide nada."
+   },
+   {
+    "id": "v2-50compras-07",
+    "severidad": "media",
+    "regla": "§11 Checklist al añadir un componente nuevo (color + icono + texto)",
+    "dice_el_sistema": "¿Un estado se comunica con color **+ icono + texto**, nunca con color solo?",
+    "hay_en_el_build": "`.espera.mucho b{color:var(--err-ink)}`: «4 d» se distingue de «1 d» solo por el rojo (mismo tamaño y peso, sin icono); la regla de «más de 3 días» solo se explica en el chip de arriba.",
+    "selector": ".espera.mucho b",
+    "linea": 645,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 645,
+     "cita": ".espera.mucho b{color:var(--err-ink)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Anteponer el icono `#i-alertc` que ya usa el chip «esperando más de 3 días» a la cifra roja."
+    },
+    "por_que_importa": "Para quien no distingue el rojo (o imprime en gris) la cifra urgente es una cifra más."
+   },
+   {
+    "id": "v2-50compras-08",
+    "severidad": "media",
+    "regla": "§2 Tipografía (D116: fuentes autoalojadas)",
+    "dice_el_sistema": "**Ese `@font-face` no es opcional.**",
+    "hay_en_el_build": "El archivo no declara ningún `@font-face` ni enlaza fuentes (barrido: font_face 0, google_fonts_link vacío) pero `--font-ui` es `'Inter'` y `--font-brand` `'Michroma'`: sin la fuente inyectada al renderizar, la pantalla cae a `system-ui` sin ningún aviso.",
+    "selector": ":root{--font-ui}",
+    "linea": 10,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 10,
+     "cita": "--font-ui: 'Inter'"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No crítico. Añadir los dos `@font-face` de §2 (rutas `../../apps/web/public/fuentes/…`, como ya hacen 39 y 40) es una edición de dos líneas y hace que el 404 de una fuente sea visible en la pestaña de red en vez de un cambio de tipografía silencioso."
+    },
+    "por_que_importa": "Lo medido y capturado aquí lleva Inter porque se inyectó al renderizar (no viene en el paquete): sin `@font-face` la pantalla real depende de que la fuente exista por otro lado. §2 documenta una incidencia real de 4 días sin detección por exactamente esto. Mismo defecto en 56 y 57 (39 y 40 sí los declaran)."
+   },
+   {
+    "id": "v2-50compras-09",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla",
+    "dice_el_sistema": "**El estado va dentro de una tarjeta, no suelto sobre el fondo.**",
+    "hay_en_el_build": "Las vistas vacío y error son `.state` suelto sobre `--bg`: icono de 30px en `--text-3`, sin `.tarjeta-estado` ni medallón, y el título es un `<b>`, no un encabezado (regla 2 de §6.4). Además `.state b{font-size:var(--fs-base)}` alcanza también a los `<b>` de énfasis dentro de los `<p>`: medido con la vista error forzada, `<p>` a 13px y su `<b>` a 14px (estado error de esta pantalla).",
+    "selector": ".state",
+    "linea": 604,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 609,
+     "cita": ".state b{font-size:var(--fs-base)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No crítico y el bloque ARQ-ESTADOS es del cliente. La receta de §6.4 lo resuelve sin tocar el contenido: envolver el contenido de `.state` en `.tarjeta-estado` con medallón sólido, cambiar `<b>` por `<h2>` y acotar el selector a `.state > h2`. Decidir si se adopta la receta del sistema o se documenta el estado plano del cliente."
+    },
+    "por_que_importa": "Sin superficie, un mensaje centrado en una zona de contenido enorme se lee como una pantalla que no terminó de cargar (§6.4), y el énfasis inflado rompe el ritmo de la frase justo en los textos que más se leen el día que algo falla. Mismo bloque en 39, 40, 56 y 57."
+   },
+   {
+    "id": "v2-50compras-10",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga (`.skel`)",
+    "dice_el_sistema": "**Sin texto real dentro de las barras.**",
+    "hay_en_el_build": "Las barras `.skel` llevan texto dentro (con `color:transparent`, que sigue en el árbol de accesibilidad); el esqueleto mide 140 px frente a los 333 px de la tabla (658 px el estado con datos) (medido forzando data-state; §6.7 pide «el mismo alto»); y bajo `prefers-reduced-motion` solo se hace `animation:none`, que congela el degradado en la posición 0 en vez de aplanar el fondo.",
+    "selector": ".skel",
+    "linea": 725,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_estados",
+     "detalle": "script m6/estados.cjs: con #contenido[data-state=loading] se mide .state-loading (140 px frente a los 333 px de la tabla (658 px el estado con datos)); texto dentro de las barras leído en el marcado de la línea citada"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Vaciar las barras (el contenedor ya lleva `role=\"status\"` y `aria-label`), dar `min-height` por fila hasta igualar el alto de lo que sustituye (§6.7) y, bajo reduced-motion, `background:var(--surface-2)`."
+    },
+    "por_que_importa": "Al llegar los datos la pantalla salta cientos de píxeles, y un lector de pantalla puede leer el texto de relleno (una «x» o un folio inventado) como si fuera dato. Mismo bloque en 39 y 40."
+   },
+   {
+    "id": "v2-50compras-11",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla (regla 1)",
+    "dice_el_sistema": "**El cambio se anuncia y mueve el foco.**",
+    "hay_en_el_build": "El conmutador de estados solo hace `cont.setAttribute('data-state',…)`: no hay ningún `aria-live` en la página (medido: ninguno) ni se envía el foco al `<main id=\"contenido\" tabindex=\"-1\">`, que queda preparado sin que nadie lo use.",
+    "selector": "#contenido",
+    "linea": 768,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 768,
+     "cita": "cont.setAttribute('data-state',b.dataset.set);"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "La parte del conmutador es andamio de maqueta, pero es la que se copia al producto: añadir un `<p class=\"sr\" aria-live=\"polite\">` con la frase del estado y `main.focus()` al cambiar, como en el fragmento de §6.4."
+    },
+    "por_que_importa": "Quien usa lector de pantalla no se entera de que la vista pasó de datos a cargando o a error. Mismo bloque en 39, 40, 56 y 57."
+   },
+   {
+    "id": "v2-50compras-12",
+    "severidad": "media",
+    "regla": "§8 Voz de producto (ningún bloque pasa de ~140 caracteres)",
+    "dice_el_sistema": "**Ningún bloque de texto siempre visible pasa de ~140 caracteres.**",
+    "hay_en_el_build": "Vista vacía: `<p>` de 223 caracteres en tres frases («La bandeja está limpia. Es la situación buena, no un fallo de la pantalla… quita el filtro de «por autorizar» para verla.»). Vista error: 207 caracteres. Medido con la vista forzada.",
+    "selector": ".state p",
+    "linea": 729,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_estados",
+     "detalle": "script m6/estados.cjs: .state-empty txtLens [223]; .state-error [207, 39]"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Propuesta de una frase para el vacío: «No hay compras esperando decisión. Quita el filtro para ver las decididas.» (74 caracteres). El aviso del error («comprueba que quedó guardada antes de avisarle al proveedor») es lo valioso y cabe solo."
+    },
+    "por_que_importa": "La vista vacía es una buena noticia; tres frases para decir «todo bien» la convierten en lectura obligada."
+   },
+   {
+    "id": "v2-50compras-13",
+    "severidad": "media",
+    "regla": "§6.12 Resumen de estatus y barra de filtros (regla 8)",
+    "dice_el_sistema": "**Un control con pinta de interactivo tiene que interactuar.**",
+    "hay_en_el_build": "Cuatro `.schip` con `aria-pressed=\"false\"` y `data-f` sin ningún manejador (`data-f` solo aparece en el marcado; el único `<script>` atiende el andamio, el tema y el menú). Lo mismo con el conmutador de densidad `.seg`.",
+    "selector": ".schip",
+    "linea": 671,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 671,
+     "cita": "class=\"schip c-warn\" type=\"button\" aria-pressed=\"false\" data-f=\"warn\""
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "En maqueta sin lógica de filtrado, §6.12 pide presentarlos como cifra de lectura (sin `aria-pressed` ni puntero); y §6.11 regla 6 pregunta primero si hace falta ofrecer densidad en 5 filas."
+    },
+    "por_que_importa": "Controles que parecen filtros y no filtran; en una pantalla de decisión la confusión es sobre qué se está mirando."
+   },
+   {
+    "id": "v2-50compras-14",
+    "severidad": "baja",
+    "regla": "§6.12 Resumen de estatus y barra de filtros (regla 6: el resumen no sobrevive a su propio filtro)",
+    "dice_el_sistema": "**El resumen no sobrevive a su propio filtro.**",
+    "hay_en_el_build": "`.resumen` del título («3 esperan decisión · 1 lleva 4 días») repite las cifras de los chips de debajo («3 por autorizar», «1 esperando más de 3 días») con otras palabras: «lleva 4 días» y «más de 3 días» son la misma compra descrita con dos umbrales.",
+    "selector": ".resumen",
+    "linea": 669,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 669,
+     "cita": "<span class=\"resumen\"><b>3</b> esperan decisión · <b>1</b> lleva 4 días</span>"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Dejar el título solo con el nombre de la pantalla o con un total, y las condiciones en los chips."
+    },
+    "por_que_importa": "Cuatro cifras para dos hechos; quien suma tres y cuatro duda de cuál es la compra atrasada."
+   },
+   {
+    "id": "v2-50compras-15",
+    "severidad": "baja",
+    "regla": "§1.1 Superficies y texto (`--surface`: superficie sólida de tablas)",
+    "dice_el_sistema": "Superficie sólida (tarjetas, tablas, botones)",
+    "hay_en_el_build": "Cabecera y primera columna anclada («Folio») llevan `--surface` y las celdas del cuerpo no tienen fondo: se ve `--bg` (#F2F5F7) detrás, así que la columna anclada se lee más clara que el resto (captura 1440).",
+    "selector": "tbody th:first-child",
+    "linea": 407,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 407,
+     "cita": "tbody th:first-child,thead th:first-child{position:sticky;left:0;z-index:6;background:var(--surface)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Misma causa que en 40: la receta de §6.11 deja `.tabla-caja` sin fondo; corregir el sistema (`.tabla-caja{background:var(--surface)}`)."
+    },
+    "por_que_importa": "La banda clara de la columna ancla se lee como otra superficie, no como columna fija."
+   },
+   {
+    "id": "v2-50compras-16",
+    "severidad": "baja",
+    "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional",
+    "dice_el_sistema": "**el relleno de un contenedor lo declara el contenedor**, no el hijo que casualmente va último",
+    "hay_en_el_build": "`.p4` no declara `padding-bottom` (barrido: p4_sin_padding_bottom [308]); aquí lo cierra la fila de chips `.p4-f`. Latente.",
+    "selector": "div.p4",
+    "linea": 308,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 308,
+     "cita": ".p4{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Una línea: `.p4{padding-bottom:var(--sp-3)}` (ya se ve en 39)."
+    },
+    "por_que_importa": "Sin efecto visible hoy; es la causa del hueco que sí se ve en 39."
+   },
+   {
+    "id": "v2-50compras-17",
+    "severidad": "baja",
+    "regla": "§3 Espaciado y radios (escala base de 4px)",
+    "dice_el_sistema": "Escala base de 4px.",
+    "hay_en_el_build": "I5_ritmo: 5 valores fuera de escala, 150 ocurrencias (6px×70, 9px×36, 5px×24, 3px×12, 7px×8); 4 interlineados distintos (1.25×18, 1.4×5, 1.55×2, 1.5×1)",
+    "selector": "(varios)",
+    "linea": null,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I5_ritmo",
+     "detalle": "I5_ritmo: 5 valores fuera de escala, 150 ocurrencias (6px×70, 9px×36, 5px×24, 3px×12, 7px×8); 4 interlineados distintos (1.25×18, 1.4×5, 1.55×2, 1.5×1)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El propio sistema usa 3, 5, 6 y 9 px en sus recetas (`.pill` padding:3px 9px, `.ctrl` gap:5px, `.pasos` padding:9px 0, `.it` padding:9px 10px): la escala declarada no describe lo que el sistema dibuja. Documentar esos medios pasos como valores admitidos del cromo en vez de pedir al cliente que los cambie."
+    },
+    "por_que_importa": "No es un fallo visible sino ruido de medición: el instrumento marca cientos de ocurrencias en cada pantalla y tapa las desviaciones que sí importan."
+   },
+   {
+    "id": "v2-50compras-18",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (excepción de 10,5px en mayúsculas) · §7.2 Cromo de aplicación",
+    "dice_el_sistema": "10,5px en mayúsculas con `letter-spacing` para los **rótulos de grupo** de la barra lateral",
+    "hay_en_el_build": "`.grp` a 10,5px sin `text-transform:uppercase`: «Principal», «Operación», «Trámites vehiculares»… salen en caja mixta (instrumento C2_105_no_mayusculas: 5 fallos; computado: font-size 10,5 y text-transform none).",
+    "selector": ".grp",
+    "linea": 235,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "5 fallos: p.grp «Principal», «Operación», «Trámites vehiculares», «Dirección y Administraci…», «Soporte»"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El `.grp` que el propio §7.2 enseña tampoco lleva `text-transform:uppercase`: el cliente copió el fragmento. Corregir el sistema (añadir uppercase al fragmento de §7.2) o, si se prefiere caja mixta, subir el rótulo a 12px y retirar la excepción; no se le pide nada al cliente."
+    },
+    "por_que_importa": "Los rótulos de grupo salen a 10,5px en caja mixta, justo el tamaño que §2.1 solo admite en mayúsculas: sistema y cliente se contradicen y el defecto se repite en cada pantalla con este cromo."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "La tabla es legible y honesta con la tarea: importe a la derecha, la compra propia marcada «la pediste tú», y solo las pendientes llevan botón verde; a 1280 px cabe sin scroll y a 1024 desplaza con la primera columna anclada (D-6). Lo que baja la nota: tres destinos críticos (5 folios y el buscador), el menú colapsado sin nombre, isotipo recortado y ausencia de `@font-face`. Contraste 0 fallos en claro y oscuro (93 nodos).",
+  "evidencia": [
+   "contraste claro/oscuro 0 fallos (dossier)",
+   "anchos: 1280 y 1440 sin scroll; 1024 dx 59 (intencional, D-6)",
+   "tactil_bajo24: 6 de 43",
+   "menu_1000px: 15 de 15 sin nombre",
+   "barrido font_face 0",
+   "captura 50_compras_almacen--1440.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Marca de pertenencia en la celda de persona: «la pediste tú» (`.mia`), pastilla discontinua en mayúsculas con borde `--border-2`.",
+   "propuesta_de_regla": "Una marca de pertenencia («tuyo», «pediste tú») es una etiqueta sin juicio: borde discontinuo, `--text-3`, sin color de estado y sin icono; nunca en mayúsculas de 12px sostenidas."
+  },
+  {
+   "patron": "Antigüedad de espera con umbral: «Lleva esperando» con cifra y fecha, cifra roja pasados 3 días.",
+   "propuesta_de_regla": "Un umbral de espera se marca con icono + color + texto (la cifra roja sola no basta) y el umbral se declara una vez, en el chip que lo filtra."
+  }
+ ],
+ "sin_datos": [
+  "La ficha describe «Pantalla de calle… se coteja lo pedido contra lo recibido, renglón por renglón» y «Qué se compara al recibir», pero el archivo es una bandeja de autorización (folio, proveedor, importe, quién la pide, espera, estado); no hay columnas de pedido contra recibido. No se evalúa lo que la ficha dice y el archivo no muestra: se señala la discrepancia entre ficha y build.",
+  "No evaluado: la pantalla de revisión que abre «Revisar y decidir»; es una acción de dinero (autorizar una compra) pero la protección (confirmación, a quién afecta) no está dibujada, así que no se puede aplicar el criterio 3.",
+  "No evaluado: modo tarjeta y cajón (<860 px) y tema oscuro visual (se midió el contraste, 0 fallos). Estados hover/foco y rendimiento tampoco.",
+  "Falsos positivos del instrumento I3 (`caption`, `span.sr`) no se tratan como hallazgo.",
+  "Las fuentes reales (Inter, Michroma) se inyectaron al renderizar: las capturas llevan Inter aunque el archivo no la declare (ver hallazgo 08)."
+ ]
+}
