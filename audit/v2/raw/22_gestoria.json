@@ -1,0 +1,509 @@
+{
+ "pantalla": "22_gestoria",
+ "tier": "B",
+ "sha256": "2225d311b5e97cf4ad24fb5d021916b3c54728e5b632f05a6d78d786123f61a2",
+ "estado_entrega": "modificada",
+ "estado_vs_pdf": "NO_ALINEADO",
+ "estados_auditados": [
+  "ok",
+  "error",
+  "vacio (solo por el andamio de demo)",
+  "cargando (solo leído en código)"
+ ],
+ "capturas": [
+  "22_gestoria--1280-fold.png",
+  "22_gestoria--1440.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 1,
+   "texto_usuario": "Estado de error de gestoría (22 ó 32, por confirmar): icono gris sobre el botón verde «Reintentar».",
+   "veredicto": "confirmada",
+   "evidencia": [
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "I1_icono_vs_boton",
+      "detalle": "[I1_icono_vs_boton (brief)] botón «Reintentar» (button.btn.p, enEstado:true): colorIcono rgb(102,113,127), colorTexto rgb(247,250,249), fondo rgb(62,122,76), ratio icono/fondo 1,03 (mínimo 3:1)"
+     },
+     "dato": "El icono de «Reintentar» es gris (rgb 102,113,127) sobre el relleno verde: 1,03:1 en claro; en oscuro 1,31:1 (rgb 139,150,166 sobre 74,143,90). El texto del mismo botón es rgb(247,250,249) a 4,89:1. Es el síntoma que describe la persona."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 609,
+      "cita": ".state .ico{width:30px;height:30px;color:var(--text-3)}"
+     },
+     "dato": "Causa raíz confirmada: la regla descendiente `.state .ico` (línea 609) alcanza al `<svg class=\"ico ico-sm\">` que está dentro de `.state .acc .btn.p` y lo tiñe con `--text-3`; por especificidad (0,2,0 contra `.ico-sm` 0,1,0) también lo agranda a 30×30 px y el botón sube a 48 px de alto."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio:aud-b/fix.cjs",
+      "detalle": "[script aud-b/fix.cjs] se cambia el selector de la regla a `.state > .ico` en memoria y se vuelve a leer el botón de Reintentar"
+     },
+     "dato": "Con `.state > .ico` (C3 del PDF; sistema §1.4.1 y §6.4 regla 6): icono rgb(247,250,249) sobre rgb(62,122,76) = 4,89:1 en claro; rgb(8,18,13) sobre rgb(74,143,90) = 4,87:1 en oscuro; icono 13×13 px; botón 34 px. El icono grande del estado (30 px, hijo directo) no cambia."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 746,
+      "cita": "data-andamio"
+     },
+     "dato": "Alcance: el estado de error solo se activa con el andamio de demo (`<div class=\"demo\" data-andamio>` línea 746; su manejador fija `main#contenido[data-state]`, línea 772). El resto del script no tiene ninguna ruta que lo dispare (ni fetch ni temporizador). En producto lo dispararía el código de la aplicación; la regla CSS que causa el defecto sí viaja a producción."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 738,
+      "cita": "No se pudo cargar la bandeja de gestoría"
+     },
+     "dato": "Atribución: ambos estados de error (22 y 32) producen exactamente el mismo síntoma. Por texto, el que dice «gestoría» es el de 22 («No se pudo cargar la bandeja de gestoría», línea 738; el de 32 dice «…de trámites CFE»). No tengo la captura de la persona: esto es indicio por el rótulo, no prueba."
+    }
+   ],
+   "causa_raiz": "Regla de contexto descendiente `.state .ico{...color:var(--text-3)}` (línea 609) en lugar del hijo directo `.state > .ico`: el icono pequeño del `.btn.p` hereda el gris del icono grande del estado. Es el defecto de sistema documentado en §1.4.1 y §6.4 regla 6.",
+   "solucion_propuesta": "Cambiar el selector de la línea 609 a `.state > .ico{width:30px;height:30px;color:var(--text-3)}`. Sin otro cambio el icono del botón vuelve a `currentColor` (= --accent-ink, el «blanco» del botón, #F7FAF9; en oscuro #08120D) y recupera 13 px. Para evitar recaer: añadir `--on-state` (§1.4.1) y que `.btn.p .ico{color:inherit}`.",
+   "tipo_de_cambio": "sencillo",
+   "critico": {
+    "es": true,
+    "criterio": 1
+   },
+   "decision": {
+    "valor": "exigir_cambio",
+    "motivo": "Aplica C3: `.state > .ico`. Es crítico por criterio 1 y es un cambio que el propio cliente declara haber hecho (PDF C3), así que lo recibido no coincide con lo declarado."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-22gest-01",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado (regla 6) + §6.2 + §1.4.1",
+    "dice_el_sistema": "«`.state .ico` apunta solo al ícono grande, nunca a los de sus botones» (§6.4 regla 6); «La regla es `.state > .ico`» (§1.4.1); «Un icono dentro de un botón hereda el color del botón» (§6.2)",
+    "hay_en_el_build": "`.state .ico{width:30px;height:30px;color:var(--text-3)}` (selector descendiente, línea 609). Con main[data-state=error]: el icono del botón «Reintentar» (`.btn.p`, fondo rgb(62,122,76)) sale rgb(102,113,127): 1,03:1 en claro; en oscuro rgb(139,150,166) sobre rgb(74,143,90): 1,31:1 (medición propia). Además la misma regla le da 30×30 px al icono del botón (debe ser 13 por `.ico-sm`) y el botón crece a 48 px de alto (34 px con el arreglo). El texto del mismo botón sí cumple: 4,89:1. El estado vacío tiene el mismo defecto en «Quitar todos los filtros».",
+    "selector": ".state .ico  (alcanza a .state .acc .btn.p .ico)",
+    "linea": 609,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I1_icono_vs_boton",
+     "detalle": "[I1_icono_vs_boton (brief) + script aud-b/err.cjs] I1: botón «Reintentar» colorIcono rgb(102,113,127) vs fondo rgb(62,122,76) ratio 1,03 (enEstado:true). err.cjs fuerza main#contenido[data-state=error] y lee getComputedStyle: icoW=30, btnH=48, ratio icono/fondo 1,03 claro y 1,31 oscuro; con `.state > .ico` inyectado (aud-b/fix.cjs): icono rgb(247,250,249)/rgb(8,18,13), 13 px, botón 34 px"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Contraste de elemento gráfico < 3:1 medido (criterio 1). Además es C3 del propio PDF del cliente («.state > .ico», 44 pantallas) y este archivo no lo contiene: pedirlo no es un cambio nuevo sino aplicar lo declarado. Arreglo de una línea, verificado inyectándolo."
+    },
+    "por_que_importa": "No aplicado (el PDF declara C3 para esta pantalla), no regresión: la regla ya estaba así en v1 pero v1 no medía iconos dentro de botones. En el estado de error, justo donde la persona necesita actuar, el icono de «Reintentar» es casi invisible y el botón se ve desproporcionado (48 px). El texto sigue legible, de modo que no bloquea la tarea; sí incumple 3:1 de elemento gráfico."
+   },
+   {
+    "id": "v2-22gest-02",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (modo colapsado) + criterio de accesibilidad: control sin nombre accesible",
+    "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.»",
+    "hay_en_el_build": "`.side .et,.grp,.side .wordmark{display:none}` dentro de @media (min-width:860.02px) and (max-width:1100px) (línea 288). A 1000 px los 15 `<a class=\"it\">` quedan solo con `<svg aria-hidden>`: sin texto, sin aria-label ni title; el árbol de accesibilidad muestra `link:` vacío (Playwright ariaSnapshot). En v1 esta misma pantalla ocultaba el rótulo con la técnica visualmente-oculto (`.side .et{position:absolute;width:1px;height:1px;...clip:rect(0 0 0 0)}`, v1flat/22_gestoria.html:289), que conserva el nombre accesible: v2 lo cambió a display:none.",
+    "selector": ".side .et",
+    "linea": 288,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio:aud-b/menu.cjs",
+     "detalle": "[menu_1000px (brief) + script aud-b/menu.cjs] brief: hayMenu:true, total:15, sinNombre:15, anchoSide:64. menu.cjs a 1000x800: 15 .it, 0 con title, 0 con aria-label, .et display:none, ariaSnapshot = `link:` sin nombre"
+    },
+    "estado_vs_v1": "regresion",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1), y en 22 además es regresión respecto a v1. Arreglo mínimo: sustituir display:none por la técnica de v1 (visualmente oculto) y añadir title/aria-label o etiqueta emergente que exige §7.2."
+    },
+    "por_que_importa": "Entre 860 y 1100 px (portátil pequeño, ventana partida) la navegación son 15 iconos que un lector de pantalla anuncia como «enlace» sin nombre. Es regresión: v1 lo hacía bien en esta pantalla. Es la plantilla de cromo común: probablemente afecta a todas las pantallas del paquete que la copian."
+   },
+   {
+    "id": "v2-22gest-03",
+    "severidad": "alta",
+    "regla": "§13.3 Un contenedor no cede el ancho a un descendiente + decisión del cliente de v1 «Acciones sin cortar»",
+    "dice_el_sistema": "§13.3: «Un contenedor no cede el ancho a un descendiente»; el propio v1 del cliente documentaba el objetivo: «Acciones sin cortar: a 1366 px la tabla llenaba justo y a menos ancho la columna se iba tras el scroll» (v1flat/22_gestoria.html:414)",
+    "hay_en_el_build": "`.gest table{min-width:1080px}` (línea 638) dentro de `.tabla-caja{overflow-x:auto}`. Medido: a 1280 px la caja visible mide 1044 px y la tabla 1080 px; los 8 botones de la columna Acciones (Admitir, No admitir, Ver expediente) quedan fuera del área visible en las 8 filas (a 1024 y 1100 también). En la captura 1280-fold se ve cortado el borde derecho («Admit…», «Ver expedient…»). En v1 la tabla tenía min-width:900px y un bloque @media (min-width:860.02px) and (max-width:1440px) que compactaba columnas; v2 lo elimina y sube a 1080px.",
+    "selector": ".gest table / .tabla-caja",
+    "linea": 638,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "anchos",
+     "detalle": "[anchos_1440_1280_1024 (brief) + script aud-b/cut.cjs] brief: scroll-x en div.tabla-caja a 1280 (dx 36) y 1024 (dx 120). cut.cjs: a 1280 accionesFueraDelAreaVisible=8/8; a 1440 0/8"
+    },
+    "estado_vs_v1": "regresion",
+    "critico": {
+     "es": true,
+     "criterio": 2
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "La acción primaria de la fila (Admitir / No admitir / Ver expediente) queda fuera de la vista a 1280 px, el ancho más común de portátil (criterio 2). Dos lecturas: un scroll horizontal de tabla es patrón legítimo y las acciones son alcanzables desplazando; pero aquí no hay ninguna pista de que haya más contenido y el propio v1 del cliente lo trató como defecto. En 22 es regresión: restaurar min-width:900px y el bloque de compactación de v1."
+    },
+    "por_que_importa": "Quien trabaja en un portátil de 1280 px abre la bandeja y no ve ningún botón de acción; tiene que descubrir que debe desplazar la tabla. El botón «Admitir», que arranca el reloj y no se puede deshacer (FICHA 22), es justo lo que queda cortado."
+   },
+   {
+    "id": "v2-22gest-04",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles",
+    "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8)»; los enlaces que son el elemento primario de su fila «llevan padding hasta llegar a 24px»",
+    "hay_en_el_build": "`.folio{font-variant-numeric:tabular-nums;font-weight:600;color:var(--link);...}` sin padding ni min-height: 6 enlaces de 108×16 px. El buscador: el `<input>` mide 329×16 px dentro de una caja `.search` de 380×34 px que no es `<label>` (clic fuera del input no enfoca).",
+    "selector": ".folio, .search input",
+    "linea": 382,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil",
+     "detalle": "[tactil_bajo24 (brief) + script aud-b/tgt.cjs] brief: total 45, bajo24 7; muestra folio 108×16 y input[type=search] 329×16. tgt.cjs: folio 108×16 en las 6 filas"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino < 24 px de alto (criterio 1, definición del proyecto). Dos lecturas: la excepción de espaciado de WCAG 2.5.8 probablemente se cumple (los folios están a ≥40 px entre sí), pero el sistema §7.3 y el criterio del proyecto no la admiten. Arreglo de una línea: `.folio{display:inline-block;min-height:24px;padding:4px 0}`. Alternativa que el sistema también contempla (§6.11 regla 10): folio como texto `--text` y la fila entera como destino."
+    },
+    "por_que_importa": "El folio es el acceso al expediente y mide 16 px de alto: errar con el cursor o el dedo es fácil. La señal de que se ve distinto del resto de la celda (verde) es la que §6.11 regla 10 pide quitar; ambas reglas del sistema apuntan a resolver lo mismo de formas incompatibles (ver cobertura)."
+   },
+   {
+    "id": "v2-22gest-05",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 — un <symbol> ya trae su viewBox",
+    "dice_el_sistema": "«Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.»",
+    "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>` (logo lateral, línea 650) y lo mismo a 22×21 en el FAB (línea 744); el `<symbol id=\"dproma-mark\">` ya declara viewBox=\"740 0 970 932\". Medido: la caja del `<use>` se desplaza −32,5 px (logo) y −16,2 px (FAB) respecto de su `<svg>`; en la captura se ve una hoja recortada.",
+    "selector": ".logo svg, .fab svg",
+    "linea": 650,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio:aud-b/mark.cjs",
+     "detalle": "[script aud-b/mark.cjs] getBoundingClientRect de svg>use[href=#dproma-mark] contra su svg padre a 1440x900: logo svg x=96 / use x=63,5 (dx −32,5); fab svg x=1377 / use x=1360,8 (dx −16,2). Esperado ~0"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico. Regla 2: arreglo de una línea que mejora la marca en todas las pantallas que copian el cromo (es un bloque data-cromo): `<svg width=\"44\" height=\"42\"><use href=\"#dproma-mark\" width=\"44\" height=\"42\"/></svg>` y sin viewBox en el svg. Se propone en el paquete de cromo, no se exige."
+    },
+    "por_que_importa": "El isotipo —la marca— aparece mutilado en la esquina más vista de la aplicación y en el botón del asistente. En v1 ya estaba; el PDF no lo menciona."
+   },
+   {
+    "id": "v2-22gest-06",
+    "severidad": "alta",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "«`--fs-meta` es el tamaño más pequeño del sistema. Nada baja de ahí.»",
+    "hay_en_el_build": "`thead th{text-align:left;color:var(--text-2);font-size:11px;...}` (línea 365), `.pill{...}` con font-size:11px (línea 451), `.state .ref{...font-size:11px}` (línea 612), `.sin-reloj{...font-size:11px` (línea 458). El brief mide 16 declaraciones < 12 px; el PDF dice 0 (C1).",
+    "selector": "thead th, .pill, .state .ref, .sin-reloj",
+    "linea": 365,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio:aud-b/tgt.cjs",
+     "detalle": "[estado_vs_pdf_del_cliente.lt12_medido (brief) + script aud-b/tgt.cjs] brief: lt12_medido=16, lt12_pdf_despues=0 (NO_ALINEADO). tgt.cjs: 26 elementos con texto y font-size < 12 px (excluidos los de 10,5 px)"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico (el contraste de esos textos cumple: 0 fallos en claro y oscuro). El cliente declara C1 aplicado: lo recibido no lo contiene; se verifica la versión del paquete, no se pide un cambio nuevo."
+    },
+    "por_que_importa": "No aplicado, no regresión. Afecta a cabeceras de tabla y a las etiquetas de estado (lo más repetido de la pantalla), que son lo que se lee a diario."
+   },
+   {
+    "id": "v2-22gest-07",
+    "severidad": "media",
+    "regla": "§6.2 Botones — el suelo se declara con min-height",
+    "dice_el_sistema": "«Y el suelo hay que declararlo, no confiarlo al relleno.» (`.btn` min-height:36px; `.btn.mini` 28px)",
+    "hay_en_el_build": "`.btn{display:inline-flex;align-items:center;gap:6px;...padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);` sin min-height (línea 317) y `.btn.mini{padding:5px 10px;font-size:var(--fs-meta)}` (línea 323). Medido: `.btn` 34 px, `.btn.mini` 27 px.",
+    "selector": ".btn, .btn.mini",
+    "linea": 317,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio:aud-b/tgt.cjs",
+     "detalle": "[script aud-b/tgt.cjs] `.btn` 110,1×34 y 135,5×34 (22) / 163,9×34 (32); `.btn.mini` ×27. C4 y C5 del PDF declaran min-height 36 y 28"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "34 y 27 px superan el mínimo de 24 (§7.3): no es crítico. C4/C5 declarados y no presentes; no se exige."
+    },
+    "por_que_importa": "No aplicado. Un píxel o dos por debajo del suelo; solo se ve midiendo."
+   },
+   {
+    "id": "v2-22gest-08",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado — el estado va dentro de una tarjeta",
+    "dice_el_sistema": "«El estado va dentro de una tarjeta, no suelto sobre el fondo.»",
+    "hay_en_el_build": "`.state{display:none;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-2);` + `padding:56px 16px;flex:1;justify-content:center}` (líneas 605-606): sin fondo, borde, radio ni sombra; en la captura de error el mensaje flota sobre el fondo gris de la zona de contenido. El icono de error es un glifo suelto de 30 px, sin medallón (§6.4).",
+    "selector": ".state",
+    "linea": 605,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 605,
+     "cita": ".state{display:none;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-2);"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico y la ficha técnica no lo defiende. Regla 2: `.tarjeta-estado` (§6.4) ya existe en el sistema; se propone, no se exige."
+    },
+    "por_que_importa": "Un mensaje centrado sin superficie «se lee como una pantalla que no terminó de cargar» (§6.4). Es el estado donde la persona más necesita saber que el sistema respondió."
+   },
+   {
+    "id": "v2-22gest-09",
+    "severidad": "media",
+    "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+    "dice_el_sistema": "«Un control con pinta de interactivo tiene que interactuar.»",
+    "hay_en_el_build": "El único `<script>` registra manejadores solo para el andamio (`.demo [data-set]`, línea 770), tema y menú. Probado: clic en el primer `.schip` (5 chips con aria-pressed=\"false\") y en «Compacta» del `.seg`: aria-pressed no cambia, la tabla sigue con 6 filas. «Columnas», «Exportar», «Nuevo trámite» y los botones de fila tampoco hacen nada.",
+    "selector": ".schip, .seg button, .p4-t .acc button",
+    "linea": 770,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio:aud-b/chips.cjs",
+     "detalle": "[script aud-b/chips.cjs] clic en .schip[0] y .seg button[1]; aria-pressed de 5 chips = false antes y después; filas = 6 antes y después; seg = [true,false] antes y después"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Es una maqueta de propuesta visual: no crítico. La regla 8 dice cómo presentarlo (cifra de lectura sin aria-pressed) si no se va a implementar."
+    },
+    "por_que_importa": "Quien revisa la maqueta cree que filtra o cambia de densidad y no pasa nada."
+   },
+   {
+    "id": "v2-22gest-10",
+    "severidad": "media",
+    "regla": "§1.1 Superficies y texto — --text-3 (valor canónico 2.15.0) y tokens 2.15.0 no propagados",
+    "dice_el_sistema": "«`--text-3` cambió de valor. Era `#66717F`» → ahora `#5C6675` (§1.1)",
+    "hay_en_el_build": "`--text-3: #66717F;` en :root (línea 68). El brief lista 15 tokens con valor divergente del canónico (--text-3, --ok/warn/err/block/pause-ink y -bg, --serie-1/2, --font-ui, --font-brand); el PDF del cliente (cambios.txt §2) declara 33 tokens «propagados a los :root incrustados» y `--on-state` (necesario para §1.4.1) no existe en el archivo. Medido: el contraste de los textos en `--text-3` cumple en los estados renderizados (mínimo 4,53:1 sobre --bg; 0 fallos en claro y oscuro), así que el daño visible es nulo hoy.",
+    "selector": ":root",
+    "linea": 68,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 68,
+     "cita": "--text-3: #66717F;"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico: pasa 4,5:1 en lo renderizado (v1 lo marcó alta; se rebaja porque se midió). Las superficies --surface-2 (filas inactivas, hover) donde caería a 4,21:1 no se ejercitaron aquí: no evaluado."
+    },
+    "por_que_importa": "No aplicado: el archivo recibido no incorpora la actualización de tokens que el PDF declara. Mientras no se propague, cualquier texto auxiliar sobre --surface-2 quedaría a 4,21:1 según §1.1."
+   },
+   {
+    "id": "v2-22gest-11",
+    "severidad": "media",
+    "regla": "§8 Voz de producto",
+    "dice_el_sistema": "«si el texto explica una decisión, no va en pantalla. Si explica una consecuencia para quien está mirando, sí — y en una frase.»",
+    "hay_en_el_build": "`<p class=\"nota\">` de 595 caracteres: explica por qué el renglón sin admitir lleva recuadro punteado y no pastilla gris, y por qué el reloj de gestoría «no se pausa nunca» (línea 727). Es razonamiento de diseño, siempre visible bajo la tabla.",
+    "selector": "p.nota",
+    "linea": 727,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 727,
+     "cita": "<p class=\"nota\">"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico. La decisión que el párrafo razona es de DPROMA y está bien fundada (FICHA 22: «No pintar “sin admitir” como pastilla gris “pausado”», doc 34, apartado 7.1.1) y se respeta en la tabla; lo que no es de producto es el párrafo que la justifica (§8). Propuesta: una frase de consecuencia («Sin admitir: el plazo aún no corre») y el resto a toggletip §6.23."
+    },
+    "por_que_importa": "Texto de razonamiento de diseño siempre visible, que desplaza la tabla. C11 («≤140 caracteres») declarado y no presente. La banda «Propuesta TRAZO…» de v1 sí se retiró."
+   },
+   {
+    "id": "v2-22gest-12",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga",
+    "dice_el_sistema": "«Sin texto real dentro de las barras.» y «Hay que aplanar el fondo, no solo parar la animación.»",
+    "hay_en_el_build": "`<span class=\"skel\">...` con texto dentro de cada barra (línea 729) y `@media (prefers-reduced-motion:reduce){.skel{animation:none}}` sin reponer `background:var(--surface-2)` (línea 604).",
+    "selector": ".state-loading .skel",
+    "linea": 604,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 604,
+     "cita": "@media (prefers-reduced-motion:reduce){.skel{animation:none}}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico. Regla 2: línea única `animation:none;background:var(--surface-2)` y barras vacías; se propone."
+    },
+    "por_que_importa": "Un lector de pantalla puede anunciar el texto «invisible» de las barras (color:transparent no lo saca del árbol); con movimiento reducido quedan barras con degradado congelado."
+   },
+   {
+    "id": "v2-22gest-13",
+    "severidad": "media",
+    "regla": "§2 Tipografía — fuentes autoalojadas (D116)",
+    "dice_el_sistema": "«Ese `@font-face` no es opcional.» (§2, D116)",
+    "hay_en_el_build": "El archivo declara `--font-ui:'Inter'` y `--font-brand:'Ethnocentric Rg','Michroma'` pero no contiene ningún `@font-face` ni ningún `<link>` a fuentes (grep -n '@font-face\\|googleapis' sin resultados). Cae a system-ui salvo que la fuente la inyecte el entorno. El PDF declara C8 para esta pantalla. Aviso: el arnés lib.cjs inyecta @font-face al renderizar, así que document.fonts/styleSheets NO sirven de prueba aquí; vale el grep.",
+    "selector": ":root",
+    "linea": 10,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 10,
+     "cita": "--font-ui"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "En la app real las fuentes las sirve `apps/web/public/fuentes/` (según `_sio-tokens.css`); en un HTML autocontenido de propuesta no es crítico. Verificar con la hoja `_sio-tokens.css` del paquete."
+    },
+    "por_que_importa": "La comprobación del sistema es que la fuente aparezca cargada en red, no que esté declarada."
+   },
+   {
+    "id": "v2-22gest-14",
+    "severidad": "baja",
+    "regla": "§10 trampa 10 — una clase corta no se declara dos veces en el mismo archivo",
+    "dice_el_sistema": "«una clase corta no se declara dos veces» (trampa 10)",
+    "hay_en_el_build": "`.tabla-caja{min-width:0;overflow-x:auto;flex:none}` (línea 362) y `.tabla-caja{position:relative}` (línea 407).",
+    "selector": ".tabla-caja",
+    "linea": 407,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 407,
+     "cita": ".tabla-caja{position:relative}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "C14 declarado y no aplicado; no crítico."
+    },
+    "por_que_importa": "Funciona hoy; la segunda declaración puede pisar a la primera al editar."
+   },
+   {
+    "id": "v2-22gest-15",
+    "severidad": "baja",
+    "regla": "§6.5 Iconos (.msi)",
+    "dice_el_sistema": "«Material Symbols Rounded, variante rellena (`FILL@1`).»",
+    "hay_en_el_build": "Set propio de `<symbol>` SVG de trazo consumido con `.ico{width:18px;height:18px;stroke:currentColor;...fill:none}` (línea 208); no hay `.msi`.",
+    "selector": ".ico",
+    "linea": 208,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 208,
+     "cita": ".ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Decisión estable del cliente en todas sus maquetas; el sistema debería documentar el set de trazo (ver cobertura)."
+    },
+    "por_que_importa": "Inconsistencia de nomenclatura; funciona."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [
+  {
+   "id_v1": "f1-22gest-05",
+   "evidencia": "Parcial: la banda «Propuesta TRAZO con componentes de Studio — pendiente de revisión de Studio.» (v1flat/22_gestoria.html:734) ya no está en v2 (grep 'TRAZO|class=\"banda' sin resultados). La `.nota` de 595 caracteres persiste (v2-22gest-11)."
+  },
+  {
+   "id_v1": "f1-22gest-03",
+   "evidencia": "No es un cierre del cliente sino una reinterpretación: la tabla v2 no tiene columnas ordenables (0 elementos `.sort`, ningún `<button>` en `<th>`: línea 670 `<thead><tr><th scope=\"col\">Folio</th>…`). §6.11 regla 3 exige aria-sort en las columnas ordenables; sin orden, no aplica. El v1 lo marcó alta: probablemente falso positivo. Las reglas CSS `thead th .sort` (líneas 376-378) son código muerto."
+  },
+  {
+   "id_v1": "f1-22gest-14",
+   "evidencia": "El desplegable de filtros `.f` con popover (bloque ARQ-STUDIO-COMPONENTES de v1) ya no está en el markup: v2 trae chips `.schip` con valor y rótulo («2 sin admitir»)."
+  }
+ ],
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 2,
+   "integridad": 2
+  },
+  "justificacion": "Visualmente la pantalla está bien resuelta (la decisión de gestoría «sin admitir ≠ pausado» se ve clara y los dos temas pasan contraste: 0 fallos en claro y oscuro). Pero acumula fallos medidos que el sistema ya documenta: menú colapsado sin nombre accesible (15 enlaces vacíos), columna de acciones fuera de la vista a 1280 px, icono del botón de estado a 1,03:1, folios de 16 px, isotipo descolocado y 16 declaraciones < 12 px. Casi todo es «no aplicado» de lo que el PDF declara (C1, C3, C4–C8, C10, C11, C14), no regresión; las dos regresiones son el rótulo del menú (display:none) y el ancho mínimo de tabla.",
+  "evidencia": [
+   "Instrumentos del brief: I1 fallos 2 (ratio 1,03), tactil bajo24 7, menu_1000px sinNombre 15, contraste 0 fallos claro/oscuro, scroll-x a 1280 y 1024",
+   "Mediciones propias: aud-b/err.cjs, fix.cjs, menu.cjs, cut.cjs, mark.cjs, chips.cjs, tgt.cjs, t3.cjs",
+   "Capturas: 22_gestoria--1440.png, 22_gestoria--1280-fold.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — Tier B"
+ },
+ "cobertura": [
+  {
+   "patron": "El folio como enlace de 16 px frente a la regla de que la fila entera navega",
+   "propuesta_de_regla": "§7.3 y §6.11 regla 10 dan salidas incompatibles al mismo elemento. Una tabla elige UNA: o la fila entera es el destino (folio en `--text`, sin enlace propio) o el folio es el único enlace y lleva `min-height:24px;padding:4px 0`. Nunca un enlace verde de 16 px junto a una fila que ya navega."
+  }
+ ],
+ "sin_datos": [
+  "Las capturas de la persona no están en el brief: la atribución de la observación 1 a 22 o a 32 se apoya solo en el rótulo del estado de error ('gestoría' vs 'trámites CFE').",
+  "No se ejercitó --text-3 sobre --surface-2 (filas inactivas, hover): el instrumento de contraste no ve hover; el cálculo de §1.1 (4,21:1) queda sin comprobar en esta pantalla.",
+  "Rendimiento: no_evaluado (sin criterio en el brief).",
+  "El estado «cargando» solo se leyó en código (no se midió el alto del esqueleto contra la tabla)."
+ ]
+}

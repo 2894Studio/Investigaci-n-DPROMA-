@@ -1,0 +1,550 @@
+{
+ "pantalla": "26_estados_de_pantalla",
+ "tier": "A",
+ "sha256": "77746609e16c43d244e7267681fdc2aa67b29b46e46af82cc1f36f22b365ce7a",
+ "estado_entrega": "modificada",
+ "estado_vs_pdf": "NO_ALINEADO",
+ "nota_estado_vs_pdf": "El PDF declara C1-C8 y C10 para 26; el brief mide 19 declaraciones <12px (PDF: 0), `--text-3` sigue en #66717F (linea 68), `.state .ico` sigue descendiente (linea 609) y las reglas [data-tacto] sin :root. REGRESION detectada con diff contra la entrega v1 (v1flat): v1 tenia `<div class=\"p4\">` y v2 `<header class=\"p4\">` (dos banners), que es exactamente el defecto que FICHAS_TECNICAS.md dice haber corregido en 26 (linea 1419). Lo demas que persiste es 'no aplicado'.",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error"
+ ],
+ "capturas": [
+  "26_estados_de_pantalla--1440.png",
+  "26_estados_de_pantalla--1280-fold.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 1,
+   "texto_usuario": "Icono gris sobre botón verde «Reintentar» en estados de error; debe ser blanco (componente «Patrón de error», transversal).",
+   "veredicto": "confirmada",
+   "evidencia": [
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "I1_icono_vs_boton",
+      "detalle": "fallos 2: button.btn.p «Reintentar» (x2), colorIcono rgb(102,113,127), colorTexto rgb(247,250,249), fondo rgb(62,122,76), ratio 1.03, enEstado true"
+     },
+     "dato": "Instrumento I1 y script propio scratchpad/a_lote_a/m26.cjs (tema claro y oscuro, 3 data-state): el icono de refrescar de «Reintentar» mide rgb(102,113,127) sobre el boton verde rgb(62,122,76) = 1,03:1 en claro y rgb(139,150,166) sobre rgb(74,143,90) = 1,31:1 en oscuro, mientras el texto del mismo boton mide 4,89:1. Aparece dos veces: en la muestra «Patrón de error» (la del PDF/captura, contenedor .esp.esp-error) y en la vista de estado de error de la pagina (.state.state-error)."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 609,
+      "cita": ".state .ico{width:30px;height:30px;color:var(--text-3)}"
+     },
+     "dato": "Causa raiz verificada, con un matiz que el brief no recoge: hay DOS reglas descendientes. `.state .ico` (linea 609) tine la vista de estado de error; `.esp .ico{width:30px;height:30px;color:var(--text-3)}` (linea 654) tine la muestra «Patrón de error» de la captura. Los dos selectores descendientes alcanzan el `.ico.ico-sm` del boton (lineas 753 y 778) y le pisan el `color` heredado de `.btn.p`. La correccion documentada (`.state > .ico`, §6.4 regla 6) cubre solo la primera: hay que cambiar tambien `.esp .ico` por `.esp > .ico`."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_m26_botones",
+      "detalle": "m26.cjs: botones visibles por estado. ok: 6 botones de vacio sin icono (ratioIcono null) + Reintentar con icono; empty: «Volver al catálogo» sin icono; error: Reintentar con icono. Solo Reintentar lleva icono en todo el archivo"
+     },
+     "dato": "Estados afectados en ESTE archivo: error (2 instancias). Cargando, vacio (filtro, alcance, de verdad, y la vista state-empty) y con datos no estan afectados porque sus botones no llevan icono; la causa, sin embargo, es del bloque ARQ-ESTADOS y afecta a cualquier boton con icono en un vacio/error (en 51 «Pedirlo a Sistemas» y en 58 «Ver las cinco maquetas» tambien salen grises: instrumento I1 de sus briefs). Los catalogos de estados que no declaran «bloqueado» no tienen otro estado donde fallar."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "captura",
+      "archivo": "26_estados_de_pantalla--1440.png",
+      "region": "seccion «Error: lo que falló, y sobre todo lo que no pasó»: boton verde «Reintentar» con un icono circular gris apenas visible a su izquierda"
+     },
+     "dato": "Visible en la captura: el glifo de refrescar se ve como un aro gris oscuro sobre el verde; el texto «Reintentar» es blanco."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_m26_botones",
+      "detalle": "contrastes calculados en Python con la formula del sistema: icono heredado claro rgb(247,250,249) sobre rgb(62,122,76) = 4,89:1; oscuro rgb(8,18,13) sobre rgb(74,143,90) = 4,87:1; icono actual 1,03:1 y 1,31:1; con --text-3 canonico #5C6675 seria 1,13:1"
+     },
+     "dato": "Sobre «debe ser blanco»: en tema claro, heredar `currentColor` da rgb(247,250,249) (--accent-ink), que es el blanco de la persona (4,89:1). En tema oscuro el texto del boton es oscuro (--on-state #08120D, 4,87:1): «blanco» a secas fallaria ahi, asi que el requisito correcto es «el icono hereda el color del texto del boton», no un blanco fijo."
+    }
+   ],
+   "causa_raiz": "Selectores descendientes en ARQ-ESTADOS: `.state .ico` (linea 609) y, en la propia muestra del catalogo, `.esp .ico` (linea 654), que apuntan a todo `.ico` del bloque y no solo al grande que cuelga directo del estado. El catalogo es el origen del bloque que se copia en las demas pantallas.",
+   "solucion_propuesta": "`.state > .ico{...}` y `.esp > .ico{...}` (hijo directo, §6.4 regla 6 / §6.2): el icono del boton hereda el color del boton. Sin mas cambios. Alternativa defensiva de §6.2: `.state .btn .ico,.esp .btn .ico{color:inherit}`.",
+   "tipo_de_cambio": "sencillo",
+   "critico": {
+    "es": true,
+    "criterio": 1
+   },
+   "decision": {
+    "valor": "exigir_cambio",
+    "motivo": "Criterio 1 en lectura literal (contraste <3:1 en controles: 1,03:1 y 1,31:1). Otra lectura: el icono es decorativo (aria-hidden) y la etiqueta del boton cumple (4,89:1), asi que el daño es visual y no impide la tarea; se señala la duda. Arreglo de un caracter por regla, ya documentado en §6.4 regla 6; el PDF declara C3 y no esta en el archivo: 'no aplicado'. Ademas ajustar_sistema: el patron correcto debe vivir en el catalogo, que es el que se copia."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-26estados-01",
+    "severidad": "alta",
+    "regla": "§6.2 Un icono dentro de un botón hereda el color del botón + §6.4 regla 6 (`.state > .ico`)",
+    "dice_el_sistema": "«El contraste entre el icono gris y el verde era de **1,03:1**; el mínimo para un elemento gráfico es 3:1. Heredando `currentColor` sube a 4,89:1.» · §6.4 regla 6: «`.state .ico` apunta solo al ícono grande, nunca a los de sus botones.»",
+    "hay_en_el_build": "`.state .ico{...color:var(--text-3)}` y `.esp .ico{...color:var(--text-3)}`: el icono de «Reintentar» sale gris sobre verde, 1,03:1 (claro) y 1,31:1 (oscuro)",
+    "selector": ".state .ico",
+    "linea": 609,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I1_icono_vs_boton",
+     "detalle": "fallos 2, ratio 1.03, enEstado true; m26.cjs: oscuro 1,31:1"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Ver observaciones_resueltas hoja 1. v1 no lo tenia como hallazgo propio (v1 f1-26estados-02 solo cubria la ausencia de medallon). C3 declarado y no aplicado."
+    },
+    "por_que_importa": "El boton de salida de todo estado de error, el unico camino cuando algo falla, lleva un icono casi invisible; y como este catalogo es el modelo que se copia, el defecto viaja a las demas pantallas."
+   },
+   {
+    "id": "v2-26estados-02",
+    "severidad": "alta",
+    "regla": "§1.1 Superficies y texto (`--text-3` = #5C6675) + §1.7 Regla de contraste",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)»; «si el elemento puede caer sobre --surface-2, se mide también ahí» (§1.1/§1.7)",
+    "hay_en_el_build": "`--text-3: #66717F` (linea 68) y los rotulos de las muestras (`.muestra > .rot` 10,5px y `.rot .cuando` 11px) caen sobre --surface-2 rgb(231,237,243): 4,21:1 frente al minimo de 4,5:1",
+    "selector": ".muestra > .rot",
+    "linea": 647,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "contraste",
+     "detalle": "brief tactil/contraste claro: div.rot «Vacío por filtro…» rgb(102,113,127) sobre rgb(231,237,243), 10.5px peso 700, ratio 4.21; span.cuando «hay datos, tus filtros los esconden» 11px, ratio 4.21 (los demas fallos listados, span.skel con color transparente, son falsos positivos del instrumento)"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Texto con contraste <4,5:1 medido (criterio 1): 4,21:1 en 8 nodos (los 4 rotulos .rot de vacio×3 y error, y sus 4 leyendas .cuando; m26c.cjs). v1 f1-26estados-07. El PDF declara el cambio de token (cambios.txt: --text-3 #66717F → #5C6675) y el archivo no lo contiene: 'no aplicado'. Con el valor canonico la misma combinacion mide 4,93:1."
+    },
+    "por_que_importa": "Los rotulos que dicen que significa cada muestra («hay datos, tus filtros los esconden», «no hay datos, punto») son justo lo que distingue un vacio de otro, y son los de peor contraste de la pagina."
+   },
+   {
+    "id": "v2-26estados-03",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (colapsada a solo iconos) + §6.5 Iconos sin texto",
+    "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.»",
+    "hay_en_el_build": "A 861-1100px `.side .et,.grp,.side .wordmark{display:none}`: 15 de 15 enlaces del menu sin nombre accesible",
+    "selector": ".side .et",
+    "linea": 288,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "sidebar",
+     "detalle": "brief mediciones_v2.menu_1000px: hayMenu true, total 15, sinNombre 15, anchoSide 64"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1). delta_vs_v1.menu_sin_nombre = 0: existia igual en v1 sin reportarse; no es regresion. Cromo compartido."
+    },
+    "por_que_importa": "La navegacion principal queda muda a 1000px para lectores de pantalla."
+   },
+   {
+    "id": "v2-26estados-04",
+    "severidad": "alta",
+    "regla": "§6.7 Esqueleto de carga (muestra «Así sí»)",
+    "dice_el_sistema": "«**Sin texto real dentro de las barras.**... `color:transparent`, que sigue en el árbol de accesibilidad» · «Todas las celdas al 100% de su columna se leen como papel cuadriculado» · «`.skel{animation:none;background:var(--surface-2)}`»",
+    "hay_en_el_build": "La muestra «Así sí» (el modelo del patron) tiene 12 `.skel` con texto real («nombre del cliente y su RFC», «estado», «28 ago 2026») y 0 con aria-hidden, mientras la regla de la propia pagina dice «las barras van ocultas para la lectura asistida»; 4 filas con anchos identicos (296/90/110px) y 78px de alto; bajo reduced-motion solo `animation:none`",
+    "selector": ".sk-demo .skel",
+    "linea": 739,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 739,
+     "cita": "<div class=\"r\"><span class=\"skel\">nombre del cliente y su RFC</span>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-26estados-03 y -11. La ficha del cliente defiende «añadirlo conservando el aviso a lectura asistida, no sustituir el texto»: lo que defiende es el aviso en el contenedor (role=status + aria-label, que SI esta, linea 738), no texto dentro de cada barra; §6.7 y la propia pagina piden barras sin texto. Como el catalogo es el modelo, el sistema debe publicar la muestra correcta (barras vacias, anchos irregulares, fondo aplanado bajo reduced-motion)."
+    },
+    "por_que_importa": "El ejemplo «Así sí» enseña lo contrario de lo que dice: un lector de pantalla recitaria doce etiquetas de datos que no existen, y la muestra se copia en las demas pantallas."
+   },
+   {
+    "id": "v2-26estados-05",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado (reglas 1 y 2)",
+    "dice_el_sistema": "«El cambio se anuncia y mueve el foco. Sin esto, quien usa lector de pantalla no se entera de que la pantalla cambió.» · «Cada estado lleva un encabezado real, no un `<b>`.»",
+    "hay_en_el_build": "0 elementos con aria-live en el archivo; las 8 muestras `.esp` y las vistas empty/error titulan con `<b>`; ningun h2/h3 dentro de ellas",
+    "selector": ".state-error > b",
+    "linea": 775,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 775,
+     "cita": "<b>No se pudo cargar el catálogo de estados</b>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-26estados-01 y -04. La pagina que ensena el patron no lo cumple en dos de sus seis reglas. El sistema debe entregar el catalogo con el encabezado real y la region viva."
+    },
+    "por_que_importa": "Un catalogo de «cómo se dice un estado a un lector de pantalla» que no lo hace."
+   },
+   {
+    "id": "v2-26estados-06",
+    "severidad": "media",
+    "regla": "§6.4 «El estado va dentro de una tarjeta» y «El medallón carga el peso visual del icono»",
+    "dice_el_sistema": "«`.tarjeta-estado{max-width:480px;...border-radius:var(--r-modal);box-shadow:var(--sh-modal)...}` · `.estado-ico{width:52px;height:52px;border-radius:50%;background:var(--accent);color:var(--on-state)}`»",
+    "hay_en_el_build": "Las muestras `.esp` llevan un icono de trazo de 30px en --text-3 (error: --err-ink) sin medallon ni tarjeta-estado: 0 `.estado-ico`/`.tarjeta-estado` en el archivo (medido)",
+    "selector": ".esp .ico",
+    "linea": 654,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 654,
+     "cita": ".esp .ico{width:30px;height:30px;color:var(--text-3)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-26estados-02. La ficha del cliente decide «los íconos por tipo de vacío» (bandeja, escudo, más): compatible con ponerlos en medallon. El catalogo vive dentro de `.muestra` (una tarjeta) y dibuja el estado dentro de ella; se documenta como variante de catalogo y se pide el medallon solo en pantallas de producto."
+    },
+    "por_que_importa": "Las pantallas que copian el catalogo heredan el icono suelto en gris, el 'texto en --text-3 a 30px' que §6.4 describe."
+   },
+   {
+    "id": "v2-26estados-07",
+    "severidad": "media",
+    "regla": "FICHAS_TECNICAS.md del cliente · «Defectos reales de accesibilidad encontrados y corregidos» (axe-core): `<header class=\"p4\">` duplicando `role=\"banner\"`",
+    "dice_el_sistema": "FICHAS_TECNICAS.md linea 1419: «**`<header class=\"p4\">` duplicando `role=\"banner\"`** (mismo defecto que 31/53 en la tanda 1), encontrado y corregido en: `33_cfe_detalle.html`, `42_alta_tramite_gestoria.html`, `43_alta_tramite_vehicular.html`, `44_alta_tramite_cfe.html`, `26_estados_de_pantalla.html`.»",
+    "hay_en_el_build": "`<header class=\"p4\">` (linea 695) dentro de `div.main`: dos landmarks banner (header.cromo-top y header.p4; banners.cjs: 2). El archivo de la entrega v1 tenia `<div class=\"p4\">`",
+    "selector": ".p4",
+    "linea": 695,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 695,
+     "cita": "<header class=\"p4\"><div class=\"p4-t\"><h1>Los cuatro estados de una pantalla</h1>"
+    },
+    "estado_vs_v1": "regresion",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Regresion (v1 tenia div y la ficha del cliente dice haberlo dejado asi): diff v1flat → v2 cambia `<div class=\"p4\">` por `<header class=\"p4\">`. Cambio de una etiqueta."
+    },
+    "por_que_importa": "Un lector de pantalla encuentra dos «banner» en la pagina que ensena el patron de accesibilidad."
+   },
+   {
+    "id": "v2-26estados-08",
+    "severidad": "media",
+    "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional",
+    "dice_el_sistema": "«la cabecera se quedó con 5px entre el título y su propio borde... `.p4{ padding-bottom: var(--sp-3) }`»",
+    "hay_en_el_build": ".p4-t con padding-bottom 0 y .p4 sin relleno: cabecera de 38px (12 + 25 + 1), titulo a 0px del borde inferior",
+    "selector": ".p4-t",
+    "linea": 309,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_p4scan",
+     "detalle": "a_lote_a/p4scan.cjs: 26_estados_de_pantalla padB 0px, alto 38px"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Mismo defecto sistemico que Mi día (28): 30 pantallas con .p4 miden padding-bottom 0px. El instrumento I2 no lo detecta aqui (controles 0). 'nuevo' = no reportado en v1, no regresion."
+    },
+    "por_que_importa": "Misma cabecera pegada al borde que en Mi día; en el catalogo que ensena el patron se ve sin aire bajo el titulo."
+   },
+   {
+    "id": "v2-26estados-09",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "«Se admite una excepción, y solo una: 10,5px en mayúsculas con `letter-spacing` para los **rótulos de grupo** de la barra lateral y las etiquetas de campo del modo tarjeta.»",
+    "hay_en_el_build": "`.muestra > .rot{...font-size:10.5px;...text-transform:uppercase...}` (rotulos de muestra, fuera de la excepcion), `.rot .cuando` 11px, `.pz .n` 11px, `.pz span.tx` 11,5px, `.esp .ref` 11px: 19 declaraciones <12px (PDF: 0)",
+    "selector": ".muestra > .rot",
+    "linea": 648,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 648,
+     "cita": "background:var(--surface-2);border-bottom:1px solid var(--border);font-size:10.5px;font-weight:700;"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-26estados-08. C1 del PDF 'no aplicado'; el contraste de estos rotulos se trata aparte (v2-26estados-02, critico). Tambien C2: 5 rotulos .grp del menu en caja mixta (instrumento C2_105_no_mayusculas) por el mismo defecto de §7.2 que en 28."
+    },
+    "por_que_importa": "El texto que rotula las muestras es de 10,5-11px."
+   },
+   {
+    "id": "v2-26estados-10",
+    "severidad": "baja",
+    "regla": "§10 trampa 5 — isotipo (viewBox en el <svg>)",
+    "dice_el_sistema": "«Escrito al revés —`viewBox=\"740 0 970 932\"` en el `<svg>` y un `<use>` sin medidas— ... se pinta 32,5px a la izquierda de su caja y se recorta casi entera.»",
+    "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>` en el menu (linea 683); en la captura solo asoma una astilla verde sobre el wordmark",
+    "selector": ".side .logo svg",
+    "linea": 683,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 683,
+     "cita": "viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-26estados-05. Mismo error de cromo que en 28, 47, 51 y 58: el sistema debe entregar el fragmento canonico del isotipo."
+    },
+    "por_que_importa": "La marca aparece recortada en el cromo de cada pantalla."
+   },
+   {
+    "id": "v2-26estados-11",
+    "severidad": "baja",
+    "regla": "§6.11 regla 1 «`<caption>` siempre, aunque vaya oculto con `.sr`»",
+    "dice_el_sistema": "«**`<caption>` siempre**, aunque vaya oculto con `.sr`. Es lo que dice de qué es la tabla a...»",
+    "hay_en_el_build": "`<table data-prosa>` de comparacion de estados sin `<caption>` (0 en el archivo)",
+    "selector": "table",
+    "linea": 701,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 701,
+     "cita": "<div class=\"tabla-caja\"><table data-prosa>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-26estados-10. C17 solo lo declara para 59. Tabla de prosa de 4 filas con `<th scope>` correcto: bajo impacto."
+    },
+    "por_que_importa": "La tabla no se anuncia como «comparacion de los cuatro estados»."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 2,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "v1 le dio 3; aqui 2 porque los instrumentos nuevos añaden el icono del boton a 1,03:1/1,31:1, el menu sin nombre (15/15) y la regresion del doble banner, ademas de los 2 nodos de texto a 4,21:1 y el esqueleto modelo con texto en las barras. Mantiene buena estructura: tabla de prosa con `th scope`, muestras con contenido correcto (qué falló/qué no pasó/referencia), sin desbordes a 1440/1280/1024 ni a 390. Rendimiento no evaluado.",
+  "evidencia": [
+   "Brief: contraste claro 3 fallos (2 reales: 4,21:1), oscuro 1 (falso positivo: skel transparente).",
+   "Brief: I1 fallos 2 (1,03:1).",
+   "m26.cjs: icono 1,31:1 en oscuro.",
+   "Brief: menu_1000px sinNombre 15."
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 1,
+   "hallazgo": "El catalogo explica que cada estado debe decirlo («Decirlo a un lector de pantalla») pero la propia pagina no lo anuncia (0 aria-live).",
+   "selector": ".state-error",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "propio_m26b_aria",
+    "detalle": "m26b.cjs: ariaLive 0; role=status solo en las muestras de esqueleto"
+   }
+  },
+  {
+   "n": 2,
+   "heuristica": "Concordancia entre el sistema y el mundo real",
+   "severidad": 0,
+   "hallazgo": "Los textos de las muestras usan lenguaje del dominio («bandeja de gestoría», «pedimento 2024», «Ningún expediente se admitió ni se rechazó solo») y nombran lo que no paso.",
+   "selector": ".esp-error p",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 751,
+    "cita": "Ningún expediente se admitió ni se rechazó solo"
+   }
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": "n/a",
+   "hallazgo": "Es un catalogo de lectura; los botones de las muestras son ilustrativos.",
+   "selector": "n/a",
+   "certeza": "inferido",
+   "reproduce": {
+    "tipo": "captura",
+    "archivo": "26_estados_de_pantalla--1440.png",
+    "region": "muestras con botones de ejemplo"
+   }
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 3,
+   "hallazgo": "El modelo del patron de error se contradice con el patron de §6.4 (sin medallon, icono del boton gris por selector descendiente) y con su propia leyenda del esqueleto («las barras van ocultas para la lectura asistida»: no lo estan). Como este archivo es la fuente que copian las demas pantallas, la inconsistencia se multiplica.",
+   "selector": ".esp",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "I1_icono_vs_boton",
+    "detalle": "fallos 2; m26b.cjs: .skel con aria-hidden 0 de 12"
+   }
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 0,
+   "hallazgo": "«El error más caro es confundir «vacío» con «error»» y las tres variantes de vacio (filtro, alcance, de verdad) previenen afirmar algo falso con cara de dato.",
+   "selector": ".regla",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 709,
+    "cita": "El error más caro es confundir «vacío» con «error»."
+   }
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocimiento antes que recuerdo",
+   "severidad": 0,
+   "hallazgo": "Las cinco piezas del vacio y del error se numeran y se muestran junto a la muestra: el equipo puede reconocerlas en vez de recordarlas.",
+   "selector": ".piezas",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 725,
+    "cita": "<div class=\"pz\"><span class=\"n tnum\">1</span><b>Ícono</b>"
+   }
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": "n/a",
+   "hallazgo": "Catalogo de consulta.",
+   "selector": "n/a",
+   "certeza": "inferido",
+   "reproduce": {
+    "tipo": "captura",
+    "archivo": "26_estados_de_pantalla--1440.png",
+    "region": "pagina de lectura"
+   }
+  },
+  {
+   "n": 8,
+   "heuristica": "Estética y diseño minimalista",
+   "severidad": 2,
+   "hallazgo": "Rotulos de muestra a 10,5-11px con contraste de 4,21:1 y cabecera sin relleno inferior; el resto de la pagina es ordenada y de lectura rapida.",
+   "selector": ".muestra > .rot",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "contraste",
+    "detalle": "div.rot 10.5px ratio 4.21; span.cuando 11px ratio 4.21"
+   }
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de errores",
+   "severidad": 1,
+   "hallazgo": "Contenido ejemplar de error: que fallo, que no paso, referencia GES-20260821-1012 y «Reintentar» (cumple §6.4 regla 3); el boton pierde legibilidad de icono (1,03:1). El catalogo no muestra el error con trabajo del usuario encima (§6.4 regla 4) ni el esqueleto con salida a error (regla 5).",
+   "selector": ".esp-error",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "I1_icono_vs_boton",
+    "detalle": "fallos 2"
+   }
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 0,
+   "hallazgo": "La pagina es documentacion del patron, con la regla de cada estado y su contraejemplo («Así no / Así sí»).",
+   "selector": ".cat",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 737,
+    "cita": "Así no</div><div class=\"in\"><div class=\"sk-mal\"><p role=\"status\">Cargando trámites…</p>"
+   }
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-070",
+    "documento": "data/insights/2026-07-31_direccion-general-supervision-operativa.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-070: «se reconoce el riesgo de que fallas del asistente virtual queden sin contingencia definida». El patron de error exige «qué no pasó», referencia y un unico «Reintentar» (lineas 748-753): es la contingencia que ese pain point pide, definida una vez para todo el producto. Queda a medias porque el icono del unico boton de salida es casi invisible (1,03:1)."
+   },
+   {
+    "pp": "pp-104",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-104: la certificacion ISO 9001 exige formatos de registro normalizados entre departamentos. Este catalogo es, literalmente, un formato normalizado de como una pantalla dice cada estado, con referencia citable por incidente (GES-20260821-1012, linea 752)."
+   }
+  ],
+  "usabilidad_para_el_area": "Para quien construye pantallas (soporte administrativo y equipo de desarrollo) el catalogo es util: reglas, contraejemplos y contenido ejemplar para vacio y error. Pero es la fuente que se copia, y copia tambien el defecto del icono gris del boton, el esqueleto con texto y el contraste de 4,21:1 en los rotulos. La investigacion no contiene pain points sobre estados de pantalla en si; la cobertura es indirecta (pp-070, pp-104)."
+ },
+ "cobertura": [
+  {
+   "patron": "Muestra de catalogo `.muestra` con rotulo `.rot` y variantes de vacio (filtro / alcance / de verdad)",
+   "propuesta_de_regla": "El vacio se parte en tres con titular, causa, «lo que no significa» y accion correctiva (ficha del cliente: «partir «vacío» en tres»); cada variante lleva su icono por tipo en un medallon de 52px (§6.4) y se rotula en 12px con --text-3 sobre --surface-2 ≥4,5:1."
+  },
+  {
+   "patron": "Estado «bloqueado» / sin permiso",
+   "propuesta_de_regla": "El catalogo no define un estado bloqueado: «vacío por alcance» cubre «hay datos, no son tuyos» pero no «no puedes hacer esto». Proponer una quinta muestra «Bloqueado» con la banda de §6.9 (nivel 1 de §8: bloquea la accion ahora) y la via para pedir acceso."
+  },
+  {
+   "patron": "Icono dentro de un boton de estado",
+   "propuesta_de_regla": "En todo bloque de estado, el icono grande es hijo directo (`.state > .ico`, `.esp > .ico`) y el del boton hereda `currentColor`; se comprueba con el instrumento I1 (icono vs boton ≥3:1)."
+  }
+ ],
+ "sin_datos": [
+  "Estado «bloqueado»: no existe en el catalogo; el brief lo menciona pero el archivo solo tiene con datos, cargando, vacio (x3) y error. No se evalua lo que no esta.",
+  "Pain points de la investigacion sobre estados de pantalla: ninguno; F5 es indirecta.",
+  "Rendimiento (F3): no evaluado.",
+  "Alto del esqueleto frente a una tabla real (§6.7 «y el mismo alto»): la muestra mide 78px y el catalogo no dibuja la tabla real con la que compararla: no evaluado."
+ ]
+}

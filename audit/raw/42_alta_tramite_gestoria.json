@@ -1,0 +1,520 @@
+{
+ "pantalla": "42_alta_tramite_gestoria",
+ "ruta_zip": "04-tramites-vehiculares-y-cfe/42_alta_tramite_gestoria.html",
+ "carpeta": "04-tramites-vehiculares-y-cfe",
+ "area": "administracion vehicular",
+ "arquetipo": "formulario",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "oscuro"
+ ],
+ "capturas": [
+  "42_alta_tramite_gestoria--ok.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-42alta-01",
+    "severidad": "alta",
+    "regla": "§10 trampa 2 — selectores por exclusión, no por enumeración",
+    "dice_el_sistema": "«El tamaño de los campos estaba definido como .ctrl input[type=\"text\"], .ctrl input[type=\"date\"], .ctrl input[type=\"number\"]. Al cambiar dos campos a type=\"email\" y type=\"tel\" —que es lo correcto— se quedaron fuera y colapsaron a 19px de alto. Lo que aplica a todos los campos se escribe .ctrl input:not([type=\"file\"]):not([type=\"checkbox\"]):not([type=\"radio\"])»",
+    "hay_en_el_build": ".ctrl input[type=\"text\"],.ctrl input[type=\"date\"],.ctrl input[type=\"number\"],.ctrl select,.ctrl textarea{border:…;padding:9px 12px;font:400 var(--fs-dense) var(--font-ui);width:100%}",
+    "selector": ".ctrl input[type=\"text\"], .ctrl input[type=\"date\"], .ctrl input[type=\"number\"]",
+    "evidencia": "Línea 581 del <style>: es la enumeración exacta, carácter por carácter, que §10 trampa 2 documenta como el fallo ya ocurrido. Se agrava con §6.16 regla 6 («el tipo de campo es el tipo del dato»): el día que la placa pase a inputmode/pattern o se añada un teléfono o un correo, ese campo sale del selector y colapsa",
+    "por_que_importa": "La hoja está escrita de forma que cumplir la regla de tipos de campo rompe el tamaño de los campos — y el fallo es silencioso, no da error."
+   },
+   {
+    "id": "f1-42alta-02",
+    "severidad": "alta",
+    "regla": "§6.16 regla 3 — required y aria-required de verdad, no asteriscos decorativos",
+    "dice_el_sistema": "«required y aria-required de verdad, no asteriscos decorativos»",
+    "hay_en_el_build": "<label for=\"cli\">Cliente <span class=\"req\">*</span></label> en cuatro campos (cli, tt, canal, rec), con .ctrl > label .req{color:var(--err-ink)}. Ningún control lleva required ni aria-required",
+    "selector": ".ctrl > label .req",
+    "evidencia": "Medido sobre los 11 controles: required=0, aria-required=0, aria-invalid=0. Los cuatro asteriscos existen solo como <span class=\"req\">*</span> pintado en --err-ink",
+    "por_que_importa": "Un lector de pantalla no anuncia ningún campo como obligatorio, y el navegador no impide enviar el formulario sin cliente, tipo de trámite, canal ni fecha."
+   },
+   {
+    "id": "f1-42alta-03",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles + §10 trampa 4 — casillas",
+    "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo»; los dos casos que el bloque dejaba fuera: «casillas de 15×15px → .selfila{display:flex;align-items:center;min-height:24px;padding:4px;margin:-4px} + input[type=\"checkbox\"]{width:16px;height:16px;accent-color:var(--accent)}»; «el destino táctil es la región que acepta la pulsación»",
+    "hay_en_el_build": "<label style=\"display:flex;gap:8px;align-items:center;font-size:var(--fs-dense);font-weight:400\"><input type=\"checkbox\" checked> Tarjeta de circulación vigente</label> — cinco veces, sin ninguna regla CSS para .ctrl input[type=\"checkbox\"] y sin min-height en la etiqueta",
+    "selector": ".ctrl.ancho label",
+    "evidencia": "Medido a 1440px: las cinco etiquetas miden 998×15px y las cinco casillas 15×15px. La etiqueta es la región pulsable, pero tiene 15px de alto, así que el destino no llega a 24px por ninguna de las dos vías. Coincide con el brief: casillas_bajo_24 = 5. El panel de filtros de 22_gestoria sí lo hace bien (.pop-l input[type=\"checkbox\"]{width:16px;height:16px} con etiqueta de 36px), así que el patrón correcto existe dentro del mismo paquete",
+    "por_que_importa": "La lista de documentos recibidos es el control que más se toca de esta pantalla y cada casilla es un destino de 15px de alto."
+   },
+   {
+    "id": "f1-42alta-04",
+    "severidad": "alta",
+    "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+    "dice_el_sistema": "«un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero»",
+    "hay_en_el_build": "Bajo el <select id=\"canal\"> conviven DOS avisos visibles a la vez y contradictorios: <span class=\"aviso-canal si\"><b>Ventanilla arranca el reloj.</b>…</span> y <span class=\"aviso-canal no\"><b>Traspaso interno NO arranca el reloj.</b>…</span>. El único <script> maneja tema, cajón del menú y el andamio .demo [data-set]; no hay nada escuchando el select",
+    "selector": ".aviso-canal.si, .aviso-canal.no",
+    "evidencia": "Medido con el andamio oculto: ambos tienen display:flex y offsetParent distinto de null — los dos se pintan a la vez. Visible en 42_alta_tramite_gestoria--ok.png: la banda verde y la ámbar, una encima de otra, bajo un select que dice «Ventanilla · Querétaro». grep -c querySelectorAll = 2, las dos sobre .demo [data-set]. HALLAZGO TRANSVERSAL de controles inertes: se enuncia una vez para toda la pantalla (afecta también a Cancelar, Guardar borrador, Crear expediente y los botones de los estados vacío y error), no uno por control",
+    "por_que_importa": "La pantalla afirma al mismo tiempo que el canal elegido arranca el reloj y que no lo arranca; es la decisión que la propia pantalla declara más importante y queda dicha dos veces en sentidos opuestos."
+   },
+   {
+    "id": "f1-42alta-05",
+    "severidad": "alta",
+    "regla": "§8 Voz de producto (ANEXO B), límites 1 y 2",
+    "dice_el_sistema": "«.nota y .banda llevan como máximo UNA frase, sin punto y coma ni raya explicativa después del primer punto. No hay excepción por importancia del contenido»; «Ningún bloque de texto siempre visible pasa de ~140 caracteres»; «si el texto explica una decisión, no va en pantalla»",
+    "hay_en_el_build": "<div class=\"banda b-warn\"><p><b>El canal de entrada decide si este trámite va a tener plazo.</b> Con un canal que arranca el reloj… Por eso el canal se elige aquí y se dice qué hace cada uno.</p></div>",
+    "selector": ".banda.b-warn",
+    "evidencia": "innerText medido: 381 caracteres, 2,7 veces el tope de 140, cuatro oraciones. La última («Por eso el canal se elige aquí y se dice qué hace cada uno») explica por qué se diseñó así, que es el nivel 3 de §8: no va en la interfaz. Los dos .aviso-canal añaden 102 y 155 caracteres más, el segundo también sobre el tope. La .banda b-info de arriba («Propuesta TRAZO con componentes de Studio — pendiente de revisión de Studio», 75 caracteres) habla del estado de revisión de la maqueta",
+    "por_que_importa": "El formulario abre con cinco líneas de explicación antes del primer campo, y el aviso que de verdad bloquea la acción queda enterrado entre ellas."
+   },
+   {
+    "id": "f1-42alta-06",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 — isotipo con viewBox repetido",
+    "dice_el_sistema": "«medidas en el <use> y sin viewBox en el envoltorio»; «se comprueba midiendo la caja del <use> contra la del <svg>: si el desplazamiento no es ~0, está mal»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el logo lateral y <svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> en el FAB",
+    "selector": ".logo svg, .fab svg",
+    "evidencia": "getBoundingClientRect del <use> contra el del <svg> a 1440px: logo dx=-32px, FAB dx=-16px. En 42_alta_tramite_gestoria--ok.png la marca es una astilla verde sobre el wordmark. 08_detalle_tramite del mismo paquete lo escribe bien (dx=+1px)",
+    "por_que_importa": "La marca sale recortada en la pantalla de alta, que es la primera que ve alguien que entra a dar de alta un expediente."
+   },
+   {
+    "id": "f1-42alta-07",
+    "severidad": "alta",
+    "regla": "§2.1 Suelo tipográfico de 12px + §2 — ayuda de campo a --fs-dense",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí»; §2: --fs-dense (13px) = «Tablas densas, cuerpo compacto, ayuda de campo»",
+    "hay_en_el_build": ".ctrl .ayuda{font-size:11px;color:var(--text-3);line-height:1.45} y .ctrl .mal{font-size:11px;color:var(--err-ink)} — el mensaje de error del campo también a 11px. Además .idx.tnum, .cromo-av y .state .ref a 11px, y dos fragmentos a 11,5px",
+    "selector": ".ctrl .ayuda, .ctrl .mal",
+    "evidencia": "Estilo calculado a 1440px, andamio oculto: 3 .ayuda a 11px, 1 .ref a 11px, 3 .idx a 11px. El archivo declara --fs-dense:13px y --fs-meta:12px y no usa ninguno de los dos en la ayuda de campo",
+    "por_que_importa": "La ayuda de campo es lo que resuelve la duda en el momento de capturar («Si el vehículo aún no tiene placa, se deja en blanco»), y va 2px por debajo del suelo; el mensaje de error, cuando exista, irá igual."
+   },
+   {
+    "id": "f1-42alta-08",
+    "severidad": "media",
+    "regla": "§6.16 regla 6 — el tipo de campo es el tipo del dato, con autocomplete",
+    "dice_el_sistema": "«el tipo de campo es el tipo del dato (type=\"email\", type=\"tel\", inputmode=\"numeric\") + autocomplete»",
+    "hay_en_el_build": "<input type=\"text\" id=\"pl\" value=\"\" placeholder=\"AAA-00-AA\"> para la placa, sin inputmode, sin pattern y sin autocomplete; ninguno de los 11 controles lleva autocomplete",
+    "selector": ".ctrl input#pl",
+    "evidencia": "Medido sobre los 11 controles: autocomplete=0, inputmode=null en todos. Los tipos presentes son select-one, text, date, checkbox y textarea",
+    "por_que_importa": "La placa se captura a mano muchas veces al día y el campo no ofrece ni teclado adecuado ni validación de formato, aunque el marcador de posición ya declara el formato esperado."
+   },
+   {
+    "id": "f1-42alta-09",
+    "severidad": "media",
+    "regla": "§6.16 regla 2 — dos niveles de obligatoriedad con palabras distintas",
+    "dice_el_sistema": "«dos niveles de obligatoriedad con palabras distintas — «obligatorio para dar de alta» vs «necesario para facturar o programar»»",
+    "hay_en_el_build": "Un único asterisco rojo para los cuatro campos obligatorios y nada para los demás; no hay ninguna leyenda que diga qué significa el asterisco ni ningún segundo nivel",
+    "selector": ".ctrl > label .req",
+    "evidencia": "Los cuatro .req miden lo mismo y tienen el mismo color (rgb(176,58,49) = --err-ink). La pantalla sí distingue conceptualmente dos niveles en el texto («El expediente nace recibido y sin admitir. Se admite —y arranca el reloj— cuando estén los cinco») pero no lo refleja en el marcado de los campos",
+    "por_que_importa": "No se distingue lo que impide crear el expediente de lo que solo hace falta más adelante, que es exactamente lo que esta pantalla tiene que separar."
+   },
+   {
+    "id": "f1-42alta-10",
+    "severidad": "media",
+    "regla": "§6.16 regla 7 — el contador de sección habla en español, no en aritmética, y si cuenta, cuenta bien",
+    "dice_el_sistema": "«el contador de sección habla en español, no en aritmética, y si cuenta, cuenta bien»",
+    "hay_en_el_build": "Sección 1 «Cliente y trámite»: <span class=\"est\">2 de 2 capturados</span>, en una sección con tres controles (Cliente, Tipo de trámite, Placa). Sección 2: «decide el plazo». Sección 3: «2 de 5 marcados»",
+    "selector": ".seccion > header .est",
+    "evidencia": "Medido: los tres rótulos son «2 de 2 capturados», «decide el plazo» y «2 de 5 marcados». La sección 1 contiene 3 campos y el contador dice 2 de 2: o cuenta solo los obligatorios sin decirlo, o está mal. El de la sección 3 sí cuadra (2 de 5 casillas marcadas). El de la sección 2 no es un contador, así que el mismo sitio significa dos cosas distintas",
+    "por_que_importa": "El contador que más se mira al rellenar deja fuera un campo sin decir que lo deja fuera, y la misma ranura unas veces cuenta y otras explica."
+   },
+   {
+    "id": "f1-42alta-11",
+    "severidad": "media",
+    "regla": "§6.9 — antes de escribir una clase nueva, verificar si .banda ya lo cubre",
+    "dice_el_sistema": "«Antes de escribir una clase nueva, verificar si .banda + una de sus cuatro variantes ya lo cubre»; .banda-ok usa --ok-bg/--ok-ink y .banda-warn usa --warn-bg/--warn-ink. Trampa adicional de §6.9: «también se reinventan componentes enteros por no buscar primero si ya existen»",
+    "hay_en_el_build": ".aviso-canal{display:flex;gap:var(--sp-3);align-items:flex-start;border-radius:var(--r-ctrl)…} con .aviso-canal.si{background:var(--ok-bg);color:var(--ok-ink)} y .aviso-canal.no{background:var(--warn-bg);color:var(--warn-ink)} — en un archivo que ya declara .banda y usa .banda.b-info y .banda.b-warn",
+    "selector": ".aviso-canal",
+    "evidencia": "Líneas 647-651 frente a la .banda del mismo <style>. .aviso-canal.si es .banda-ok y .aviso-canal.no es .banda-warn, con los mismos tokens y otro nombre; solo cambia el radio (--r-ctrl en vez del borde transparente de .banda)",
+    "por_que_importa": "La misma pantalla pinta avisos con dos componentes distintos, así que un cambio en .banda no alcanza a la mitad de los avisos."
+   },
+   {
+    "id": "f1-42alta-12",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga",
+    "dice_el_sistema": "«sin texto real dentro de las barras»; «prefers-reduced-motion aplana el fondo, no solo detiene la animación»: {.skel{animation:none;background:var(--surface-2)}}",
+    "hay_en_el_build": "<span class=\"skel\" style=\"width:30%\">Cliente y trámite</span>, …>cliente<, …>aviso del canal<, …>fecha de recepción< en las dos cajas; y @media (prefers-reduced-motion:reduce){.skel{animation:none}}",
+    "selector": ".state-loading .skel",
+    "evidencia": "Medido: 8 de 8 barras .skel llevan texto. Con reducedMotion:'reduce', animation-name:none pero background-image sigue siendo linear-gradient(90deg, rgb(231,237,243) 25%, …) y background-color rgba(0,0,0,0): el degradado se congela en vez de aplanarse",
+    "por_que_importa": "Un lector de pantalla lee nombres de campo falsos mientras el formulario carga, y con movimiento reducido el esqueleto queda a medio pintar."
+   },
+   {
+    "id": "f1-42alta-13",
+    "severidad": "media",
+    "regla": "§2 — las fuentes se autoalojan y la comprobación es que carguen",
+    "dice_el_sistema": "«Las fuentes se autoalojan (D116)… @font-face con font-display:swap sobre /fuentes/inter-variable.woff2 y /fuentes/michroma.woff2. La comprobación es que la fuente aparezca cargada en las herramientas de red, no la declaración de --font-ui»",
+    "hay_en_el_build": "--font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif y --font-brand con 'Ethnocentric Rg' y 'Michroma', sin ningún @font-face y sin ningún <link>",
+    "selector": ":root",
+    "evidencia": "Medido en vivo: document.fonts.size = 0; grep de @font-face = 0 y de <link> = 0. La tipografía depende de que Inter esté instalada en el equipo de quien mire",
+    "por_que_importa": "La maqueta se ve con Inter en un equipo que la tenga y con la fuente del sistema en cualquier otro, sin que nada lo avise."
+   },
+   {
+    "id": "f1-42alta-14",
+    "severidad": "media",
+    "regla": "§7.2 — en modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece",
+    "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece»",
+    "hay_en_el_build": "@media (min-width:860.02px) and (max-width:1100px){.side{width:64px;padding:16px 8px} .side .et,.grp,.side .wordmark{display:none}} y ningún title en los <a class=\"it\">",
+    "selector": ".side .it .et",
+    "evidencia": "Medido a 1000px de ancho: .side mide 64px y getComputedStyle(.side .et).display = none. Los ítems son <a class=\"it\" href=\"#\"><svg class=\"ico\"/><span class=\"et\">Tablero</span></a>, sin title. 22_gestoria, con la misma media query, usa en cambio el recorte de .sr (la etiqueta sobrevive para el lector de pantalla): dos pantallas del mismo paquete resuelven el mismo caso de dos formas distintas, y ninguna de las dos pone la etiqueta emergente",
+    "por_que_importa": "Entre 860 y 1100px la navegación queda en diez iconos sin nombre, y aquí además el nombre se pierde también para el lector de pantalla."
+   },
+   {
+    "id": "f1-42alta-15",
+    "severidad": "media",
+    "regla": "§1.1 — valor canónico de --text-3",
+    "dice_el_sistema": "«--text-3 es #5C6675, no el antiguo #66717F (que caía a 4,21:1 sobre --surface-2)»",
+    "hay_en_el_build": "--text-3: #66717F; en el bloque de tema claro",
+    "selector": ":root",
+    "evidencia": "Leído en vivo: getComputedStyle(:root).getPropertyValue('--text-3') = #66717F, igual que las otras cuatro del lote. El brief mide 0 fallos de contraste en claro y en oscuro. Severidad media y no alta porque en esta pantalla concreta no he encontrado ningún texto en --text-3 que caiga sobre --surface-2: .ayuda y .barra-form .izq van sobre --surface y sobre --bg, y la pantalla no tiene filas con sobrevuelo",
+    "por_que_importa": "No hay daño medible aquí, pero el token obsoleto viaja con el archivo y en cuanto algo en --text-3 caiga sobre --surface-2 baja a 4,21:1."
+   },
+   {
+    "id": "f1-42alta-16",
+    "severidad": "media",
+    "regla": "§6.5 Iconos — Material Symbols Rounded, variante rellena",
+    "dice_el_sistema": "«todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1)», cargada por subconjunto con un solo <link>",
+    "hay_en_el_build": "Sprite propio de <symbol> SVG de trazo: .ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none}. No existe .msi en el archivo",
+    "selector": ".ico",
+    "evidencia": "grep: 0 ocurrencias de 'Material Symbols' y de .msi en las cinco pantallas del lote. Los iconos llevan aria-hidden=\"true\", que es el requisito a11y de §6.5",
+    "por_que_importa": "El paquete usa un sistema de iconos distinto del documentado; el peso visual no coincide con el resto del producto."
+   },
+   {
+    "id": "f1-42alta-17",
+    "severidad": "baja",
+    "regla": "§10 trampa 10 — una clase corta no se declara dos veces en el mismo archivo",
+    "dice_el_sistema": "«Antes de escribir .algo{...} se busca con grep -n '^\\.algo{' en el archivo: si ya existe, la regla se añade a la declaración existente»",
+    "hay_en_el_build": ".tabla-caja{ declarado dos veces en un archivo que no tiene ninguna tabla",
+    "selector": ".tabla-caja",
+    "evidencia": "grep -oE '^\\.[a-z0-9-]+\\{' 42_alta_tramite_gestoria.html | sort | uniq -d devuelve .tabla-caja{. El brief confirma tablas=0 y th=0: las dos declaraciones son código muerto heredado de la plantilla de bandeja",
+    "por_que_importa": "Severidad baja porque hoy no pinta nada, pero la duplicación viaja a cualquier pantalla que se copie de esta."
+   },
+   {
+    "id": "f1-42alta-18",
+    "severidad": "baja",
+    "regla": "§7.3 — la regla táctil lleva :root",
+    "dice_el_sistema": ":root[data-tacto=\"dedo\"] .it, :root[data-tacto=\"dedo\"] .iconbtn, :root[data-tacto=\"dedo\"] .btn{min-height:46px}; «Se comprueba midiendo con data-tacto=\"dedo\" puesto»",
+    "hay_en_el_build": "[data-tacto=\"dedo\"] .it{min-height:46px} … 6 reglas, todas sin :root",
+    "selector": "[data-tacto=\"dedo\"]",
+    "evidencia": "Comprobado midiendo con data-tacto=\"dedo\" puesto: .it y .iconbtn llegan a 46px, así que la regla gana igual porque la pantalla no dibuja ningún .acciones .iconbtn que la empate. El bug es latente. Lo que sí queda fuera del bloque, con o sin :root, son las cinco casillas y sus etiquetas, recogidas en f1-42alta-03",
+    "por_que_importa": "Hoy no rompe nada; el daño real del modo dedo en esta pantalla no es la especificidad sino que las casillas no están en el bloque."
+   },
+   {
+    "id": "f1-42alta-19",
+    "severidad": "baja",
+    "regla": "§6.4 / §1.4.1 — tinta sobre relleno sólido de color",
+    "dice_el_sistema": ".estado-ico{52px;border-radius:50%;background:var(--accent);color:var(--on-state)}; §1.4.1: «Glifo o texto sobre relleno sólido de color usa --on-state, no un gris de texto»",
+    "hay_en_el_build": ".estado-ico{width:52px;height:52px;border-radius:50%;…background:var(--accent);color:var(--accent-ink)}",
+    "selector": ".estado-ico",
+    "evidencia": "Línea 626 del <style>: usa --accent-ink en vez de --on-state. En este archivo los dos tokens valen lo mismo en los dos temas (#F7FAF9 claro, #08120D oscuro), así que no hay consecuencia visual medible; es divergencia de nomenclatura. El resto de §6.4 sí se cumple: .tarjeta-estado con <h2> real y medallón de 52px en los dos estados",
+    "por_que_importa": "Sin efecto hoy; si --accent-ink y --on-state se separan alguna vez, el glifo del medallón dejará de seguir la regla."
+   }
+  ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 1
+  },
+  "justificacion": "Accesibilidad 1: ningún campo lleva required ni aria-required pese a marcar cuatro con asterisco, las cinco casillas y sus etiquetas son destinos de 15px, la ayuda de campo va a 11px y no está vinculada a ningún control por aria-describedby, y el esqueleto lleva texto dentro de las barras. Theming 3: los dos temas están completos y medidos (brief: 0 fallos de contraste en claro y en oscuro, tema oscuro medido), no hay un solo hex literal fuera de los bloques de tema y no hay tokens usados sin declarar; baja de 4 por --text-3 obsoleto y por los tamaños literales de 11px. Responsive 3: la rejilla del formulario es la de §6.16 (repeat(auto-fit,minmax(230px,1fr)), medida en 4 columnas a 1440px y 2 a 760px), no hay desplazamiento horizontal de página a 760px y existe el cajón con velo; baja de 4 porque entre 860 y 1100px los rótulos del menú se ocultan con display:none y sin etiqueta emergente. Integridad 1: dos avisos contradictorios visibles a la vez bajo el mismo select, el isotipo desplazado 32px, el selector de tamaño de campo escrito por enumeración (la trampa de §10 ya documentada), .tabla-caja declarado dos veces en un archivo sin tablas, y todos los controles de producto inertes.",
+  "evidencia": [
+   "Medido: .aviso-canal.si y .aviso-canal.no, ambos display:flex y offsetParent != null — visibles a la vez (42_alta_tramite_gestoria--ok.png)",
+   "11 controles: required=0, aria-required=0, aria-invalid=0, autocomplete=0, inputmode=null",
+   "5 etiquetas de casilla de 998x15px con casillas de 15x15px",
+   "Línea 581: .ctrl input[type=\"text\"],[type=\"date\"],[type=\"number\"] — enumeración literal de §10 trampa 2",
+   "getBoundingClientRect del <use> contra el <svg>: dx=-32px (logo), dx=-16px (FAB)",
+   "getComputedStyle: 3 .ayuda a 11px, 3 .idx a 11px, .ref a 11px",
+   "Rejilla medida: 237,5px x4 a 1440px y 339px x2 a 760px",
+   "Estados vacío y error: .tarjeta-estado con h2 real y .estado-ico presente — cumplen §6.4",
+   "8 de 8 barras .skel con texto; document.fonts.size = 0"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+ },
+ "cobertura": [
+  {
+   "patron": "Lista de acuse de documentación: cinco casillas que declaran qué documentos trae ya el expediente, sin adjuntar ningún archivo. §6.17 regula el caso de pedir un documento («un documento no se pide en una caja de texto») y da los valores de .subida, pero no dice nada del caso de registrar la recepción de un documento que llega en papel o por otro canal, que es lo que esta pantalla hace.",
+   "propuesta_de_regla": "§6.17.1 Acuse de documentación — .acuse-docs. Cuándo: se registra que un documento llegó, pero el archivo no entra por esta pantalla (ventanilla, mensajería, otro sistema). No se usa cuando el archivo sí puede adjuntarse: ahí va .subida (§6.17). Cada renglón es una <label> de 24px de alto como mínimo (§7.3) con su casilla de 16px y accent-color:var(--accent); el nombre del documento es el mismo literal que usa la bandeja cuando dice qué falta, para que las dos pantallas se refieran a lo mismo con las mismas palabras. El renglón marcado dice quién lo marcó y cuándo, igual que §6.17 exige nombre y fecha del archivo cargado. Si el documento sí se puede adjuntar, el renglón ofrece la subida en el sitio y no obliga a cambiar de pantalla."
+  },
+  {
+   "patron": "Ayuda de campo .ayuda bajo un control, sin id y sin que ningún control la referencie. §6.17 sí exige «aria-describedby del <input> al id de la ayuda», pero lo dice dentro del componente .subida; §6.16 enumera los valores de .ctrl y de label pero no fija nada para la ayuda de campo más allá de que §2 la sitúa en --fs-dense. No hay regla general.",
+   "propuesta_de_regla": "Añadir a §6.16 una novena regla: «La ayuda de un campo se vincula al campo. Todo texto de ayuda lleva id y el control lo apunta con aria-describedby, igual que §6.17 exige para .subida. Va a var(--fs-dense) —el suelo de 12px no admite excepción aquí (§2.1)— y en --text-3. Si la ayuda no cabe en una línea bajo el campo, es nivel 2 de §8 y va a toggletip (§6.23), no a un párrafo bajo el control.» Medido en esta maqueta: 3 .ayuda sin id y 0 aria-describedby en 11 controles."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática sin backend que perfilar",
+  "§6.16 regla 5 (el error se vincula con aria-invalid + aria-describedby): la pantalla no muestra ningún campo en error, y §6.16 regla 4 dice que no debe haberlo antes de la interacción; el CSS declara .ctrl.error y .ctrl .mal, que ningún markup activa, así que no hay estado de error que medir",
+  "§6.16 regla 1 (dato calculado como dato, .dato-calc): el formulario no muestra ningún dato calculado",
+  "§6.16 regla 8 (guardado automático o botón de guardar, no los dos): hay «Guardar borrador» y no hay autoguardado, así que no hay conflicto; pero sin lógica no se puede comprobar que no exista un autoguardado previsto",
+  "§6.11, §6.12, §6.21, §6.13, §6.14: la pantalla no tiene tabla, ni resumen de estatus, ni barra de filtros, ni selección múltiple (brief: tablas=0, th=0)",
+  "§6.18 Diálogo modal: 0 <dialog> y 0 div[role=dialog]",
+  "§6.20 Ficha de detalle: no aplica a este arquetipo"
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--border-fuerte",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--velo-trama",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-activo",
+   "--chrome-dim",
+   "--chrome-focus",
+   "--chrome-hover",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--link",
+   "--marca-3",
+   "--marca-azul",
+   "--marca-halo",
+   "--marca-halo-suave",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--velo-modal",
+   "--velo-suave",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [],
+  "declarados_no_usados": [
+   "--block",
+   "--block-fill",
+   "--border-fuerte",
+   "--dur-enter",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--fs-kpi",
+   "--glass",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--sp-12",
+   "--stagger",
+   "--velo-trama",
+   "--warn",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 83,
+  "n_usados": 66,
+  "n_divergentes": 15,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": true,
+   "filas": 0,
+   "nodosText3": 0
+  }
+ }
+}

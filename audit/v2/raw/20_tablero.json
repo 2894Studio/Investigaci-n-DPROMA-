@@ -1,0 +1,409 @@
+{
+  "pantalla": "20_tablero",
+  "tier": "B",
+  "sha256": "3ae1406ea8e1ec70476901c3ff9e2184bd8842705ac3d8aa89fc017386627721",
+  "estado_entrega": "modificada",
+  "estado_vs_pdf": "alineado",
+  "estados_auditados": [
+    "ok (rol Dirección, completo)",
+    "vacío y error (solo código)"
+  ],
+  "capturas": [
+    "20_tablero--1440.png",
+    "20_tablero--1280-fold.png"
+  ],
+  "observaciones_resueltas": [
+    {
+      "hoja": 6,
+      "texto_usuario": "«Volumen de las últimas 12 semanas»: gráficas ininteligibles; texto amontonado sobre las barras; dar orden.",
+      "veredicto": "parcial",
+      "evidencia": [
+        {
+          "certeza": "leido_en_codigo",
+          "reproduce": {
+            "tipo": "codigo",
+            "linea": 901,
+            "cita": "<div class=\"semanas\" role=\"img\""
+          },
+          "dato": "Cómo está hecha: no hay `<canvas>` ni librería. El bloque es HTML/CSS y SVG: 12 columnas `div.sem` con una pila de dos `<i>` (`.a` = --serie-1, `.b` = --serie-2) y, debajo, dos `<svg viewBox=\"0 0 260 60\"><polyline class=\"spark\">`. Verificado con `grep -n -E 'canvas|<table'`: 0 coincidencias de `<canvas>` y 0 de `<table>` en todo el archivo (las únicas `<svg>` son iconos, el isotipo y las dos polilíneas)."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "script mi/t20b.cjs + mi/t20c.cjs (Playwright 1440, tras 2,5 s de animación)",
+            "detalle": "getBoundingClientRect de `.sem .pila`: la columna 1 («hace 12 sem») y la 12 («esta sem») tienen rótulo de 15 px; las otras diez traen `<span class=\"et\"></span>` vacío (0 px). Base de la pila: y=1033 en las columnas 1 y 12; y=1048 en las diez restantes. Idéntico a 1280, 1181 y 1024."
+          },
+          "dato": "Las barras de la primera y la última semana quedan 15 px por encima de la línea base de las otras diez: no hay una base común. La barra de «esta sem» (la semana en curso, la que se mira primero) se ve 15 px más alta de lo que es (96 px reales; se lee como ~111). Es la causa de que la gráfica «no se entienda»: el ojo compara tope con tope y dos de los doce topes están desplazados."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "script mi/t20g.cjs (Playwright, solape de Range del rótulo contra `.pila` de la columna vecina)",
+            "detalle": "Ancho de columna 1: 71 px a 1440/1280, 67 a 1024, 57 a 900, 46 a 700, 20 a 390. El rótulo «hace 12 sem» mide 74 px con `white-space:nowrap`. Solape con la barra 2: false a 1440, 1280, 1181, 1100 y 1024; true a 900, 700 y 390."
+          },
+          "dato": "«Texto amontonado sobre las barras» se reproduce por debajo de ~1000 px de ancho: la barra de la columna 2 tapa «12 se» de «hace 12 sem», y «esta sem» sale cortado por el borde derecho. A 1440, 1280 y 1024 px no hay texto sobre las barras."
+        },
+        {
+          "certeza": "leido_en_codigo",
+          "reproduce": {
+            "tipo": "codigo",
+            "linea": 900,
+            "cita": "trámites y órdenes no comparten escala, así que nunca comparten eje"
+          },
+          "dato": "El texto dice «Un solo eje en cada gráfica: trámites y órdenes no comparten escala, así que nunca comparten eje», pero las barras apiladas (`.pila > i.a` + `i.b`, líneas 902-903) suman trámites y órdenes en la misma altura: comparten eje y su suma (15 a 25) no es una medida de nada. La ficha cita doc 34 §5: «Un solo eje por gráfica; órdenes y trámites en dos mini-gráficas». Las dos mini-gráficas existen debajo (líneas 908 y 912) pero la de arriba las contradice."
+        },
+        {
+          "certeza": "leido_en_codigo",
+          "reproduce": {
+            "tipo": "codigo",
+            "linea": 901,
+            "cita": "role=\"img\" aria-label=\"Doce semanas de trámites admitidos y órdenes cerradas; la última semana, 18 trámites y 7 órdenes\""
+          },
+          "dato": "Orden/lectura: la gráfica no tiene valores, ni escala vertical, ni rótulos de semana salvo los de los extremos; la gráfica de estado de al lado sí tiene eje `0 … 80` (línea 824, `.eje`). Del conjunto de 24 valores (12 semanas × 2 series) solo 2 son recuperables (el `aria-label`) y no hay tabla equivalente (§12.3)."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "script mi/t20d.cjs (Playwright 1280)",
+            "detalle": "`svg` de la sparkline: ancho de caja 463 px; ancho de la polilínea 242 px (viewBox 260×60 a escala 1:1 porque `height=60` y `width=100%` sin `preserveAspectRatio=\"none\"`). A 390 px la caja mide 324 y el dibujo sigue en 260."
+          },
+          "dato": "Las dos líneas de tendencia ocupan ~55 % del ancho de su caja, centradas, con el «18/sem» pegado al borde derecho: parecen sueltas de su cifra y no aprovechan el ancho de la tarjeta (§13.3)."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "I7_colision_texto (brief)",
+            "detalle": "I7: colisiones 1, a=`b«me la inventé»`, b=`b«El hueco se re»`, solape 1. Ambas `<b>` están en el `.pie` de la tarjeta «Por cobrar» (línea 829), no en el bloque de 12 semanas."
+          },
+          "dato": "El único candidato de I7 no es esta gráfica y es un falso positivo: el rectángulo de un `<b>` que se parte en dos renglones es la caja envolvente de los dos fragmentos y contiene al `<b>` vecino. En la captura 20_tablero--1440.png el texto de esa tarjeta se lee sin solape. I7 no detecta el problema real de la gráfica semanal (el rótulo que desborda su columna)."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "captura",
+            "archivo": "20_tablero--1440.png",
+            "region": "Pliegue de 800 px de alto: el bloque «Volumen de las últimas 12 semanas» queda por debajo (y≈937 del documento) y no aparece"
+          },
+          "dato": "Contradicción del brief: dice que `--1440.png` es página completa, pero mide 1440×800 (el scroll es interno a `main`). La observación no se puede ver en las capturas del paquete; se evaluó renderizando el bloque (Playwright, 1440/1280/1024/900/700/390)."
+        }
+      ],
+      "causa_raiz": "(1) `.sem` es una columna flex cuyo rótulo `.et` existe solo en 2 de 12 columnas: el rótulo ocupa 15 px en esas dos y 0 en las otras, y `justify-content:flex-end` baja cada pila hasta su propio rótulo, de modo que no comparten línea base (CSS líneas 725-732). (2) `.sem .et{white-space:nowrap}` con texto de 74 px en una columna que a 900 px mide 57: desborda y las barras vecinas lo tapan. (3) La pieza no declara escala, valores ni tabla (§12.3) y mezcla en una pila dos medidas que el propio texto dice que no comparten eje. (4) `svg viewBox` sin `preserveAspectRatio`.",
+      "solucion_propuesta": "Cuatro cambios, de menor a mayor: (a) fila de rótulos propia: `.semanas{display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:132px auto;align-items:end;column-gap:var(--sp-2)}` con la pila en la fila 1 y el rótulo en la fila 2 de las doce columnas, o bien quitar el rótulo de la columna y usar `.eje` (ya se usa en la línea 824) debajo con «hace 12 sem … esta sem»: base común, 0 solapes; (b) bajo 1000 px, `.sem .et{display:none}` y que solo se vea el `.eje`; (c) tabla equivalente en `<details class=\"viz-tabla\">` con 12 filas × 2 series y total en `<tfoot>` (§12.3): resuelve de paso los 22 valores no recuperables; (d) decidir si la pila se queda: si cada serie tiene su mini-gráfica debajo (ya las tiene), la pila puede ser una sola serie (trámites admitidos) y la segunda mini-gráfica deja de ser redundante; y `preserveAspectRatio=\"none\"` + `vector-effect:non-scaling-stroke` en las polilíneas para que ocupen la caja. Coste: (a)+(b) 6 líneas de CSS; (c) 24 celdas de marcado; (d) decisión de diseño, no técnica.",
+      "tipo_de_cambio": "medio",
+      "critico": {
+        "es": false,
+        "criterio": null
+      },
+      "decision": {
+        "valor": "decidir_diseño",
+        "motivo": "No es crítico (no hay fallo de contraste, tamaño ni nombre medido en este bloque). La corrección de base común y rótulos es sencilla y mejora la lectura (Regla 2); la decisión abierta es si la pila de dos medidas se mantiene, porque contradice el texto de la propia tarjeta y la ficha (doc 34 §5)."
+      }
+    }
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "cumple_parcialmente",
+    "hallazgos": [
+      {
+        "id": "v2-20tablero-01",
+        "severidad": "alta",
+        "regla": "§12.3 El <canvas> no es accesible (tabla equivalente) + §12.4 Tendencia",
+        "dice_el_sistema": "«Cada gráfico lleva su tabla equivalente, y esa tabla es la fuente de verdad del dato. No es un añadido para cumplir: es lo que hace que la información exista para quien no ve el lienzo.» (§12.3)",
+        "hay_en_el_build": "0 `<table>` y 0 `<canvas>` en el archivo. La gráfica semanal y las dos sparklines solo exponen `role=\"img\"` + `aria-label`; el de las 12 semanas nombra 2 de 24 valores («la última semana, 18 trámites y 7 órdenes»).",
+        "selector": ".semanas, .graficas svg > polyline.spark",
+        "linea": 901,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 901,
+          "cita": "role=\"img\" aria-label=\"Doce semanas de trámites admitidos y órdenes cerradas; la última semana, 18 trámites y 7 órdenes\""
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "El cliente no usa canvas (§12.1 permite CSS para rectángulos proporcionales) y por eso §12.3, escrita para `<canvas>`, no le llega literalmente. El sistema debe decir que la tabla equivalente vale para cualquier técnica de dibujo (CSS, SVG o canvas) y la gráfica semanal debe llevarla. Las barras de «Trámites por estado» no la necesitan: cada barra lleva su valor en texto."
+        },
+        "por_que_importa": "22 de los 24 valores de la serie semanal solo existen como altura de un `<i>`: no se pueden leer con lector de pantalla, ni copiar, ni verificar contra la cifra de 18 y 7 (§12.5). Sin la tabla, un fallo de dibujo (ver v2-20tablero-02) no se puede detectar leyendo el dato."
+      },
+      {
+        "id": "v2-20tablero-02",
+        "severidad": "media",
+        "regla": "§12.5 Reglas de lectura (un solo eje; la serie y la cifra cuadran)",
+        "dice_el_sistema": "«Un solo eje. Nunca dos escalas verticales en la misma gráfica» y «La serie y la cifra del mismo widget miden lo mismo, y cuadran.» (§12.5)",
+        "hay_en_el_build": "Las columnas 1 y 12 llevan rótulo (15 px) y las otras diez no (0 px): las pilas de 1 y 12 terminan en y=1033 y las demás en y=1048. Dos líneas base en una misma gráfica; la barra de la semana en curso se ve 15 px más alta de lo que es.",
+        "selector": ".semanas > .sem, .sem .et",
+        "linea": 725,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "script mi/t20b.cjs (Playwright 1440/1024/390)",
+          "detalle": "`.sem .pila` getBoundingClientRect().bottom: 1033 (columnas 1 y 12) vs 1048 (columnas 2–11) a 1440; 1266 vs 1281 a 1024; 2229 vs 2244 a 390. Rótulo: altura 15 en las dos columnas con texto, 0 en las otras."
+        },
+        "estado_vs_v1": "nuevo",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "No crítico. §12.5 no nombra la línea base: se anota en `cobertura` como regla nueva. Corrección sencilla y global (Regla 2): rótulos en una fila de rejilla común a las doce columnas, o `.eje` bajo la gráfica; 6 líneas de CSS, ver la respuesta a la observación 6."
+        },
+        "por_que_importa": "La gráfica existe para comparar semanas y la semana más relevante (la última) aparece distorsionada 15 px sobre 96. v1 no lo registró: su archivo tiene la misma estructura (rótulo de 9,5 px en lugar de 12), así que probablemente ya existía."
+      },
+      {
+        "id": "v2-20tablero-03",
+        "severidad": "media",
+        "regla": "§12.5 Un solo eje (dos medidas de magnitud distinta son dos gráficas)",
+        "dice_el_sistema": "«dos medidas de magnitud distinta son dos gráficas.» (§12.5); ficha del cliente (texto de la ficha, no del sistema): Un solo eje por gráfica; órdenes y trámites en dos mini-gráficas, doc 34 §5.",
+        "hay_en_el_build": "Barras apiladas por semana con `i.a` (trámites admitidos) e `i.b` (órdenes cerradas) sumadas en la misma pila, bajo el texto «trámites y órdenes no comparten escala, así que nunca comparten eje». Debajo, las mismas dos series otra vez como sparklines.",
+        "selector": ".semanas .pila > i.a, i.b",
+        "linea": 900,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 900,
+          "cita": "trámites y órdenes no comparten escala, así que nunca comparten eje"
+        },
+        "estado_vs_v1": "nuevo",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Lo declara la ficha como decisión del cliente (barras apiladas), pero contradice la regla que el mismo cliente cita (un solo eje). Es pregunta abierta: dejar la pila como visión de volumen total o quedarse solo con las dos series por separado."
+        },
+        "por_que_importa": "Una pila suma «trámites admitidos» con «órdenes cerradas», que son universos distintos; su altura total (15 a 25) no es ninguna cantidad real y el texto de la tarjeta dice lo contrario de lo que se ve. Cada serie ya se ve entera en las líneas de abajo: la pila duplica y confunde."
+      },
+      {
+        "id": "v2-20tablero-04",
+        "severidad": "media",
+        "regla": "§13.3 Un contenedor no cede el ancho a un descendiente + §12.4 Sparkline / Leyenda inline",
+        "dice_el_sistema": "«Si la tarjeta que envuelve un dato crece (porque el layout le da más espacio), el contenido debe crecer con ella.» (§13.3); Leyenda inline = «Marca de color + rótulo en tinta de texto + cifra» (§12.4).",
+        "hay_en_el_build": "`<svg viewBox=\"0 0 260 60\" width=\"100%\" height=\"60\">`: caja de 463 px (1280) y polilínea de 242 px, centrada. La `.leyenda` de la pila no lleva cifra y el nombre y color de cada serie se repite en la cabecera de cada mini-gráfica (`.gh`).",
+        "selector": ".graficas svg, .leyenda",
+        "linea": 908,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "script mi/t20d.cjs (Playwright 1280/1181/390)",
+          "detalle": "svg.getBoundingClientRect().width = 463 / 431 / 324 y polyline.getBoundingClientRect().width = 242 en los tres anchos."
+        },
+        "estado_vs_v1": "nuevo",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Cosmético y no crítico. Arreglo de una línea (`preserveAspectRatio=\"none\"` y `vector-effect:non-scaling-stroke`); se ofrece, no se exige."
+        },
+        "por_que_importa": "Las tendencias, que son lo que la persona vio como «ininteligible», se dibujan a la mitad de su caja y quedan desconectadas del «18/sem» que las acompaña."
+      },
+      {
+        "id": "v2-20tablero-05",
+        "severidad": "media",
+        "regla": "§1 Decisión previa a elegir color + §6.22 Ámbito de datos",
+        "dice_el_sistema": "«Si es un dato sobre el dato —de qué conjunto habla una cifra— no lleva color propio: va en tinta de texto (§6.22).» (§1); el ámbito «sin relleno, sin borde, icono y texto en tinta auxiliar» (§6.22).",
+        "hay_en_el_build": "`.aparte{border-left:3px solid var(--warn);background:var(--warn-bg)}`, `.aparte .lbl` y `.aparte .porque` en `--warn-ink`: la tarjeta «Viáticos por autorizar» pinta en ámbar el aviso «Estos 14 son de toda la organización, no de tus plazas».",
+        "selector": ".mini.aparte",
+        "linea": 691,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 691,
+          "cita": ".aparte{border-left:3px solid var(--warn);background:var(--warn-bg)}"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "v1 lo puso en alta (f1-20tablero-04); aquí media: es una sola tarjeta y no hay fallo medido. La decisión de separar los viáticos es del sistema (`Tablero.tsx:12-19`, ficha) y se adopta; el ámbar es lo que §6.22 ya describe como error («en una sola pantalla del tablero salía cuatro veces»). Solución: `.aparte` sin borde ni fondo y el aviso en `.ambito` (tinta --text-3), 3 líneas de CSS."
+        },
+        "por_que_importa": "El ámbar de la pantalla lo lleva el único dato que no está mal: se lee «14 viáticos con problema» cuando el texto dice «14 de otro conjunto»."
+      },
+      {
+        "id": "v2-20tablero-06",
+        "severidad": "alta",
+        "regla": "§9 Andamiaje de maqueta + §8 Voz de producto",
+        "dice_el_sistema": "«Se marca siempre con data-andamio, va visualmente separado del producto y rotulado… Todo lo que lleve data-andamio se retira en la versión real.» (§9)",
+        "hay_en_el_build": "Solo el conmutador de estados (`.demo`, línea 954) lleva `data-andamio`. Sin marcar y visible en el primer pliegue: el selector «VIENDO COMO» (`.seg`, línea 792, que declara «el selector es de esta maqueta, no del sistema») y las tarjetas `.mini.hueco` con voz de autor: «La cifra que había aquí —$3.08 M— me la inventé», «el circuito de autorización sólo consta en un documento mío».",
+        "selector": ".seg[role=group], .mini.hueco .pie",
+        "linea": 829,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 829,
+          "cita": "<b>me la inventé</b>"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "El cliente lo declara en la propia pantalla y en la ficha (S-28; «Hueco declarado»), así que el contenido se adopta. Lo que cuesta poco y resuelve el hallazgo: `data-andamio` en `.seg` y en el `<p class=\"nota\">` final, y reescribir los dos `.pie` en voz de producto («Sin dato todavía»). No bloquea la tarea."
+        },
+        "por_que_importa": "Con `[data-andamio]` fuera, el selector de rol y la nota que lo explica seguirían en producción; y una tarjeta que dice «me la inventé» llega tal cual al usuario final."
+      },
+      {
+        "id": "v2-20tablero-07",
+        "severidad": "media",
+        "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional",
+        "dice_el_sistema": "«el relleno de un contenedor lo declara el contenedor, no el hijo que casualmente va último» y la regla `.p4{ padding-bottom: var(--sp-3) }` (§3.1)",
+        "hay_en_el_build": "`.p4{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}` sin `padding-bottom`; el último hijo, `.p4-t`, lleva `padding:var(--sp-3) var(--sp-6) 0`. El selector «Viendo como» y el botón «Actualizar» (`.acc`, que pasa a una segunda línea) terminan 1 px (la línea del borde) sobre el borde inferior del encabezado.",
+        "selector": "header.p4 > .p4-t .acc",
+        "linea": 312,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "I2_holgura_inferior (brief)",
+          "detalle": "I2: `header.p4`, gap 0, altoBarra 86, controles 6. Mi medición a 1440: header.bottom 144,25 y `max(button.bottom)` 143,25 (la diferencia es el borde de 1 px); padding-bottom del header 0 px. Captura recortada a 2x del encabezado (mi/20_hdr.png): el botón de refrescar toca la línea."
+        },
+        "estado_vs_v1": "nuevo",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "No crítico. La regla ya existe (§3.1); solución de una línea: `.p4{padding-bottom:var(--sp-3)}`. La otra fila de I2 (`div.seg` → `button.iconbtn`, gap −31,5) es un falso positivo: el botón es hermano del `.seg`, no hijo."
+        },
+        "por_que_importa": "El encabezado de la portada parece cortado justo en el control con el que se cambia de rol."
+      },
+      {
+        "id": "v2-20tablero-08",
+        "severidad": "baja",
+        "regla": "§2.1 El suelo son 12px (excepción 10,5 px en mayúsculas)",
+        "dice_el_sistema": "«Se admite una excepción, y solo una: 10,5px en mayúsculas con letter-spacing para los rótulos de grupo de la barra lateral y las etiquetas de campo del modo tarjeta.» (§2.1)",
+        "hay_en_el_build": "`.grp{… font-size:10.5px; letter-spacing:.1em}` sin `text-transform:uppercase` y con texto en minúsculas («Principal», «Operación»…): 5 nodos que C2 marca. Además el rótulo «VIENDO COMO» lleva `font-size:10.5px` en línea (línea 792) y no es rótulo de barra lateral ni etiqueta de campo.",
+        "selector": "p.grp, .seg > .et-g",
+        "linea": 792,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "C2_105_no_mayusculas (brief) + script mi/t20e.cjs",
+          "detalle": "C2: fallos 5 (p.grp «Principal», «Operación», «Trámites vehiculares», «Dirección y Administraci…», «Soporte»). Mi recuento de nodos de texto visibles < 12 px fuera de [data-andamio] a 1440: `p.grp @10.5` ×6 (incluye «ICEV», que sí está en mayúsculas) y `span.et-g @10.5` ×1; ninguno más."
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "Contradicción interna del sistema: §2.1 exige mayúsculas, pero el CSS de `.grp` que el propio §7.2 publica no lleva `text-transform:uppercase`. El cliente sigue §7.2. El sistema debe unificar: o `.grp` en mayúsculas, o la excepción sin esa condición. El único nodo propio del cliente fuera de excepción es «VIENDO COMO» (andamio, ver v2-20tablero-06)."
+        },
+        "por_que_importa": "Contradice lo que el PDF declara (0 declaraciones < 12 px): quedan 7 nodos a 10,5 px. Pero 6 son cromo del sistema; no pesa sobre la pantalla del cliente."
+      },
+      {
+        "id": "v2-20tablero-09",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado de una pantalla (regla 2: encabezado real; tarjeta de estado)",
+        "dice_el_sistema": "«Cada estado lleva un encabezado real, no un `<b>`.» (§6.4, regla 2); «El estado va dentro de una tarjeta, no suelto sobre el fondo.»",
+        "hay_en_el_build": "`<div class=\"state state-empty\">…<b>No hay nada en tu alcance todavía</b>` y `<b>No se pudo cargar el tablero</b>`: título en `<b>` y sin `.tarjeta-estado` ni `.estado-ico`. Sí cumple la corrección 2.15.0: `.state > .ico` (hijo directo) en lugar de `.state .ico`.",
+        "selector": ".state.state-empty, .state.state-error",
+        "linea": 928,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 928,
+          "cita": "<b>No hay nada en tu alcance todavía</b>"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "v1 lo puso en alta; aquí media: no hay fallo medido y las vistas solo se alcanzan por el conmutador de andamio. La estructura de §6.4 se ofrece al integrar."
+        },
+        "por_que_importa": "El salto por encabezados no llega a las vistas de vacío y error."
+      },
+      {
+        "id": "v2-20tablero-10",
+        "severidad": "alta",
+        "regla": "§7.2 Cromo de aplicación (modo colapsado) + criterio crítico 1 (control sin nombre accesible)",
+        "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.» (§7.2)",
+        "hay_en_el_build": "Entre 861 y 1100 px: `.side .et,.grp,.side .wordmark{display:none}` oculta el texto de los 15 enlaces `a.it`; el icono es `<svg aria-hidden=\"true\">`, el enlace no lleva `aria-label` ni `title`. El árbol de accesibilidad (ariaSnapshot de `nav.side` a 1000 px) da `link` sin nombre ×15; no hay etiqueta emergente.",
+        "selector": ".side .et (en @media 860.02–1100 px) / a.it",
+        "linea": 291,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "menu_1000px (brief)",
+          "detalle": "menu_1000px: hayMenu true, total 15, sinNombre 15, anchoSide 64. Reproducido con Playwright a 1000 px: `await page.locator('nav.side').ariaSnapshot()` → 15 `link:` sin texto (script mi/t20f.cjs). Citas de código: línea del `display:none` y enlaces `<a class=\"it\" href=\"#\">` sin atributos de nombre."
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": true,
+          "criterio": 1
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Control sin nombre accesible, medido. Arreglo de una línea en el cromo: sustituir el `display:none` por la clase de solo lectores (`.sr`) en `.et` y añadir `title`/etiqueta emergente. Lo que el cliente decidió (colapsar a iconos) se adopta; lo que se exige es que el nombre siga existiendo."
+        },
+        "por_que_importa": "Quien navega con lector de pantalla entre 861 y 1100 px (portátil con ventana reducida, tableta apaisada) oye «enlace» quince veces sin saber a qué módulo va cada uno. No es regresión: el CSS es idéntico en v1 (v1flat, líneas 288 a 291 según la pantalla) y delta_vs_v1.menu_sin_nombre = 0; v1 no lo registró como hallazgo. Es el cromo compartido: aparece igual en las otras pantallas del paquete. Quién lo introdujo no está determinado: la ficha dice que el cromo sale de `Marco.tsx`, no del cliente."
+      }
+    ]
+  },
+  "cerrados_desde_v1": [
+    {
+      "id_v1": "f1-20tablero-05",
+      "evidencia": "`--text-3` ya es `#5C6675` (líneas 71, claro) y 0 fallos de contraste en claro y oscuro (brief: 114 nodos, fallos 0 en ambos); delta_vs_v1.contraste_claro = -1."
+    },
+    {
+      "id_v1": "f1-20tablero-03",
+      "evidencia": "Cerrado en lo esencial: `.sem .et` usa `var(--fs-meta)` (12 px, línea 732) y el brief mide lt12 = 0. Quedan 10,5 px solo en `.grp` y en «VIENDO COMO» (ver v2-20tablero-08)."
+    }
+  ],
+  "f3_boost_ui": {
+    "puntuacion": 3,
+    "dimensiones": {
+      "accesibilidad": 2,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 2,
+      "integridad": 3
+    },
+    "justificacion": "La portada cumple lo medible de contraste (0 fallos en ambos temas), táctil (0 destinos < 24 px) y tokens (0 sin declarar), y de las altas de v1 quedan cerradas dos (--text-3 y el suelo de 12 px, salvo 10,5 px de cromo), además de aplicar `.state > .ico`. Lo que la baja: el cromo colapsado sin nombre accesible (15 enlaces), el bloque de 12 semanas sin base común ni tabla equivalente y con rótulos que se montan sobre las barras bajo ~1000 px, y andamiaje sin marcar en el primer pliegue.",
+    "evidencia": [
+      "brief: tactil bajo24 0, contraste claro/oscuro 0 fallos, menu_1000px sinNombre 15, I2 fallos 2 (1 real), tokens usados no declarados 0",
+      "mi/t20b.cjs: base de pila 1033 vs 1048 px; mi/t20g.cjs: solape de rótulo a ≤ 900 px",
+      "brief: 12 tokens de semáforo con valores distintos al canónico 2.15.0 (--ok-ink #22705A vs #1D5A46, etc.): theming correcto por tokens pero con valores propios"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — Tier B"
+  },
+  "cobertura": [
+    {
+      "patron": "Columnas de una gráfica que no comparten línea base porque el rótulo del eje vive dentro de la columna",
+      "propuesta_de_regla": "Las columnas de una gráfica de barras comparten una sola línea base. El rótulo del eje no vive dentro de la columna: va en una fila común de la rejilla (o en `.eje`) bajo todas, y por debajo de 1000 px solo se muestran los rótulos que caben sin tocar la barra vecina."
+    },
+    {
+      "patron": "Gráfica dibujada en CSS o SVG sin tabla equivalente",
+      "propuesta_de_regla": "§12.3 vale para cualquier técnica de dibujo, no solo `<canvas>`: toda gráfica cuyo dato no esté escrito en el propio dibujo lleva su tabla equivalente. Una barra con su valor en texto (`.barra`) no la necesita."
+    }
+  ],
+  "sin_datos": [
+    "El PDF del cliente (C1–C12) no está en mi brief: solo sé qué códigos el orquestador confirmó. El brief dice «alineado»; es coherente con lo que mido salvo el recuento de < 12 px (ver v2-20tablero-08).",
+    "No se evaluó el contenido de los otros tres roles del selector (ICEV, Gestoría, Instalador) ni los estados cargando/vacío/error con capturas: solo código.",
+    "I3 marca `main` con recorte (dy 686): es el scroll interno del shell, falso positivo conocido.",
+    "Lo que la persona vio en la hoja 6 no se pudo cotejar con una captura: las de shots2 miden 800 px de alto y no incluyen el bloque."
+  ]
+}
