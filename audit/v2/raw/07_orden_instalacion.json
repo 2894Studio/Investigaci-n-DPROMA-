@@ -1,0 +1,354 @@
+{
+  "pantalla": "07_orden_instalacion",
+  "tier": "B",
+  "modo": "cumplimiento",
+  "sha256": "039a69bc82c7b6546d563b412156dd5240a24d8644833cf358b37b5bf73e3075",
+  "estado_vs_pdf": "alineado",
+  "estados_auditados": [
+    "formulario con error de VIN (única vista; no existen cargando, vacío ni error)"
+  ],
+  "capturas": [
+    "07_orden_instalacion--1280-fold.png",
+    "07_orden_instalacion--1440.png"
+  ],
+  "observaciones_resueltas": [],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "v2-07orden-01",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto",
+        "dice_el_sistema": "para el control cuya única frontera visible es el borde",
+        "hay_en_el_build": "`.in{...background:var(--surface-2);border:1px solid var(--border)...}`: la frontera de los campos de texto mide 1,50:1 (editable) y 1,32:1 (solo lectura, `.locked`) en claro, 1,54:1 y 1,39:1 en oscuro; el relleno contra la tarjeta 1,15:1. El token `--border-ctrl` (3,06:1) está declarado en la línea 98 y ninguna regla lo usa.",
+        "selector": "input.in",
+        "linea": 263,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "aud5-medir3.cjs (script propio)",
+          "detalle": "contraste de frontera de input.in contra la tarjeta que lo contiene: editable 1,50:1, `.locked` 1,32:1, relleno 1,15:1 (claro); 1,54 / 1,39 / 1,10 (oscuro). Umbral 3:1"
+        },
+        "critico": {
+          "es": true,
+          "criterio": "1 · contraste < 3:1 en controles (frontera de campos de texto 1,32 a 1,50:1)"
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Criterio 1 (contraste < 3:1 en controles). Arreglo de una línea: `.in{border:1px solid var(--border-ctrl)}` (el token ya está en el `:root` del archivo). Lectura 2: §1.1 reserva `--border-ctrl` para controles sin relleno propio y acepta `--border-2` «con relleno que ya lo identifica»; aquí el relleno (`--surface-2` sobre `--surface`) mide 1,15:1 y no identifica nada, y el archivo usa `--border`, más débil aún que `--border-2`."
+        },
+        "por_que_importa": "Los doce campos del formulario (fecha, contrato, dirección, VIN, placas y las cantidades de la tabla) se ven como cajas grises casi sin borde: quien tiene baja visión o una pantalla con brillo alto no distingue dónde empieza y acaba cada campo, que es la tarea central de la pantalla."
+      },
+      {
+        "id": "v2-07orden-02",
+        "severidad": "alta",
+        "regla": "§1.7 Regla de contraste",
+        "dice_el_sistema": "Texto normal 4,5:1 mínimo",
+        "hay_en_el_build": "Los iconos de estado se escriben `<svg class=\"ico-xs\">` sin la clase base `.ico`; `.ico-xs{width:11px;height:11px}` no define trazo ni relleno, así que el SVG toma el relleno negro por omisión y el `<path>` abierto del check no se pinta. Medido (aud5-medir.cjs): 10 iconos con `fill: rgb(0,0,0)` y `stroke: none` (paso hecho 1 y 2 del stepper, «En captura», «Pre-cargado», el check/alerta de existencia y el de la receta). En claro salen discos negros (17,8:1 contra el fondo) en lugar de checks; en oscuro caen a 1,27:1 a 1,63:1.",
+        "selector": "svg.ico-xs",
+        "linea": 179,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 179,
+          "cita": ".ico-xs{width:11px;height:11px}"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Defecto de una clase que falta (`class=\"ico ico-xs\"`, como ya hacen el aviso de error del VIN y las migas de otras pantallas). Lo corregimos al integrar. No es crítico porque cada icono va junto a su texto («14», «18 — stock bajo», «En captura»). Lectura 2: si se cuenta el glifo del stepper como único indicador visual de paso hecho (el `<span class=\"n\">` es `aria-hidden`), bajo tema oscuro es un control con glifo a 1,27:1 y sería crítico por el criterio 1."
+        },
+        "por_que_importa": "En claro la lista de pasos y las etiquetas de estado enseñan un punto negro donde debía haber un check, un reloj o una alerta (el estado «hecho» no se reconoce); en oscuro esos glifos casi desaparecen. Además los pasos hechos no dicen «completo» a un lector de pantalla: el número y el icono están ocultos."
+      },
+      {
+        "id": "v2-07orden-03",
+        "severidad": "alta",
+        "regla": "§7.2 Cromo de aplicación",
+        "dice_el_sistema": "Tres anchos: completa (≥1100px), colapsada a solo iconos (860–1100px) y cajón con velo",
+        "hay_en_el_build": "Entre 981 y 1131 px de ventana el formulario se recorta sin desplazamiento: a 1024 px `.wrap` mide 800 de ancho útil y 908 de contenido, con `overflow-x:hidden`, así que 108 px del formulario quedan fuera (dx 108 en el dossier; la pastilla «En captura», el campo «Instalador asignado» y la columna «Existencia CDMX» se cortan; 48 nodos fuera del borde). A 1100 px se pierden aún 32 px, dentro del ancho que §7.2 llama «completa». Causa: `<main class=\"form-main\">` no tiene regla CSS (sin `min-width:0`), su contenido mínimo es 602 px (tabla de 560 más relleno) y `.wrap` oculta el desborde.",
+        "selector": ".wrap > main.form-main",
+        "linea": 230,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "anchos_1440_1280_1024",
+          "detalle": "dossier 1024: div.wrap scroll-x oculto dx 108 (tabla), input.in dx 74, nodosFueraDelBorde 48; aud5-medir2.cjs: a 1024 wrapClient 800 / wrapScroll 908, a 1100 876 / 908, overflow-x hidden; formW 602 (captura propia aud5-shots/07-1024.png)"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "No es crítico (la acción primaria sigue visible y a 1280 px o más no se recorta). Arreglo: `.form-main{flex:1;min-width:0}` y que `.wrap` no oculte el desborde horizontal. Lo recogemos al integrar; no se le pide al cliente."
+        },
+        "por_que_importa": "En una ventana de 1024 a 1131 px quien rellena una orden ve los campos y los estados de existencia cortados por la derecha, sin barra ni aviso de que falta algo: el recorte parece que el dato no existe."
+      },
+      {
+        "id": "v2-07orden-04",
+        "severidad": "media",
+        "regla": "§7.2 Cromo de aplicación",
+        "dice_el_sistema": "Tres anchos: completa (≥1100px), colapsada a solo iconos (860–1100px) y cajón con velo",
+        "hay_en_el_build": "`.side{width:224px...}` es fijo: a 1000 px el menú sigue en 224 px (menu_1000px anchoSide 224), no colapsa a 64 px ni pasa a cajón por debajo de 860, y la pantalla no lleva barra superior de cromo (perfil, tema, menú) sino su propia cabecera `.top`. Las otras cuatro pantallas del lote usan 236 px, 64 px y cajón.",
+        "selector": ".side",
+        "linea": 195,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "sidebar",
+          "detalle": "dossier: hayMenu true, total 4, sinNombre 0, anchoSide 224 (no colapsa)"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Pregunta abierta: 07 es el arquetipo de formulario multi-sección y trae su propia cabecera con acciones; hay que decidir si adopta el cromo estándar (236/64/cajón + barra superior) y mueve «Guardar borrador»/«Programar» a la cabecera de pantalla, o si el sistema documenta una variante de cromo para formularios. Propuesta: adoptar el cromo estándar; es lo que arregla de paso el recorte de v2-07orden-03."
+        },
+        "por_que_importa": "Sin colapso ni cajón, la pantalla pierde 224 px de ancho útil en ventanas estrechas (causa del recorte) y el cromo cambia de forma entre pantallas del mismo módulo."
+      },
+      {
+        "id": "v2-07orden-05",
+        "severidad": "media",
+        "regla": "§6.16 Formulario",
+        "dice_el_sistema": "Guardado automático o botón de guardar, no los dos.",
+        "hay_en_el_build": "La cabecera enseña «Guardado automático hace 40 s» y, a su lado, el botón «Guardar borrador».",
+        "selector": "span.autosave + #btn-draft",
+        "linea": 359,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 359,
+          "cita": "Guardado automático hace 40 s"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Si el borrador se guarda solo, el botón sobra; si no, el mensaje engaña (§6.16, regla 8). Hay que decidir cuál es el comportamiento real del producto; propuesta: dejar el aviso y retirar el botón, o dejar el botón y retirar el aviso."
+        },
+        "por_que_importa": "Quien lee «guardado automático hace 40 s» y aun así pulsa «Guardar borrador» duda de cuál de los dos es verdad, y en una orden que luego se programa con datos fiscales esa duda cuesta."
+      },
+      {
+        "id": "v2-07orden-06",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado de una pantalla",
+        "dice_el_sistema": "Toda pantalla que pida datos tiene cuatro formas de presentarse",
+        "hay_en_el_build": "07 solo tiene la vista «con datos»: `<main class=\"form-main\">` no lleva `data-state`, no hay vista cargando, vacía ni error, aunque la pantalla se alimenta de una receta de 13 partidas y de existencias por almacén. El propio archivo declara que es el formulario de alta sin lista de órdenes.",
+        "selector": "main.form-main",
+        "linea": 399,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 399,
+          "cita": "<main class=\"form-main\" aria-label=\"Formulario de la orden de instalación\">"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Falta decidir qué ve quien abre la orden cuando la receta o la existencia no cargan (un error sobre el formulario, §6.4 regla 4, conservando lo capturado). Propuesta: añadir el arnés de cuatro estados y, para el error, un aviso encima del formulario."
+        },
+        "por_que_importa": "Si la existencia por almacén o la receta tardan o fallan, la pantalla no tiene qué enseñar: o se cuelga o muestra un formulario sin partidas sin explicar por qué."
+      },
+      {
+        "id": "v2-07orden-07",
+        "severidad": "media",
+        "regla": "§6.17 Subida de archivo",
+        "dice_el_sistema": "Indica formatos y peso admitidos, muestra el archivo cargado con su nombre y fecha, y permite",
+        "hay_en_el_build": "La sección 5 es un `<div class=\"dropzone\">` con un `<span>` pintado como enlace («elige del equipo»): no hay `<input type=\"file\">`, ni botón, ni nada enfocable. No hay forma de adjuntar el croquis con teclado ni de ver el archivo cargado.",
+        "selector": "div.dropzone",
+        "linea": 499,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 499,
+          "cita": "<span style=\"color:var(--link);font-weight:600\">elige del equipo</span>"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "§6.17 solo describe el campo de archivo con `<input type=\"file\">`; no cubre arrastrar y soltar con cupo («0 de 10 archivos», 2 MB imagen / 5 MB PDF). El sistema debe documentar esa variante (con el input real dentro de una `<label>`), y el cliente construirla así."
+        },
+        "por_que_importa": "El croquis es un anexo obligatorio de la orden y hoy la zona se ve como un control pero no responde a ningún dispositivo que no sea un arrastre con ratón."
+      },
+      {
+        "id": "v2-07orden-08",
+        "severidad": "baja",
+        "regla": "§6.16 Formulario",
+        "dice_el_sistema": "El tipo de campo es el tipo del dato.",
+        "hay_en_el_build": "La fecha propuesta es `<input class=\"in tnum\" id=\"f-fecha\" value=\"22/07/2026\" required>` (tipo texto) y las cantidades de la tabla `<input class=\"in qty tnum\" id=\"q1\" value=\"1\">` (texto, sin `inputmode`).",
+        "selector": "#f-fecha, input.qty",
+        "linea": 409,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 409,
+          "cita": "<input class=\"in tnum\" id=\"f-fecha\" value=\"22/07/2026\" required>"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Pasar la fecha a `type=\"date\"` y las cantidades a `inputmode=\"decimal\"`. Cambio mecánico que hacemos al integrar."
+        },
+        "por_que_importa": "Una fecha en texto libre admite «22-7-26» o «mañana»; las cantidades piden teclado numérico en tableta."
+      },
+      {
+        "id": "v2-07orden-09",
+        "severidad": "baja",
+        "regla": "§6.16 Formulario",
+        "dice_el_sistema": "Un dato calculado se muestra como dato, no como campo.",
+        "hay_en_el_build": "«Instalador asignado» es un `<input class=\"in\" id=\"f-instalador\" placeholder=\"Se asigna al programar\">` editable cuyo texto describe el mecanismo en lugar de ser un dato.",
+        "selector": "#f-instalador",
+        "linea": 417,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 417,
+          "cita": "<input class=\"in\" id=\"f-instalador\" placeholder=\"Se asigna al programar\">"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Dos lecturas: (1) si el instalador solo se asigna en el paso 6, el campo debe mostrarse como dato («Se asigna al programar») y no como entrada; (2) si se admite preasignarlo aquí, el placeholder debe decir «Elegir instalador». Decide producto."
+        },
+        "por_que_importa": "Un campo editable con una frase que parece un valor invita a borrarla y a escribir encima, y esa frase puede acabar como dato guardado."
+      },
+      {
+        "id": "v2-07orden-10",
+        "severidad": "baja",
+        "regla": "§1 Color",
+        "dice_el_sistema": "ningún hex literal en un componente",
+        "hay_en_el_build": "Valores literales donde existen tokens con el mismo valor: `.side :focus-visible{outline-color:#9FE0AE}` (= `--chrome-focus`), `.fab{background:linear-gradient(135deg,var(--chrome),#2e823d)...}` (= `--marca-3`, declarado en la línea 98) y `rgba(199,217,123,.35)` (= `--marca-halo`).",
+        "selector": ".side :focus-visible, .fab",
+        "linea": 183,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 183,
+          "cita": ".side :focus-visible{outline-color:#9FE0AE}"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Sustituir los literales por `--chrome-focus`, `--marca-3` y `--marca-halo`. Sin efecto visual hoy (los valores coinciden); evita que un cambio de token deje estos tres sitios atrás."
+        },
+        "por_que_importa": "Un literal que repite un token se queda desactualizado la próxima vez que cambie el token, y el foco sobre el cromo es justo el valor que ya cambió una vez (§1.5)."
+      },
+      {
+        "id": "v2-07orden-11",
+        "severidad": "baja",
+        "regla": "§2.1 El suelo son 12px",
+        "dice_el_sistema": "Se admite una excepción, y solo una: 10,5px en mayúsculas con `letter-spacing` para los",
+        "hay_en_el_build": "Los rótulos de grupo del menú (`p.grp`) van a 10,5 px sin `text-transform:uppercase` (se ven «Principal», «Operación», no en mayúsculas). Instrumento C2_105_no_mayusculas: 2 elementos en esta pantalla (Operación, Gestoría).",
+        "selector": "p.grp",
+        "linea": 199,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "C2_105_no_mayusculas",
+          "detalle": "dossier: p.grp a 10,5 px con texto no en mayúsculas; confirmado en aud5-medir.cjs (font-size 10,5 px, text-transform none)"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "La causa raíz es nuestra: el CSS de `.grp` que §7.2 publica tampoco lleva `text-transform:uppercase`, así que el cliente copió lo documentado. O §7.2 añade las mayúsculas, o §2.1 admite 10,5 px también sin ellas (o se sube a 12 px). Se decide una vez en el sistema."
+        },
+        "por_que_importa": "Cinco o seis rótulos por pantalla bajo el suelo de 12 px que §2.1 declara sin excepción más que la de las mayúsculas; no afecta a la lectura de datos, pero la inconsistencia entre §2.1 y §7.2 la heredan todas las pantallas con cromo."
+      },
+      {
+        "id": "v2-07orden-12",
+        "severidad": "baja",
+        "regla": "§6.5 Iconos (`.msi`)",
+        "dice_el_sistema": "Si un icono va sin texto visible, lleva **como mínimo** etiqueta emergente y `aria-label`:",
+        "hay_en_el_build": "El botón de tema (`#theme`) es solo icono. Llevan `aria-label` pero ningún `title`.",
+        "selector": "button.iconbtn",
+        "linea": 360,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 360,
+          "cita": "<button class=\"iconbtn\" id=\"theme\" aria-label=\"Cambiar a tema oscuro\">"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Añadir `title` con el mismo texto del `aria-label`. Cambio mecánico que hacemos nosotros; el nombre accesible ya existe, solo falta la etiqueta emergente para quien ve."
+        },
+        "por_que_importa": "Quien ve el icono pero no lo reconoce (descarga, tema, menú) no tiene etiqueta emergente que se lo diga; el nombre accesible sí está, así que no bloquea."
+      }
+    ]
+  },
+  "cerrados_desde_v1": [],
+  "f3_boost_ui": {
+    "puntuacion": 3,
+    "dimensiones": {
+      "accesibilidad": 2,
+      "rendimiento": "no_evaluado",
+      "theming": 2,
+      "responsive": 1,
+      "integridad": 2
+    },
+    "justificacion": "Formulario ordenado, con buena semántica (etiquetas asociadas, error vinculado con `aria-invalid`/`aria-describedby`, `role=\"status\"` en el autoguardado, jerarquía de títulos) y tokens bien declarados. Lo resta: frontera de campos a 1,3-1,5:1, iconos de estado negros por una clase que falta, recorte del formulario entre 981 y 1131 px y cromo sin colapso.",
+    "evidencia": [
+      "aud5-medir3.cjs: frontera de input.in 1,50:1 / 1,32:1",
+      "aud5-medir.cjs: 10 svg.ico-xs con fill negro, 1,27 a 1,63:1 en oscuro",
+      "aud5-medir2.cjs: wrapScroll 908 frente a 800 a 1024 px",
+      "dossier: contraste texto 0 fallos, táctil 0 bajo 24, sin ids repetidos"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado"
+  },
+  "cobertura": [
+    {
+      "patron": "Barra de pasos lateral (`.steps` / `.step`) con tres estados: hecho, actual (`aria-current=\"step\"`) y pendiente, y rótulo «Progreso · 2 de 6 completas».",
+      "propuesta_de_regla": "El progreso de un formulario multi-sección se ofrece como lista de pasos: cada paso es un `<button>` con nombre y estado dicho en texto («completo», «1 campo pendiente»), el activo lleva `aria-current=\"step\"`, y el icono del estado hereda `currentColor`. Nunca solo el número ni solo el icono."
+    },
+    {
+      "patron": "Barra de acciones de sección pegajosa (`.foot`, `position:sticky;bottom:0`) con degradado y botón flotante D-PRIMI en la misma esquina: a 1280x800 y 1366x768 el botón flotante cubre 52x8 px de «Sección anterior» (medido, aud5-medir2.cjs).",
+      "propuesta_de_regla": "El botón flotante y la barra pegajosa no comparten esquina: la barra reserva `padding-right` igual al ancho del botón flotante más su margen (como hace `.nota` en las otras pantallas del lote con `calc(var(--sp-6) + 68px)`)."
+    },
+    {
+      "patron": "Tabla de partidas con un campo de cantidad editable por fila (`input.qty`) y estado de existencia con icono y texto.",
+      "propuesta_de_regla": "Una tabla editable lleva una `<label class=\"sr\">` por campo con el nombre de la fila, alinea a la derecha cabecera y valor, y muestra la existencia con color + icono + texto (como `.pill`, §6.10)."
+    }
+  ],
+  "sin_datos": [
+    "Rendimiento: no evaluado (no hay trazas de carga ni peso real; las fuentes se inyectan al renderizar).",
+    "Estados de foco, orden de tabulación y comportamiento con teclado: no recorridos; solo se evaluó lo medible estáticamente.",
+    "Falsos positivos descartados del dossier: I3 recorte en `main`, `caption` y `.sr` (scroll del shell y texto solo para lector de pantalla); I2 gap 6,5 px en celdas `td` con un control.",
+    "I5 ritmo vertical (valores 5, 6, 7, 9, 10 px fuera de escala): sin § del sistema que fije una tolerancia ni decisión del cliente que lo contradiga; no se convierte en hallazgo.",
+    "tokens_valores_divergentes de --ok-ink/--warn-ink/--err-ink/--block-ink/--pause-ink y sus -bg: el 'canónico' del dossier no tiene respaldo en el texto de §1.3; los valores declarados por el cliente reproducen exactamente los contrastes documentados en §1.3 (ok 5,04:1; warn 5,25:1; err 5,02:1; block 5,41:1; pause 6,30:1, medidos con la fórmula de §1.7), así que no se cuentan como divergencia.",
+    "Significado de los códigos C1-C18 del PDF: no se dispone del PDF; solo se usa el estado alineado/NO_ALINEADO del dossier.",
+    "Sin ficha técnica del cliente para esta pantalla (ficha_tecnica_del_cliente null): ninguna decisión se contrastó contra FICHAS_TECNICAS.md."
+  ]
+}

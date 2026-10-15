@@ -1,0 +1,312 @@
+{
+  "pantalla": "25_consumo_de_material",
+  "tier": "B",
+  "sha256": "1c6c5ce652975e06c9bdf14e3f1b8b95ea16b057a8c95dfe3217359d5b623bb7",
+  "estado_entrega": "modificada",
+  "estado_vs_pdf": "alineado",
+  "estados_auditados": [
+    "ok (consumo con grupo expandido)",
+    "vacío y error (solo código)"
+  ],
+  "capturas": [
+    "25_consumo_de_material--1440.png",
+    "25_consumo_de_material--1280-fold.png"
+  ],
+  "observaciones_resueltas": [
+    {
+      "hoja": 11,
+      "texto_usuario": "¿Cumple el sistema? Exceso de color. Evaluar soluciones.",
+      "veredicto": "parcial",
+      "evidencia": [
+        {
+          "certeza": "leido_en_codigo",
+          "reproduce": {
+            "tipo": "codigo",
+            "linea": 6,
+            "cita": "<meta name=\"theme-color\" content=\"#F2F5F7\">"
+          },
+          "dato": "Mecánica de color: cumple. `grep -n -E '#[0-9a-fA-F]{6}\\b'` fuera de las declaraciones `--token:` da solo dos líneas: la 6 (`theme-color` del `<head>`) y la 677 (degradado del isotipo). Ningún hex literal en los estilos de producto: todo va por tokens, el texto usa `-ink` y los rellenos `-bg` (`.b-err{background:var(--err-bg);color:var(--err-ink)}`), y el color base solo en elementos gráficos (el punto del SKU), como pide §1.3."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "script mi/t25.cjs (Playwright 1440): resuelve los tokens ok/warn/err/block/pause/serie/accent del propio `:root` del cliente a rgb y busca qué elementos visibles (fuera de [data-andamio]) los usan",
+            "detalle": "Familias presentes en la pantalla: `--accent` (botón «Cerrar la orden»; el borde de la entrada activa de la barra lateral usa `--ok`), `--err-bg`/`--err-ink` (banda `.b-err` y rótulo «Así no»), `--block-bg`/`--block-ink` (`.derivado`), `--warn-bg`/`--warn-ink` (`tr.total-fis`), `--ok-bg`/`--ok-ink` (rótulo «Así sí»). Más el punto `--err` de `.c-rojo` (pseudoelemento, no recorrido). Cuatro familias de significado a la vez en el área de producto (acento + err + block + warn); cinco con la comparativa sin marcar (+ ok)."
+          },
+          "dato": "Lo que la persona llamó «exceso de color» se corresponde con: verde de acento (botón principal y nav), una banda rosa de error, una etiqueta morada, una fila total ámbar y, dos pantallas más abajo, un panel rojo y otro verde. Ninguno de esos colores de estado marca un problema real en esta pantalla."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "I6_presupuesto_de_color (brief)",
+            "detalle": "I6: familiasVisibles 1, familias {acento: 9}."
+          },
+          "dato": "Contradicción: I6 dice 1 familia y mi recuento dice 4-5. I6 compara los colores calculados contra la paleta canónica 2.15.0 con tolerancia de 3 por canal y el cliente declara valores propios para 12 tokens (brief, tokens_valores_divergentes: --err-bg #F4E8E7 vs #F6DAD7, --warn-bg #F1ECDE vs #F5E7C6, --block-bg, --ink de los cinco…). Los -bg/-ink del cliente no coinciden con la paleta, así que I6 no los reconoce: es un falso negativo estructural. Solo sirve como medida cuando el cliente usa los hex canónicos."
+        },
+        {
+          "certeza": "leido_en_codigo",
+          "reproduce": {
+            "tipo": "codigo",
+            "linea": 650,
+            "cita": ".derivado{display:inline-flex;align-items:center;gap:5px;border-radius:4px;padding:1px 7px;"
+          },
+          "dato": "Asignaciones frente a §1 («Un color de estado no se reutiliza para una categoría, ni al revés»): (a) `.derivado` en `--block` (línea 650-651): es una etiqueta de clasificación, no un estado; la ficha lo reconoce: «es un uso que nadie autorizó». (b) `.c-rojo::before{background:var(--err)}` (línea 655): el color físico del cable toma el rojo de error; la ficha: «son colores del cable, no estados, y hay roce con la regla». (c) `.total-fis{background:var(--warn-bg)}` (línea 659): el total se pinta de «falta algo o vence pronto», sin que falte nada. (d) `.banda.b-err` (línea 701): la explicación «un tramo lleva tres conductores, cada uno con su SKU» va como error, y justo encima hay una `.banda.b-info` con el mismo cometido (línea 698)."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "script mi/t25b.cjs (Playwright; `getComputedStyle(el,'::before')` con data-theme=light y dark)",
+            "detalle": "Punto «negro»: claro rgb(27,36,48) → oscuro rgb(231,236,242). Punto «blanco»: claro rgb(250,252,253) → oscuro rgb(23,31,44). Punto «rojo»: rgb(194,66,56) → rgb(238,110,95)."
+          },
+          "dato": "En tema oscuro el punto del cable negro es casi blanco y el del cable blanco es casi negro: `.c-negro::before{background:var(--text)}` y `.c-blanco::before{background:var(--surface)}` invierten con el tema. El texto («negro», «blanco») sigue bien, pero el punto dice lo contrario."
+        },
+        {
+          "certeza": "leido_en_codigo",
+          "reproduce": {
+            "tipo": "codigo",
+            "linea": 719,
+            "cita": "<div class=\"comparativa\">"
+          },
+          "dato": "El bloque «Así no / Así sí» es documentación, no producto: la ficha dice «dejar la comparativa… dentro de la maqueta como documentación embebida (se retira al portar)». Sin embargo no lleva `data-andamio` (solo lo lleva `.demo`, línea 745) y aporta dos de las cinco familias (`.comp.mal > .rot` en `--err`, `.comp.bien > .rot` en `--ok`)."
+        }
+      ],
+      "causa_raiz": "El contrato no tiene color para tres cosas que la pantalla necesita: «derivado» (clasificación), el color físico de un material y «total» (énfasis). El autor las resolvió con el semáforo, que es lo único que había (ficha: «Hueco que esta maqueta destapa: el contrato no tiene tokens de color de material. Acabé pintando un cable con tokens de estado»). A eso se suman dos usos del semáforo por defecto para algo que no es juicio (la banda de explicación y el total) y el andamio sin marcar.",
+      "solucion_propuesta": "Soluciones evaluadas. A) Neutralizar lo que no es juicio (4 cambios, ~8 líneas): `.banda.b-err` → `.banda.b-info` (§6.9) en la explicación de 20 m / 60 m; `.derivado` → `.p-type.p-s0` (§6.10: punto neutro, peso bajo); `.total-fis` → relleno `--surface-2`, `border-top:2px solid var(--border-2)` y peso 700 (la receta del `<tfoot>` de §12.3, sin ámbar); `data-andamio` en `.comparativa`. Resultado: la pantalla queda en acento + los puntos de SKU. Coste: se pierde el realce ámbar del total (el peso y la línea lo mantienen) y la banda de explicación baja de énfasis. B) Como A, pero dejando UNA señal de semáforo con significado real: la discrepancia capturado ≠ salido es el riesgo que la propia comparativa documenta (descuadre por factor 3), así que se queda como `.banda.b-warn` y lo demás se neutraliza. Coste: igual que A más decidir que esa discrepancia es «falta algo» y no «error»; ganancia: el único color de estado de la pantalla dice algo. C) Tokens de material en el sistema: `--mat-rojo`, `--mat-negro`, `--mat-blanco` con valor claro y oscuro propios (negro con borde `--border-2` para que no desaparezca en oscuro). Coste: 3 tokens × 2 temas y una subsección de §1; arregla la inversión en oscuro y el roce con la regla; sirve a las recetas de despacho. D) Quitar los puntos: el nombre ya dice «rojo/negro/blanco» y el SKU `CAB-08-ROJ/NEG/BLA`. Coste: 0 tokens, pero se pierde la lectura por color de un vistazo. Recomendación: A (o B si la persona acepta la lectura de la discrepancia como aviso) + C, y D solo si no se quiere tocar el sistema. Un presupuesto de color («acento + como máximo una familia de semáforo si ningún dato la pide») no existe en el sistema: se propone en `cobertura`.",
+      "tipo_de_cambio": "sencillo",
+      "critico": {
+        "es": false,
+        "criterio": null
+      },
+      "decision": {
+        "valor": "ajustar_sistema",
+        "motivo": "No crítico: 0 fallos de contraste en 96 nodos y ambos temas. El cliente destapó dos huecos reales del sistema (color de material, etiqueta de «derivado») que hay que documentar. Lo demás se resuelve a favor del cliente: A es opcional y de coste mínimo (Regla 2)."
+      }
+    }
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "cumple_parcialmente",
+    "hallazgos": [
+      {
+        "id": "v2-25consumo-01",
+        "severidad": "media",
+        "regla": "§1.3 Semáforo (--err = falta lo que impide operar) + §6.9 Avisos (`.banda`)",
+        "dice_el_sistema": "`--err`: «Falta lo que impide operar» (§1.3); «Antes de escribir una clase nueva para un aviso… se verifica si `.banda` + una de sus cuatro variantes ya lo cubre» y «El icono tiene que coincidir con la variante» (§6.9).",
+        "hay_en_el_build": "`<div class=\"banda b-err\">…<b>El instalador capturó 20 m de tramo y del almacén salieron 60 m:</b> un tramo lleva tres conductores, cada uno con su SKU.</div>` — una explicación de cómo funciona la receta, dibujada como error, dos renglones por debajo de una `.banda.b-info` que ya explica la receta.",
+        "selector": ".banda.b-err",
+        "linea": 701,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 701,
+          "cita": "<div class=\"banda b-err\">"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "No crítico y es texto del autor. Solución de una clase: `b-info` (o `b-warn` si se quiere conservar un aviso; ver las soluciones A y B de la observación 11)."
+        },
+        "por_que_importa": "Lo primero que ve quien cierra la orden es una banda de error cuando no ha fallado nada: se lee «algo salió mal» y la banda dice «así funciona un tramo»."
+      },
+      {
+        "id": "v2-25consumo-02",
+        "severidad": "media",
+        "regla": "§1 Decisión previa a elegir color + §6.10 `.p-type`",
+        "dice_el_sistema": "«Un color de estado no se reutiliza para una categoría, ni al revés.» (§1); `.p-type` = clasificación, «usa las series de gráfica (§1.4), no el semáforo» (§6.10); `--block`: «Bloqueado por una condición externa» (§1.3).",
+        "hay_en_el_build": "`.derivado{…background:var(--block-bg);color:var(--block-ink)…}`: la etiqueta «derivado · 3 SKU» va en el morado de «bloqueado». La ficha: «la etiqueta «derivado» en el morado del semáforo (es el único par que no significa bien/mal/urgencia, pero es un uso que nadie autorizó)».",
+        "selector": ".derivado",
+        "linea": 651,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 651,
+          "cita": "font-size:var(--fs-meta);font-weight:700;background:var(--block-bg);color:var(--block-ink);white-space:nowrap}"
+        },
+        "estado_vs_v1": "nuevo",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "El cliente avisó del hueco: el sistema no tiene etiqueta para «calculado/derivado». Documentar `.p-type` con variante neutra (`p-s0`, punto gris) para «derivado» o la ficha seguirá usando `--block`. No se le exige cambiar."
+        },
+        "por_que_importa": "Un morado de «bloqueado» sobre una fila que no está bloqueada enseña a leer el morado mal en las demás pantallas (el padrón ya lo hizo con la columna Tipo, §1)."
+      },
+      {
+        "id": "v2-25consumo-03",
+        "severidad": "baja",
+        "regla": "§1.3 Semáforo (--warn = falta algo o vence pronto)",
+        "dice_el_sistema": "`--warn`: «Falta algo, o vence pronto» (§1.3).",
+        "hay_en_el_build": "`.total-fis{background:var(--warn-bg)}` y `.total-fis th,.total-fis td{color:var(--warn-ink);font-weight:700}`: «Cable que salió del almacén, en total… 60.000 m» en ámbar. No falta nada ni vence nada.",
+        "selector": "tr.total-fis",
+        "linea": 659,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 659,
+          "cita": ".total-fis{background:var(--warn-bg)}"
+        },
+        "estado_vs_v1": "nuevo",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "El énfasis es legítimo (el total no es la suma de lo capturado); el color no. Solución: relleno `--surface-2` + línea superior + peso, sin ámbar (opción A de la observación 11)."
+        },
+        "por_que_importa": "El total, que sí hay que mirar, se parece a un aviso que no existe."
+      },
+      {
+        "id": "v2-25consumo-04",
+        "severidad": "media",
+        "regla": "§1.4 Series de gráfica (un color de estado nunca es una categoría) + §1.7 Regla de contraste (ambos temas)",
+        "dice_el_sistema": "«Una serie de gráfica nunca reutiliza un color de estado. Si la barra de «Agencias» fuera verde, se leería como «agencias correctas».» (§1.4)",
+        "hay_en_el_build": "`.c-rojo::before{background:var(--err)}`, `.c-negro::before{background:var(--text)}`, `.c-blanco::before{background:var(--surface)}`. En oscuro el punto del cable negro mide rgb(231,236,242) y el del blanco rgb(23,31,44): invertidos.",
+        "selector": ".pcolor.c-rojo, .c-negro, .c-blanco (::before)",
+        "linea": 656,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "script mi/t25b.cjs (Playwright, data-theme=dark)",
+          "detalle": "getComputedStyle(.c-negro,'::before').backgroundColor = rgb(231, 236, 242) en oscuro (rgb(27, 36, 48) en claro); `.c-blanco` = rgb(23, 31, 44) en oscuro (rgb(250, 252, 253) en claro)."
+        },
+        "estado_vs_v1": "nuevo",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "Falta un token de color de material y el cliente lo declara («el contrato no tiene tokens de color de material»). El sistema debe añadirlos (opción C de la observación 11); mientras tanto, la inversión en oscuro se arregla con un borde (`--border-2`) y valores fijos por tema."
+        },
+        "por_que_importa": "Quien trabaja en tema oscuro ve un punto blanco junto a «negro»; el texto desmiente el color y el color contradice al texto."
+      },
+      {
+        "id": "v2-25consumo-05",
+        "severidad": "media",
+        "regla": "§9 Andamiaje de maqueta",
+        "dice_el_sistema": "«Se marca siempre con data-andamio, va visualmente separado del producto y rotulado… Un solo selector lo encuentra.» (§9)",
+        "hay_en_el_build": "`<div class=\"comparativa\">` con dos tarjetas didácticas («Así no — el renglón único», «Así sí — agrupado, expandible y etiquetado») y dos `.porque` explicativos, dentro de `<main>`, sin `data-andamio`. La ficha la declara «documentación embebida (se retira al portar)». Solo `.demo` (línea 745) lleva `data-andamio`.",
+        "selector": ".comparativa, .comp.mal, .comp.bien",
+        "linea": 719,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 719,
+          "cita": "<div class=\"comparativa\">"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "v1 lo puso en alta (f1-25consumo-01); aquí media porque la ficha lo declara y el arreglo es un atributo. Se ofrece `data-andamio` en `.comparativa`."
+        },
+        "por_que_importa": "Sin la marca, el selector de retirada no la encuentra y las dos tarjetas rojas y verdes acabarían en producción."
+      },
+      {
+        "id": "v2-25consumo-06",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado de una pantalla (regla 2: encabezado real)",
+        "dice_el_sistema": "«Cada estado lleva un encabezado real, no un `<b>`.» (§6.4, regla 2)",
+        "hay_en_el_build": "`<b>No se pudo cargar el consumo de la orden</b>` dentro de `div.state.state-error`, sin `.tarjeta-estado`/`.estado-ico`. Sí lleva `.state > .ico` (línea 611), la corrección 2.15.0.",
+        "selector": ".state.state-empty, .state.state-error",
+        "linea": 737,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 737,
+          "cita": "<b>No se pudo cargar el consumo de la orden</b>"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "v1 lo puso en alta; aquí media (sin fallo medido; la vista solo se alcanza por el conmutador). El texto del error («no captures el consumo otra vez», ficha) es una decisión de producto bien fundada y se adopta."
+        },
+        "por_que_importa": "El lector de pantalla no anuncia el error como sección."
+      },
+      {
+        "id": "v2-25consumo-07",
+        "severidad": "alta",
+        "regla": "§7.2 Cromo de aplicación (modo colapsado) + criterio crítico 1 (control sin nombre accesible)",
+        "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.» (§7.2)",
+        "hay_en_el_build": "Entre 861 y 1100 px: `.side .et,.grp,.side .wordmark{display:none}` oculta el texto de los 15 enlaces `a.it`; el icono es `<svg aria-hidden=\"true\">`, el enlace no lleva `aria-label` ni `title`. El árbol de accesibilidad (ariaSnapshot de `nav.side` a 1000 px) da `link` sin nombre ×15; no hay etiqueta emergente.",
+        "selector": ".side .et (en @media 860.02–1100 px) / a.it",
+        "linea": 291,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "menu_1000px (brief)",
+          "detalle": "menu_1000px: hayMenu true, total 15, sinNombre 15, anchoSide 64. Reproducido con Playwright a 1000 px: `await page.locator('nav.side').ariaSnapshot()` → 15 `link:` sin texto (script mi/t20f.cjs). Citas de código: línea del `display:none` y enlaces `<a class=\"it\" href=\"#\">` sin atributos de nombre."
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": true,
+          "criterio": 1
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Control sin nombre accesible, medido. Arreglo de una línea en el cromo: sustituir el `display:none` por la clase de solo lectores (`.sr`) en `.et` y añadir `title`/etiqueta emergente. Lo que el cliente decidió (colapsar a iconos) se adopta; lo que se exige es que el nombre siga existiendo."
+        },
+        "por_que_importa": "Quien navega con lector de pantalla entre 861 y 1100 px (portátil con ventana reducida, tableta apaisada) oye «enlace» quince veces sin saber a qué módulo va cada uno. No es regresión: el CSS es idéntico en v1 (v1flat, líneas 288 a 291 según la pantalla) y delta_vs_v1.menu_sin_nombre = 0; v1 no lo registró como hallazgo. Es el cromo compartido: aparece igual en las otras pantallas del paquete. Quién lo introdujo no está determinado: la ficha dice que el cromo sale de `Marco.tsx`, no del cliente."
+      }
+    ]
+  },
+  "cerrados_desde_v1": [],
+  "f3_boost_ui": {
+    "puntuacion": 3,
+    "dimensiones": {
+      "accesibilidad": 2,
+      "rendimiento": "no_evaluado",
+      "theming": 2,
+      "responsive": 3,
+      "integridad": 3
+    },
+    "justificacion": "Pantalla clara en lo que enseña (el tramo de 20 m que consume 60, jerarquía expandible con etiqueta «derivado») y limpia en la mecánica: 0 hex literales en estilos, 0 fallos de contraste en 96 nodos y ambos temas, 0 destinos < 24 px. Lo que la baja: el semáforo usado cuatro veces para algo que no es juicio, el punto de color de los SKU invertido en tema oscuro, el cromo colapsado sin nombre y el andamio sin marcar.",
+    "evidencia": [
+      "brief: tactil bajo24 0, contraste 0/0 (96 nodos), tokens usados no declarados 0, I6 1 familia (falso negativo; mi recuento 4-5)",
+      "mi/t25.cjs (familias de color resueltas con los tokens del cliente), mi/t25b.cjs (puntos de SKU claro vs oscuro)",
+      "brief: a 1024 px, scroll-x de 20 px en la tabla (`.cons table{min-width:980px}`, línea 640)"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — Tier B"
+  },
+  "cobertura": [
+    {
+      "patron": "Etiqueta de «dato calculado/derivado» sobre una fila de tabla",
+      "propuesta_de_regla": "`.p-type` admite la variante neutra `p-s0` (punto gris) para «derivado», «calculado» o «estimado»: describe lo que el dato es, no su estado, y no usa `--block`."
+    },
+    {
+      "patron": "Color físico de un material (cable rojo, negro, blanco) dentro de una tabla",
+      "propuesta_de_regla": "§1.5 bis: los colores del dato físico se declaran como `--mat-*` con valor por tema y llevan siempre borde `--border-2`; no toman prestado un color de estado ni `--text`/`--surface`."
+    },
+    {
+      "patron": "Presupuesto de color de una pantalla de datos",
+      "propuesta_de_regla": "Una pantalla de datos usa a la vez el acento y, como máximo, una familia de semáforo; una segunda familia exige un dato con juicio propio. El total, la explicación y las etiquetas de clasificación no cuentan como juicio. (Regla nueva: no existe hoy en el sistema.)"
+    }
+  ],
+  "sin_datos": [
+    "I6 (presupuesto de color) devuelve 1 familia porque compara con la paleta canónica y el cliente declara valores distintos para 12 tokens: no es utilizable en pantallas con tokens propios. Reemplazado por mi script mi/t25.cjs.",
+    "I2 marca `th` con gap 4,5: es el `button.abrir` con `margin:-4px -6px` de §6.15; no lo trato como hallazgo (falso positivo).",
+    "v1 f1-25consumo-03 (esqueleto): con `animation:none` el degradado de fondo del `.skel` sigue pintándose (la regla de la línea 606 no borra el fondo), así que no veo contenido invisible; no lo reproduzco como hallazgo.",
+    "`.comp > .rot` y `.grp` usan 10,5 px: el primero es andamio (comparativa) y el segundo es cromo; el brief no cuenta ninguno en lt12.",
+    "No se compararon los estados cargando/vacío/error en captura: solo código."
+  ]
+}

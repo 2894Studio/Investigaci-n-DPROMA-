@@ -1,0 +1,456 @@
+{
+ "pantalla": "08_detalle_tramite",
+ "ruta_zip": "04-tramites-vehiculares-y-cfe/08_detalle_tramite.html",
+ "carpeta": "04-tramites-vehiculares-y-cfe",
+ "area": "administracion vehicular",
+ "arquetipo": "detalle",
+ "modo": "cumplimiento",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error"
+ ],
+ "capturas": [
+  "08_detalle_tramite--ok.png"
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "f1-08det-01",
+    "severidad": "alta",
+    "regla": "§6.20 — el indicador de la derecha declara su ancho; no se queda con lo que sobre",
+    "dice_el_sistema": "«el indicador de la derecha declara su ancho; no se queda con lo que sobre (rejilla, no flex con min-width:250px;max-width:330px frente a flex:1)». Valores: .cab{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,360px);gap:var(--sp-6)}",
+    "hay_en_el_build": ".wrap{display:flex;gap:20px;padding:20px 24px 40px;align-items:flex-start;flex-wrap:wrap} y .colR{flex:1;min-width:300px;max-width:380px}",
+    "selector": ".wrap, .colR",
+    "evidencia": "Líneas 261 y 263 del <style>. Es la forma exacta que §6.20 nombra como incorrecta (flex con min-width/max-width frente a flex:1) y además §13.3 la prohíbe: «Un contenedor no cede el ancho a un descendiente. flex:1 en el hijo, nunca un max-width». Medido a 760px, .wrap pasa a columna por flex-wrap, no por una regla de punto de ruptura",
+    "por_que_importa": "La columna que decide la urgencia (el aviso «Requiere atención» y el bloque de acciones) tiene un ancho que depende de lo que sobre, así que cambia según lo largo que sea el contenido de la izquierda."
+   },
+   {
+    "id": "f1-08det-02",
+    "severidad": "alta",
+    "regla": "§6.20 — quién es el cliente va junto al expediente, antes de la bitácora y de los documentos",
+    "dice_el_sistema": "«Quién es el cliente va junto al expediente, a ancho completo y con los datos en fila, antes de la bitácora y de los documentos — ese orden es también el del recorrido con teclado»",
+    "hay_en_el_build": "El cliente es el quinto de ocho pares <div><span>Cliente / sucursal</span><b>Flotillas GNP · Puebla Centro</b></div> dentro del panel «Información del trámite», en una rejilla .kv de dos columnas en la columna izquierda",
+    "selector": ".kv div:nth-child(5)",
+    "evidencia": "Visible en 08_detalle_tramite--ok.png: el bloque de identidad del encabezado solo lleva folio (TRM-202606-0798) y la pastilla de SLA; el cliente aparece en la tercera fila de la rejilla de datos, después de Tipo, Ciudad, Vehículo y VIN. El recorrido con teclado llega al cliente después de las cuatro acciones de cabecera",
+    "por_que_importa": "La primera pregunta al abrir un expediente es de quién es, y aquí hay que leer ocho pares de datos para encontrarlo."
+   },
+   {
+    "id": "f1-08det-03",
+    "severidad": "alta",
+    "regla": "§2 — prohibido el <link> a Google Fonts para las fuentes de interfaz",
+    "dice_el_sistema": "«Las fuentes se autoalojan (D116). Prohibido el <link> a Google Fonts para las fuentes de interfaz: un CDN caído falla en silencio (incidencia real de 4 días sin detección). @font-face con font-display:swap sobre /fuentes/inter-variable.woff2 y /fuentes/michroma.woff2»",
+    "hay_en_el_build": "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap\" rel=\"stylesheet\"> y 0 @font-face",
+    "selector": "head > link[href*=fonts.googleapis.com]",
+    "evidencia": "Es la única de las cinco pantallas del lote con <link> a Google Fonts. Medido en vivo: document.fonts.size = 0 — el CDN no respondió y la hoja no registró ninguna cara, exactamente el fallo silencioso que §2 describe; el texto se pintó con la fuente del sistema sin que nada lo señalara",
+    "por_que_importa": "La prohibición está escrita por una incidencia real de cuatro días sin detectar, y esta pantalla la reproduce entera: se ve bien y la fuente no está cargada."
+   },
+   {
+    "id": "f1-08det-04",
+    "severidad": "alta",
+    "regla": "§2.1 Suelo tipográfico de 12px",
+    "dice_el_sistema": "«El suelo son 12px. Nada baja de ahí». Única excepción admitida: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral y etiquetas de campo del modo tarjeta",
+    "hay_en_el_build": ".kv div span{display:block;color:var(--text-3);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase} — las etiquetas de los doce datos de la ficha. Además .hint, .who, .tnum, .lockrow y small.tnum a 11px, y .fstep, .sladef a 11.5px",
+    "selector": ".kv div span, .who, .hint, .lockrow",
+    "evidencia": "Estilo calculado a 1440px, andamio oculto: 12 span a 10,5px (las etiquetas de «Información del trámite» y «Métricas del folio»), 3 .hint + 6 .who + 6 .tnum + 4 small.tnum + 1 .lockrow + 1 .tip a 11px, 5 elementos a 11,5px. Las etiquetas de 10,5px no son rótulo de grupo de la barra lateral ni etiqueta de campo del modo tarjeta: son los rótulos de la ficha de detalle, visibles en 08_detalle_tramite--ok.png («TIPO», «CIUDAD / MÓDULO», «VIN»)",
+    "por_que_importa": "La ficha de detalle es la pantalla donde se lee el dato con calma, y sus rótulos van 1,5px por debajo del suelo que el sistema declara innegociable."
+   },
+   {
+    "id": "f1-08det-05",
+    "severidad": "alta",
+    "regla": "§8 Voz de producto (ANEXO B) — prueba base y límite de 140 caracteres",
+    "dice_el_sistema": "«si el texto explica una decisión, no va en pantalla. Si explica una consecuencia para quien está mirando, sí — y en una frase»; «Ningún bloque de texto siempre visible pasa de ~140 caracteres»",
+    "hay_en_el_build": "Texto siempre visible con referencias internas de especificación: «Bitácora · inmutable, solo lectura (S11)», «SLA del tipo \"Baja de placas · Puebla\": 7 días hábiles (configurable U-07)», «Acciones · según tu rol: AdminV Director», «Esta bitácora no admite ediciones ni borrados — cada acción nueva agrega un registro (trazabilidad ISO 9001, D13)», y la banda «Propuesta TRAZO con componentes de Studio — pendiente de revisión de Studio.»",
+    "selector": ".hint, .sladef, .lockrow, .banda.b-info",
+    "evidencia": "innerText medido: .banda.b-info = 76 caracteres pero habla del estado de revisión de la maqueta; .note de la bitácora = 148 caracteres, sobre el tope de ~140. Los códigos S11, U-07, D13 e ISO 9001 son referencias al documento de requisitos, no a lo que la persona puede hacer",
+    "por_que_importa": "La ficha enseña códigos internos del proyecto a quien solo quiere saber en qué va el trámite, y publica en la interfaz el estado de revisión de la propia maqueta."
+   },
+   {
+    "id": "f1-08det-06",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles — migas y modo dedo",
+    "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo»; «Enlaces que son el elemento primario de su fila (folio, miga, Ver en Maps): no son texto en prosa, llevan padding hasta llegar a 24px»; y el bloque :root[data-tacto=\"dedo\"] … {min-height:46px}",
+    "hay_en_el_build": "<nav class=\"crumb\"><a href=\"#\">Trámites</a><span>/</span><a href=\"#\">Kanban</a>…</nav> sin padding, y ningún bloque [data-tacto] en toda la hoja",
+    "selector": ".crumb a",
+    "evidencia": "Brief: 2 de 19 interactivos por debajo de 24px — «Trámites» 51,2×14px y «Kanban» 45,2×14px. Comprobado midiendo con data-tacto=\"dedo\" puesto, como pide §7.3: .it, .iconbtn y .btn se quedan en 36px, es decir el modo dedo no existe en esta pantalla (el brief lo confirma: regla_data_tacto_sin_root = 0 porque no hay ninguna regla)",
+    "por_que_importa": "Las dos migas son la única salida de la ficha y miden 14px de alto; y la pantalla no tiene modo táctil, aunque las otras cuatro del paquete lo declaran."
+   },
+   {
+    "id": "f1-08det-07",
+    "severidad": "alta",
+    "regla": "§7.2 — tres anchos del cromo, cajón con velo por debajo de 860px",
+    "dice_el_sistema": "«Tres anchos: completa ≥1100px, colapsada a solo iconos 860-1100px, cajón con velo <860px»",
+    "hay_en_el_build": "@media (max-width:900px){.side{display:none} .wrap{flex-direction:column} .colR{max-width:none}} y ningún botón de menú: el <script> solo maneja el tema y el andamio .demo [data-set]",
+    "selector": ".side, #menu-btn",
+    "evidencia": "Medido a 760px: .side mide 0px de ancho y no existe ningún control para recuperarla (grep de menu-btn y hamburguesa: 0 ocurrencias; las otras cuatro pantallas del lote sí llevan .hamburguesa + .velo-menu). Además el punto de ruptura es 900px, no los 860 del sistema, y no hay estado colapsado intermedio",
+    "por_que_importa": "Por debajo de 900px la navegación entera desaparece sin cajón ni botón: desde esa ficha ya no se puede ir a ninguna otra pantalla salvo por las migas."
+   },
+   {
+    "id": "f1-08det-08",
+    "severidad": "alta",
+    "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+    "dice_el_sistema": "«un control con pinta de interactivo tiene que interactuar — sin lógica real se presenta como cifra de lectura, sin aria-pressed ni cursor de puntero»; §6.18: «Se usa <dialog> nativo con showModal()»",
+    "hay_en_el_build": "El único <script> contiene el conmutador de tema y el andamio de maqueta. Los 17 botones de producto no tienen manejador: «Mover a En revisión…», «Reasignar gestor…», «Pausar (justificar)», «Agregar comentario / documento», «Notificar al cliente», «Marcar bloqueado por cliente», «Subir documento», «PDF membretado». Tres de ellos terminan en puntos suspensivos, que anuncian un diálogo que no existe",
+    "selector": ".panel.act .btn, .docs .btn",
+    "evidencia": "grep -c querySelectorAll = 2, y las dos ocurrencias son .demo [data-set]. Brief: dialogNativo=0 y divDialog=0. HALLAZGO TRANSVERSAL: se enuncia una vez para toda la pantalla, no uno por control",
+    "por_que_importa": "La ficha ofrece ocho acciones y ninguna responde; los puntos suspensivos prometen un paso intermedio que no está maquetado, así que no se puede auditar si ese paso cumple §6.18."
+   },
+   {
+    "id": "f1-08det-09",
+    "severidad": "media",
+    "regla": "§1 preámbulo + §1.5 — ningún hex literal en un componente",
+    "dice_el_sistema": "«ningún hex literal en un componente. Todo pasa por un token. Cuando algo no tenga token, se añade aquí siguiendo el patrón de nombres, no se resuelve con un valor suelto en la hoja de estilos»; §7.2: .side :focus-visible{outline-color:var(--chrome-focus)}",
+    "hay_en_el_build": ".side :focus-visible{outline-color:#9FE0AE} y .fab{background:linear-gradient(135deg,#1E4E79,#2e823d)}",
+    "selector": ".side :focus-visible, .fab",
+    "evidencia": "Líneas 178 y 355 del <style>. #9FE0AE es el valor de --chrome-focus (§1.5), #1E4E79 el de --chrome / --marca-azul y #2e823d el de --marca-3 (§1.2): los tres tienen token y se escribieron sueltos. Son los dos únicos hex fuera de bloque de tema en esta pantalla, y la única de las cinco del lote que los tiene",
+    "por_que_importa": "El anillo de foco del cromo y el degradado del botón flotante dejan de seguir al token: si --chrome-focus cambia, estos dos sitios no cambian."
+   },
+   {
+    "id": "f1-08det-10",
+    "severidad": "media",
+    "regla": "§6.9 — antes de escribir una clase nueva, verificar si .banda ya lo cubre",
+    "dice_el_sistema": "«Antes de escribir una clase nueva, verificar si .banda + una de sus cuatro variantes ya lo cubre». Trampa adicional de §6.9: «no solo se repiten nombres de clase por accidente, también se reinventan componentes enteros por no buscar primero si ya existen»",
+    "hay_en_el_build": ".warnbox{background:var(--err-bg);border:1px solid var(--border);border-radius:var(--r-card);padding:12px 14px} con icono en --err-ink — en un archivo que ya declara .banda y usa .banda.b-info tres párrafos más arriba",
+    "selector": ".warnbox",
+    "evidencia": "Líneas 295-298 frente a la .banda b-info del markup. .warnbox reproduce .banda-err (--err-bg + --err-ink + icono) con otro nombre y otro radio (--r-card en vez del borde de 1px transparente de .banda). Además su encabezado accesible sale de un <b id=\"h-atencion\">Requiere atención:</b> dentro de un <p>, no de un encabezado real (§11 Estructura)",
+    "por_que_importa": "Dos avisos de la misma pantalla se pintan con dos componentes distintos, y el aviso de urgencia toma su nombre accesible de un texto en negrita."
+   },
+   {
+    "id": "f1-08det-11",
+    "severidad": "media",
+    "regla": "§6.17 Subida de archivo",
+    "dice_el_sistema": "«un documento no se pide en una caja de texto»; «indica formatos y peso admitidos, muestra el archivo cargado con su nombre y fecha, y permite reemplazarlo o quitarlo»; markup: <input type=\"file\" accept=\".pdf,.jpg,.jpeg,.png\" aria-describedby=…> con data-estado",
+    "hay_en_el_build": "<button class=\"btn\" style=\"width:100%;margin-top:10px;justify-content:center\">Subir documento</button> y una lista de cuatro <div class=\"doc\"> con nombre y fecha, sin ninguna acción por documento",
+    "selector": ".docs .btn, .doc",
+    "evidencia": "Medido: 0 <input type=\"file\"> en la pantalla, ningún data-estado y ningún aria-describedby. Los cuatro documentos muestran nombre y fecha (eso sí lo cumple) pero no hay forma de reemplazar ni de quitar ninguno, ni se dicen los formatos ni el peso admitidos",
+    "por_que_importa": "La ficha enseña los cuatro documentos del expediente y no permite corregir ninguno, aunque uno de ellos está marcado «(rechazada)» en su propio nombre."
+   },
+   {
+    "id": "f1-08det-12",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga",
+    "dice_el_sistema": "«sin texto real dentro de las barras»; «prefers-reduced-motion aplana el fondo, no solo detiene la animación»: {.skel{animation:none;background:var(--surface-2)}}",
+    "hay_en_el_build": "<span class=\"skel\" style=\"width:40%\">Información del trámite</span>, …>Bitácora<, …>evento<, …>botón< en las tres cajas; y @media (prefers-reduced-motion:reduce){.skel{animation:none}}",
+    "selector": ".state-loading .skel",
+    "evidencia": "Medido: 11 de 11 barras .skel llevan texto. Con reducedMotion:'reduce', animation-name:none pero background-image sigue siendo linear-gradient(90deg, rgb(231,237,243) 25%, …) y background-color rgba(0,0,0,0): el degradado queda congelado, que es el fallo que §6.7 describe",
+    "por_que_importa": "Un lector de pantalla lee «Información del trámite», «Bitácora», «evento», «botón» mientras la ficha carga."
+   },
+   {
+    "id": "f1-08det-13",
+    "severidad": "media",
+    "regla": "§6.5 Iconos — Material Symbols Rounded, variante rellena",
+    "dice_el_sistema": "«todo icono del sistema. Material Symbols Rounded, variante rellena (FILL@1)», cargada por subconjunto con un solo <link> y los ejes opsz,wght,FILL,GRAD@24,500,1,0 en .msi",
+    "hay_en_el_build": "Sprite propio de <symbol> SVG de trazo: .ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none}. No existe .msi en el archivo",
+    "selector": ".ico",
+    "evidencia": "grep: 0 ocurrencias de 'Material Symbols' y de .msi; el <link> de Google Fonts que sí existe pide Inter y Michroma, no el subconjunto de iconos. Los iconos llevan aria-hidden=\"true\", que es el requisito a11y de §6.5",
+    "por_que_importa": "Toda la familia de iconos del paquete es distinta de la documentada; el peso visual (trazo de 1,6 frente a relleno FILL@1) no coincide con el resto del producto."
+   },
+   {
+    "id": "f1-08det-14",
+    "severidad": "baja",
+    "regla": "§1.4 Series de gráfica — valores de la paleta categórica",
+    "dice_el_sistema": "--serie-1 azul #2a78d6 claro / #3987e5 oscuro; --serie-2 naranja #eb6834 claro / #d95926 oscuro",
+    "hay_en_el_build": "--serie-1: #2C6CA8 y --serie-2: #7A5FA8 en claro; --serie-1: #6FA8DC y --serie-2: #B69BE0 en oscuro",
+    "selector": ":root, [data-theme=\"dark\"]",
+    "evidencia": "Líneas 101-102 (claro) y 135-136 (oscuro). Los cuatro valores divergen de la tabla de §1.4, y --serie-2 es violeta en los dos temas en vez de naranja, con lo que ocupa el hueco de --serie-3. El brief los lista como declarados_sin_usar, así que hoy no se pinta nada con ellos",
+    "por_que_importa": "No tiene consecuencia visible en esta pantalla porque no hay gráficas, pero si se copia este :root a una pantalla que sí las tenga, la paleta categórica arranca con dos valores que no son los del sistema."
+   },
+   {
+    "id": "f1-08det-15",
+    "severidad": "baja",
+    "regla": "§6.4 regla 1 — el cambio de vista se anuncia y mueve el foco",
+    "dice_el_sistema": "«el cambio se anuncia (aria-live=\"polite\") y mueve el foco (main.focus() con tabindex=\"-1\")»",
+    "hay_en_el_build": "<main id=\"contenido\" data-state=\"ok\" aria-label=\"Detalle del trámite\"> sin aria-live y sin tabindex=\"-1\"; el único mecanismo de cambio de vista es el andamio de maqueta, que solo escribe cont.setAttribute('data-state', …)",
+    "selector": "main#contenido",
+    "evidencia": "Medido: ningún [aria-live] en la pantalla; el único role=\"status\" es el del contenedor del esqueleto. Las otras cuatro pantallas del lote sí llevan tabindex=\"-1\" en el <main>",
+    "por_que_importa": "Severidad baja porque el disparador es el andamio, no el producto; pero el contenedor de vistas no está preparado para anunciar ni para recibir el foco cuando esa lógica se escriba."
+   }
+  ]
+ },
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 2,
+   "responsive": 1,
+   "integridad": 3
+  },
+  "justificacion": "Accesibilidad 1: doce etiquetas de la ficha a 10,5px y una veintena larga de textos a 11-11,5px, migas de 14px de alto, sin ningún bloque de modo dedo, encabezado del aviso de urgencia tomado de un <b>, y esqueleto con texto dentro de las barras. Theming 2: los dos temas están completos y el conmutador no depende de ninguna librería, pero esta pantalla es la única del lote con hex literales dentro de componentes (#9FE0AE en el foco del cromo, #1E4E79 y #2e823d en el FAB), con --serie-1/--serie-2 fuera de los valores de §1.4 y con --text-3 obsoleto; además el brief no pudo medir el tema oscuro (tema_oscuro_medido: false, fallos_oscuro: null). Responsive 1: por debajo de 900px la barra lateral se oculta sin cajón ni botón de menú y la navegación desaparece; el punto de ruptura no es el de §7.2 y no existe el estado colapsado intermedio; la columna derecha se reparte por flex-wrap con max-width, que es la forma que §6.20 y §13.3 prohíben. Integridad 3: es la mejor del lote — el isotipo está escrito bien (medidas en el <use>, sin viewBox en el envoltorio, dx=+1px), los estados vacío y error usan .tarjeta-estado con <h2> real y medallón de 52px, no hay clases duplicadas y no hay tokens usados sin declarar; baja de 4 porque todos los controles de producto son inertes y porque tres botones prometen un diálogo que no existe.",
+  "evidencia": [
+   "getComputedStyle: 12 span de .kv a 10,5px; .hint/.who/.tnum/.lockrow a 11px; .fstep/.sladef a 11,5px",
+   "getBoundingClientRect del <use> contra el <svg>: dx=+1px en el logo y en el FAB — patrón correcto",
+   "Estados medidos: .tarjeta-estado y .tarjeta-estado.es-err con h2 real y .estado-ico presente",
+   "A 760px: .side mide 0px de ancho; 0 ocurrencias de menu-btn o hamburguesa en el archivo",
+   "Con data-tacto=\"dedo\" puesto: .it, .iconbtn y .btn siguen en 36px — no hay regla táctil",
+   "document.fonts.size = 0 pese al <link> a fonts.googleapis.com; 0 @font-face",
+   "11 de 11 barras .skel con texto; con reducedMotion:reduce el background-image sigue siendo el degradado",
+   "Brief: 2 de 19 interactivos bajo 24px (migas de 51,2×14 y 45,2×14); 0 fallos de contraste medidos en claro"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — fuera del subconjunto por arquetipo"
+ },
+ "cobertura": [
+  {
+   "patron": "Indicador de etapas del flujo del expediente (<nav class=\"flow\"> con .fstep done / .fstep now [aria-current=\"step\"] / .fstep y conectores .farrow). Es la pieza que abre la ficha y dice en qué punto del recorrido va el trámite. §6.6 .pasos cubre una secuencia de 2-4 acciones que la persona tiene que seguir, no un estado de avance que la organización va marcando, y §6.20 no lo menciona.",
+   "propuesta_de_regla": "§6.20.1 Indicador de etapa — .flow. Cuándo: una ficha cuyo registro recorre una secuencia fija y conocida de estados, para decir en cuál está hoy. No sustituye a la pastilla de estado (§6.10): la pastilla dice el juicio, el indicador dice la posición. Markup: <nav class=\"flow\" aria-label=\"Etapas del trámite\"> con un elemento por etapa; la etapa en curso lleva aria-current=\"step\" y las anteriores un texto accesible que diga «completada», nunca solo el color o el icono de visto. Tipografía a var(--fs-meta) como suelo; las etapas cumplidas en --text-2, la actual en el token de su estado, las pendientes en --text-3. Si una etapa trae una cifra de desvío («día 9 de 7»), esa cifra va con su propio token de estado, no en peso 400 sobre el fondo de la etapa. La definición del plazo que sostiene el indicador no va en la misma fila: es nivel 2 de §8 y va a toggletip (§6.23)."
+  },
+  {
+   "patron": "Bitácora inmutable (<ol class=\"tl\"> con entradas .ev tipificadas por color: roja de incumplimiento, verde de cambio de estado, morada de documento, neutra de comentario). Es el componente central de la ficha y no hay regla para él: no es .pasos (§6.6), no es tabla densa (§6.11) y los colores que usa son los del semáforo aplicados a sucesos pasados, no a estados vigentes.",
+   "propuesta_de_regla": "§6.24 Bitácora de registro — .bitacora. Cuándo: un expediente que acumula sucesos con autor y fecha y que no se edita. Cada entrada lleva autor, marca de tiempo y el suceso en una frase; el matiz va al detalle, no a la entrada (§6.11 regla 7). El punto de la izquierda es gráfico y necesita 3:1 contra la superficie (§1.7). Regla de color: el semáforo de §1.3 solo se usa cuando el suceso es el propio cambio de estado; un suceso neutro (comentario, documento, reasignación) no toma color de estado, va en --text-3, porque «un color de estado no se reutiliza para una categoría» (§1). La leyenda de que la bitácora no se edita se dice una vez, en una frase, bajo el límite de §8, y sin códigos de requisito."
+  }
+ ],
+ "sin_datos": [
+  "f3.rendimiento: maqueta estática sin backend que perfilar",
+  "§6.11 Tabla densa, §6.12 Resumen y barra de filtros, §6.21 Filtros con multiselección, §6.13 Barra de selección, §6.14 Menú de acciones por fila: la pantalla no tiene tabla ni lista seleccionable (brief: tablas=0, th=0), así que ninguna de esas reglas tiene sobre qué medirse",
+  "§6.16 Formulario y §6.17 Subida: la pantalla no tiene ningún campo (brief: inputs=0); la única parte auditable de §6.17 es el botón «Subir documento», recogida en f1-08det-11",
+  "§6.18 Diálogo modal: 0 <dialog> y 0 div[role=dialog]; tres botones con puntos suspensivos lo prometen pero no hay modal que auditar",
+  "§1.1 contraste en tema oscuro: el brief trae fallos_oscuro: null y tema_oscuro_medido: false, y no hay captura --oscuro de esta pantalla"
+ ],
+ "f2_tokens": {
+  "fuente": "medicion mecanica del orquestador; canon = web/design-tokens.json (81 tokens)",
+  "declarados": [
+   "--accent",
+   "--accent-ink",
+   "--accent-soft",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-fill",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-dim",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-enter",
+   "--dur-micro",
+   "--ease-in-out",
+   "--ease-out",
+   "--ease-spring",
+   "--err",
+   "--err-bg",
+   "--err-fill",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-kpi",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--glass",
+   "--link",
+   "--ok",
+   "--ok-bg",
+   "--ok-fill",
+   "--ok-ink",
+   "--on-state",
+   "--pause",
+   "--pause-bg",
+   "--pause-fill",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-1",
+   "--sp-12",
+   "--sp-2",
+   "--sp-3",
+   "--sp-4",
+   "--sp-6",
+   "--sp-8",
+   "--stagger",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--warn",
+   "--warn-bg",
+   "--warn-fill",
+   "--warn-ink"
+  ],
+  "usados": [
+   "--accent",
+   "--accent-ink",
+   "--bg",
+   "--block",
+   "--block-bg",
+   "--block-ink",
+   "--border",
+   "--border-2",
+   "--chrome",
+   "--chrome-dim",
+   "--chrome-ink",
+   "--chrome-line",
+   "--dur-base",
+   "--dur-micro",
+   "--ease-out",
+   "--err",
+   "--err-bg",
+   "--err-ink",
+   "--focus-offset",
+   "--focus-w",
+   "--font-brand",
+   "--font-ui",
+   "--fs-base",
+   "--fs-dense",
+   "--fs-meta",
+   "--fs-sub",
+   "--fs-title",
+   "--ok",
+   "--ok-bg",
+   "--ok-ink",
+   "--on-state",
+   "--pause-bg",
+   "--pause-ink",
+   "--r-card",
+   "--r-ctrl",
+   "--r-modal",
+   "--r-pill",
+   "--sh-float",
+   "--sh-modal",
+   "--sh-rest",
+   "--sp-2",
+   "--sp-3",
+   "--sp-8",
+   "--surface",
+   "--surface-2",
+   "--text",
+   "--text-2",
+   "--text-3",
+   "--warn",
+   "--warn-bg",
+   "--warn-ink"
+  ],
+  "usados_no_declarados": [],
+  "declarados_no_usados": [
+   "--accent-soft",
+   "--block-fill",
+   "--dur-enter",
+   "--ease-in-out",
+   "--ease-spring",
+   "--err-fill",
+   "--fs-kpi",
+   "--glass",
+   "--link",
+   "--ok-fill",
+   "--pause",
+   "--pause-fill",
+   "--row-comfy",
+   "--row-compact",
+   "--serie-1",
+   "--serie-2",
+   "--sp-1",
+   "--sp-12",
+   "--sp-4",
+   "--sp-6",
+   "--stagger",
+   "--warn-fill"
+  ],
+  "valores_divergentes": [
+   {
+    "token": "--block-bg",
+    "canonico": "#EAE1F7",
+    "declara": "#EDEBF7"
+   },
+   {
+    "token": "--block-ink",
+    "canonico": "#5B4680",
+    "declara": "#6D4FA3"
+   },
+   {
+    "token": "--err-bg",
+    "canonico": "#F6DAD7",
+    "declara": "#F4E8E7"
+   },
+   {
+    "token": "--err-ink",
+    "canonico": "#7A2A23",
+    "declara": "#B03A31"
+   },
+   {
+    "token": "--ok-bg",
+    "canonico": "#DCF0E7",
+    "declara": "#E2EFEC"
+   },
+   {
+    "token": "--ok-ink",
+    "canonico": "#1D5A46",
+    "declara": "#22705A"
+   },
+   {
+    "token": "--pause-bg",
+    "canonico": "#E2E6E9",
+    "declara": "#E7EAEC"
+   },
+   {
+    "token": "--pause-ink",
+    "canonico": "#333B44",
+    "declara": "#4A5560"
+   },
+   {
+    "token": "--text-3",
+    "canonico": "#5C6675",
+    "declara": "#66717F"
+   },
+   {
+    "token": "--warn-bg",
+    "canonico": "#F5E7C6",
+    "declara": "#F1ECDE"
+   },
+   {
+    "token": "--warn-ink",
+    "canonico": "#6E5210",
+    "declara": "#7E5B0E"
+   },
+   {
+    "token": "--font-brand",
+    "canonico": "'Michroma',sans-serif",
+    "declara": "'Ethnocentric Rg', 'Michroma', 'Inter', sans-serif"
+   },
+   {
+    "token": "--font-ui",
+    "canonico": "'Inter',system-ui,sans-serif",
+    "declara": "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+   },
+   {
+    "token": "--serie-1",
+    "canonico": "#2a78d6",
+    "declara": "#2C6CA8"
+   },
+   {
+    "token": "--serie-2",
+    "canonico": "#eb6834",
+    "declara": "#7A5FA8"
+   }
+  ],
+  "n_declarados": 73,
+  "n_usados": 51,
+  "n_divergentes": 15,
+  "hover_text3_sobre_surface2": {
+   "reglaHoverSurface2": false,
+   "filas": 0,
+   "nodosText3": 0
+  }
+ }
+}

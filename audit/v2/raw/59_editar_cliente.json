@@ -1,0 +1,521 @@
+{
+ "pantalla": "59_editar_cliente",
+ "tier": "A",
+ "sha256": "3e2c9ceab8d0a6522f3850ed7de64b909eec96efd715d3aa6b980463766ad2c8",
+ "estado_vs_pdf": "alineado",
+ "estado_entrega": "modificada",
+ "estados_auditados": [
+  "con datos: hoja de especímenes (captura 1440 y 1280)",
+  "diálogos mientras guarda y al fallar (código)",
+  "vacío y error de la hoja (código)"
+ ],
+ "capturas": [
+  "59_editar_cliente--1280-fold.png",
+  "59_editar_cliente--1440.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-59editar-01",
+    "severidad": "alta",
+    "regla": "§11 Estructura (todos los id únicos; cada control con nombre) + §6.16 regla 5",
+    "dice_el_sistema": "«¿Todos los `id` son únicos, y cada `aria-describedby` / `aria-controls` apunta a algo que existe?»",
+    "hay_en_el_build": "Los cuatro especímenes repiten el formulario sin renumerar: id=\"nombre-legal\" ×4 e id=\"rfc-ro\" ×4, con 8 <label for> que apuntan siempre al primero. En el árbol de accesibilidad, de los 8 campos de texto solo el primero tiene nombre (y es la suma de las cuatro etiquetas: «Razón social * Razón social * Razón social * Razón social *»); los otros 6 tienen nombre vacío.",
+    "selector": "#nombre-legal, #rfc-ro",
+    "linea": 795,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_a59_ax",
+     "detalle": "script aud2/a59_a.cjs con CDP Accessibility.getFullAXTree a 1440×900: 8 textbox; 6 con name vacío; id duplicados = nombre-legal×4, rfc-ro×4; dialogs 0, role=dialog 4, h1 0"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1), medido: 6 de 8 campos. Mitigante honesto: en la aplicación real solo hay un diálogo abierto a la vez, así que el efecto es sobre la hoja de especímenes que se entrega y se audita; el arreglo es renumerar los id con sufijo por espécimen. v1: f1-59editar-05 alta."
+    },
+    "por_que_importa": "Quien revisa o prueba la hoja con lector de pantalla oye campos sin nombre en tres de los cuatro diálogos, y la herramienta automática de accesibilidad los marca."
+   },
+   {
+    "id": "v2-59editar-02",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (modo colapsado) + §11 Estructura (nombre accesible)",
+    "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.»",
+    "hay_en_el_build": "A 1000 px: barra de 64 px, .side .et{display:none} y 15 enlaces .it sin aria-label ni title; nombre accesible vacío en 15 de 15.",
+    "selector": ".side .et, .it",
+    "linea": 288,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "sidebar",
+     "detalle": "brief menu_1000px: total 15, sinNombre 15; CDP Accessibility.getFullAXTree a 1000×800 (aud2/common_b.cjs)"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1), medido. Cromo común a todas las pantallas; un solo arreglo."
+    },
+    "por_que_importa": "En portátil pequeño o tableta, el lector de pantalla anuncia quince enlaces sin nombre."
+   },
+   {
+    "id": "v2-59editar-03",
+    "severidad": "media",
+    "regla": "§6.18 Diálogo modal (<dialog> nativo y las cuatro reglas de foco)",
+    "dice_el_sistema": "«Se usa `<dialog>` nativo con `showModal()`… La alternativa —un `<div role=\"dialog\" aria-modal=\"true\">` en el flujo del documento— obliga a reimplementar las tres cosas, y en la práctica no se reimplementan.»",
+    "hay_en_el_build": "Cuatro <div class=\"modal\" role=\"dialog\" aria-modal=\"true\"> en el flujo y ningún <dialog>; el <script> solo registra tema, menú lateral, panel de maqueta y un keydown de Escape que cierra el menú: ni foco al primer campo, ni retorno de foco, ni manejador de cancel mientras guarda. El estado «guardando» se dibuja con disabled en el aspa y los dos botones, sin aria-busy ni aria-describedby al motivo.",
+    "selector": ".modal, .cerrar",
+    "linea": 752,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 752,
+     "cita": "<div class=\"modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"t-ed\">"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Dos lecturas. (A) El cliente dibuja a propósito «los tres momentos que se rompen» (FICHAS 59) en una hoja estática: cuatro diálogos a la vez no pueden ser <dialog> modales, porque showModal() solo admite uno en la capa superior; el comportamiento pertenece a la implementación. (B) Si la aplicación real usa el mismo marcado, no hay trampa de foco nativa. El sistema debe decir cómo se documenta un diálogo en una hoja de especímenes (cobertura). v1 lo marcó alta (-01, -02, -03); aquí media por ser maqueta estática declarada."
+    },
+    "por_que_importa": "La hoja describe reglas de foco y de Escape que ningún código del archivo implementa; no sirve como prueba de que el diálogo las cumple."
+   },
+   {
+    "id": "v2-59editar-04",
+    "severidad": "media",
+    "regla": "§11 Estructura (cada pantalla o vista tiene un encabezado real)",
+    "dice_el_sistema": "«¿Cada pantalla o vista tiene un encabezado real, no solo texto en negrita?»",
+    "hay_en_el_build": "Ningún <h1> en el documento (h1=0); la jerarquía empieza en <h2>1 · El diálogo, mientras se edita</h2>, y el <title> «SIO-DPROMA — El sexto diálogo — editar cliente» no aparece en ningún encabezado.",
+    "selector": "main#contenido, .cab-blq",
+    "linea": 746,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_a59_ax",
+     "detalle": "aud2/a59_a.cjs: h1 = 0, h2 = 6, h3 = 4"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Menor para una hoja de especímenes; se pide un <h1> con el nombre de la hoja. v1: f1-59editar-06 alta; se rebaja a media porque el diálogo en sí sí lleva título."
+    },
+    "por_que_importa": "Sin <h1>, quien navega por encabezados no sabe de qué pantalla es la hoja."
+   },
+   {
+    "id": "v2-59editar-05",
+    "severidad": "media",
+    "regla": "§6.18 Tres reglas de contenido (el nombre del botón y el contenido coinciden)",
+    "dice_el_sistema": "«El nombre del botón y el contenido coinciden. «Editar cliente» que solo deja cambiar la razón social se llama «Cambiar razón social».»",
+    "hay_en_el_build": "El título de los cuatro diálogos es «Editar cliente», y el diálogo solo permite cambiar la razón social (el RFC es de solo lectura y, por D9, los datos fiscales se editan en la ficha).",
+    "selector": ".modal > header h3",
+    "linea": 754,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 754,
+     "cita": "<h3 id=\"t-ed\">Editar cliente</h3>"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "FICHAS 59 llama al flujo «Editar cliente» (así se llama el botón en padrón y ficha). El sistema cita este mismo ejemplo como regla; con D9 (los campos fiscales van en línea, el diálogo se queda de dos renglones) la discrepancia crece. Pregunta abierta: renombrar el botón y el título a «Cambiar razón social» o mantener el nombre del cliente."
+    },
+    "por_que_importa": "Quien pulsa «Editar cliente» espera cambiar contactos o datos fiscales y encuentra solo la razón social."
+   },
+   {
+    "id": "v2-59editar-06",
+    "severidad": "media",
+    "regla": "§8 Voz de producto (descripciones de la estructura del formulario)",
+    "dice_el_sistema": "§8 cita como mala práctica «descripciones de la estructura del formulario («1 campo editable · 1 de solo lectura»)».",
+    "hay_en_el_build": "El pie del primer espécimen dice «1 campo editable · 1 de sólo lectura» (el texto literal del ejemplo).",
+    "selector": ".modal > footer .izq",
+    "linea": 770,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 770,
+     "cita": "1 campo editable · 1 de sólo lectura"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Mejora sugerida: quitar el texto o sustituirlo por algo accionable. No se exige."
+    },
+    "por_que_importa": "Es voz de conversación interna en un pie que debería llevar solo las acciones."
+   },
+   {
+    "id": "v2-59editar-07",
+    "severidad": "media",
+    "regla": "§6.16 regla 3 (required y aria-required de verdad)",
+    "dice_el_sistema": "«Los asteriscos eran `<span>` decorativos sin `required`, sin `aria-required` y sin leyenda, así que un lector leía «Razón social asterisco».»",
+    "hay_en_el_build": "<label for=\"nombre-legal\">Razón social <span class=\"req\">*</span></label> sobre un <input type=\"text\"> sin required ni aria-required; 0 required y 0 aria-required en el documento; el asterisco no lleva leyenda.",
+    "selector": ".req, #nombre-legal",
+    "linea": 759,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 759,
+     "cita": "<label for=\"nombre-legal\">Razón social <span class=\"req\">*</span></label>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Corrección de dos atributos; la validación pertenece a la implementación. v1: f1-59editar-10 media, no tocado. En 41_alta_cliente el mismo cliente sí usa required y aria-required."
+    },
+    "por_que_importa": "El lector lee «Razón social asterisco» y no sabe que es obligatoria."
+   },
+   {
+    "id": "v2-59editar-08",
+    "severidad": "media",
+    "regla": "§6.18 Tres reglas de contenido (un campo de solo lectura se muestra como dato, pero conservando el motivo) · FICHAS 59",
+    "dice_el_sistema": "«Un campo de solo lectura se muestra como dato, no como campo — pero conservando el motivo. Un campo en gris sin explicación se lee como una carencia del formulario; con el motivo al lado, como la decisión que es.»",
+    "hay_en_el_build": "El RFC sigue siendo un <input type=\"text\" readonly> con caja y borde, en gris, con la marca «no se edita aquí» y la explicación debajo. FICHAS 59 lo declara deliberado: «El RFC, y por qué se enseña apagado con su motivo debajo».",
+    "selector": "#rfc-ro, .ctrl.solo-lectura",
+    "linea": 765,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 765,
+     "cita": "<input type=\"text\" id=\"rfc-ro\" value=\"ABA210415H29\" readonly>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Decisión documentada del cliente («apagado con su motivo») frente a la frase del sistema («como dato, no como campo»), que se contradice con su propia explicación (campo en gris con motivo = decisión). El sistema debe aclarar que ambas formas son válidas mientras el motivo esté al lado."
+    },
+    "por_que_importa": "Un campo que parece editable pero no lo es invita a probar; con el motivo debajo el costo es bajo."
+   },
+   {
+    "id": "v2-59editar-09",
+    "severidad": "baja",
+    "regla": "§1.6 Velos + regla de fondo del sistema (ningún hex literal en un componente)",
+    "dice_el_sistema": "«**La regla de fondo:** ningún hex literal en un componente. Todo pasa por un token.» --velo-modal = `rgba(19,29,43,.45)`.",
+    "hay_en_el_build": ".velo::before{content:\"\";position:absolute;inset:0;background:rgba(9,14,20,.44)} — un color escrito a mano en lugar de var(--velo-modal); detrás de cada diálogo, además, un esqueleto de barras (.fondo) en lugar de la pantalla real atenuada.",
+    "selector": ".velo, .fondo",
+    "linea": 664,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 664,
+     "cita": ".velo::before{content:\"\";position:absolute;inset:0;background:rgba(9,14,20,.44)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Menor y en la hoja de especímenes, no en el producto. Sugerencia: var(--velo-modal) y la pantalla real atenuada detrás (§6.18). v1: f1-59editar-07 y -12 (media)."
+    },
+    "por_que_importa": "El velo de la hoja no cambia con el tema como el del producto, y las barras grises se leen como «cargando»."
+   },
+   {
+    "id": "v2-59editar-10",
+    "severidad": "baja",
+    "regla": "§6.18 CSS canónico del diálogo (--r-modal, --sh-modal, max-width 520px)",
+    "dice_el_sistema": "`dialog.modal{… max-width:520px; … border-radius:var(--r-modal);box-shadow:var(--sh-modal)}`",
+    "hay_en_el_build": ".modal{…border-radius:var(--r-card);box-shadow:var(--sh-float);max-width:560px;margin:0 auto;…}: radio de tarjeta (10 px) y sombra de reposo/hover en lugar de las de diálogo (16 px, --sh-modal) y 40 px más de ancho.",
+    "selector": ".modal",
+    "linea": 674,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 674,
+     "cita": "border-radius:var(--r-card);box-shadow:var(--sh-float);max-width:560px;margin:0 auto;"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Diferencia visual menor; avanzó respecto a v1 (el max-height de 620 px ya no está). v1: f1-59editar-08 media."
+    },
+    "por_que_importa": "El diálogo se ve más plano y más ancho que el resto de diálogos del sistema."
+   },
+   {
+    "id": "v2-59editar-11",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 (isotipo) + §1.2.1 Logotipo",
+    "dice_el_sistema": "«Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg> (y el botón flotante): el <use> queda 32,5 px a la izquierda del <svg> y solo se ve una astilla de la «Λ».",
+    "selector": ".logo svg, .fab svg",
+    "linea": 727,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_isotipo",
+     "detalle": "aud2/common_a.cjs: <use> x=63,5 frente a <svg> x=96 (−32,5 px); 46 de 50 archivos conservan el patrón"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Corrección sencilla y global en la plantilla del cromo, ya documentada en §10. v1: f1-59editar-15 media."
+    },
+    "por_que_importa": "La marca aparece recortada en el cromo de la pantalla."
+   },
+   {
+    "id": "v2-59editar-12",
+    "severidad": "baja",
+    "regla": "§10 trampa 2 (selectores por exclusión, no por enumeración)",
+    "dice_el_sistema": "«Lo que aplica a todos los campos se escribe `.ctrl input:not([type=\"file\"]):not([type=\"checkbox\"]):not([type=\"radio\"])`.»",
+    "hay_en_el_build": ".ctrl input[type=\"text\"],.ctrl input[type=\"date\"],.ctrl input[type=\"number\"],.ctrl select,.ctrl textarea{…}: sin email ni tel (la regla del tamaño de campo).",
+    "selector": ".ctrl input, .ctrl select",
+    "linea": 579,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 579,
+     "cita": ".ctrl input[type=\"text\"],.ctrl input[type=\"date\"],.ctrl input[type=\"number\"],.ctrl select,.ctrl textarea{"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Hoy los dos campos son type=\"text\"; el riesgo es futuro. v1: f1-59editar-16 baja."
+    },
+    "por_que_importa": "El día que un campo pase a email o tel se encogerá a 19 px de alto sin aviso."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [
+  {
+   "id_v1": "f1-59editar-04",
+   "evidencia": "Cerrado en efecto, no en forma: .modal > header, .cuerpo, > footer y .tel-fila usan ahora var(--sp-5,20px) con respaldo (líneas 676, 685, 688, 717), así que la declaración ya no se invalida; la medición SP5 del brief da padding 16px 20px en los tres bloques. El token --sp-5 sigue sin declararse en :root (tokens_usados_no_declarados = ['--sp-5'])."
+  },
+  {
+   "id_v1": "f1-59editar-13",
+   "evidencia": "lt12_medido = 0 (brief): .ayuda y el resto pasaron a var(--fs-meta); solo quedan rótulos en mayúsculas a 10,5 px."
+  },
+  {
+   "id_v1": "f1-59editar-14",
+   "evidencia": "--text-3 pasó de #66717F a #5C6675; contraste: 0 fallos en claro y oscuro sobre 145 nodos de texto (brief)."
+  }
+ ],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 4,
+   "integridad": 2
+  },
+  "justificacion": "Sube de 2 a 3. Cierra tres altas de v1 (--sp-5 en efecto, tamaños bajo 12 px, --text-3) y el contraste queda en 0 fallos; el aspa mide 44 px y no hay scroll horizontal a 1440/1280/1024 (el espécimen de teléfono de 330 px cabe). Pero conserva un crítico medido (6 de 8 campos sin nombre accesible por id duplicados; 15 enlaces del menú sin nombre a 1000 px), ningún <h1>, ningún <dialog> y un velo con color literal. Integridad 2: lo escrito en la hoja (foco, Escape, cierre en vuelo) no lo implementa ningún código.",
+  "evidencia": [
+   "propio_a59_ax: 6 de 8 textbox sin nombre; h1 = 0; dialog = 0",
+   "contraste: 0 fallos; tactil: 0 de 39; anchos: sin scroll horizontal",
+   "SP5: --sp-5 con respaldo, padding 16px 20px"
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 0,
+   "hallazgo": "«Guardando los cambios…» se pinta y se anuncia (role=status), el botón dice «Guardando…» y la hoja lo explica; el motivo de los botones deshabilitados está escrito en el pie.",
+   "selector": ".vivo",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 791,
+    "cita": "<p class=\"vivo\" role=\"status\">"
+   }
+  },
+  {
+   "n": 2,
+   "heuristica": "Relación entre el sistema y el mundo real",
+   "severidad": 2,
+   "hallazgo": "El diálogo se llama «Editar cliente» pero solo cambia la razón social; el sistema pide «Cambiar razón social».",
+   "selector": ".modal > header h3",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 754,
+    "cita": "<h3 id=\"t-ed\">Editar cliente</h3>"
+   }
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 1,
+   "hallazgo": "Al fallar el diálogo no se cierra y conserva lo escrito; mientras guarda se bloquean Escape, aspa y Cancelar (intencional, para no dejar dudas), a costa de no poder salir si la operación se cuelga.",
+   "selector": ".modal",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 769,
+    "cita": "<footer>"
+   }
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 2,
+   "hallazgo": "Radio, sombra y ancho distintos de los otros diálogos, campo de solo lectura como input, asterisco decorativo y velo con color propio; en 41_alta_cliente el mismo cliente sí marca required.",
+   "selector": ".modal, .req, .velo",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 674,
+    "cita": "border-radius:var(--r-card);box-shadow:var(--sh-float);max-width:560px;margin:0 auto;"
+   }
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 1,
+   "hallazgo": "El RFC no se puede cambiar y dice por qué; la razón social avisa «Mínimo 3 caracteres»; el estado de error evita guardar sobre un formulario sin datos previos («un campo vacío guardado encima borra el nombre legal»). Falta required.",
+   "selector": "#nombre-legal",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 761,
+    "cita": "Es el nombre legal con el que factura. Mínimo 3 caracteres."
+   }
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocimiento antes que recuerdo",
+   "severidad": 0,
+   "hallazgo": "El motivo del RFC bloqueado está junto al campo («no se edita aquí» + explicación): no hace falta recordar por qué.",
+   "selector": ".ctrl.solo-lectura .ayuda",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 764,
+    "cita": "<span class=\"candado\">"
+   }
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": "n/a",
+   "hallazgo": "No aplica: un diálogo de dos renglones no ofrece atajos ni caminos alternos; su valor es caber en un teléfono (330 px) y eso se cumple.",
+   "selector": ".tel",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 718,
+    "cita": ".tel{width:330px"
+   }
+  },
+  {
+   "n": 8,
+   "heuristica": "Estética y diseño minimalista",
+   "severidad": 2,
+   "hallazgo": "El pie del diálogo describe la estructura («1 campo editable · 1 de sólo lectura») y la hoja mezcla producto y explicación sin marcar como andamio; el diálogo en sí es mínimo.",
+   "selector": ".modal > footer .izq",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 770,
+    "cita": "1 campo editable · 1 de sólo lectura"
+   }
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de errores",
+   "severidad": 1,
+   "hallazgo": "El error dice qué pasó, que el cliente sigue como estaba y que lo escrito no se perdió, con referencia; muestra además el código crudo «SYS_ERROR_INTERNO» (el cliente lo declara codigoError).",
+   "selector": ".err-linea",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 827,
+    "cita": "<span class=\"ref\" translate=\"no\">SYS_ERROR_INTERNO"
+   }
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 1,
+   "hallazgo": "La ayuda del RFC explica la regla en una frase de dos renglones junto al campo, sin párrafos aparte.",
+   "selector": ".ctrl .ayuda",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 766,
+    "cita": "El RFC es la <b>identidad fiscal</b>"
+   }
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-109",
+    "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+    "cobertura": "cubre",
+    "evidencia": "«Un error en la razón social o el RFC provoca el rechazo fiscal»: el diálogo deja corregir la razón social y bloquea el RFC con su motivo («cambiarlo es decir que era otro»), de modo que el dato fiscal clave no se cambia a la ligera."
+   },
+   {
+    "pp": "pp-111",
+    "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+    "cobertura": "cubre",
+    "evidencia": "«los datos llegan errados o tarde y no existe un padrón único del que tomarlos»: editar la razón social en un solo sitio y que se refleje en todo el sistema responde a la necesidad de un padrón único."
+   }
+  ],
+  "usabilidad_para_el_area": "Para finanzas, que sufre el rechazo de facturas por razón social o RFC mal capturados, el diálogo es el correctivo mínimo y seguro (solo la razón social, RFC visible y protegido). Para comercial es una pantalla de paso; lo que más le afecta es el nombre «Editar cliente», que promete más de lo que ofrece."
+ },
+ "cobertura": [
+  {
+   "patron": "Hoja de especímenes de un diálogo (varios estados del mismo diálogo en una página)",
+   "propuesta_de_regla": "Los especímenes se dibujan con .modal estático (o <dialog open> no modal), con id únicos por espécimen (sufijo -1…-4), el velo con var(--velo-modal), la pantalla real atenuada detrás y todo texto explicativo de la hoja marcado con data-andamio; la hoja lleva <h1> y no pretende demostrar foco ni Escape."
+  },
+  {
+   "patron": "Campo de solo lectura con motivo",
+   "propuesta_de_regla": "§6.18 acepta dos formas equivalentes: dato en texto con candado, o campo apagado (readonly, --surface-2, cursor not-allowed) siempre con el motivo visible debajo; un campo apagado sin motivo no se admite."
+  },
+  {
+   "patron": "Nombre del botón que abre un diálogo parcial",
+   "propuesta_de_regla": "Cuando un diálogo edita solo una parte del registro, el botón y el título dicen esa parte («Cambiar razón social»), y el resto se edita en el lugar (D9)."
+  }
+ ],
+ "sin_datos": [
+  "Esta pantalla no tiene observaciones de la persona (observaciones_resueltas vacío).",
+  "No pude determinar si la aplicación real usa <dialog> o un <div role=\"dialog\"> (FICHAS 59 dice que registra lo construido); por eso v2-59editar-03 queda con dos lecturas.",
+  "D9 del aviso del 28-sep («Este diálogo se queda de 2 renglones… los campos fiscales NO van aquí», FICHAS 59): el diálogo dibujado tiene dos renglones y ningún campo fiscal; coincide. No encontré contradicción con D-n.",
+  "Modo oscuro: solo la medición de contraste del brief (0 fallos). Rendimiento: no evaluado."
+ ]
+}

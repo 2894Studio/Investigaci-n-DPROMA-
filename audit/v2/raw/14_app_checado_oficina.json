@@ -1,0 +1,107 @@
+{
+ "pantalla": "14_app_checado_oficina",
+ "tier": "no_indicado_en_dossier",
+ "modo": "cobertura",
+ "sha256": "4815aeee2f4332e20576639a04def3f581bcb5dc9ada4cad6efbe3f064010d96",
+ "estado_vs_pdf": "no_listado_en_pdf",
+ "estados_auditados": [
+  "Antes de checar",
+  "Entrada puntual",
+  "Retardo",
+  "Fuera de zona",
+  "Temas claro y oscuro"
+ ],
+ "capturas": [
+  "14_app_checado_oficina--1440.png",
+  "14_app_checado_oficina--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-14checadooficina-01",
+    "severidad": "media",
+    "regla": "§1.7 Regla de contraste (elementos gráficos 3:1)",
+    "dice_el_sistema": "Texto normal 4,5:1 mínimo; texto grande (≥24px, o ≥18,66px en negrita) y elementos gráficos",
+    "hay_en_el_build": "La barra de la ventana de entrada pinta el tramo «Tolerancia hasta 09:10» con `--warn` base rgb(185,138,30) sobre `.window` (`--surface-2`) rgb(231,237,243): 2,65:1, por debajo del 3:1 de §1.7 para un elemento gráfico (con el tramo ok 3,37:1 y el de retardo 4,31:1 sí cumplen). El cuadradito de la leyenda usa el mismo color. En oscuro `--warn` da 8,79:1.",
+    "selector": ".wbar .w-tol, .wlegend i",
+    "linea": 115,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 115,
+     "cita": ".wbar .w-tol{background:var(--warn)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El cliente usó §1.3 al pie de la letra («base… solo para elementos gráficos: un punto, un borde, una barra»): el defecto está en el sistema, cuyo `--warn` base no llega a 3:1 sobre `--surface-2` (sí sobre `--surface`, 3,04:1). No es crítico: la barra lleva `role=\"img\"` con `aria-label` completo y la leyenda dice cada tramo en texto. Propuesta: en claro, el gráfico de advertencia usa `--warn-ink` (5,25:1 sobre `--surface-2`) o el sistema añade un `--warn-graf`. Colores computados con el DOM (scratchpad/m6/m3.cjs) y razón WCAG propia."
+    },
+    "por_que_importa": "La franja amarilla de tolerancia (10 minutos) es la que separa «puntual» de «retardo»; si se confunde con el fondo, la barra parece ir de verde directamente a rojo y la ventana de gracia no se ve."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 3,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 3
+  },
+  "justificacion": "Pantalla de oficina clara: la acción primaria («Registrar entrada», 86 px) está en el primer pliegue, la ventana de entrada se ve antes de checar, el resultado de cada escenario (puntual, retardo, fuera de zona) usa icono + texto + color, y los 7 destinos miden ≥ 44 px. 0 fallos de contraste de texto en 4 escenarios × 2 temas. Resta por el tramo `--warn` de la barra a 2,65:1, Google Fonts por `<link>`, el token `--text-3` viejo y tamaños de 10–11,5 px.",
+  "evidencia": [
+   "brief: tactil bajo24 0 de 11; I8 0 grupos dispares; C2 3 fallos (badge/leyenda)",
+   "scratchpad/m6/run.cjs: 4 escenarios × 2 temas, 0 fallos de texto reales",
+   "scratchpad/m6/m3.cjs: colores computados de `.wbar` y `.window`",
+   "captura 14_app_checado_oficina--1440.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Barra de ventana horaria con tres tramos de color y leyenda (`.wbar`, `.wlegend`): puntual / tolerancia / retardo en proporción 52/14/34 %",
+   "propuesta_de_regla": "Componente «ventana de tiempo»: los tramos van en el orden del tiempo, cada uno con su etiqueta de hora dentro o debajo (no solo en una leyenda aparte), colores del semáforo con ≥ 3:1 sobre su fondo (§1.7) y `role=\"img\"` con la descripción completa. Los anchos son proporcionales al tiempo, no decorativos."
+  },
+  {
+   "patron": "Zona del centro de trabajo como medallón (`.zone .rad` 54 px: pin verde dentro de zona, alerta roja fuera) con distancia en texto",
+   "propuesta_de_regla": "Variante de §6.4 para estado de ubicación: medallón de 54 px con icono distinto por estado (pin = dentro, triángulo = fuera), la distancia en una línea («Estás a 24 m del centro — dentro de la zona permitida») y el color de apoyo `-bg`/`-ink` opacos. «Fuera de zona» no bloquea y lo dice."
+  },
+  {
+   "patron": "Tarjeta de resultado de checado (`.result` con `.r-ok`/`.r-warn`/`.r-err`): título con hora, párrafo de consecuencia y, en retardo, nota de retardos acumulados con acción «Adjuntar justificación»",
+   "propuesta_de_regla": "Patrón de resultado irreversible en móvil: una sola tarjeta con icono de estado, título con la hora que cuenta, consecuencia en una frase y la acción correctiva debajo (≥ 44 px). El resultado «ya no cambia» se dice y la corrección se pide como incidencia."
+  },
+  {
+   "patron": "Google Fonts por <link> en una pantalla de app (línea 10)",
+   "propuesta_de_regla": "D116 aplica a toda pantalla, también a las de app de campo: sin `<link>` a Google Fonts ni `preconnect`; `@font-face` autoalojado (§2). En una app offline-first es más fuerte: sin señal el CDN no responde y la pantalla cae a `system-ui` sin aviso."
+  },
+  {
+   "patron": "Bloque de tokens del antecesor en pantalla móvil: `--text-3:#66717F` (línea 30) y el resto de valores que el sistema 2.15.0 cambió",
+   "propuesta_de_regla": "Propagar `_sio-tokens.css` 2.15.0 a las pantallas de app (`--text-3:#5C6675`, §1.1). Las pantallas móviles se pintan sobre `--bg`, `--surface` y `--surface-2` igual que las de escritorio, así que el mismo suelo de 4,5:1 aplica; el valor viejo da 4,21:1 sobre `--surface-2` y 4,14:1 sobre `--err-bg`."
+  },
+  {
+   "patron": "Tamaños < 12 px y pastillas de estado sin mayúsculas (instrumento C2: 3 fallos en «Puntual hasta 09:00», «Tolerancia hasta 09:10», «Retardo» de la leyenda, línea 117) además de `.badge` 10,5 px (línea 162), `.saldo .lb` 10,5 px (línea 179) y pestañas a 10 px (línea 192)",
+   "propuesta_de_regla": "Igual que 04 y 12: la leyenda de la barra y las etiquetas de saldo se leen a diario y van a 12 px; la excepción de 10,5 px de §2.1 es solo para rótulos de grupo en mayúsculas."
+  },
+  {
+   "patron": "Marco de teléfono y barra de estado simulados (`main.phone`, `.status`, hora 8:52 fija por escenario) sin `data-andamio`",
+   "propuesta_de_regla": "§9: marco y barra de estado son andamio de maqueta (`data-andamio`, `aria-hidden`). El escenario simulado cambia la hora de la barra para ilustrar el retardo, así que además la hora que muestra el producto es la del servidor (ya lo dice la nota), no la del teléfono."
+  }
+ ],
+ "sin_datos": [
+  "`span.av` («AB») figura en el brief con ratio 1,00 en claro: falso positivo (fondo con degradado). Medido en píxeles en oscuro: peor píxel 4,82:1; en claro el mismo componente da 5,43:1 (medido en 04).",
+  "El interlineado, el espaciado fuera de escala (I5: 7 valores) y la presencia de 4 familias de color (I6) son candidatos de instrumento; no se consideraron defectos sin regla en el sistema para móvil.",
+  "I3 `div.body` (scroll intencional) y `h1.sr`: falsos positivos conocidos.",
+  "Dossier: sin ficha del cliente y `no_listado_en_pdf`. No evaluado: lector de pantalla real, teclado, rendimiento, el cálculo real de la ventana de entrada (la maqueta usa horas fijas por escenario)."
+ ]
+}

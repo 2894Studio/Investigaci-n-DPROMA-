@@ -1,0 +1,132 @@
+{
+ "pantalla": "11_app_login_2fa_offline",
+ "tier": "no_indicado_en_dossier",
+ "modo": "cobertura",
+ "sha256": "144f9dcc74abb11b00fe4bd37d071e7201a9c78f3a8780cfb6eff6c9e72a2011",
+ "estado_vs_pdf": "no_listado_en_pdf",
+ "estados_auditados": [
+  "Login",
+  "Verificación en dos pasos",
+  "Desbloqueo sin conexión (modo campo)",
+  "Temas claro, oscuro y exterior en las tres vistas"
+ ],
+ "capturas": [
+  "11_app_login_2fa_offline--1440.png",
+  "11_app_login_2fa_offline--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-11login-01",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles",
+    "dice_el_sistema": "Todo destino interactivo mide",
+    "hay_en_el_build": "En la vista 2FA, «Reenviarlo» (`button.linklike#resend`) mide 64,7×22 px: 22 px de alto, bajo el mínimo de 24 px de §7.3 (y lejos de los 44 px de uso en campo). Es la salida cuando el código no llega. Su vecino «usar la app Authenticator» es un enlace en línea dentro de la misma frase (≈ 14 px de línea, 40 px de caja porque envuelve). El brief midió 0 destinos < 24 px solo porque midió la vista Login.",
+    "selector": "button.linklike#resend",
+    "linea": 410,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio:scratchpad/m6/run.cjs",
+     "detalle": "[script propio scratchpad/m6/run.cjs: Playwright 1440×900, lib.cjs preparar; para cada tema y estado de la demo recorre todos los nodos de texto visibles, compone el fondo real capa a capa (incluye degradados: usa ambos extremos) y calcula la razón WCAG; mide también ancho×alto de cada destino interactivo fuera del andamio] Vista 2FA, temas claro/oscuro/exterior: button.linklike#resend 64,7×22 (font:inherit 11,5 px + padding:4px, línea 247-248); a#usealt inline. Los otros 16 destinos de la pantalla ≥ 44 px."
+    },
+    "critico": {
+     "es": true,
+     "criterio": "1 · destino táctil < 24 px (22 px de alto); además es el camino alterno cuando no llega el código de acceso"
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Criterio 1. Dos lecturas: (a) WCAG 2.5.8 admite destinos pequeños si un círculo de 24 px centrado no pisa otro destino, y aquí no lo pisa; (b) §7.3 del sistema pide 24×24 sin esa salida, y la pantalla es de campo (44). Se aplica (b) porque es la regla del sistema. Arreglo: `.altlink button.linklike{min-height:44px;padding:0 12px}` o sacar «Reenviarlo» a su propia fila de 44 px."
+    },
+    "por_que_importa": "Si el código de Google no llega, el instalador necesita pulsar «Reenviarlo» con el pulgar y a la primera; a 22 px de alto y 11,5 px de texto es el control más pequeño y más fácil de fallar del flujo de acceso, justo el paso que impide entrar a trabajar."
+   },
+   {
+    "id": "v2-11login-02",
+    "severidad": "media",
+    "regla": "§1.7 Regla de contraste (texto 4,5:1)",
+    "dice_el_sistema": "Texto normal 4,5:1 mínimo",
+    "hay_en_el_build": "En el tema claro, el botón principal deshabilitado («Confirmar código» en 2FA y «Desbloquear» en offline) pinta `--text-3` rgb(102,113,127) sobre `--surface-2` rgb(231,237,243): 4,21:1, el mismo fallo que §1.1 documenta para el valor viejo de `--text-3`. En oscuro y exterior pasa. Es texto de 14 px peso 800.",
+    "selector": ".primarybtn:disabled",
+    "linea": 258,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 258,
+     "cita": ".primarybtn:disabled{background:var(--surface-2);color:var(--text-3);"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico por la lectura de WCAG 1.4.3, que excluye los componentes inactivos; la lectura literal del criterio 1 («texto < 4,5:1») lo haría crítico. Me quedo con la primera porque el motivo se explica en texto visible justo debajo (`.ctanote`, que sí cumple) y porque la pantalla arranca en oscuro. Se resuelve solo al propagar `--text-3:#5C6675` (4,93:1 sobre `--surface-2`, §1.1). Medido con scratchpad/m6/run.cjs (vistas 2FA y offline, tema claro)."
+    },
+    "por_que_importa": "El rótulo del botón que el instalador tiene que pulsar en cuanto escribe el sexto dígito se ve gris y apagado en el tema claro; con luz fuerte cuesta distinguir si está bloqueado o simplemente tenue."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 3,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 3
+  },
+  "justificacion": "Flujo de acceso muy cuidado para campo: casillas OTP de 44×52 con nombre propio por dígito (`aria-label=\"Dígito n de 6\"`), `autocomplete=\"one-time-code\"`, botón biométrico de 64 px, botones principales a 48 px, motivo del bloqueo en texto visible, tres temas con 0 fallos de contraste salvo el botón deshabilitado en claro, vista offline que separa «qué puedes hacer» de «qué queda en cola». Resta por «Reenviarlo» a 22 px, Google Fonts por `<link>` en una app offline, la fuente de marca usada en un título de interfaz y textos de 10,5–11,5 px, incluido el pie de vencimiento de sesión.",
+  "evidencia": [
+   "brief: tactil bajo24 0 de 7 (solo Login); contraste 0 fallos (solo Login oscuro)",
+   "scratchpad/m6/run.cjs: 3 vistas × 3 temas; 1 destino de 22 px; botón deshabilitado 4,21:1 en claro",
+   "scratchpad/m6/m3.cjs: `.wm` computa 'Ethnocentric Rg', Michroma en «VERIFICACIÓN EN DOS PASOS»",
+   "capturas propias scratchpad/m6/11-2fa.png y 11-offline.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Google Fonts por <link> en una pantalla de app (línea 10)",
+   "propuesta_de_regla": "D116 aplica a toda pantalla, también a las de app de campo: sin `<link>` a Google Fonts ni `preconnect`; `@font-face` autoalojado (§2). En una app offline-first es más fuerte: sin señal el CDN no responde y la pantalla cae a `system-ui` sin aviso."
+  },
+  {
+   "patron": "Bloque de tokens del antecesor en pantalla móvil: `--text-3:#66717F` (línea 55) y el resto de valores que el sistema 2.15.0 cambió",
+   "propuesta_de_regla": "Propagar `_sio-tokens.css` 2.15.0 a las pantallas de app (`--text-3:#5C6675`, §1.1). Las pantallas móviles se pintan sobre `--bg`, `--surface` y `--surface-2` igual que las de escritorio, así que el mismo suelo de 4,5:1 aplica; el valor viejo da 4,21:1 sobre `--surface-2` y 4,14:1 sobre `--err-bg`."
+  },
+  {
+   "patron": "Textos de 10,5–11,5 px en móvil: `.hero small` y `.note` (11 px), `.hint` (11,5 px), `.seclabel` y `.qcount` (10,5 px) y el pie `.footnote` de 10,5 px con 4 líneas de política de sesión («Sesión de campo válida 4 días más… el PIN deja de funcionar al vencer la sesión»)",
+   "propuesta_de_regla": "§2.1 pone el suelo en 12 px; un párrafo que explica cuándo caduca el acceso no es una etiqueta. Propuesta: en la app, ningún texto de lectura continua baja de 12 px y el aviso de vencimiento se reduce a una frase («Sesión válida 4 días más · vence 24 jul»), con el detalle en una pantalla aparte."
+  },
+  {
+   "patron": "Fuente de marca en un título de interfaz: `.wordmark.wm` con «VERIFICACIÓN EN DOS PASOS» (línea 393, `--font-brand`, 11 px) y «APP PERSONAL DPROMA» (línea 367)",
+   "propuesta_de_regla": "§2 reserva `--font-brand` al wordmark «SIO-DPROMA» y al nombre «DPROMA» y dice «Nunca en texto de interfaz». El título de una vista es texto de interfaz: va en Inter 600–700. El lockup de marca (isotipo + «DPROMA») sí puede quedar arriba, como en el acceso de escritorio (§7.1, §1.2.1)."
+  },
+  {
+   "patron": "Casillas OTP/PIN de 6 dígitos (`.otp` 44×52, `data-filled`, foco automático, pegado) y PIN enmascarado con `-webkit-text-security:disc` sobre un `input` sin `type` (línea 244 y 447)",
+   "propuesta_de_regla": "Un campo de código de un solo uso es un grupo `role=\"group\"` con 6 `input` de ≥ 44×48, `inputmode=\"numeric\"`, `autocomplete=\"one-time-code\"` en el primero, nombre «Dígito n de 6», foco al siguiente y pegado repartido. El PIN usa `type=\"password\"` en lugar de máscara por CSS: con `type=\"text\"` un lector de pantalla puede leer los dígitos (no verificado sin lector real)."
+  },
+  {
+   "patron": "Vista de modo sin conexión: banda de estado + identidad + desbloqueo (huella o PIN) + lista «qué puedes hacer» + cola de sincronización con contador (`.offbanner`, `.biobtn`, `.oklist`, `.qlist`, `.qcount`)",
+   "propuesta_de_regla": "Variante de la banda de aviso (§6.9) para estado de conexión: `role=\"status\"`, icono de señal tachada y `--warn-bg` opaco (no `--warn-fill`, §1.3). La cola de sincronización muestra qué hay pendiente y cuántos elementos, con el mismo contador que el resto de la app (09)."
+  },
+  {
+   "patron": "Tercer tema «Exterior» en el acceso (`[data-theme=\"sun\"]`, línea 123) y selector de tema visible en el panel de la demo",
+   "propuesta_de_regla": "Mismo caso que 09: documentar el tema de sol directo como variante medida de §1, y que el selector de tema viva dentro de la app (ajustes o cabecera), no solo en la maqueta."
+  }
+ ],
+ "sin_datos": [
+  "Contraste del brief: solo midió la vista Login en el tema por defecto (oscuro). Las vistas 2FA y offline y los temas claro y exterior se midieron con script propio (scratchpad/m6/run.cjs).",
+  "I7 colisiones `b«qué se puede h»`/`b«qué queda en c»`: son negritas de la columna explicativa de la demo que envuelven en líneas contiguas; no hay solape visible en la captura. Falso positivo.",
+  "`h1.sr` y `p.sr` recortados por I3: texto solo para lector de pantalla.",
+  "El enlace «usar la app Authenticator» (`a#usealt`, `href=\"#\"`) es un enlace en línea dentro de una frase y no hace nada en la maqueta: no se evaluó su destino ni se contó como destino < 24 px (WCAG 2.5.8 exime los enlaces en línea).",
+  "El `toast` es `position:fixed` y cae fuera del marco del teléfono en la maqueta; no evaluado sobre un dispositivo real.",
+  "Dossier: sin ficha del cliente y `no_listado_en_pdf`. No evaluado: lector de pantalla real, teclado, gestor de contraseñas, comportamiento sin señal real, rendimiento."
+ ]
+}

@@ -1,0 +1,598 @@
+{
+ "pantalla": "28_instalador_mi_dia",
+ "tier": "A",
+ "sha256": "5115486ad830f3604202748ff8d3dd85e3bca04e087f17a3eda8169c9cc32ec7",
+ "estado_entrega": "modificada",
+ "estado_vs_pdf": "alineado",
+ "nota_estado_vs_pdf": "El brief marca 'alineado' (C1, C3-C8, C10 confirmados; lt12=0). Excepcion medida: C2 ('10.5px solo en rotulos en mayusculas') no se cumple en los 5 p.grp del menu lateral, que se pintan en mayuscula/minuscula mixta (instrumento C2_105_no_mayusculas, 5 fallos; linea 240 sin text-transform). C16 (--sp-5 declarado) el PDF solo lo declara para 31_orden_detalle: en 28 persiste sin ser un 'no aplicado' declarado.",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error"
+ ],
+ "capturas": [
+  "28_instalador_mi_dia--1440.png",
+  "28_instalador_mi_dia--1280-fold.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 13,
+   "texto_usuario": "Barra superior sin espacio bajo «Mi día»; contrastar con el flujo de la investigación.",
+   "veredicto": "confirmada",
+   "evidencia": [
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_m28_p4",
+      "detalle": "script scratchpad/a_lote_a/m28.cjs a 1440x900: .p4 alto 38px = 12px de relleno superior + h1 de 25px + 1px de borde; caja de texto del h1 termina en y=99 y el borde inferior de .p4 empieza en y=100 (hueco 0px); la linea de resumen termina 3,5px antes del borde. Mismo hueco a 1280 (0px) y a 390 (0px, resumen a 1px)."
+     },
+     "dato": "Entre «Mi día» y la linea que cierra la barra hay 0px (1px de descuelgue de la tipografia). Arriba hay 12px: la barra queda descentrada, con aire arriba y nada abajo."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 314,
+      "cita": ".p4-t{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-6) 0;flex-wrap:wrap}"
+     },
+     "dato": "El relleno inferior de la cabecera es 0 en .p4-t y .p4 (linea 313) no declara ninguno. La unica fila hija es .p4-t (linea 718; la linea 719, donde iria .p4-b/.p4-f, esta vacia). El sistema describe exactamente este caso: §3.1 «la cabecera se quedó con 5px entre el título y su propio borde... el único hijo que aportaba cierre ya no estaba» y fija `.p4{ padding-bottom: var(--sp-3) }`."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_m28_p4",
+      "detalle": "mismo script, con addStyleTag('.p4{padding-bottom:var(--sp-3)}'): alto de .p4 pasa de 38px a 50px"
+     },
+     "dato": "La correccion de §3.1 devuelve 12px de aire bajo el titulo y no mueve nada mas."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "SP5",
+      "detalle": "declarado null, reglasQueLoUsan 1, elementosAfectados 8; ejemplo .gordo padding 0px; mas script propio m28.cjs: con addStyleTag(':root{--sp-5:20px}') el alto de .p4 sigue en 38px"
+     },
+     "dato": "HIPOTESIS --sp-5 REFUTADA como causa de esta observacion: --sp-5 si falta en :root (lineas 26-27 saltan de --sp-4 a --sp-6) y solo lo usa .gordo (linea 645, unica coincidencia de grep), pero .gordo es un boton, no la cabecera; declararlo no cambia el alto de la cabecera. Lo que pierde --sp-5: el padding horizontal de las 8 .gordo (20px -> 0px)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "captura",
+      "archivo": "28_instalador_mi_dia--1440.png",
+      "region": "primer pliegue: «Mi día» y la linea «2 citas · 7 h de trabajo · 1 con material incompleto» pegadas a la linea inferior de la barra"
+     },
+     "dato": "El dato que decide la jornada («1 con material incompleto») vive en esa linea, la mas pequena (--fs-meta 12px, gris --text-3) y la mas pegada al borde de toda la pantalla."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_p4scan",
+      "detalle": "script a_lote_a/p4scan.cjs sobre las 30 pantallas con .p4: padding-bottom computado de .p4 = 0px en todas; con alto 38px (solo titulo) en 26, 28, 29, 41, 42, 43, 44"
+     },
+     "dato": "No es un fallo local de Mi día: el bloque ARQ-P4 que se copia en cada maqueta no lleva el relleno inferior en el contenedor. Mi día lo muestra porque no tiene filas de busqueda ni de chips que cierren la barra."
+    }
+   ],
+   "causa_raiz": "Relleno inferior repartido entre filas opcionales (§3.1): .p4-t lleva padding-bottom:0 esperando que .p4-b/.p4-f cierren el bloque, y en Mi día no existen. NO es --sp-5 (hipotesis verificada y refutada: afecta a otra regla y a otro elemento). Causa de fondo en el sistema: §3.1 documenta el arreglo pero el bloque ARQ-P4 de referencia que se copia a cada maqueta no lo incorpora (30 de 30 pantallas con .p4 miden 0px).",
+   "solucion_propuesta": "Una linea en el bloque ARQ-P4: `.p4{padding-bottom:var(--sp-3)}` (§3.1); las filas hijas declaran solo relleno superior. Ademas declarar `--sp-5:20px` en :root (§3, D-39 del propio _sio-tokens.css del cliente) para que .gordo recupere sus 20px laterales.",
+   "tipo_de_cambio": "sencillo",
+   "critico": {
+    "es": true,
+    "criterio": 5
+   },
+   "decision": {
+    "valor": "exigir_cambio",
+    "motivo": "La persona marco Mi día como rediseño critico (criterio 5; la viabilidad del rediseño completo la decide la Fase 4). El arreglo concreto de esta observacion es de una linea, ya esta documentado (§3.1) y es viable por si mismo. Va ademas a ajustar_sistema: el bloque ARQ-P4 canonico debe llevar el relleno en el contenedor para no repetirse en 30 pantallas."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-28midia-01",
+    "severidad": "alta",
+    "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional",
+    "dice_el_sistema": "«el relleno de un contenedor lo declara el contenedor, no el hijo que casualmente va último»",
+    "hay_en_el_build": ".p4-t{...padding:var(--sp-3) var(--sp-6) 0...} y .p4 sin padding: hueco 0px entre «Mi día» y el borde de la barra (alto 38px = 12 + 25 + 1)",
+    "selector": ".p4-t",
+    "linea": 314,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m28_p4",
+     "detalle": "m28.cjs: gapH1BordeInferior 0, p4 alto 38px, p4tPadding 12px 24px 0px, hijos de .p4 = ['p4-t']"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": true,
+     "criterio": 5
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Criterio 5 (observacion de la persona en pantalla marcada rediseño critico; viabilidad final en Fase 4, pero el arreglo es de una linea). Es el componente de cabecera mas repetido (30 pantallas con .p4, todas con padding-bottom 0px, medido) y la persona lo senalo en Mi día. Arreglo de una linea ya documentado en §3.1; ademas el sistema debe entregar el bloque ARQ-P4 corregido para que el cliente lo adopte copiandolo (ajustar_sistema en paralelo). Severidad alta por ser el componente mas visible, no por riesgo de accesibilidad. No estaba en v1 (v1 no auditaba esta relacion): 'nuevo' = no reportado, no regresion."
+    },
+    "por_que_importa": "La barra que abre la pantalla se ve cortada: el titulo y la linea de resumen (donde esta el aviso de material incompleto) quedan pegados a la linea divisoria, mientras arriba tienen 12px. En un instalador que mira la pantalla de pie y con sol, la franja que mas importa es la que menos aire tiene."
+   },
+   {
+    "id": "v2-28midia-02",
+    "severidad": "media",
+    "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional (mismo principio, columna de tarjetas)",
+    "dice_el_sistema": "«si al quitar una fila el bloque se descuadra, el relleno estaba en el sitio equivocado»",
+    "hay_en_el_build": ".tel con padding-bottom 0: al llegar al final del scroll la tarjeta «Lo que llevas encima» termina a -0,4px respecto al borde superior de la barra fija (1440) y a -0,2px (390): cero aire",
+    "selector": ".tel",
+    "linea": 642,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m28b_fin",
+     "detalle": "script a_lote_a/m28b.cjs: scrollTop=scrollHeight en main#contenido; gapUltimaTarjetaPie = -0.4 a 1440 y -0.2 a 390; captura a_lote_a/m28-fin-1440.png"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Mismo principio que 01. El cliente declaro `main::after{height:var(--sp-8)}` (linea 269) para dar cola, pero la barra sticky vive dentro de .state-ok y la cola no se ve. Se resuelve con relleno inferior en .tel (--sp-4) o en .state-ok."
+    },
+    "por_que_importa": "Al terminar de leer el dia, la ultima tarjeta y su boton «Ver lo que traigo del almacén» se pegan a la barra de accion; se lee como una pantalla cortada, y el boton de 56px queda a 0px de otro boton de 56px."
+   },
+   {
+    "id": "v2-28midia-03",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (colapsada a solo iconos) + §6.5 Iconos sin texto",
+    "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.» · «Si un icono va sin texto visible, lleva como mínimo etiqueta emergente y `aria-label`»",
+    "hay_en_el_build": "A 861-1100px `.side .et,.grp,.side .wordmark{display:none}`: los 15 enlaces del menu quedan sin texto, sin aria-label y sin title (los iconos son aria-hidden)",
+    "selector": ".side .et",
+    "linea": 293,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "sidebar",
+     "detalle": "brief mediciones_v2.menu_1000px: hayMenu true, total 15, sinNombre 15, anchoSide 64; reproducido con script propio a_lote_a/m28b.cjs a 1000x800: 15 de 15 a.it con .et display:none, aria-label null, title null"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1). Nota: delta_vs_v1.menu_sin_nombre = 0, es decir existia igual en v1 sin haberse reportado; marcado 'nuevo' como hallazgo, no como regresion. Es cromo compartido: la correccion (aria-label + title en cada a.it, o dejar el rotulo como etiqueta emergente) se aplica una vez y se propaga."
+    },
+    "por_que_importa": "En una tableta pequena (o una ventana estrecha) el instalador o quien le da soporte ve solo iconos que ademas un lector de pantalla anuncia como «enlace» sin nombre, en la navegacion principal de todo el producto."
+   },
+   {
+    "id": "v2-28midia-04",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado de una pantalla (reglas 1 y 2) + §6.4 «El estado va dentro de una tarjeta»",
+    "dice_el_sistema": "«El cambio se anuncia y mueve el foco» · «Cada estado lleva un encabezado real, no un `<b>`» · «El estado va dentro de una tarjeta, no suelto sobre el fondo»",
+    "hay_en_el_build": "Vacio y error titulan con `<b>`; 0 ocurrencias de aria-live en el archivo; los estados flotan sin tarjeta-estado ni medallon (captura de error medida en mi script: icono de 30px sin relleno sobre --bg)",
+    "selector": ".state-empty > b",
+    "linea": 777,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 777,
+     "cita": "<b>Hoy no tienes ninguna cita</b>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 lo marco alta (f1-28midia-05). Cerrado el selector `.state .ico` -> `.state > .ico` (C3, linea 613; I1 = 0 fallos; el icono del boton sale rgb(247,250,249), medido). Persiste lo demas: encabezado real, aria-live y tarjeta-estado. El PDF no declara este punto, asi que es 'no aplicado' y no regresion. Como las 44 pantallas copian el mismo bloque ARQ-ESTADOS, el sistema debe entregarlo ya con las seis reglas de §6.4."
+    },
+    "por_que_importa": "Quien usa lector de pantalla no se entera de que «Hoy no tienes ninguna cita» o «No se pudo traer tu día» reemplazo a la agenda; quien navega por encabezados no encuentra el estado."
+   },
+   {
+    "id": "v2-28midia-05",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga",
+    "dice_el_sistema": "«Sin texto real dentro de las barras» · «`@media (prefers-reduced-motion:reduce){.skel{animation:none;background:var(--surface-2)}}`» (hay que aplanar el fondo)",
+    "hay_en_el_build": "Las barras del esqueleto llevan texto real («hoy», «00:00», «cliente», «domicilio») y bajo reduced-motion solo `animation:none`",
+    "selector": ".skel",
+    "linea": 774,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 774,
+     "cita": "<span class=\"skel\" style=\"width:40%\">hoy</span>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-28midia-04. No aplicado (el PDF no lo declara). Linea 608: `.skel{animation:none}` sin background. Mismo patron en las pantallas que copian ARQ-ESTADOS: el sistema entrega el bloque correcto."
+    },
+    "por_que_importa": "El lector de pantalla leeria «hoy, 00:00, cliente, domicilio» como si fuera la agenda; con movimiento reducido el degradado queda congelado a medio pintar."
+   },
+   {
+    "id": "v2-28midia-06",
+    "severidad": "media",
+    "regla": "§5 Movimiento — Reducción de movimiento",
+    "dice_el_sistema": "«se conservan opacidad y color, se elimina todo desplazamiento y escala»",
+    "hay_en_el_build": "El bloque reduced-motion solo remapea duraciones; `button:active{transform:scale(.97)}` sigue activo en todos los botones de la pantalla (a 1ms)",
+    "selector": "button:active",
+    "linea": 225,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 225,
+     "cita": "button:active,.pressable:active{transform:scale(.97)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-28midia-03. Lo declarado en §5 («se elimina todo desplazamiento y escala») no se corresponde con el bloque de ejemplo del propio §5, que solo remapea duraciones: el sistema se contradice a si mismo y el cliente copia el ejemplo. Corregir §5 (anadir `button:active,.pressable:active{transform:none}` en el bloque reduced-motion)."
+    },
+    "por_que_importa": "Quien activa «reducir movimiento» por mareo sigue viendo un salto de escala en cada pulsacion del boton mas usado de la jornada."
+   },
+   {
+    "id": "v2-28midia-07",
+    "severidad": "media",
+    "regla": "§3 Espaciado («un token que no existe falla en silencio») + §11 usados − declarados = vacío",
+    "dice_el_sistema": "«**`--sp-5` (20px) se añadió porque faltaba y ya se estaba usando.**... Un `var()` que no resuelve ... invalida **la declaración entera**»",
+    "hay_en_el_build": "`.gordo{...padding:0 var(--sp-5)...}` con --sp-5 ausente del :root (lineas 26-27); padding computado 0px en las 8 .gordo; con el token declarado computa 20px",
+    "selector": ".gordo",
+    "linea": 645,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "SP5",
+     "detalle": "declarado null, reglasQueLoUsan 1, elementosAfectados 8, ejemplo .gordo padding 0px gap 8px margin 0px; reproducido en m28.cjs: padding-left/right 0px en las 8; con :root{--sp-5:20px} inyectado, 20px"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "No es un fallo visible hoy: todos los .gordo estan estirados (flex:1 / .ancho) y el texto esta centrado con ≥30px de holgura a cada lado incluso a 390px (medido, holguraIzq 30px en «Cómo llegar»). Es latente. El propio _sio-tokens.css del cliente (linea 45) ya declara `--sp-5: 20px; /* D-39 — faltaba, y no se ve porque no da error */`, pero 28 no lo enlaza ni lo copia en su :root, y el PDF declara C16 solo para 31_orden_detalle (1 de 50): el propagado de tokens es el que falla, no una decision del cliente. Responde a la hipotesis de la persona: se confirma el token sin declarar y se mide su efecto exacto, pero NO explica la observacion hoja 13 (ver 01)."
+    },
+    "por_que_importa": "El dia que un .gordo se use suelto o en un telefono de 320px, el texto toca el borde del boton y nadie sabra por que; el token ausente no da error."
+   },
+   {
+    "id": "v2-28midia-08",
+    "severidad": "media",
+    "regla": "§10 Diez trampas — isotipo (viewBox en el <svg>)",
+    "dice_el_sistema": "«Escrito al revés —`viewBox=\"740 0 970 932\"` en el `<svg>` y un `<use>` sin medidas— ... se pinta 32,5px a la izquierda de su caja y se recorta casi entera.»",
+    "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>`: caja del <use> en x=63,5 frente a la del <svg> en x=96 (−32,5px)",
+    "selector": ".side .logo svg",
+    "linea": 705,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 705,
+     "cita": "viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-28midia-08. Medido de nuevo con script propio (m28b.cjs): svgL 96, useL 63,54. En la captura solo se ve una astilla verde sobre el wordmark. Aparece en todas las pantallas que copian el cromo: el sistema debe entregar el cromo completo como fragmento copiable, no como prosa."
+    },
+    "por_que_importa": "La marca se ve recortada en cada pantalla que comparte este cromo: es el elemento mas repetido del producto."
+   },
+   {
+    "id": "v2-28midia-09",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (excepcion: 10,5px en mayúsculas)",
+    "dice_el_sistema": "«Se admite una excepción, y solo una: 10,5px en mayúsculas con `letter-spacing` para los rótulos de grupo de la barra lateral»",
+    "hay_en_el_build": ".grp{...font-size:10.5px;font-weight:700;letter-spacing:.1em...} sin text-transform: «Principal», «Operación», «Trámites vehiculares», «Dirección y Administración», «Soporte» se pintan en minusculas mixtas",
+    "selector": ".grp",
+    "linea": 240,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "fallos 5: p.grp «Principal», «Operación», «Trámites vehiculares», «Dirección y Administraci», «Soporte»"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El sistema se contradice: §2.1 pide mayusculas, pero el ejemplo de .grp en §7.2 (`.grp{margin:14px 8px 4px;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}`) no lleva text-transform, y el cliente copio ese ejemplo. Decidir: o §7.2 anade `text-transform:uppercase` o §2.1 admite el rotulo en caja mixta. Contradice el 'C2 aplicado' del PDF solo en la lectura literal."
+    },
+    "por_que_importa": "Texto de 10,5px en caja mixta se lee peor que en mayusculas espaciadas; es orientacion, no dato diario, por eso baja."
+   },
+   {
+    "id": "v2-28midia-10",
+    "severidad": "baja",
+    "regla": "§6.9 Avisos: «Antes de escribir una clase nueva para un aviso de ancho completo, se verifica si `.banda` + una de sus cuatro variantes ya lo cubre»",
+    "dice_el_sistema": "«también se reinventan componentes enteros por no buscar primero si ya existen»",
+    "hay_en_el_build": "El aviso «Sin señal» usa `.senal` (linea 661) mientras `.banda`/`.b-warn` estan declaradas (lineas 518 y 522) y sin uso (0 `class=\"banda\"`). El texto ya es de una frase y 100 caracteres (cerrado el exceso de v1)",
+    "selector": ".senal",
+    "linea": 723,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 723,
+     "cita": "<div class=\"senal\"><svg class=\"ico\" aria-hidden=\"true\">"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-28midia-06 era alta por el texto de 268 caracteres; el texto se corrigio (C11 no listado para 28, pero el medido es 100 caracteres, 1 frase). Queda solo el nombre de clase duplicado: .senal no se distingue de .banda.b-warn con borde. Se documenta en el sistema la variante `.banda-warn` con borde para offline y el cliente puede conservar .senal."
+    },
+    "por_que_importa": "Dos nombres para el mismo aviso: el dia que .banda cambie, el aviso de «Sin señal» (el mas importante del teléfono) quedara distinto."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [
+  {
+   "id_v1": "f1-28midia-01",
+   "evidencia": "--text-3 ahora #5C6675 (linea 73: `--text-3: #5C6675;`); contraste claro y oscuro con 0 fallos en 62 nodos de texto (brief mediciones_v2.contraste); delta_vs_v1.contraste_claro = -2."
+  },
+  {
+   "id_v1": "f1-28midia-02",
+   "evidencia": "Brief: lt12_medido 0 (lt12_pdf_despues 0); las pastillas, .pie y .ref usan var(--fs-meta) 12px. Se mantiene 10,5px solo en .grp y en ::before del modo tarjeta (ver v2-28midia-09)."
+  },
+  {
+   "id_v1": "f1-28midia-09",
+   "evidencia": "Las reglas de modo dedo ahora llevan :root (lineas 284-289: `:root[data-tacto=\"dedo\"] .it{min-height:46px}`); brief tactil: reglaTactoSinRoot 0, bajo24 0 de 27."
+  }
+ ],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "Mejora clara respecto a v1 (f3=2): contraste con 0 fallos en claro y oscuro, 0 destinos bajo 24px (27 medidos, objetivos de 56px en las acciones), suelo de 12px, `.state > .ico` correcto. Se queda en 3 por: nav colapsada sin nombre accesible a 861-1100px (15 de 15), estados sin aria-live ni encabezado, esqueleto con texto, token --sp-5 ausente, isotipo mal posicionado y la cabecera sin relleno inferior. Responsive sin desbordes a 1440/1280/1024 y 390 coherente. Rendimiento no evaluado (no se midio carga ni JS).",
+  "evidencia": [
+   "Brief: contraste claro 62 nodos / 0 fallos; oscuro 62 / 0.",
+   "Brief: anchos_1440_1280_1024 sin scrollsHorizontales ni nodosFueraDelBorde.",
+   "Brief: menu_1000px sinNombre 15 de 15.",
+   "Brief: tokens_usados_no_declarados ['--sp-5']."
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 2,
+   "hallazgo": "El estado sin conexion se anuncia bien («lo que marques no se guarda»), pero la linea de resumen de la cabecera sigue diciendo «2 citas · 7 h de trabajo · 1 con material incompleto» cuando la vista cambia a «Hoy no tienes ninguna cita» o «No se pudo traer tu día»: dato contradictorio.",
+   "selector": ".p4-t .resumen",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "propio_m28d_estados",
+    "detalle": "script a_lote_a/m28d.cjs: data-state=empty y =error; el .resumen (fuera de main) no cambia; capturas a_lote_a/m28-empty.png / m28-error.png"
+   }
+  },
+  {
+   "n": 2,
+   "heuristica": "Concordancia entre el sistema y el mundo real",
+   "severidad": 0,
+   "hallazgo": "El vocabulario es el del instalador («Lo que llevas encima», «pasos de ayer sin marcar», «tramos de canaleta que Almacén no ha despachado»); coincide con los terminos de la entrevista de coordinacion tecnica (material, viaticos, hoja de servicio).",
+   "selector": ".llevas .cosa",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 748,
+    "cita": "<span>Te faltan <b>2 tramos de canaleta</b> que Almacén no ha despachado.</span>"
+   }
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": "n/a",
+   "hallazgo": "Pantalla de consulta y salida a otras pantallas: sin acciones destructivas ni flujos que deshacer.",
+   "selector": "n/a",
+   "certeza": "inferido",
+   "reproduce": {
+    "tipo": "captura",
+    "archivo": "28_instalador_mi_dia--1440.png",
+    "region": "las 8 acciones son navegacion o llamada; ninguna cambia datos"
+   }
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 3,
+   "hallazgo": "Hay 3 botones primarios verdes a la vez (dos «Abrir la orden» y la barra fija «Ir a la cita de las 08:00»), y la barra fija usa el mismo icono de pin que «Cómo llegar» para otra accion. La ficha del cliente dice «una sola acción grande para salir». Ademas la cita con «Falta material» conserva «Abrir la orden» en verde primario.",
+   "selector": ".gordo.p",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "propio_m28c_primarios",
+    "detalle": "script a_lote_a/m28c.cjs: .gordo.p = 3 y .gordo = 8 en total, a 1440 y a 390; lineas 739 (`<button class=\"gordo p ancho\"...Abrir la orden`) y 772 (`...Ir a la cita de las 08:00`)"
+   }
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 2,
+   "hallazgo": "La barra fija «Ir a la cita de las 08:00» no cambia si esa cita estuviera bloqueada por material: el bloqueo (pastilla «Falta material» y linea roja) se muestra en la tarjeta pero no condiciona la accion principal. Hoy la cita bloqueada es la de las 14:00, por eso no ocurre.",
+   "selector": ".pie-accion .gordo",
+   "certeza": "inferido",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 772,
+    "cita": "Ir a la cita de las 08:00"
+   }
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocimiento antes que recuerdo",
+   "severidad": 0,
+   "hallazgo": "«Lo que llevas encima» pone a la vista lo que se olvida (consumo sin capturar, viatico por vencer, pasos de ayer) con cifra y fecha limite: decision documentada en la ficha.",
+   "selector": ".llevas",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 758,
+    "cita": "<h3>Lo que llevas encima</h3>"
+   }
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 1,
+   "hallazgo": "«Cómo llegar» y «Llamar al sitio» por cita ahorran pasos y los objetivos son de 56px. No hay vista de ruta del dia: el orden y el desplazamiento entre las 08:00 y las 14:00 no aparece.",
+   "selector": ".cita-tel .acc",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "tactil",
+    "detalle": "brief tactil: total 27, bajo24 0; .gordo min-height 56px (linea 645)"
+   }
+  },
+  {
+   "n": 8,
+   "heuristica": "Estética y diseño minimalista",
+   "severidad": 2,
+   "hallazgo": "Antes de la primera cita hay 248px de 800 (31%) a 1440 y 270px de 844 (32%) a 390: aviso de conexion, tarjeta con solo la fecha y 2 gaps. Y la cabecera sin relleno inferior (v2-28midia-01).",
+   "selector": ".senal",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "propio_m28c_pliegue",
+    "detalle": "script a_lote_a/m28c.cjs: cita1 top 248 (1440x800) y 270 (390x844); senal 46px y 85px de alto"
+   }
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de errores",
+   "severidad": 1,
+   "hallazgo": "El error dice que paso, que no se perdio y da referencia y «Reintentar» (cumple §6.4 regla 3) y el boton conserva el icono blanco. Falta el encabezado real y el anuncio (v2-28midia-04).",
+   "selector": ".state-error",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "I1_icono_vs_boton",
+    "detalle": "fallos 0; icono del boton rgb(247,250,249) = color del boton"
+   }
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": "n/a",
+   "hallazgo": "No hay ayuda contextual en la pantalla; no es necesaria para una agenda de consulta.",
+   "selector": "n/a",
+   "certeza": "inferido",
+   "reproduce": {
+    "tipo": "captura",
+    "archivo": "28_instalador_mi_dia--1440.png",
+    "region": "sin enlaces de ayuda"
+   }
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-028",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-028 (alta): sin aprobaciones/recursos externos la operacion queda detenida. Mi día lo atiende en lo mas costoso: pastilla «Falta material» + «Te faltan 2 tramos de canaleta que Almacén no ha despachado» (linea 748) antes de salir. No muestra el estado de aprobaciones ni de viaticos, solo el de material."
+   },
+   {
+    "pp": "pp-025",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-025: el material sobrante/faltante se avisa por WhatsApp sin registro. «Lo que llevas encima» muestra 4 renglones despachados «Sin capturar el consumo todavía» (linea 761): hace visible lo que se arrastra. No hay accion para registrar sobrante ni para pedir lo faltante desde la pantalla."
+   },
+   {
+    "pp": "pp-026",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-026: hojas de servicio en papel y conciliacion posterior. «2 pasos de ayer sin marcar» (linea 763) sustituye el papel y evita el cruce manual; pero solo cuenta pasos, no enlaza a la hoja."
+   },
+   {
+    "pp": "pp-027",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-027: viaticos solicitados y aprobados por WhatsApp. Mi día muestra «1 viático por comprobar · Vence el 24 ago» (linea 762) pero no el estado de la solicitud del dia ni quien aprobo."
+   },
+   {
+    "pp": "pp-113",
+    "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-113 (alta): la comprobacion llega tarde; plazo de tres dias tras el regreso. «Vence el 24 ago» es el aviso de plazo que ese pain point pide («no hay mecanismo que avise del plazo»). No hay escalado ni distincion de plazo cercano."
+   },
+   {
+    "pp": "pp-022",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-022: programacion y rutas en un Word aparte. Mi día lista citas con «Cómo llegar» individual pero no ordena la ruta del dia, tiempos de traslado ni cambios de programacion."
+   },
+   {
+    "pp": "pp-024",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-024: el despacho sale sin las firmas de validacion cuando falta alguno de los dos responsables. La tarjeta de «material» no dice si el despacho esta firmado/validado por quien debe, solo cuantos renglones salieron."
+   }
+  ],
+  "usabilidad_para_el_area": "Mi día concentra bien lo que la investigacion senala como lo que cuesta caro al instalador: enterarse de que falta material al llegar (pp-028), el consumo sin capturar (pp-025/pp-026) y el viatico por vencer (pp-027/pp-113); y lo hace con objetivos de 56px y una accion fija al alcance del pulgar. Falla en lo que la investigacion describe como flujo real: ordenar la ruta (pp-022), mostrar las aprobaciones y firmas que detienen la operacion (pp-024/pp-028) y dar una salida dentro del sistema a «falta material» sin volver a WhatsApp. En lo visual, la franja que resume la jornada (incluido «1 con material incompleto») es la menos espaciada y la mas pequena de la pantalla."
+ },
+ "diagnostico_rediseno_critico": {
+  "que_hay_hoy": "Agenda del dia para el instalador en teléfono y escritorio: aviso de conexion, tarjeta con la fecha, una tarjeta por cita (hora, duración, cliente, equipo, domicilio, aviso de material, «Cómo llegar», «Llamar al sitio», «Abrir la orden»), tarjeta «Lo que llevas encima» (3 cifras + boton) y una barra fija con la accion «Ir a la cita de las 08:00». 4 estados (con datos, cargando, vacio, error). Fuente: lineas 718-787.",
+  "que_falla_y_por_que": [
+   "Cabecera sin relleno inferior (0px) por §3.1: .p4-t padding-bottom 0 y ninguna fila hermana que cierre (lineas 313-314, 718-719).",
+   "Cola de la lista sin aire: .tel padding-bottom 0 y barra fija pegada a la ultima tarjeta (linea 642; -0,4px medido).",
+   "Tres primarios verdes y una accion fija que repite el icono de «Cómo llegar» (lineas 739, 753, 772): la ficha promete «una sola acción grande».",
+   "La informacion que mas importa al instalador (¿puedo salir?: material, aprobaciones, viatico) queda repartida en 4 sitios: pastilla, linea roja, resumen de cabecera y tarjeta inferior.",
+   "El 31-32% del primer pliegue es aviso + tarjeta de fecha antes de la primera cita.",
+   "Estados sin encabezado ni aria-live, esqueleto con texto, cabecera que no cambia en vacio/error."
+  ],
+  "causa_raiz": "Dos de seis fallos son de sistema, no de diseno de la pantalla: (a) el bloque ARQ-P4 no lleva relleno inferior en el contenedor aunque §3.1 lo prescribe; (b) el bloque ARQ-ESTADOS no incorpora las seis reglas de §6.4. El resto (3 primarios, informacion dispersa) es decision de producto que la ficha declara a medias («una sola acción grande»). --sp-5 NO es causa de la observacion: solo afecta al padding lateral de .gordo (8 botones) sin efecto visible.",
+  "requisitos": [
+   "R1. La cabecera declara su relleno inferior en el contenedor (§3.1) y el resumen de la jornada, incluido «material incompleto», se lee con jerarquia propia y no como metadato de 12px gris pegado al borde.",
+   "R2. En 390x844 el primer pliegue responde «¿qué cita sigue, puedo salir, cómo llego?» sin pasar de ~20% de la altura en avisos y fecha antes de la primera cita (hoy 32%).",
+   "R3. Una sola accion primaria visible por pliegue; la accion de cada cita y la fija no se duplican ni comparten icono con otra accion; una cita bloqueada por material no ofrece «Abrir la orden» como primario verde.",
+   "R4. El bloqueo se explica y se resuelve dentro del sistema: que falta, quien lo despacha, cuando, y una via de avisar a Almacén sin volver a WhatsApp (pp-028, pp-025, pp-035 del documento de almacen).",
+   "R5. «Lo que llevas encima» conserva consumo sin capturar, viatico por vencer y pasos de ayer (ficha), y suma estado de la solicitud de viaticos y firma de validacion del despacho (pp-027, pp-024).",
+   "R6. La ruta del dia (orden y traslado entre citas) es visible (pp-022).",
+   "R7. Cumple §6.4 (encabezado real, aria-live, foco, tarjeta-estado), §6.7 (esqueleto sin texto, fondo aplanado), §6.9 (.banda-warn), §7.2 (nav colapsada con nombre) y mantiene objetivos de 46-56px de S-30 (ficha).",
+   "R8. Las cabeceras y los estados son coherentes entre si: cuando el cuerpo esta en vacio o error, el resumen no afirma que hay citas."
+  ]
+ },
+ "cobertura": [
+  {
+   "patron": "Boton de campo `.gordo` (56px) y barra de accion fija `.pie-accion` (decision S-30 de la ficha)",
+   "propuesta_de_regla": "Modo de campo: `.gordo{min-height:56px;padding:0 var(--sp-5)}` para acciones de teléfono usadas de pie y con una mano (§7.3). Una sola `.gordo.p` por pliegue; la barra fija `.pie-accion` lleva la accion de la pantalla y no repite la de ninguna tarjeta. La cola de la lista deja `--sp-4` antes de la barra."
+  },
+  {
+   "patron": "Tarjeta de cita (`.cita-tel`) con hora, cliente, aviso de material y tres acciones",
+   "propuesta_de_regla": "La tarjeta de agenda de campo lleva hora (26px), cliente, lugar, aviso de bloqueo (`.aviso-fila`, color de §1.3) y como maximo dos acciones secundarias y una primaria; la pastilla de estado (§6.10) y el aviso de bloqueo usan la misma familia de color del semaforo."
+  },
+  {
+   "patron": "Aviso de «sin conexion» permanente en teléfono (`.senal`)",
+   "propuesta_de_regla": "El aviso de conectividad usa `.banda-warn` con `role=\"status\"`, una frase, y se retira cuando vuelve la conexion; no ocupa mas del 10% del primer pliegue."
+  }
+ ],
+ "sin_datos": [
+  "Rendimiento de carga (F3 dimension rendimiento): no se midio.",
+  "Efecto real de `.gordo` sin padding en anchos menores a 390px: no se midio (a 390 la holgura es de 30px por lado).",
+  "Cuanto tiempo dedica un instalador a la cabecera de Mi día: la investigacion (11 entrevistas) no tiene un pain point sobre la cabecera ni sobre la agenda en telefono; las conclusiones de F5 son sobre el contenido, no sobre la forma."
+ ]
+}

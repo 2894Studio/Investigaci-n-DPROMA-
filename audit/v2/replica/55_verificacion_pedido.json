@@ -1,0 +1,460 @@
+{
+  "pantalla": "55_verificacion_pedido",
+  "tier": "A",
+  "sha256": "2db289827b94f4ebf79133f1fec358ca93f94658ca32e0ba1ad2019e6411bb8f",
+  "estado_entrega": "no_evaluado (sin brief)",
+  "estado_vs_pdf": "no_evaluado",
+  "estados_auditados": [
+    "con datos"
+  ],
+  "capturas": [
+    "55_verificacion_pedido--1440.png",
+    "55_verificacion_pedido--1280-fold.png"
+  ],
+  "observaciones_resueltas": [
+    {
+      "hoja": null,
+      "texto_usuario": "“Siguiente” cortado en el borde superior de la tarjeta; debe ir por fuera",
+      "veredicto": "confirmada",
+      "evidencia": [
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep55.cjs",
+            "detalle": "getComputedStyle(.ren.siguiente,'::before'): top 26.5px, position absolute, transform translateY(-32px); .ren align-items:center"
+          },
+          "dato": "Confirmada. El rótulo es `::before` absoluto sin `top`: en un contenedor flex con `align-items:center` su posición estática es el centro vertical (26,5px) y el `translateY(-32px)` lo deja en −5,5px, de modo que sus 15px de alto quedan a caballo del borde superior (2px con el box-shadow de 1px) y el borde corta las letras (recorte ×3 propio y captura 1440)."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "captura",
+            "archivo": "55_verificacion_pedido--1440.png",
+            "region": "«SIGUIENTE» sobre «Centro de carga 4 polos» cortado por la línea verde"
+          },
+          "dato": "Hay sitio fuera: entre el renglón anterior (borde inferior y=1037) y este (y=1065) hay 28px libres (margin-top 16 + gap 12), suficientes para un rótulo de 15px."
+        }
+      ],
+      "causa_raiz": "`.ren.siguiente::before` coloca el rótulo con `transform` fijo sobre una posición estática que depende de `align-items:center` del padre; no es un posicionamiento anclado al borde de la tarjeta (`top`/`bottom` explícito).",
+      "solucion_propuesta": "`.ren.siguiente::before{top:auto;bottom:100%;left:0;margin-bottom:var(--sp-1);transform:none}` (comprobado en captura contrafactual: «SIGUIENTE» queda por fuera, a 4px del borde, sin tocar el margen de 16px). Mejor aún un `<span class=\"sig-et\">` real antes del botón, que además se lee con lector de pantalla y se puede probar con el instrumento de colisión de texto.",
+      "tipo_de_cambio": "sencillo",
+      "critico": {
+        "es": false,
+        "criterio": null
+      },
+      "decision": {
+        "valor": "adoptar_cliente",
+        "motivo": "No crítico; la solución es una línea y mejora un componente reutilizable. Se parcha al integrar y se documenta la regla del rótulo de paso activo (§cobertura); no se pide al cliente."
+      }
+    }
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "cumple_parcialmente",
+    "hallazgos": [
+      {
+        "id": "v2-55verif-01",
+        "severidad": "media",
+        "regla": "§3 Espaciado y radios (escala; separación entre bloques) y §6.3 Tarjeta (borde de acento)",
+        "dice_el_sistema": "`--sp-4` 16px: padding de control, gap entre bloques cortos",
+        "hay_en_el_build": "La etiqueta «SIGUIENTE» del renglón activo es un `::before` con `position:absolute` y `transform:translateY(-32px)` sin `top`: dentro de `.ren` (flex, `align-items:center`) su posición estática es el centro vertical (top computado 26,5px), así que acaba a 26,5−32 = −5,5px: los 15px de alto del texto quedan a caballo sobre el borde superior de 2px (box-shadow 1px + border 1px) y el borde pisa las letras. El hueco libre sobre el renglón es de 28px (margin-top 16 + gap 12), de sobra para un rótulo de 15px.",
+        "selector": ".ren.siguiente::before",
+        "linea": 678,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 678,
+          "cita": ".ren.siguiente::before{content:'SIGUIENTE';position:absolute;transform:translateY(-32px);"
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep55.cjs/rep55b.cjs",
+            "detalle": "getComputedStyle(sig,'::before').top = 26.5px a 1280/1000/390/1440; alignItems del .ren = center; recorte x3 rep55-sig.png"
+          },
+          {
+            "tipo": "captura",
+            "archivo": "55_verificacion_pedido--1440.png",
+            "region": "«SIGUIENTE» cortado por el borde verde sobre «Centro de carga 4 polos»"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Es la observación de la persona. No es crítico (el renglón se entiende y se puede marcar), pero el arreglo es de una línea y mejora un componente repetible: `.ren.siguiente::before{top:auto;bottom:100%;margin-bottom:var(--sp-1);left:0;transform:none}` (verificado en captura contrafactual propia: el rótulo queda fuera, sobre la tarjeta, a 4px). Se propone a Studio al integrar; no se exige al cliente."
+        },
+        "por_que_importa": "Es la única señal de «qué toca ahora» en una lista de 12 materiales y se lee cortada; en pantalla pequeña la persona que verifica en el andén duda de qué renglón es."
+      },
+      {
+        "id": "v2-55verif-02",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto (--border-ctrl) y §1.7 Regla de contraste (elementos gráficos 3:1)",
+        "dice_el_sistema": "`--border-ctrl` (3,06:1 medido) — para el control cuya única frontera visible es el borde",
+        "hay_en_el_build": "La casilla de verificación sin marcar (`.ren .caja`, 44×44px) dibuja su única frontera con `border:2px solid var(--border-2)` = rgba(27,36,48,.26): 1,70:1 contra --surface (1,68:1 en hover sobre --surface-2). --border-ctrl está declarado en el :root (línea 90) pero no se usa en ninguna regla.",
+        "selector": ".ren .caja",
+        "linea": 665,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 665,
+          "cita": "border:2px solid var(--border-2)"
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep55",
+            "detalle": "getComputedStyle(.ren[aria-pressed=false] .caja).borderTopColor = rgba(27, 36, 48, 0.26); ratio calculado 1,70:1 sobre #FAFCFD"
+          },
+          {
+            "tipo": "captura",
+            "archivo": "55_verificacion_pedido--1440.png",
+            "region": "casillas vacías de los tres últimos renglones en gris muy claro"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": true,
+          "criterio": 1
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Criterio 1 (control < 3:1). Es el indicador de estado del control principal de la pantalla (marcado/sin marcar), no un adorno: sin marcar solo se distingue por ese borde. Cambio de un token: `border:2px solid var(--border-ctrl)` (3,13:1 medido). El token ya está declarado en el archivo."
+        },
+        "por_que_importa": "Quien verifica material con sol o la pantalla sucia ve 9 renglones verdes y 3 casillas casi invisibles: es justo lo que debe distinguir para no marcar algo que no recibió."
+      },
+      {
+        "id": "v2-55verif-03",
+        "severidad": "alta",
+        "regla": "§7.2 Cromo de aplicación (colapsada a solo iconos: «el rótulo se convierte en etiqueta emergente; no desaparece») y §6.5 Iconos (icono sin texto lleva aria-label)",
+        "dice_el_sistema": "Si un icono va sin texto visible, lleva como mínimo etiqueta emergente y `aria-label`",
+        "hay_en_el_build": "Entre 861 y 1100px `.side .et{display:none}` retira el rótulo de cada `.it` y el enlace no tiene `aria-label` ni `title` (getAttribute = null). A 1000px el árbol de accesibilidad de `nav.side` muestra cada `link:` sin nombre (ariaSnapshot) y no hay etiqueta emergente: 15 destinos de navegación sin nombre accesible (15 enlaces .it).",
+        "selector": ".side .et / .it",
+        "linea": 288,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 288,
+          "cita": ".side .et,.grp,.side .wordmark{display:none}"
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep55.cjs",
+            "detalle": "viewport 1000: etDisp=none, aria-label=null, title=null en los .it; locator('nav.side').ariaSnapshot() => 'link:' sin nombre"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": true,
+          "criterio": 1
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Criterio 1: control sin nombre accesible, medido a 1000px (viewport de tableta apaisada, el uso de campo según §7.3). La raíz está en el bloque ARQ-CROMO compartido por todas las pantallas con cromo: lo correcto es arreglarlo una vez (`aria-label` en cada `.it` o `.et` visualmente oculto en lugar de `display:none`, más `title`) y que el sistema lo documente en §7.2."
+        },
+        "por_que_importa": "En una tableta de 1000px un instalador con lector de pantalla o un usuario de teclado ve un menú de enlaces sin nombre; con ratón, tiene que adivinar 15 iconos sin etiqueta emergente."
+      },
+      {
+        "id": "v2-55verif-04",
+        "severidad": "alta",
+        "regla": "§3 Espaciado y radios (padding de sección --sp-6) y §7.2 Cromo de aplicación (zona de contenido)",
+        "dice_el_sistema": "`--sp-6` 24px: Padding de sección, margen entre grupos",
+        "hay_en_el_build": "El contenido se envuelve en `<div class=\"pad\">`, clase que no existe en el CSS (computado padding 0). Resultado medido: la tarjeta de cabecera empieza a 0px de la barra superior (gap 0 a 1280/1000/390/1440) y a 390px las tarjetas, la cifra «9 de 12» y la barra de avance van de borde a borde de la pantalla (x=0, ancho 390). A ≥1000px el `max-width:720px` del `.pedido` esconde el defecto lateral, pero no el superior.",
+        "selector": ".pad",
+        "linea": 730,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 730,
+          "cita": "<div class=\"pad\">"
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep55",
+            "detalle": "gapTopCab=0 en 4 viewports; a 390: .cabeza x=0 w=390; getComputedStyle(.pad).padding=0px"
+          },
+          {
+            "tipo": "captura",
+            "archivo": "55_verificacion_pedido--1280-fold.png",
+            "region": "tarjeta PED-202608-0117 pegada a la línea inferior de la barra superior"
+          },
+          {
+            "tipo": "captura",
+            "archivo": "(captura propia rep55-390.png)",
+            "region": "tarjetas y barra de avance tocando los bordes del móvil"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "No crítico, pero afecta a la pantalla de campo en móvil. Sustituir `.pad` por el contenedor de contenido del sistema (`.cuerpo`, ARQ-P6: padding --sp-4 --sp-6 --sp-8, que a ≤1280px baja a --sp-4) o añadirle ese padding; cambio sencillo. Es el mismo patrón de clase inexistente que la trampa del §10."
+        },
+        "por_que_importa": "Sin gutter lateral en móvil nada respira y el pulgar roza el borde de la pantalla; la cabecera pegada a la barra se lee como un bloque cortado."
+      },
+      {
+        "id": "v2-55verif-05",
+        "severidad": "media",
+        "regla": "§1.1 Superficies y texto / §1.7 Regla de contraste (texto normal 4,5:1)",
+        "dice_el_sistema": "Texto normal 4,5:1 mínimo",
+        "hay_en_el_build": "El `<textarea id=\"motivo\">` no estiliza `::placeholder`: usa el gris por defecto del navegador, rgb(117,117,117), sobre --bg #F2F5F7 = 4,21:1 a 14px. Con --text-3 (#5C6675) serían 5,31:1.",
+        "selector": "#motivo::placeholder",
+        "linea": 819,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 819,
+          "cita": "placeholder=\"Ej.: el centro de carga y la varilla no estaban en el andén\""
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep55",
+            "detalle": "getComputedStyle(#motivo,'::placeholder').color = rgb(117,117,117); fondo rgb(242,245,247); ratio 4,21:1"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": true,
+          "criterio": 1
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Criterio 1 aplicado mecánicamente (texto < 4,5:1). Dos lecturas: es texto de ejemplo, no la etiqueta (que sí cumple, 5,97:1), y la mayoría de herramientas lo toleran; aun así el ejemplo es la ayuda de qué escribir. Arreglo de una línea: `::placeholder{color:var(--text-3)}`. Podría considerarse no crítico por el papel secundario del texto."
+        },
+        "por_que_importa": "El ejemplo de qué escribir en el motivo de cierre incompleto es difícil de leer con luz ambiente fuerte."
+      },
+      {
+        "id": "v2-55verif-06",
+        "severidad": "media",
+        "regla": "§13 Composición y grid (13.1 Lectura → control → objeto) / §7.3 Objetivos táctiles (acción principal 44px+)",
+        "dice_el_sistema": "El orden de una pantalla es fijo: primero lo que se lee, luego lo que controla, luego el objeto sobre el que se actúa",
+        "hay_en_el_build": "`.pie-verif` es `position:sticky;bottom:0` y siempre muestra el aviso ámbar completo, el textarea y el botón de 56px: 283px a 1280×800 (35% del alto), 322px a 390×844 (38%), 283px a 1440×900 (31%). La zona de lista que queda visible es de 454px a 1280×800 y 459px a 390×844: dos renglones completos (de 70px) de 12. La parte que se necesita al final (motivo + cerrar) ocupa más sitio que la tarea que se repite 12 veces (marcar).",
+        "selector": ".pie-verif",
+        "linea": 682,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 682,
+          "cita": ".pie-verif{position:sticky;bottom:0;"
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep55",
+            "detalle": "pieFrac=0.354/0.382/0.314; nVisiblesCompletos=2/2/3 a 1280×800, 390×844 y 1440×900"
+          },
+          {
+            "tipo": "captura",
+            "archivo": "55_verificacion_pedido--1280-fold.png",
+            "region": "el panel ámbar y el botón verde cubren la mitad inferior; solo 2,5 renglones visibles"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Pregunta abierta. El pie fijo con el botón de cierre es una decisión razonable (acción principal siempre a mano) y el texto del aviso es de producto. Opciones: dejar fijo solo el botón y plegar el motivo hasta que se pulsa, o compactar el aviso a una línea. No se puede resolver sin la ficha técnica del flujo."
+        },
+        "por_que_importa": "Quien verifica ve poco de la lista y tiene que hacer scroll constante debajo de un panel que solo importa al terminar."
+      },
+      {
+        "id": "v2-55verif-07",
+        "severidad": "alta",
+        "regla": "§10 Diez trampas comprobadas («Un `<symbol>` ya trae su `viewBox`») y §11 Checklist (isotipo)",
+        "dice_el_sistema": "Escrito al revés —`viewBox=\"740 0 970 932\"` en el `<svg>` y un `<use>` sin medidas— ... se pinta 32,5px a la izquierda de su caja y se recorta casi entera",
+        "hay_en_el_build": "El logo del cromo es `<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>`. Medido: caja del svg x=96, caja del `<use>` x=63,5 (−32,5px, exactamente el desplazamiento descrito); a la vista solo queda una astilla verde sobre «SIO-DPROMA» en la esquina de la barra lateral.",
+        "selector": ".side .logo svg",
+        "linea": 717,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 717,
+          "cita": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>"
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep55c.cjs",
+            "detalle": "svg=[96,16,44,42] use=[63.54,16,42.97,41.97] a 1280×800"
+          },
+          {
+            "tipo": "captura",
+            "archivo": "55_verificacion_pedido--1440.png",
+            "region": "isotipo reducido a una hoja verde delgada sobre el wordmark"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "No crítico, pero es el isotipo oficial roto en el cromo de toda pantalla que copie el bloque (ARQ-CROMO). Arreglo en una sola línea, en el bloque canónico: quitar el viewBox del <svg> y poner width/height en el <use> (§10). El sistema ya describe el fallo; falta que el bloque de arquitectura base que se distribuye lo traiga corregido."
+        },
+        "por_que_importa": "La marca del producto aparece mutilada en cada pantalla con cromo."
+      },
+      {
+        "id": "v2-55verif-08",
+        "severidad": "media",
+        "regla": "§6.19 Botón-icono (`.iconbtn`) y §7.2 Cromo de aplicación (tres anchos: cajón solo <860px)",
+        "dice_el_sistema": "Tres anchos: completa (≥1100px), colapsada a solo iconos (860–1100px) y cajón con velo (<860px)",
+        "hay_en_el_build": "`.hamburguesa{display:none}` (línea 250) la pisa `.iconbtn{...display:grid}` (línea 327), que va después con la misma especificidad: el botón del cajón se ve a 1280, 1440 y 1000px (display computado grid, caja 46×46) aunque el menú lateral ya está a la vista y el botón no hace nada por encima de 860px (`.side` solo se transforma dentro de `@media (max-width:860px)`).",
+        "selector": ".hamburguesa",
+        "linea": 250,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 250,
+          "cita": ".hamburguesa{display:none}"
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "medicion",
+            "instrumento": "script_propio_rep55",
+            "detalle": "getComputedStyle(#menu-btn).display = 'grid' a 1280, 1000 y 1440"
+          },
+          {
+            "tipo": "captura",
+            "archivo": "55_verificacion_pedido--1440.png",
+            "region": "botón de tres rayas junto al borde izquierdo de la barra superior con el menú ya abierto"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "Bloque ARQ-CROMO compartido; se corrige una vez con `.iconbtn.hamburguesa{display:none}` (y `.hamburguesa` dentro del media query igual de específica). No crítico: control inoperante pero no bloquea nada."
+        },
+        "por_que_importa": "Un control visible que no hace nada en escritorio y tableta apaisada; además ocupa 46px del primer plano de la barra."
+      },
+      {
+        "id": "v2-55verif-09",
+        "severidad": "baja",
+        "regla": "§6.16 Formulario (regla 3: `required` y `aria-required` de verdad) / §6.2 (botón deshabilitado accesible)",
+        "dice_el_sistema": "`required` y `aria-required` de verdad",
+        "hay_en_el_build": "El aviso dice «hace falta que digas por qué» pero el `<textarea id=\"motivo\">` no lleva `required` ni `aria-required`, no hay estado de error ni el botón «Cerrar con 3 sin verificar» refleja que falta el motivo (sin `aria-disabled`/`aria-describedby`).",
+        "selector": "#motivo / .gordo.p",
+        "linea": 819,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 819,
+          "cita": "<textarea id=\"motivo\""
+        },
+        "reproduce_adicional": [
+          {
+            "tipo": "codigo",
+            "linea": 821,
+            "cita": "<button class=\"gordo p\" type=\"button\">"
+          }
+        ],
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Si el motivo es obligatorio para cerrar incompleto (lo dice el texto) hay que protegerlo; si es solo recomendable, el texto debe decirlo. Sin ficha técnica no se puede saber cuál es la regla de negocio; se registra como pregunta."
+        },
+        "por_que_importa": "El cierre de un pedido incompleto puede enviarse sin el motivo que el propio texto exige."
+      },
+      {
+        "id": "v2-55verif-10",
+        "severidad": "baja",
+        "regla": "§1.1 Superficies y texto (--surface-hover) y §11 Checklist (Estructura: encabezado real)",
+        "dice_el_sistema": "Hace falta un `--surface-hover` ... un tono perceptiblemente distinto de reposo, no un préstamo de un token que significa otra cosa",
+        "hay_en_el_build": "`.ren:hover{background:var(--surface-2)}` pese a que --surface-hover está declarado (línea 90) y no se usa. Además la pantalla no tiene ningún encabezado (el folio PED-202608-0117 es un `<span>`, no h1/h2).",
+        "selector": ".ren:hover",
+        "linea": 662,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 662,
+          "cita": ".ren:hover{background:var(--surface-2)}"
+        },
+        "estado_vs_v1": "no_evaluado",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "sin_accion",
+          "motivo": "Diferencia cosmética menor; pasa a --surface-hover al integrar. El encabezado se propone `<h1>` en `.folio` sin cambio visual."
+        },
+        "por_que_importa": "El sobrevuelo del renglón apenas se nota y no hay punto de entrada por encabezados para lector de pantalla."
+      }
+    ]
+  },
+  "cerrados_desde_v1": [],
+  "f3_boost_ui": {
+    "puntuacion": 3,
+    "dimensiones": {
+      "accesibilidad": {
+        "puntos": 2,
+        "nota": "Destinos táctiles generosos (renglón 70px, caja 44px, botón 56px) y texto con contraste ≥ 4,69:1, pero casilla sin marcar a 1,70:1, placeholder a 4,21:1 y menú colapsado sin nombre accesible a 1000px."
+      },
+      "rendimiento": {
+        "puntos": null,
+        "nota": "no_evaluado (réplica)"
+      },
+      "theming": {
+        "puntos": 3,
+        "nota": "Usa el :root 2.15.0 (--text-3 #5C6675, --on-state, --border-ctrl, --surface-hover) pero no aprovecha dos de ellos (--border-ctrl, --surface-hover); sin colores sueltos en la pantalla."
+      },
+      "responsive": {
+        "puntos": 2,
+        "nota": "Sin overflow horizontal en 4 viewports, pero `.pad` inexistente deja el contenido sin gutter a 390px y el pie fijo se come 35–38% del alto."
+      },
+      "integridad": {
+        "puntos": 2,
+        "nota": "Clase inexistente (.pad), `::before` colocado por transform, isotipo con viewBox repetido y hamburguesa visible por orden de cascada; `var(--sp-5,20px)` con fallback evita el error de 51."
+      }
+    },
+    "justificacion": "El corazón de la pantalla está bien resuelto (renglón táctil grande, color+icono+texto para el estado, copy claro, aviso de «solo confirma lo que recibiste»), pero hay varios defectos de integración de CSS que se ven a simple vista (etiqueta cortada, cabecera pegada, logo mutilado) y dos fallos de accesibilidad medibles.",
+    "evidencia": [
+      "55_verificacion_pedido--1440.png",
+      "55_verificacion_pedido--1280-fold.png",
+      "script propio rep55.cjs / rep55b.cjs / rep55c.cjs"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — réplica"
+  },
+  "cobertura": [
+    {
+      "patron": "Rótulo de paso activo («SIGUIENTE») sobre un renglón de lista de verificación (`.ren.siguiente`)",
+      "propuesta_de_regla": "El rótulo de «lo que toca ahora» vive fuera de la tarjeta, anclado a su borde superior (`bottom:100%`, a --sp-1), nunca centrado por transform sobre la posición estática de un contenedor flex. Si la lista usa `gap` --sp-3, el rótulo cabe en el hueco; si no, el renglón activo gana margen superior --sp-4 y el rótulo es un elemento real (no `::before`) que también llega al lector de pantalla."
+    },
+    {
+      "patron": "Pie fijo de cierre con aviso, campo de motivo y acción primaria (`.pie-verif`)",
+      "propuesta_de_regla": "Un pie fijo no supera el 25% del alto útil: el botón primario va siempre visible (mín. 56px en campo) y el campo de motivo se despliega solo al pulsar «Cerrar incompleto»; el aviso es una sola frase."
+    }
+  ],
+  "sin_datos": [
+    "No hay ficha técnica ni brief: no se puede atribuir ninguna decisión a DPROMA (D-n, FICHAS).",
+    "estado_vs_pdf y estado_vs_v1 no evaluados (réplica ciega).",
+    "F4 (Nielsen) y F5 (investigación) no evaluados — réplica.",
+    "Los estados cargando, vacío y error solo se leyeron en código; no se midieron (el vacío/error usa `.state > .ico`, ya corregido en esta pantalla).",
+    "El renglón no tiene JS de marcado: no se pudo comprobar qué pasa al tocarlo (contador, aria-live, persistencia por renglón que declara el texto del error).",
+    "Contraste en tema oscuro no medido."
+  ]
+}
