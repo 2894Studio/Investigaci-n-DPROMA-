@@ -12,6 +12,7 @@ WEB = os.path.join(REPO, 'web', 'entregables')
 IMG = '/entregables/img/revision/'
 MED = json.load(open(os.path.join(REPO, 'web', 'entregables', 'img', 'revision', '_medidas.json')))
 ARIA = json.load(open(os.path.join(AQUI, 'ev-datos.json')))
+BAR = json.load(open(os.path.join(AQUI, '..', 'mediciones', 'v2', 'barrido.json')))
 E = html.escape
 TITULO = 'Revisión de pantallas SIO DPROMA'
 PDF = 'SIO-DPROMA-revision-de-pantallas-oct2026.pdf'
@@ -48,7 +49,7 @@ def archivos(lista):
 # ================================================================ A · SE PIDE
 A = 'A'
 cambio(A, 'El menú lateral dice a dónde lleva cada enlace', 'pide',
-  '19 de las 23 pantallas revisadas a fondo. La medición automática lo encuentra en 35 de las 42 que llevan menú, y la regla <code>.side .et</code> está en 36 archivos. Revisadas: ' + archivos(['20', '21', '22', '23', '24', '25', '26', '27', '28', '32', '34', '41', '46', '47', '48', '54', '55', '58', '59']),
+  'La regla <code>.side .et{display:none}</code> está en 36 archivos, y en 35 de ellos los enlaces del menú no llevan nombre propio. Lista completa, con línea, en el anexo.',
   'Entre 861 y 1100 px la barra lateral se reduce a iconos y los quince enlaces del menú se quedan sin nombre. Quien navega con lector de pantalla oye «enlace» quince veces seguidas y no sabe a dónde va ninguno.',
   '<code>.side .et{display:none}</code> quita el texto de la vista y también del árbol de accesibilidad, y los enlaces <code>.it</code> no llevan <code>aria-label</code> ni <code>title</code>. El sistema pide que la etiqueta no desaparezca (§7.2).',
   par(panel('Antes — lo que anuncia un lector de pantalla', pre(arbol('ariaantes')), 'antes'), panel('Después — con el texto oculto solo a la vista', pre(arbol('ariadespues')), 'despues')),
@@ -56,7 +57,7 @@ cambio(A, 'El menú lateral dice a dónde lleva cada enlace', 'pide',
   'A 1000 px, <code>ariaSnapshot()</code> del <code>.side</code> debe devolver <code>link "Tablero"</code>, <code>link "Padrón de clientes"</code>… y ningún <code>link:</code> vacío. Medido en <code>27_padron_clientes</code>.')
 
 cambio(A, 'El icono del botón verde deja de verse gris', 'pide',
-  'Seis archivos con el fallo medido: ' + archivos(['22', '24', '26', '32', '51', '58']) + '. La regla descendiente <code>.state .ico{…}</code> aparece en 21 de las 50 pantallas.',
+  'La regla descendiente <code>.state .ico{…}</code> está en 21 de las 50 pantallas. El fallo se midió en ' + archivos(['22', '24', '26', '32', '51', '58']) + '. Lista completa, con línea, en el anexo.',
   'En el estado de error de gestoría, el botón verde «Reintentar» lleva un icono gris que casi desaparece sobre el verde.',
   '<code>.state .ico</code> alcanza a cualquier <code>.ico</code> del bloque y no solo al grande que cuelga del estado, así que el icono pequeño del botón hereda el gris. El PDF de cambios lo da por corregido (C3); en estos archivos la regla antigua sigue ahí.',
   a_d('obs01', 'Estado de error de gestoría: el botón Reintentar con el icono gris sobre el verde', 'El mismo botón con el icono blanco', 'Antes — icono gris, 1,03:1', 'Después — icono blanco, 4,89:1'),
@@ -64,7 +65,7 @@ cambio(A, 'El icono del botón verde deja de verse gris', 'pide',
   'El icono del botón mide 4,89:1 contra el verde. El mínimo para un gráfico es 3:1.')
 
 cambio(A, 'El gris del texto auxiliar llega a 4,5:1', 'pide',
-  '29 de las 50 pantallas declaran <code>--text-3: #66717F</code>; las otras 20 ya traen <code>#5C6675</code>. El fallo se midió en ' + archivos(['13', '24', '26', '34']) + '.',
+  '29 de las 50 pantallas declaran <code>--text-3: #66717F</code>; las otras 20 ya traen <code>#5C6675</code>. El fallo se midió en ' + archivos(['13', '24', '26', '34']) + '. Lista completa, con línea, en el anexo.',
   'El texto auxiliar (rótulos pequeños, el departamento bajo un nombre) queda por debajo del mínimo cuando cae sobre el fondo de una fila con el cursor encima.',
   'El token conserva el valor anterior. <code>_sio-tokens.css</code>, que viene en el mismo paquete, ya declara <code>#5C6675</code> y lo documenta con 4,93:1.',
   par(panel('Antes — <code>#66717F</code> sobre <code>--surface-2</code>', '<div class="muestra" style="background:#E7EDF3;color:#66717F">Texto auxiliar de ejemplo · <b>4,21:1</b> · no llega a 4,5:1</div>', 'antes'),
@@ -81,8 +82,8 @@ cambio(A, 'Las fuentes dejan de pedirse a Google', 'pide',
   'El archivo no debe contener <code>fonts.googleapis.com</code> ni <code>fonts.gstatic.com</code>. El <code>@font-face</code> es el de <code>27_padron_clientes</code>, líneas 9 y 10.')
 
 cambio(A, 'Cada campo del formulario tiene un identificador único', 'pide',
-  '<code>58_altas_como_modal</code> y <code>59_editar_cliente</code>.',
-  'En <code>58</code>, los 14 <code>id</code> del formulario «Nuevo cliente» (<code>rs</code>, <code>rfc</code>, <code>tipo</code>, <code>cp</code>, <code>reg</code>, <code>dom</code>, <code>csf</code>, <code>idr</code>, <code>grp</code>, <code>mar</code>, <code>per</code>, <code>rol</code>, <code>cor</code>, <code>tel</code>) se repiten en la versión de teléfono. Cada <code>label for</code> resuelve al primero, así que 12 de los 14 controles del teléfono se quedan sin nombre. <code>59</code> repite el mismo defecto.',
+  'Tres archivos: <code>58_altas_como_modal</code>, <code>59_editar_cliente</code> y <code>21_ficha_cliente</code>. Es el resultado de buscar identificadores repetidos en las 50 pantallas.',
+  'En <code>58</code>, los 14 <code>id</code> del formulario «Nuevo cliente» (<code>rs</code>, <code>rfc</code>, <code>tipo</code>, <code>cp</code>, <code>reg</code>, <code>dom</code>, <code>csf</code>, <code>idr</code>, <code>grp</code>, <code>mar</code>, <code>per</code>, <code>rol</code>, <code>cor</code>, <code>tel</code>) se repiten en la versión de teléfono. Cada <code>label for</code> resuelve al primero, así que 12 de los 14 controles del teléfono se quedan sin nombre. En <code>59</code>, <code>nombre-legal</code> y <code>rfc-ro</code> aparecen cuatro veces cada uno, y el <code>label for</code> resuelve al primero. En <code>21</code>, <code>tope-CORREO</code>, <code>tope-TELEFONO</code>, <code>tope-DIRECCION</code> (destinos de <code>aria-describedby</code>) y <code>l-DIRECCION-16</code> aparecen dos veces; el efecto es menor porque el contenido repetido es idéntico.',
   None, '',
   '/* en la versión de teléfono */\n<label for="rs-tel">Razón social</label>\n<input id="rs-tel" …>',
   '<code>document.querySelectorAll(\'[id]\')</code> no debe devolver identificadores repetidos (§11).')
@@ -379,6 +380,22 @@ lista_no = ('<ul class="plano">'
   '<li><b>La agenda de instaladores propia</b> se mantiene. Solo lleva el cambio mínimo del cambio ' + ref('Agenda de instaladores') + '.</li>'
   '<li><b>El panel «Con qué filtros»</b> se mantiene como registro de auditoría, sin controles.</li></ul>')
 
+def anexo_html():
+    P = BAR['por_archivo']
+    def chips(items):
+        return ' '.join(f'<code>{a}{(":" + str(l)) if l else ""}</code>' for a, l in items)
+    filas = [
+     ('1', 'Menú lateral sin nombre (<code>.side .et{display:none}</code>)', [(a, P[a]['menu_et_display_none'][0]) for a in BAR['resumen']['menu_et_display_none']]),
+     ('2', 'Icono gris (<code>.state .ico</code> descendiente)', [(a, P[a]['state_ico_descendiente'][0]) for a in BAR['resumen']['state_ico_descendiente']]),
+     ('3', 'Gris de texto (<code>--text-3: #66717F</code>)', [(a, P[a]['text3_linea']) for a in BAR['resumen']['text3_66717F']]),
+     ('4', 'Fuentes por <code>&lt;link&gt;</code> a Google', [(a, P[a]['google_fonts_link'][0]) for a in BAR['resumen']['google_fonts_link']]),
+     ('5', 'Identificadores repetidos', [(a + ' (' + ', '.join(f'{k} ×{v}' for k, v in P[a]['ids_repetidos'].items()) + ')', None) for a in BAR['resumen']['ids_repetidos']]),
+     (ref('Las cajas de cabecera'), 'Cabecera <code>.p4</code> sin relleno inferior', [(a, P[a]['p4_sin_padding_bottom'][0]) for a in BAR['resumen']['p4_sin_padding_bottom']]),
+    ]
+    cuerpo = ''.join(f'<tr><td class="r">{n}</td><td>{t}<br><span class="cuenta">{len(it)} archivos</span></td><td class="chips">{chips(it)}</td></tr>' for n, t, it in filas)
+    return ('<table class="t t-anexo"><colgroup><col style="width:10%"><col style="width:24%"><col style="width:66%"></colgroup>'
+            '<thead><tr><th class="r">Cambio</th><th>Qué se busca</th><th>Archivos, con la línea de la regla</th></tr></thead><tbody>' + cuerpo + '</tbody></table>')
+
 # ---------------------------------------------------------------- documento
 CSS = open(os.path.join(AQUI, 'revision.css'), encoding='utf-8').read()
 DOC = f'''<!doctype html>
@@ -437,6 +454,11 @@ DOC = f'''<!doctype html>
   <article class="cambio abierto"><header><h3>El archivo <code>49_alta_orden</code></h3></header><p class="que">El PDF de cambios dice que se actualizó, y no está entre las 50 pantallas. Dos observaciones sobre esa pantalla (la caja de «Croquis y anexos» cortada y la sombra sobre la barra de acciones) quedan sin respuesta hasta recibirla.</p></article>
   <article class="cambio abierto"><header><h3>El archivo <code>SUPUESTOS.md</code></h3></header><p class="que"><code>FICHAS_TECNICAS.md</code> remite a él para las decisiones sin ratificar (S-25, S-28, S-30, S-31…) y no viene en el ZIP. Sin ese archivo no podemos saber qué se dio por bueno y qué sigue pendiente.</p></article>
   <article class="cambio abierto"><header><h3>¿Qué manda sobre el plazo de los tickets?</h3></header><p class="que">La ficha de <code>24_tickets</code> en la tanda 3 dice que se retiró el reloj de plazo y que la antigüedad va en gris, igual en los seis renglones. La tanda 4 habla de que tickets conserva su propio semáforo de plazo. El archivo dibuja el plazo: «Vence hoy», con una regla de cálculo de 420 caracteres. El cambio {ref('Tickets TI')} depende de cuál sea la respuesta.</p></article>
+</section>
+
+<section class="parte" id="anexo">
+  <header class="ph"><span class="eyebrow">Anexo</span><h2>Archivos de cada sustitución</h2><p class="lede">Resultado de buscar cada regla en el código de las 50 pantallas, con la línea donde está. Sirve para aplicar cada cambio de una vez en todos los archivos, y para comprobar después que ninguno se quedó atrás.</p></header>
+  {anexo_html()}
 </section>
 </main>
 <footer class="pie"><span>SIO-DPROMA · 2894 Studio</span><span>{TITULO}</span></footer>
