@@ -1,7 +1,7 @@
 ---
 title: Sistema de diseño — SIO-DPROMA (descargable)
-version: 2.16.0
-last_updated: 2026-10-14
+version: 2.16.1
+last_updated: 2026-10-15
 description: Copia descargable del sistema de diseño real de SIO-DPROMA (docs/sistema-diseno-sio-dproma.md), construido sobre las propuestas de acceso y padrón de clientes. No es la guía de marca 2894/AZ — es el sistema de producto.
 ---
 
@@ -169,36 +169,6 @@ de "cada tema tiene su paleta" que sí aplica a `--bg`/`--surface`/`--accent`. U
 cambiar de color al cambiar de tema — es la misma regla que ya protegía al verde lima suelto de
 arriba, aplicada de forma incompleta. Se declara **una sola vez, fuera de cualquier bloque de
 tema**, y así queda verificado en los dos temas por DPROMA.
-
-### 1.2.1 Logotipo: uso y restricciones
-
-Fuente: *DPROMA — Manual de uso*, LAIÖN (15/03/2026).
-
-**Dos lockups, dos contextos — no se mezclan.** Isotipo + «SIO-DPROMA» (`--font-brand`) es el
-lockup del *producto*, ya en el cromo de cada pantalla. Isotipo + «DPROMA» es el lockup
-*corporativo* del manual del cliente — para comunicación externa (documentos, redes, membretes),
-nunca dentro de la interfaz. Assets: `img/marca/dproma-isotipo.svg` (producto),
-`dproma-lockup-color.svg` / `dproma-lockup-reversa.svg` (corporativo, claro/oscuro).
-
-**Variante por fondo.** Color (wordmark en `--marca-azul`) sobre fondos claros; reversa (wordmark
-blanco) sobre fondos oscuros. El gradiente del isotipo nunca cambia — es la firma de color de la
-marca.
-
-**Fondos** (regla literal del manual): limpios o con textura sutil sí; saturados, multicolor o con
-patrones ajenos no — *"generan ruido visual, reducen la legibilidad y afectan la consistencia"*.
-
-**Área de seguridad y tamaño mínimo** (no estaban en el manual con medida exacta; se fijan aquí
-por convención estándar): espacio libre ≥ la altura del isotipo solo; mínimo digital 24px de alto
-para el isotipo — por debajo, el pico de la "Λ" pierde su curva.
-
-**Usos incorrectos:** no estirar/deformar, no recolorear el isotipo fuera de su gradiente, no
-partir el gradiente en bloques sólidos, no colocarlo sin el contraste 3:1 de §1.7, no
-reconstruirlo a mano — siempre el asset oficial.
-
-**Tipografía de marca vs. de producto.** El manual pide Ethnocentric (titulares, ya es
-`--font-brand`) y Arial Rounded MT Bold (texto informativo) para comunicación de marca — ninguna
-de las dos sustituye a Inter (`--font-ui`, §2) dentro del producto. Arial Rounded MT Bold aplica
-solo fuera de `SIO-DPROMA`.
 
 ### 1.3 Semáforo — cinco estados, tres variantes cada uno
 
@@ -2653,6 +2623,37 @@ La información retirada sigue en el `aria-label`/`title` y en el detalle a un c
 tiene que correr después de insertar el bloque en el documento: medido antes, con el subárbol
 sin su ancho final, el cálculo no refleja el resultado visible y no retira nada.
 
+## 14. Logotipo
+
+Vivía como §1.2.1 dentro de Color; se saca a sección propia porque es identidad de marca, no
+armonía de color. Fuente: *DPROMA — Manual de uso*, LAIÖN (15/03/2026).
+
+**Dos lockups, dos contextos — no se mezclan.** Isotipo + «SIO-DPROMA» (`--font-brand`) es el
+lockup del *producto*, ya en el cromo de cada pantalla. Isotipo + «DPROMA» es el lockup
+*corporativo* del manual del cliente — para comunicación externa (documentos, redes, membretes),
+nunca dentro de la interfaz. Assets: `img/marca/dproma-isotipo.svg` (producto),
+`dproma-lockup-color.svg` / `dproma-lockup-reversa.svg` (corporativo, claro/oscuro).
+
+**Variante por fondo.** Color (wordmark en `--marca-azul`) sobre fondos claros; reversa (wordmark
+blanco) sobre fondos oscuros. El gradiente del isotipo nunca cambia — es la firma de color de la
+marca.
+
+**Fondos** (regla literal del manual): limpios o con textura sutil sí; saturados, multicolor o con
+patrones ajenos no — *"generan ruido visual, reducen la legibilidad y afectan la consistencia"*.
+
+**Área de seguridad y tamaño mínimo** (no estaban en el manual con medida exacta; se fijan aquí
+por convención estándar): espacio libre ≥ la altura del isotipo solo; mínimo digital 24px de alto
+para el isotipo — por debajo, el pico de la "Λ" pierde su curva.
+
+**Usos incorrectos:** no estirar/deformar, no recolorear el isotipo fuera de su gradiente, no
+partir el gradiente en bloques sólidos, no colocarlo sin el contraste 3:1 de §1.7, no
+reconstruirlo a mano — siempre el asset oficial.
+
+**Tipografía de marca vs. de producto.** El manual pide Ethnocentric (titulares, ya es
+`--font-brand`) y Arial Rounded MT Bold (texto informativo) para comunicación de marca — ninguna
+de las dos sustituye a Inter (`--font-ui`, §2) dentro del producto. Arial Rounded MT Bold aplica
+solo fuera de `SIO-DPROMA`.
+
 ---
 
 ## Historial de cambios
@@ -2693,3 +2694,4 @@ sin su ancho final, el cálculo no refleja el resultado visible y no retira nada
 | 2.13.4 | 2026-10-09 | Bug real reportado por el cliente: el ícono del botón verde en un estado vacío (Cuentas por cobrar, "Marca A no tiene saldo por cobrar") salía gris en vez de blanco, sin contraste contra el fondo. Causa: `.state .ico{color:var(--text-3)}` es un selector descendiente que alcanza también a los íconos pequeños de los botones dentro de `.acc`, aplastando el color que heredaban de `.btn.p`. Mismo bug activo en Viáticos, Viático detalle, Cuentas por cobrar y Autorización de compra — las cuatro copiaron el bloque `ARQ-ESTADOS` con el selector descendiente; Administración Vehicular ya tenía el fix (`.state > .ico`, hijo directo) desde el principio. Corregido en las cuatro pantallas. §6.4 gana la regla 6, documentando el selector correcto y el caso real. |
 | 2.15.0 | 2026-10-09 | Añade §13.9: un bloque cuyo alto lo fija un dato externo (una duración, no el contenido ni el layout) necesita un plan explícito de qué línea de contenido se retira primero si no cabe — crecer el contenedor falsearía el dato que ese alto representa. A partir del calendario de instalaciones: sus bloques de evento recortaban texto a media línea con `overflow:hidden`, y en los casos más ajustados el contenido ni desbordaba — se aplastaba por `flex-shrink:1`, el valor por omisión en un hijo de `flex-direction:column`, hasta quedar ilegible sin disparar ningún indicador de desborde. Añade §1.2.1: normas de uso del logotipo, traducidas del manual de marca que entregó el cliente (LAIÖN, 15/03/2026) — dos lockups que no se mezclan (isotipo+«SIO-DPROMA» del producto vs. isotipo+«DPROMA» corporativo), variante por fondo, usos incorrectos, y una aclaración de qué tipografía del manual aplica dentro del producto (ninguna de las dos: sigue siendo Inter) y cuál solo fuera de él. Área de seguridad y tamaño mínimo no venían en el manual con una medida exacta — se fijan aquí por convención. Se incorporan los assets oficiales a `web/entregables/img/marca/` (isotipo, lockup color, lockup reversa). |
 | 2.16.0 | 2026-10-14 | §6.5 pasa a documentar los iconos como sprite SVG (`.ico`) y retira la carga de Material Symbols por `<link>`; §6.9 adopta `.banda.b-info` y las otras tres variantes y fija que `.banda` no lleva margen propio; §2.1 acota el 10,5px a los rótulos de grupo y las etiquetas del modo tarjeta; §6.23 lleva `.tip` a la escala de texto. Reglas nuevas: un estado por eje y `.p-neutro` (§6.10), escala de interlineado (§2), botón flotante y su zona segura, diseño de la fila hija en la fila desplegable (§6.15), cabecera en vacío y error (§6.4), tarjeta con pie (§6.3), agenda (§6.24) e hilo de conversación (§6.25). §10 pasa a once trampas y §11 gana tres preguntas. |
+| 2.16.1 | 2026-10-15 | Reordena: el logotipo pasa de §1.2.1 (dentro de Color) a §14, sección propia — es identidad de marca, no armonía de color. Sin cambio de contenido ni de valores. |
