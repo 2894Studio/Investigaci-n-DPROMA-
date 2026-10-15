@@ -1,0 +1,691 @@
+{
+ "pantalla": "06_padron_clientes",
+ "tier": "B",
+ "modo": "cumplimiento",
+ "sha256": "11b36bcf9d1024aa86642c4fa6701de9878cd04f45858d501b922e52822574e7",
+ "estado_vs_pdf": "no_listado_en_pdf",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error"
+ ],
+ "capturas": [
+  "06_padron_clientes--1440.png",
+  "06_padron_clientes--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-06padron-01",
+    "severidad": "alta",
+    "regla": "D6 del padrón 28-sep (AVISO_A_STUDIO_PADRON_2026-09-28.md, punto 1; FICHAS_TECNICAS.md, «Padrón — decisiones del 28-sep»)",
+    "dice_el_sistema": "Aviso del 28-sep, punto 1: \"Reenviar liga de registro no se construye. El menú de fila de padron-clientes la dibuja; el dictamen 2894 (punto 15) la rechazó y sigue rechazada (D6). Les pedimos quitarla.\" FICHAS, D6: \"Reenviar liga de registro sigue RECHAZADA (dictamen 2894, punto 15)\".",
+    "hay_en_el_build": "La fila «Autos del Valle SAPI» dibuja como tercera acción un botón de icono de enlace con `aria-label=\"Reenviar liga de registro a Autos del Valle\"` (línea 533); la acción reaparece en la cabecera como «Liga de auto-registro» (línea 424) y en la nota inferior (línea 592). Captura 1440, fila 3, columna ACCIONES (icono de cadena).",
+    "selector": ".act button[aria-label^=\"Reenviar liga\"]",
+    "linea": 533,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 533,
+     "cita": "aria-label=\"Reenviar liga de registro a Autos del Valle\""
+    },
+    "critico": {
+     "es": true,
+     "criterio": "Contradice una decisión de producto de DPROMA: D6 del aviso del 28-sep (punto 1), función rechazada que se pidió quitar"
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Quitar el botón de la línea 533 (la fila queda con «Ver ficha» y «Editar», como las demás). La decisión del cliente sobre el botón de cabecera «Liga de auto-registro» queda pendiente (ver sin_datos)."
+    },
+    "por_que_importa": "La pantalla vuelve a dibujar una función que DPROMA rechazó con dictamen y que no se construye: quien la use en la revisión creerá que existe, y Studio ya había recibido el aviso de quitarla."
+   },
+   {
+    "id": "v2-06padron-02",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado de una pantalla (regla 6) y §1.4.1 Tinta sobre relleno sólido de color",
+    "dice_el_sistema": "«El selector correcto es .state > .ico (hijo directo)»",
+    "hay_en_el_build": "`.state .ico{width:30px;height:30px;color:var(--text-3)}` (línea 336) tiñe el icono de «Reintentar» (`button.btn.p` en `.state-error`): rgb(102,113,127) sobre el botón verde rgb(62,122,76) = 1,03:1; el texto del mismo botón es rgb(247,250,249). Sale en la vista Error (captura propia e_06_padron_clientes.png).",
+    "selector": ".state .ico",
+    "linea": 336,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I1_icono_vs_boton",
+     "detalle": "dossier: fallos 1, button.btn.p «Reintentar», colorIcono rgb(102,113,127), colorTexto rgb(247,250,249), fondo rgb(62,122,76), ratio 1.03. Reproducido con scratchpad/lote27b/cap.cjs"
+    },
+    "critico": {
+     "es": true,
+     "criterio": "Falla de accesibilidad medida: contraste <3:1 en un control (icono de «Reintentar» a 1,03:1)"
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Cambiar el selector a `.state > .ico` (línea 336); es el arreglo de §6.4 regla 6, un selector sin tocar el markup."
+    },
+    "por_que_importa": "El botón de recuperación pierde el icono en el estado de error. Lectura alternativa: el icono es redundante con el texto (4,89:1) y el botón conserva nombre; el criterio 1 del proyecto cuenta el icono de un control bajo 3:1. Mismo bloque en 02, 03 y 30."
+   },
+   {
+    "id": "v2-06padron-03",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles",
+    "dice_el_sistema": "«Se amplía el área pulsable sin agrandar el dibujo»",
+    "hay_en_el_build": "7 casillas de 15×15 px (`input[type=\"checkbox\"]{…width:15px;height:15px…}`, línea 295: cabecera «Seleccionar todos» y 6 filas), dentro de un `td` de 34 px sin `<label>` que amplíe el destino, y 3 botones de orden de cabecera de 20 px de alto («Razón social / RFC», «Sucursales», «Última orden»; `padding:3px 5px;margin:-3px -5px`, línea 276). La columna se declara `<col style=\"width:34px\">` (línea 475) con 12+12 px de relleno: la celda mide 34 px y su contenido 50 (scrollWidth 50 > clientWidth 34), por eso asoma un «…» junto a cada casilla en la captura.",
+    "selector": "input.rowsel, #selall, thead th button",
+    "linea": 295,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil_bajo24",
+     "detalle": "dossier: total 62, bajo24 14, checkbox 7; muestra input checkbox «Seleccionar todos…» 15×15, input.rowsel 15×15, button «Razón social / RFC» 149.5×20, «Sucursales» 105.6×20, «Última orden» 115.5×20. Celda de casilla medida con scratchpad/lote27b/m_otros.cjs: td 34×40, scrollWidth 50"
+    },
+    "critico": {
+     "es": true,
+     "criterio": "Falla de accesibilidad medida: destino táctil <24 px (casillas de 15×15, botones de orden de 20 px)"
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Receta del propio §7.3: `.selfila{display:flex;align-items:center;min-height:24px;padding:4px;margin:-4px}` (o `<label>` que ocupe la celda) y `<col style=\"width:48px\">`; `min-height:24px` real en los botones de orden quitando el margen negativo."
+    },
+    "por_que_importa": "Es la selección múltiple del padrón: sin ella no se llega a «Exportar selección» ni «Desactivar». Lectura alternativa: WCAG 2.5.8 admite destinos pequeños con espaciado suficiente; el criterio 1 del proyecto y §7.3 nombran estas dos piezas."
+   },
+   {
+    "id": "v2-06padron-04",
+    "severidad": "alta",
+    "regla": "§6.13 Barra de selección (reglas 1 y 2) y §7.3 Objetivos táctiles",
+    "dice_el_sistema": "«Botones, no enlaces.»",
+    "hay_en_el_build": "La barra de selección usa tres `<a href=\"#\">`: «Exportar selección» (117,8×16 px), «Asignar a campaña» (120,1×16) y «Desactivar» (`class=\"danger\"`, 67,5×16), líneas 463-465. Los tres ejecutan una acción y no navegan; «Desactivar» (destructiva) va pegada al grupo con `gap:14px` (línea 260), no separada a la derecha.",
+    "selector": ".selbar a",
+    "linea": 463,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil_bajo24",
+     "detalle": "dossier: a «Exportar selección» 117.8×16, a «Asignar a campaña» 120.1×16, a.danger «Desactivar» 67.5×16 (de 14 destinos bajo 24 px)"
+    },
+    "critico": {
+     "es": true,
+     "criterio": "Falla de accesibilidad medida: destino táctil <24 px (tres acciones a 16 px de alto)"
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Cambiar a `<button>` con `min-height:28px` y aplicar `.destructiva{margin-left:auto}` a «Desactivar» (CSS de §6.13). No cambia el texto."
+    },
+    "por_que_importa": "Un lector anuncia «enlace» y espera navegar; con teclado un `<a href=\"#\">` responde a Intro pero no a Espacio. La acción destructiva queda a 14 px de «Exportar selección», que no cambia nada."
+   },
+   {
+    "id": "v2-06padron-05",
+    "severidad": "alta",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "«Por debajo de 12px no queda nada»",
+    "hay_en_el_build": "37 nodos de texto visibles bajo 12 px (estilo calculado): 32 a 11 px (las 9 pastillas «Completos», 2 «Falta carátula bancaria», 6 RFC en `.rz small`, las etiquetas `.p-type` «Agencia/Empresa/Persona física», las cabeceras de tabla y los botones de orden), 4 a 10,5 px (`.grp`, wordmark) y 1 a 11,5 px (la nota inferior). `.pill` y `.p-type` declaran `font-size:11px` (líneas 312 y 318); `.rz small` también (línea 291).",
+    "selector": ".pill, .p-type, .rz small, thead th",
+    "linea": 312,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_fuentes_lt12",
+     "detalle": "scratchpad/lote27b/m_fuentes.cjs 06_padron_clientes: 37 nodos <12 px (32 a 11, 4 a 10.5, 1 a 11.5)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta: `.pill`, `.p-type`, `.rz small` y `thead th` a `var(--fs-meta)` (el RFC es «un dato que se compara carácter a carácter», §2.1). Son los mismos componentes que §2.1 cita al medir el padrón: etiquetas de estado, cabeceras y RFC."
+    },
+    "por_que_importa": "El RFC y el estado de cada cliente son lo que se consulta a diario; a 11 px se leen peor justo donde se comparan carácter a carácter."
+   },
+   {
+    "id": "v2-06padron-06",
+    "severidad": "alta",
+    "regla": "§6.11 Tabla densa (reglas 4, 5 y 8)",
+    "dice_el_sistema": "«La cabecera no se corta.»",
+    "hay_en_el_build": "Con 9 columnas, `colgroup` en % y `white-space:nowrap` en pastillas y celdas (líneas 475-477), el instrumento I3 cuenta 14 elementos recortados a 1440 px: «Registro incompleto» (68 px), «Persona física» (42), «Falta carátula bancaria» (37), «Empresa» (13), la razón social, la lista de sucursales y varios contactos. A 1280 px la cabecera «ÚLTIMA ORDE…» se corta y 8 celdas más. I4: la cabecera «Acciones» va alineada a la derecha y el contenido de la celda empieza 18,4 px más a la izquierda.",
+    "selector": "table, td .pill, td .p-type, thead th",
+    "linea": 475,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I3_recorte",
+     "detalle": "dossier: recortados 14 (b «Grupo Automotriz ELEKTRA SA de…» 17 px, td 4 Coyoacán… 106, td.col-contacto 28/36, td.col-fiscal «Falta carátula bancaria» 37, td «Registro incompleto» 68, td «Persona física» 42, td «Empresa» 13). anchos_1280: 8 celdas con recorte; I4: col 8 «Acciones» alinCab right / alinCel start, dxIzq 18.4"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico (el dato se completa al abrir la ficha). Solución concreta, la que pide la regla 4: reducir columnas visibles de forma explícita; por ejemplo pasar las tres acciones a un menú «⋯» (libera ~70 px), ampliar «Tipo» a 12 % y retirar «Datos fiscales» a un filtro; o `table-layout:auto` con `min-width` y desplazamiento horizontal."
+    },
+    "por_que_importa": "El estado y el tipo son las columnas que clasifican al cliente; cortados a «Registro inco…» y «Persona fís…» obligan a abrir la ficha para confirmar. Está en el componente más visible de la pantalla."
+   },
+   {
+    "id": "v2-06padron-07",
+    "severidad": "media",
+    "regla": "§6.11 Tabla densa (CSS de referencia: hover y fila seleccionada)",
+    "dice_el_sistema": "«tbody tr:hover td{background:var(--surface-2)}»",
+    "hay_en_el_build": "`tbody tr:hover td{background:var(--surface-2)}` (línea 285) y `tbody tr[data-selected=\"true\"] td{background:var(--accent-soft)}` (línea 286) solo alcanzan `td`; la celda de razón social/RFC es un `th scope=\"row\"` y queda transparente: con el cursor sobre la fila 3 el `th` mide rgba(0,0,0,0) frente a rgb(231,237,243) del resto; en las filas seleccionadas (1 y 2) se ve una banda clara entre la casilla y «Tipo» (captura 1440).",
+    "selector": "tbody tr:hover td / tbody tr[data-selected] td",
+    "linea": 285,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_hover_th",
+     "detalle": "scratchpad/lote27b/m_30.cjs: hover sobre la fila 3; backgroundColor de sus celdas: TD rgb(231,237,243) ×8, TH rgba(0,0,0,0). Captura propia c06_sel.png"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Causa raíz en el sistema: el CSS de referencia de §6.11 repite el mismo selector solo para `td`, y `th:first-child` queda con `background:var(--surface)` fijo. Corregir en el sistema: `tbody tr:hover > *`, `tbody tr[aria-selected=\"true\"] > *` y `th:first-child` heredando de la fila. En 30 el cliente ya añadió `tbody tr:hover th` (línea 380)."
+    },
+    "por_que_importa": "La fila se ve partida en dos tonos justo en la celda que identifica al cliente; en la selección múltiple es el primer indicio visual de qué filas están marcadas."
+   },
+   {
+    "id": "v2-06padron-08",
+    "severidad": "media",
+    "regla": "§6.12 Resumen de estatus y barra de filtros (regla 1) y §6.21",
+    "dice_el_sistema": "«Un filtro se resalta solo si su valor difiere del predeterminado.»",
+    "hay_en_el_build": "«Tipo: Todos» se entrega con `aria-pressed=\"true\"` (línea 448) y por tanto con borde `--accent` y fondo `--accent-soft` (`.f[aria-pressed=\"true\"]`, línea 249): el ejemplo literal que cita la regla. Al pulsarlo se apaga y al pulsar cualquier `.f` alterna el resalte sin que cambie su valor (línea 680). Los cuatro filtros no llevan flecha ni abren panel.",
+    "selector": "button.f",
+    "linea": 448,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_filtros_clic",
+     "detalle": "scratchpad/lote27b/m_f.cjs 06: antes «Tipo: Todos» pressed=true, borde rgb(62,122,76), fondo rgba(62,122,76,.1); tras un clic pressed=false y borde rgba(27,36,48,.26); «Estado: Activos» pressed=true"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. En una maqueta sin panel el control es una cifra de lectura (§6.12 regla 8): `aria-pressed=\"false\"` en «Tipo: Todos», sin listener que alterne, y resalte solo cuando el valor difiera. El componente completo está en §6.21."
+    },
+    "por_que_importa": "«Todos» no filtra nada; resaltarlo hace que el resalte deje de significar «aquí hay algo puesto» y confunde con «Estado: Activos», que sí filtra."
+   },
+   {
+    "id": "v2-06padron-09",
+    "severidad": "media",
+    "regla": "§6.12 Resumen de estatus y barra de filtros (reglas 2 y 6)",
+    "dice_el_sistema": "«El resumen no sobrevive a su propio filtro.»",
+    "hay_en_el_build": "El chip «1,189 activos» (línea 441) y el desplegable «Estado: Activos» (línea 449) son dos controles del mismo campo; en el estado inicial el chip está `aria-pressed=\"false\"` mientras «Estado: Activos» está `aria-pressed=\"true\"`, sin reflejarse el uno en el otro. «Registro incompleto» (42) e «Inactivos» (17) repiten los otros dos valores del filtro de estado.",
+    "selector": ".schip, button.f",
+    "linea": 441,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 441,
+     "cita": "<button class=\"schip c-ok\" data-f=\"ok\" aria-pressed=\"false\">"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Retirar los tres chips (los conteos viven en el tablero) o retirar «Estado» de los filtros; no los dos."
+    },
+    "por_que_importa": "Dos vías para el mismo filtro, con estados que no coinciden: la persona no sabe cuál manda."
+   },
+   {
+    "id": "v2-06padron-10",
+    "severidad": "baja",
+    "regla": "§13.1 Lectura → control → objeto (y §6.12 regla 7)",
+    "dice_el_sistema": "«Va en la misma fila que ellos»",
+    "hay_en_el_build": "El buscador va en su propia fila (`<section class=\"searchrow\">`, línea 429) encima del resumen y los filtros, que forman otra fila (línea 439).",
+    "selector": ".searchrow",
+    "linea": 429,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 429,
+     "cita": "<section class=\"searchrow\" aria-label=\"Buscar en el padrón\">"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Mover `<label class=\"search\">` a la fila `.filters` con `flex:1;min-width:200px` (recetado en §6.12 regla 7)."
+    },
+    "por_que_importa": "El buscador parece un cuarto bloque flotando; ocupa una fila entera de 50 px que se recupera al fusionarlo."
+   },
+   {
+    "id": "v2-06padron-11",
+    "severidad": "media",
+    "regla": "§6.14 Menú de acciones por fila (y §6.5 Iconos)",
+    "dice_el_sistema": "«Con más de dos, o si cambian según la fila: menú ⋯ con las opciones escritas.»",
+    "hay_en_el_build": "Cada fila lleva tres botones de icono sin texto y sin `title` (0 de 17 con `title`; solo `aria-label`): «Ver ficha» (ojo), «Editar» (lápiz) y una tercera acción que cambia según la fila: recibo «Ver órdenes» (línea 503), cadena «Reenviar liga de registro» (línea 533) o flecha circular «Reactivar» (línea 577).",
+    "selector": ".act button",
+    "linea": 503,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_title_acciones",
+     "detalle": "scratchpad/lote27b/m_30.cjs: botones .act con atributo title = 0 de 17"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta: «Ver ficha» como acción principal con texto + menú «⋯» con las otras (§6.14); como mínimo `title` en cada icono (§6.5). La opción de la cadena desaparece de la fila al cumplirse D6."
+    },
+    "por_que_importa": "Tres significados en la misma posición según la fila es el caso que §6.5 usa para explicar por qué un icono nunca es la única forma de entender un control."
+   },
+   {
+    "id": "v2-06padron-12",
+    "severidad": "baja",
+    "regla": "§6.10 Etiqueta de estado (`.pill`) y de clasificación (`.p-type`)",
+    "dice_el_sistema": "«O las tres llevan punto, o ninguna»",
+    "hay_en_el_build": "`.p-type::before{content:\"\";width:7px;height:7px;border-radius:999px;flex-shrink:0}` (línea 319) no declara color y `.p-pf{background:var(--surface-2)}` (línea 324) tampoco: el punto de «Persona física» queda transparente pero conserva su hueco de 7 + 6 px; «Agencia» y «Empresa» sí llevan punto (`--serie-2`/`--serie-1`). Con el recorte de la celda el texto queda «Persona físi…» (captura 1440, fila 4).",
+    "selector": ".p-type.p-pf",
+    "linea": 324,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 324,
+     "cita": ".p-pf{background:var(--surface-2)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Una declaración: `.p-type::before{background:var(--text-3)}` por omisión (receta de §6.10)."
+    },
+    "por_que_importa": "El texto de «Persona física» queda desalineado respecto a las otras dos etiquetas: el síntoma que describe §6.10."
+   },
+   {
+    "id": "v2-06padron-13",
+    "severidad": "media",
+    "regla": "§8 Voz de producto",
+    "dice_el_sistema": "«Ningún bloque de texto siempre visible pasa de ~140 caracteres.»",
+    "hay_en_el_build": "La nota bajo la tabla (línea 592) tiene 244 caracteres, cita un documento del proyecto («Plan», sección 3.4) y explica un botón de cabecera: «Regla del sistema: no se puede programar una instalación para una sucursal con datos fiscales incompletos (validación automática, Plan, sección 3.4). El botón «Liga de auto-registro» genera la URL tokenizada…». El instrumento C11 no la revisó (revisados 0).",
+    "selector": "p.note",
+    "linea": 592,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 592,
+     "cita": "validación automática, Plan"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta: borrar la nota; si se conserva la regla, una frase de ≤140 caracteres («Sin datos fiscales completos no se puede programar una instalación.») y el resto a un toggletip (§6.23)."
+    },
+    "por_que_importa": "Es voz de conversación interna (decisión + referencia a un documento) en la pantalla que se usa todos los días; en 1280 px ocupa dos líneas bajo la tabla."
+   },
+   {
+    "id": "v2-06padron-14",
+    "severidad": "media",
+    "regla": "§2 Tipografía (fuentes autoalojadas, D116)",
+    "dice_el_sistema": "«Las fuentes se autoalojan — D116.»",
+    "hay_en_el_build": "Inter y Michroma se piden con `<link href=\"https://fonts.googleapis.com/css2?family=Inter…\">` (líneas 8 y 10) y no hay `@font-face` (barrido: font_face 0). Las fuentes de las capturas se inyectaron al renderizar.",
+    "selector": "head > link",
+    "linea": 10,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 10,
+     "cita": "fonts.googleapis.com/css2?family=Inter"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Sustituir los tres `<link>` por los dos `@font-face` de §2."
+    },
+    "por_que_importa": "Con el CDN caído la pantalla cae a system-ui sin error visible (incidente D116)."
+   },
+   {
+    "id": "v2-06padron-15",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla",
+    "dice_el_sistema": "«El medallón carga el peso visual del icono.»",
+    "hay_en_el_build": "`.state{…padding:56px 16px}` con `.state .ico{width:30px;height:30px;color:var(--text-3)}` (línea 336): glifo gris de 30 px, sin medallón ni tarjeta (`.tarjeta-estado`/`.estado-ico` no existen); título, tres frases y botón sobre el fondo de la zona de contenido (captura propia e_06_padron_clientes.png).",
+    "selector": ".state",
+    "linea": 336,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 336,
+     "cita": ".state .ico{width:30px;height:30px;color:var(--text-3)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Copiar `.tarjeta-estado` + `.estado-ico` de §6.4 alrededor del contenido de `.state-empty`/`.state-error`."
+    },
+    "por_que_importa": "Es la forma exacta de los estados que §6.4 describe de las maquetas del padrón («llegaron así pese a que este apartado ya lo prescribía»). Solo se ve al cambiar de estado."
+   },
+   {
+    "id": "v2-06padron-16",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga (`.skel`)",
+    "dice_el_sistema": "«Y el mismo alto, que es la mitad que se olvida.»",
+    "hay_en_el_build": "El esqueleto mide 201 px frente a los 669 px de la tabla con sus seis filas, el pie y la nota (−468 px, 70 %): cinco filas de barras sin cabecera; cada `.skel` contiene el texto real de la fila («Grupo Automotriz ELEKTRA SA de CV») en `color:transparent` bajo un contenedor `aria-hidden`.",
+    "selector": ".state-loading",
+    "linea": 597,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_esqueleto_alto",
+     "detalle": "scratchpad/lote27b/m_varios2.cjs: `.tablewrap` 669 px; `.state-loading` 201 px"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Seis filas de `min-height:67px` con cabecera de 35 px (receta de §6.7) y sin texto en las barras; añadir `role=\"status\"` con `aria-label`."
+    },
+    "por_que_importa": "Al llegar los datos la pantalla salta casi 470 px; §6.7 mide 291 px del mismo defecto."
+   },
+   {
+    "id": "v2-06padron-17",
+    "severidad": "media",
+    "regla": "§6.11 Tabla densa (regla 5)",
+    "dice_el_sistema": "«Ninguna columna desaparece en silencio.»",
+    "hay_en_el_build": "`@media (max-width:1180px){.col-contacto{display:none}}` (línea 362) y `@media (max-width:980px){.col-fiscal{display:none}}` (línea 363): a 1024 px «Contacto principal» ya no está (el dossier mide 1024 px sin scroll horizontal) y no hay aviso de columnas ocultas ni forma de recuperarlas (el botón «Columnas» no tiene panel).",
+    "selector": ".col-contacto, .col-fiscal",
+    "linea": 362,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 362,
+     "cita": "@media (max-width:1180px){.col-contacto{display:none}}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Aviso «2 columnas ocultas · Columnas» junto al pie, o desplazamiento horizontal."
+    },
+    "por_que_importa": "El contacto principal es el dato para llamar al cliente; en un portátil pequeño desaparece sin que nadie lo avise."
+   },
+   {
+    "id": "v2-06padron-18",
+    "severidad": "baja",
+    "regla": "§6.11 Tabla densa (regla 6)",
+    "dice_el_sistema": "«Si se ofrece densidad, la compacta reduce contenido, no solo espacio.»",
+    "hay_en_el_build": "«Cómoda / Compacta» (línea 455) solo cambia `--row-comfy` de 40 a 32 px (línea 171); la segunda línea de la razón social (RFC) se queda. §6.11 dice que el padrón retiró este control.",
+    "selector": ".seg[aria-label=\"Densidad de la tabla\"]",
+    "linea": 171,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 171,
+     "cita": "[data-density=\"compact\"]{--row-comfy:32px}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Pregunta abierta: ¿se ofrece densidad en el padrón? El sistema la retiró («una preferencia que casi nadie cambia») pero aquí sigue. Si se queda: `[data-density=\"compact\"] .rz small{display:none}` con el RFC en emergente."
+    },
+    "por_que_importa": "Dos botones permanentes que compiten con los filtros que sí se usan a diario."
+   },
+   {
+    "id": "v2-06padron-19",
+    "severidad": "baja",
+    "regla": "§1.7 Regla de contraste",
+    "dice_el_sistema": "«Texto normal 4,5:1 mínimo; texto grande (≥24px, o ≥18,66px en negrita) y elementos gráficos 3:1.»",
+    "hay_en_el_build": "`thead th .sort{opacity:.25;…}` (línea 278): la flecha de orden inactiva de «Sucursales» y «Última orden» mide 1,38:1 (rgb(102,113,127) al 25 % sobre rgb(250,252,253)).",
+    "selector": "thead th .sort",
+    "linea": 278,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_sort_contraste",
+     "detalle": "scratchpad/lote27b/m_otros.cjs 06: color rgb(102,113,127), opacity .25, fondo rgb(250,252,253) → 1,38:1"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Dos lecturas, ver 03: la flecha es la pista de que la columna ordena (si se aplica el criterio 1 a iconos de control sería crítico) o es decorativa porque el texto y `aria-sort` bastan. Se deja no crítico; §6.11 no regula la flecha inactiva: propuesta, `--text-3` a opacidad 1."
+    },
+    "por_que_importa": "Las cabeceras ordenables y las que no lo son se ven casi iguales hasta pasar el cursor."
+   },
+   {
+    "id": "v2-06padron-20",
+    "severidad": "baja",
+    "regla": "D10 del padrón 28-sep (AVISO_A_STUDIO_PADRON_2026-09-28.md, punto 7; FICHAS_TECNICAS.md, «Padrón — decisiones del 28-sep»)",
+    "dice_el_sistema": "Aviso del 28-sep, punto 7: \"Último movimiento vuelve al listado (D10), ocultable desde Columnas. Ustedes la dibujaban; nosotros la habíamos retirado por espacio.\" FICHAS, D10: \"Vuelve Último movimiento\" (con Studio); \"el servidor la calcula por razón social cruzando órdenes y trámites\".",
+    "hay_en_el_build": "La columna se titula «Última orden» (línea 486) y la caption la describe igual («…última orden y estado»); «Columnas» existe (línea 457) pero sin panel que permita ocultarla.",
+    "selector": "th «Última orden»",
+    "linea": 486,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 486,
+     "cita": "<th scope=\"col\" aria-sort=\"none\"><button data-c=\"6\" data-t=\"num\">Última orden"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Pregunta abierta: D10 devuelve «Último movimiento» (órdenes y trámites); la maqueta muestra solo la última orden. Si la maqueta es previa a D10, renombrar la columna y el dato; si se quiere conservar «Última orden», decirlo a DPROMA."
+    },
+    "por_que_importa": "Si el listado llegara a construirse con este rótulo, el dato diferiría del que DPROMA decidió calcular."
+   },
+   {
+    "id": "v2-06padron-21",
+    "severidad": "baja",
+    "regla": "§9 Andamiaje de maqueta",
+    "dice_el_sistema": "«Se marca siempre con data-andamio, va visualmente separado del producto y rotulado»",
+    "hay_en_el_build": "`<aside class=\"demo\" aria-label=\"Controles de la maqueta (no forman parte del producto)\">` (línea 630) sin `data-andamio` (0 coincidencias); `position:fixed` a la derecha: I2 cuenta holgura inferior de 5 px.",
+    "selector": "aside.demo",
+    "linea": 630,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 630,
+     "cita": "<aside class=\"demo\" aria-label=\"Controles de la maqueta"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Añadir `data-andamio`."
+    },
+    "por_que_importa": "Sin la marca no se retira con un selector."
+   },
+   {
+    "id": "v2-06padron-22",
+    "severidad": "baja",
+    "regla": "§6.2 Botones (`.btn`, `.btn.p`, `.btn.mini`)",
+    "dice_el_sistema": "«Y el suelo hay que declararlo, no confiarlo al relleno.»",
+    "hay_en_el_build": "`.btn{…padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);…}` (líneas 213-215) sin `min-height`: «Exportar», «Liga de auto-registro», «Columnas» y «Nuevo cliente» miden 34 px (suelo 36 px).",
+    "selector": ".btn",
+    "linea": 213,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_fuentes_lt12",
+     "detalle": "scratchpad/lote27b/m_fuentes.cjs 06: button.btn 34×101, 34×179, 34×110; button.btn.p 34×133"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. `min-height:36px`."
+    },
+    "por_que_importa": "Mismo error de 35 px que §6.2 midió en el padrón; aquí son 34."
+   },
+   {
+    "id": "v2-06padron-23",
+    "severidad": "baja",
+    "regla": "§3 Espaciado y radios",
+    "dice_el_sistema": "«Escala base de 4px.»",
+    "hay_en_el_build": "I5: 7 valores fuera de la escala y 208 ocurrencias (6px×84, 3px×44, 5px×34, 10px×20, 9px×14, 7px×6, 14px×6) y 1 interlineado distinto.",
+    "selector": ".act, .selbar, .schip …",
+    "linea": 298,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I5_ritmo",
+     "detalle": "dossier: valoresFueraDeEscala 7, ocurrencias 208, top 6px×84, 3px×44, 5px×34, 10px×20, 9px×14, 7px×6, 14px×6"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Candidato del instrumento. 6 px (84 usos: `gap:6px` de `.act`, relleno de `.schip`) es el valor dominante fuera de escala; decidir token de 6 px o ajuste a 4/8."
+    },
+    "por_que_importa": "Ritmo irregular; sin consecuencia funcional."
+   },
+   {
+    "id": "v2-06padron-24",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (excepción del 10,5 px)",
+    "dice_el_sistema": "«Se admite una excepción, y solo una: 10,5px en mayúsculas con letter-spacing para los rótulos de grupo de la barra lateral»",
+    "hay_en_el_build": "`.grp{…font-size:10.5px;…letter-spacing:.1em…}` (línea 199) sin `text-transform:uppercase`: «Operación», «Gestoría», «Comercial» salen en mayúscula inicial. C2: 4 fallos (3 `p.grp` y el rótulo «Estado de los datos» del andamio).",
+    "selector": "p.grp",
+    "linea": 199,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "dossier: fallos 4: p.grp «Operación», «Gestoría», «Comercial»; span «Estado de los datos»"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. `text-transform:uppercase` en `.grp`."
+    },
+    "por_que_importa": "El cromo se copia a todas las pantallas."
+   },
+   {
+    "id": "v2-06padron-25",
+    "severidad": "baja",
+    "regla": "§1.4 Series de gráfica",
+    "dice_el_sistema": "«Los dos colores anteriores no se distinguían entre sí.»",
+    "hay_en_el_build": "`--serie-1: #2C6CA8;` (línea 100) y `--serie-2: #7A5FA8;` (línea 101) son el par que 2.15.0 sustituyó, y en la columna «Tipo» conviven como los dos tintes de `.p-emp` y `.p-agn` (líneas 320-323). El texto «Agencia»/«Empresa» acompaña a cada punto, así que el color no es el único canal.",
+    "selector": ".p-emp, .p-agn",
+    "linea": 100,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 100,
+     "cita": "--serie-1: #2C6CA8;"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Adoptar `--serie-1:#2a78d6` y `--serie-2:#eb6834` (2.15.0); es cambio de dos tokens. Los valores de los tokens los inyecta el orquestador en f2."
+    },
+    "por_que_importa": "ΔE de 10,0 en visión normal y 1,1 en protanopia entre ambos (medido por el sistema): dos tintes casi iguales para dos tipos de cliente."
+   },
+   {
+    "id": "v2-06padron-26",
+    "severidad": "baja",
+    "regla": "§7.2 Cromo de aplicación",
+    "dice_el_sistema": "«Tres anchos: completa (≥1100px), colapsada a solo iconos (860–1100px) y cajón con velo»",
+    "hay_en_el_build": "A 800 px el `nav.side` sigue en 224 px (`main` 576 px) y a 390 px `main` mide 166 px; solo se ocultan columnas de la tabla (líneas 362-363). Sin scroll de página en ninguno de los dos. Mediciones propias fuera de los tres anchos del dossier.",
+    "selector": "nav.side",
+    "linea": 362,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_responsive",
+     "detalle": "scratchpad/lote27b/m_resp.cjs: 06 a 800 px side 224, main 576; a 390 px main 166, scrollW 390"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Aplicar el patrón de iconos a ≤1100 px y cajón a ≤860 px de 30."
+    },
+    "por_que_importa": "Pantalla de escritorio; en tableta vertical el contenido útil se reduce."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 1,
+   "integridad": 2
+  },
+  "justificacion": "Estructura de tabla densa sólida (caption, `th scope=row`, `aria-sort`, etiqueta con `for` en el buscador, `aria-label` en cada casilla y botón). Pero la pantalla dibuja una función que DPROMA rechazó (D6), tiene cuatro fallos críticos medidos (icono de «Reintentar», casillas de 15 px, acciones de selección de 16 px y la propia D6), recorta el estado y el tipo del cliente a 1440 px, y conserva casi todos los defectos del padrón que el sistema ya describe (filtro «Todos» resaltado, contador duplicado, tercer icono variable, hover sin `th`, nota con la cita «Plan», sección 3.4).",
+  "evidencia": [
+   "06_padron_clientes--1440.png",
+   "06_padron_clientes--1280-fold.png",
+   "tactil_bajo24",
+   "I3_recorte",
+   "I1_icono_vs_boton",
+   "propio_fuentes_lt12"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Botón flotante del asistente D-PRIMI (`.fab`) sobre la zona de paginación",
+   "propuesta_de_regla": "El asistente flotante vive en la esquina inferior derecha; las pantallas con paginación a la derecha reservan 96 px inferiores. En 06 el pie de la tabla queda libre (medido: 0 solapes a 1440 y 1280)."
+  },
+  {
+   "patron": "Tipo de cliente como tinte de serie con punto (`.p-type`) y nombre de la persona en la razón social (persona física) sin sucursales",
+   "propuesta_de_regla": "La persona física se muestra con el mismo `.p-type` neutro (punto `--text-3`) que las otras clasificaciones; nunca sin punto (ver hallazgo v2-06padron-12)."
+  }
+ ],
+ "sin_datos": [
+  "No hay texto del PDF del cliente para 06 (no listado en el PDF): no se contrastó contra C1–C18.",
+  "Botón de cabecera «Liga de auto-registro»: no se dispone del dictamen 2894 (punto 15); el aviso solo nombra «Reenviar liga de registro». Si el dictamen cubre también el botón de cabecera, la nota de la línea 592 y el botón de la 424 caen en el mismo hallazgo crítico.",
+  "D7 (vigencia de documentos), D8 (duplicados) y D1 (el alta es una página): la maqueta no dibuja vigencia, duplicados ni diálogo de alta; sin desajuste evidente que reportar. «Nuevo cliente» no navega en la maqueta (no se puede comprobar D1).",
+  "La confirmación de «Desactivar» y el «Deshacer» (§6.13 reglas 3 y 4) no están dibujados: es un enlace `href=\"#\"` sin flujo; no se puede evaluar si hay protección (criterio 3 de la regla 1).",
+  "Falso positivo conocido: el `input` de búsqueda mide 329×16 px (dossier), pero está dentro de `<label class=\"search\" for=\"buscar\">` de ~34 px de alto, que es el destino pulsable (§10): no se reporta.",
+  "Vista Vacío y Error revisadas por captura propia; teclado, foco y lector de pantalla no se probaron.",
+  "Rendimiento no evaluado. Tema oscuro medido con el instrumento de contraste: 0 fallos en 101 nodos."
+ ]
+}

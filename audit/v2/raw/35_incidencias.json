@@ -1,0 +1,401 @@
+{
+  "pantalla": "35_incidencias",
+  "tier": "B",
+  "modo": "cumplimiento",
+  "sha256": "df39bee75861862399b51c9c3cf5d4a52b97db57ae10c3188c2910f2875425cd",
+  "estado_vs_pdf": "alineado",
+  "estados_auditados": [
+    "con datos",
+    "cargando",
+    "vacío",
+    "error"
+  ],
+  "capturas": [
+    "35_incidencias--1280-fold.png",
+    "35_incidencias--1440.png"
+  ],
+  "observaciones_resueltas": [],
+  "f1_cumplimiento": {
+    "veredicto": "no_cumple",
+    "hallazgos": [
+      {
+        "id": "v2-35incid-01",
+        "severidad": "alta",
+        "regla": "§7.2 Cromo de aplicación",
+        "dice_el_sistema": "En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+        "hay_en_el_build": "A 1000 px el menú mide 64 px y sus 15 enlaces quedan sin nombre accesible (menu_1000px: total 15, sinNombre 15). `.side .et,.grp,.side .wordmark{display:none}` saca el texto del árbol de accesibilidad y los `<a class=\"it\">` no llevan `title` ni `aria-label` (aud5-medir2.cjs: conTitle 0).",
+        "selector": ".side .et",
+        "linea": 293,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "sidebar",
+          "detalle": "dossier: hayMenu true, total 15, sinNombre 15, anchoSide 64; reproducido con aud5-medir2.cjs a 1000x800 (nombre accesible = aria-label, texto no oculto o title): 15 de 15 vacíos"
+        },
+        "critico": {
+          "es": true,
+          "criterio": "1 · control sin nombre accesible (15 enlaces de navegación con el menú colapsado)"
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Es el criterio 1 de la Regla 1 (control sin nombre accesible). Arreglo de una línea: dejar el rótulo en el DOM con la clase `.sr` en lugar de `display:none` en `.et` (o `aria-label`/`title` en cada `.it`), que es lo que §7.2 pide con la «etiqueta emergente»."
+        },
+        "por_que_importa": "Entre 860 y 1100 px (portátil con la ventana a medias, tableta en horizontal) quien usa lector de pantalla o conmutador oye «enlace» quince veces sin saber a dónde lleva ninguno, y quien ve solo iconos no recibe la etiqueta emergente que §7.2 exige. Mismo bloque de cromo en 33, 35, 36 y 37."
+      },
+      {
+        "id": "v2-35incid-02",
+        "severidad": "alta",
+        "regla": "§10 Diez trampas comprobadas",
+        "dice_el_sistema": "con forma de pastilla **no** cumple, porque pulsar la pastilla",
+        "hay_en_el_build": "El buscador es `<div class=\"search\">` (no una `<label>`) que contiene un `<input type=\"search\">` de 16 px de alto: el destino real mide 16 px (tactil_bajo24: input «Buscar…» h 16). La pastilla mide 34 px pero pulsarla fuera del texto no enfoca el campo (enLabel: false).",
+        "selector": "div.search > input",
+        "linea": 677,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 677,
+          "cita": "<div class=\"search\"><svg class=\"ico ico-sm\" aria-hidden=\"true\"><use href=\"#i-search\"/></svg><input id=\"buscar\" type=\"search\""
+        },
+        "critico": {
+          "es": true,
+          "criterio": "1 · destino táctil < 24 px (el campo de búsqueda mide 16 px y su contenedor no es una etiqueta)"
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Criterio 1 (destino táctil < 24 px). Arreglo: `<label class=\"search\">` en lugar de `<div>` (o `min-height:24px` en el input), tal como §10 lo describe. Cambio de una etiqueta."
+        },
+        "por_que_importa": "Quien pulsa el borde o la lupa del buscador no recibe foco y cree que el campo no responde; con ratón en pantalla táctil el destino real es una franja de 16 px."
+      },
+      {
+        "id": "v2-35incid-03",
+        "severidad": "alta",
+        "regla": "§7.3 Objetivos táctiles",
+        "dice_el_sistema": "llevan padding hasta llegar a 24px",
+        "hay_en_el_build": "Los seis folios (`a.folio`, «IN-2026-00312» …) miden 16 px de alto: `.folio` no declara altura mínima (tactil_bajo24: 6 folios h 16). Los enlaces de orden (`a.lnk`) miden 48 px solo porque «ORD-202608-0388» se parte en tres líneas.",
+        "selector": "a.folio",
+        "linea": 386,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "tactil_bajo24",
+          "detalle": "dossier: total 50, bajo24 7 (6 a.folio 104x16 y el input de búsqueda); aud5-medir2.cjs: a.folio h 16"
+        },
+        "critico": {
+          "es": true,
+          "criterio": "1 · destino táctil < 24 px (6 folios de 16 px de alto)"
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Criterio 1 (destino táctil < 24 px). Arreglo: `display:inline-flex;align-items:center;min-height:24px` en `.folio`, como ya hace 37_concluidos (línea 384). Lectura 2: WCAG 2.5.8 admite el destino menor cuando no hay otro a menos de 24 px (las filas están a 65 px); §7.3 nombra el folio expresamente y la Regla 1 fija 24 px. Si se aplica §6.11 regla 11 (la fila entera navega, v2-35incid-06) el folio deja de ser un destino separado."
+        },
+        "por_que_importa": "El folio es la entrada principal a la incidencia; a 16 px de alto exige precisión y es lo primero que se pulsa en la lista."
+      },
+      {
+        "id": "v2-35incid-04",
+        "severidad": "alta",
+        "regla": "§1.1 Superficies y texto",
+        "dice_el_sistema": "para el control cuya única frontera visible es el borde",
+        "hay_en_el_build": "`.search{background:var(--bg);border:1px solid var(--border)...}`: la frontera del buscador mide 1,40:1 en claro y 1,24:1 en oscuro contra la superficie (el relleno `--bg` 1,06:1). `--border-ctrl` está declarado (línea 95) y no se usa.",
+        "selector": "div.search",
+        "linea": 336,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 336,
+          "cita": "border:1px solid var(--border);border-radius:var(--r-pill);padding:8px 14px;color:var(--text-3)}"
+        },
+        "critico": {
+          "es": true,
+          "criterio": "1 · contraste < 3:1 en controles (frontera del buscador 1,40:1 claro, 1,24:1 oscuro)"
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Criterio 1 (contraste < 3:1 en controles). `border:1px solid var(--border-ctrl)` (3,06:1). Lectura 2: es la receta de buscador que traía el paquete anterior y el propio §1.7 muestra el `.search` con otro borde solo en foco; pero §1.1 define `--border-ctrl` precisamente para este caso."
+        },
+        "por_que_importa": "El buscador es el control con el que se acota la tabla y su frontera se pierde contra la barra de filtros; con poco contraste de pantalla no se ve dónde escribir."
+      },
+      {
+        "id": "v2-35incid-05",
+        "severidad": "alta",
+        "regla": "§6.11 Tabla densa",
+        "dice_el_sistema": "**La cabecera no se corta.**",
+        "hay_en_el_build": "La tabla necesita 1207 px (`.inc table{min-width:1120px}` y contenido) y a 1280 px la caja mide 1044: la columna «Días hasta el cierre» sale cortada («DÍAS HASTA EL CIERR») y el botón «Ver incidencia» queda del todo fuera (borde derecho a 1427 px con la caja acabando en 1280). Dossier: scroll-x de `div.tabla-caja` dx 163 a 1280 px, 247 a 1024 y 3 incluso a 1440. A 1366 px (portátil habitual) faltan 77 px.",
+        "selector": ".inc table",
+        "linea": 642,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "anchos_1440_1280_1024",
+          "detalle": "dossier: div.tabla-caja scroll-x 1280 dx 163, 1024 dx 247, 1440 dx 3; aud5-medir2.cjs a 1280: cw 1044, sw 1207, botón «Ver incidencia» right 1427; capturas 35_incidencias--1280-fold.png (cabecera y acciones cortadas)"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "No es crítico: la fila se alcanza por el folio y hay desplazamiento horizontal (lectura 2: §6.11 regla 5 admite el scroll cuando no hay aviso de columnas ocultas). Solución concreta: retirar el botón «Ver incidencia» que repite el folio (v2-35incid-06): la tabla pasa de 1207 a unos 1071 px (columna de acciones medida en 136 px), cabe a 1366 px y a 1280 px quedan por recuperar unos 27 px (p. ej. dejar que «Cliente» ceda ancho) además de bajar `min-width`."
+        },
+        "por_que_importa": "A 1280 px (y 1366 px) quien revisa incidencias no ve los días hasta el cierre ni el botón de abrir sin desplazar la tabla; el dato por el que existe la pantalla («días hasta el cierre», vacío frente a cero, decisión documentada en la FICHA) queda en el borde de la tabla, sin aviso."
+      },
+      {
+        "id": "v2-35incid-06",
+        "severidad": "media",
+        "regla": "§6.11 Tabla densa",
+        "dice_el_sistema": "Si la fila entera navega, nada más dentro de ella repite esa acción.",
+        "hay_en_el_build": "Cada fila lleva el folio como `<a class=\"folio\">` y, además, un botón «Ver incidencia» que abre lo mismo; la fila no es clicable. Es la octava columna y la que fuerza el ancho de v2-35incid-05.",
+        "selector": "button.btn.mini «Ver incidencia»",
+        "linea": 692,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 692,
+          "cita": "<td data-et=\"Acciones\"><div class=\"acciones\"><button class=\"btn mini\" type=\"button\">Ver incidencia</button></div></td>"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Propuesta: hacer clicable la fila (`cursor:pointer`, `tabindex`, Enter), dejar el folio en texto y quitar el botón (§6.11 reglas 10 y 11). Resuelve casi del todo el ancho (v2-35incid-05) y el destino táctil del folio (v2-35incid-03). Es una decisión de producto abierta, no un defecto exigible."
+        },
+        "por_que_importa": "Dos caminos para lo mismo hacen preguntarse si abren cosas distintas y ocupan el espacio que la columna de días necesita."
+      },
+      {
+        "id": "v2-35incid-07",
+        "severidad": "media",
+        "regla": "§6.12 Resumen de estatus y barra de filtros",
+        "dice_el_sistema": "**El orden fijo es resumen → buscador + filtros en una sola fila → tabla.**",
+        "hay_en_el_build": "El buscador va solo en su fila (`.p4-b`) y las cuatro pastillas de severidad/estado en otra (`.p4-f`): tres bandas de cabecera (título, búsqueda, chips) antes de la tabla, a 135 y 181 px en la captura.",
+        "selector": ".p4-b, .p4-f",
+        "linea": 677,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 677,
+          "cita": "<div class=\"p4-b\"><div class=\"search\">"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "§13.1 pide buscador y filtros en la misma fila. Propuesta: fundir `.p4-b` y `.p4-f` en una fila (buscador `flex:1;min-width:200px` y las pastillas a su lado). Es ARQ-P4, el bloque de cabecera que 35 y 37 comparten."
+        },
+        "por_que_importa": "La pantalla gasta tres filas de cabecera antes del primer dato y el buscador flota sin relación visible con los filtros."
+      },
+      {
+        "id": "v2-35incid-08",
+        "severidad": "media",
+        "regla": "§6.12 Resumen de estatus y barra de filtros",
+        "dice_el_sistema": "**Un control con pinta de interactivo tiene que interactuar.**",
+        "hay_en_el_build": "Las cuatro pastillas `.schip` llevan `aria-pressed=\"false\"` y `data-f`, pero el único script del archivo (líneas 767–804) solo conecta el conmutador de estados, el tema y el menú: pulsarlas no filtra ni cambia nada. Tampoco responde «Cómoda»/«Compacta».",
+        "selector": "button.schip, .seg button",
+        "linea": 678,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 678,
+          "cita": "<button class=\"schip c-err\" type=\"button\" aria-pressed=\"false\" data-f=\"err\">"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Dos salidas, ambas de §6.12 regla 8: o se conecta el filtrado, o en esta maqueta se presentan como cifras de lectura sin `aria-pressed` ni cursor de puntero."
+        },
+        "por_que_importa": "Quien prueba la maqueta pulsa «1 críticas» esperando que la tabla se acote y no pasa nada: el control miente por forma."
+      },
+      {
+        "id": "v2-35incid-09",
+        "severidad": "media",
+        "regla": "§6.11 Tabla densa",
+        "dice_el_sistema": "**Y la primera pregunta es si hace falta ofrecerla.**",
+        "hay_en_el_build": "La pantalla ofrece «Cómoda/Compacta». La regla `.denso` solo baja la altura de fila a `--row-compact`, sin reducir contenido, y no se aplica a ninguna tabla (código muerto).",
+        "selector": ".denso, .seg",
+        "linea": 385,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 385,
+          "cita": ".denso tbody th,.denso td{height:var(--row-compact);padding:var(--sp-1) var(--sp-4);font-size:var(--fs-dense)}"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "§6.11 regla 6: la compacta debe reducir contenido (segunda línea a tooltip) o no ofrecerse; el padrón la retiró. Propuesta: retirar el conmutador de densidad; con seis filas por página no aporta."
+        },
+        "por_que_importa": "Dos botones permanentes para una preferencia que casi nadie cambia compiten por atención con los filtros y, en el estado actual, no hacen nada."
+      },
+      {
+        "id": "v2-35incid-10",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado de una pantalla",
+        "dice_el_sistema": "**El estado va dentro de una tarjeta, no suelto sobre el fondo.**",
+        "hay_en_el_build": "Las vistas vacío y error son un `<div class=\"state state-empty\">` con un glifo de 30 px sobre el fondo, sin `.tarjeta-estado` ni medallón (grep: 0). El icono sí respeta el arreglo `.state > .ico` (línea 613): los botones heredan color.",
+        "selector": ".state-empty, .state-error",
+        "linea": 744,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 744,
+          "cita": "<div class=\"state state-empty\">"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Se adopta como está y se documenta: el bloque ARQ-ESTADOS del lote no usa tarjeta ni medallón en ninguna de las cuatro pantallas. Si el sistema decide imponerlo (§6.4), se aplica al bloque común, no pantalla por pantalla."
+        },
+        "por_que_importa": "Un mensaje centrado sin superficie se lee como una pantalla sin terminar, aunque el texto («No hay incidencias abiertas» y a dónde ir) sea bueno."
+      },
+      {
+        "id": "v2-35incid-11",
+        "severidad": "baja",
+        "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional",
+        "dice_el_sistema": ".p4{ padding-bottom: var(--sp-3) }",
+        "hay_en_el_build": "`.p4` no declara relleno inferior: hoy cierra gracias a que `.p4-f` lleva `padding:var(--sp-3) var(--sp-6)` (I2 no marca la cabecera), pero si se retiran los chips queda a 0 px, el caso que §3.1 describe.",
+        "selector": ".p4",
+        "linea": 313,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 313,
+          "cita": ".p4{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Latente: añadir `padding-bottom:var(--sp-3)` a `.p4` cuando se toque el bloque (y retirarlo de `.p4-f`)."
+        },
+        "por_que_importa": "Sin consecuencia visible hoy; se rompe en silencio el día que la fila de chips se retire."
+      },
+      {
+        "id": "v2-35incid-12",
+        "severidad": "alta",
+        "regla": "§10 Diez trampas comprobadas",
+        "dice_el_sistema": "Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.",
+        "hay_en_el_build": "El isotipo del cromo y el del botón flotante se escriben con `viewBox=\"740 0 970 932\"` en el `<svg>` y un `<use href=\"#dproma-mark\"/>` sin medidas. Medido: el `<use>` queda desplazado -32,5 px (logo 44x42) y -16,2 px (botón flotante 22x21) respecto de su `<svg>`; en las capturas la marca sale como una astilla verde recortada, no como la Λ.",
+        "selector": ".side .logo svg",
+        "linea": 663,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 663,
+          "cita": "<div class=\"logo\"><svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "No es decisión de producto sino un defecto de copia del cromo (ARQ-CROMO). Lo corregimos nosotros al integrar: quitar `viewBox` del `<svg>` y poner `width`/`height` en el `<use>`, tal como §10 lo escribe. Medición: aud5-medir2.cjs (caja del `<use>` contra la del `<svg>`)."
+        },
+        "por_que_importa": "La marca es lo primero que ve cualquiera en el cromo y está en las cinco pantallas de este lote (en 07 está bien escrita, con medidas en el `<use>`). Con la marca recortada la pantalla se lee como inacabada y §1.2.1 (nunca una aproximación del isotipo) deja de cumplirse sin que nadie lo decida. Mismo bloque en 33, 35, 36 y 37."
+      },
+      {
+        "id": "v2-35incid-13",
+        "severidad": "baja",
+        "regla": "§2.1 El suelo son 12px",
+        "dice_el_sistema": "Se admite una excepción, y solo una: 10,5px en mayúsculas con `letter-spacing` para los",
+        "hay_en_el_build": "Los rótulos de grupo del menú (`p.grp`) van a 10,5 px sin `text-transform:uppercase` (se ven «Principal», «Operación», no en mayúsculas). Instrumento C2_105_no_mayusculas: 5 elementos.",
+        "selector": "p.grp",
+        "linea": 240,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "C2_105_no_mayusculas",
+          "detalle": "dossier: p.grp a 10,5 px con texto no en mayúsculas; confirmado en aud5-medir.cjs (font-size 10,5 px, text-transform none)"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "La causa raíz es nuestra: el CSS de `.grp` que §7.2 publica tampoco lleva `text-transform:uppercase`, así que el cliente copió lo documentado. O §7.2 añade las mayúsculas, o §2.1 admite 10,5 px también sin ellas (o se sube a 12 px). Se decide una vez en el sistema."
+        },
+        "por_que_importa": "Cinco o seis rótulos por pantalla bajo el suelo de 12 px que §2.1 declara sin excepción más que la de las mayúsculas; no afecta a la lectura de datos, pero la inconsistencia entre §2.1 y §7.2 la heredan todas las pantallas con cromo."
+      },
+      {
+        "id": "v2-35incid-14",
+        "severidad": "baja",
+        "regla": "§6.5 Iconos (`.msi`)",
+        "dice_el_sistema": "Si un icono va sin texto visible, lleva **como mínimo** etiqueta emergente y `aria-label`:",
+        "hay_en_el_build": "El botón «Exportar» de la cabecera y los de tema y menú son solo icono. Llevan `aria-label` pero ningún `title`.",
+        "selector": "button.iconbtn",
+        "linea": 676,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 676,
+          "cita": "<button class=\"iconbtn\" type=\"button\" aria-label=\"Exportar\">"
+        },
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "Añadir `title` con el mismo texto del `aria-label`. Cambio mecánico que hacemos nosotros; el nombre accesible ya existe, solo falta la etiqueta emergente para quien ve."
+        },
+        "por_que_importa": "Quien ve el icono pero no lo reconoce (descarga, tema, menú) no tiene etiqueta emergente que se lo diga; el nombre accesible sí está, así que no bloquea."
+      }
+    ]
+  },
+  "cerrados_desde_v1": [],
+  "f3_boost_ui": {
+    "puntuacion": 3,
+    "dimensiones": {
+      "accesibilidad": 2,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 2,
+      "integridad": 3
+    },
+    "justificacion": "Archivo alineado con el PDF (C1 a C10 confirmados, `--text-3` y `.state > .ico` correctos, `.folio` sin color de enlace), con la decisión de producto bien resuelta (vacío frente a cero). Lo resta: menú sin nombre, buscador bajo 24 px y a 1,4:1 de frontera, folio de 16 px, tabla más ancha que el área a 1280/1366 px y marca recortada.",
+    "evidencia": [
+      "dossier: contraste 0 fallos claro/oscuro, menú sinNombre 15, táctil bajo24 7",
+      "aud5-medir.cjs: sin textos bajo 12 px fuera del rótulo de grupo",
+      "dossier anchos: scroll-x de la tabla a 1280 (dx 163) y 1440 (dx 3)",
+      "aud5-medir2.cjs: marca dx -32,5"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado"
+  },
+  "cobertura": [
+    {
+      "patron": "Severidad en cuatro formas (`.sev`: triángulo, punto, raya, anillo) con texto, distinta del semáforo de estado de la columna vecina.",
+      "propuesta_de_regla": "La severidad y el estado no comparten forma: la severidad usa glifo geométrico + texto en `--fs-meta`, el estado usa `.pill` con icono; las cuatro formas son la única convención de prioridad del sistema."
+    },
+    {
+      "patron": "Columna numérica donde vacío y cero significan cosas distintas («Días hasta el cierre»: «—» mientras está abierta, 0 si se cerró el mismo día).",
+      "propuesta_de_regla": "Una cifra que puede no existir se muestra vacía («—»), nunca con cero; el cero se reserva para «ocurrió y valió cero» y se explica en el encabezado de la columna con un toggletip."
+    }
+  ],
+  "sin_datos": [
+    "Rendimiento: no evaluado (no hay trazas de carga ni peso real; las fuentes se inyectan al renderizar).",
+    "Estados de foco, orden de tabulación y comportamiento con teclado: no recorridos; solo se evaluó lo medible estáticamente.",
+    "Falsos positivos descartados del dossier: I3 recorte en `main`, `caption` y `.sr` (scroll del shell y texto solo para lector de pantalla); I2 gap 6,5 px en celdas `td` con un control.",
+    "I5 ritmo vertical (valores 5, 6, 7, 9, 10 px fuera de escala): sin § del sistema que fije una tolerancia ni decisión del cliente que lo contradiga; no se convierte en hallazgo.",
+    "tokens_valores_divergentes de --ok-ink/--warn-ink/--err-ink/--block-ink/--pause-ink y sus -bg: el 'canónico' del dossier no tiene respaldo en el texto de §1.3; los valores declarados por el cliente reproducen exactamente los contrastes documentados en §1.3 (ok 5,04:1; warn 5,25:1; err 5,02:1; block 5,41:1; pause 6,30:1, medidos con la fórmula de §1.7), así que no se cuentan como divergencia.",
+    "Significado de los códigos C1-C18 del PDF: no se dispone del PDF; solo se usa el estado alineado/NO_ALINEADO del dossier.",
+    "No se midió el estado compacto: el conmutador no hace nada en la maqueta."
+  ]
+}

@@ -1,0 +1,530 @@
+{
+ "pantalla": "03_kanban_gestoria",
+ "tier": "B",
+ "modo": "cumplimiento",
+ "sha256": "65903f758b6fb5bf65d502b31f933b55d730b26426305af675db643176703f7a",
+ "estado_vs_pdf": "no_listado_en_pdf",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error",
+  "kanban"
+ ],
+ "capturas": [
+  "03_kanban_gestoria--1440.png",
+  "03_kanban_gestoria--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-03kanban-01",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado de una pantalla (regla 6) y §1.4.1 Tinta sobre relleno sólido de color",
+    "dice_el_sistema": "«El selector correcto es .state > .ico (hijo directo)»",
+    "hay_en_el_build": "El selector descendiente `.state .ico{width:30px;height:30px;color:var(--text-3)}` (línea 237) tiñe también el icono de «Reintentar» (`button.btn.p` dentro de `.state-error`): rgb(102,113,127) sobre el botón verde rgb(62,122,76) = 1,03:1; el texto del mismo botón es rgb(247,250,249). Sale en la vista Error.",
+    "selector": ".state .ico",
+    "linea": 237,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I1_icono_vs_boton",
+     "detalle": "dossier: fallos 1, button.btn.p «Reintentar», colorIcono rgb(102,113,127), colorTexto rgb(247,250,249), fondo rgb(62,122,76), ratio 1.03. Reproducido con scratchpad/lote27b/cap.cjs (data-state=error, estilo calculado del icono)"
+    },
+    "critico": {
+     "es": true,
+     "criterio": "Falla de accesibilidad medida: contraste <3:1 en un control (icono de «Reintentar» a 1,03:1)"
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Cambiar el selector por `.state > .ico{…}` (línea 237). Un selector, sin tocar el markup; es el arreglo ya documentado en §6.4 regla 6."
+    },
+    "por_que_importa": "En el estado de error el botón de recuperación pierde su icono (anillo gris sobre verde). Lectura alternativa: el icono es redundante y el botón conserva texto (4,89:1) y nombre; el criterio 1 del proyecto cuenta el icono de un control bajo 3:1. Mismo bloque de estados que 02, 06 y 30."
+   },
+   {
+    "id": "v2-03kanban-02",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles",
+    "dice_el_sistema": "«llevan padding hasta llegar a 24px»",
+    "hay_en_el_build": "17 de 50 destinos miden menos de 24 px de alto: los 12 folios `a.lnk` (123–124 × 16 px; `.lnk` sin padding ni `min-height`, línea 170) y los 4 botones de orden de cabecera «Folio», «Trámite», «Semáforo», «Compromiso» (62–110 × 20 px; `padding:3px 5px;margin:-3px -5px`, línea 156) más 1. El propio §7.3 nombra los dos casos: el folio de la fila y el botón de orden de la cabecera.",
+    "selector": "thead th button, tbody th a.lnk",
+    "linea": 170,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil_bajo24",
+     "detalle": "dossier: total 50, bajo24 17; muestra button «Folio» 62.2×20, «Trámite» 80.1×20, «Semáforo» 93.6×20, «Compromiso» 110.3×20; a.lnk «TRM-202606-0798» 123.7×16 … (12 folios 16 px)"
+    },
+    "critico": {
+     "es": true,
+     "criterio": "Falla de accesibilidad medida: destino táctil <24 px (folios a 16 px, botones de orden a 20 px)"
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Solución mínima: `.lnk{display:inline-flex;align-items:center;min-height:24px}` y `thead th button{min-height:24px}` (quitar el margen negativo). Solución de raíz que además resuelve la regla 10 de §6.11: hacer pulsable la fila entera y quitar el color de enlace del folio."
+    },
+    "por_que_importa": "Es la columna de identificación y el control de orden de la tabla principal. Lectura alternativa: WCAG 2.5.8 admite destinos menores si el espaciado compensa (filas de 40 px) y el folio es un enlace en línea; el criterio 1 del proyecto y §7.3 no hacen esa excepción para el folio de fila."
+   },
+   {
+    "id": "v2-03kanban-03",
+    "severidad": "alta",
+    "regla": "§6.11 Tabla densa (regla 2: la primera celda identifica al registro; regla 4: la cabecera no se corta)",
+    "dice_el_sistema": "«es la que identifica al registro»",
+    "hay_en_el_build": "A 1280 px la columna Folio se dibuja con `<col style=\"width:13%\">` (línea 373) y el folio se corta con puntos suspensivos: «TRM-202606-0…», «TRM-202607-0…», perdiendo los tres últimos dígitos que distinguen un trámite de otro (captura 1280-fold, columna FOLIO). El dossier mide el recorte: celdas `th` con dx 11 px y ancho 137 px (`oculto: true`). A 1440 (ancho 158 px) cabe.",
+    "selector": "tbody th (columna Folio)",
+    "linea": 373,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "captura",
+     "archivo": "03_kanban_gestoria--1280-fold.png",
+     "region": "columna FOLIO de la tabla: los doce folios terminan en «-0…» y varios son indistinguibles entre sí (TRM-202606-0…, TRM-202607-0…)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Ninguna regla de §6.11 dice que el identificador no se trunca (la regla 8 solo pide el nombre completo en emergente). Propuesta de regla para el sistema (ver cobertura): el identificador de fila se dimensiona por su contenido (`width:max-content` o `ch`), nunca en %. Para el cliente: `<col style=\"width:15%\">` o `min-width:128px` en la primera columna a 1280 px."
+    },
+    "por_que_importa": "El folio es lo que se copia, se dicta por teléfono y se busca; recortado a 12 de 15 caracteres obliga a abrir el trámite para saber cuál es. La pantalla funciona (el enlace sigue activo), por eso no es crítico."
+   },
+   {
+    "id": "v2-03kanban-04",
+    "severidad": "alta",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "«Nada baja de ahí.»",
+    "hay_en_el_build": "42 nodos de texto visibles bajo 12 px (estilo calculado): 24 a 11 px (las 17 pastillas `.sla` de semáforo y las 7 cabeceras de tabla), 12 iniciales de avatar `.avatar` a 9 px (línea 169), 3 a 11,5 px (pie `.leg`) y 3 a 10,5 px (`.grp`, wordmark). Hay además 11 px en `.card .fol`, `.col-h .c` y `.card .foot` de la vista Kanban.",
+    "selector": ".sla, thead th, .avatar, .leg",
+    "linea": 182,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_fuentes_lt12",
+     "detalle": "scratchpad/lote27b/m_fuentes.cjs 03_kanban_gestoria: 42 nodos <12 px (24 a 11, 12 a 9, 3 a 10.5, 3 a 11.5). El dossier no trae lt12 para 03 (no listado en el PDF)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta de pocas líneas: `.sla` y `thead th` a `var(--fs-meta)`, avatar a 12 px (o `--fs-meta` con 24 px de círculo) y las leyendas a 12 px. Son los dos componentes que §2.1 cita por nombre: las etiquetas de estado y las cabeceras de tabla."
+    },
+    "por_que_importa": "Las pastillas de semáforo son lo primero que se escanea en la tabla y están a 11 px; los avatares a 9 px duplican el nombre que ya se lee al lado."
+   },
+   {
+    "id": "v2-03kanban-05",
+    "severidad": "media",
+    "regla": "§6.12 Resumen de estatus y barra de filtros (reglas 1 y 5; §6.21)",
+    "dice_el_sistema": "«Un filtro se resalta solo si su valor difiere del predeterminado.»",
+    "hay_en_el_build": "Los tres desplegables `button.f` («Ciudad: Todas», «Tipo: Todos», «Responsable: Todos») alternan `aria-pressed` con cada clic (línea 717) y `.f[aria-pressed=\"true\"]` los pinta con borde `--accent` y fondo `--accent-soft` (línea 142): medido, tras pulsar «Ciudad: Todas» queda resaltado con borde rgb(62,122,76) y el valor sigue siendo «Todas». No llevan flecha ni abren panel.",
+    "selector": "button.f",
+    "linea": 142,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_filtros_clic",
+     "detalle": "scratchpad/lote27b/m_f.cjs: clic en .f[0]; antes aria-pressed=false, borde rgba(27,36,48,.14), fondo rgb(250,252,253); después aria-pressed=true, borde rgb(62,122,76), fondo rgba(62,122,76,.1), texto sigue «Ciudad: Todas»"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. En una maqueta sin panel el control debe presentarse como lo que es (§6.12 regla 8): quitar el listener que alterna `aria-pressed` y dejar `data-activo=\"true\"` solo cuando el valor difiera del predeterminado; añadir el chevron de §6.21 cuando exista el panel."
+    },
+    "por_que_importa": "El resalte deja de significar «hay un filtro puesto»: la persona ve un filtro activo que no filtra nada y puede creer que la lista está acotada."
+   },
+   {
+    "id": "v2-03kanban-06",
+    "severidad": "media",
+    "regla": "§1 Color (un color de estado no se reutiliza para una categoría) y §1.4 Series de gráfica",
+    "dice_el_sistema": "«Un color de estado no se reutiliza para una categoría, ni al revés.»",
+    "hay_en_el_build": "En la vista Kanban las cinco etapas llevan fondo y marca con colores distintos: «En proceso» con `--warn-bg`/`--warn` (línea 529), «En revisión» con `--ok-bg`/`--ok` (línea 581), «Bloqueado» con `--block`, «En espera externa» con `--pause`, «Recibido» con `--serie-1`. Las tarjetas de «En proceso» llevan pastillas roja («−2 d») y verde («3 d»), así que la misma columna dice ámbar y rojo/verde a la vez (captura propia de la vista Kanban).",
+    "selector": ".col-h, .col-h .mark",
+    "linea": 529,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 529,
+     "cita": "<h2 class=\"col-h\" style=\"background:var(--warn-bg)\">"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Dos lecturas: «Bloqueado» y «En espera externa» sí coinciden con los estados `block`/`pause` del semáforo; «En proceso» (ámbar = «falta algo») y «En revisión» (verde = «correcto») son etapas del flujo, no juicios. Solución concreta: cabeceras neutras (`--surface-2`) con una marca de `--serie-1..4`, y dejar el semáforo solo en la pastilla de cada tarjeta; con cinco etapas se agrupan las dos últimas en «Otras» (§1.4 regla 1)."
+    },
+    "por_que_importa": "Un ámbar sobre «En proceso» se lee como alerta de plazo cuando la etapa es normal; el color de la columna compite con el de la pastilla de cada tarjeta, que es el que sí lleva el juicio."
+   },
+   {
+    "id": "v2-03kanban-07",
+    "severidad": "media",
+    "regla": "§6.11 Tabla densa (regla 5)",
+    "dice_el_sistema": "«Ninguna columna desaparece en silencio.»",
+    "hay_en_el_build": "`@media (max-width:1240px){.col-ciudad{display:none}}` (línea 271) y `@media (max-width:1040px){.col-tipo{display:none}}` (línea 272): a 1024 px «Ciudad» y «Etapa» ya no están y no hay aviso de cuántas columnas se ocultaron ni cómo recuperarlas (el botón «Columnas» no tiene panel).",
+    "selector": ".col-ciudad, .col-tipo",
+    "linea": 271,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 271,
+     "cita": "@media (max-width:1240px){.col-ciudad{display:none}}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta: añadir el aviso «2 columnas ocultas · Columnas» junto al pie de tabla, o desplazar en horizontal en vez de ocultar."
+    },
+    "por_que_importa": "Quien trabaja en un portátil pequeño tiene menos datos sin saber que faltan; «Etapa» es el dato que distingue una fila En proceso de una En revisión."
+   },
+   {
+    "id": "v2-03kanban-08",
+    "severidad": "media",
+    "regla": "§6.11 Tabla densa (reglas 10 y 11)",
+    "dice_el_sistema": "«El identificador de fila no lleva color de enlace.»",
+    "hay_en_el_build": "Los 12 folios son `<a class=\"lnk\">` con `color:var(--link);font-weight:600` (línea 170) y la fila no es pulsable (sin `cursor:pointer`, `tabindex` ni manejador): solo el folio navega.",
+    "selector": "tbody th .lnk",
+    "linea": 387,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 387,
+     "cita": "<th scope=\"row\"><a class=\"lnk\" href=\"#\" translate=\"no\">TRM-202606-0798</a></th>"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Dos lecturas: la regla 10 parte de que la fila entera es la zona pulsable; aquí no lo es, y un folio sin color de enlace no se vería navegable. Solución que cierra las dos preguntas y el destino de 16 px: fila pulsable (`cursor:pointer`, Enter navega) y folio en `--text`."
+    },
+    "por_que_importa": "Es la columna más repetida de la tabla; el verde coincide con el color de acción (`--accent`) y de «en tiempo» en las pastillas contiguas."
+   },
+   {
+    "id": "v2-03kanban-09",
+    "severidad": "media",
+    "regla": "§1.7 Regla de contraste",
+    "dice_el_sistema": "«Texto normal 4,5:1 mínimo; texto grande (≥24px, o ≥18,66px en negrita) y elementos gráficos 3:1.»",
+    "hay_en_el_build": "`thead th .sort{opacity:.25;…}` (línea 158): la flecha de orden de «Folio», «Trámite» y «Compromiso» queda en rgb(213,217,222) efectivo sobre rgb(250,252,253) = 1,38:1. Activa (`aria-sort`) pasa a `--accent` a opacidad 1.",
+    "selector": "thead th .sort",
+    "linea": 158,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_sort_contraste",
+     "detalle": "scratchpad/lote27b/m_otros.cjs: color rgb(102,113,127), opacity 0.25 sobre rgb(250,252,253); mezcla = rgb(213,217,222); razón 1,38:1"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Dos lecturas: (a) la flecha es la única pista visual de que la cabecera ordena y 1,38:1 no llega a 3:1 (criterio 1 si la dirección lo aplica a iconos de control); (b) el texto de la cabecera, el `aria-sort` y el cursor siguen siendo legibles (4,82:1) y la flecha es decorativa. Se deja no crítico por (b); §6.11 no dice cómo se pinta la flecha inactiva: propuesta de sistema, flecha inactiva en `--text-3` a opacidad 1."
+    },
+    "por_que_importa": "En reposo una cabecera ordenable y una que no lo es se ven casi igual; hay que acercar el cursor para descubrirlo."
+   },
+   {
+    "id": "v2-03kanban-10",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla",
+    "dice_el_sistema": "«El estado va dentro de una tarjeta, no suelto sobre el fondo.»",
+    "hay_en_el_build": "`.state{display:none;…padding:48px 16px}` con `.state .ico{width:30px;height:30px;color:var(--text-3)}` (línea 237): título, tres frases y botón centrados directamente sobre el fondo de la zona de contenido, con un glifo gris de 30 px; `.tarjeta-estado`/`.estado-ico` no existen. Captura propia de los estados Vacío y Error.",
+    "selector": ".state",
+    "linea": 237,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 237,
+     "cita": ".state .ico{width:30px;height:30px;color:var(--text-3)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta: copiar `.tarjeta-estado` (480 px, `--r-modal`, `--sh-modal`) y `.estado-ico` (medallón de 52 px) de §6.4 alrededor del contenido de `.state-empty`/`.state-error`."
+    },
+    "por_que_importa": "En una zona de contenido de 1200 px un mensaje sin superficie se lee como una pantalla que no terminó de cargar. Solo se ve al cambiar de estado."
+   },
+   {
+    "id": "v2-03kanban-11",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga (`.skel`)",
+    "dice_el_sistema": "«Y el mismo alto, que es la mitad que se olvida.»",
+    "hay_en_el_build": "El esqueleto mide 201 px frente a los 685 px de la tabla con 12 filas y su pie (−484 px, 71 %): cinco filas de barras sin cabecera. Cada `.skel` lleva el texto real de la fila en `color:transparent` y el contenedor es `aria-hidden=\"true\"` sin `role=\"status\"`.",
+    "selector": ".state-loading",
+    "linea": 598,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_esqueleto_alto",
+     "detalle": "scratchpad/lote27b/m_varios2.cjs: `.tablewrap` con datos 685 px; `.state-loading` con data-state=loading 201 px"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta: doce filas de `min-height:41px` con la cabecera, y vaciar el texto de los `.skel`; si el contenedor se queda `aria-hidden`, anunciar la carga con `aria-live` (hoy solo lo hace el selector de estados)."
+    },
+    "por_que_importa": "Al llegar los datos la pantalla salta casi 500 px: es el caso que §6.7 mide con 291 px, aquí más grande."
+   },
+   {
+    "id": "v2-03kanban-12",
+    "severidad": "baja",
+    "regla": "§6.12 Resumen de estatus y barra de filtros",
+    "dice_el_sistema": "«Son dos zonas distintas, no una fila.»",
+    "hay_en_el_build": "`<section class=\"filters\">` (línea 341) junta en una sola fila los cinco contadores `.schip`, un `.sep` de 1 px, tres filtros `.f`, la densidad y «Columnas»: contadores y filtros comparten la misma forma de pastilla (`border-radius:var(--r-pill)`). A 1280 px «Responsable» baja a una segunda línea.",
+    "selector": ".filters",
+    "linea": 341,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 341,
+     "cita": "<section class=\"filters\" aria-labelledby=\"h-filtros\">"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta: dos filas (resumen arriba, filtros debajo) o un rótulo «Estatus» antes de los contadores."
+    },
+    "por_que_importa": "El separador funciona, pero resumen (lectura) y filtros (control) tienen la misma forma y la fila se parte sola en pantallas de 1280."
+   },
+   {
+    "id": "v2-03kanban-13",
+    "severidad": "baja",
+    "regla": "§6.11 Tabla densa (regla 6)",
+    "dice_el_sistema": "«Y la primera pregunta es si hace falta ofrecerla.»",
+    "hay_en_el_build": "Dos botones permanentes «Cómoda / Compacta» (línea 360) cuyo único efecto es `[data-density=\"compact\"]{--row:32px}` (línea 59): fila de 40 a 32 px sin reducir contenido (§6.11 regla 6 pide que la compacta quite la segunda línea y acorte listas).",
+    "selector": ".seg[aria-label=\"Densidad de la tabla\"]",
+    "linea": 59,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 59,
+     "cita": "[data-density=\"compact\"]{--row:32px}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Pregunta abierta de diseño: el sistema dice que el padrón retiró este control por ser una preferencia que casi nadie cambia; aquí no hay segunda línea que ocultar. Opción: retirarlo y recuperar el espacio de la barra."
+    },
+    "por_que_importa": "Ocupa un cuarto de la barra de filtros a cambio de 8 px de alto de fila."
+   },
+   {
+    "id": "v2-03kanban-14",
+    "severidad": "baja",
+    "regla": "§9 Andamiaje de maqueta",
+    "dice_el_sistema": "«Se marca siempre con data-andamio, va visualmente separado del producto y rotulado»",
+    "hay_en_el_build": "`<aside class=\"demo\" aria-label=\"Controles de la maqueta (no forman parte del producto)\">` (línea 651) sin `data-andamio` (0 coincidencias). Con `position:fixed;right:26px;bottom:88px` tapa la paginación («‹ 1 2 3 ›») en la captura 1440 del dossier y la última fila de la tabla en la de 1280 — I2: holgura inferior 5 px (`aside.demo`).",
+    "selector": "aside.demo",
+    "linea": 651,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 651,
+     "cita": "<aside class=\"demo\" aria-label=\"Controles de la maqueta"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Añadir `data-andamio` (un atributo)."
+    },
+    "por_que_importa": "Sin la marca el andamio no se puede retirar con un selector y, mientras está, oculta los controles de paginación."
+   },
+   {
+    "id": "v2-03kanban-15",
+    "severidad": "media",
+    "regla": "§2 Tipografía (fuentes autoalojadas, D116)",
+    "dice_el_sistema": "«Las fuentes se autoalojan — D116.»",
+    "hay_en_el_build": "Inter y Michroma se piden con `<link href=\"https://fonts.googleapis.com/css2?family=Inter…\">` (líneas 8 y 10) y no hay `@font-face` (barrido: font_face 0). Las fuentes de las capturas se inyectaron al renderizar.",
+    "selector": "head > link",
+    "linea": 10,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 10,
+     "cita": "fonts.googleapis.com/css2?family=Inter"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Sustituir los tres `<link>` por los dos `@font-face` de §2."
+    },
+    "por_que_importa": "Con el CDN caído la pantalla cae a system-ui sin error visible (incidente D116)."
+   },
+   {
+    "id": "v2-03kanban-16",
+    "severidad": "baja",
+    "regla": "§6.2 Botones (`.btn`, `.btn.p`, `.btn.mini`)",
+    "dice_el_sistema": "«Y el suelo hay que declararlo, no confiarlo al relleno.»",
+    "hay_en_el_build": "`.btn{…padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);…}` (líneas 105-107) sin `min-height`: «Exportar», «Importar» y «Nuevo trámite» miden 34 px de alto (suelo 36 px).",
+    "selector": ".btn",
+    "linea": 105,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_fuentes_lt12",
+     "detalle": "scratchpad/lote27b/m_fuentes.cjs: button.btn 34×101 y 34×110, button.btn.p 34×135; minHeight calculado auto"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. `min-height:36px` en `.btn`."
+    },
+    "por_que_importa": "El botón primario «Nuevo trámite» queda 2 px bajo el suelo del sistema."
+   },
+   {
+    "id": "v2-03kanban-17",
+    "severidad": "baja",
+    "regla": "§3 Espaciado y radios",
+    "dice_el_sistema": "«Escala base de 4px.»",
+    "hay_en_el_build": "I5: 7 valores fuera de la escala y 214 ocurrencias (6px×58, 3px×46, 5px×46, 7px×34, 10px×16, 9px×12, 14px×2). Ejemplo: `.card{…padding:10px 11px;…}` (línea 203).",
+    "selector": ".card, .col-b, .schip …",
+    "linea": 203,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I5_ritmo",
+     "detalle": "dossier: valoresFueraDeEscala 7, ocurrencias 214, top 6px×58, 3px×46, 5px×46, 7px×34, 10px×16, 9px×12, 14px×2; interlineadosDistintos 0"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Candidato del instrumento. 6 px es el valor fuera de escala dominante también en 06 y 30: decidir si el sistema añade un token de 6/10 o se ajusta a 4/8/12."
+    },
+    "por_que_importa": "Ritmo irregular; sin consecuencia funcional."
+   },
+   {
+    "id": "v2-03kanban-18",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (excepción del 10,5 px)",
+    "dice_el_sistema": "«Se admite una excepción, y solo una: 10,5px en mayúsculas con letter-spacing para los rótulos de grupo de la barra lateral»",
+    "hay_en_el_build": "`.grp{…font-size:10.5px;font-weight:700;letter-spacing:.1em;…}` (línea 91) sin `text-transform:uppercase`: «Gestoría» y «Operación» salen en mayúscula inicial. C2 cuenta 3 fallos (los dos `p.grp` y el rótulo «Estado de los datos» del andamio).",
+    "selector": "p.grp",
+    "linea": 91,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "dossier: fallos 3: p.grp «Gestoría», p.grp «Operación», span «Estado de los datos»"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Una línea: `text-transform:uppercase` en `.grp`."
+    },
+    "por_que_importa": "El cromo se copia a todas las pantallas."
+   },
+   {
+    "id": "v2-03kanban-19",
+    "severidad": "baja",
+    "regla": "§7.2 Cromo de aplicación",
+    "dice_el_sistema": "«Tres anchos: completa (≥1100px), colapsada a solo iconos (860–1100px) y cajón con velo»",
+    "hay_en_el_build": "A 800 px el `nav.side` sigue en 224 px (`main` 576 px) y a 390 px `main` mide 166 px con scroll horizontal de página (scrollWidth 839). No hay `@media` que colapse el menú; las dos que existen ocultan columnas de la tabla (líneas 271-272). Mediciones propias fuera de los tres anchos del dossier (que pasan sin scroll de página).",
+    "selector": "nav.side",
+    "linea": 271,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_responsive",
+     "detalle": "scratchpad/lote27b/m_resp.cjs: 03 a 800 px side 224, main 576, scrollW 839; a 390 px main 166, scrollW 839"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Aplicar el patrón de iconos a ≤1100 px y cajón a ≤860 px que ya trae 30."
+    },
+    "por_que_importa": "Pantalla de escritorio; en tableta vertical se reduce el ancho útil."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 2,
+   "integridad": 3
+  },
+  "justificacion": "Tabla densa bien armada (semáforo con color + icono + texto, `aria-sort` en las cuatro columnas ordenables, caption, `th scope=row`, kanban operable con teclado). Resta: 17 destinos bajo 24 px, icono de «Reintentar» a 1,03:1, folio recortado a 1280 px, 42 textos bajo 12 px, columnas de kanban pintadas con el semáforo y cromo que no colapsa.",
+  "evidencia": [
+   "03_kanban_gestoria--1440.png",
+   "03_kanban_gestoria--1280-fold.png",
+   "tactil_bajo24",
+   "I1_icono_vs_boton",
+   "propio_fuentes_lt12"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Tarjeta de kanban movible con teclado: Ctrl/⌘ + ← → entre columnas, anuncio por `aria-live`, aviso «TRM-… → Etapa» con «Deshacer» 5 s",
+   "propuesta_de_regla": "Mover una tarjeta entre columnas funciona con arrastre y con Ctrl/⌘ + ← →; al soltar se anuncia «{folio} movido de {origen} a {destino}», el foco vuelve a la tarjeta y un aviso de 5 s ofrece «Deshacer». El arrastre es una comodidad, el teclado es la vía principal (§5: `--ease-spring` solo aquí)."
+  },
+  {
+   "patron": "Leyenda del semáforo como pie fijo (`.leg`: cinco pastillas con icono y rótulo) y pista de teclado según la vista",
+   "propuesta_de_regla": "Una pantalla que usa el semáforo de §1.3 muestra su leyenda en el pie, con las mismas pastillas que la tabla (icono + texto); la pista de teclado solo aparece en la vista que la necesita."
+  },
+  {
+   "patron": "Identificador de fila que no se trunca",
+   "propuesta_de_regla": "La primera celda de una tabla densa (folio, RFC) se dimensiona por su contenido y no en porcentaje; si la tabla no cabe, se oculta otra columna con aviso (§6.11 regla 5) o se desplaza en horizontal."
+  },
+  {
+   "patron": "Botón flotante del asistente D-PRIMI (`.fab`) con la leyenda reservando 96 px a la derecha",
+   "propuesta_de_regla": "El asistente flotante ocupa la esquina inferior derecha; los pies de pantalla reservan 96 px a la derecha (como hace `.leg`) para que la paginación no quede debajo. A 1280×800 cubre hasta 28×15 px de los botones «3» y «›» de la paginación y 28×3 px incluso al final del desplazamiento."
+  }
+ ],
+ "sin_datos": [
+  "No hay texto del PDF del cliente para 03 (no listado en el PDF).",
+  "Vista Kanban capturada solo por mí (clic en #v-kanban); las capturas del dossier son la vista Tabla. Su contraste y su tamaño de texto entran en las mediciones de la página, no se midieron por separado.",
+  "Arrastre, teclado (Ctrl/⌘ + ← →), «Deshacer» y lector de pantalla no se probaron; solo código, estilo calculado y geometría.",
+  "Rendimiento no evaluado (`content-visibility:auto` en `.col-b` declarado; no se midió).",
+  "Tema oscuro medido con el instrumento de contraste: 0 fallos en 161 nodos de texto.",
+  "Folio recortado a 1280 px: no hay una regla escrita en el sistema que lo prohíba; se reporta con la regla 2 de §6.11 y se propone una regla nueva en `cobertura`."
+ ]
+}

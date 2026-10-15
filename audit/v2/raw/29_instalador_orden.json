@@ -1,0 +1,221 @@
+{
+ "pantalla": "29_instalador_orden",
+ "tier": "no_indicado_en_dossier",
+ "modo": "cobertura",
+ "sha256": "83a8c82417d68ce7a332beb784759fefec1aa463da4596118063d91a6cae12da",
+ "estado_vs_pdf": "alineado",
+ "estados_auditados": [
+  "Con datos",
+  "Cargando",
+  "Vacío",
+  "Error",
+  "Temas claro y oscuro",
+  "Ancho 390, 1000 y 1440 px"
+ ],
+ "capturas": [
+  "29_instalador_orden--1440.png",
+  "29_instalador_orden--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-29instalador-01",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación",
+    "dice_el_sistema": "En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+    "hay_en_el_build": "Entre 861 y 1100 px, `@media (min-width:860.02px) and (max-width:1100px)` aplica `.side .et,.grp,.side .wordmark{display:none}`: los 15 enlaces del menú quedan solo con un icono `aria-hidden` y sin `aria-label` ni `title`. Medido a 1000 px: 15 de 15 enlaces sin nombre accesible (árbol de accesibilidad: `link:` sin nombre), ancho del menú 64 px. Tampoco hay etiqueta emergente.",
+    "selector": ".side .et",
+    "linea": 293,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "sidebar",
+     "detalle": "brief: hayMenu true, total 15, sinNombre 15, anchoSide 64; barrido: menu_et_display_none [293], menu_enlaces_sin_nombre_propio 15. Script propio scratchpad/m6/m2.cjs a 1000×800: ariaSnapshot de `nav.side` → 15 `link:` sin nombre; `.et` display:none; sin aria-label ni title."
+    },
+    "critico": {
+     "es": true,
+     "criterio": "1 · control sin nombre accesible (15 enlaces de navegación sin nombre entre 861 y 1100 px)"
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Criterio 1. Aplica a la franja de tableta (861–1100 px); en teléfono (< 860 px) el cajón sí muestra rótulos. Arreglo: ocultar `.et` de forma visual (patrón `.sr`: `position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)`) en vez de `display:none`, y añadir `title`/etiqueta emergente al `.it` como pide §7.2."
+    },
+    "por_que_importa": "Un instalador con tableta apaisada, o cualquiera con lector de pantalla en una ventana de ese ancho, encuentra quince enlaces mudos: no puede saber cuál lleva a «Órdenes de instalación» y cuál a «Tickets TI»."
+   },
+   {
+    "id": "v2-29instalador-02",
+    "severidad": "alta",
+    "regla": "§1.7 Regla de contraste (texto 4,5:1)",
+    "dice_el_sistema": "Texto normal 4,5:1 mínimo",
+    "hay_en_el_build": "En la tarjeta de fotos, el paso en curso del envío («2 · enviando 62 %», `.paso-envio .ahora`, 12 px peso 700) usa `--accent` como color de texto sobre `--surface-2` (fondo de `.ev`): 4,35:1 en claro (rgb(62,122,76) sobre rgb(231,237,243)) y 3,85:1 en oscuro (rgb(74,143,90) sobre rgb(29,39,53)). `--accent` es el color de acción, no de texto: para texto verde el sistema tiene `--link`/`--ok-ink`.",
+    "selector": ".paso-envio .ahora",
+    "linea": 742,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "contraste",
+     "detalle": "brief: contraste.claro span.ahora ratio 4,35 (mín. 4,5) y contraste.oscuro span.ahora ratio 3,85. Cálculo propio de alternativas con la fórmula WCAG: `--link` #2F6B3C sobre `--surface-2` = 5,41:1 en claro y #7FC08F sobre #1D2735 = 7,06:1 en oscuro."
+    },
+    "critico": {
+     "es": true,
+     "criterio": "1 · falla de accesibilidad medida: texto con contraste 4,35:1 (claro) y 3,85:1 (oscuro) < 4,5:1"
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Criterio 1. Cambio de una línea: `.paso-envio .ahora{color:var(--link)}` (5,41:1 y 7,06:1) y conservar el peso 700 y el «2 ·» como segundo canal."
+    },
+    "por_que_importa": "Ese texto dice en qué paso va la foto que el instalador no puede repetir («si cierras la pantalla, el envío se pierde»); es el único indicador del estado del envío y el que peor se lee, sobre todo en oscuro."
+   },
+   {
+    "id": "v2-29instalador-03",
+    "severidad": "media",
+    "regla": "§2 Tipografía (escala de tamaños)",
+    "dice_el_sistema": "Título de pantalla o de ficha",
+    "hay_en_el_build": "`.enc-orden .cli{font-size:var(--fs-h2);…}`: `--fs-h2` no existe en la escala de §2 (`--fs-meta … --fs-kpi`) ni se declara en `:root` (líneas 14–57). Al ser inválido se descarta la declaración y el nombre del cliente («Comercializadora Vértice del Bajío») se pinta a 14 px, el mismo tamaño que el domicilio de debajo.",
+    "selector": ".enc-orden .cli",
+    "linea": 685,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tokens_usados_no_declarados",
+     "detalle": "brief: ['--fs-h2','--sp-5']. Script propio scratchpad/m6/m2.cjs a 1440: getComputedStyle('.enc-orden .cli').fontSize = 14px, fontWeight 700."
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Pregunta abierta: la tarjeta de la orden necesita un título de cliente más grande que el cuerpo. El sistema tiene `--fs-sub` (16 px, «subtítulo destacado») y `--fs-title` (20 px, título de pantalla); el cliente imaginó un `--fs-h2` intermedio que no existe. Propuesta: usar `--fs-sub` (16 px), sin crear token nuevo."
+    },
+    "por_que_importa": "El dato que identifica la orden en la calle (a qué cliente voy) tiene el mismo peso visual que la dirección; la jerarquía que el cliente quiso dar no llega a la pantalla."
+   },
+   {
+    "id": "v2-29instalador-04",
+    "severidad": "baja",
+    "regla": "§3 Espaciado y radios",
+    "dice_el_sistema": "`--sp-5` (20px) se añadió porque faltaba y ya se estaba usando.",
+    "hay_en_el_build": "`.gordo{min-height:56px;…;padding:0 var(--sp-5);…}` usa `--sp-5`, que §3 declara (20 px) pero el `:root` de la pantalla salta de `--sp-4` a `--sp-6` (líneas 26–27). La declaración es inválida y el relleno lateral de los 20 botones `.gordo` computa 0 px. No se nota en los botones a ancho completo porque el rótulo va centrado en una caja `flex:1`.",
+    "selector": ".gordo",
+    "linea": 645,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 645,
+     "cita": "padding:0 var(--sp-5);"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El bloque de tokens que se copia a cada pantalla no lleva `--sp-5`, que el sistema sí declara en §3 (mismo caso que en 28_instalador_mi_dia). El brief lo mide: SP5 elementosAfectados 20, `.gordo` padding 0px. Solución: añadir `--sp-5:20px` al bloque de referencia."
+    },
+    "por_que_importa": "Si un rótulo largo llegara a un `.gordo` estrecho (p. ej. «Volver a tomar esta foto» a 360 px) tocaría los bordes del botón."
+   },
+   {
+    "id": "v2-29instalador-05",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "Se admite una excepción, y solo una: 10,5px en mayúsculas",
+    "hay_en_el_build": "Los 5 rótulos de grupo del menú (`.grp`: «Principal», «Operación», «Trámites vehiculares», «Dirección y Administración», «Soporte») van a 10,5 px en mayúscula/minúscula mixta: la excepción de §2.1 exige mayúsculas con `letter-spacing`. El PDF del cliente declara C2 («10,5 px solo en rótulos en mayúsculas») y el instrumento C2 da 5 fallos.",
+    "selector": ".grp",
+    "linea": 240,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 240,
+     "cita": ".grp{margin:9px 8px 2px;font-size:10.5px;font-weight:700;letter-spacing:.1em;"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "La causa raíz es el propio sistema: el `.grp` de §7.2 está escrito a 10,5 px y con `letter-spacing:.1em` pero sin `text-transform:uppercase`, y el cliente lo copió tal cual. Solución: añadir `text-transform:uppercase` al `.grp` de §7.2 (o subirlo a 12 px) y propagarlo."
+    },
+    "por_que_importa": "El rótulo de grupo del menú queda a 10,5 px en mayúscula/minúscula, el caso que §2.1 quiere evitar; es lo primero que se lee para orientarse en el menú."
+   },
+   {
+    "id": "v2-29instalador-06",
+    "severidad": "media",
+    "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional",
+    "dice_el_sistema": ".p4{ padding-bottom: var(--sp-3) }",
+    "hay_en_el_build": "`.p4` no declara relleno inferior (línea 313) y su único hijo es `.p4-t` (padding-bottom 0, línea 314; la fila de `.p4-b`/`.p4-f` está vacía en la línea 780). Medido: `.p4` 38 px de alto, relleno inferior 0; el fondo del `h1` («La orden en sitio») coincide con el borde inferior (hueco 0 px) y el resumen queda a 3,5 px.",
+    "selector": ".p4",
+    "linea": 313,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 313,
+     "cita": ".p4{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Mismo bloque que en 28_instalador_mi_dia: §3.1 documenta el arreglo pero el bloque ARQ-P4 de referencia que se copia a cada pantalla no lo lleva. Una línea: `.p4{padding-bottom:var(--sp-3)}`. Medición con script propio scratchpad/m6/m3.cjs a 1440×900 (el instrumento I2 no lo marca: 0 fallos)."
+    },
+    "por_que_importa": "El título de la orden queda pegado a la línea de la barra, sin el aire que sí tiene arriba; lo que se lee es una cabecera descentrada en la pantalla que más se mira."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 4,
+   "integridad": 2
+  },
+  "justificacion": "Muy buena resolución para campo: `data-tacto=\"dedo\"` activo y efectivo (31 destinos distintos, mínimo 46 px; botones `.gordo` de 56 px), una acción primaria fija abajo (`.pie-accion`, sin tapar la última tarjeta: la tarjeta termina en y=818 y la barra empieza en y=819 al final del scroll), estados Cargando/Vacío/Error completos, `role=\"status\"` en el esqueleto, sin desborde horizontal a 390 px, cajón con velo en teléfono y fuentes autoalojadas. Baja por dos fallos críticos de accesibilidad (menú de 15 enlaces mudos entre 861 y 1100 px; texto del envío a 4,35/3,85:1) y por tokens que no existen (`--fs-h2`, `--sp-5`) y la cabecera sin relleno inferior.",
+  "evidencia": [
+   "brief: tactil bajo24 0 de 39, dataTacto dedo; menu_1000px sinNombre 15; contraste span.ahora 4,35 / 3,85; tokens no declarados ['--fs-h2','--sp-5']",
+   "scratchpad/m6/m2.cjs: menú a 1000 px, `.cli` a 14 px, `.gordo` padding 0, scroll al final a 1440 y 390 sin solape, sin desborde a 390",
+   "scratchpad/m6/m3.cjs: `.p4` 38 px, gap bajo el h1 = 0",
+   "capturas 29_instalador_orden--1440.png y propias scratchpad/m6/29-390-top.png, 29-390-fin.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Botón de campo `.gordo` (56 px) en pareja «Cumplido / No cumplido» con `aria-pressed` y barra de acción fija `.pie-accion` (decisión de la ficha del cliente para la orden en sitio)",
+   "propuesta_de_regla": "Modo de campo: `.gordo{min-height:56px;padding:0 var(--sp-5)}` para acciones de teléfono usadas de pie y con una mano (§7.3). Un par de respuestas excluyentes usa `aria-pressed`, ocupa el mismo ancho y marca la elegida con borde `--accent` + fondo `--accent-soft` + icono. La barra fija lleva la acción de la pantalla y no repite la de ninguna tarjeta."
+  },
+  {
+   "patron": "Botón primario deshabilitado sin motivo visible: «Marcar trabajo terminado» (`.gordo.p` con `disabled`, línea 917) en la barra fija",
+   "propuesta_de_regla": "§6.16: «Un botón deshabilitado no recibe el foco»; propone `aria-disabled` + motivo. En la barra de acción móvil, el motivo va en texto visible junto al botón («Faltan 4 obligatorios y 1 foto»), como hacen 09 y 11. La tarjeta «Cómo se cierra esta orden» explica el flujo, pero queda 2 pantallas arriba."
+  },
+  {
+   "patron": "Etiquetas de estado de construcción de un apartado (`.no-existe` «No existe todavía» / «Analizado, sin construir», `.ya-existe` «Ya construido») dentro de la tarjeta del producto (líneas 801, 860, 905)",
+   "propuesta_de_regla": "La ficha del cliente las defiende («no es decoración: es la respuesta a ¿esto ya existe?»). Son anotación de la lámina, no de la app: §9 pide que lo que se retira en la versión real lleve `data-andamio`. Propuesta: `.est-construccion` con `data-andamio` y `aria-hidden` para que el lector de pantalla no las lea como contenido ni salgan en producción; `--block` (§1.3: «bloqueado») no es el color adecuado para «no existe»."
+  },
+  {
+   "patron": "Banda de señal del dispositivo (`.senal`: «Sin señal desde hace 6 minutos: lo que marcaste ahora no se guarda») y banda de dato obligatorio faltante, con borde de color",
+   "propuesta_de_regla": "Variante de `.banda` (§6.9) para estado de conexión: `role=\"status\"`, `--warn-bg` o `--err-bg` opacos, icono con la misma intención, título en negrita con la consecuencia («lo que marques ahora no se guarda») y, si procede, el momento de la última sincronización. Una sola banda por prioridad: la de conexión arriba de la de datos faltantes."
+  },
+  {
+   "patron": "Menú de navegación del escritorio (cromo, 15 enlaces) dentro de una pantalla que el instalador usa en el teléfono",
+   "propuesta_de_regla": "Decidir si el instalador, en teléfono, usa el cromo del dashboard (cajón con velo, 272 px) o la barra de pestañas de la app (04, 12, 14). La ficha dice que web y app conviven; la pantalla 29 hereda el cromo completo con 5 grupos de menú ajenos al instalador."
+  }
+ ],
+ "sin_datos": [
+  "`span.skel` con ratio 1,00 en el estado Cargando (propio y del brief): texto del esqueleto con `color:transparent` a propósito (§6.7); falso positivo.",
+  "I3 intersección de `div.pie-accion` con los `button.gordo`: la barra sticky se desplaza sobre el contenido al hacer scroll; con el scroll al final (1440×900 y 390×844) no tapa la última tarjeta. No es defecto.",
+  "El brief marca C2 como `se_mide_en_navegador` y la lectura general como `alineado`; la medición de C2 falla (5 `.grp`), pero eso es del bloque del sistema, no un cambio no aplicado.",
+  "La ficha del cliente cubre el estado de construcción y el flujo de foto (⭐⭐); no se evaluó si «web y app conviven» ni el flujo de foto en 31_orden_detalle.",
+  "No evaluado: lector de pantalla real, teclado, rendimiento, comportamiento sin señal real (el banner es estático), cámara."
+ ]
+}

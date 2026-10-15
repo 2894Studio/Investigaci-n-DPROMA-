@@ -1,0 +1,76 @@
+{
+ "pantalla": "09_app_checklist_instalacion",
+ "tier": "no_indicado_en_dossier",
+ "modo": "cobertura",
+ "sha256": "febc125e1d6c51a0bf89840328e2e9783a4b12897ade708a6d45b0551fd12bed",
+ "estado_vs_pdf": "alineado",
+ "estados_auditados": [
+  "Tema nocturno (por defecto), con checklist parcial",
+  "Tema exterior / sol directo"
+ ],
+ "capturas": [
+  "09_app_checklist_instalacion--1440.png",
+  "09_app_checklist_instalacion--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "cumple",
+  "hallazgos": []
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 4,
+  "dimensiones": {
+   "accesibilidad": 4,
+   "rendimiento": "no_evaluado",
+   "theming": 4,
+   "responsive": 3,
+   "integridad": 3
+  },
+  "justificacion": "La pantalla que el cliente llama «riesgo técnico #1» cumple lo que el sistema regula en móvil: 11 destinos distintos, todos ≥ 44 px (filas de checklist 48 px por `--touch`, botón de cierre 48, botón de fotografía 56, volver 44); 0 fallos de contraste en 55 nodos de texto tanto en el tema nocturno como en el de exterior; casilla real dentro de una etiqueta que abarca la fila; CTA bloqueado que explica por qué (`aria-describedby` + nota visible); fuentes autoalojadas con `@font-face` (D116). Resta por radios y anillo de foco propios (8/12 px y 3 px), un hex literal y un tercer tema sin regla.",
+  "evidencia": [
+   "brief: tactil bajo24 0 de 6; contraste 0 fallos; google_fonts_link []; font_face 1",
+   "scratchpad/m6/run.cjs: temas dark y sun, 55 nodos cada uno, 0 fallos; 11 destinos, mínimo 44×44",
+   "scratchpad/m6/m2.cjs: sin desborde a 390 y 360 px",
+   "captura 09_app_checklist_instalacion--1440.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Tercer tema «Exterior / sol directo» (`[data-theme=\"sun\"]`, línea 32; también en 11) con `--text-3:#4E5A69`, `--border-2` a .55 y acento `#1F5E30`",
+   "propuesta_de_regla": "§1 define claro y oscuro. Para la app de campo, un tercer tema `data-theme=\"sun\"` con contraste reforzado: texto ≥ 7:1 sobre `--bg`, `--border`/`--border-2` ≥ 3:1 y semáforo `-ink` oscurecido. Se mide como los otros dos (§1.7) y se activa con un control visible, no por `prefers-color-scheme`."
+  },
+  {
+   "patron": "Fila de checklist con casilla real oculta y casilla dibujada de 26 px (`.row` = etiqueta, `input` con `opacity:0;width:0`, `.chk` visual; foco en `.chk`)",
+   "propuesta_de_regla": "§7.3 trata las casillas de 15 px ampliando el área pulsable. Para la app: la etiqueta de toda la fila es el destino (≥ 44 px, 48 por `--touch` en campo), la casilla visual de 24–26 px con borde ≥ 3:1 (`--border-ctrl`) y anillo de foco en el dibujo cuando el `input` real tiene foco."
+  },
+  {
+   "patron": "Botón de cierre bloqueado con su motivo en texto visible (`.ctabtn:disabled` + `.ctanote`, línea 143, y `aria-describedby`)",
+   "propuesta_de_regla": "§6.16 recomienda `aria-disabled` + motivo para que el botón siga recibiendo foco. En la barra inferior móvil: el botón bloqueado va con una nota visible de una línea que dice cuántos puntos faltan; si el `disabled` nativo se conserva, la nota es obligatoria (como aquí y en 11, a diferencia de 29)."
+  },
+  {
+   "patron": "Tinta sobre relleno de color con hex literal: `.thumb .st.up{background:var(--warn);color:#221A02}` (línea 124)",
+   "propuesta_de_regla": "§1.4.1: el glifo sobre relleno sólido usa `--on-state`, que voltea por tema, no un hex. `#221A02` sobre el `--warn` oscuro contrasta bien (cálculo ≈ 9,9:1), pero la regla de fondo es «ningún hex literal»."
+  },
+  {
+   "patron": "Radios 8/12 px (`--r-ctrl:8px;--r-card:12px`, línea 16), foco de 3 px y token `--touch:48px` (línea 20) propios de la app",
+   "propuesta_de_regla": "§3 fija 6/10 px y §1.7 usa `--focus-w` de 2 px. Decidir si la app de campo tiene escala propia (radios +2 px, foco 3 px, `--touch:48px`) y documentarla como variante `data-tacto=\"dedo\"` (§7.3) en vez de dejarla como valores sueltos. Nota: el brief marca como divergentes casi todos los tokens de color, pero es porque compara el tema oscuro de la pantalla con el valor claro del sistema; en oscuro coinciden con §1.1."
+  },
+  {
+   "patron": "Evidencia fotográfica como miniatura de 56 px con insignia de estado (`.thumb`, `.st.ok`/`.st.up`, solo `title` para el estado)",
+   "propuesta_de_regla": "La insignia de estado de una evidencia lleva forma distinta (✓ / ↑, ya la tiene) y un nombre accesible real: `role=\"img\" aria-label=\"Fotografía sincronizada\"` en la miniatura en lugar de `title` en el hijo, que los lectores de pantalla no anuncian de forma fiable. La miniatura abre la foto (≥ 44 px) o se declara solo informativa."
+  }
+ ],
+ "sin_datos": [
+  "El brief marca tokens divergentes (`--bg`, `--surface`, `--text`…) que no son tales: la pantalla arranca en `data-theme=\"dark\"` y la comparación es contra el valor claro. En oscuro `--text-3:#8B96A6`, `--surface:#171F2C`, etc. coinciden con §1.1. Sí divergen `--r-ctrl`, `--r-card` y el foco (ver cobertura).",
+  "`h1.sr` y `span.sr` recortados por el instrumento I3: texto solo para lector de pantalla, falso positivo conocido.",
+  "El `toast` es `position:fixed;bottom:20px` y en la maqueta cae debajo del marco del teléfono (captura propia a 390 px): no se pudo evaluar si en un dispositivo real taparía la nota del CTA.",
+  "El tema claro no existe en esta pantalla (solo nocturno y exterior); no hay medición de claro.",
+  "No evaluado: lector de pantalla real, teclado, comportamiento sin señal real, rendimiento. La fuente se inyectó al renderizar (D116: el `.woff2` no viene en el paquete)."
+ ]
+}

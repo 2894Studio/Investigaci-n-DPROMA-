@@ -1,0 +1,347 @@
+{
+ "pantalla": "56_frontera_error",
+ "tier": "B",
+ "modo": "cumplimiento",
+ "sha256": "08ff2649ef7007dcba0fa2e9642eefcc3579f280ca9bb5ebb5d41e52d4d890b7",
+ "estado_vs_pdf": "NO_ALINEADO",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error"
+ ],
+ "capturas": [
+  "56_frontera_error--1440.png",
+  "56_frontera_error--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-56frontera-01",
+    "severidad": "alta",
+    "regla": "§1.4.1 Tinta sobre relleno sólido de color (un selector que tiñe iconos por contexto se acota a hijo directo) · §6.4 Vistas de estado (regla 6)",
+    "dice_el_sistema": "**Un selector que tiñe iconos por contexto se acota a hijo directo.**",
+    "hay_en_el_build": "`.state .ico{width:30px;height:30px;color:var(--text-3)}` (descendiente) alcanza el icono de cada botón de las vistas empty y error: «Volver a cargar» e «Ir al tablero» (`.btn.p`) pintan su glifo en rgb(102,113,127) sobre el verde rgb(62,122,76), 1,03:1 (I1_icono_vs_boton: 2 fallos). Medido además con la vista forzada: los glifos de los botones salen a 30×30 px en gris (también «Avisar a soporte»), no a 13 px.",
+    "selector": ".state .ico",
+    "linea": 609,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I1_icono_vs_boton",
+     "detalle": "2 fallos: button.btn.p «Volver a cargar» y «Ir al tablero», colorIcono rgb(102,113,127), fondo rgb(62,122,76), ratio 1,03; script propio m6/ico56.cjs: svg de los botones de .state-empty/.state-error 30×30, color rgb(102,113,127)"
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Elemento gráfico de un control a 1,03:1 < 3:1 (criterio 1). Arreglo de un carácter y es el que §1.4.1 y §6.4-6 prescriben: `.state > .ico` en vez de `.state .ico`. Este es el archivo sin aplicar (NO_ALINEADO)."
+    },
+    "por_que_importa": "En las vistas vacío y error —las que se ven el día que algo falla— el icono de la acción principal desaparece sobre el verde y el de las demás sale gigante: el botón se ve roto justo donde hay que reintentar. La vista `ok` no se afecta porque su aviso no es `.state`."
+   },
+   {
+    "id": "v2-56frontera-02",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (modo colapsado) · §6.5 Iconos",
+    "dice_el_sistema": "En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+    "hay_en_el_build": "A 1000 px el `.side` pasa a 64 px y `.side .et` se oculta con display:none: 15 de 15 enlaces `.it` quedan sin nombre accesible (instrumento menu_1000px: total 15, sinNombre 15). Comprobado además con script propio a 1000×800: innerText vacío y sin aria-label ni title en los 15.",
+    "selector": ".side .et",
+    "linea": 288,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "sidebar (menu_1000px)",
+     "detalle": "total 15, sinNombre 15, anchoSide 64 (dossier); script propio m6/medir.cjs a 1000×800: [innerText, aria-label, title] = [\"\",null,null] en los 15 `.side .it`"
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1 de la regla 1). Arreglo de una línea que no cambia el diseño: en vez de `display:none` sobre `.side .et`, aplicarle la receta `.sr` que el propio archivo ya declara (recorte de 1 px), o añadir `title` y `aria-label` a cada `.it`; `.grp` y `.wordmark` pueden seguir ocultos. Con `title` se cumple además lo que §7.2 pide («etiqueta emergente»)."
+    },
+    "por_que_importa": "Entre 860 y 1100 px (portátil con la ventana partida, tableta apaisada) toda la navegación es una columna de iconos sin nombre: un lector de pantalla anuncia 15 veces «enlace» y quien ve la pantalla no tiene ni etiqueta emergente. Mismo bloque ARQ-CROMO que en 39, 40, 50 y 57."
+   },
+   {
+    "id": "v2-56frontera-03",
+    "severidad": "alta",
+    "regla": "§10 Diez trampas comprobadas (un `<symbol>` ya trae su `viewBox`) · §1.2.1 Logotipo: uso y restricciones",
+    "dice_el_sistema": "repetirlo en el `<svg>` que lo invoca descoloca la marca",
+    "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>` con el `<symbol>` ya declarado con ese mismo viewBox: la caja del `<use>` empieza en x=63,5 y la del `<svg>` en x=96, un desfase de −32,5 px (medido a 1440×900). En la captura el isotipo del cromo es una hoja estrecha recortada, no la «Λ» completa.",
+    "selector": ".side .logo svg",
+    "linea": 667,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_logo",
+     "detalle": "script m6/medir.cjs: `.logo svg` x=96 w=44; su `<use>` x=63,5 w=43; svgViewBox \"740 0 970 932\", `<use>` sin width"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No entra en los 4 criterios críticos, así que no se exige. Arreglo propuesto de una línea, la receta del propio §10: quitar el `viewBox` del `<svg>` y poner las medidas en el `<use>` (`<use href=\"#dproma-mark\" width=\"44\" height=\"42\"/>`). Mejora la marca en todas las pantallas del paquete que copien este cromo."
+    },
+    "por_que_importa": "La marca de la aplicación, visible en cada pantalla, no se reconoce: §1.2.1 prohíbe deformar o recortar el isotipo oficial. Es el mismo bloque de cromo que en 39, 40, 50 y 57; en 10_dprimi_asistente el `<use>` lleva sus medidas y el isotipo sale completo."
+   },
+   {
+    "id": "v2-56frontera-04",
+    "severidad": "media",
+    "regla": "§2.1 El suelo son 12px · §1.1 Superficies y texto (`--text-3`)",
+    "dice_el_sistema": "`--fs-meta` es el tamaño más pequeño del sistema. **Nada baja de ahí.**",
+    "hay_en_el_build": "Archivo NO_ALINEADO con el PDF: C1, C3–C7 y C10 «NO_confirmado»; lt12_medido 16 frente a 0 declarado. Visibles bajo 12 px: `.cromo-av` (`font:700 11px`), `.cromo-quien small` 11px (el rol en la barra superior), `.ref code` 11,5px (la referencia de soporte) y `.state .ref` 11px; en esas dos vistas el `<b>` de la misma línea se agranda a 14px (`.state b`) y la línea mezcla tres tamaños. `--text-3` sigue en #66717F y `--serie-1/2` con los valores anteriores.",
+    "selector": ".cromo-av, .cromo-quien small, .ref code",
+    "linea": 258,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "claims (lt12_medido)",
+     "detalle": "estado_vs_pdf_del_cliente: lt12_medido 16, lt12_pdf_despues 0; script propio m6/medir.cjs: menor12 → span.cromo-av 11, small 11, code 11,5"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "El PDF ya declara que estos tamaños y valores pasan a su versión corregida: se adopta lo que el cliente declaró y se le pide el archivo que lo contenga; no hay exigencia nueva. Auditado lo que hay."
+    },
+    "por_que_importa": "La referencia que soporte necesita para encontrar el registro es el texto más pequeño de la pantalla de error; y el cromo no está igualado con el resto del paquete. Lo que se ve aquí no es lo que el PDF afirma."
+   },
+   {
+    "id": "v2-56frontera-05",
+    "severidad": "media",
+    "regla": "§2 Tipografía (D116: fuentes autoalojadas)",
+    "dice_el_sistema": "**Ese `@font-face` no es opcional.**",
+    "hay_en_el_build": "El archivo no declara ningún `@font-face` ni enlaza fuentes (barrido: font_face 0, google_fonts_link vacío) pero `--font-ui` es `'Inter'` y `--font-brand` `'Michroma'`: sin la fuente inyectada al renderizar, la pantalla cae a `system-ui` sin ningún aviso.",
+    "selector": ":root{--font-ui}",
+    "linea": 10,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 10,
+     "cita": "--font-ui: 'Inter'"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No crítico. Añadir los dos `@font-face` de §2 (rutas `../../apps/web/public/fuentes/…`, como ya hacen 39 y 40) es una edición de dos líneas y hace que el 404 de una fuente sea visible en la pestaña de red en vez de un cambio de tipografía silencioso."
+    },
+    "por_que_importa": "Lo medido y capturado aquí lleva Inter porque se inyectó al renderizar (no viene en el paquete): sin `@font-face` la pantalla real depende de que la fuente exista por otro lado. §2 documenta una incidencia real de 4 días sin detección por exactamente esto. Mismo defecto en 50 y 57 (39 y 40 sí los declaran)."
+   },
+   {
+    "id": "v2-56frontera-06",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla (el medallón y la tarjeta)",
+    "dice_el_sistema": "**El medallón va con relleno sólido.**",
+    "hay_en_el_build": "`.aviso .marca` es un círculo de 44 px con `background:var(--err-bg);color:var(--err-ink)` (relleno translúcido y glifo del mismo tono, la receta que §6.4 dice haber retirado), y `.aviso` usa `--r-card` y `--sh-rest` en vez de `--r-modal` y `--sh-modal`. En empty y error, además, el `.state .ico` del hallazgo 01 pinta el glifo en gris `--text-3`, así que el color del icono cambia entre las vistas.",
+    "selector": ".aviso .marca",
+    "linea": 645,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 645,
+     "cita": "background:var(--err-bg);color:var(--err-ink);flex-shrink:0}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "La ficha fija «fondo y borde propios», que se respeta. Receta del sistema: `.aviso .marca{background:var(--err);color:var(--on-state)}` y `.aviso{border-radius:var(--r-modal);box-shadow:var(--sh-modal)}`; §1.4.1 da 3,79–4,89:1 en claro para estos pares."
+    },
+    "por_que_importa": "Es el único elemento de color de una pantalla gris: con medallón pálido se lee apagado, que es lo que §6.4 corrigió en el resto del sistema."
+   },
+   {
+    "id": "v2-56frontera-07",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla (la barra lateral y la superior siguen ahí porque siguen siendo verdad)",
+    "dice_el_sistema": "porque siguen siendo verdad",
+    "hay_en_el_build": "La vista `empty` dice «falló antes de que hubiera ninguna [pantalla], así que tampoco hay menú al que ir» (ficha: «el fallo ocurrió antes de que hubiera cromo: no hay menú, sólo recargar»), pero el archivo la dibuja con el cromo completo: medido con data-state=\"empty\", `.side` sigue en display:flex y la barra superior visible, con 15 enlaces de menú.",
+    "selector": "main[data-state=\"empty\"]",
+    "linea": 700,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_cromo",
+     "detalle": "script m6/m2.cjs: con #contenido[data-state=error] (igual en empty) getComputedStyle(.side).display = \"flex\"; texto de la vista empty en la línea citada"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "La maqueta no puede quitar el cromo desde `<main>`; dos salidas: ocultar `.side` y `.cromo-top` con `:root:has(main[data-state=\"empty\"])` (y rotularlo como andamio), o aceptar que la vista se ve con cromo y quitar la frase «tampoco hay menú» de la maqueta. La ficha manda el primero."
+    },
+    "por_que_importa": "La pantalla que debe enseñar «no hay menú, solo recargar» enseña un menú entero: quien la revisa no ve el caso que se diseñó."
+   },
+   {
+    "id": "v2-56frontera-08",
+    "severidad": "media",
+    "regla": "§8 Voz de producto (ningún bloque pasa de ~140 caracteres)",
+    "dice_el_sistema": "**Ningún bloque de texto siempre visible pasa de ~140 caracteres.**",
+    "hay_en_el_build": "En el aviso hay cuatro bloques de texto fijos. Medido por vista: ok 183 / 101 / 94 / 152 caracteres, empty 167 / 116 / 94 / 156, error 127 / 117 / 94 / 109. El último, `.gris` («Si vuelve a pasar… dilo con la referencia de arriba: con ella se encuentra el registro exacto y no hace falta que reproduzcas nada»), repite la idea del bloque de referencia («ya quedó registrado, no hace falta que copies nada»).",
+    "selector": ".aviso p",
+    "linea": 691,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_estados",
+     "detalle": "script m6/estados.cjs: txtLens ok [183,101,94,152], empty [167,116,94,156], error [127,117,94,109]"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "La ficha decide qué se dice (qué NO pasó, que ya quedó registrado, una salida que no es reintentar) y todo eso se respeta; propuesta: fundir `.gris` en el bloque de referencia y acortar la primera frase, p. ej. «Algo falló al dibujarla. No se ha perdido nada y el menú te lleva a otra pantalla.» (82 caracteres)."
+    },
+    "por_que_importa": "Es la pantalla que se lee con prisa y con el trabajo en el aire: cuatro bloques con dos mensajes repetidos la alargan sin añadir nada."
+   },
+   {
+    "id": "v2-56frontera-09",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla (regla 1: el cambio se anuncia y mueve el foco)",
+    "dice_el_sistema": "**El cambio se anuncia y mueve el foco.**",
+    "hay_en_el_build": "`<div class=\"aviso\" role=\"alert\" tabindex=\"-1\">` está preparado para recibir el foco (la ficha dice que «recibe el foco»), pero ninguna línea del archivo llama a `.focus()` (grep: 0 coincidencias) y el conmutador solo cambia `data-state`. `role=\"alert\"` anuncia, pero el foco de teclado se queda donde estaba.",
+    "selector": ".aviso",
+    "linea": 681,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 681,
+     "cita": "<div class=\"aviso\" role=\"alert\" tabindex=\"-1\">"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Al mostrar una vista, `aviso.focus()` sobre el `.aviso` visible (es lo que el `tabindex=\"-1\"` anticipa); en maqueta basta añadirlo al manejador del andamio."
+    },
+    "por_que_importa": "Quien navega con teclado sigue sobre un elemento del cromo mientras el contenido cambió a un fallo."
+   },
+   {
+    "id": "v2-56frontera-10",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga (`.skel`)",
+    "dice_el_sistema": "**Sin texto real dentro de las barras.**",
+    "hay_en_el_build": "Las barras `.skel` de la vista loading llevan la letra «x» dentro (con `color:transparent`, que sigue en el árbol de accesibilidad); la vista mide 402 px frente a los 811 px del estado ok (§6.7 pide «el mismo alto»); y bajo `prefers-reduced-motion` solo se hace `animation:none` (degradado congelado).",
+    "selector": ".skel",
+    "linea": 694,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_estados",
+     "detalle": "script m6/estados.cjs: .state-loading 402 px, .state-ok 811 px; texto «x» en el marcado de la línea citada"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Vaciar las barras (el contenedor ya lleva `role=\"status\"`), igualar el alto y `background:var(--surface-2)` bajo reduced-motion. Mismo bloque en 39, 40 y 50."
+    },
+    "por_que_importa": "Un lector de pantalla puede leer cinco «x» como contenido, y la pantalla de carga no se parece a la de fallo que va a sustituir."
+   },
+   {
+    "id": "v2-56frontera-11",
+    "severidad": "baja",
+    "regla": "§3 Espaciado y radios (escala base de 4px)",
+    "dice_el_sistema": "Escala base de 4px.",
+    "hay_en_el_build": "I5_ritmo: 2 valores fuera de escala, 72 ocurrencias (6px×36, 9px×36), ambos del menú; 2 interlineados distintos (1.25×18, 1.6×8)",
+    "selector": "(varios)",
+    "linea": null,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I5_ritmo",
+     "detalle": "I5_ritmo: 2 valores fuera de escala, 72 ocurrencias (6px×36, 9px×36), ambos del menú; 2 interlineados distintos (1.25×18, 1.6×8)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El propio sistema usa 3, 5, 6 y 9 px en sus recetas (`.pill` padding:3px 9px, `.ctrl` gap:5px, `.pasos` padding:9px 0, `.it` padding:9px 10px): la escala declarada no describe lo que el sistema dibuja. Documentar esos medios pasos como valores admitidos del cromo en vez de pedir al cliente que los cambie."
+    },
+    "por_que_importa": "No es un fallo visible sino ruido de medición: el instrumento marca cientos de ocurrencias en cada pantalla y tapa las desviaciones que sí importan."
+   },
+   {
+    "id": "v2-56frontera-12",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (excepción de 10,5px en mayúsculas) · §7.2 Cromo de aplicación",
+    "dice_el_sistema": "10,5px en mayúsculas con `letter-spacing` para los **rótulos de grupo** de la barra lateral",
+    "hay_en_el_build": "`.grp` a 10,5px sin `text-transform:uppercase`: «Principal», «Operación», «Trámites vehiculares»… salen en caja mixta (instrumento C2_105_no_mayusculas: 5 fallos; computado: font-size 10,5 y text-transform none).",
+    "selector": ".grp",
+    "linea": 235,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "5 fallos: p.grp «Principal», «Operación», «Trámites vehiculares», «Dirección y Administraci…», «Soporte»"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El `.grp` que el propio §7.2 enseña tampoco lleva `text-transform:uppercase`: el cliente copió el fragmento. Corregir el sistema (añadir uppercase al fragmento de §7.2) o, si se prefiere caja mixta, subir el rótulo a 12px y retirar la excepción; no se le pide nada al cliente."
+    },
+    "por_que_importa": "Los rótulos de grupo salen a 10,5px en caja mixta, justo el tamaño que §2.1 solo admite en mayúsculas: sistema y cliente se contradicen y el defecto se repite en cada pantalla con este cromo."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 2,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "El contenido es de lo mejor del paquete: tres cosas en el orden de §6.4 (qué pasó, qué no se perdió, qué hacer), referencia que se dice ya registrada, `role=\"alert\"`, botones a 44 px y salida que no es reintentar. Lo que lo baja es que el archivo no contiene los cambios del PDF: la regla `.state .ico` descendiente deja un botón primario ilegible en dos de las cuatro vistas, `--text-3` y las series con valores anteriores, 11 px en el cromo y la referencia, y ausencia de `@font-face`. Contraste 0 fallos medidos (37 nodos), pero el 1,03:1 del icono no lo mide el instrumento de texto.",
+  "evidencia": [
+   "I1_icono_vs_boton: 2 fallos (ratio 1,03)",
+   "estado_vs_pdf: NO_ALINEADO (C1,C3-C7,C10 NO_confirmado; lt12 16 vs 0)",
+   "menu_1000px: 15 de 15 sin nombre",
+   "captura 56_frontera_error--1440.png (vista ok) y vistas empty/error forzadas"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Frontera de error: aviso con fondo y borde propios, `role=\"alert\"`, icono de error, qué pasó / qué NO se perdió / referencia ya registrada / una salida que no es reintentar, en cuatro casos (cromo vivo, reintentando, antes del cromo, reintento fallido).",
+   "propuesta_de_regla": "La pantalla de fallo de una pantalla concreta es una `.tarjeta-estado` con `role=\"alert\"` y `tabindex=\"-1\"` que recibe el foco; dice qué pasó, qué no se perdió y qué hacer, lleva la referencia de soporte marcada como ya registrada y siempre ofrece una salida distinta de reintentar. El caso «antes del cromo» se dibuja sin menú ni barra superior."
+  }
+ ],
+ "sin_datos": [
+  "No evaluado: la vista `loading` se miró solo por el marcado y su altura; no hay captura propia de ella en los anchos 1280 ni 1024.",
+  "No evaluado: modo tarjeta y cajón (<860 px) y tema oscuro visual (contraste oscuro medido: 0 fallos, 37 nodos). Estados hover/foco y rendimiento tampoco.",
+  "La ficha dice que el aviso «recibe el foco»; el archivo solo tiene `tabindex=\"-1\"`. No se puede saber si el comportamiento real vive en el producto (la maqueta no trae script de foco).",
+  "El instrumento I1 marca esos dos botones con `oculto: true` (se midieron con el estado oculto); el defecto se comprobó con la vista forzada visible y es real.",
+  "Las fuentes reales (Inter, Michroma) se inyectaron al renderizar: las capturas llevan Inter aunque el archivo no la declare (ver hallazgo 05)."
+ ]
+}

@@ -1,0 +1,428 @@
+{
+ "pantalla": "02_dashboard",
+ "tier": "B",
+ "modo": "cumplimiento",
+ "sha256": "bf2f9e66c4ca010b8cf7dfac39b81189b2b306c804fdec5031b806940b0174aa",
+ "estado_vs_pdf": "no_listado_en_pdf",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "error"
+ ],
+ "capturas": [
+  "02_dashboard--1440.png",
+  "02_dashboard--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-02dashboard-01",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado de una pantalla (regla 6) y §1.4.1 Tinta sobre relleno sólido de color",
+    "dice_el_sistema": "«El selector correcto es .state > .ico (hijo directo)»",
+    "hay_en_el_build": "El selector descendiente `.state .ico{width:30px;height:30px;color:var(--text-3)}` (línea 246) alcanza también el icono de «Reintentar» (`button.btn.p` dentro de `.state-error`): el icono mide rgb(102,113,127) sobre el botón verde rgb(62,122,76) = 1,03:1, mientras el texto del mismo botón es rgb(247,250,249). Sale en la vista Error (selector de estados de la maqueta).",
+    "selector": ".state .ico",
+    "linea": 246,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I1_icono_vs_boton",
+     "detalle": "dossier: fallos 1, button.btn.p «Reintentar», colorIcono rgb(102,113,127), colorTexto rgb(247,250,249), fondo rgb(62,122,76), ratio 1.03, enEstado true. Reproducido con scratchpad/lote27b/cap.cjs (data-state=error, estilo calculado del icono y captura e_02_dashboard.png)"
+    },
+    "critico": {
+     "es": true,
+     "criterio": "Falla de accesibilidad medida: contraste <3:1 en un control (icono de «Reintentar» a 1,03:1)"
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Cambio de un selector, sin tocar el markup: `.state > .ico{…}` (hijo directo) en la línea 246. Es el arreglo que ya documenta el sistema 2.15.0; con él el icono hereda el color del botón (4,89:1)."
+    },
+    "por_que_importa": "En el estado de error la acción de recuperación pierde su icono: se ve un anillo gris casi invisible sobre el verde. Lectura alternativa: el icono es redundante (el botón conserva su texto «Reintentar» a 4,89:1 y su nombre accesible); aun así el criterio 1 del proyecto cuenta un icono de control bajo 3:1. Mismo bloque de estados que en 03, 06 y 30."
+   },
+   {
+    "id": "v2-02dashboard-02",
+    "severidad": "alta",
+    "regla": "§1.1 Superficies y texto (--text-3 sobre --surface-2) y §1.7 Regla de contraste",
+    "dice_el_sistema": "«ahí caía a 4,21:1, por debajo del mínimo»",
+    "hay_en_el_build": "`--text-3:#66717F` (línea 38) con `.alert:hover{background:var(--surface-2)…}` (línea 200) y `.alert .when{…color:var(--text-3);font-size:11px…}` (línea 208): con el cursor encima, «hace 24 min / Red de carga» mide rgb(102,113,127) sobre rgb(231,237,243) = 4,21:1 (mínimo 4,5:1). La medición en reposo del dossier (1 fallo, el avatar «AR») no cubre este estado.",
+    "selector": ".alert:hover .when",
+    "linea": 208,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_hover_contraste",
+     "detalle": "scratchpad/lote27b/m_varios.cjs: hover real (Playwright) sobre a.alert, color de cada nodo de texto compuesto sobre su fondo real; peor caso 4,21:1 en «hace 24 min Red de carga» (11 px). Cálculo: 66717F sobre E7EDF3 = 4,21"
+    },
+    "critico": {
+     "es": true,
+     "criterio": "Falla de accesibilidad medida: contraste <4,5:1 en texto (4,21:1, 11 px, estado :hover)"
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Una línea: `--text-3:#5C6675` (valor de 2.15.0; 4,93:1 sobre --surface-2). Es la causa raíz y arregla de paso todos los usos de --text-3 del archivo."
+    },
+    "por_que_importa": "La hora y el módulo de origen de cada alerta son lo que permite priorizarlas; al pasar el cursor pierden contraste justo cuando la persona está leyendo esa fila. Lectura alternativa: el hover es transitorio y el texto es secundario; el criterio 1 del proyecto no distingue."
+   },
+   {
+    "id": "v2-02dashboard-03",
+    "severidad": "alta",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "«Nada baja de ahí.»",
+    "hay_en_el_build": "74 nodos de texto visibles por debajo de 12 px (estilo calculado): 24 a 11 px (cabeceras de tabla, `.pill`, `.alert .when`, `.prof small`), 15 a 11,5 px (`.mini .lbl`, `.panel .sub`, leyenda del SLA), 13 a 10,5 px (rótulos `.grp`, contadores `.n`, `.kbd`, `.tag` como «+3 hoy» y «2 críticos») y 22 etiquetas de los ejes de las gráficas a 11,2 px renderizados (`font-size=\"9\"` × escala 1,24).",
+    "selector": ".pill, .tag, thead th, .alert .when, .mini .lbl, .panel .sub, svg text",
+    "linea": 171,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_fuentes_lt12",
+     "detalle": "scratchpad/lote27b/m_fuentes.cjs 02_dashboard: recorre los nodos de texto visibles (excluye andamio, .sr, caption) y lee getComputedStyle().fontSize; SVG: font-size × (ancho renderizado / ancho del viewBox). Total 74 (24 a 11, 15 a 11.5, 13 a 10.5, 22 SVG a 11.2). El dossier no trae lt12 para 02 (no listado en el PDF)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico; no se exige. Solución concreta de pocas líneas: llevar `.pill`, `.tag`, `thead th`, `.alert .when`, `.mini .lbl`, `.panel .sub`, `.slalegend` y `.t-mute` a `var(--fs-meta)`, y el `font-size` de los textos SVG a 10 (×1,24 = 12,4 px). Sube de golpe la legibilidad de todo el tablero."
+    },
+    "por_que_importa": "Las etiquetas de estado de la tabla, los deltas de los KPI y las cabeceras son lo que se consulta a diario y están en el tamaño reservado a lo secundario; a 10,5 px los deltas («+3 hoy», «2 críticos») son lo más pequeño de la pantalla y llevan el juicio del dato."
+   },
+   {
+    "id": "v2-02dashboard-04",
+    "severidad": "media",
+    "regla": "§1.4 Series de gráfica (y §1 Color: el trabajo que hace el dato)",
+    "dice_el_sistema": "«Una serie de gráfica nunca reutiliza un color de estado.»",
+    "hay_en_el_build": "La serie «Órdenes» se dibuja con `stroke=\"var(--ok)\"` (línea 451) y su marca de leyenda `style=\"background:var(--ok)\"` (línea 445), el verde de «correcto». `--serie-2` está declarado (línea 45) y no se usa en ninguna parte del archivo. Captura: gráfica derecha de «Actividad de los últimos 7 días».",
+    "selector": "svg polyline (Órdenes) / .swatch",
+    "linea": 451,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 451,
+     "cita": "stroke=\"var(--ok)\""
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta de dos sustituciones: `var(--ok)` → `var(--serie-2)` en las líneas 445 y 451 (y el punto de la línea 453). De paso, los valores de --serie-1/--serie-2 del archivo son los anteriores a 2.15.0."
+    },
+    "por_que_importa": "Un verde en una serie se lee como «órdenes correctas», que es justo el ejemplo con el que el sistema explica la regla («Agencias» en verde). Lectura alternativa: las dos gráficas están rotuladas y separadas, así que la confusión real es baja; el color sí choca con los verdes de los deltas «+3 hoy»."
+   },
+   {
+    "id": "v2-02dashboard-05",
+    "severidad": "media",
+    "regla": "§4 Sombra y superficie translúcida y §6.3 Tarjeta (no se anidan tarjetas)",
+    "dice_el_sistema": "«El translúcido es de la pantalla de entrada. En el dashboard las superficies son opacas»",
+    "hay_en_el_build": "`.hero` usa `background:var(--glass);backdrop-filter:blur(10px)` (línea 149) y dentro lleva `.hero .chip{background:var(--surface);border:1px solid var(--border)…}` (línea 152): una tarjeta con borde dentro de la tarjeta de vidrio «Trámites en proceso». El comentario del propio archivo lo justifica como «Regla H3: el vidrio es marco decorativo, la cifra va sobre chip sólido».",
+    "selector": ".hero / .hero .chip",
+    "linea": 149,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 149,
+     "cita": "--glass);backdrop-filter:blur(10px)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Dos lecturas: (a) el cliente tiene una regla propia (H3, citada en su comentario) para que el KPI principal destaque con un marco translúcido; (b) §4 reserva el vidrio al acceso y §6.3 no admite tarjeta dentro de tarjeta. Solución concreta si se acoge (b): quitar `--glass`/`backdrop-filter` de `.hero` y el borde/relleno de `.chip`; el `.card` ya es superficie opaca."
+    },
+    "por_que_importa": "En la captura la cifra 182 queda en una caja dentro de otra caja, con dos bordes concéntricos (el del hero, `--border-2`, y el del chip): jerarquía más ruidosa que las cuatro tarjetas simples de al lado."
+   },
+   {
+    "id": "v2-02dashboard-06",
+    "severidad": "media",
+    "regla": "§12.5 Reglas de lectura (la serie y la cifra cuadran)",
+    "dice_el_sistema": "«La serie y la cifra del mismo widget miden lo mismo, y cuadran.»",
+    "hay_en_el_build": "La rejilla de «Trámites» tiene líneas en y=14/47/80/99 etiquetadas 60/40/20/0: 33 px entre 60→40 y 40→20 pero solo 19 px entre 20→0 (escala no lineal; «Órdenes» igual con 20/14/7/0). La polilínea `points=\"38,50 74,43 110,63 146,26 182,14 218,79 250,89\"` no corresponde a los valores del `aria-label` (30, 38, 22, 44, 55, 12, 6): el pico de 55 queda sobre la rejilla de 60, el sábado (12) se dibuja sobre la línea de 20 y el domingo (6) se lee como ≈10.",
+    "selector": "svg[role=img] (Trámites, Órdenes)",
+    "linea": 436,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 436,
+     "cita": "<line x1=\"26\" y1=\"14\" x2=\"256\" y2=\"14\"/>"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta: una sola fórmula `y = 99 − v × (85/60)` para Trámites (y `85/20` para Órdenes) con el cero en y=99 y las líneas de rejilla a y=14/42,3/70,7/99 para 60/40/20/0; o generar los puntos desde los datos."
+    },
+    "por_que_importa": "Quien lee la gráfica contra los ejes obtiene valores distintos a los del texto («55 el viernes»). Lectura alternativa: son datos de maqueta y los puntos pueden ser ilustrativos; el desajuste de la rejilla (19 px frente a 33) es verificable aunque los datos no lo sean."
+   },
+   {
+    "id": "v2-02dashboard-07",
+    "severidad": "baja",
+    "regla": "§12.3 El <canvas> no es accesible",
+    "dice_el_sistema": "«Cada gráfico lleva su tabla equivalente, y esa tabla es la fuente de verdad del dato»",
+    "hay_en_el_build": "Las dos gráficas son `<svg role=\"img\" aria-label=\"…30, 38, 22, 44, 55, 12 y 6\">` sin `<table>`/`<details>` equivalente ni totales; solo se muestra en pantalla el máximo («55 el viernes»).",
+    "selector": "svg[role=img]",
+    "linea": 435,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 435,
+     "cita": "aria-label=\"Trámites por día de la semana: 30, 38, 22, 44, 55, 12 y 6\""
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El sistema redacta §12.3 para `<canvas>` con Chart.js. Falta decir si un SVG estático con `aria-label` que enumera los valores cuenta como equivalente o si también debe llevar tabla. Propuesta: aceptar el `aria-label` completo para series de ≤7 puntos y exigir tabla solo para canvas."
+    },
+    "por_que_importa": "Para quien usa lector, el `aria-label` entrega los siete valores; para quien ve la gráfica pero necesita el dato exacto del martes, no existe. Lectura alternativa: con un SVG inline no hay riesgo de que la librería no cargue, que era la otra razón de la tabla."
+   },
+   {
+    "id": "v2-02dashboard-08",
+    "severidad": "baja",
+    "regla": "§6.4 Vistas de estado de una pantalla",
+    "dice_el_sistema": "«El medallón carga el peso visual del icono.»",
+    "hay_en_el_build": "`.state .ico{width:30px;height:30px;color:var(--text-3)}` (línea 246): el icono de Vacío y de Error es un glifo de contorno de 30 px (gris `--text-3`; en Error solo `--err-ink`) sin medallón de relleno sólido; `.tarjeta-estado` y `.estado-ico` no existen en el archivo. El estado sí queda dentro de la tarjeta «Actividad reciente», que conserva título y «Ver todo» (captura propia del estado Error).",
+    "selector": ".state",
+    "linea": 246,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 246,
+     "cita": ".state .ico{width:30px;height:30px;color:var(--text-3)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta: copiar `.estado-ico` (52 px, relleno `--accent`/`--err`, glifo `--on-state`) de §6.4 dentro de `.state-empty`/`.state-error`; el texto no cambia."
+    },
+    "por_que_importa": "Sin medallón el icono pesa menos que el título; el estado se lee como texto con adorno en vez de como respuesta del sistema. Solo se ve al cambiar de estado."
+   },
+   {
+    "id": "v2-02dashboard-09",
+    "severidad": "baja",
+    "regla": "§6.7 Esqueleto de carga (`.skel`)",
+    "dice_el_sistema": "«Y el mismo alto, que es la mitad que se olvida.»",
+    "hay_en_el_build": "El esqueleto de «Actividad reciente» mide 160 px frente a los 273 px de la tabla con datos (−113 px, 41 %): cuatro filas sin banda de cabecera frente a cinco filas con cabecera, y cada `.skel` contiene el texto real de la fila con `color:transparent` (línea 520).",
+    "selector": ".state-loading",
+    "linea": 518,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_esqueleto_alto",
+     "detalle": "scratchpad/lote27b/m_varios2.cjs: alto de `#tabla .real` con datos (273 px) frente a `.state-loading` con data-state=loading (160 px)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta: añadir la fila de cabecera y la quinta fila (`min-height` de fila 41 px) y vaciar el texto de los `.skel`; el contenedor ya es `aria-hidden`, así que añadir `role=\"status\"` con `aria-label` para que la carga se anuncie."
+    },
+    "por_que_importa": "Al llegar los datos la tabla salta 113 px hacia abajo; menor que el caso medido en el sistema (291 px) pero del mismo tipo."
+   },
+   {
+    "id": "v2-02dashboard-10",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (excepción del 10,5 px)",
+    "dice_el_sistema": "«Se admite una excepción, y solo una: 10,5px en mayúsculas con letter-spacing para los rótulos de grupo de la barra lateral»",
+    "hay_en_el_build": "`.grp{…font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--chrome-dim)}` (línea 99) sin `text-transform:uppercase`: los seis rótulos («Principal», «Operación», «Gestoría», «Comercial», «Soporte», «Sistema») se pintan en mayúscula inicial. La excepción solo vale en mayúsculas. El instrumento C2 cuenta 9 fallos (6 `p.grp` y los 2 `.tag` de la fila de KPI, tratados en el hallazgo de 12 px).",
+    "selector": "p.grp",
+    "linea": 99,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "dossier: fallos 9; p.grp «Principal», «Operación», «Gestoría», «Comercial», «Soporte», «Sistema»; span.tag.t-ok «+3 hoy»; span.tag.t-err «2 críticos»"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Una línea: `text-transform:uppercase` en `.grp` (cumple la excepción) o `font-size:var(--fs-meta)` (cumple el suelo). La captura muestra «Principal» en mayúscula inicial con tracking ancho."
+    },
+    "por_que_importa": "El cromo se copia a todas las pantallas: la corrección de una línea queda en todas."
+   },
+   {
+    "id": "v2-02dashboard-11",
+    "severidad": "baja",
+    "regla": "§9 Andamiaje de maqueta",
+    "dice_el_sistema": "«Se marca siempre con data-andamio, va visualmente separado del producto y rotulado»",
+    "hay_en_el_build": "El conmutador de estados es `<aside class=\"demo\" aria-label=\"Controles de la maqueta (no forman parte del producto)\">` (línea 554) sin `data-andamio` (0 coincidencias en el archivo) y `position:fixed` abajo a la izquierda: tapa los últimos ítems del menú («Catálogos», «Reportes») según el alto de la ventana (I3: `aside.demo` × `a.it` «Reportes», solape 0,3; I2: holgura inferior 5 px).",
+    "selector": "aside.demo",
+    "linea": 554,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 554,
+     "cita": "<aside class=\"demo\" aria-label=\"Controles de la maqueta"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Añadir `data-andamio` al `<aside>` (un atributo) para que se retire en la versión real y se pueda ocultar al medir."
+    },
+    "por_que_importa": "Sin la marca nada impide que el andamio llegue al producto, y mientras tanto cubre parte de la navegación."
+   },
+   {
+    "id": "v2-02dashboard-12",
+    "severidad": "media",
+    "regla": "§2 Tipografía (fuentes autoalojadas, D116)",
+    "dice_el_sistema": "«Las fuentes se autoalojan — D116.»",
+    "hay_en_el_build": "Cargan Inter y Michroma desde `<link href=\"https://fonts.googleapis.com/css2?family=Inter…\">` (líneas 8 y 10) y no hay ningún `@font-face` (barrido: font_face 0). Las fuentes que se ven en la captura se inyectaron al renderizar; no son un defecto de la pantalla.",
+    "selector": "head > link",
+    "linea": 10,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 10,
+     "cita": "fonts.googleapis.com/css2?family=Inter"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Solución concreta: sustituir los tres `<link>` por los dos `@font-face` de §2 (`/fuentes/inter-variable.woff2`, `/fuentes/michroma.woff2`)."
+    },
+    "por_que_importa": "Con el CDN caído la pantalla cae a system-ui sin ningún error visible, que es el incidente de 4 días sin detección que motivó D116."
+   },
+   {
+    "id": "v2-02dashboard-13",
+    "severidad": "baja",
+    "regla": "§6.2 Botones (`.btn`, `.btn.p`, `.btn.mini`)",
+    "dice_el_sistema": "«Y el suelo hay que declararlo, no confiarlo al relleno.»",
+    "hay_en_el_build": "`.btn{…padding:8px 13px;font:600 var(--fs-dense) var(--font-ui);…}` (líneas 233-234) sin `min-height`: «Ver todo» y «Reintentar» miden 34 px de alto frente al suelo de 36 px (`min-height` calculado: auto).",
+    "selector": ".btn",
+    "linea": 233,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_fuentes_lt12",
+     "detalle": "scratchpad/lote27b/m_fuentes.cjs: alto de button.btn = 34 px (82 px de ancho, «Ver todo»); getComputedStyle().minHeight = auto"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico. Una declaración: `min-height:36px` en `.btn` (y 28 px en `.mini`)."
+    },
+    "por_que_importa": "Es el mismo error de 35 px que el sistema ya midió en las maquetas del padrón; el botón primario «Ver todo»/«Reintentar» queda 2 px por debajo."
+   },
+   {
+    "id": "v2-02dashboard-14",
+    "severidad": "baja",
+    "regla": "§3 Espaciado y radios",
+    "dice_el_sistema": "«Escala base de 4px.»",
+    "hay_en_el_build": "I5: 6 valores fuera de la escala `--sp-*` y 144 ocurrencias (10px×55, 9px×30, 6px×26, 5px×20, 3px×12, 96px×1) y 4 interlineados distintos (1,35×7, 1×4, 1,3×4, 1,05×2). Ejemplo: `.alert{display:flex;gap:10px;padding:10px 0;…}` (línea 197).",
+    "selector": ".alert, .top, .mini …",
+    "linea": 197,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I5_ritmo",
+     "detalle": "dossier: valoresFueraDeEscala 6, ocurrencias 144, top 10px×55, 9px×30, 6px×26, 5px×20, 3px×12, 96px×1; interlineadosDistintos 4"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Candidato del instrumento, no veredicto. El mismo patrón aparece en 03, 06 y 30 con 6 px como valor dominante: la escala del sistema (4, 8, 12, 16, 20, 24, 32, 48) no ofrece 6 ni 10 y los dos son los valores que el equipo usa para gaps y relleno de filas. Decisión de sistema: añadir un token de 6/10 o fijar el ajuste a 4/8/12."
+    },
+    "por_que_importa": "Ritmo vertical irregular entre widgets; sin consecuencia funcional."
+   },
+   {
+    "id": "v2-02dashboard-15",
+    "severidad": "baja",
+    "regla": "§7.2 Cromo de aplicación",
+    "dice_el_sistema": "«Tres anchos: completa (≥1100px), colapsada a solo iconos (860–1100px) y cajón con velo»",
+    "hay_en_el_build": "A 800 px el `nav.side` sigue en 236 px y `main` queda en 564 px; a 390 px `main` mide 154 px y hay scroll horizontal de página (scrollWidth 690). Solo hay una `@media (max-width:1180px)` que apila las rejillas del contenido (línea 277); el botón «Contraer navegación» (`.iconbtn`, línea 350) no tiene manejador en el script. Mediciones propias fuera de los tres anchos del dossier (1440/1280/1024, sin scroll horizontal).",
+    "selector": "nav.side",
+    "linea": 277,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_responsive",
+     "detalle": "scratchpad/lote27b/m_resp.cjs: ancho de nav.side, ancho de main y scrollWidth a 800 y 390 px. 02: side 236, main 564 / 154, scrollW 800 / 690"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No es crítico (los tres anchos medidos por el dossier pasan sin scroll). Solución: aplicar el patrón de 30 (iconos a ≤1100 px y cajón a ≤860 px)."
+    },
+    "por_que_importa": "Pantalla pensada para escritorio; en tableta vertical el contenido útil se reduce a la mitad."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 2,
+   "integridad": 2
+  },
+  "justificacion": "Buena base de tablero: jerarquía clara (saludo, KPI principal con barra de SLA con trama, gráficas con un eje cada una, alertas con icono + color + texto) y tema oscuro sin fallos de contraste. Resta: dos fallos críticos medidos (icono de «Reintentar», contraste en :hover), 74 textos bajo 12 px, serie «Órdenes» con color de estado, ejes de gráfica no lineales, vidrio + tarjeta anidada en el KPI principal y cromo que no colapsa por debajo de 1100 px.",
+  "evidencia": [
+   "02_dashboard--1440.png",
+   "02_dashboard--1280-fold.png",
+   "I1_icono_vs_boton",
+   "propio_hover_contraste",
+   "propio_fuentes_lt12"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Botón flotante del asistente D-PRIMI (`.fab`, 52 px, fijo abajo a la derecha, con anillo discontinuo al enfocar)",
+   "propuesta_de_regla": "El asistente flotante vive en la esquina inferior derecha a 26 px de los bordes y el contenido reserva 96 px inferiores para que ningún control (paginación, «Ver todo») quede debajo. A 1280×800 cubre 37×34 px del botón «Ver todo» hasta que se desplaza la página."
+  },
+  {
+   "patron": "Barra de SLA apilada con trama diagonal además del color (`.slabar`: sólido, rayas 45°, rayas −45°)",
+   "propuesta_de_regla": "Los tramos de una barra de reparto entre estados del semáforo llevan una trama distinta cada uno además del color, y la leyenda repite icono y cifra: el estado no depende solo del matiz. Complementa §12.4 (barra apilada) y §1.3."
+  },
+  {
+   "patron": "Unidad de medida de una cifra KPI: «kWh» dentro de la cifra y «MXN» fuera, tras el delta",
+   "propuesta_de_regla": "La unidad va siempre en `small` pegada a la cifra y en la misma línea; si no cabe, la cifra baja con su unidad, nunca la unidad sola. Hoy «kWh» salta de línea a 1280 px y «MXN» se queda detrás del delta."
+  }
+ ],
+ "sin_datos": [
+  "No hay texto del PDF del cliente para 02 (no listado en el PDF): no se contrastó contra declaraciones C1–C18.",
+  "Estado Vacío (`.state-empty`) no capturado; leído solo en código (misma estructura sin tarjeta que Error).",
+  "Navegación con teclado, foco visible y lector de pantalla no se probaron; solo estilo calculado, contraste y geometría.",
+  "Rendimiento no evaluado (la pantalla es estática; el único coste visible es `backdrop-filter` en el hero).",
+  "Falso positivo conocido del dossier: `span.av` «AR» 1,06:1 en tema claro: el contraste se calcula contra el fondo del padre porque `.av` lleva `linear-gradient(135deg,#1E4E79,#3E7A4C)`; texto rgb(242,245,247) sobre 3E7A4C = 4,69:1 y sobre 1E4E79 = 7,92:1. No se reporta.",
+  "Tema oscuro medido con el instrumento de contraste (clic en `#theme`): 0 fallos en 147 nodos de texto."
+ ]
+}

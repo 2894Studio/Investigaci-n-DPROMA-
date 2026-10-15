@@ -1,0 +1,569 @@
+{
+ "pantalla": "40_usuarios",
+ "tier": "B",
+ "modo": "cumplimiento",
+ "sha256": "41634c36875dca3710c53ad9281347a4bd975a1fb85a52418b2b8cf2b79ed3c0",
+ "estado_vs_pdf": "alineado",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error"
+ ],
+ "capturas": [
+  "40_usuarios--1440.png",
+  "40_usuarios--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-40usuarios-01",
+    "severidad": "alta",
+    "regla": "§10 Diez trampas comprobadas (el destino táctil es la región que acepta la pulsación) · §7.3 Objetivos táctiles",
+    "dice_el_sistema": "un campo de búsqueda dentro de un `<div>` con forma de pastilla **no** cumple, porque pulsar la pastilla no hace nada",
+    "hay_en_el_build": "`<div class=\"search\">` (380×34) contiene `<input id=\"buscar\" type=\"search\">` de 329×16: es el único destino bajo 24 px de la pantalla (tactil_bajo24: 1 de 47). Comprobado: el contenedor es un DIV, no una `<label for>`; el input ya tiene `aria-label`.",
+    "selector": ".search input",
+    "linea": 671,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil_bajo24",
+     "detalle": "1 de 47 bajo 24 px: input type=search «Buscar usuarios», 329×16; script propio m6/m2.cjs: input [329,16], pastilla [380,34], tag DIV"
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino táctil < 24 px medido (criterio 1). Una línea: `<div class=\"search\">` → `<label class=\"search\" for=\"buscar\">`; la pastilla de 34 px pasa a ser el destino. El mismo `.search` está en 50."
+    },
+    "por_que_importa": "Quien pulsa en la pastilla (la zona que parece el campo) no consigue escribir; con dedo o puntero impreciso hay que acertar a una franja de 16 px."
+   },
+   {
+    "id": "v2-40usuarios-02",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (modo colapsado) · §6.5 Iconos",
+    "dice_el_sistema": "En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.",
+    "hay_en_el_build": "A 1000 px el `.side` pasa a 64 px y `.side .et` se oculta con display:none: 15 de 15 enlaces `.it` quedan sin nombre accesible (instrumento menu_1000px: total 15, sinNombre 15). Comprobado además con script propio a 1000×800: innerText vacío y sin aria-label ni title en los 15.",
+    "selector": ".side .et",
+    "linea": 291,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "sidebar (menu_1000px)",
+     "detalle": "total 15, sinNombre 15, anchoSide 64 (dossier); script propio m6/medir.cjs a 1000×800: [innerText, aria-label, title] = [\"\",null,null] en los 15 `.side .it`"
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1 de la regla 1). Arreglo de una línea que no cambia el diseño: en vez de `display:none` sobre `.side .et`, aplicarle la receta `.sr` que el propio archivo ya declara (recorte de 1 px), o añadir `title` y `aria-label` a cada `.it`; `.grp` y `.wordmark` pueden seguir ocultos. Con `title` se cumple además lo que §7.2 pide («etiqueta emergente»)."
+    },
+    "por_que_importa": "Entre 860 y 1100 px (portátil con la ventana partida, tableta apaisada) toda la navegación es una columna de iconos sin nombre: un lector de pantalla anuncia 15 veces «enlace» y quien ve la pantalla no tiene ni etiqueta emergente. Mismo bloque ARQ-CROMO que en 39, 50, 56 y 57."
+   },
+   {
+    "id": "v2-40usuarios-03",
+    "severidad": "alta",
+    "regla": "§6.11 Tabla densa (regla 5: ninguna columna desaparece en silencio)",
+    "dice_el_sistema": "O hay desplazamiento horizontal, o hay un aviso de cuántas columnas están ocultas con forma de recuperarlas.",
+    "hay_en_el_build": "`.usr table{min-width:1120px}` dentro de una caja de 1044 px a 1280 px: scroll horizontal de 76 px (anchos_1440_1280_1024: dx 76; a 1024 px, dx 160 y 39 nodos fuera del borde). La columna «Acciones» —Cambiar rol / Dar de baja— queda cortada por el borde derecho («Car…», «Da…» en la captura de 1280) y sus botones se apilan en dos líneas (celda de 62 px). No hay pista de que existe más tabla a la derecha.",
+    "selector": ".usr table",
+    "linea": 640,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "anchos_1440_1280_1024",
+     "detalle": "1280: scroll-x div.tabla-caja dx 76, ancho 1044; 1024: dx 160, ancho 960; 1440 sin scroll. Script propio m6/m2.cjs a 1280: caja 1044, scrollWidth 1120; con min-width:0 la tabla cabe justa (scrollWidth 1044) y `.acciones` sigue en 62 px"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No crítico según la regla 1: el desplazamiento horizontal lo permite §6.11 y la acción es alcanzable. Si «oculta la acción primaria» se lee como «no visible sin desplazar», sube a crítico (criterio 2); se deja la lectura prudente. Solución concreta: anclar también la última columna (`position:sticky;right:0` con `--surface`, como ya se ancla la primera por D-6) para que las acciones se vean a cualquier ancho; bajar `min-width` a 1040px solo no basta (medido: las acciones siguen en dos líneas)."
+    },
+    "por_que_importa": "Las acciones por fila son la tarea de la pantalla (cambiar rol, dar de baja, reactivar); a 1280 px, ancho de portátil habitual, no se ven completas sin desplazar, y quien no desplaza cree que hay una sola acción o ninguna."
+   },
+   {
+    "id": "v2-40usuarios-04",
+    "severidad": "alta",
+    "regla": "§10 Diez trampas comprobadas (un `<symbol>` ya trae su `viewBox`) · §1.2.1 Logotipo: uso y restricciones",
+    "dice_el_sistema": "repetirlo en el `<svg>` que lo invoca descoloca la marca",
+    "hay_en_el_build": "`<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/></svg>` con el `<symbol>` ya declarado con ese mismo viewBox: la caja del `<use>` empieza en x=63,5 y la del `<svg>` en x=96, un desfase de −32,5 px (medido a 1440×900). En la captura el isotipo del cromo es una hoja estrecha recortada, no la «Λ» completa. El botón flotante repite el patrón (`<svg width=\"22\" height=\"21\" viewBox=\"740 0 970 932\">`; no se midió por separado).",
+    "selector": ".side .logo svg",
+    "linea": 657,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_logo",
+     "detalle": "script m6/medir.cjs: `.logo svg` x=96 w=44; su `<use>` x=63,5 w=43; svgViewBox \"740 0 970 932\", `<use>` sin width"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No entra en los 4 criterios críticos, así que no se exige. Arreglo propuesto de una línea, la receta del propio §10: quitar el `viewBox` del `<svg>` y poner las medidas en el `<use>` (`<use href=\"#dproma-mark\" width=\"44\" height=\"42\"/>`). Mejora la marca en todas las pantallas del paquete que copien este cromo."
+    },
+    "por_que_importa": "La marca de la aplicación, visible en cada pantalla, no se reconoce: §1.2.1 prohíbe deformar o recortar el isotipo oficial. Es el mismo bloque de cromo que en 39, 50, 56 y 57; en 10_dprimi_asistente el `<use>` lleva sus medidas y el isotipo sale completo."
+   },
+   {
+    "id": "v2-40usuarios-05",
+    "severidad": "media",
+    "regla": "§6.12 Resumen de estatus y barra de filtros (regla 8)",
+    "dice_el_sistema": "**Un control con pinta de interactivo tiene que interactuar.**",
+    "hay_en_el_build": "Tres `.schip` con `aria-pressed=\"false\"` y `data-f` («sin ciudades», «activos», «de baja») sin ningún manejador: el único `<script>` solo atiende `data-set` del andamio, el tema y el menú, y `data-f` aparece una sola vez en todo el archivo (en el marcado).",
+    "selector": ".schip",
+    "linea": 672,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 672,
+     "cita": "class=\"schip c-err\" type=\"button\" aria-pressed=\"false\" data-f=\"err\""
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "En maqueta sin lógica de filtrado, §6.12 pide presentarlos como cifra de lectura (sin `aria-pressed` ni cursor de puntero); si se conectan, la regla 2 exige que el estado del filtro se vea en un único sitio."
+    },
+    "por_que_importa": "Se ven pulsables y no hacen nada: quien revisa la maqueta concluye que el filtrado está roto, o peor, que el chip «sin ciudades» ya se aplicó cuando `aria-pressed` dice que no."
+   },
+   {
+    "id": "v2-40usuarios-06",
+    "severidad": "media",
+    "regla": "§6.12 Resumen de estatus y barra de filtros (regla 6: el resumen no sobrevive a su propio filtro)",
+    "dice_el_sistema": "**El resumen no sobrevive a su propio filtro.**",
+    "hay_en_el_build": "«1 sin ciudades» y «1 de baja» se dicen cuatro veces: en `.resumen` del título («23 usuarios · 1 sin ciudades · 1 de baja»), en los chips de debajo (que son el filtro de ese mismo criterio), en la banda roja y en el pie `.tfoot`.",
+    "selector": ".resumen",
+    "linea": 670,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 670,
+     "cita": "<span class=\"resumen\"><b>23</b> usuarios · <b>1</b> sin ciudades · <b>1</b> de baja</span>"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "La ficha documenta la banda y la marca en la fila («aviso de cabecera además de marca en la fila»); lo demás son repeticiones. Propuesta: dejar «23 usuarios» en el título, las cifras de condición solo en los chips y el pie en «Mostrando 7 de 23»."
+    },
+    "por_que_importa": "La banda roja es lo único que debe llamar la atención; la misma cifra repetida cuatro veces la desgasta."
+   },
+   {
+    "id": "v2-40usuarios-07",
+    "severidad": "media",
+    "regla": "§8 Voz de producto (nivel 2: una consecuencia que no bloquea nada ahora) · §6.23 Toggletip de información",
+    "dice_el_sistema": "Toggletip sobre el control o columna relacionada",
+    "hay_en_el_build": "`<p class=\"nota\">` con «Cambiar el rol cierra todas las sesiones de esa persona al instante.» va después de la paginación, al final del cuerpo: a 1440×900 asoma por abajo, a 1280×800 queda fuera del primer pliegue (captura 1280-fold), lejos de los botones «Cambiar rol» que repite cada fila. La ficha decide «Cambiar el rol cierra todas las sesiones, y se avisa antes» (`Usuarios.tsx:6-11`).",
+    "selector": "p.nota",
+    "linea": 733,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 733,
+     "cita": "Cambiar el rol cierra todas las sesiones de esa persona al instante."
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Avisar donde se actúa: toggletip (§6.23) en «Cambiar rol» o, mejor, la misma frase como cuerpo del diálogo de confirmación de §6.18 (no está dibujado: ver sin_datos). La nota de pie puede quedarse como recordatorio."
+    },
+    "por_que_importa": "La consecuencia —la persona pierde su sesión de golpe— se lee después de haber visto, y quizá pulsado, el botón que la provoca."
+   },
+   {
+    "id": "v2-40usuarios-08",
+    "severidad": "media",
+    "regla": "§11 Checklist al añadir un componente nuevo (acción destructiva)",
+    "dice_el_sistema": "¿Toda acción destructiva confirma, dice a cuántos afecta y se puede deshacer?",
+    "hay_en_el_build": "La fila «Alex Rai» —el mismo nombre que el cromo muestra como usuario actual— ofrece «Cambiar rol» y «Dar de baja» igual que las demás; nada la marca como «tú» ni la protege en lo dibujado.",
+    "selector": "tbody tr (Alex Rai)",
+    "linea": 710,
+    "certeza": "inferido",
+    "reproduce": {
+     "tipo": "captura",
+     "archivo": "40_usuarios--1440.png",
+     "region": "fila «Alex Rai · Administración de sistemas» con los botones Cambiar rol y Dar de baja; arriba a la derecha el cromo dice Alex Rai"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No se afirma el fallo (depende de la confirmación, que no está dibujada): se plantea la pregunta. Propuesta: marcar la fila propia («tú») y no ofrecer «Dar de baja» sobre uno mismo, o pedir confirmación reforzada (cambiar el propio rol cierra la propia sesión)."
+    },
+    "por_que_importa": "Un clic en la fila equivocada deja a quien administra fuera del sistema."
+   },
+   {
+    "id": "v2-40usuarios-09",
+    "severidad": "baja",
+    "regla": "§6.11 Tabla densa (regla 6: la primera pregunta es si hace falta la densidad)",
+    "dice_el_sistema": "**Y la primera pregunta es si hace falta ofrecerla.**",
+    "hay_en_el_build": "`<div class=\"seg\" role=\"group\" aria-label=\"Densidad de la tabla\">` con «Cómoda» y «Compacta», sin manejador; la tabla tiene 7 filas y 23 usuarios. El sistema anota que el padrón retiró este control.",
+    "selector": ".seg",
+    "linea": 672,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 672,
+     "cita": "aria-label=\"Densidad de la tabla\""
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Retirarlo o, si se queda, que «Compacta» reduzca contenido (el correo pasa a emergente) como pide la regla 6."
+    },
+    "por_que_importa": "Dos botones permanentes compiten con los chips y el buscador por una preferencia que casi nadie cambia."
+   },
+   {
+    "id": "v2-40usuarios-10",
+    "severidad": "baja",
+    "regla": "§6.10 Etiqueta de estado (`.pill`) y de clasificación (`.p-type`) · §6.9 (no reinventar componentes)",
+    "dice_el_sistema": "**`.p-type` = clasificación.** Lo que la cosa **es**",
+    "hay_en_el_build": "El rol es una clasificación y se dibuja con `.rolchip2` (fondo `color-mix(serie-1 16%)`, radio 4px, icono de escudo), definida al final del archivo, en vez de `.p-type.p-s1` que el mismo archivo ya declara (radio `--r-ctrl` 6px, punto de color). Las ciudades `.cd` repiten el patrón con radio 4px y sin punto.",
+    "selector": ".rolchip2",
+    "linea": 649,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 649,
+     "cita": ".rolchip2{display:inline-flex;align-items:center;gap:5px;border-radius:4px"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El cliente necesitó un icono en una clasificación y §6.10 no tiene esa variante. Documentarla (`.p-type` con icono, radio `--r-ctrl`) en vez de pedir que la quiten; las ciudades pasarían a `.p-type.p-s0`."
+    },
+    "por_que_importa": "Dos recetas visuales para el mismo tipo de dato conviven en el archivo; la siguiente pantalla de roles copiará la que encuentre."
+   },
+   {
+    "id": "v2-40usuarios-11",
+    "severidad": "baja",
+    "regla": "§1.3 Semáforo — cinco estados, tres variantes cada uno",
+    "dice_el_sistema": "Inactivo, en pausa — no es un fallo",
+    "hay_en_el_build": "«De baja» es `.pill.p-neutro` y su chip `.schip.c-neutro` (fondo `--surface-2`, texto `--text-2`); `--pause` y `.p-pause` están declarados en el mismo archivo y son el estado «inactivo, en pausa».",
+    "selector": ".pill.p-neutro",
+    "linea": 728,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 728,
+     "cita": "<span class=\"pill p-neutro\">De baja</span>"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "La baja lógica de la ficha (D80/U-25) es un estado inactivo, que es lo que `--pause` significa. Usar `.p-pause` o documentar `.p-neutro` como sexto estado sin juicio; no se pide nada al cliente."
+    },
+    "por_que_importa": "Un estado de color propio no documentado: la baja no se lee con el mismo código que cualquier otro «inactivo» del semáforo."
+   },
+   {
+    "id": "v2-40usuarios-12",
+    "severidad": "baja",
+    "regla": "§1.1 Superficies y texto (`--surface-2`: filas inactivas)",
+    "dice_el_sistema": "Superficie secundaria (cabeceras, filas al pasar el cursor, filas inactivas, esqueleto)",
+    "hay_en_el_build": "`.baja` solo añade `box-shadow:inset 3px 0 0 var(--border-fuerte)` a la primera celda; el resto de la fila de Patricia Verduzco conserva fondo y texto de una fila activa. La ficha dice «enseñar los de baja en la misma tabla atenuados».",
+    "selector": ".baja",
+    "linea": 648,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 648,
+     "cita": ".baja th:first-child{box-shadow:inset 3px 0 0 var(--border-fuerte)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Atenuar la fila con `--surface-2` y `--text-2` en todas sus celdas; medir `--text-2` sobre `--surface-2` antes de adoptarlo (§1.7)."
+    },
+    "por_que_importa": "La baja se distingue por una franja de 3 px y una pastilla gris, pero la fila se lee igual de viva que las activas, que es lo que la ficha quería evitar."
+   },
+   {
+    "id": "v2-40usuarios-13",
+    "severidad": "baja",
+    "regla": "§1.1 Superficies y texto (`--surface`: superficie sólida de tablas)",
+    "dice_el_sistema": "Superficie sólida (tarjetas, tablas, botones)",
+    "hay_en_el_build": "Cabecera y primera columna anclada llevan `--surface` (#FAFCFD) y las celdas del cuerpo no tienen fondo, así que muestran `--bg` (#F2F5F7): la columna «Persona» se ve más clara que el resto de cada fila (captura 1440).",
+    "selector": "tbody th:first-child",
+    "linea": 410,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 410,
+     "cita": "tbody th:first-child,thead th:first-child{position:sticky;left:0;z-index:6;background:var(--surface)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El §6.11 del sistema tiene la misma receta (primera columna con `background:var(--surface)` y `.tabla-caja` sin fondo): corregir el sistema con `.tabla-caja{background:var(--surface)}`, que arregla también 50 y cualquier tabla con columna anclada."
+    },
+    "por_que_importa": "La banda clara de la primera columna se lee como otra superficie y no como columna fija; es lo primero que se ve al desplazar."
+   },
+   {
+    "id": "v2-40usuarios-14",
+    "severidad": "baja",
+    "regla": "§6.11 Tabla densa (regla 9: registros por página elegibles)",
+    "dice_el_sistema": "**Registros por página elegibles.**",
+    "hay_en_el_build": "El pie dice «Mostrando 7 de 23» con paginador, sin selector 10 / 25 / 50 / 100.",
+    "selector": ".tfoot",
+    "linea": 732,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 732,
+     "cita": "<div class=\"tfoot\"><span>Mostrando <b class=\"tnum\">7</b> de <b class=\"tnum\">23</b>"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Añadir el selector de §6.11 o, con 23 usuarios, mostrar todos en una página."
+    },
+    "por_que_importa": "Con 7 por página hay cuatro páginas para revisar 23 personas."
+   },
+   {
+    "id": "v2-40usuarios-15",
+    "severidad": "baja",
+    "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional",
+    "dice_el_sistema": "**el relleno de un contenedor lo declara el contenedor**, no el hijo que casualmente va último",
+    "hay_en_el_build": "`.p4` no declara `padding-bottom` (barrido: p4_sin_padding_bottom [311]); aquí lo cierra la fila de chips `.p4-f`, con relleno arriba y abajo. Latente: aparece cuando se retire esa fila.",
+    "selector": "div.p4",
+    "linea": 311,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 311,
+     "cita": ".p4{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Una línea: `.p4{padding-bottom:var(--sp-3)}`, plantilla ARQ-P4 (se ve ya en 39)."
+    },
+    "por_que_importa": "Sin efecto visible hoy; es la causa del hueco de 0 px que sí se ve en 39."
+   },
+   {
+    "id": "v2-40usuarios-16",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla",
+    "dice_el_sistema": "**El estado va dentro de una tarjeta, no suelto sobre el fondo.**",
+    "hay_en_el_build": "Las vistas vacío y error son `.state` suelto sobre `--bg`: icono de 30px en `--text-3`, sin `.tarjeta-estado` ni medallón, y el título es un `<b>`, no un encabezado (regla 2 de §6.4). Además `.state b{font-size:var(--fs-base)}` alcanza también a los `<b>` de énfasis dentro de los `<p>`: medido con la vista error forzada, `<p>` a 13px y su `<b>` a 14px (estado error de esta pantalla).",
+    "selector": ".state",
+    "linea": 607,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 612,
+     "cita": ".state b{font-size:var(--fs-base)}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No crítico y el bloque ARQ-ESTADOS es del cliente. La receta de §6.4 lo resuelve sin tocar el contenido: envolver el contenido de `.state` en `.tarjeta-estado` con medallón sólido, cambiar `<b>` por `<h2>` y acotar el selector a `.state > h2`. Decidir si se adopta la receta del sistema o se documenta el estado plano del cliente."
+    },
+    "por_que_importa": "Sin superficie, un mensaje centrado en una zona de contenido enorme se lee como una pantalla que no terminó de cargar (§6.4), y el énfasis inflado rompe el ritmo de la frase justo en los textos que más se leen el día que algo falla. Mismo bloque en 39, 50, 56 y 57."
+   },
+   {
+    "id": "v2-40usuarios-17",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga (`.skel`)",
+    "dice_el_sistema": "**Sin texto real dentro de las barras.**",
+    "hay_en_el_build": "Las barras `.skel` llevan texto dentro (con `color:transparent`, que sigue en el árbol de accesibilidad); el esqueleto mide 188 px frente a los 401 px de la tabla (658 px el estado con datos) (medido forzando data-state; §6.7 pide «el mismo alto»); y bajo `prefers-reduced-motion` solo se hace `animation:none`, que congela el degradado en la posición 0 en vez de aplanar el fondo.",
+    "selector": ".skel",
+    "linea": 735,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_estados",
+     "detalle": "script m6/estados.cjs: con #contenido[data-state=loading] se mide .state-loading (188 px frente a los 401 px de la tabla (658 px el estado con datos)); texto dentro de las barras leído en el marcado de la línea citada"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Vaciar las barras (el contenedor ya lleva `role=\"status\"` y `aria-label`), dar `min-height` por fila hasta igualar el alto de lo que sustituye (§6.7) y, bajo reduced-motion, `background:var(--surface-2)`."
+    },
+    "por_que_importa": "Al llegar los datos la pantalla salta cientos de píxeles, y un lector de pantalla puede leer el texto de relleno (una «x» o un folio inventado) como si fuera dato. Mismo bloque en 39 y 50."
+   },
+   {
+    "id": "v2-40usuarios-18",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla (regla 1)",
+    "dice_el_sistema": "**El cambio se anuncia y mueve el foco.**",
+    "hay_en_el_build": "El conmutador de estados solo hace `cont.setAttribute('data-state',…)`: no hay ningún `aria-live` en la página (medido: ninguno) ni se envía el foco al `<main id=\"contenido\" tabindex=\"-1\">`, que queda preparado sin que nadie lo use.",
+    "selector": "#contenido",
+    "linea": 778,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 778,
+     "cita": "cont.setAttribute('data-state',b.dataset.set);"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "La parte del conmutador es andamio de maqueta, pero es la que se copia al producto: añadir un `<p class=\"sr\" aria-live=\"polite\">` con la frase del estado y `main.focus()` al cambiar, como en el fragmento de §6.4."
+    },
+    "por_que_importa": "Quien usa lector de pantalla no se entera de que la vista pasó de datos a cargando o a error. Mismo bloque en 39, 50, 56 y 57."
+   },
+   {
+    "id": "v2-40usuarios-19",
+    "severidad": "media",
+    "regla": "§8 Voz de producto (ningún bloque pasa de ~140 caracteres)",
+    "dice_el_sistema": "**Ningún bloque de texto siempre visible pasa de ~140 caracteres.**",
+    "hay_en_el_build": "Vista vacía: `<p>` de 179 caracteres con dos frases («No hay personas que casen con lo que buscaste. Ojo con los usuarios de baja: no aparecen si el chip «de baja» está apagado, y es lo que más suele esconder a alguien que sí existe.»). Vista error: 170 caracteres. Medido con la vista forzada.",
+    "selector": ".state p",
+    "linea": 739,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_estados",
+     "detalle": "script m6/estados.cjs: .state-empty txtLens [179]; .state-error [170, 39]"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "El contenido es decisión del cliente (ficha: «el chip de “de baja” es lo que más suele esconder a alguien que sí existe»). Propuesta de una frase: «Ningún usuario coincide. Los de baja no salen si el chip está apagado.» (70 caracteres)."
+    },
+    "por_que_importa": "El aviso útil (los de baja se esconden) está enterrado en la segunda frase de un párrafo de cinco líneas."
+   },
+   {
+    "id": "v2-40usuarios-20",
+    "severidad": "baja",
+    "regla": "§3 Espaciado y radios (escala base de 4px)",
+    "dice_el_sistema": "Escala base de 4px.",
+    "hay_en_el_build": "I5_ritmo: 5 valores fuera de escala, 224 ocurrencias (6px×92, 5px×72, 9px×36, 3px×18, 7px×6); 4 interlineados distintos (1.25×18, 1.35×14, 1.55×3, 1.5×2)",
+    "selector": "(varios)",
+    "linea": null,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I5_ritmo",
+     "detalle": "I5_ritmo: 5 valores fuera de escala, 224 ocurrencias (6px×92, 5px×72, 9px×36, 3px×18, 7px×6); 4 interlineados distintos (1.25×18, 1.35×14, 1.55×3, 1.5×2)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El propio sistema usa 3, 5, 6 y 9 px en sus recetas (`.pill` padding:3px 9px, `.ctrl` gap:5px, `.pasos` padding:9px 0, `.it` padding:9px 10px): la escala declarada no describe lo que el sistema dibuja. Documentar esos medios pasos como valores admitidos del cromo en vez de pedir al cliente que los cambie."
+    },
+    "por_que_importa": "No es un fallo visible sino ruido de medición: el instrumento marca cientos de ocurrencias en cada pantalla y tapa las desviaciones que sí importan."
+   },
+   {
+    "id": "v2-40usuarios-21",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (excepción de 10,5px en mayúsculas) · §7.2 Cromo de aplicación",
+    "dice_el_sistema": "10,5px en mayúsculas con `letter-spacing` para los **rótulos de grupo** de la barra lateral",
+    "hay_en_el_build": "`.grp` a 10,5px sin `text-transform:uppercase`: «Principal», «Operación», «Trámites vehiculares»… salen en caja mixta (instrumento C2_105_no_mayusculas: 5 fallos; computado: font-size 10,5 y text-transform none).",
+    "selector": ".grp",
+    "linea": 238,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "5 fallos: p.grp «Principal», «Operación», «Trámites vehiculares», «Dirección y Administraci…», «Soporte»"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El `.grp` que el propio §7.2 enseña tampoco lleva `text-transform:uppercase`: el cliente copió el fragmento. Corregir el sistema (añadir uppercase al fragmento de §7.2) o, si se prefiere caja mixta, subir el rótulo a 12px y retirar la excepción; no se le pide nada al cliente."
+    },
+    "por_que_importa": "Los rótulos de grupo salen a 10,5px en caja mixta, justo el tamaño que §2.1 solo admite en mayúsculas: sistema y cliente se contradicen y el defecto se repite en cada pantalla con este cromo."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 2,
+   "integridad": 3
+  },
+  "justificacion": "Buena lectura de la tarea: la banda roja nombra a la persona afectada y la marca «Sin ciudades · no ve nada» lleva color + icono + texto; los roles y estados se distinguen. Lo que baja la nota: el buscador con destino de 16 px, el menú colapsado sin nombre, el cromo con isotipo recortado y la tabla a 1280 px, que corta las acciones. Contraste 0 fallos en claro y oscuro (110 nodos).",
+  "evidencia": [
+   "contraste claro/oscuro 0 fallos (dossier)",
+   "anchos: 1280 scroll-x dx 76; 1024 dx 160",
+   "tactil_bajo24: 1 de 47",
+   "menu_1000px: 15 de 15 sin nombre",
+   "captura 40_usuarios--1280-fold.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Marca de alcance vacío por fila: «Sin ciudades · no ve nada» (`.sin-ciudad`), pastilla discontinua en `--err-ink` con icono y texto, más una banda con el nombre de la persona.",
+   "propuesta_de_regla": "Un alcance vacío no se dibuja como «0»: se marca en la fila con color + icono + texto («Sin X · no ve nada») y, si deja a alguien sin trabajo, se repite una vez como `.banda-err` con la acción de corregirlo (§6.22 solo cubre el ámbito de las cifras)."
+  },
+  {
+   "patron": "Fila de baja lógica en la misma tabla: franja izquierda de 3px en `--border-fuerte`, pastilla neutra y acción «Reactivar» en lugar de «Dar de baja».",
+   "propuesta_de_regla": "La baja lógica se muestra en la misma tabla, atenuada con `--surface-2`, con la pastilla `.p-pause` y la acción inversa («Reactivar») donde estaba la destructiva; el registro nunca desaparece."
+  }
+ ],
+ "sin_datos": [
+  "No evaluado: el diálogo de confirmación de «Cambiar rol» y «Dar de baja» no está dibujado en el archivo; no se puede comprobar §6.13/§6.18 (a cuántos afecta, deshacer) más allá de la nota de pie.",
+  "Las cifras no cuadran entre sí (23 usuarios, «6 activos», 1 sin ciudades, 1 de baja, 7 filas visibles): puede ser dato de maqueta; no hay § del sistema que lo regule fuera de los dashboards (§12.5), queda como observación.",
+  "No evaluado: modo tarjeta y cajón (<860 px). El dossier mide 1440/1280/1024; las capturas son 1440 y 1280 (primer pliegue).",
+  "No evaluado: capturas del tema oscuro (se midió el contraste, 0 fallos, pero no se miró la pantalla), hover/foco, rendimiento.",
+  "Falsos positivos del instrumento I3 (`caption`, `span.sr`) y de overflow de `main` no se tratan como hallazgo: son texto solo para lector de pantalla y el scroll del shell.",
+  "Las fuentes reales (Inter, Michroma) se inyectaron al renderizar; esta pantalla sí declara `@font-face` con ruta relativa que no existe en el paquete."
+ ]
+}

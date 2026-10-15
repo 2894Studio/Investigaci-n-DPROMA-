@@ -1,0 +1,371 @@
+{
+ "pantalla": "10_dprimi_asistente",
+ "tier": "B",
+ "modo": "cumplimiento",
+ "sha256": "247e20e532bc833c2b1bd1f36083c1deb308aa4d57080d307c3d45049cdd1e84",
+ "estado_vs_pdf": "no_listado_en_pdf",
+ "estados_auditados": [
+  "ok",
+  "bandeja: loading, empty y error (solo por marcado, no alcanzables en la maqueta)"
+ ],
+ "capturas": [
+  "10_dprimi_asistente--1440.png",
+  "10_dprimi_asistente--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-10dprimi-01",
+    "severidad": "alta",
+    "regla": "§5 Movimiento (reducción de movimiento)",
+    "dice_el_sistema": "No es «cero animación»: se conservan opacidad y color, se elimina todo desplazamiento y escala.",
+    "hay_en_el_build": "Bajo `prefers-reduced-motion: reduce` las cuatro burbujas `.msg.enter` —toda la conversación— quedan con opacity 0. La regla de reducción `.enter{animation:none !important;opacity:1;transform:none}` (línea 337) está escrita ANTES que `.enter{opacity:0;…;animation:enter … forwards}` (línea 339), con la misma especificidad: para `opacity` gana la segunda, y `animation:none !important` impide que la animación la lleve a 1. Medido con reducedMotion \"reduce\": opacity 0 en las 4 burbujas; sin preferencia, 1. Es lo que muestran las capturas del dossier (hilo vacío). Los instrumentos de contraste corren con reduced-motion y excluyen esos nodos (63 nodos de texto en vez de 67).",
+    "selector": ".msg.enter",
+    "linea": 339,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_10",
+     "detalle": "script m6/m10.cjs: con reducedMotion \"reduce\" getComputedStyle(.msg).opacity = \"0\" y animationName \"none\" en las 4 burbujas; con \"no-preference\" opacity \"1\"; nodosTexto del instrumento de contraste 63 (reduce) frente a 67"
+    },
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Contenido invisible bajo una preferencia del usuario (criterio 1). Arreglo sin tocar el diseño: mover el bloque `@media (prefers-reduced-motion:reduce)` de la línea 336 DESPUÉS de `.enter`, o declarar `.enter` dentro de `@media (prefers-reduced-motion:no-preference)`; con eso §5 se cumple (se conserva la opacidad, se retira el desplazamiento)."
+    },
+    "por_que_importa": "Quien pide menos movimiento (trastorno vestibular, sistema en ahorro) abre el asistente y ve un hilo vacío: ni sus preguntas, ni las respuestas, ni el botón de confirmar el envío."
+   },
+   {
+    "id": "v2-10dprimi-02",
+    "severidad": "alta",
+    "regla": "FICHAS_TECNICAS.md · 47_asistente · decisión de producto S-19",
+    "dice_el_sistema": "FICHAS_TECNICAS.md, 47_asistente, «Lo que decidí yo»: `S-19` (el asistente consulta y **no modifica**)",
+    "hay_en_el_build": "La respuesta ofrece acciones que escriben: `<button>Notificar a los responsables</button>`, «Confirmar y enviar» el reporte por correo a los 3 usuarios con rol Dirección («Quedará registrado en la bitácora a tu nombre») y el acceso rápido «Llena un trámite desde esta ficha»; la cabecera dice «las acciones siempre se confirman antes de ejecutarse». La otra pantalla del asistente, 47_asistente, declara «Consulta y resume · no modifica nada» (47_asistente.html línea 704).",
+    "selector": ".acts button, .confirm .y",
+    "linea": 509,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 509,
+     "cita": "<button>Notificar a los responsables</button>"
+    },
+    "critico": {
+     "es": true,
+     "criterio": 4
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Contradice una decisión de producto de DPROMA (criterio 4). Dos lecturas: (a) 10 es la maqueta original que 47 sustituye (FICHAS: «hay maqueta original (`10_dprimi_asistente`) y no hay pantalla») y basta retirarla del paquete o rotularla como histórica; (b) si se entrega para construir, hay que quitar los botones de acción y dejar las fuentes («cada respuesta enseña de dónde salió», S-20) con enlaces de lectura."
+    },
+    "por_que_importa": "Dos asistentes en el mismo paquete prometen cosas opuestas: uno consulta y no modifica, el otro envía correos y notifica. Quien construya el de 10 construye lo que producto decidió que el asistente no hace."
+   },
+   {
+    "id": "v2-10dprimi-03",
+    "severidad": "alta",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "`--fs-meta` es el tamaño más pequeño del sistema. **Nada baja de ahí.**",
+    "hay_en_el_build": "37 nodos de texto visibles bajo 12 px (9,5px ×4, 10px ×2, 10,5px ×11, 11px ×12, 11,5px ×8), incluidos controles y datos del componente central: botones «Ver los 4 en el kanban» y «Confirmar y enviar» a 11px, enlaces de fuentes a 10,5px, subtítulos de las cifras (`.kpimini span`) a 9,5px, accesos rápidos y sugerencias a 11–11,5px, y el aviso legal a 9,5px. El archivo no está en el PDF del cliente, así que no declara nada sobre esto.",
+    "selector": ".kpimini span, .legal, .src a, .acts button…",
+    "linea": 334,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_10",
+     "detalle": "scripts m6/medir.cjs y m6/m3.cjs: nodos <12 px visibles = 37, tamaños {9,5:4, 10:2, 10,5:11, 11:12, 11,5:8}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No crítico (el instrumento táctil da 0 bajo 24 px). Propuesta de una pasada: las ~15 declaraciones de 9,5–11,5px (`.kpimini span`, `.legal`, `.src a`, `.conv .when`, `.conv .snip`, `.qchip`, `.sugg button`, `.acts button`, `.confirm`, `.msg.a .who`, `.dp-h .tt small`, `.scope`, `.prof small`, `.tray-state p`) pasan a `var(--fs-meta)`; el hilo ya va a 12,5 px."
+    },
+    "por_que_importa": "Es lo que más se lee de la pantalla —de dónde salió la respuesta, qué se va a ejecutar y el botón que lo confirma—: §2.1 pone el suelo justo ahí («si un dato se lee todos los días, va a 12–13px como mínimo»)."
+   },
+   {
+    "id": "v2-10dprimi-04",
+    "severidad": "media",
+    "regla": "§2 Tipografía (D116: fuentes autoalojadas)",
+    "dice_el_sistema": "Se retira: un CDN que no responde falla **en silencio**",
+    "hay_en_el_build": "El archivo enlaza `<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">` y `<link href=\"https://fonts.googleapis.com/css2?family=Inter…&family=Michroma…\">` (barrido: google_fonts_link [8, 10]) y no declara `@font-face`.",
+    "selector": "head > link",
+    "linea": 10,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 10,
+     "cita": "<link href=\"https://fonts.googleapis.com/css2?family=Inter"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Sustituir los tres `<link>` por los dos `@font-face` autoalojados de §2."
+    },
+    "por_que_importa": "Si el CDN falla la pantalla cae a `system-ui` sin error visible; §2 documenta 4 días sin detección por exactamente esto."
+   },
+   {
+    "id": "v2-10dprimi-05",
+    "severidad": "media",
+    "regla": "§8 Voz de producto (códigos internos en pantalla)",
+    "dice_el_sistema": "códigos internos, y descripciones de la estructura del formulario",
+    "hay_en_el_build": "`<p class=\"legal\">D-PRIMI puede equivocarse — verifica los datos críticos. Consultas procesadas por el backend (S13); nunca durante impersonaciones (S4).</p>` a 9,5px: «S13» y «S4» son códigos de decisiones internas y «backend» e «impersonaciones» son vocabulario de equipo.",
+    "selector": "p.legal",
+    "linea": 542,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 542,
+     "cita": "Consultas procesadas por el backend (S13); nunca durante impersonaciones (S4)."
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Dejar «D-PRIMI puede equivocarse: verifica los datos críticos.» a 12px; los códigos y la política de backend van a la documentación."
+    },
+    "por_que_importa": "Quien usa el asistente lee una referencia a decisiones que no puede consultar y que no condiciona nada de lo que hace ahora."
+   },
+   {
+    "id": "v2-10dprimi-06",
+    "severidad": "media",
+    "regla": "§7.2 Cromo de aplicación (tres anchos)",
+    "dice_el_sistema": "Tres anchos: completa (≥1100px), colapsada a solo iconos (860–1100px) y cajón con velo (<860px).",
+    "hay_en_el_build": "`@media (max-width:980px){ .side{display:none} … .tray{display:none} }`: medido a 800×800, `.side` y `.tray` en display:none y no existe botón de menú ni cajón en el marcado. Sin navegación y sin historial de conversaciones; solo queda «Volver al dashboard».",
+    "selector": ".side, .tray",
+    "linea": 343,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_10",
+     "detalle": "script m6/m2.cjs a 800×800: .side \"none\", .tray \"none\", botón de menú (.hamburguesa / #menu-btn) inexistente"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Reutilizar el cromo de tres anchos de §7.2 (colapsado con rótulos accesibles entre 860 y 1100 y cajón con velo debajo de 860) y mover el historial a un cajón o desplegable sobre el hilo."
+    },
+    "por_que_importa": "En una tableta vertical o una ventana partida el asistente no permite cambiar de conversación ni ir a otra pantalla."
+   },
+   {
+    "id": "v2-10dprimi-07",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla",
+    "dice_el_sistema": "Toda pantalla que pida datos tiene cuatro formas de presentarse",
+    "hay_en_el_build": "Solo la bandeja tiene vistas (`.tray[data-state]`: loading, empty, error) y nada las activa: no hay manejador de `data-state` ni andamio rotulado (§9), así que son inalcanzables en la maqueta. El hilo, que es lo principal, no tiene vistas de carga, vacío ni error. Las de la bandeja son `.tray-state` suelto: icono de 26px en `--text-3`, título `<b>`, la de carga con `aria-hidden=\"true\"` y sin `role=\"status\"`, «Reintentar» con estilos en línea y texto a 11,5px.",
+    "selector": ".tray-state",
+    "linea": 264,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 264,
+     "cita": ".tray-state{display:none;flex-direction:column"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Añadir el andamio de §9 con las cuatro vistas para el hilo y para la bandeja y llevar las de la bandeja a `.tarjeta-estado` con `<h2>`; la de carga con `role=\"status\"` y `aria-label`."
+    },
+    "por_que_importa": "El estado más probable de un asistente —tarda, o no responde— no está dibujado para su pieza principal."
+   },
+   {
+    "id": "v2-10dprimi-08",
+    "severidad": "baja",
+    "regla": "§2 Tipografía (la fuente de marca no se usa en texto de interfaz)",
+    "dice_el_sistema": "solo para el wordmark «SIO-DPROMA» y el nombre «DPROMA». Nunca en texto de interfaz.",
+    "hay_en_el_build": "`.dp-h .tt b{font-family:var(--font-brand);font-size:14px;…}` pinta «D-PRIMI», el nombre del asistente, con Michroma a 14px en la cabecera del hilo.",
+    "selector": ".dp-h .tt b",
+    "linea": 281,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 281,
+     "cita": ".dp-h .tt b{font-family:var(--font-brand)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Decisión de producto: si D-PRIMI es una marca (como DPROMA), añadirla a §2 como nombre permitido; si no, Inter 600."
+    },
+    "por_que_importa": "El sistema admite la fuente de marca para dos nombres; este es un tercero sin documentar."
+   },
+   {
+    "id": "v2-10dprimi-09",
+    "severidad": "baja",
+    "regla": "Regla de fondo del sistema (ningún hex literal en un componente)",
+    "dice_el_sistema": "ningún hex literal en un componente. Todo pasa por un token.",
+    "hay_en_el_build": "Hay hex sueltos en componentes: `.av{background:linear-gradient(135deg,#1E4E79,#3E7A4C);color:#F2F5F7}`, `.dp-av{…linear-gradient(135deg,#1E4E79,#2e823d)}`, `.side :focus-visible{outline-color:#9FE0AE}` y `.it .n{…color:#2A1512}`. Los tokens equivalentes de §1 (`--marca-azul`, `--marca-3`, `--chrome-focus`, `--chrome-ink`) no están declarados en este archivo, que lleva los valores anteriores a la 2.15.",
+    "selector": ".av, .dp-av, .side :focus-visible",
+    "linea": 182,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 182,
+     "cita": ".side :focus-visible{outline-color:#9FE0AE}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Declarar los tokens de marca y de cromo de §1.2 y §1.5 y sustituir los hex; `#2A1512` no tiene token (se trata en el siguiente punto)."
+    },
+    "por_que_importa": "Un cambio de marca o de tema no llega a esos componentes (avatar, medallón del asistente, anillo de foco del menú)."
+   },
+   {
+    "id": "v2-10dprimi-10",
+    "severidad": "baja",
+    "regla": "§1.5 Cromo de aplicación (`--chrome`: solo estructura)",
+    "dice_el_sistema": "**solo estructura, nunca fondo de página**",
+    "hay_en_el_build": "`.msg.u{background:var(--chrome);color:var(--chrome-ink)…}`: la burbuja del usuario usa el azul del cromo como fondo de contenido.",
+    "selector": ".msg.u",
+    "linea": 290,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 290,
+     "cita": ".msg.u{align-self:flex-end;background:var(--chrome)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Dos lecturas: una burbuja no es página, así que no la prohíbe la letra; pero «solo estructura» no la ampara. Propuesta: `--accent-soft` o `--surface-2` con texto `--text` (la pregunta del usuario no debería pesar más que la respuesta del asistente)."
+    },
+    "por_que_importa": "La pregunta (azul oscuro sólido) pesa visualmente más que la respuesta (tarjeta clara), al revés de lo que interesa en un asistente."
+   },
+   {
+    "id": "v2-10dprimi-11",
+    "severidad": "baja",
+    "regla": "§6.2 Botones (`.btn`, `.btn.p`, `.btn.mini`) · §6.9 (no reinventar componentes)",
+    "dice_el_sistema": "En el dashboard el suelo es 36px (28px en `.mini`",
+    "hay_en_el_build": "Siete recetas de botón propias en lugar de `.btn`: `.newchat` 263×34, `.acts button` 143×30, `.confirm .y` 130×30 y `.n` 112×30, `.sugg button` 183×28, `.qchip` 263×28 y el «Reintentar» de la bandeja, que usa `class=\"btn\"` con estilos en línea porque el archivo no declara `.btn` (medido 116×42). La acción primaria del hilo, «Confirmar y enviar», mide 30px.",
+    "selector": ".newchat, .acts button, .confirm .y",
+    "linea": 465,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m6_10",
+     "detalle": "script m6/m2.cjs: alturas .newchat 34, .acts button 30, .confirm .y 30, .confirm .n 30, .sugg button 28, .qchip 28, .inp button 41; tray-error .btn 42"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Declarar `.btn`, `.btn.p` y `.btn.mini` de §6.2 y usarlos: «Confirmar y enviar» como `.btn.p`, «Solo descargar» como `.btn`, las acciones del hilo como `.btn.mini`."
+    },
+    "por_que_importa": "Cada botón tiene su propio tamaño y radio; la siguiente pantalla copiará el que encuentre."
+   },
+   {
+    "id": "v2-10dprimi-12",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (excepción de 10,5px en mayúsculas) · §7.2",
+    "dice_el_sistema": "10,5px en mayúsculas con `letter-spacing` para los **rótulos de grupo** de la barra lateral",
+    "hay_en_el_build": "`.grp` a 10,5px sin `text-transform:uppercase` («Principal», «Operación», «Gestoría») y otros cinco textos de 10,5px en caja mixta que no son rótulos de grupo (`span.when` «Hoy», «Ayer», «24 jul» y dos `a` de fuentes): C2_105_no_mayusculas da 8 fallos.",
+    "selector": ".grp, .conv .when, .src a",
+    "linea": 198,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "8 fallos: p.grp ×3, span.when ×3 («Hoy», «Ayer», «24 jul»), a «Kanban · filtro aplicado», a «Reporte SLA junio»"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Los tres `.grp` repiten el fragmento de §7.2, que no lleva uppercase (corregir el sistema); la fecha de cada conversación y los enlaces de fuente no son rótulos de grupo y entran en el hallazgo 03 (12px)."
+    },
+    "por_que_importa": "La excepción de 10,5px se ha usado como tamaño general de texto secundario."
+   },
+   {
+    "id": "v2-10dprimi-13",
+    "severidad": "baja",
+    "regla": "§3 Espaciado y radios (escala base de 4px)",
+    "dice_el_sistema": "Escala base de 4px.",
+    "hay_en_el_build": "I5_ritmo: 8 valores fuera de escala, 120 ocurrencias (10px×39, 7px×24, 6px×22, 9px×21, 5px×6, 14px×4, 3px×2, 11px×2); 3 interlineados distintos (1.55×17, 1.4×3, 1.5×1)",
+    "selector": "(varios)",
+    "linea": null,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I5_ritmo",
+     "detalle": "I5_ritmo: 8 valores fuera de escala, 120 ocurrencias (10px×39, 7px×24, 6px×22, 9px×21, 5px×6, 14px×4, 3px×2, 11px×2); 3 interlineados distintos (1.55×17, 1.4×3, 1.5×1)"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El propio sistema usa 3, 5, 6 y 9 px en sus recetas (`.pill` padding:3px 9px, `.ctrl` gap:5px, `.pasos` padding:9px 0, `.it` padding:9px 10px): la escala declarada no describe lo que el sistema dibuja. Documentar esos medios pasos como valores admitidos del cromo en vez de pedir al cliente que los cambie."
+    },
+    "por_que_importa": "No es un fallo visible sino ruido de medición: el instrumento marca cientos de ocurrencias en cada pantalla y tapa las desviaciones que sí importan."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 2,
+   "integridad": 2
+  },
+  "justificacion": "La estructura bandeja + hilo es clara, hay fuentes por respuesta, cifras mini y una tarjeta de confirmación bien nombrada, y los destinos táctiles cumplen (0 bajo 24 px; contraste claro y oscuro 0 fallos reales). Pero con reduced-motion el hilo entero es invisible, el texto central va de 9,5 a 11,5 px, el archivo conserva el enlace a Google Fonts y la nomenclatura anterior, la navegación desaparece bajo 980 px, y las acciones del asistente contradicen la decisión S-19.",
+  "evidencia": [
+   "reducedMotion reduce: 4 burbujas con opacity 0",
+   "37 nodos de texto <12 px",
+   "google_fonts_link [8,10]",
+   "FICHAS_TECNICAS.md 47_asistente S-19 frente a líneas 509 y 522",
+   "captura 10_dprimi_asistente--1440.png (hilo vacío por la preferencia)"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Burbujas de conversación: el usuario a la derecha en azul de cromo con esquina recortada, el asistente a la izquierda en tarjeta con borde, sombra de reposo y rótulo de quién habla.",
+   "propuesta_de_regla": "Una burbuja de conversación no usa colores de cromo ni de estado: la del usuario va en `--accent-soft` o `--surface-2` y la del asistente en `.tarjeta` con rótulo; el rótulo de quién habla va a 12px."
+  }
+ ],
+ "sin_datos": [
+  "Contradicción con 47_asistente: en el archivo de 10 se ven las acciones que escriben (hallazgo 02); que 47 declare «no modifica nada» se leyó en 47_asistente.html línea 704 y en FICHAS (S-19). No se revisó el resto de 47 (ya revisado).",
+  "`span.av` («AR», 12px) sale en el instrumento de contraste con 1,06:1 sobre rgb(250,252,253): es un falso positivo porque el fondo real es un degradado `linear-gradient(135deg,#1E4E79,#3E7A4C)` que el instrumento no resuelve. Calculado contra el extremo más claro (#3E7A4C), el texto #F2F5F7 da unos 4,7:1; no se trata como hallazgo.",
+  "El hilo no se desplaza al último mensaje al cargar: a 1440×900 la tarjeta «Acción que requiere tu confirmación» queda cortada por la fila de sugerencias y sus botones solo se ven desplazando el hilo (captura propia sin reduced-motion). No hay § del sistema que lo regule, queda como observación de diseño.",
+  "El menú lateral de 10 tiene 7 enlaces y llama «Dashboard» a lo que el resto del paquete llama «Tablero», y lista «Asistente D-PRIMI» como entrada de menú mientras FICHAS (47) dice que el lanzador es cromo (botón flotante). Son decisiones de producto de las que el archivo no da fuente; no se evalúan.",
+  "No evaluado: el estado `empty` del hilo (no existe), hover/foco, el tema oscuro visualmente (contraste oscuro medido: 0 fallos, 67 nodos), modo <860 px, rendimiento y las animaciones reales de entrada.",
+  "Las fuentes reales (Inter, Michroma) se definieron al renderizar: el arnés devuelve CSS vacío a la petición de Google Fonts y declara Inter y Michroma locales, así que las capturas no dependen del CDN que el archivo enlaza."
+ ]
+}
