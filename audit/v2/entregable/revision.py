@@ -321,6 +321,15 @@ cambio(C, 'Los botones hermanos del portal del cliente se parecen', 'rec',
   a_d('b30', 'Portal del cliente: «Contactar a DPROMA» en dos líneas y con el icono lejos del texto', 'Los dos botones con el rótulo en una línea', 'Antes — dos líneas, botón más alto', 'Después — una línea, iguales', apilado=False), '.abtn{white-space:nowrap}   /* o rotular «Contactar» */',
   'Los dos botones miden 44 px de alto y el icono queda junto a su palabra.')
 
+cambio(C, 'Dashboard: las cajas de actividad y alertas cierran a la misma altura', 'menor',
+  '<code>02_dashboard</code> · <code>.row2</code> (línea 178) y la tarjeta «Alertas» (líneas 459 a 476).',
+  'En el tablero principal, la tarjeta «Actividad de los últimos 7 días» termina unos 128 px antes que «Alertas» y deja un hueco debajo. Es un asunto meramente estético: no impide nada ni falla ninguna medición, y no tiene prioridad. Se propone para que la primera pantalla del sistema se vea más cuidada.',
+  '<code>.row2</code> usa <code>align-items:start</code>, el valor por omisión del sistema (§13.4), así que cada tarjeta conserva su altura: 218 px la de actividad, con gráficas de 120 px fijos, y 346 px la de alertas, que lista cinco. Estirar la tarjeta corta sin más dejaría un rectángulo vacío por dentro (§13.8). Por eso la propuesta usa contenido: «Alertas» muestra las tres más recientes, con un botón «Ver todas (5)» arriba a la derecha como el «Ver todo» de «Actividad reciente», y las gráficas se ensanchan hasta llenar su tarjeta sin deformarse.',
+  a_d('d02', 'Dashboard con la tarjeta de actividad más baja que la de alertas, que lista cinco', 'El mismo dashboard con tres alertas, el botón Ver todas (5) y las dos tarjetas a la misma altura', 'Antes — 218 px y 346 px', 'Después — 247 px las dos', apilado=True),
+  '/* solo con dos columnas (a 1180 px o menos ya se apilan) */\n@media (min-width:1181px){\n  .row2{align-items:stretch}\n  .row2 > .panel{display:flex;flex-direction:column}\n  .row2 .charts{flex:1}\n  .row2 .chart{display:flex;flex-direction:column}\n  .row2 .chart svg{flex:1;height:auto;min-height:120px}   /* antes: height="120" */\n}\n\n/* Alertas: las tres más recientes y el resto tras el botón */\n<button class="btn" style="margin-left:auto">Ver todas (5)</button>',
+  'A 1440, 1366 y 1280 px las dos tarjetas miden lo mismo (247, 240 y 240 px) y las gráficas conservan su proporción. A 1180 px o menos no cambia nada. Con cuatro alertas no funciona: las gráficas tendrían que crecer más de lo que su dibujo permite.',
+  ('Estético, sin prioridad',))
+
 # ================================================================ D · AVISO
 D = 'D'
 cambio(D, 'El padrón dibuja lo que se pospuso: vigencia y duplicados', 'pide',
@@ -346,7 +355,7 @@ cambio(D, 'La alta de cliente dice la frase del aviso', 'menor',
 PARTES = {
  'A': ('Parte A', 'Lo que se pide', 'Once cambios. Los seis primeros son sustituciones que se repiten en muchos archivos; los cinco siguientes son problemas propios de una pantalla o una contradicción con el aviso del 28 de septiembre. Cada uno cumple alguna de las cinco condiciones de crítico.'),
  'B': ('Parte B', 'Propuestas de diseño', 'Ocho rediseños. Cada uno parte de lo que dibujó DPROMA, evalúa al menos dos opciones (la primera siempre es el mínimo cambio sobre su dibujo) y se probó en el navegador a 1440, 1280, 1024 y 390 px. Son prototipos: ningún archivo de DPROMA se modificó.'),
- 'C': ('Parte C', 'Mejoras sencillas', 'Doce cambios que no se exigen. Cada uno mejora algo visible y, varias veces, delata una causa que se repite en otras pantallas.'),
+ 'C': ('Parte C', 'Mejoras sencillas', 'Trece cambios que no se exigen. Cada uno mejora algo visible y, varias veces, delata una causa que se repite en otras pantallas.'),
  'D': ('Parte D', 'El aviso del 28 de septiembre', 'Se comprobaron los doce puntos del aviso contra las cinco pantallas del padrón. Casi todo está donde debe. Tres cosas no, y las tres tienen que ver con lo que se pospuso. Aparte, una pantalla que la tabla no cubre, <code>06</code>, sigue dibujando lo que el aviso rechazó.'),
 }
 
