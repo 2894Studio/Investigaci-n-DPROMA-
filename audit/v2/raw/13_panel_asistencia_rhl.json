@@ -1,0 +1,536 @@
+{
+ "pantalla": "13_panel_asistencia_rhl",
+ "tier": "B",
+ "sha256": "c45a3ec3cab7d708302d001de765bdf16cef938c62e002c276a7fcb3a7caa80b",
+ "estado_entrega": "identica",
+ "estado_vs_pdf": "no_listado_en_pdf",
+ "estados_auditados": [
+  "con datos",
+  "cargando",
+  "vacío (tabla)",
+  "error (tabla)"
+ ],
+ "capturas": [
+  "13_panel_asistencia_rhl--1440.png",
+  "13_panel_asistencia_rhl--1280-fold.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 5,
+   "texto_usuario": "RHL incidentes: el interlineado da sensación de desorden. (El auditor del 48 halló que la «bandeja de incidencias» está en ESTE archivo, no en 48.)",
+   "veredicto": "confirmada",
+   "evidencia": [
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "script propio m13.cjs (Playwright 1440x900, lib.preparar): getComputedStyle de #inbox .inc .body *",
+      "detalle": "`.acts` computa display:block, margin-top:1px y gap ignorado (declarado display:flex; margin-top:8px; gap:6px). Los dos <span translate=\"no\"> anidados computan display:block, margin-top:1px."
+     },
+     "dato": "La regla `.inc .body span` (0,2,1) gana a `.inc .acts` (0,2,0) porque la fila de botones es un <span> dentro de .body. Resultado medido en las 4 filas: separación texto→botones 1px (el diseño declara 8px), botones inline con hueco de 3,4px por espacio en blanco (no los 6px del gap) y la primera (con icono) 1,5px más arriba que sus hermanas (tops 458,4 / 459,9 / 459,9 en la fila 1; idéntico en filas 2 y 3). Bajo los botones quedan 10px de padding de fila: 1px arriba, 10px abajo."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 181,
+      "cita": ".inc .body span{color:var(--text-2);font-size:var(--fs-meta);display:block;margin-top:1px}"
+     },
+     "dato": "Selector descendiente genérico de elemento, escrito para la línea de detalle, que alcanza (a) la fila de acciones `<span class=\"acts\">` (línea 426) y (b) los <span translate=\"no\"> que van dentro de la frase (líneas 437 y 448). La línea 182 `.inc .acts{display:flex;gap:6px;margin-top:8px}` queda anulada en display y margin-top."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "captura",
+      "archivo": "13_panel_asistencia_rhl--1440.png",
+      "region": "bandeja de incidencias, filas 2 y 3 (Pedro Torres, Marisol Gil)"
+     },
+     "dato": "La frase se parte en tres líneas a mitad de oración: «Checado 08:20 desde ruta · instalación en» / «ORD-202607-0119» / «iniciada 10:20 vs. 10:00…» y «Checado a 340 m del» / «Almacén CDMX» / «· foto adjunta para validación manual». El texto de la fila 1 y 4 (sin span anidado) es de una sola línea; las filas 2 y 3 son 112px frente a 81 y 78,5: la lista no tiene ritmo uniforme. Es lo que se lee como «desorden»."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "script propio m13b.cjs: contrafactual en el navegador cambiando solo el selectorText de la regla de la línea 181 a `.inc .body > span:not(.acts)`",
+      "detalle": "alto de fila y separación texto→acciones antes/después"
+     },
+     "dato": "Con solo ese cambio: filas 86,5 / 101,5 / 86,5 / 85,5px (antes 81 / 112 / 112 / 78,5); separación texto→acciones 8px en las 4 (antes 1px); botones alineados al mismo top y 6px entre sí (antes 3,4px y 1,5px de desnivel); las frases de campo caben en 2 y 1 línea sin partirse; el cuerpo de la bandeja baja de 383,7 a 360,2px. Mismo contenido, mismos tokens: la causa queda aislada en esa regla."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "script propio m13.cjs + I5_ritmo del brief",
+      "detalle": "line-height computado por bloque; interlineadosDistintos=4 (1.3×5, 1.35×4, 1×3, 1.05×2)"
+     },
+     "dato": "Interlineados mezclados: sí, pero es causa secundaria. Título de la incidencia `.inc .body b` = 1,35 (17,55px/13px, línea 180); línea de detalle = `normal` (15px sobre 12px = 1,25), sin declarar; `.tinote` también `normal` (45px/3 líneas = 15px). El resto del archivo declara 1,05 (.hero .v), 1 (.mini .v), 1,3 (.mini .lbl), 1,55 (.state p, oculto). El sistema prescribe 1,5–1,55 para texto de varias líneas (§6.9 `.note` 1,5 y `.banda` 1,55; §6.7 `.paso-txt` 1,5; §6.16 `.ayuda` 1,5) y no define una escala de interlineado en §2 ni en §3."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "script propio m13.cjs",
+      "detalle": "padding, margin y gap de .inc, .panel, .tinote, .cfg-row contra --sp-*"
+     },
+     "dato": "Valores verticales fuera de la escala 4/8/12/16/20/24/32/48 dentro de la bandeja: `.inc` padding 10px 0 (línea 172), `.body span` margin-top 1px (181), `.badge` margin-top 1px, `.sub` margin-top 2px (167), `.tinote` padding 10px 12px (261); gap horizontal 10px y 6px. Son idénticos en las 4 filas, es decir, coherentes entre sí, y el propio sistema usa 10px/9px (§6.9 `.note{padding:10px 12px}`, §7.2 `.it{padding:9px 10px}`). No explican el desorden: la lista no varía de padding, varía de alto por la frase partida y por la fila de acciones pegada."
+    }
+   ],
+   "causa_raiz": "No es el valor de line-height ni la escala --sp-*: es la regla `.inc .body span` (línea 181), un selector descendiente de elemento (`span`) que se filtra en dos sitios: la fila de acciones `.acts` (que es un <span> y pierde su display:flex, su gap de 6px y su margin-top de 8px por especificidad) y los <span translate=\"no\"> internos de la frase (que pasan a display:block y parten la oración). Contribuyen, en segundo plano, el interlineado `normal` (≈1,25) de la línea de detalle frente al 1,35 del título y al 1,5–1,55 que el sistema usa en texto de varias líneas, y que §2 no define una escala de interlineado.",
+   "solucion_propuesta": "Una línea: sustituir `.inc .body span{…}` por `.inc .body > span:not(.acts){color:var(--text-2);font-size:var(--fs-meta);display:block;margin-top:var(--sp-1);line-height:1.4}` (o dar clase `.desc` a la línea de detalle y usar `.inc .desc`). Con ello `.inc .acts` recupera flex, gap y margin-top:var(--sp-2) (8px). Opcional, mismo bloque: `.inc{padding:var(--sp-3) 0}` (12px, en escala) y `.inc .body b{line-height:1.4}` para igualar títulos y detalle. Verificado el efecto del selector acotado en el navegador (ver evidencia 4).",
+   "tipo_de_cambio": "sencillo",
+   "critico": {
+    "es": false,
+    "criterio": null
+   },
+   "decision": {
+    "valor": "ajustar_sistema",
+    "motivo": "No es crítico: no falla accesibilidad ni impide dictaminar (los botones son operables, 24px de alto). Se resuelve a favor del cliente (no se le exige), pero el defecto delata causa raíz del sistema: la regla de «hijo directo» existe solo para iconos (§1.4.1, §6.3 punto 6: `.state > .ico`) y no está generalizada a los contenedores de texto con <span> anidados; y §2 no define escala de interlineado. Se recomienda al cliente el cambio de una línea y se documenta en el sistema (ver `cobertura`)."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-13asist-01",
+    "severidad": "alta",
+    "regla": "§3 Espaciado y radios + trampa de selectores (§1.4.1 / §6.3 punto 6, hijo directo)",
+    "dice_el_sistema": "Escala base de 4px… «Cuando un espaciado se vea raro, lo primero es comprobar que su token está definido.» · «Un selector que tiñe iconos por contexto se acota a hijo directo.»",
+    "hay_en_el_build": "`.inc .body span{color:var(--text-2);font-size:var(--fs-meta);display:block;margin-top:1px}` alcanza a `.acts` (anula display:flex y margin-top:8px → computa block y 1px) y a los <span translate=\"no\"> internos (pasan a bloque y parten la frase). Alto de fila 81/112/112/78,5px; con el selector acotado 86,5/101,5/86,5/85,5px.",
+    "selector": ".inc .body span / .inc .acts",
+    "linea": 181,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "script propio m13.cjs y m13b.cjs (contrafactual)",
+     "detalle": "display/margin-top computados de .acts y span anidados en #inbox; filas 2 y 3 con 3 líneas por frase partida"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "No crítico. Es el componente central de la pantalla (la bandeja de dictamen de RHL) y la causa de la observación 5; fix de una línea que se recomienda al cliente y que el sistema debe documentar como trampa (ver `cobertura`). v1 no lo detectó (no medía ritmo vertical)."
+    },
+    "por_que_importa": "Es la tarea principal de RHL en esta pantalla. Las frases con referencias (orden, almacén) se parten a mitad de oración y los botones quedan pegados al texto (1px) con el doble de aire debajo, de modo que cada fila se ve distinta y mal cerrada; la lista se lee como desordenada aunque sus valores individuales sean coherentes."
+   },
+   {
+    "id": "v2-13asist-02",
+    "severidad": "alta",
+    "regla": "§1.5 Cromo de aplicación (`--chrome-alerta` / `--chrome-alerta-ink`) + §1.7 Regla de contraste",
+    "dice_el_sistema": "`--chrome-alerta` #C24238 · `--chrome-alerta-ink` #FAFCFD «Texto/icono sobre `--chrome-alerta`»",
+    "hay_en_el_build": "Contador de Asistencia en el menú: color #2A1512 sobre fondo rgb(194,66,56), 10,5px peso 800 → 3,40:1 (texto normal exige 4,5:1). Con `--chrome-alerta-ink` (#FAFCFD) daría 4,94:1.",
+    "selector": ".it .n",
+    "linea": 95,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "script propio m13e.cjs (getComputedStyle de `.it .n:not(.b)`) + cálculo de luminancia relativa WCAG",
+     "detalle": "color rgb(42,21,18) sobre rgb(194,66,56) = 3,40:1; el instrumento de contraste del brief no lo marcó (solo reportó span.av, falso positivo)"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Crítico por criterio 1 (contraste de texto medido < 4,5:1). El arreglo es un token que el sistema ya define: `color:var(--chrome-alerta-ink)` y `background:var(--chrome-alerta)`. v1 lo señaló como hex literal (f1-13asistencia-09) sin medir el contraste en claro: la medición lo eleva."
+    },
+    "por_que_importa": "El número «4» es el conteo de incidencias pendientes de dictamen que el menú le muestra a RHL: es el dato que dice si hay trabajo. A 3,4:1 y 10,5px, con baja visión o brillo alto, se lee mal. Hay dos lecturas: el badge es redundante con la bandeja (no oculta la acción primaria), pero el criterio 1 del documento no distingue por redundancia."
+   },
+   {
+    "id": "v2-13asist-03",
+    "severidad": "alta",
+    "regla": "§1.1 Superficies y texto — valor de --text-3",
+    "dice_el_sistema": "`--text-3` cambió de valor. Era `#66717F`… sobre `--surface-2` cae a 4,21:1 · ahora `#5C6675` (4,93:1)",
+    "hay_en_el_build": "`--text-3:#66717F`. Caso medido: `.prof:hover` pinta `background:var(--surface-2)` (rgb 231,237,243) con `.prof small` (RHL, 11px, peso 400) en rgb(102,113,127) → 4,21:1. Sobre --bg 4,53:1 (placeholder del buscador), sobre --surface 4,82:1: ahí cumple.",
+    "selector": ".prof:hover small / :root --text-3",
+    "linea": 30,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "script propio m13d.cjs: hover sobre .prof, getComputedStyle de fondo y color de `.prof small`; ratio por luminancia relativa",
+     "detalle": "rgb(102,113,127) sobre rgb(231,237,243) = 4,21:1 (11px, no es texto grande)"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Crítico por criterio 1 solo en el caso medido (texto de 11px en hover de .prof sobre --surface-2 = 4,21:1) y trivial de cerrar: `--text-3:#5C6675` (cambio de un valor, ya aplicado en las otras pantallas según v1). En reposo todos los pares de texto de esta pantalla cumplen; el alcance real es pequeño (etiqueta «RHL» del perfil al pasar el cursor)."
+    },
+    "por_que_importa": "El valor obsoleto convive con una tercera superficie (--surface-2: hover, .tinote, .seg) que el sistema ya midió. En esta pantalla el fallo efectivo es estrecho, pero el token mantiene el margen en 4,53:1 sobre --bg: cualquier texto nuevo en --text-3 sobre --surface-2 fallará. Dos lecturas: v1 lo calificó alta por el valor; aquí la severidad se sostiene por la medición, no por el valor."
+   },
+   {
+    "id": "v2-13asist-04",
+    "severidad": "alta",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "«`--fs-meta` es el tamaño más pequeño del sistema. Nada baja de ahí.» · excepción única: 10,5px en mayúsculas con letter-spacing para rótulos de grupo de la barra lateral",
+    "hay_en_el_build": "Texto visible computado por debajo de 12px (fuera del andamio): 10,5px (.tag ×4, .it .n ×3, .kbd, .grp ×4 sin text-transform:uppercase → fuera de la excepción), 11px (thead th ×6, .pill ×7, .t-mute, .prof small, wordmark), 11,5px (.mini-btn ×9 = botones de dictamen, .sub ×3, .mini .lbl ×5, .slalegend, .rolechip).",
+    "selector": "thead th, .pill, .tag, .mini-btn, .panel .sub, .mini .lbl, .slalegend, .rolechip, .kbd, .prof small, .t-mute, .grp",
+    "linea": 193,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "script propio m13d.cjs (TreeWalker sobre nodos de texto visibles, font-size computado < 12) + C2_105_no_mayusculas del brief (9 fallos)",
+     "detalle": "inventario por selector; p.grp 10,5px con textTransform:none"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico por criterio (el suelo es regla de legibilidad, no un mínimo WCAG medido; los botones miden 24px de alto y cumplen §7.3). Se adopta a favor del cliente y se lleva a la Fase 2/sistema: la excepción de §2.1 exige mayúsculas, y `.grp` no las usa."
+    },
+    "por_que_importa": "Cabeceras de tabla, etiquetas de estado y los nueve botones de dictamen son lo que RHL lee a diario y están a 10,5–11,5px, con los botones más importantes de la pantalla en el tamaño reservado a lo secundario. v1 lo calificó alta; aquí queda alta por afectar al componente más repetido (pills y cabecera de tabla) sin llegar a fallo medido de contraste."
+   },
+   {
+    "id": "v2-13asist-05",
+    "severidad": "media",
+    "regla": "§1.4.1 Tinta sobre relleno sólido de color / §6.3 punto 6 — `.state > .ico`",
+    "dice_el_sistema": "«La regla es `.state > .ico`: un `.ico` puede estar dentro de un botón que ya tiene su propio color, y una regla de contexto no debe pisarlo.»",
+    "hay_en_el_build": "`.state .ico{width:30px;height:30px;color:var(--text-3)}` alcanza al icono del botón «Reintentar»: en el estado de error el icono computa color rgb(102,113,127) y 30×30px sobre fondo rgb(62,122,76) → 1,03:1; el botón mide 48px de alto (el resto de .btn, ~36).",
+    "selector": ".state .ico → .state-error .btn.p .ico",
+    "linea": 228,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I1_icono_vs_boton (fallos 1, ratio 1,03, enEstado, oculto en estado inicial) + script propio m13c.cjs con data-state=error (icono 30×30, color rgb(102,113,127))",
+     "detalle": "icono de Reintentar gris sobre verde, y botón de 48px"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico por criterio: el icono es decorativo (aria-hidden) y el botón se sigue identificando por su texto (#F7FAF9 sobre #3E7A4C = 4,89:1). Lectura alternativa: si se trata el icono como gráfico de control, 1,03:1 cae bajo 3:1 (criterio 1). El sistema ya documenta el arreglo; el cliente copió el bloque de estados con el selector descendiente. v1 mencionó `.state .ico` pero no midió este efecto; el archivo no cambió."
+    },
+    "por_que_importa": "En el único estado de error de la tabla, el botón de recuperación aparece con un icono gris casi invisible y un botón más alto que cualquier otro. Se ve como un defecto de acabado justo donde la persona está frustrada."
+   },
+   {
+    "id": "v2-13asist-06",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla (+ §11 Checklist)",
+    "dice_el_sistema": "§6.4: «Cada estado lleva un encabezado real, no un `<b>`.» · §11: «¿Los estados de vacío y error van en tarjeta, con su medallón, y no sueltos sobre el fondo?»",
+    "hay_en_el_build": "Vacío y error usan `<b>` como título (líneas 567 y 574), sin tarjeta ni medallón; el estado vacío computa 209px y no hay ningún h1–h4 ni role=heading dentro. La bandeja tiene estado vacío propio (`#incVacio`) con `<b>Bandeja al día</b>`.",
+    "selector": ".state b / #incVacio",
+    "linea": 567,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "script propio m13c.cjs: estado empty → bTag:B, hasHeading:false",
+     "detalle": "título de estado en <b>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico. Los estados existen, son completos y con buena redacción (qué falló, que los datos no se perdieron, salida); lo que falta es la semántica de encabezado y la tarjeta con medallón. Mejora de Fase 2."
+    },
+    "por_que_importa": "Quien navega por encabezados no encuentra en qué estado está el registro; el estado se lee como un párrafo suelto dentro del panel."
+   },
+   {
+    "id": "v2-13asist-07",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga (`.skel`)",
+    "dice_el_sistema": "«Hay que aplanar el fondo, no solo parar la animación.» · «Sin texto real dentro de las barras» · «Y el mismo alto»",
+    "hay_en_el_build": "Reduced-motion: `.skel{animation:none}` sin `background:var(--surface-2)` (el degradado queda congelado). Las 24 barras llevan texto real con color:transparent; el contenedor es aria-hidden sin role=status/aria-label. Alto del esqueleto 160px frente a 313px de la tabla real: salto de 153px.",
+    "selector": ".state-loading .skel",
+    "linea": 226,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "script propio m13c.cjs (loading: h 160, skelWithText 24, aria-hidden true, role null; ok: .real h 313)",
+     "detalle": "comparación de alto cargando vs con datos"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico. v1 calificó el fallo de reduced-motion como alta (f1-13asistencia-02); aquí se mantiene que persiste pero como media: el efecto es un degradado detenido de dos grises de superficie, no contenido invisible (no cumple el criterio 1 ni el 2). Los otros dos puntos (texto en barras, alto) se suman al mismo componente."
+    },
+    "por_que_importa": "Con «reducir movimiento» las barras quedan a medio pintar y, al llegar los datos, la tabla salta ~150px. El estado de carga no se anuncia a lector de pantalla (aria-hidden)."
+   },
+   {
+    "id": "v2-13asist-08",
+    "severidad": "media",
+    "regla": "§8 Voz de producto, límites 1 y 2 (ANEXO B)",
+    "dice_el_sistema": "«Ningún bloque de texto siempre visible pasa de ~140 caracteres.»",
+    "hay_en_el_build": ".tinote visible siempre: 236 caracteres (contados en el navegador), explica por qué el sistema no dictamina; además su interlineado es `normal` (15px/12px ≈ 1,25) cuando el sistema prescribe 1,55 para `.banda-info`, que es el mismo componente (fondo --surface-2, texto --text-2, borde --border).",
+    "selector": ".tinote",
+    "linea": 476,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "script propio m13d.cjs: textContent de `.tinote span` = 236 caracteres; C11_texto_largo del brief no lo detecta (revisados 0)",
+     "detalle": "236 caracteres; line-height normal"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "No crítico. Es copia de producto (decisión de contenido de DPROMA según el patrón S-solo-RHL del propio archivo), pero es nivel 3 de §8 (explica el porqué del diseño). Pregunta abierta: ¿se queda como `.banda-info` corta con el detalle en un toggletip (§6.23) o se adopta tal cual?"
+    },
+    "por_que_importa": "Ocupa un bloque de tres líneas apretadas bajo la bandeja justo donde la persona decide; cuatro filas de decisión y un párrafo de explicación compiten por la atención."
+   },
+   {
+    "id": "v2-13asist-09",
+    "severidad": "media",
+    "regla": "§7.2 Cromo de aplicación — tres anchos",
+    "dice_el_sistema": "«Tres anchos: completa (≥1100px), colapsada a solo iconos (860–1100px) y cajón con velo (<860px).»",
+    "hay_en_el_build": "`.side{width:236px}` fija; el único breakpoint es `@media (max-width:1180px)` que solo cambia rejillas. A 1000px: menú 236px, main 764px; 13 enlaces con nombre (sinNombre 0); en la tabla «Instaladores» (scrollWidth 95 > 89) y «340 m fuera de zona» (148 > 136) se truncan con elipsis. El botón «Contraer navegación» (línea 333) no tiene manejador.",
+    "selector": ".side / .iconbtn[aria-label=\"Contraer navegación\"]",
+    "linea": 84,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "menu_1000px del brief (anchoSide 236, sinNombre 0) + script propio m13c.cjs a 1000 y 1024px (celdas truncadas)",
+     "detalle": "side 236 a 1000px; 3 celdas con scrollWidth > clientWidth"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico: sin scroll de página (scrollPagina 0), el nombre accesible del menú existe y las celdas truncadas conservan `title`. Mejora de responsive en Fase 2."
+    },
+    "por_que_importa": "En ventanas de 1000–1100px el menú consume un 24% del ancho y el registro corta datos del área y la ubicación (la columna donde RHL verifica «fuera de zona»)."
+   },
+   {
+    "id": "v2-13asist-10",
+    "severidad": "media",
+    "regla": "§6.10 Etiqueta de estado `.pill` y semáforo de cinco estados (§1.3)",
+    "dice_el_sistema": "«`--pause`: Inactivo, en pausa — no es un fallo» y la familia `.p-pause`",
+    "hay_en_el_build": "`.p-mute{background:var(--surface-2);color:var(--text-2)}` para «En campo» (2 de 6 filas), aunque `--pause-ink`/`--pause-bg` están declarados en el :root (líneas 34-36); `.t-mute` usa --text-3 a 11px.",
+    "selector": ".pill.p-mute, .tag.t-mute",
+    "linea": 208,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 208,
+     "cita": ".p-mute{background:var(--surface-2);color:var(--text-2)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico; el contraste del par es 5,97:1. El cliente eligió un neutro para «en campo», que no es un error; se recoge en Fase 2 como decisión de diseño (si «en campo» es `pause`)."
+    },
+    "por_que_importa": "«En campo» (21 personas) se ve más apagado que sus hermanas y puede leerse como «sin dato»."
+   },
+   {
+    "id": "v2-13asist-11",
+    "severidad": "media",
+    "regla": "§9 Andamiaje de maqueta (ANEXO A)",
+    "dice_el_sistema": "«Se marca siempre con data-andamio… Todo lo que lleve data-andamio se retira en la versión real.»",
+    "hay_en_el_build": "`<aside class=\"demo\" aria-label=\"Controles de la maqueta (no forman parte del producto)\">` sin `data-andamio`; flotante fijo con z-index 60 que tapa contenido en la captura de 1440.",
+    "selector": "aside.demo",
+    "linea": 586,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 586,
+     "cita": "<aside class=\"demo\" aria-label=\"Controles de la maqueta (no forman parte del producto)\">"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico: está rotulado en su aria-label y no es producto. Basta añadir el atributo para que el barrido de entrega lo retire."
+    },
+    "por_que_importa": "Sin la marca puede viajar al producto como una función real. (El candidato I2 «aside.demo gap 5» es del andamio, no del producto: descartado.)"
+   },
+   {
+    "id": "v2-13asist-12",
+    "severidad": "baja",
+    "regla": "§2 Tipografía — D116 fuentes autoalojadas",
+    "dice_el_sistema": "«Las fuentes se autoalojan — D116… Se retira [el `<link>` a Google Fonts]»",
+    "hay_en_el_build": "`<link href=\"https://fonts.googleapis.com/css2?family=Inter…&family=Michroma…\">` y preconnect a fonts.gstatic.com; sin `@font-face` local. `--font-brand` declara 'Ethnocentric Rg' con fallback Michroma/Inter.",
+    "selector": "head > link[href*=fonts.googleapis.com]",
+    "linea": 10,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 10,
+     "cita": "<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap\" rel=\"stylesheet\">"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico; la regla D116 es posterior a lo que v1 evaluaba y el archivo no cambió, por lo que no es regresión. Las fuentes reales se inyectaron al renderizar: la captura no refleja este defecto."
+    },
+    "por_que_importa": "Si el CDN no responde la pantalla cae a system-ui sin aviso (el caso que D116 describe)."
+   },
+   {
+    "id": "v2-13asist-13",
+    "severidad": "baja",
+    "regla": "Preámbulo del sistema («ningún hex literal en un componente») + §1.5",
+    "dice_el_sistema": "`--chrome-focus` #9FE0AE; «Cada archivo declara sus propios tokens»",
+    "hay_en_el_build": "Hex literales en componentes: `.side :focus-visible{outline-color:#9FE0AE}` (73), `.av{… linear-gradient(135deg,#1E4E79,#3E7A4C); color:#F2F5F7}` (121), `.it .n{… color:#2A1512}` (95). Candidato `span.av` 1,06:1 del brief: falso positivo (el instrumento lee background-color y el fondo es degradado; medido #F2F5F7 sobre #1E4E79 = 7,92:1 y sobre #3E7A4C = 4,69:1).",
+    "selector": ".side :focus-visible, .av",
+    "linea": 73,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 73,
+     "cita": ".side :focus-visible{outline-color:#9FE0AE}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico. El avatar no cambia con el tema; los tokens `--chrome-focus` y `--chrome-alerta` existen en el sistema."
+    },
+    "por_que_importa": "Al cambiar de tema el avatar y el foco del menú no siguen a los tokens."
+   },
+   {
+    "id": "v2-13asist-14",
+    "severidad": "baja",
+    "regla": "§1.3 / §1.5 + design-tokens.json v2.15.0 — valores divergentes del canónico",
+    "dice_el_sistema": "design-tokens.json v2.15.0: `--err-ink` #7A2A23, `--ok-ink` #1D5A46, `--warn-ink` #6E5210 · §1.5: `--chrome-dim` `rgba(242,245,247,.72)`",
+    "hay_en_el_build": "14 tokens con valor distinto al canónico (brief): --ok/warn/err/block/pause -ink y -bg, --chrome-dim .74, --serie-1/2, --font-ui/--font-brand, --text-3. Los pares -ink/-bg de las etiquetas medidos aquí cumplen: err 5,02, ok 5,04, warn 5,25, block 5,41, pause (p-mute) 5,97:1.",
+    "selector": ":root, [data-theme=\"light\"]",
+    "linea": 35,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tokens_valores_divergentes del brief + cálculo propio de contraste de los pares declarados",
+     "detalle": "pares -ink/-bg ≥ 5,0:1; sin_declarar 0"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico: el archivo es anterior a 2.15.0 y los pares declarados cumplen AA. `--serie-1/2` están declarados pero no se usan en esta pantalla."
+    },
+    "por_que_importa": "Mantiene el archivo apartado del sistema; sin efecto visual ni de accesibilidad medible hoy (salvo --text-3, hallazgo 3)."
+   },
+   {
+    "id": "v2-13asist-15",
+    "severidad": "baja",
+    "regla": "§6.5 Iconos (`.msi`)",
+    "dice_el_sistema": "«Material Symbols Rounded, variante rellena (FILL@1)»",
+    "hay_en_el_build": "Sprite SVG propio de 23 <symbol> de trazo con aria-hidden en cada uso.",
+    "selector": "svg .ico / <symbol>",
+    "linea": 67,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 67,
+     "cita": ".ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Diverge de nomenclatura y familia visual, no de función; sin dependencia remota. Pregunta abierta de sistema: ¿el sprite de trazo del cliente se adopta?"
+    },
+    "por_que_importa": "Familia de iconos distinta a la del sistema; no afecta uso."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": {
+    "valor": 2,
+    "nota": "Estructura sólida (skip link, aria-label en iconos, caption .sr, 44 destinos sin ninguno < 24px, foco visible, h1→h3). Resta: badge del menú 3,40:1, --text-3 4,21:1 en hover, icono Reintentar 1,03:1, 24 barras de esqueleto con texto, suelo de 12px."
+   },
+   "rendimiento": {
+    "valor": "no_evaluado",
+    "nota": "No se midió peso ni tiempo de carga; solo se observa dependencia de Google Fonts (línea 10)."
+   },
+   "theming": {
+    "valor": 3,
+    "nota": "Tokens declarados para claro y oscuro, tokens_usados_no_declarados vacío, semáforo de cinco estados; resta: hex literales (avatar, foco, badge), 14 valores divergentes de 2.15.0. Tema oscuro no medido (sin_datos)."
+   },
+   "responsive": {
+    "valor": 2,
+    "nota": "Un solo breakpoint (1180px) para rejillas; menú de 236px fijo sin colapso, celdas del registro truncadas a 1000–1024px, última tarjeta KPI huérfana en 2 columnas, sin scroll horizontal de página."
+   },
+   "integridad": {
+    "valor": 2,
+    "nota": "Selector `.inc .body span` que rompe la bandeja, `.state .ico` descendiente, andamio sin `data-andamio`, estados con <b> como título."
+   }
+  },
+  "justificacion": "La arquitectura de la pantalla es buena (jerarquía KPI → bandeja → registro, estados completos, redacción de producto clara, acciones reversibles con «Deshacer» en el dictamen) y el archivo es idéntico a v1 (f3 2). Lo que baja la nota es la integridad de implementación: una regla CSS demasiado amplia deforma el componente principal, y hay dos fallos de contraste medidos (badge, --text-3 en hover). Con los dos arreglos críticos y la regla de la bandeja sería un 3–4.",
+  "evidencia": [
+   "13_panel_asistencia_rhl--1440.png: bandeja con frases partidas y botones pegados al texto",
+   "tactil_bajo24 del brief: 44 elementos, 0 bajo 24px",
+   "script propio m13e.cjs: badge 3,40:1",
+   "script propio m13b.cjs: contrafactual de selector (alto de fila y separación)"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — Tier B"
+ },
+ "cobertura": [
+  {
+   "patron": "Selector descendiente de elemento (`.componente span`, `.componente b`) dentro de un componente cuyas filas contienen <span> con otro rol (acciones, texto en línea). Medido en la bandeja de Asistencia RHL: el span genérico anuló display, gap y margin-top de la fila de botones y partió frases.",
+   "propuesta_de_regla": "Un selector de contexto se acota a hijo directo y por clase: `.inc .body > .desc`, no `.inc .body span`. Un `<span>` que lleva clase propia (`.acts`) pierde ante cualquier regla de elemento que lo alcance por especificidad (0,2,1 > 0,2,0). Generaliza al texto la trampa de `.state > .ico` de §1.4.1/§6.3: los componentes con filas de varias líneas dan clase a cada línea (`.desc`, `.acts`) y no estilan por etiqueta. Comprobación en navegador: el `display` y el `margin-top` computados de la fila de acciones tienen que coincidir con los declarados."
+  },
+  {
+   "patron": "Escala de interlineado: el sistema no la define (§2 y §3 solo tienen tamaños y espaciados). En esta pantalla conviven `normal` (≈1,25), 1, 1,05, 1,3, 1,35 y 1,55, y los bloques de texto multilínea del sistema usan 1,4, 1,5, 1,55 y 1,6 sin nombre (§6.7, §6.9, §6.16, §12.4.1).",
+   "propuesta_de_regla": "Tres interlineados con nombre en §2: `--lh-num:1` (cifras KPI), `--lh-ui:1.4` (rótulos y una línea de apoyo) y `--lh-text:1.5` (todo texto que pueda ocupar más de una línea: avisos, detalle de fila, ayuda). Ningún bloque de texto multilínea queda en `normal`. Se mide en el navegador con `getComputedStyle(el).lineHeight` ≠ `normal`."
+  },
+  {
+   "patron": "Fila de bandeja de dictamen (icono-badge 26px + título + detalle + acciones), no descrita en el sistema. Aparece en esta pantalla y es el equivalente de §6.15/§6.12 para colas de decisión.",
+   "propuesta_de_regla": "`.inc{display:flex;gap:var(--sp-3);padding:var(--sp-3) 0;border-bottom:1px solid var(--border)}`, detalle en `--fs-meta` y `--lh-text`, acciones `display:flex;gap:var(--sp-2);margin-top:var(--sp-2)`; todas las filas con el mismo padding y la fila de acciones siempre a 8px del texto; los botones de la fila `min-height:24px` (§7.3)."
+  },
+  {
+   "patron": "El 10px de padding (y 9px) aparece en componentes del propio sistema (§6.9 `.note`, §7.2 `.it`) sin estar en la escala --sp-*, por lo que los clientes lo reproducen.",
+   "propuesta_de_regla": "O bien se admite explícitamente 10px (9/10 en `.it` por el borde de 3px) como excepción documentada de componentes compactos, o bien §6.9 y §7.2 pasan a `--sp-3`/`--sp-2`. Hoy la escala 4/8/12/16/20/24/32/48 y el propio sistema se contradicen."
+  }
+ ],
+ "sin_datos": [
+  "Tema oscuro: el brief mide contraste solo en claro; no se midió el tema oscuro (en particular --err-ink = --err #EE6E5F sobre --err-bg #352A33 y el badge del menú en oscuro).",
+  "Candidato descartado: I7_colision_texto (span «El sistema no »/botones Vacío y Error; caption/th «Miguel Torres»): el span es el texto de .tinote tapado por el andamio fijo `aside.demo` en la captura (artefacto del conmutador de maqueta) y caption es texto solo para lector de pantalla (`.sr`).",
+  "Candidato descartado: I3_recorte (label.sr, h2.sr, caption): texto solo para lector de pantalla. A 1024px, el recorte de `td` es el truncado por elipsis intencional, recogido en el hallazgo 9.",
+  "Candidato descartado: I2_holgura_inferior (`aside.demo`, `div.seg → select.selfilter` −30,5): el primero es andamio; el segundo es una fila flex-wrap de filtros que en la captura de 1440 aparece alineada.",
+  "Candidato descartado: contraste `span.av` 1,06:1 (el instrumento toma background-color y el fondo es un degradado): medido 4,69–7,92:1.",
+  "«Ver todas (14)» se parte en dos líneas a 1440px (50px de alto) porque el subtítulo de la tarjeta comprime el botón y `.btn` no lleva `white-space:nowrap`; el sistema (§6.2) no prescribe nowrap en `.btn`, así que no se califica como hallazgo; se menciona como dato visible en captura.",
+  "F4 y F5: no se evalúan (Tier B)."
+ ]
+}

@@ -1,0 +1,693 @@
+{
+ "pantalla": "47_asistente",
+ "tier": "A",
+ "sha256": "acd0c2fc62a6189424fa1554647601e448f729655ddcdce3b34645de8ac7f51f",
+ "estado_entrega": "modificada",
+ "estado_vs_pdf": "alineado",
+ "nota_estado_vs_pdf": "El brief marca 'alineado' (C1, C3-C7, C10; lt12=0). Excepcion medida: C2 no se cumple en los 5 p.grp del menu lateral (instrumento C2_105_no_mayusculas: 5 fallos, rotulos en caja mixta). Los defectos de v1 que el PDF no declara (margen negativo de .fuentes, objetivos <24px, estados) son 'no aplicados', no regresiones.",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error"
+ ],
+ "capturas": [
+  "47_asistente--1440.png",
+  "47_asistente--1280-fold.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 17,
+   "texto_usuario": "Rediseño crítico; ¿sección «Chat»?; ¿por qué dos colores, blanco y gris? (captura: la última línea sigue tocando la franja).",
+   "veredicto": "parcial",
+   "evidencia": [
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_m47_fuentes",
+      "detalle": "script scratchpad/a_lote_a/m47.cjs a 1440x900, 1280x800 y 390x844: en cada respuesta con .fuentes, el borde inferior del ultimo <p> esta 12px por debajo del borde superior de la franja; la caja de la ultima linea de texto (17px) entra 8,9px en la franja"
+     },
+     "dato": "SUB-PREGUNTA «la última línea sigue tocando la franja»: CONFIRMADA y es peor que «tocar»: se monta. En la 1.ª respuesta, la ultima linea («El que sí vence antes es GT-2026-02388, mañana 22 de agosto, con Mauricio Ríos.») va de y=340,7 a 357,7 y la franja gris empieza en y=348,8: el borde de la franja cruza el texto por la mitad (mitad sobre blanco, mitad sobre gris). Identico en la 2.ª respuesta («Te dejo los dos abiertos…», 615,5-632,5 frente a 623,6) y a 390px (solape de 12px del parrafo)."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 669,
+      "cita": "margin:calc(var(--sp-3) * -1) calc(var(--sp-4) * -1) calc(var(--sp-3) * -1)}"
+     },
+     "dato": "Causa: .fuentes vive DENTRO de .msg.ia .tx (padding 12px 16px, linea 666) y usa margenes negativos para sangrar hasta el borde de la tarjeta. Los de izquierda, derecha y abajo son correctos; el SUPERIOR (−12px) es el error: en vez de separar el cuerpo de la franja, la sube 12px sobre el ultimo parrafo, que no tiene margen inferior (`.msg .tx p + p` solo pone margen superior, linea 664). El relleno de la tarjeta no lo declara el contenedor sino un hijo con margenes que compensan (§3.1)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_m47_fuentes",
+      "detalle": "mismo script: .msg.ia .tx background rgb(250,252,253) = --surface; .fuentes background rgb(231,237,243) = --surface-2; .msg.yo .tx background transparente sobre body rgb(242,245,247) = --bg; contrastes entre tonos calculados en m47b.cjs: surface/bg 1,06:1, surface/surface-2 1,15:1, bg/surface-2 1,08:1"
+     },
+     "dato": "SUB-PREGUNTA «¿por qué dos colores, blanco y gris?»: la lectura del equipo SE CONFIRMA en lo esencial. Dentro de la respuesta hay dos tonos: cuerpo blanco (--surface #FAFCFD, linea 665) y franja gris de procedencia/acciones (--surface-2 #E7EDF3, linea 668) con rotulo «DE DÓNDE SALIÓ» o «PARA HACERLO» (lineas 729 y 745). NO son «quién habla». MATIZ que la lectura no recogia: el hablante tambien se codifica en parte por fondo, porque la respuesta del asistente va en tarjeta blanca con borde y el turno del usuario va SIN tarjeta, directo sobre el lienzo --bg (#F2F5F7, tercer tono). Pero blanco/lienzo miden 1,06:1: no separan por tono, separan el borde de 1px y el avatar. Por eso la persona puede leer «blanco = asistente, gris = tú» y «blanco/gris dentro de la respuesta» a la vez."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_m47_chat",
+      "detalle": "m47.cjs: titulos y regiones nombradas de la pantalla = H1 «Asistente»; H2.sr «Conversaciones»; H2.sr «Conversación con el asistente»; LABEL.sr «Escribe tu pregunta». Ninguno dice «Chat»"
+     },
+     "dato": "SUB-PREGUNTA «¿sección «Chat»?»: NO CONFIRMADA. No hay ninguna seccion ni rotulo visible «Chat». «chat» es solo el nombre de clase del panel (`.chat`, linea 654; `<section class=\"chat\" aria-labelledby=\"h-chat\">`) y su encabezado, solo para lectores de pantalla, es «Conversación con el asistente» (linea 715). Lo que se ve es: titulo «Asistente» + subtitulo «Consulta y resume · no modifica nada», columna izquierda de conversaciones (sin titulo visible) y panel de mensajes (sin titulo visible)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "tactil",
+      "detalle": "brief tactil: total 36, bajo24 5 (input#buscar 216x16; cuatro .fuentes a 780x19,8); I2_holgura_inferior: header.p4 gap 0 con un control"
+     },
+     "dato": "Ademas de lo preguntado, el diagnostico para el rediseño critico encuentra: 5 destinos tactiles <24px (criterio 1), la cabecera sin relleno inferior con el boton «Nueva conversación» tocando el borde, y en 390x844 el panel de mensajes mide 215px de 844 (25%)."
+    }
+   ],
+   "causa_raiz": "(a) Solape: margen superior negativo en .fuentes (linea 669) dentro de una tarjeta que lleva su relleno en el contenedor (.tx, linea 666) y no en filas hermanas: §3.1. (b) Dos tonos: el componente «respuesta» mezcla en una sola superficie dos zonas con significado distinto —cuerpo (lo que dice el asistente) y franja (de donde salio / que puedes hacer)— y la misma clase .fuentes sirve para dos cosas (procedencia de solo lectura y acciones «Abrir GT-…»). (c) «Chat»: es nombre de clase, no de interfaz; la pantalla no nombra visiblemente sus dos paneles.",
+   "solucion_propuesta": "Corte minimo y viable: `.fuentes{margin:var(--sp-3) calc(var(--sp-4) * -1) calc(var(--sp-3) * -1)}` (margen superior positivo: 12px de aire y la franja sigue sangrando a los lados y abajo). Corte correcto (§3.1): la tarjeta `.msg.ia .tx{padding:0;overflow:hidden}` con dos hijos, `.cuerpo{padding:var(--sp-3) var(--sp-4)}` y `.fuentes{padding:var(--sp-3) var(--sp-4);margin:0}`, sin margenes negativos. La separacion de significados (procedencia vs acciones) y la codificacion del hablante son decision de rediseño (Fase 4).",
+   "tipo_de_cambio": "rediseño",
+   "critico": {
+    "es": true,
+    "criterio": 5
+   },
+   "decision": {
+    "valor": "exigir_cambio",
+    "motivo": "La persona marco el Asistente como rediseño critico (criterio 5; viabilidad en Fase 4). El solape se corrige con un margen (cambio sencillo, viable ya); el rediseño del componente de respuesta, la estructura de la pantalla y el nombre de las secciones se decide en la Fase 4. Ademas hay 5 destinos <24px (criterio 1) en v2-47asis-02/03."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-47asis-01",
+    "severidad": "alta",
+    "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional (el sistema no tiene una regla propia contra margenes negativos: se aplica por analogia)",
+    "dice_el_sistema": "«el relleno de un contenedor lo declara el contenedor, no el hijo que casualmente va último»",
+    "hay_en_el_build": ".fuentes{...margin:calc(var(--sp-3) * -1) calc(var(--sp-4) * -1) calc(var(--sp-3) * -1)} dentro de .msg.ia .tx{padding:var(--sp-3) var(--sp-4)}: la franja sube 12px sobre el ultimo parrafo y la caja de la ultima linea entra 8,9px en ella",
+    "selector": ".fuentes",
+    "linea": 669,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 669,
+     "cita": "margin:calc(var(--sp-3) * -1) calc(var(--sp-4) * -1) calc(var(--sp-3) * -1)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 5
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "v1 f1-47asis-09 (media). El PDF del cliente no lo declara: es 'no aplicado', no regresion. Subo a alta porque es lo que la persona senalo en el rediseño critico y esta en el elemento central de la pantalla (cada respuesta). Solucion de una linea disponible; ver observaciones_resueltas hoja 17."
+    },
+    "por_que_importa": "La ultima linea de cada respuesta —la conclusion, el dato que se va a copiar o actuar— queda cruzada por el borde de la franja; se lee como un error de pintado y apiña la conclusion con el rotulo «DE DÓNDE SALIÓ», que queda justo debajo."
+   },
+   {
+    "id": "v2-47asis-02",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles — enlaces que son el elemento primario de su fila",
+    "dice_el_sistema": "«los enlaces que son el elemento primario de su fila (un folio, una miga, «Ver en Maps») no son texto en prosa: llevan padding hasta llegar a 24px»",
+    "hay_en_el_build": "Cuatro enlaces `.fuentes a` de 780x19,8px; la regla `.fuentes a{font-size:var(--fs-meta);color:var(--link);...}` no declara alto minimo ni relleno",
+    "selector": ".fuentes a",
+    "linea": 671,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil",
+     "detalle": "brief tactil_bajo24: a «Bandeja de gestoría · 6 expedientes», «Trámites vehiculares · 5 expedientes», «Abrir GT-2026-02417», «Abrir GT-2026-02416»: w 780, h 19,8"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino tactil <24px medido (criterio 1). v1 f1-47asis-02; delta_vs_v1.bajo24 = 0 (siguen 5). El PDF no lo declara. Arreglo: `.fuentes a{display:flex;align-items:center;min-height:24px}`."
+    },
+    "por_que_importa": "«Abrir GT-2026-02417» es la salida que el propio asistente ofrece cuando se niega a actuar («te dejo los dos abiertos para que lo hagas en dos clics»); a 19,8px es el eslabon mas facil de fallar justo donde se decide la tarea."
+   },
+   {
+    "id": "v2-47asis-03",
+    "severidad": "alta",
+    "regla": "§7.3 Objetivos táctiles + §10 Diez trampas (el destino es la región que acepta la pulsación)",
+    "dice_el_sistema": "«un campo de búsqueda dentro de un `<div>` con forma de pastilla **no** cumple, porque pulsar la pastilla no hace nada. El contenedor tiene que ser una `<label for=\"…\">`»",
+    "hay_en_el_build": "`<div class=\"search\"><svg…/><input id=\"buscar\" type=\"search\"…></div>`: el input mide 216x16px; la pastilla (.search, 34px) es un div",
+    "selector": ".hist .search",
+    "linea": 709,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 709,
+     "cita": "<div class=\"search\"><svg class=\"ico ico-sm\" aria-hidden=\"true\"><use href=\"#i-search\"/></svg><input id=\"buscar\" type=\"search\""
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino tactil <24px medido (criterio 1): input 216x16 segun el instrumento tactil del brief; pulsar la lupa o el relleno de la pastilla no enfoca nada. v1 f1-47asis-01. Arreglo: `<label class=\"search\" for=\"buscar\">`."
+    },
+    "por_que_importa": "Es la unica forma de encontrar una conversacion anterior y su zona pulsable es de 16px de alto en una pantalla pensada para usarse tambien en telefono."
+   },
+   {
+    "id": "v2-47asis-04",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (colapsada a solo iconos) + §6.5 Iconos sin texto",
+    "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.»",
+    "hay_en_el_build": "A 861-1100px `.side .et,.grp,.side .wordmark{display:none}`: 15 de 15 enlaces del menu sin nombre accesible (sin aria-label ni title; iconos aria-hidden)",
+    "selector": ".side .et",
+    "linea": 288,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "sidebar",
+     "detalle": "brief mediciones_v2.menu_1000px: hayMenu true, total 15, sinNombre 15, anchoSide 64"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1). delta_vs_v1.menu_sin_nombre = 0: existia igual en v1 sin reportarse, no es regresion. Cromo compartido: se corrige una vez (aria-label + title en cada a.it)."
+    },
+    "por_que_importa": "A 1000px un lector de pantalla anuncia 15 enlaces «sin nombre» en la navegacion principal; el asistente depende de ese menu para volver al resto del producto."
+   },
+   {
+    "id": "v2-47asis-05",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado de una pantalla (reglas 1 y 2) + «El estado va dentro de una tarjeta»",
+    "dice_el_sistema": "«El cambio se anuncia y mueve el foco. Sin esto, quien usa lector de pantalla no se entera de que la pantalla cambió.» · «Cada estado lleva un encabezado real, no un `<b>`»",
+    "hay_en_el_build": "0 elementos con aria-live en todo el archivo (medido: ariaLive 0); vacio y error titulan con `<b>`; ni las respuestas nuevas del asistente ni los cambios de estado se anuncian; los estados flotan sin tarjeta-estado ni medallon",
+    "selector": ".state-error > b",
+    "linea": 789,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 789,
+     "cita": "<b>El asistente no está disponible</b>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-47asis-06. Cerrado el selector `.state .ico` -> `.state > .ico` (C3; I1 = 0 fallos). Persiste lo demas. En una pantalla conversacional falta ademas el anuncio de cada respuesta nueva. Como ARQ-ESTADOS se copia en las pantallas, el sistema debe entregar el bloque con las seis reglas de §6.4 (y una regla para el hilo de mensajes, ver cobertura)."
+    },
+    "por_que_importa": "Quien usa lector de pantalla envia una pregunta y no recibe aviso de que llego la respuesta: la pantalla central del asistente es inutilizable sin vista."
+   },
+   {
+    "id": "v2-47asis-06",
+    "severidad": "alta",
+    "regla": "§3.1 El relleno de un contenedor no vive en un hijo opcional (cabecera de pantalla)",
+    "dice_el_sistema": "«la cabecera se quedó con 5px entre el título y su propio borde... `.p4{ padding-bottom: var(--sp-3) }`»",
+    "hay_en_el_build": ".p4-t{...padding:var(--sp-3) var(--sp-6) 0...} y .p4 sin relleno: el boton «Nueva conversación» (36px) termina a 0px del borde inferior de la cabecera (49px de alto)",
+    "selector": ".p4-t",
+    "linea": 309,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I2_holgura_inferior",
+     "detalle": "fallos 1: header.p4, gap 0, altoBarra 49, controles 1"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Mismo defecto que Mi día (28): 30 pantallas con .p4 miden padding-bottom 0px (script propio a_lote_a/p4scan.cjs). Aqui es un control, no un titulo, el que toca el borde. Arreglo de una linea ya documentado en §3.1; el sistema debe entregar ARQ-P4 corregido. 'nuevo' = no reportado en v1, no regresion."
+    },
+    "por_que_importa": "El boton principal de la pantalla se ve pegado a la linea que cierra la cabecera, con 12px de aire arriba y ninguno abajo."
+   },
+   {
+    "id": "v2-47asis-07",
+    "severidad": "media",
+    "regla": "§10 Diez trampas — isotipo (viewBox en el <svg>)",
+    "dice_el_sistema": "«Escrito al revés —`viewBox=\"740 0 970 932\"` en el `<svg>` y un `<use>` sin medidas— ... se pinta 32,5px a la izquierda de su caja y se recorta casi entera.»",
+    "hay_en_el_build": "Dos instancias mal escritas: el isotipo del menu (linea 692) y el avatar del asistente en cada respuesta (linea 723: `<svg width=\"16\" height=\"15\" viewBox=\"740 0 970 932\"...><use href=\"#dproma-mark\"/>`); en el avatar la caja del <use> queda 11,5px a la izquierda de la del <svg> (555,6 contra 567)",
+    "selector": ".msg.ia .av",
+    "linea": 723,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 723,
+     "cita": "viewBox=\"740 0 970 932\" aria-hidden=\"true\"><use href=\"#dproma-mark\"/>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-47asis-11 solo reportaba el menu; el avatar es una segunda instancia del mismo error (§10). Medido con m47b.cjs: avatarIA svgL 567, useL 555,55. En la captura el avatar del asistente es un disco degradado con la marca casi invisible. Corregir con medidas en el <use> (§10) y entregar el fragmento canonico del isotipo."
+    },
+    "por_que_importa": "El avatar es una de las pistas que separan «Tú» de «Asistente»; con la marca recortada la pista se reduce a un disco verde sin significado."
+   },
+   {
+    "id": "v2-47asis-08",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga",
+    "dice_el_sistema": "«Sin texto real dentro de las barras» · «El esqueleto imita la forma de lo que va a llegar» · «`.skel{animation:none;background:var(--surface-2)}`»",
+    "hay_en_el_build": "Las barras llevan texto real («buscador», «conversación anterior», «pregunta», «respuesta del asistente»); `.sk` declara flex-direction y gap sin display:flex y las barras salen pegadas; bajo reduced-motion solo `animation:none`; no dibuja el compositor ni turnos alternos",
+    "selector": ".state-loading .sk",
+    "linea": 617,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 617,
+     "cita": ".sk{flex-direction:column;gap:var(--sp-3);padding:var(--sp-4) var(--sp-6)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-47asis-07. Reproducido en captura propia m47-loading.png (barras de la columna izquierda sin separacion; el bloque entero ocupa ~180px de 900). Lineas 771-778 conservan el texto. El sistema entrega ARQ-ESTADOS con `.sk{display:flex}` y el fondo aplanado."
+    },
+    "por_que_importa": "La espera promete una pantalla que no se parece a la que llega, y el lector de pantalla recita «buscador, conversación anterior…» como si fueran datos."
+   },
+   {
+    "id": "v2-47asis-09",
+    "severidad": "media",
+    "regla": "§5 Movimiento — Reducción de movimiento",
+    "dice_el_sistema": "«se conservan opacidad y color, se elimina todo desplazamiento y escala»",
+    "hay_en_el_build": "El bloque reduced-motion solo remapea duraciones; `button:active{transform:scale(.97)}` sigue activo en todos los botones",
+    "selector": "button:active",
+    "linea": 220,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 220,
+     "cita": "button:active,.pressable:active{transform:scale(.97)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-47asis-10. El ejemplo del propio §5 solo remapea duraciones y contradice su texto: corregir §5."
+    },
+    "por_que_importa": "Quien activa «reducir movimiento» sigue viendo un salto de escala en cada pulsacion, incluido «Enviar»."
+   },
+   {
+    "id": "v2-47asis-10",
+    "severidad": "baja",
+    "regla": "§6.8 Chip / control secundario (`.chip`)",
+    "dice_el_sistema": "`.chip{...min-width:40px;min-height:34px;...padding:8px 12px}`",
+    "hay_en_el_build": "Los 4 accesos rapidos son una clase nueva `.rapido` con `padding:5px 12px` y sin min-height: miden 27px",
+    "selector": ".rapido",
+    "linea": 683,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 683,
+     "cita": "padding:5px 12px;font:600 var(--fs-meta) var(--font-ui);color:var(--text-2);cursor:pointer}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-47asis-08 era media por dos piezas: `.btn` sin min-height (CERRADO: «Enviar» y «Nueva conversación» miden 36px, C4) y `.rapido` 26px (queda en 27px, ≥24px). Los chips de sugerencia son un patron real que el sistema no documenta (§6.8 solo describe botones de cabecera): se documenta como variante en vez de pedir cambio."
+    },
+    "por_que_importa": "No incumple ningun minimo; solo duplica el componente con otro nombre y 7px menos de alto."
+   },
+   {
+    "id": "v2-47asis-11",
+    "severidad": "baja",
+    "regla": "§7.2 Cromo de aplicación / §7.3 Objetivos táctiles",
+    "dice_el_sistema": "`.it{...min-height:38px;padding:9px 10px;...}` · «Ese bloque existía en las tres maquetas y **nunca se activaba**: el atributo `data-tacto` no aparecía»",
+    "hay_en_el_build": "`.it{display:flex;...padding:6px 9px...}` sin min-height: 30px medidos en los items del menu; `data-tacto` ausente del <html> (regla con :root ya corregida, C7, pero sin efecto)",
+    "selector": ".it",
+    "linea": 237,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 237,
+     "cita": ".it{display:flex;align-items:center;gap:9px;padding:6px 9px;border-radius:7px;color:var(--chrome-dim);"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-47asis-12. 30px >24px: cumple WCAG; el menu del cliente es mas denso que el §7.2 en todas las pantallas y 28 lo activa con data-tacto. Se documenta la densidad del cromo del cliente (30px con data-tacto=dedo a 46px) en vez de exigirla."
+    },
+    "por_que_importa": "No es un incumplimiento; es una divergencia de densidad del cromo compartido."
+   },
+   {
+    "id": "v2-47asis-12",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (excepcion: 10,5px en mayúsculas)",
+    "dice_el_sistema": "«Se admite una excepción, y solo una: 10,5px en mayúsculas con `letter-spacing` para los rótulos de grupo de la barra lateral»",
+    "hay_en_el_build": ".grp{...font-size:10.5px...letter-spacing:.1em...} sin text-transform: 5 rotulos en caja mixta",
+    "selector": ".grp",
+    "linea": 235,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "fallos 5: p.grp «Principal», «Operación», «Trámites vehiculares», «Dirección y Administraci», «Soporte»"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El ejemplo de .grp en §7.2 tampoco lleva text-transform: el sistema se contradice (§2.1 pide mayusculas). Decidir cual de los dos corrige."
+    },
+    "por_que_importa": "Rotulo de orientacion de 10,5px en caja mixta: se lee algo peor que en mayusculas espaciadas; es orientacion, no dato diario."
+   },
+   {
+    "id": "v2-47asis-13",
+    "severidad": "baja",
+    "regla": "§8 Voz de producto (limite 2: ~140 caracteres, una frase) + §6.9 Avisos (reutilizar .nota/.banda)",
+    "dice_el_sistema": "«Antes de escribir una clase nueva para un aviso de ancho completo, se verifica si `.banda` + una de sus cuatro variantes ya lo cubre.»",
+    "hay_en_el_build": "El descargo pasa a una frase de 84 caracteres (cerrado el exceso de v1: 228 caracteres, 3 frases) pero sigue en la clase nueva `.aviso-ia`; y el limite del asistente se dice 3 veces en la vista: subtitulo («no modifica nada», linea 704), placeholder (linea 762) y descargo (linea 765)",
+    "selector": ".aviso-ia",
+    "linea": 765,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 765,
+     "cita": "<p class=\"aviso-ia\">El asistente consulta y resume: no da de alta, no asigna, no aprueba ni cierra nada.</p>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "S-19 (el asistente consulta y no modifica) es decision de producto del cliente en la FICHA: «Lo que decidí yo: S-19 ... S-20». La repeticion es una cuestion de voz, no una regla medible; se documenta el patron `.aviso-ia` como pie de compositor y se sugiere decir el limite una vez al nivel 1 de §8 (que bloquea la accion)."
+    },
+    "por_que_importa": "Dicho tres veces en una pantalla, el limite deja de leerse; dicho una vez en el sitio donde se escribe, condiciona la pregunta."
+   },
+   {
+    "id": "v2-47asis-14",
+    "severidad": "media",
+    "regla": "FICHAS_TECNICAS.md del cliente · «Defectos reales de accesibilidad encontrados y corregidos» (axe-core): `<header class=\"p4\">` duplicando `role=\"banner\"` (el sistema 2.15.0 no tiene § propio sobre landmarks)",
+    "dice_el_sistema": "FICHAS_TECNICAS.md linea 1419: «**`<header class=\"p4\">` duplicando `role=\"banner\"`** (mismo defecto que 31/53 en la tanda 1)» y su correccion: `<header class=\"p4\">` → `<div class=\"p4\">`",
+    "hay_en_el_build": "`<header class=\"p4\">` (linea 704) dentro de `div.main`, fuera de main/section: la pagina expone dos landmarks banner (header.cromo-top y header.p4)",
+    "selector": ".p4",
+    "linea": 704,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 704,
+     "cita": "<header class=\"p4\"><div class=\"p4-t\"><h1>Asistente</h1>"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Atribuido al cliente solo por su propia FICHAS (que lo corrige en 33, 42, 43, 44 y 26 y no menciona 47). El archivo v1 ya tenia la misma linea: 'nuevo' = no reportado en v1, no regresion. Medido con script propio a_lote_a/banners.cjs: 2 banners. El sistema no tiene regla: debe anadir a §7.2 que la cabecera de pantalla (.p4) es un <div> y no un <header>."
+    },
+    "por_que_importa": "Un lector de pantalla encuentra dos «banner» en la misma pagina y no sabe cual es el de la aplicacion."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [
+  {
+   "id_v1": "f1-47asis-03",
+   "evidencia": "--text-3 ahora #5C6675: `.fuentes .et` (rgb(92,102,117)) sobre --surface-2 (rgb(231,237,243)) = 4,93:1 (calculo propio en m47b.cjs: 'text-3 on s2 4.93'); contraste con 0 fallos en 75 nodos de texto, claro y oscuro (brief)."
+  },
+  {
+   "id_v1": "f1-47asis-04",
+   "evidencia": "Brief: lt12_medido 0. Medido con m47.cjs: tamanos de fuente de los mensajes = ['12px','14px']; `.fuentes .et` ahora 12px (linea 670)."
+  }
+ ],
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 2,
+   "integridad": 2
+  },
+  "justificacion": "Contraste y suelo tipografico corregidos (0 fallos en 75 nodos; sin texto <12px), iconos de boton correctos. Pero: 5 destinos <24px (search + 4 enlaces) sin cambio desde v1, menu colapsado sin nombre (15/15), cero aria-live en una pantalla conversacional, esqueleto con texto y sin separacion, margen negativo que monta la franja sobre el texto, isotipo mal escrito dos veces, y en 390x844 el panel de mensajes mide 215px de 844 (25%). Rendimiento no evaluado.",
+  "evidencia": [
+   "Brief: tactil total 36, bajo24 5.",
+   "Brief: menu_1000px sinNombre 15.",
+   "m47c.cjs: 390x844 → .mensajes 215px, .hist 253px, .compositor 206px.",
+   "m47.cjs: solape de .fuentes sobre el ultimo parrafo = 12px."
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 2,
+   "hallazgo": "No hay estado de «respondiendo» dentro del hilo: el unico estado de espera es el esqueleto de pagina. Tras pulsar «Enviar» no se ve un turno pendiente ni se anuncia.",
+   "selector": ".compositor .btn.p",
+   "certeza": "inferido",
+   "reproduce": {
+    "tipo": "captura",
+    "archivo": "47_asistente--1440.png",
+    "region": "compositor con «Enviar»; en el archivo no existe marcado de turno pendiente (grep 'aria-live' = 0)"
+   }
+  },
+  {
+   "n": 2,
+   "heuristica": "Concordancia entre el sistema y el mundo real",
+   "severidad": 0,
+   "hallazgo": "Vocabulario de la operacion («recibido, sin admitir», «gestor asignado», «fecha compromiso», «De dónde salió»), y el asistente explica por que un expediente aparece en la lista aunque no venza.",
+   "selector": ".msg.ia .tx",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 727,
+    "cita": "recibido, sin admitir"
+   }
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 0,
+   "hallazgo": "Cuando rechaza una peticion («Asígnale los dos sin gestor a Nayeli») ofrece la salida directa «Abrir GT-2026-02417 / 02416»: no deja al usuario en un callejon.",
+   "selector": ".fuentes",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 745,
+    "cita": "<div class=\"fuentes\"><span class=\"et\">Para hacerlo</span>"
+   }
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 3,
+   "hallazgo": "La misma clase `.fuentes` sirve para dos significados distintos —procedencia de solo lectura («De dónde salió») y acciones («Para hacerlo» → «Abrir GT-…»)— con identica forma, color de enlace y franja gris; solo cambia el rotulo. Ademas, 47 contradice a 10_dprimi_asistente (otro asistente del mismo paquete, identico a v1): nombre «D-PRIMI» frente a «Asistente», acciones con confirmacion («Confirmar y enviar», «Notificar a los responsables») frente a «consulta y resume, no da de alta, no asigna».",
+   "selector": ".fuentes",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 729,
+    "cita": "<div class=\"fuentes\"><span class=\"et\">De dónde salió</span>"
+   }
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 0,
+   "hallazgo": "El limite de lo que hace el asistente esta escrito antes de escribir (placeholder y pie) y se demuestra con un rechazo; evita la accion equivocada por diseño (S-19).",
+   "selector": ".compositor textarea",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 762,
+    "cita": "placeholder=\"Pregunta o pide un resumen. El asistente consulta, no modifica.\""
+   }
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocimiento antes que recuerdo",
+   "severidad": 0,
+   "hallazgo": "Cuatro accesos rapidos («¿Qué vence hoy?», «Órdenes sin instalador», «Viáticos por autorizar», «Resumen de la semana») y historial buscable con 5 conversaciones evitan tener que recordar la forma de preguntar.",
+   "selector": ".rapido",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 755,
+    "cita": "<button class=\"rapido\" type=\"button\">¿Qué vence hoy?</button>"
+   }
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 1,
+   "hallazgo": "Accesos rapidos y buscador del historial, pero el buscador es un destino de 16px (ver v2-47asis-03) y no hay indicacion de teclado para enviar.",
+   "selector": ".hist .search",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "tactil",
+    "detalle": "input#buscar 216x16"
+   }
+  },
+  {
+   "n": 8,
+   "heuristica": "Estética y diseño minimalista",
+   "severidad": 3,
+   "hallazgo": "La ultima linea de cada respuesta queda cruzada por la franja (solape medido de 12px del parrafo y 8,9px de la linea); tres tonos de superficie casi iguales (1,06:1, 1,15:1) obligan a separar por borde; el limite se repite 3 veces; en 390px el hilo ocupa 25% de la altura.",
+   "selector": ".fuentes",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "propio_m47_fuentes",
+    "detalle": "m47.cjs: solapeParrafoConFranja 12, solapeLineaConFranja 8,9 (1440, 1280); 12 a 390; m47c.cjs mensajesH 215 de 844 a 390"
+   }
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de errores",
+   "severidad": 1,
+   "hallazgo": "El error dice que paso, que no se perdio («Tus conversaciones anteriores no se perdieron y ningún dato del sistema cambió»), referencia ASI-… y «Reintentar»: cumple §6.4 regla 3. Falta encabezado real y anuncio (v2-47asis-05).",
+   "selector": ".state-error",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "I1_icono_vs_boton",
+    "detalle": "fallos 0; el icono de «Reintentar» hereda el color del boton"
+   }
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 0,
+   "hallazgo": "«Ver ejemplos de preguntas» en el estado vacio y el pie con el alcance del asistente sirven de ayuda en el sitio.",
+   "selector": ".state-empty",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 785,
+    "cita": "Ver ejemplos de preguntas"
+   }
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-070",
+    "documento": "data/insights/2026-07-31_direccion-general-supervision-operativa.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-070: «No hay criterios definidos ni un proceso maduro para el uso de inteligencia artificial en la operación; se reconoce el riesgo de que fallas del asistente virtual queden sin contingencia definida». La pantalla define el alcance escrito (S-19, lineas 704 y 765) y una contingencia: el estado de error dice «los módulos del menú funcionan con normalidad» y que no se perdio nada (linea 790)."
+   },
+   {
+    "pp": "pp-050",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-050: la IA entrego agencias que no existen, sin verificacion. El bloque «De dónde salió» (S-20: cada respuesta enseña de dónde salió) permite comprobar contra la fuente. Se queda a medias porque los enlaces miden 19,8px y no distinguen dato consultado de dato inferido."
+   },
+   {
+    "pp": "pp-103",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-103: uso de IA aun basico. La pantalla ofrece un uso concreto y acotado de consulta sobre datos reales («trámites que vencen», «órdenes sin instalador») con accesos rapidos: sube el uso de IA de configuracion a consulta de operacion."
+   },
+   {
+    "pp": "pp-038",
+    "documento": "data/insights/2026-07-20_gestion-almacen-inventario.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-038: IA generativa personal y no reglamentada. Aqui el alcance nunca excede al del usuario («Y sólo ve lo que tu usuario ve», linea 784) y el asistente no escribe en el sistema: hay lineamiento visible dentro del producto."
+   },
+   {
+    "pp": "pp-084",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-084: los tramites se asignan por canales distintos sin alerta y se pierde al menos un dia. La conversacion de ejemplo localiza «2 no tienen gestor asignado» (linea 727); pero es consulta bajo demanda, no alerta."
+   },
+   {
+    "pp": "pp-100",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-100 (alta): no hay repositorio de contratos. El asistente solo ve bandejas de gestoria y tramites vehiculares (lineas 730-731); la consulta que mas falta en soporte —qué dice el contrato de un cliente— queda fuera."
+   },
+   {
+    "pp": "pp-102",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-102: las cotizaciones se mandan por WhatsApp a Dirección General. El asistente es de solo lectura y se niega a aprobar o asignar (linea 743): el flujo de autorizacion por WhatsApp sigue intacto; es coherente con S-19 pero no resuelve el dolor de flujo."
+   }
+  ],
+  "usabilidad_para_el_area": "Para el area de soporte/direccion, el asistente responde a lo que la investigacion pide de la IA: alcance acotado, solo lectura, procedencia visible y contingencia cuando falla (pp-070, pp-050, pp-038, pp-103). Funciona mal en lo practico: las conversaciones de consulta terminan en acciones («Abrir GT-…», «Para hacerlo») cuyos destinos de 19,8px son faciles de fallar, el buscador del historial es de 16px, y en telefono el hilo ocupa un cuarto de la pantalla. El diseño tambien deja sin resolver lo que mas duele a esta area —contratos fuera del sistema (pp-100) y autorizaciones por WhatsApp (pp-102)— y contradice a la maqueta 10_dprimi_asistente, que si ejecuta acciones con confirmacion."
+ },
+ "diagnostico_rediseno_critico": {
+  "que_hay_hoy": "Pantalla de dos paneles (.conv): columna de historial con buscador y 5 conversaciones (260-300px) + panel de hilo con mensajes (usuario sin tarjeta; asistente en tarjeta blanca con franja gris de procedencia/acciones), accesos rapidos, caja de texto, boton «Enviar» y pie de alcance. Cabecera con titulo «Asistente», subtitulo «Consulta y resume · no modifica nada» y «Nueva conversación». 4 estados (con datos, cargando, vacio, error). Lineas 704-793.",
+  "que_falla_y_por_que": [
+   "Margen negativo superior en .fuentes: la franja se monta 12px sobre la ultima linea de cada respuesta (linea 669).",
+   "Un solo componente (.fuentes) para dos significados: procedencia de solo lectura y acciones («Abrir GT-…»).",
+   "Los tonos blanco, lienzo y gris de franja miden 1,06:1 y 1,15:1: el hablante se separa por borde y avatar, y el avatar del asistente tiene la marca recortada.",
+   "5 destinos <24px (buscador y 4 enlaces de procedencia/accion).",
+   "Cero aria-live en una pantalla cuyo trabajo es mostrar respuestas nuevas; estados con <b> como titulo.",
+   "La pantalla no nombra visiblemente sus dos paneles; «Chat» solo es nombre de clase.",
+   "En 390x844 el hilo de mensajes ocupa 215px (25%) entre un historial de 253px y un compositor de 206px.",
+   "El limite del asistente se dice 3 veces; 47 contradice a 10_dprimi_asistente (nombre, acciones con confirmacion) y 47 no incluye el lanzador `.fab` en su marcado (solo su CSS, lineas 268-275)."
+  ],
+  "causa_raiz": "Dos causas de implementacion (margen negativo; clase unica para dos significados) y una de producto sin resolver (que es el asistente: consulta-solo [S-19, 47] o consulta+accion confirmada [10]). Las demas (estados, esqueleto, isotipo, cabecera) vienen de bloques del armazon que el sistema aun no entrega correctos.",
+  "requisitos": [
+   "R1. La tarjeta de respuesta separa estructuralmente cuerpo y pie sin margenes negativos (§3.1) y deja ≥12px entre la ultima linea y el pie.",
+   "R2. Procedencia (solo lectura) y acciones son componentes distintos o al menos distintos en forma, no solo en rotulo.",
+   "R3. El hablante se identifica por mas de un tono: rotulo, avatar integro y posicion/forma; no depende de diferencias de 1,06:1.",
+   "R4. Todo destino de enlace o campo ≥24px (§7.3); el buscador es una <label>.",
+   "R5. Las respuestas nuevas y los cambios de estado se anuncian (aria-live) y el foco se gestiona (§6.4 reglas 1-2); encabezados reales.",
+   "R6. Los paneles tienen nombre visible o una estructura que no lo necesita; no se usa «Chat» como rotulo sin decision de producto.",
+   "R7. A 390x844 el hilo y el compositor tienen prioridad sobre el historial (el historial se colapsa); el hilo ocupa al menos la mitad de la altura.",
+   "R8. Una sola definicion del asistente (consulta-solo vs consulta+accion) en 47 y 10; el limite se dice una vez, donde condiciona la accion (§8 nivel 1).",
+   "R9. El lanzador del asistente existe en el armazon (ficha: lanzador portado, deshabilitado) y se prueba: hoy 47 no tiene `.fab` en el marcado."
+  ]
+ },
+ "cobertura": [
+  {
+   "patron": "Burbuja de respuesta de asistente con pie de procedencia (`.msg.ia .tx` + `.fuentes`)",
+   "propuesta_de_regla": "La respuesta de un asistente es una tarjeta (§6.3) con dos zonas hermanas: cuerpo (`padding:var(--sp-3) var(--sp-4)`) y pie en `--surface-2` con rotulo en mayusculas de 12px; el pie nunca usa margenes negativos y deja ≥ `--sp-3` entre la ultima linea y su borde superior. Procedencia (solo lectura) y acciones no comparten pie."
+  },
+  {
+   "patron": "Hilo de conversacion (`.mensajes`) con turnos de usuario sin tarjeta y de asistente con tarjeta",
+   "propuesta_de_regla": "El hilo es una region con `aria-live=\"polite\"`; cada turno lleva rotulo, hora y avatar; el hablante no se codifica solo por tono de superficie (la diferencia --surface/--bg es 1,06:1)."
+  },
+  {
+   "patron": "Accesos rapidos tipo chip (`.rapido`) y compositor",
+   "propuesta_de_regla": "Los chips de sugerencia son `.chip` pill con `min-height:34px` (§6.8) que rellenan el compositor al pulsarlos; el compositor declara su relleno en el contenedor."
+  },
+  {
+   "patron": "Contradiccion entre 10_dprimi_asistente (identico a v1) y 47_asistente",
+   "propuesta_de_regla": "Un solo asistente por producto. 10: «D-PRIMI», ejecuta acciones tras confirmacion («Confirmar y enviar», «las acciones siempre se confirman antes de ejecutarse»); 47: «Asistente», consulta y resume, rechaza «Asígnale los dos sin gestor a Nayeli». Si el producto sigue S-19, 10 debe retirarse o alinearse; si no, 47 debe permitir la accion con confirmacion. Decision de producto, fuera del alcance de la auditoria visual de 47."
+  }
+ ],
+ "sin_datos": [
+  "Rendimiento (F3): no evaluado.",
+  "Nombre visible deseado para las secciones: la persona pregunta «¿sección Chat?»; la respuesta del cliente no esta en la FICHA (solo dice «hay maqueta original y no hay pantalla»): sin_datos sobre la intencion.",
+  "Que la persona viera una captura distinta a este archivo: no se puede saber; el solape medido coincide con su descripcion («la última línea sigue tocando la franja»), asi que el archivo coincide en lo esencial.",
+  "No se midio el comportamiento con teclado ni lector de pantalla real (solo lectura del DOM)."
+ ]
+}

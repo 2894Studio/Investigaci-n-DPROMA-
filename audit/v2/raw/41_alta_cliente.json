@@ -1,0 +1,513 @@
+{
+ "pantalla": "41_alta_cliente",
+ "tier": "A",
+ "sha256": "da9b8e074371a562505608bd808968cc3eb64adc34cae9c21b49767099a8e823",
+ "estado_entrega": "modificada",
+ "estado_vs_pdf": "alineado",
+ "estados_auditados": [
+  "con datos (captura 1440 y 1280)",
+  "error (render propio)",
+  "vacío (render propio y código)",
+  "cargando (render propio)"
+ ],
+ "capturas": [
+  "41_alta_cliente--1280-fold.png",
+  "41_alta_cliente--1440.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-41alta-01",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (modo colapsado) + §11 Estructura (nombre accesible)",
+    "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.»",
+    "hay_en_el_build": "A 1000 px: barra de 64 px, .side .et{display:none} y 15 enlaces .it sin aria-label ni title; nombre accesible vacío en 15 de 15.",
+    "selector": ".side .et, .it",
+    "linea": 291,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "sidebar",
+     "detalle": "brief menu_1000px: total 15, sinNombre 15; CDP Accessibility.getFullAXTree a 1000×800 (aud2/common_b.cjs)"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1), medido. Cromo común a todas las pantallas; un solo arreglo."
+    },
+    "por_que_importa": "En portátil pequeño o tableta, el lector de pantalla anuncia quince enlaces sin nombre."
+   },
+   {
+    "id": "v2-41alta-02",
+    "severidad": "media",
+    "regla": "§6.9 Avisos: el icono tiene que coincidir con la variante",
+    "dice_el_sistema": "«El icono tiene que coincidir con la variante. El alta de cliente abría con un triángulo de advertencia sobre una banda neutra: señal mixta, el lector no sabe si preocuparse.»",
+    "hay_en_el_build": "Las tres .banda.b-info (cabecera, sección Sucursal, sección Primer contacto) y el chip «Se deduce del RFC» llevan <use href=\"#i-alert\"/> (triángulo de advertencia) sobre fondo neutro; es el mismo ejemplo que cita el sistema.",
+    "selector": ".banda.b-info, .pista-calc",
+    "linea": 740,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 740,
+     "cita": "<use href=\"#i-alert\"/>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Sin riesgo de accesibilidad; se pide el icono de información (i-info o i-badge) en la banda y en el chip. v1: f1-41alta-02 media, no tocado."
+    },
+    "por_que_importa": "Cuatro triángulos de advertencia en un formulario donde nada está mal desgastan el aviso de verdad."
+   },
+   {
+    "id": "v2-41alta-03",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla (tarjeta con medallón)",
+    "dice_el_sistema": "`.tarjeta-estado{max-width:480px;width:100%;padding:var(--sp-8);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-modal);box-shadow:var(--sh-modal);…}` y «El medallón va con relleno sólido» (`.estado-ico`, 52 px, --on-state).",
+    "hay_en_el_build": ".tarjeta-estado{display:flex;flex-direction:column;align-items:center;gap:var(--sp-2)} sin ancho máximo, relleno, borde, radio ni sombra, y sin .estado-ico: el icono es un .ico de 30 px en --text-3. Conserva el nombre de la clase y el <h2>.",
+    "selector": ".tarjeta-estado, .state-empty",
+    "linea": 645,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 645,
+     "cita": ".tarjeta-estado{display:flex;flex-direction:column;align-items:center;gap:var(--sp-2)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Avanzó respecto a v1 (ahora usa el nombre canónico, <h2> y aria-live con foco) pero la receta visual sigue incompleta. Es el estado vacío de un formulario; no se exige."
+    },
+    "por_que_importa": "El vacío del formulario se ve como texto suelto sobre el fondo, no como una respuesta del sistema."
+   },
+   {
+    "id": "v2-41alta-04",
+    "severidad": "media",
+    "regla": "§11 Estructura (un solo landmark banner) · FICHAS_TECNICAS.md tanda 1 (header.p4 duplicaba role=banner)",
+    "dice_el_sistema": "FICHAS (tanda 1): «Un `<header>` fuera de `<main>` toma implícitamente `role=\"banner\"`, y como `.cromo-top` … también lo es, quedaban **dos** banners en la misma página.»",
+    "hay_en_el_build": "<header class=\"p4\"> en la línea 729: el árbol de accesibilidad da 2 landmarks banner.",
+    "selector": "header.p4, .cromo-top",
+    "linea": 729,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_landmarks",
+     "detalle": "script aud2/common_b.cjs: banners=2 en 41_alta_cliente y 21_ficha_cliente; 1 en 24, 27 y 59"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "El propio cliente ya describió y aplicó el arreglo (header → div) en otras maquetas; solo hay que extenderlo. No cambia estilos."
+    },
+    "por_que_importa": "Dos banners en la misma página confunden la navegación por landmarks."
+   },
+   {
+    "id": "v2-41alta-05",
+    "severidad": "media",
+    "regla": "§8 Voz de producto, regla 1 (una frase, sin punto y coma) frente a AVISO_A_STUDIO_PADRON_2026-09-28.md punto 5",
+    "dice_el_sistema": "§8: «`.nota` y `.banda` llevan como máximo una frase, sin punto y coma». AVISO punto 5: la sección «Sucursal» lleva «el aviso «Sin sucursal no se le puede programar una orden; se puede añadir después desde la ficha»» (una frase con punto y coma).",
+    "hay_en_el_build": "La banda de la sección 3 solo dice «Si capturas cualquier dato de la sucursal, el nombre, el municipio y la dirección pasan a ser obligatorios.» La frase del aviso no aparece en ningún lugar del HTML (0 coincidencias de «Sin sucursal no se le puede»), aunque el comentario del CSS aún dice que la sección lleva «el aviso de lo que pasa sin ella». La banda de cabecera conserva un punto y coma.",
+    "selector": ".seccion > .banda, .banda.b-info",
+    "linea": 792,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 792,
+     "cita": "<p>Si capturas cualquier dato de la sucursal"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "El aviso del 28-sep pide un texto que choca con la regla de una frase sin punto y coma; el v1 tenía las dos frases juntas y la entrega las recortó. Decisión abierta: o se conserva el texto literal (sistema: tolerar una excepción) o se parte en frase + toggletip. No lo marco crítico: omite un texto del aviso, no contradice D2 (la sucursal sigue siendo opcional)."
+    },
+    "por_que_importa": "Quien da de alta un cliente sin sucursal no lee que luego no podrá programarle una orden (D2: las órdenes cuelgan de la sucursal); lo infiere de la etiqueta «para programar»."
+   },
+   {
+    "id": "v2-41alta-06",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px (la excepción de 10,5 px)",
+    "dice_el_sistema": "«Se admite una excepción, y solo una: 10,5px en mayúsculas con `letter-spacing` para los rótulos de grupo de la barra lateral y las etiquetas de campo del modo tarjeta.»",
+    "hay_en_el_build": ".nivel{font-size:10.5px…text-transform:uppercase} marca cada campo («PARA DAR DE ALTA», «PARA FACTURAR», «PARA PROGRAMAR»): 10 apariciones en un formulario, no en modo tarjeta; y .grp a 10,5 px sin mayúsculas en el menú.",
+    "selector": ".nivel, .grp",
+    "linea": 606,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C2_105_no_mayusculas",
+     "detalle": "brief: 5 fallos, p.grp ×5 (el .nivel va en mayúsculas y no se cuenta como fallo)"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Una etiqueta de nivel de obligatoriedad es un dato que se lee en cada campo, no un rótulo de orientación: el sistema debe decidir si la excepción la cubre (§2.1) o fijarla a 12 px. El ejemplo de §7.2 escribe .grp sin text-transform aunque §2.1 pide mayúsculas. v1: f1-41alta-01 (alta) por 25 declaraciones; hoy quedan solo estas."
+    },
+    "por_que_importa": "La marca de qué campo es obligatorio se lee a 10,5 px."
+   },
+   {
+    "id": "v2-41alta-07",
+    "severidad": "baja",
+    "regla": "§6.16 regla 2 (dos niveles de obligatoriedad, con palabras distintas)",
+    "dice_el_sistema": "«**Obligatorio para dar de alta** (sin esto no hay registro) y **necesario para facturar o programar** (el registro existe, pero no opera). Se nombran distinto y se marcan distinto.»",
+    "hay_en_el_build": "Las dos subidas de documentos llevan la marca «para facturar» (.nivel-op) mientras su ayuda dice «Opcional para dar de alta; necesaria para programar y facturar»; la sección Sucursal usa una tercera marca, «para programar».",
+    "selector": ".nivel-op, .nivel-fact",
+    "linea": 780,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 782,
+     "cita": "Opcional para dar de alta; necesaria para programar y facturar."
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Los documentos sirven para programar y para facturar (FICHAS 27: «Los dos documentos son opcionales aquí y obligatorios para programar una instalación o facturar»): la marca debería decir lo mismo que la ayuda. Corrección de una palabra."
+    },
+    "por_que_importa": "La marca y la ayuda del mismo campo dicen cosas distintas; quien solo lee la marca cree que los documentos no afectan a la programación."
+   },
+   {
+    "id": "v2-41alta-08",
+    "severidad": "alta",
+    "regla": "§10 trampa 5 (isotipo) + §1.2.1 Logotipo",
+    "dice_el_sistema": "«Un `<symbol>` ya trae su `viewBox`; repetirlo en el `<svg>` que lo invoca descoloca la marca.»",
+    "hay_en_el_build": "<svg width=\"44\" height=\"42\" viewBox=\"740 0 970 932\"><use href=\"#dproma-mark\"/></svg>: el <use> queda 32,5 px a la izquierda del <svg> y solo se ve una astilla de la «Λ»; FAB, 16,2 px.",
+    "selector": ".logo svg, .fab svg",
+    "linea": 715,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_isotipo",
+     "detalle": "aud2/common_a.cjs: <use> x=63,5 frente a <svg> x=96; 46 de 50 archivos conservan el patrón"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Corrección sencilla y global en la plantilla del cromo, ya documentada en §10. v1: f1-41alta-08 media."
+    },
+    "por_que_importa": "La marca aparece recortada en el cromo de la pantalla."
+   },
+   {
+    "id": "v2-41alta-09",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga (aplanar el fondo; el punto de ruptura es el de la tabla/pantalla)",
+    "dice_el_sistema": "«Hay que aplanar el fondo, no solo parar la animación.» · el esqueleto cambia de forma en el mismo punto que la pantalla.",
+    "hay_en_el_build": "@media (prefers-reduced-motion:reduce){.skel{animation:none}} sin reponer el fondo (línea 664); @media (max-width:900px) para .sk-fila cuando el resto rompe a 860 px; las barras llevan texto dentro («Identificación», «razón social»).",
+    "selector": ".skel, .sk-fila",
+    "linea": 664,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 664,
+     "cita": "prefers-reduced-motion:reduce){.skel{animation:none}}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No impide completar la tarea; arreglo ya documentado. v1: f1-41alta-05 media."
+    },
+    "por_que_importa": "Con movimiento reducido las barras quedan a medio pintar y el lector anuncia texto inventado."
+   },
+   {
+    "id": "v2-41alta-10",
+    "severidad": "baja",
+    "regla": "§6.5 Iconos (un icono no cambia de significado)",
+    "dice_el_sistema": "«se sostiene solo cuando es universal **y su significado no cambia de contexto**.»",
+    "hay_en_el_build": "Las migas separan «Padrón de clientes» y «Nuevo cliente» con una flecha hacia abajo (#i-down), la misma que indica orden descendente en las tablas.",
+    "selector": ".migas",
+    "linea": 738,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 738,
+     "cita": "<use href=\"#i-down\"/></svg><span>Nuevo cliente</span>"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "El sprite propio del cliente no trae un chevron-derecha; documentar la tabla concepto→icono (migas = chevron_right) y añadir el símbolo."
+    },
+    "por_que_importa": "Una flecha abajo entre dos migas sugiere un desplegable, no una ruta."
+   },
+   {
+    "id": "v2-41alta-11",
+    "severidad": "baja",
+    "regla": "§13 Composición y grid + §7.3 (destino alcanzable) · el sistema no documenta el botón flotante",
+    "dice_el_sistema": "Búsqueda de «flotante» y «FAB» en sistema-diseno.md: 0 coincidencias; el sistema no define la zona segura del botón flotante.",
+    "hay_en_el_build": ".barra-form .der{margin-left:auto;…margin-right:68px} con el comentario «hueco del botón flotante, que caía encima de «Dar de alta»»: el cliente ya resolvió el choque en el pie. Medido a 1440, 1280 y 1024: ni «Cancelar» ni «Dar de alta» solapan el .fab.",
+    "selector": ".barra-form .der, .fab",
+    "linea": 599,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_a41_fab",
+     "detalle": "script aud2/a41_a.cjs: rectángulos de los dos botones del pie frente al .fab a 1440, 1280 y 1024: overlap=false en los tres anchos"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Buena práctica del cliente: documenta el defecto en el comentario y lo corrige. Es la evidencia de que el sistema necesita una regla de zona segura (cobertura) en lugar de parches por pantalla."
+    },
+    "por_que_importa": "Muestra que el botón flotante ya tapó una acción primaria («Dar de alta») y se arregló solo aquí."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [
+  {
+   "id_v1": "f1-41alta-01",
+   "evidencia": "lt12_medido = 0 (brief): .ctrl .ayuda, .idx y el resto pasaron a var(--fs-meta); queda .nivel a 10,5 px en mayúsculas (v2-41alta-06)."
+  },
+  {
+   "id_v1": "f1-41alta-03",
+   "evidencia": "Las bandas de cabecera, de Sucursal y de Primer contacto ahora son una frase cada una (≈94, 107 y 77 caracteres) y la ayuda larga queda tras un botón «Ver el detalle» con aria-expanded y aria-controls a un id que existe (#ayuda-alta). Salvo el punto y coma de la cabecera y la ausencia del aviso del 28-sep (v2-41alta-05)."
+  },
+  {
+   "id_v1": "f1-41alta-06",
+   "evidencia": "--text-3 pasó de #66717F a #5C6675 (línea 70 de la entrega)."
+  },
+  {
+   "id_v1": "f1-41alta-07",
+   "evidencia": "Las reglas táctiles llevan :root[data-tacto=\"dedo\"] (líneas 282–284); además .migas a ya trae min-height:24px (línea 603); tactil_bajo24 = 0 de 41."
+  }
+ ],
+ "f3_boost_ui": {
+  "puntuacion": 4,
+  "dimensiones": {
+   "accesibilidad": 3,
+   "rendimiento": "no_evaluado",
+   "theming": 4,
+   "responsive": 4,
+   "integridad": 3
+  },
+  "justificacion": "Mantiene 4. Es la pantalla del lote mejor resuelta: 0 destinos bajo 24 px, 0 fallos de contraste en los dos temas, ningún scroll horizontal a 1440/1280/1024, validación al salir del campo con aria-invalid y aria-describedby, contador de sección en español, error encima del formulario con lo escrito conservado y aria-live con foco. Descuentan el menú sin nombre a 1000 px (crítico, cromo común), el banner duplicado, el isotipo recortado, la receta incompleta de la tarjeta de estado y los triángulos de advertencia sobre fondo neutro.",
+  "evidencia": [
+   "tactil: 0 de 41; contraste: 0 fallos; anchos: sin scroll horizontal; sidebar: 15/15 sin nombre",
+   "propio_a41_fab: sin solape con el botón flotante a 1440/1280/1024"
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 0,
+   "hallazgo": "Cada sección dice en español qué falta («Falta: domicilio fiscal», «Completa»), el pie dice «Borrador guardado hace 1 min» y el cambio de vista se anuncia por una región viva con foco al contenido.",
+   "selector": ".seccion > header .est, #estado-borrador",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 857,
+    "cita": "<span class=\"izq\" id=\"estado-borrador\" role=\"status\">"
+   }
+  },
+  {
+   "n": 2,
+   "heuristica": "Relación entre el sistema y el mundo real",
+   "severidad": 1,
+   "hallazgo": "Marcas «para dar de alta / para facturar / para programar» y avisos como «sin él no se puede timbrar» hablan del trabajo; «Se deduce del RFC» y la ayuda sobre «agencia manda sobre el RFC» exigen conocer la regla.",
+   "selector": ".nivel, .ayuda",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 762,
+    "cita": "<span class=\"ayuda\" id=\"ayuda-tipo\">"
+   }
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 1,
+   "hallazgo": "Cancelar a la vista y borrador del navegador (D14: «Puedes salir y volver»); la subida de archivos permite quitar lo cargado.",
+   "selector": ".barra-form, .quitar-archivo",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 951,
+    "cita": "bq.type='button'; bq.className='quitar-archivo'; bq.textContent='Quitar';"
+   }
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 2,
+   "hallazgo": "Triángulo de advertencia en avisos neutros, flecha abajo en las migas, marca «para facturar» con ayuda «programar y facturar», y un pie con «Cancelar» sin icono y «Dar de alta» con «+».",
+   "selector": ".banda.b-info, .migas, .nivel-op",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 782,
+    "cita": "Opcional para dar de alta; necesaria para programar y facturar."
+   }
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 2,
+   "hallazgo": "Razón social y RFC son required y aria-required, el código postal lleva pattern y maxlength, y el error del domicilio aparece al salir del campo; el RFC, clave única del cliente, no valida longitud ni formato (solo ayuda de 12 o 13 caracteres).",
+   "selector": "#rfc, #cp",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 757,
+    "cita": "id=\"rfc\" required aria-required=\"true\" value=\"CVB240118QT7\" placeholder=\"\""
+   }
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocimiento antes que recuerdo",
+   "severidad": 0,
+   "hallazgo": "Etiquetas visibles, placeholders con ejemplo («Matriz Querétaro», «Rosalía Mendieta Quiroz») y el dato calculado (Tipo de cliente) mostrado como dato con la explicación de dónde sale.",
+   "selector": ".dato-calc",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 761,
+    "cita": "<span class=\"dato-calc\" role=\"group\" aria-labelledby=\"et-tipo\">"
+   }
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": 1,
+   "hallazgo": "Formulario en una sola página con secciones; el estado vacío ofrece «Buscar si ya está dado de alta» para evitar duplicados; no hay atajo para guardar ni copia de datos desde un cliente existente.",
+   "selector": ".state-empty .acc",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 851,
+    "cita": "Buscar si ya está dado de alta"
+   }
+  },
+  {
+   "n": 8,
+   "heuristica": "Estética y diseño minimalista",
+   "severidad": 2,
+   "hallazgo": "Cuatro secciones con ayuda bajo casi cada campo y tres bandas neutras; el contenido está en una frase por banda, pero la ayuda por campo suma texto fijo.",
+   "selector": ".ctrl .ayuda, .banda.b-info",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "C11_texto_largo",
+    "detalle": "brief: 4 bloques revisados, 1 sobre 140 (la banda de error, oculta, 142 caracteres)"
+   }
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de errores",
+   "severidad": 0,
+   "hallazgo": "El error de alta va encima del formulario, dice qué pasó y que «lo que capturaste sigue aquí», lleva referencia PAD-20260821-1401 y «Reintentar»; cumple §6.4 reglas 3 y 4.",
+   "selector": ".aviso-error",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 732,
+    "cita": "<div class=\"banda b-err aviso-error\" id=\"aviso-error\" role=\"alert\">"
+   }
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 1,
+   "hallazgo": "La ayuda larga se abre a petición («Ver el detalle»), lo correcto frente a un párrafo fijo; el aviso de privacidad abre en ventana nueva y lo anuncia.",
+   "selector": ".mas-ayuda, .ayuda-larga",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 741,
+    "cita": "<button class=\"mas-ayuda\" type=\"button\" aria-expanded=\"false\" aria-controls=\"ayuda-alta\">Ver el detalle</button>"
+   }
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-097",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "«El alta de clientes se inicia en WhatsApp, sigue por correo y se captura manualmente en Excel; no existen formularios digitales automatizados»: el alta es una página con secciones, borrador y subida de los dos documentos en la misma pantalla (D1, D12, D14)."
+   },
+   {
+    "pp": "pp-111",
+    "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+    "cobertura": "cubre",
+    "evidencia": "«no existe un padrón único del que tomarlos»: un solo alta de razón social con RFC y datos fiscales, que luego alimentan facturación y trámites."
+   },
+   {
+    "pp": "pp-109",
+    "documento": "data/insights/2026-09-10_administracion-finanzas.json",
+    "cobertura": "cubre",
+    "evidencia": "«Un error en la razón social o el RFC provoca el rechazo fiscal»: la pantalla pide la razón social «como aparece en la constancia» y el RFC con la regla de 12 o 13 caracteres, pero no valida el RFC al capturarlo."
+   },
+   {
+    "pp": "pp-044",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "cubre",
+    "evidencia": "«Hay que buscar en el historial de WhatsApp para encontrar un documento»: constancia e identificación se suben en el alta y quedan en el expediente."
+   }
+  ],
+  "usabilidad_para_el_area": "Para comercial y administración la pantalla traduce bien el proceso real: pide poco para dar de alta, dice qué falta para operar y deja continuar después. Lo más débil para el área es el RFC sin validación (es la clave y la causa del rechazo fiscal que describen finanzas) y que el aviso de lo que pasa sin sucursal no se vea."
+ },
+ "cobertura": [
+  {
+   "patron": "Etiqueta de nivel de obligatoriedad por campo («para dar de alta», «para facturar», «para programar»)",
+   "propuesta_de_regla": "§6.16 regla 2 nombra dos niveles; añadir la forma: un solo componente .nivel a 12 px en mayúsculas con letter-spacing, con el mismo texto que la ayuda del campo, y como máximo tres valores por formulario."
+  },
+  {
+   "patron": "Zona segura del botón flotante en pies de formulario",
+   "propuesta_de_regla": "El pie de formulario y la barra de selección reservan 68 px a la derecha (margin-right:68px, como ya hace 41_alta_cliente) para que el botón flotante no caiga sobre la acción primaria."
+  },
+  {
+   "patron": "Excepción a la regla de una frase cuando un aviso del cliente exige una consecuencia",
+   "propuesta_de_regla": "Una .banda puede llevar frase + consecuencia en una sola oración sin punto y coma («Sin sucursal no se le puede programar una orden, pero se puede añadir después desde la ficha») sin superar 140 caracteres."
+  }
+ ],
+ "sin_datos": [
+  "Cumplimiento del aviso del 28-sep verificado en el HTML: D1 (página con migas y pie), D2 (sección Sucursal opcional), D3 (grupo y marca dentro de la sucursal, con la pista literal), D12 (subida de constancia e identificación en la misma pantalla), D13 (primer contacto sin sucursal), D14 (borrador), «sucursal todo o nada». Único desajuste evidente: la frase del punto 5 («Sin sucursal no se le puede programar una orden…») no aparece (v2-41alta-05). No encontré contradicción con D-n.",
+  "Esta pantalla no tiene observaciones de la persona (observaciones_resueltas vacío).",
+  "D12 prevé que, si una subida de documento falla, el cliente queda creado y la pantalla dice cuál documento falta, con reintento; ese caso no está dibujado (FICHAS: D12 «no es pantalla nueva», se construye sobre lo dibujado). El estado de error dibujado es el genérico de §6.4.",
+  "No evalué el comportamiento real del borrador en localStorage (D14: «sin datos de contacto») porque es maqueta estática; solo el texto del pie.",
+  "Modo oscuro: solo la medición de contraste del brief (0 fallos). Rendimiento: no evaluado."
+ ]
+}

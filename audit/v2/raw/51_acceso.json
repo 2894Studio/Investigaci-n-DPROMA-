@@ -1,0 +1,593 @@
+{
+ "pantalla": "51_acceso",
+ "tier": "A",
+ "sha256": "0c1242a2f17aec7c70f10f0250b203ffcf87d66dba61d2f47db2d8e85bc2afff",
+ "estado_entrega": "modificada",
+ "estado_vs_pdf": "NO_ALINEADO",
+ "nota_estado_vs_pdf": "REGRESION detectada con diff contra la entrega v1 (v1flat): <h1 class=\"wm\"> pasa a <span class=\"wm\">. El PDF declara para 51 los cambios C1-C7 y C10, pero el brief mide 16 declaraciones <12px (el PDF dice 0), `--text-3` sigue en #66717F, `.state .ico` sigue siendo descendiente y las reglas [data-tacto] siguen sin :root. Ademas FICHAS_TECNICAS.md dice textualmente: «Falta `<h1>` en tres pantallas: `51_acceso.html` (el wordmark `SIO-DPROMA` era un `<span>` decorativo — se cambió la etiqueta a `<h1>`...)», y en el archivo recibido el wordmark sigue siendo `<span class=\"wm\">` (linea 668) y no hay ningun <h1>/<h2> (grep = 0). Todo lo que persiste es 'no aplicado', no regresion.",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error"
+ ],
+ "capturas": [
+  "51_acceso--1440.png",
+  "51_acceso--1280-fold.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 0,
+   "texto_usuario": "Lista de revisión exhaustiva: «Acceso: no respeta espaciado e interlineado».",
+   "veredicto": "parcial",
+   "evidencia": [
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "SP5",
+      "detalle": "brief: declarado null, reglasQueLoUsan 1, elementosAfectados 2; ejemplo .caja-acc padding 24px gap normal margin 0px. Script propio scratchpad/a_lote_a/m51.cjs a 1440x900 y 390x844: gapsEntreHijos = [0,0,0]"
+     },
+     "dato": "ESPACIADO: CONFIRMADO. En la tarjeta de entrada, sus cuatro bloques (marca, boton «Entrar con mi cuenta de trabajo», parrafo «No hay usuario ni contraseña…», parrafo «Al entrar tratamos datos personales…») estan pegados: 0px entre ellos (marca 306,3-403,4; boton 403,4-451,4; parrafo 451,4-525; parrafo 525-561,7). «Sistema Integral de Operaciones» toca el borde del boton y el boton toca el texto de abajo (captura 51_acceso--1440.png). Con --sp-5 declarado (script propio: addStyleTag ':root{--sp-5:20px;--fs-h2:20px}') los huecos pasan a 20/20/20px y la tarjeta crece de 305,5 a 372,5px."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 639,
+      "cita": ".caja-acc{width:100%;max-width:420px;display:flex;flex-direction:column;gap:var(--sp-5);"
+     },
+     "dato": "Causa exacta: `gap:var(--sp-5)` con --sp-5 ausente del :root (las lineas 21-22 pasan de --sp-4 a --sp-6). Un var() que no resuelve invalida la declaracion entera (§3): el gap computa «normal» = 0 en un flex. Es la misma causa que §3 documenta para el dialogo («los tres paddings computaban a 0 y el contenido quedaba pegado al borde»)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 643,
+      "cita": ".marca-acc .wm{font-size:var(--fs-h2);font-weight:700;letter-spacing:.06em}"
+     },
+     "dato": "Segundo token roto en el mismo bloque: --fs-h2 no existe ni en el archivo ni en el sistema (§2 solo define --fs-meta, -dense, -base, -sub, -title, -kpi). font-size queda invalido y hereda 14px: el nombre «SIO-DPROMA» mide 14px/700 en Inter (m51.cjs: wm.fs 14px, family Inter), mientras que con 20px el titulo recupera jerarquia. Es el «interlineado» que se percibe: el titulo y su subtitulo de 13px (alto de linea 20,15px) quedan casi iguales."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_m51_interlineado",
+      "detalle": "m51.cjs: .sin-campos font-size 11.5px, line-height 18.4px (1,6); .marca-acc p 13px/20,15px (1,55); brief I5 interlineados: 1.6×4, 1.55×1"
+     },
+     "dato": "INTERLINEADO: NO CONFIRMADO como valor. Los interlineados son 1,6 y 1,55, los mismos que usa el sistema en sus ejemplos (§6.4: `.tarjeta-estado p{...line-height:1.6...}`; §6.9: `.banda{...line-height:1.55}`); el sistema no fija un unico interlineado de cuerpo. Lo que se lee como «mal interlineado» es el espaciado: dos parrafos de texto de 11.5px unidos sin hueco (0px) se leen como un solo bloque de 7 lineas (73,6 + 36,8px), y en el estado de error el unico separador de parrafos son seis <br> dentro de un <p> (linea 691)."
+    }
+   ],
+   "causa_raiz": "Tokens usados y no declarados (§3, §10 «usados − declarados = vacío»): --sp-5 en .caja-acc (gap) y --fs-h2 en .wm (tamaño). Causa de fondo: el cliente ya declara --sp-5 en su _sio-tokens.css (linea 45: `--sp-5: 20px; /* D-39 — faltaba, y no se ve porque no da error */`) pero este :root incrustado no lo copia; el PDF declara el cambio C16 solo para 1 de 50 pantallas. --fs-h2 es un token inventado que ningun documento define.",
+   "solucion_propuesta": "En :root: `--sp-5:20px` (ya existe en _sio-tokens.css y §3) y sustituir `font-size:var(--fs-h2)` por `var(--fs-title)` (20px, §2) o declarar el alias. Entre los dos parrafos pequeños, `--sp-3` de separacion. Entregar un script de comprobacion «usados − declarados» (§10) en el flujo de entrega.",
+   "tipo_de_cambio": "sencillo",
+   "critico": {
+    "es": false,
+    "criterio": null
+   },
+   "decision": {
+    "valor": "ajustar_sistema",
+    "motivo": "No cumple ningun criterio critico (ni accesibilidad medida, ni tarea bloqueada). Rule 2: es un cambio de dos lineas que mejora la pantalla y delata una causa raiz en la entrega de tokens (el :root incrustado se desincroniza de _sio-tokens.css), asi que se corrige en el sistema (bloque de tokens + comprobacion usados−declarados) y el cliente lo adopta al re-copiar. No es regresion: el PDF no declara C16 para 51."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-51acceso-01",
+    "severidad": "alta",
+    "regla": "§3 Espaciado («un token que no existe falla en silencio») + §10 usados − declarados = vacío",
+    "dice_el_sistema": "«**un token que no existe falla en silencio**. No hay error en consola, no hay aviso, y el síntoma se parece a una decisión de diseño desafortunada.»",
+    "hay_en_el_build": "`.caja-acc{...gap:var(--sp-5);...}` y `.marca-acc .wm{font-size:var(--fs-h2)...}` con ni --sp-5 ni --fs-h2 declarados: huecos de 0px entre los 4 bloques de la tarjeta y nombre de producto a 14px",
+    "selector": ".caja-acc",
+    "linea": 639,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 639,
+     "cita": "gap:var(--sp-5);"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-51acceso-02. Responde a la observacion de la persona. Es 'no aplicado' (el PDF no declara C16 para 51) y el arreglo de tokens ya existe en _sio-tokens.css del cliente (D-39): falla el propagado, no una decision."
+    },
+    "por_que_importa": "La pantalla de entrada, la primera que ve todo el equipo, tiene su tarjeta compactada: el subtitulo toca el boton y el boton toca el texto legal. Medido: 0px donde el diseño pide 20px."
+   },
+   {
+    "id": "v2-51acceso-02",
+    "severidad": "alta",
+    "regla": "§6.4 Vistas de estado (reglas 1 y 2) + §6.4 «En la pantalla de entrada, el contenedor es la propia tarjeta»",
+    "dice_el_sistema": "«El cambio se anuncia y mueve el foco.» · «Cada estado lleva un encabezado real, no un `<b>`» · «No una tarjeta suelta por estado: la pantalla no debe cambiar de forma según lo que tenga que decir»",
+    "hay_en_el_build": "Vacio y error titulan con `<b>` (lineas 684 y 690); 0 aria-live ni focus() en el archivo; los estados vacio y error son bloques sueltos sobre --bg, no la tarjeta de 420px (la regresion del <h1> va aparte: v2-51acceso-13)",
+    "selector": ".state-empty > b",
+    "linea": 684,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 684,
+     "cita": "<b>Tu cuenta entró, pero todavía no tiene acceso a nada</b>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-51acceso-03/05/06 (alta). Lo que persiste (`<b>` como titulo, sin aria-live, sin tarjeta) es 'no aplicado' y se verifica en la proxima entrega; el <h1> perdido es regresion y se trata aparte (v2-51acceso-13)."
+    },
+    "por_que_importa": "Quien usa lector de pantalla no se entera de que «cargando» paso a «error» ni encuentra el titulo de cada estado."
+   },
+   {
+    "id": "v2-51acceso-03",
+    "severidad": "alta",
+    "regla": "§6.2 Un icono dentro de un botón hereda el color del botón + §6.4 regla 6 (`.state > .ico`)",
+    "dice_el_sistema": "«El contraste entre el icono gris y el verde era de **1,03:1**; el mínimo para un elemento gráfico es 3:1. Heredando `currentColor` sube a 4,89:1.»",
+    "hay_en_el_build": "`.state .ico{width:30px;height:30px;color:var(--text-3)}` (selector descendiente) tiñe de gris rgb(102,113,127) el icono pequeño de «Pedirlo a Sistemas» y «Reintentar» (botones verdes rgb(62,122,76), texto rgb(247,250,249))",
+    "selector": ".state .ico",
+    "linea": 609,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I1_icono_vs_boton",
+     "detalle": "fallos 2: button.btn.p «Pedirlo a Sistemas» y «Reintentar», colorIcono rgb(102,113,127), colorTexto rgb(247,250,249), fondo rgb(62,122,76), ratio 1.03, enEstado true; reproducido en m51.cjs al cambiar data-state a empty y error"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Contraste de icono en control 1,03:1 (<3:1): criterio 1 en lectura literal («contraste < 3:1 en controles»). Otra lectura: el icono es decorativo (aria-hidden) y la etiqueta del boton queda a 4,89:1, asi que el daño es visual, no de acceso a la tarea; por eso se señala la duda. Arreglo de un caracter: `.state > .ico` (§6.4 regla 6). C3 del PDF declara este cambio y no esta en el archivo: 'no aplicado'. v1 no lo tenia como hallazgo propio (cubierto parcialmente en f1-51acceso-13)."
+    },
+    "por_que_importa": "Los dos botones de salida de las vistas de vacio y error —la unica forma de continuar— llevan un icono casi invisible sobre el verde; se lee como boton medio apagado. Es el patron «Reintentar» que la persona señalo como observacion 1 (transversal)."
+   },
+   {
+    "id": "v2-51acceso-04",
+    "severidad": "alta",
+    "regla": "§8 Voz de producto (limites 1 y 2) — «si el texto explica una decisión, no va en pantalla»",
+    "dice_el_sistema": "«Ningún bloque de texto siempre visible pasa de ~140 caracteres.» · «**si el texto explica una decisión, no va en pantalla.**»",
+    "hay_en_el_build": "El estado de error es un solo <p> de 1.062 caracteres con seis <br> como separadores, que enumera las variantes y explica el criterio de diseño: «Éste es uno de ocho mensajes distintos, y la diferencia importa.» / «Un solo texto para los cuatro mandaría a la mitad de la gente al sitio equivocado.»",
+    "selector": ".state-error p",
+    "linea": 691,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 691,
+     "cita": "<p><b>Esto no es que te hayamos rechazado.</b>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "La decision de producto SI esta documentada y se respeta: FICHAS «Que un rechazo se explica sin volverse un oráculo de correos» y «Cuatro mensajes distintos, y la diferencia manda a sitios opuestos». Lo que no obliga la ficha es mostrar los cuatro/ocho a la vez ni el razonamiento: pregunta abierta de diseño (¿el estado demuestra una variante o las enumera?). Ademas la propia pantalla se contradice: «uno de ocho mensajes» frente a «los cuatro» (misma linea) y «Cuatro mensajes distintos» en la ficha. m51b.cjs: 1.062 caracteres, 6 <br>, alto del parrafo 412px a 1440."
+    },
+    "por_que_importa": "Quien falla al entrar —en el peor momento— recibe un muro de texto de 412px que incluye una explicacion de diseño para el equipo, y la unica accion («Reintentar») queda debajo; el numero de variantes (cuatro u ocho) es ademas inconsistente."
+   },
+   {
+    "id": "v2-51acceso-05",
+    "severidad": "media",
+    "regla": "§1.2.1 Logotipo (lockup isotipo + «SIO-DPROMA» en --font-brand en la pantalla de acceso) + §2 Tipografía (marca)",
+    "dice_el_sistema": "«Isotipo + «SIO-DPROMA» ... en `--font-brand` ... Cromo de la aplicación (barra lateral, pantalla de acceso)» · «**Marca:** `Michroma` / `Ethnocentric Rg` (`--font-brand`), solo para el wordmark «SIO-DPROMA»»",
+    "hay_en_el_build": "En lugar del isotipo hay un icono generico de escudo de 44px (`<use href=\"#i-shield\"/>`) y el nombre «SIO-DPROMA» se pinta en Inter 14px/700 (la clase .wm no declara font-family; computado: Inter)",
+    "selector": ".marca-acc .wm",
+    "linea": 668,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 668,
+     "cita": "<span class=\"wm\">SIO-DPROMA</span>"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Nueva respecto a v1 (no reportada). Contradice §1.2.1/§2, que derivan del manual de marca del cliente. Ni la ficha de 51 ni D-n lo justifican, asi que no se atribuye a una decision de DPROMA. Cambio sencillo con efecto global sobre la marca (Rule 2): `<svg width=\"44\" height=\"42\" aria-hidden=\"true\"><use href=\"#dproma-mark\" width=\"44\" height=\"42\"/></svg>` y `.wm{font-family:var(--font-brand)}`. Pregunta abierta: ¿el acceso lleva el lockup del cromo o un icono neutro de seguridad?"
+    },
+    "por_que_importa": "La entrada es lo primero que ve cualquier persona y no lleva la marca del producto: ni el isotipo ni el wordmark en su tipografia."
+   },
+   {
+    "id": "v2-51acceso-06",
+    "severidad": "media",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "«`--fs-meta` es el tamaño más pequeño del sistema. **Nada baja de ahí.**»",
+    "hay_en_el_build": "`.sin-campos{font-size:11.5px;...}` (los dos parrafos de la tarjeta de entrada, incluido el aviso de privacidad) y `.state .ref{...font-size:11px}` (referencia del error); brief: 16 declaraciones <12px",
+    "selector": ".sin-campos",
+    "linea": 650,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 650,
+     "cita": ".sin-campos{font-size:11.5px;color:var(--text-3);line-height:1.6;text-align:center}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-51acceso-11. El PDF declara C1 (0 declaraciones <12px) y el archivo recibido tiene 16: 'no aplicado', no regresion. No es critico (contraste OK: 4,82:1 de --text-3 sobre --surface); se verifica en la proxima entrega."
+    },
+    "por_que_importa": "El aviso de privacidad —texto legal que se enlaza— y la referencia del error, el dato que Sistemas necesita, son lo mas pequeño de la pantalla."
+   },
+   {
+    "id": "v2-51acceso-07",
+    "severidad": "media",
+    "regla": "§6.4 «El estado va dentro de una tarjeta» + medallón con relleno sólido",
+    "dice_el_sistema": "«El estado va dentro de una tarjeta, no suelto sobre el fondo.» · «El medallón carga el peso visual del icono.»",
+    "hay_en_el_build": "Vacio y error: icono de trazo de 30px en --text-3 / --err-ink sin medallon y texto centrado a ~470px directamente sobre --bg (captura de error, m51-error.png), no la tarjeta de 420px que contiene los estados ok y cargando",
+    "selector": ".state",
+    "linea": 605,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 605,
+     "cita": ".state{display:none;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-2);"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-51acceso-06 y -13. El bloque ARQ-ESTADOS que se copia en todas las pantallas no incluye la tarjeta-estado; el sistema debe entregarlo ya con tarjeta y medallon (§6.4)."
+    },
+    "por_que_importa": "Al pasar de «cargando» a «error» la pantalla cambia de forma (desaparece la tarjeta, cambia el ancho de linea): se pierde la referencia visual."
+   },
+   {
+    "id": "v2-51acceso-08",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga",
+    "dice_el_sistema": "«Sin texto real dentro de las barras» · «`.skel{animation:none;background:var(--surface-2)}`»",
+    "hay_en_el_build": "Las barras del esqueleto llevan texto real («marca», «SIO-DPROMA», «entrar», «aviso») y bajo reduced-motion solo `animation:none`",
+    "selector": ".skel",
+    "linea": 678,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 678,
+     "cita": "<span class=\"skel\" style=\"width:60%;height:22px;align-self:center\">SIO-DPROMA</span>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-51acceso-08 y -09. Mismo bloque ARQ-ESTADOS que las demas pantallas (linea 604: `.skel{animation:none}` sin aplanar el fondo)."
+    },
+    "por_que_importa": "Un lector de pantalla leeria «marca, SIO-DPROMA, entrar, aviso» como contenido; con movimiento reducido el degradado queda congelado."
+   },
+   {
+    "id": "v2-51acceso-09",
+    "severidad": "baja",
+    "regla": "§6.1 Botón primario del acceso (`.gbtn`)",
+    "dice_el_sistema": "«Se bloquea **en el manejador de JS**» · `.gbtn{...padding:13px;...box-shadow:var(--sh-rest)}` · `.gbtn[aria-busy=\"true\"]` con `.spin`",
+    "hay_en_el_build": "`.btn-google` conserva min-height:48px y width:100% pero no declara padding, box-shadow ni estado ocupado; sin <script> asociado al boton",
+    "selector": ".btn-google",
+    "linea": 645,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 645,
+     "cita": ".btn-google{min-height:48px;display:flex;align-items:center;justify-content:center;gap:var(--sp-3);"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-51acceso-04 era alta. Aqui lo evaluo baja: es una maqueta sin comportamiento (§9 andamiaje) y el componente real del cliente se llama `.acceso-gbtn` (FICHAS_TECNICAS.md, sobre migracion de tokens, lo cita). Se documenta `.btn-google` como alias de `.gbtn` en vez de pedir el cambio."
+    },
+    "por_que_importa": "El guardian del doble envio y el estado ocupado de §6.1 no estan en la maqueta; en el producto real si deben existir."
+   },
+   {
+    "id": "v2-51acceso-10",
+    "severidad": "baja",
+    "regla": "§11 «todos los id únicos y cada aria-describedby/aria-controls apunta a algo que existe» (integridad del guion de la maqueta)",
+    "dice_el_sistema": "«usados − declarados → tiene que ser vacío» (aplicado al guion: lo que el script referencia debe existir)",
+    "hay_en_el_build": "El script hace `document.getElementById('tema')` (linea 709) en una pantalla sin cromo: `bt` es null y `bt.addEventListener` lanza «TypeError: Cannot read properties of null (reading 'addEventListener')», lo que corta el guion antes de `pinta()` y del cajon de menu",
+    "selector": "#contenido",
+    "linea": 727,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 727,
+     "cita": "bt.addEventListener('click'"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-51acceso-07 (alta). Medido de nuevo con m51b.cjs (pageerror). El switch de estados (andamio) se registra antes del error y funciona; lo que no corre es codigo de armazon sin efecto en esta pantalla. Es andamiaje, no producto: el recorte data-cromo (FICHAS: «caso límite») debe tambien retirar este guion."
+    },
+    "por_que_importa": "No afecta al usuario final; si a quien prueba la maqueta (sin conmutador de tema) y delata que el armazon copia script de la pantalla con cromo a la que no lo tiene."
+   },
+   {
+    "id": "v2-51acceso-11",
+    "severidad": "baja",
+    "regla": "§7.3 Objetivos táctiles — la regla táctil lleva `:root`",
+    "dice_el_sistema": "«**El `:root` es lo que hace ganar la regla.** Con `:root` delante, el selector suma (0,3,0); sin él se queda en (0,2,0)»",
+    "hay_en_el_build": "Las seis reglas de modo dedo siguen escritas `[data-tacto=\"dedo\"] .it{...}` sin :root, y `data-tacto` no esta en el <html>",
+    "selector": ".it",
+    "linea": 279,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 279,
+     "cita": "[data-tacto=\"dedo\"] .it{min-height:46px}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-51acceso-14. C7 del PDF lo declara: 'no aplicado'. Latente: esta pantalla no usa .it ni .iconbtn (brief: reglaTactoSinRoot 6, bajo24 0 de 3 destinos)."
+    },
+    "por_que_importa": "El bloque viaja con el arquetipo a otras pantallas donde `.acciones .iconbtn{width:28px}` lo empata y gana."
+   },
+   {
+    "id": "v2-51acceso-12",
+    "severidad": "baja",
+    "regla": "§7.1 Entrada al sistema (`.split`)",
+    "dice_el_sistema": "«Columna de marca (fondo oscuro, ilustración) + columna de acceso, lado a lado desde 920px y apiladas debajo.»",
+    "hay_en_el_build": "Una sola tarjeta de 420px centrada (`.acceso`, linea 638), sin columna de marca ni corte a 920px; `--glass` declarado y sin uso",
+    "selector": ".acceso",
+    "linea": 638,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 638,
+     "cita": ".acceso{display:flex;align-items:center;justify-content:center;flex:1;padding:var(--sp-6)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-51acceso-12. FICHAS describe 51 como «La entrada al sistema. Sin cromo», sin pedir columna de marca. Se documenta la entrada de tarjeta unica como variante de §7.1 (ver cobertura) en lugar de exigir la columna."
+    },
+    "por_que_importa": "Sin columna de marca, la unica señal de identidad es el bloque que lleva el icono generico (v2-51acceso-05)."
+   },
+   {
+    "id": "v2-51acceso-13",
+    "severidad": "alta",
+    "regla": "§6.4 regla 2 «Cada estado lleva un encabezado real» + FICHAS_TECNICAS.md del cliente (corregido: «Falta `<h1>` en tres pantallas: `51_acceso.html`»)",
+    "dice_el_sistema": "§6.4: «Cada estado lleva un encabezado real, no un `<b>`. Es lo que permite navegar la página saltando de encabezado en encabezado.» · FICHAS_TECNICAS.md linea 1440: «`51_acceso.html` (el wordmark `SIO-DPROMA` era un `<span>` decorativo — se cambió la etiqueta a `<h1>`...)»",
+    "hay_en_el_build": "`<span class=\"wm\">SIO-DPROMA</span>` y 0 elementos <h1>/<h2> en el archivo (banners.cjs: h1 = 0). El archivo de la entrega v1 (v1flat/51_acceso.html) tenia `<h1 class=\"wm\">SIO-DPROMA</h1>`",
+    "selector": ".marca-acc .wm",
+    "linea": 668,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 668,
+     "cita": "<span class=\"wm\">SIO-DPROMA</span>"
+    },
+    "estado_vs_v1": "regresion",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Regresion: v1 tenia el <h1> (diff v1flat → v2: `<h1 class=\"wm\">` → `<span class=\"wm\">`) y el cliente dice haberlo hecho (FICHAS). Es la unica regresion de esta pantalla; el arreglo es cambiar la etiqueta, sin tocar estilos (la clase se mantiene)."
+    },
+    "por_que_importa": "La pantalla de entrada se queda sin ningun encabezado: quien navega por encabezados no encuentra la pagina y el titulo de la ventana es lo unico que la nombra."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 2,
+   "responsive": 3,
+   "integridad": 1
+  },
+  "justificacion": "Igual que v1 (2): el archivo recibido no incorpora los cambios del PDF. Accesibilidad: contraste 0 fallos y 0 destinos <24px (3 medidos, el boton de 48px), pero sin ningun encabezado, sin aria-live y con el icono del boton a 1,03:1 en dos estados. Theming: --text-3 obsoleto (#66717F) y dos tokens sin declarar (--sp-5, --fs-h2). Responsive sin desbordes a 1440/1280/1024 y la tarjeta ocupa 342px a 390. Integridad: tokens rotos, script con TypeError, CSS del dashboard sin usar.",
+  "evidencia": [
+   "Brief: tokens_usados_no_declarados ['--fs-h2','--sp-5'].",
+   "Brief: I1_icono_vs_boton fallos 2, ratio 1.03.",
+   "m51.cjs: gapsEntreHijos [0,0,0].",
+   "m51b.cjs: pageerror 'Cannot read properties of null (reading addEventListener)'."
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 2,
+   "hallazgo": "Pulsar «Entrar con mi cuenta de trabajo» no cambia nada: el boton no tiene estado ocupado (sin aria-busy ni spinner, §6.1) ni manejador; la vista «cargando» existe pero nada la dispara.",
+   "selector": ".btn-google",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 672,
+    "cita": "<button class=\"btn-google\" type=\"button\">"
+   }
+  },
+  {
+   "n": 2,
+   "heuristica": "Concordancia entre el sistema y el mundo real",
+   "severidad": 0,
+   "hallazgo": "«Entrar con mi cuenta de trabajo», «No hay usuario ni contraseña que escribir», «Pedirlo a Sistemas»: lenguaje llano, sin jerga tecnica.",
+   "selector": ".sin-campos",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 673,
+    "cita": "No hay usuario ni contraseña que escribir."
+   }
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 0,
+   "hallazgo": "El estado sin permisos ofrece «Salir» junto a «Pedirlo a Sistemas»; el error ofrece «Reintentar»: ningun estado es callejon.",
+   "selector": ".state-empty .acc",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 686,
+    "cita": "Pedirlo a Sistemas"
+   }
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 2,
+   "hallazgo": "La entrada no lleva el isotipo ni el wordmark del producto en su tipografia (escudo generico + Inter 14px), y los estados vacio/error salen de la tarjeta; es distinta del lenguaje del resto del sistema.",
+   "selector": ".marca-acc",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 667,
+    "cita": "<svg class=\"ico\" style=\"width:44px;height:44px;color:var(--accent)\" aria-hidden=\"true\"><use href=\"#i-shield\"/></svg>"
+   }
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 0,
+   "hallazgo": "No hay campos que equivocar: sin usuario ni contraseña, el error de captura no existe por diseño (decision documentada en la ficha: no se vuelve oraculo de correos).",
+   "selector": ".caja-acc",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 673,
+    "cita": "este sistema no guarda ninguna contraseña"
+   }
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocimiento antes que recuerdo",
+   "severidad": "n/a",
+   "hallazgo": "Una sola accion en pantalla: no hay nada que recordar.",
+   "selector": "n/a",
+   "certeza": "inferido",
+   "reproduce": {
+    "tipo": "captura",
+    "archivo": "51_acceso--1440.png",
+    "region": "tarjeta con un unico boton"
+   }
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": "n/a",
+   "hallazgo": "Un clic; no aplica.",
+   "selector": "n/a",
+   "certeza": "inferido",
+   "reproduce": {
+    "tipo": "captura",
+    "archivo": "51_acceso--1440.png",
+    "region": "tarjeta con un unico boton"
+   }
+  },
+  {
+   "n": 8,
+   "heuristica": "Estética y diseño minimalista",
+   "severidad": 3,
+   "hallazgo": "La tarjeta esta compactada (gap 0 entre los 4 bloques), el nombre del producto mide 14px y el texto legal 11,5px: la pantalla es sobria por diseño pero se ve apretada por los tokens rotos.",
+   "selector": ".caja-acc",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "SP5",
+    "detalle": "ejemplo .caja-acc padding 24px gap normal; m51.cjs gapsEntreHijos [0,0,0], wm 14px"
+   }
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de errores",
+   "severidad": 3,
+   "hallazgo": "El error dice que paso («Esto no es que te hayamos rechazado»), que no pasa nada con la cuenta y da referencia ACC-… y «Reintentar»: excelente contenido (§6.4 regla 3), enterrado en 1.062 caracteres y 412px de parrafo.",
+   "selector": ".state-error p",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "propio_m51b_error",
+    "detalle": "m51b.cjs: chars 1062, pH 412px (1440), 6 <br>"
+   }
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 1,
+   "hallazgo": "La referencia del error (ACC-20260824-1121), la pieza que Sistemas necesita, va a 11px y al final del muro de texto, sin acción de copiado.",
+   "selector": ".state .ref",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 612,
+    "cita": ".state .ref{color:var(--text-3);font-size:11px;font-variant-numeric:tabular-nums}"
+   }
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-104",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-104: la certificacion ISO 9001 exige formatos de registro normalizados. El estado de error emite una referencia citable (ACC-20260824-1121, linea 692) en el formato que §6.4 regla 3 pide, que convierte un incidente de acceso en un registro. Cobertura parcial: la referencia va a 11px, al final del texto y sin copiado."
+   },
+   {
+    "pp": "pp-030",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-030: las herramientas diarias se limitan a WhatsApp, Excel y correo, sin plataforma centralizada. Una entrada unica por cuenta de trabajo (linea 672) es la puerta de esa plataforma; la cobertura es indirecta porque la pantalla no dice a que se entra."
+   },
+   {
+    "pp": "pp-100",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-100 (alta): sin repositorio centralizado de contratos. La pantalla de entrada no anticipa ni nombra ningun repositorio; el estado sin permisos (linea 685) describe la falta de rol y plaza pero no dice quien la concede."
+   }
+  ],
+  "usabilidad_para_el_area": "Para soporte administrativo la pantalla de entrada es el borde del sistema y acierta en lo de fondo: no hay contraseña que perder ni «olvidé la mía», y los errores no culpan a la cuenta. Falla en lo practico: la referencia que necesita Sistemas es la pieza mas pequeña, y el muro de texto del error es demasiado largo para leerse en el momento en que alguien no puede entrar. La investigacion no tiene pain points sobre autenticacion ni permisos de acceso, asi que esta evaluacion de F5 es indirecta."
+ },
+ "cobertura": [
+  {
+   "patron": "Entrada de tarjeta unica sin columna de marca (`.acceso > .caja-acc`)",
+   "propuesta_de_regla": "Variante de §7.1: la entrada puede ser una sola tarjeta de `max-width:420px` centrada, con `padding:var(--sp-6)`, `gap:var(--sp-5)` entre bloques y el lockup de §1.2.1 (isotipo + wordmark en --font-brand) como cabecera; la columna de marca es opcional por debajo de 920px."
+  },
+  {
+   "patron": "Estado de error de autenticacion con variantes",
+   "propuesta_de_regla": "El estado de error de acceso muestra una sola variante a la vez (qué pasó · qué no se perdió · qué hacer) en una frase corta cada una; las variantes y su razonamiento viven en la ficha, no en la pantalla (§8)."
+  }
+ ],
+ "sin_datos": [
+  "Tema oscuro de 51: el brief solo mide el claro y la pantalla no tiene boton de tema (el script falla): no evaluado.",
+  "Pain points de la investigacion sobre autenticacion o permisos de acceso: no existen en data/insights; F5 es indirecta (pp-104, pp-030).",
+  "La lectura de v1 que calificaba pp-105 como «contradice» no se reproduce: un paquete de maquetas es maquetado por definicion y la ficha remite al componente real (`modulos/acceso/Acceso.tsx`).",
+  "Rendimiento (F3): no evaluado."
+ ]
+}

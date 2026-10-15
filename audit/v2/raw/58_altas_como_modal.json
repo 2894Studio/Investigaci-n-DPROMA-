@@ -1,0 +1,640 @@
+{
+ "pantalla": "58_altas_como_modal",
+ "tier": "A",
+ "sha256": "ac1599f9af705a5147107f43de757b869446a78202fe17ce56687a1b21d05e31",
+ "estado_entrega": "modificada",
+ "estado_vs_pdf": "NO_ALINEADO",
+ "nota_estado_vs_pdf": "El PDF declara C1-C7, C10 (y C11) para 58; el brief mide 16 declaraciones <12px (el PDF dice 0), reglas [data-tacto] sin :root y 5 `.nota` de 161-412 caracteres. REGRESION detectada con diff contra la entrega v1 (v1flat/58_altas_como_modal.html): v1 tenia `<div class=\"p4\"><div class=\"p4-t\"><h1>Altas como modal</h1><span class=\"resumen\">Marco compartido de las cuatro altas restantes</span></div></div>` y el archivo recibido no lo tiene (0 <h1>); FICHAS_TECNICAS.md dice textualmente que a 57 y 58 «se les agregó» un bloque .p4. Lo demas que persiste es 'no aplicado', no regresion.",
+ "estados_auditados": [
+  "ok",
+  "loading",
+  "empty",
+  "error"
+ ],
+ "capturas": [
+  "58_altas_como_modal--1440.png",
+  "58_altas_como_modal--1280-fold.png"
+ ],
+ "observaciones_resueltas": [
+  {
+   "hoja": 0,
+   "texto_usuario": "Lista de revisión exhaustiva: «Altas como modal: información sobrepuesta».",
+   "veredicto": "confirmada",
+   "evidencia": [
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "propio_m58b_secciones",
+      "detalle": "script scratchpad/a_lote_a/m58b.cjs a 1440x900 sobre los 6 .modal: en el dialogo de «Nuevo cliente» (41), .cuerpo clientHeight 538 = scrollHeight 538 (no hay scroll); .seccion con flex-shrink 1 y overflow hidden: alto 137/185/90/126 frente a contenido 209/281/137/192 (recorte de 72/96/47/66px)"
+     },
+     "dato": "La informacion se sobrepone porque las cuatro secciones del dialogo se ENCOGEN en vez de hacer scroll: la cabecera de cada seccion (banda gris con el numero) tapa los campos de la anterior. En «Nuevo cliente», de 14 controles 5 quedan completamente fuera de su seccion (invisibles) y 3 mas cortados; en el telefono de la maqueta, 11 invisibles y 2 cortados (p. ej. «RFC», «Grupo automotriz» y «Marca» no se ven). El cuerpo nunca desplaza: no hay forma de llegar a esos campos."
+    },
+    {
+     "certeza": "leido_en_codigo",
+     "reproduce": {
+      "tipo": "codigo",
+      "linea": 685,
+      "cita": "display:flex;flex-direction:column;gap:var(--sp-5)}"
+     },
+     "dato": "Causa 1 (la que produce el solapamiento): `.modal .cuerpo` es una columna flex con overflow-y:auto (lineas 684-685) cuyos hijos `.seccion` llevan `overflow:hidden` (linea 569) y ningun `flex-shrink:0`. Un hijo flex con overflow distinto de visible tiene min-height 0 y se encoge antes de que el cuerpo desborde y haga scroll. No es --sp-5: con `:root{--sp-5:20px}` inyectado el solapamiento no desaparece, crece (41: 8 controles invisibles y 4 cortados; m58b.cjs, bloque «CON --sp-5»)."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "medicion",
+      "instrumento": "SP5",
+      "detalle": "brief: reglasQueLoUsan 4, elementosAfectados 19; ejemplos .modal > header padding 0px, .modal .cuerpo padding 0px gap normal, .modal > footer padding 0px, .tel-fila gap normal. m58b.cjs: tituloIzq 1px, pieIzq 1px, btnGuardarDer 1px, btnGuardarAbajo 1px (= solo el borde)"
+     },
+     "dato": "Causa 2 (el «pegado» al marco): --sp-5 no esta declarado y `padding:var(--sp-4) var(--sp-5)` invalida la declaracion entera, asi que cabecera, cuerpo y pie del dialogo valen 0px de relleno: el titulo «Nuevo cliente» toca el borde izquierdo, «14 campos» tambien, y «Guardar» toca el borde derecho e inferior (1px = el borde del marco; 0px en el telefono, que no lleva borde). Cabecera 45px y pie 35px en lugar de 77 y 67 con el token declarado."
+    },
+    {
+     "certeza": "medido",
+     "reproduce": {
+      "tipo": "captura",
+      "archivo": "58_altas_como_modal--1440.png",
+      "region": "primer pliegue: la aritmetica del telefono dice «la cabecera del diálogo se lleva 64 y el pie 76», pero la cabecera mide 45px y el pie 35px; los encabezados «CAMPOS», «ALTO DEL CUERPO», «PANTALLAS» quedan a la izquierda sobre cifras alineadas a la derecha"
+     },
+     "dato": "Segunda lectura de «sobrepuesto» (la mas literal): cada dialogo va sobre un velo oscuro (`.velo::before`, linea 663) con barras grises de fondo; ese velo es intencional y se lee bien (las barras solo asoman a los lados). Lo que no se sostiene es la aritmetica de la propia pagina: cabecera 64 y pie 76 declarados frente a 45/35 renderizados (y 77/67 con el token declarado)."
+    }
+   ],
+   "causa_raiz": "Dos causas independientes. (1) Interaccion entre ARQ-P5 `.seccion{overflow:hidden}` y un cuerpo de dialogo en columna flex con scroll: las secciones se encogen y se solapan. (2) Token --sp-5 usado y no declarado en `.modal > header`, `.cuerpo`, `.footer` y `.tel-fila` (§3, la misma causa que el sistema documenta para el dialogo). La (1) no la explica --sp-5.",
+   "solucion_propuesta": "(1) `.modal .cuerpo > .seccion{flex-shrink:0}` (o `.modal .seccion{overflow:visible}`): el cuerpo desborda y desplaza, que es lo que la maqueta quiere demostrar. (2) `--sp-5:20px` en :root (ya existe en _sio-tokens.css del cliente: D-39). Despues de (1)+(2), recalcular la aritmetica del texto con las alturas reales (cabecera 77, pie 67).",
+   "tipo_de_cambio": "sencillo",
+   "critico": {
+    "es": true,
+    "criterio": 2
+   },
+   "decision": {
+    "valor": "exigir_cambio",
+    "motivo": "Criterio 2 con matiz: la tarea de esta pagina es decidir «con el dibujo delante» si cada alta cabe en un dialogo, y en el dibujo hay campos invisibles e inalcanzables (5 de 14 en 41; 11 de 14 en el telefono): la comparacion se hace con datos falsos. Otra lectura: es una maqueta ilustrativa y en el producto el dialogo es `<dialog>` con su propio CSS, asi que el impacto es sobre la decision, no sobre un usuario final. Se marca critico por lo primero; el arreglo son dos lineas."
+   }
+  }
+ ],
+ "f1_cumplimiento": {
+  "veredicto": "no_cumple",
+  "hallazgos": [
+   {
+    "id": "v2-58modal-01",
+    "severidad": "alta",
+    "regla": "FICHAS_TECNICAS.md (58): «ninguna de las cinco cabe sin desplazar» + §6.18 Diálogo modal (cuerpo con scroll) + §13.7 por analogia (scroll interno del contenedor)",
+    "dice_el_sistema": "FICHAS_TECNICAS.md (58): «**ninguna de las cinco cabe sin desplazar**; la más corta pide 1.4» — el dibujo debe desplazar. §13.7: «basta que un solo eslabón lo incumpla para que todo el contenido empuje el marco hacia afuera en vez de hacer scroll dentro de él» (el sistema no tiene regla propia sobre hijos con overflow:hidden en un cuerpo flex)",
+    "hay_en_el_build": "`.modal .cuerpo` (columna flex, overflow-y:auto) con hijos `.seccion{overflow:hidden}` y sin flex-shrink:0: las secciones se encogen y se solapan; el cuerpo no desplaza (scrollHeight = clientHeight = 538)",
+    "selector": ".modal .cuerpo",
+    "linea": 685,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 685,
+     "cita": "display:flex;flex-direction:column;gap:var(--sp-5)}"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": true,
+     "criterio": 2
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Ver observaciones_resueltas hoja 0. La premisa documentada por el cliente (todas las altas «desplazan») se contradice con el dibujo: el cuerpo no desplaza. 'nuevo' = el CSS es el mismo que en v1 (el diff v1flat → v2 solo quita el bloque .p4) pero v1 no lo reporto: no es regresion. Mismo arreglo en una linea; ademas el sistema debe anadir la regla (cobertura)."
+    },
+    "por_que_importa": "La pagina cuya funcion es mostrar que formulario cabe en un dialogo muestra formularios con la mitad de los campos tapados por las cabeceras de seccion; quien decide D-15 con ese dibujo decide sobre lo que no ve."
+   },
+   {
+    "id": "v2-58modal-02",
+    "severidad": "alta",
+    "regla": "§3 Espaciado («un token que no existe falla en silencio»)",
+    "dice_el_sistema": "«La maqueta del diálogo lo referenciaba cuatro veces —el padding de la cabecera, el del cuerpo y el del pie— sin que existiera en ningún `:root`... los tres paddings computaban a **0** y el contenido quedaba pegado al borde.»",
+    "hay_en_el_build": "`.modal > header{...padding:var(--sp-4) var(--sp-5)}`, `.modal .cuerpo{...padding:var(--sp-5)}`, `.modal > footer{...padding:var(--sp-4) var(--sp-5)}` y `.tel-fila{gap:var(--sp-5)}` con --sp-5 ausente: padding computado 0px en los tres y gap normal",
+    "selector": ".modal > header",
+    "linea": 675,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "SP5",
+     "detalle": "reglasQueLoUsan 4, elementosAfectados 19; ejemplos .modal > header padding 0px, .modal .cuerpo padding 0px, .modal > footer padding 0px, .tel-fila gap normal"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "v1 f1-58modal-05. Es literalmente el caso por el que §3 anadio --sp-5 y sigue en la maqueta que dibuja ese dialogo. El PDF no declara C16 para 58. El cliente ya tiene --sp-5 en _sio-tokens.css (D-39); falla el propagado al :root incrustado (C16 solo en 1 de 50). Medido: titulo, texto del pie y «Guardar» a 1px del marco; cabecera 45px, pie 35px."
+    },
+    "por_que_importa": "El dialogo, el componente que esta pagina propone, se ve sin respiro: titulo, textos y botones pegados al borde."
+   },
+   {
+    "id": "v2-58modal-03",
+    "severidad": "alta",
+    "regla": "§11 Checklist: «¿Todos los `id` son únicos...?» + §6.16 (un `id` duplicado resuelve siempre al primero)",
+    "dice_el_sistema": "«Ese `id` **tiene que ser único**... `aria-describedby` resolvía siempre al primero» (§6.16) · «¿Todos los `id` son únicos, y cada `aria-describedby` / `aria-controls` apunta a algo que existe?» (§11)",
+    "hay_en_el_build": "Los 14 id del formulario de «Nuevo cliente» (rs, rfc, tipo, cp, reg, dom, csf, idr, grp, mar, per, rol, cor, tel) se repiten en el telefono de la maqueta (lineas 786 y 1134): cada `label for` resuelve al primero; 12 de los 14 controles del telefono quedan sin nombre accesible",
+    "selector": "#rs",
+    "linea": 1134,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio_m58c_nombres",
+     "detalle": "script a_lote_a/m58c.cjs (CDP Accessibility.getFullAXTree): 75 controles con rol textbox/combobox/checkbox, 12 sin nombre, todos dentro de .tel (rs, rfc, tipo, cp, reg, dom, grp, mar, per, rol, cor, tel); duplicados por regex sobre id=: 14"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1), medido con el arbol de accesibilidad de Chromium. v1 f1-58modal-06 (alta). Arreglo: prefijar los id del telefono (`t-rs`...) y sus `for`. Otra lectura: es una maqueta ilustrativa; aun asi el defecto esta en el dibujo que defiende «caber en el telefono»."
+    },
+    "por_que_importa": "En el escenario movil que la pagina defiende, quien usa lector de pantalla oye «cuadro de texto» doce veces sin saber que campo es."
+   },
+   {
+    "id": "v2-58modal-04",
+    "severidad": "alta",
+    "regla": "§10 Diez trampas — selectores por exclusión, no por enumeración + §7.3",
+    "dice_el_sistema": "«El tamaño de los campos estaba definido como `.ctrl input[type=\"text\"], .ctrl input[type=\"date\"], .ctrl input[type=\"number\"]`. Al cambiar dos campos a `type=\"email\"` y `type=\"tel\"` —que es lo correcto— se quedaron fuera y colapsaron a 19px de alto.»",
+    "hay_en_el_build": "`.ctrl input[type=\"text\"],.ctrl input[type=\"date\"],.ctrl input[type=\"number\"],.ctrl select,.ctrl textarea{` y los campos «Correo» (type=email) y «Teléfono» (type=tel) fuera del selector: 335x19px, cuatro instancias (dialogo y telefono)",
+    "selector": ".ctrl input",
+    "linea": 580,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil",
+     "detalle": "brief tactil_bajo24: input email 335x19 y input tel 335x19; m58c.cjs: cor y tel con h 19 en ambas instancias"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino tactil <24px medido (criterio 1): 19px. Es el mismo caso literal que §10 documenta. v1 f1-58modal-08. Arreglo: `.ctrl input:not([type=\"file\"]):not([type=\"checkbox\"]):not([type=\"radio\"])` (§10)."
+    },
+    "por_que_importa": "Correo y telefono, los dos datos de contacto que la investigacion pide capturar bien (pp-076), son los dos campos de 19px."
+   },
+   {
+    "id": "v2-58modal-05",
+    "severidad": "alta",
+    "regla": "Decision D1 del aviso del 28-sep (alta de cliente = pagina) y FICHAS_TECNICAS.md (`58`): criterio critico 4",
+    "dice_el_sistema": "AVISO_A_STUDIO_PADRON_2026-09-28.md: «6. **El alta es una página, no un diálogo** (D1), como ya la dibujaron. Nuestra `41_alta_cliente.html` la sigue.» · FICHAS: «`58` ya NO gobierna el alta de cliente (`41`) — Jhon decidió que «Nuevo cliente» **navega a una página**... y que el `<dialog>` del alta se retira, también en escritorio. Lo de arriba («modal en escritorio y **página en el teléfono**») queda **revertido sólo para `41`**.»",
+    "hay_en_el_build": "58 sigue dibujando «1 · Nuevo cliente» como dialogo (linea 773), dice «Aquí están las cinco dentro del marco de diálogo» (735) y propone para 41: «La salida que propongo para éste, y sólo para éste: modal en escritorio y página en el teléfono» (1215-1216). La unica señal de la decision de D1 en v1 (subtitulo «Marco compartido de las cuatro altas restantes») ya no esta",
+    "selector": ".tel-nota",
+    "linea": 1215,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 1215,
+     "cita": "<b>La salida que propongo para éste, y sólo para éste:</b>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 4
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "NO es coherente con D1: la maqueta presenta como propuesta vigente una vía (41 en dialogo en escritorio) que DPROMA retiro el 28-sep. La FICHAS, en cambio, conserva la aritmetica de 41 «como registro: es justo lo que motivó la página»: el cliente quiere conservar el dibujo, no la propuesta. Lo que se exige no es borrar la seccion sino marcarla como registro historico y quitar «La salida que propongo»; ademas el cuerpo sigue diciendo «cinco» (lineas 732, 735, 766) donde la ficha dice cuatro."
+    },
+    "por_que_importa": "Quien abra 58 para decidir ve una recomendacion (modal en escritorio para el alta de cliente) que contradice la decision ya tomada; la pagina de decision da ahora una respuesta distinta de la que se decidio."
+   },
+   {
+    "id": "v2-58modal-06",
+    "severidad": "alta",
+    "regla": "§6.4 regla 2 (encabezado real) + FICHAS_TECNICAS.md del cliente («Falta `<h1>` en tres pantallas ... `58_altas_como_modal.html` (páginas de referencia sin bloque `.p4` — se les agregó uno...)»)",
+    "dice_el_sistema": "FICHAS_TECNICAS.md linea 1440: «`57_menu_cuenta.html` y `58_altas_como_modal.html` (páginas de referencia sin bloque `.p4` — se les agregó uno, con el mismo patrón de título que ya usa `26_estados_de_pantalla.html`)»",
+    "hay_en_el_build": "0 elementos <h1>/<h2>/.p4 en la cabecera de la pagina (banners.cjs: h1 = 0). El archivo de la entrega v1 tenia `<div class=\"p4\"><div class=\"p4-t\"><h1>Altas como modal</h1>...`; el diff v1flat → v2 elimina exactamente esa linea",
+    "selector": ".demo-mod",
+    "linea": 730,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 730,
+     "cita": "<div class=\"state-ok \"><div class=\"pad\"><div class=\"demo-mod\">"
+    },
+    "estado_vs_v1": "regresion",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Regresion pura (v1 tenia el bloque, v2 no) y contradice lo que el cliente declara en sus propias FICHAS. Se repone el bloque .p4 con <h1> (y, de paso, el relleno inferior de §3.1)."
+    },
+    "por_que_importa": "La pagina pierde su titulo: no hay encabezado de nivel 1 ni nombre visible, y el subtitulo que reconocia que el modal ya solo gobierna cuatro altas desaparece."
+   },
+   {
+    "id": "v2-58modal-07",
+    "severidad": "alta",
+    "regla": "§7.2 Cromo de aplicación (colapsada a solo iconos) + §6.5 Iconos sin texto",
+    "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.»",
+    "hay_en_el_build": "A 861-1100px `.side .et,.grp,.side .wordmark{display:none}`: 15 de 15 enlaces del menu sin nombre accesible",
+    "selector": ".side .et",
+    "linea": 288,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "sidebar",
+     "detalle": "brief mediciones_v2.menu_1000px: hayMenu true, total 15, sinNombre 15, anchoSide 64"
+    },
+    "estado_vs_v1": "nuevo",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Control sin nombre accesible (criterio 1). delta_vs_v1.menu_sin_nombre = 0: existia igual en v1 sin reportarse; no es regresion. Cromo compartido: aria-label + title en cada a.it."
+    },
+    "por_que_importa": "La navegacion principal queda muda a 1000px para lectores de pantalla."
+   },
+   {
+    "id": "v2-58modal-08",
+    "severidad": "alta",
+    "regla": "§6.2 Un icono dentro de un botón hereda el color del botón + §6.4 regla 6 (`.state > .ico`)",
+    "dice_el_sistema": "«El contraste entre el icono gris y el verde era de **1,03:1**; el mínimo para un elemento gráfico es 3:1.»",
+    "hay_en_el_build": "`.state .ico{width:30px;height:30px;color:var(--text-3)}` (descendiente): el icono de «Ver las cinco maquetas» y de «Reintentar» sale gris rgb(102,113,127) sobre el verde rgb(62,122,76)",
+    "selector": ".state .ico",
+    "linea": 609,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "I1_icono_vs_boton",
+     "detalle": "fallos 2: «Ver las cinco maquetas» y «Reintentar», ratio 1.03, enEstado true"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Criterio 1 en lectura literal («contraste < 3:1 en controles», 1,03:1). Otra lectura: el icono es decorativo y el texto del boton queda a 4,89:1. C3 del PDF declara este cambio y no esta en el archivo: 'no aplicado'. Arreglo de un caracter: `.state > .ico` (§6.4 regla 6)."
+    },
+    "por_que_importa": "Las salidas de los estados vacio y error llevan un icono casi invisible sobre el verde."
+   },
+   {
+    "id": "v2-58modal-09",
+    "severidad": "media",
+    "regla": "§6.18 Diálogo modal — `<dialog>` nativo",
+    "dice_el_sistema": "«Se usa `<dialog>` nativo con `showModal()`... La alternativa —un `<div role=\"dialog\" aria-modal=\"true\">` en el flujo del documento— obliga a reimplementar las tres cosas, y en la práctica no se reimplementan.»",
+    "hay_en_el_build": "Seis `<div class=\"modal\" role=\"dialog\" aria-modal=\"true\">` simultaneos en el flujo de la pagina, sin <dialog> ni velo real (el velo es `.velo::before` con rgba(9,14,20,.44) en vez de --velo-modal)",
+    "selector": ".modal",
+    "linea": 1124,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 1124,
+     "cita": "<div class=\"modal\" role=\"dialog\" aria-modal=\"true\""
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-58modal-01..04. Es una pagina de referencia que dibuja marcos, no el dialogo del producto (la FICHA: «la aplicación las tiene construidas como diálogo»). Se documenta una variante 'dialogo ilustrado' sin role ni aria-modal (cobertura). Efecto sobre tecnologias de apoyo con 6 aria-modal=true a la vez: inferido, no probado con lector."
+    },
+    "por_que_importa": "Con seis aria-modal=\"true\" activos a la vez, un lector de pantalla puede tratar el resto de la pagina como inerte; la pagina de decision deja de ser navegable para quien lo usa."
+   },
+   {
+    "id": "v2-58modal-10",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado (reglas 1 y 2) + §6.7 Esqueleto de carga",
+    "dice_el_sistema": "«El cambio se anuncia y mueve el foco» · «Cada estado lleva un encabezado real, no un `<b>`» · «Sin texto real dentro de las barras»",
+    "hay_en_el_build": "Vacio y error titulan con `<b>` (lineas 1225 y 1231), 0 aria-live, y las barras del esqueleto llevan el texto «x»",
+    "selector": ".state-empty > b",
+    "linea": 1225,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 1225,
+     "cita": "<b>No hay formularios que dibujar</b>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "ajustar_sistema",
+     "motivo": "Mismo bloque ARQ-ESTADOS que el resto de las pantallas; el sistema debe entregarlo con las reglas de §6.4/§6.7. Estado de error con contenido correcto (qué pasó, qué no: «El marco de diálogo que se ve es real; los campos no»), cumple §6.4 regla 3."
+    },
+    "por_que_importa": "Quien usa lector no se entera del cambio de vista y oye «x» al cargar."
+   },
+   {
+    "id": "v2-58modal-11",
+    "severidad": "media",
+    "regla": "§8 Voz de producto (límites 1 y 2)",
+    "dice_el_sistema": "«Ningún bloque de texto siempre visible pasa de ~140 caracteres.» · «`.nota` y `.banda` llevan como máximo una frase»",
+    "hay_en_el_build": "5 de 6 `.nota` superan 140 caracteres (392, 412, 161, 226, 218) y tienen varias frases; la primera arranca «D-15 dice modal por omisión, y estas cinco están dibujadas como página.»",
+    "selector": ".nota",
+    "linea": 732,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "C11_texto_largo",
+     "detalle": "revisados 6, sobre140 5: p.nota 392, 412, 161, 226, 218 caracteres"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "El PDF declara C11 'no verificable mecanicamente'. La pagina es un documento de decision (FICHAS, «Por qué existe»), cuyo contenido ES la explicacion de la decision: §8 pensado para UI de producto aplica con menos fuerza. Lectura alternativa: es regla medible y esta incumplida. Se decide a favor del cliente y se documenta en el sistema que las paginas de decision estan fuera del limite de §8."
+    },
+    "por_que_importa": "Se leen como parrafos de documento, no como notas de pantalla; no estorban a la tarea de decidir."
+   },
+   {
+    "id": "v2-58modal-13",
+    "severidad": "baja",
+    "regla": "§2.1 El suelo son 12px",
+    "dice_el_sistema": "«`--fs-meta` es el tamaño más pequeño del sistema. **Nada baja de ahí.**»",
+    "hay_en_el_build": "`.corte b{...font-size:10px...}` en la etiqueta «fin de la ventana» (linea 709) y 15 declaraciones mas <12px (brief: lt12_medido 16; el PDF declara 0)",
+    "selector": ".corte b",
+    "linea": 709,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 709,
+     "cita": "font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.04em}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-58modal-12 (23→16 en v2). C1 del PDF: 'no aplicado'. Contraste con 0 fallos medido en claro y oscuro, no es critico."
+    },
+    "por_que_importa": "La etiqueta que explica el corte rojo del telefono es el texto mas pequeño de la pagina."
+   },
+   {
+    "id": "v2-58modal-14",
+    "severidad": "baja",
+    "regla": "§6.18 «Detrás va la pantalla real atenuada, no un esqueleto de carga» + §1.6 Velos",
+    "dice_el_sistema": "«Las barras grises se confunden con «cargando» y hacen pensar que se ha perdido el sitio en la lista.» · `--velo-modal`: «Capa detrás de un diálogo»",
+    "hay_en_el_build": "`.fondo` son cinco barras grises de anchos escalonados (34-88%) detras de cada dialogo, y el velo es `rgba(9,14,20,.44)` literal en `.velo::before`",
+    "selector": ".velo",
+    "linea": 663,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 663,
+     "cita": ".velo::before{content:\"\";position:absolute;inset:0;background:rgba(9,14,20,.44)}"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-58modal-04 y -10. En una pagina que ilustra marcos, el fondo es un recurso, no la pantalla real; el valor del velo difiere en 1 punto de opacidad y un tono de --velo-modal."
+    },
+    "por_que_importa": "Detalle de fidelidad: el fondo parece un esqueleto de carga."
+   },
+   {
+    "id": "v2-58modal-15",
+    "severidad": "baja",
+    "regla": "§6.16 regla 3 «`required` y `aria-required` de verdad»",
+    "dice_el_sistema": "«Los asteriscos eran `<span>` decorativos sin `required`, sin `aria-required` y sin leyenda, así que un lector leía «Razón social asterisco».»",
+    "hay_en_el_build": "30 `<span class=\"req\">*</span>` y 0 `required`/`aria-required` en el documento (grep sobre el archivo: 0)",
+    "selector": ".req",
+    "linea": 785,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 785,
+     "cita": "<label for=\"rs\">Razón social <span class=\"req\">*</span></label>"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "v1 f1-58modal-07 era alta. Aqui lo evaluo baja: son dibujos de formulario sin comportamiento, y los formularios reales los define cada alta (41-44, 49, que se auditan por separado)."
+    },
+    "por_que_importa": "Los dibujos de formularios que alimentan la decision omiten la obligatoriedad real."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 2,
+  "dimensiones": {
+   "accesibilidad": 1,
+   "rendimiento": "no_evaluado",
+   "theming": 2,
+   "responsive": 2,
+   "integridad": 1
+  },
+  "justificacion": "Igual que v1 (2): el archivo no incorpora los cambios del PDF y ademas pierde el <h1> que v1 tenia. Contraste 0 fallos (224 nodos, claro y oscuro) y sin desbordes horizontales, pero: 12 controles sin nombre accesible, 4 campos de 19px, 15 enlaces de menu sin nombre a 1000px, iconos de boton a 1,03:1, id duplicados, token --sp-5 ausente (paddings 0 en el dialogo) y, sobre todo, secciones que se solapan dentro del dialogo y ocultan 5 de 14 campos. Rendimiento no evaluado.",
+  "evidencia": [
+   "Brief: contraste claro y oscuro 224 nodos / 0 fallos.",
+   "Brief: tactil total 106, bajo24 14.",
+   "m58b.cjs: dialogo 41, 5 controles invisibles y 3 cortados de 14; telefono, 11 y 2.",
+   "m58c.cjs: 12 controles sin nombre en .tel."
+  ]
+ },
+ "f4_nielsen": [
+  {
+   "n": 1,
+   "heuristica": "Visibilidad del estado del sistema",
+   "severidad": 2,
+   "hallazgo": "El pie dice «14 campos» y «7 campos · 4 secciones» pero con las secciones solapadas no se puede ver que campos faltan: el contador describe algo que el dibujo no deja ver.",
+   "selector": ".modal > footer .izq",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "propio_m58b_secciones",
+    "detalle": "m58b.cjs: 41 → 14 controles, 5 invisibles y 3 cortados"
+   }
+  },
+  {
+   "n": 2,
+   "heuristica": "Concordancia entre el sistema y el mundo real",
+   "severidad": 0,
+   "hallazgo": "El texto explica en terminos de telefono real (390x844, zonas seguras, casilla de 44px) y con una escala comprensible: «cuál cabe en un teléfono, con la aritmética delante».",
+   "selector": ".cab-blq",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 739,
+    "cita": "Cuál cabe en un teléfono, con la aritmética delante"
+   }
+  },
+  {
+   "n": 3,
+   "heuristica": "Control y libertad del usuario",
+   "severidad": 1,
+   "hallazgo": "Cada dialogo trae «Cancelar» y aspa «Cerrar sin guardar» (44px), pero ninguno es operable: la pagina no se puede recorrer como un dialogo real.",
+   "selector": ".modal > header .cerrar",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 780,
+    "cita": "aria-label=\"Cerrar sin guardar\""
+   }
+  },
+  {
+   "n": 4,
+   "heuristica": "Consistencia y estándares",
+   "severidad": 3,
+   "hallazgo": "La pagina se contradice con la decision de producto que gobierna (D1): propone 41 como dialogo en escritorio, y dice «cinco» en el cuerpo mientras la ficha dice que gobierna cuatro. Ademas la aritmetica (cabecera 64, pie 76) no coincide con lo renderizado (45 y 35).",
+   "selector": ".tel-nota",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 1216,
+    "cita": "modal en escritorio y <b>página en el teléfono</b>"
+   }
+  },
+  {
+   "n": 5,
+   "heuristica": "Prevención de errores",
+   "severidad": 3,
+   "hallazgo": "El diseño que se propone para evaluar formularios esconde campos (RFC, Grupo, Marca): se puede decidir sobre una forma que no se ve completa.",
+   "selector": ".modal .seccion",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "propio_m58b_secciones",
+    "detalle": "m58b.cjs: 11 controles invisibles en el telefono"
+   }
+  },
+  {
+   "n": 6,
+   "heuristica": "Reconocimiento antes que recuerdo",
+   "severidad": 1,
+   "hallazgo": "La tabla de comparacion pone en una sola vista las cinco altas (campos, alto, pantallas, veredicto con icono y texto): buen apoyo a la decision, pero cabeceras numericas desalineadas.",
+   "selector": ".medida",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "captura",
+    "archivo": "58_altas_como_modal--1440.png",
+    "region": "tabla de cinco filas con veredicto «No — es el único que pasa de dos» y «Sí, desplazando»"
+   }
+  },
+  {
+   "n": 7,
+   "heuristica": "Flexibilidad y eficiencia de uso",
+   "severidad": "n/a",
+   "hallazgo": "Pagina de referencia para decidir; no es una herramienta de uso repetido.",
+   "selector": "n/a",
+   "certeza": "inferido",
+   "reproduce": {
+    "tipo": "captura",
+    "archivo": "58_altas_como_modal--1440.png",
+    "region": "pagina de lectura"
+   }
+  },
+  {
+   "n": 8,
+   "heuristica": "Estética y diseño minimalista",
+   "severidad": 3,
+   "hallazgo": "Secciones apiladas sin hueco que se tapan unas a otras, titulo y botones pegados al marco, y dos bloques de texto de 392 y 412 caracteres al inicio: la pagina que defiende un diseño limpio no lo muestra.",
+   "selector": ".modal .cuerpo",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "SP5",
+    "detalle": "padding 0px y gap normal en .modal .cuerpo, .modal > header, .modal > footer"
+   }
+  },
+  {
+   "n": 9,
+   "heuristica": "Ayudar a reconocer, diagnosticar y recuperarse de errores",
+   "severidad": 1,
+   "hallazgo": "El estado de error dice «El marco de diálogo que se ve es real; los campos no — no tomes las cuentas de esta pantalla como buenas hasta que cargue», muy bueno; pero esta tal cual con el icono gris en el boton «Reintentar» (1,03:1).",
+   "selector": ".state-error",
+   "certeza": "medido",
+   "reproduce": {
+    "tipo": "medicion",
+    "instrumento": "I1_icono_vs_boton",
+    "detalle": "fallos 2 en este archivo; ratio 1.03"
+   }
+  },
+  {
+   "n": 10,
+   "heuristica": "Ayuda y documentación",
+   "severidad": 0,
+   "hallazgo": "La pagina es documentacion: explica la regla de corte («pasa de dos pantallas») y deja la aritmetica a la vista para quien quiera comprobarla.",
+   "selector": ".cab-blq",
+   "certeza": "leido_en_codigo",
+   "reproduce": {
+    "tipo": "codigo",
+    "linea": 769,
+    "cita": "Ése es el corte, y por eso está"
+   }
+  }
+ ],
+ "f5_investigacion": {
+  "pain_points_evaluados": [
+   {
+    "pp": "pp-097",
+    "documento": "data/insights/2026-07-16_soporte-administrativo-transversal.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-097: el alta de clientes empieza en WhatsApp, sigue por correo y se captura a mano en Excel, sin formularios digitales. La pagina decide con medidas cual de las cinco altas se puede capturar en un dialogo (cuatro desplazando; 41 no), y por tanto si se puede hacer desde el telefono. La decision de D1 (41 pagina) ya la resolvio."
+   },
+   {
+    "pp": "pp-076",
+    "documento": "data/insights/2026-07-30_direccion-comercial-cobranza.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-076: datos de clientes finales por WhatsApp o correo sin formato, y se pierden registros. El remedio es un formulario que capture correo y telefono; en esta maqueta esos dos campos miden 19px (v2-58modal-04) y, en la version de telefono, quedan sin nombre accesible por id duplicado (v2-58modal-03): cubre la necesidad y falla justo en el escenario movil."
+   },
+   {
+    "pp": "pp-020",
+    "documento": "data/insights/2026-07-22_coordinacion-tecnica-instalaciones.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-020: las solicitudes de instalacion llegan por WhatsApp sin formulario ni canal centralizado. El dialogo «Nueva orden de instalación» (49) con 7 campos y 1,4 pantallas es el formulario centralizado que ese pain point pide; la pagina confirma que es la alta mas holgada."
+   },
+   {
+    "pp": "pp-084",
+    "documento": "data/insights/2026-07-31_administracion-vehicular-equipo.json",
+    "cobertura": "cubre",
+    "evidencia": "pp-084 (alta): los clientes asignan tramites por canales distintos sin alerta centralizada. El alta de tramite vehicular (10 campos, 1,7 pantallas) da un punto de entrada; la pagina no contempla aviso al equipo (alerta) al crear el tramite."
+   },
+   {
+    "pp": "pp-043",
+    "documento": "data/insights/2026-07-23_comercial-administracion-vehicular.json",
+    "cobertura": "ignora",
+    "evidencia": "pp-043: los canales oficiales de coordinacion se limitan a WhatsApp. La pagina trata la forma del alta, no su circulacion: ninguno de los seis dialogos contempla avisar a otra area de que el alta se hizo."
+   }
+  ],
+  "usabilidad_para_el_area": "Para comercial y administracion vehicular, la pagina responde bien a la pregunta de producto (cual alta cabe en un telefono) y su tabla de decision es clara, pero el dibujo que la sostiene esta roto: la mitad de los campos del telefono no se ven, correo y telefono son campos de 19px y 12 controles carecen de nombre accesible. Ademas la pagina ya no coincide con la decision D1 (el alta de cliente es una pagina), asi que hoy sirve como registro de por que se decidio la pagina, no como guia de lo que se construye para 41."
+ },
+ "cobertura": [
+  {
+   "patron": "Cuerpo de dialogo con secciones que desplaza (`.modal .cuerpo > .seccion`)",
+   "propuesta_de_regla": "En un cuerpo de dialogo con scroll, los hijos que llevan `overflow:hidden` declaran `flex-shrink:0`: el cuerpo desplaza, las secciones nunca se encogen. Se comprueba midiendo scrollHeight == clientHeight en cada seccion y scrollHeight > clientHeight en el cuerpo."
+  },
+  {
+   "patron": "Marco de dialogo ilustrado en una pagina de referencia (sin <dialog>)",
+   "propuesta_de_regla": "Un marco de dialogo dibujado en una pagina de decision no lleva `role=\"dialog\"` ni `aria-modal`; lleva `aria-hidden` o `role=\"img\"` con etiqueta, y los id de sus campos se prefijan para no duplicar los del formulario real."
+  },
+  {
+   "patron": "Seccion de registro historico dentro de una maqueta de decision (D1: 41 ya no es dialogo)",
+   "propuesta_de_regla": "Una seccion que un aviso posterior dejo sin vigencia lleva una banda `.banda-info` que lo dice con la fecha y la decision («Registro: D1, 28-sep — el alta de cliente es una página») y no formula propuestas."
+  },
+  {
+   "patron": "Tabla de medidas con columnas numericas (`.medida`)",
+   "propuesta_de_regla": "Una columna numerica alinea a la derecha su cabecera y sus celdas (`th.n,td.n{text-align:right}`), igual que `.num` en §6.11."
+  }
+ ],
+ "sin_datos": [
+  "Instrumento I4 (alineacion cabecera/celda): 3 columnas de la tabla `.medida` con cabecera a la izquierda y cifras a la derecha (visible en la captura 1440, tabla de cinco altas). El sistema 2.15.0 no tiene un § sobre alineacion de columnas numericas ni hay decision del cliente: no es hallazgo, va a cobertura.",
+  "Comportamiento con lector de pantalla real ante 6 `aria-modal=true`: no probado (solo lectura del marcado).",
+  "Instrumento I7 (colision de texto): detecto un solape de 1px entre «quedan ≈560 px» y «77 px» (dos <b> de lineas contiguas del mismo parrafo); no lo reproduzco como defecto visible, parece falso positivo del interlineado.",
+  "Si la aritmetica de alturas (cabecera 64, pie 76) se calculo con otro modo de densidad o con la regla R-4 de 44px: no consta; los valores medidos son 45/35 (como se renderiza) y 77/67 (con --sp-5).",
+  "Aviso 'cinco' frente a 'cuatro' altas: el v1 reconocia 'cuatro altas restantes' en el subtitulo; el cuerpo nunca se actualizo. No consta cual era la intencion para el archivo final.",
+  "Rendimiento (F3): no evaluado."
+ ]
+}

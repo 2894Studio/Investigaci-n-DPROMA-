@@ -1,0 +1,260 @@
+{
+ "pantalla": "01_login",
+ "tier": "B",
+ "sha256": "bc76e9915640dae779201cf65cf5ad98a195fe2c689bf950a22cca3b4064b9a3",
+ "estado_entrega": "modificada",
+ "estado_vs_pdf": "NO_ALINEADO",
+ "estados_auditados": [
+  "acceso (reposo)",
+  "ocupado (botón, vía clic)"
+ ],
+ "capturas": [
+  "01_login--1280-fold.png",
+  "01_login--1440.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-01login-01",
+    "severidad": "alta",
+    "regla": "§6.1 Botón primario del acceso (`.gbtn`)",
+    "dice_el_sistema": "«Se bloquea en el manejador de JS, no solo con CSS: `pointer-events:none` detiene el ratón pero no el teclado»; estado por `aria-busy`; `min-height:48px`",
+    "hay_en_el_build": "`.gbtn[data-busy=\"true\"]{pointer-events:none;color:var(--text-2)}` (línea 99) y un manejador `g.addEventListener('click', () => {` (línea 283) sin variable guardián ni aria-busy; `.gbtn` sin min-height. Medido: con el botón enfocado, 4 pulsaciones de Intro ejecutan el manejador 4 veces aunque el botón esté «busy»; aria-busy = null; alto 45,3 px (el sistema prescribe 48).",
+    "selector": "#google.gbtn",
+    "linea": 99,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio:aud-b/m01.cjs",
+     "detalle": "[script aud-b/m01.cjs] page.focus('#google') + 4× keyboard.press('Enter') con un contador de clics añadido al botón: window.__n=4; data-busy='true'; getAttribute('aria-busy')=null; getBoundingClientRect().height=45,31; getComputedStyle.minHeight='0px'"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico: en la maqueta el manejador solo cambia un texto y no hay envío real; el riesgo (varias ventanas de Google) aparece al implementarlo. Regla 2: arreglo pequeño y exacto en §6.1 (guardián `ocupado`, `aria-busy`, `min-height:48px`); se propone."
+    },
+    "por_que_importa": "Es la única acción de la pantalla de acceso. Sin guardián en JS, el teclado reenvía mientras está ocupado; sin aria-busy, el lector de pantalla depende solo del `aria-live` externo. No aplicado: el PDF no lo declara para esta pantalla."
+   },
+   {
+    "id": "v2-01login-02",
+    "severidad": "alta",
+    "regla": "§2 Tipografía — fuentes autoalojadas (D116); PDF del cliente C8 y C9",
+    "dice_el_sistema": "«Las fuentes se autoalojan — `D116`»; «Ese `@font-face` no es opcional.»",
+    "hay_en_el_build": "Líneas 8-10: `<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">`, `<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>` y `<link href=\"https://fonts.googleapis.com/css2?family=Inter:...&family=Michroma&display=swap\" rel=\"stylesheet\">`. `grep -n '@font-face'` no devuelve nada. C8 («Tipografía autoalojada por @font-face») y C9 («Sin referencias a Google Fonts») figuran para esta pantalla en el PDF (cambios.txt: `sistema/transversales/acceso/01_login.html · C8 · C9 · C15 · PR #467`): ninguno está en el archivo recibido. Aviso: lib.cjs inyecta @font-face al renderizar, así que `document.fonts` mostraría 'loaded' sin que el archivo lo cargue; vale el grep.",
+    "selector": "head > link[href*=fonts.googleapis.com]",
+    "linea": 10,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 10,
+     "cita": "<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&display=swap\" rel=\"stylesheet\">"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 4
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Criterio 4 por la lectura más estricta: D116 es decisión de DPROMA —figura en su `_sio-tokens.css` (líneas 16 y 20) y en su PDF (C8/C9)—, aunque no aparece en el aviso del 28-sep ni en FICHAS (grep sin resultados): por eso lo digo con las dos lecturas. Lo que se pide no es nuevo: es lo que el PDF dice haber hecho. Quitar las tres líneas `<link>` y enlazar `_sio-tokens.css` (que ya trae los dos @font-face) o copiarlos."
+    },
+    "por_que_importa": "No aplicado, no regresión. La pantalla de acceso es la primera que se ve: si Google Fonts no responde, cae a system-ui sin ningún error visible (incidencia real de 4 días sin detección, según §2)."
+   },
+   {
+    "id": "v2-01login-03",
+    "severidad": "baja",
+    "regla": "§1.2 Acción y marca — hex de marca → `var(--marca-*)`; PDF C15",
+    "dice_el_sistema": "«Ningún hex literal en un componente. Todo pasa por un token.» (preámbulo del sistema) y la tabla de `--marca-1`…`--marca-7`, `--marca-azul`, `--marca-lienzo`, `--marca-lienzo-ink` (§1.2)",
+    "hay_en_el_build": "Hex de marca sueltos: `.brand :focus-visible{outline-color:#C7D97B}` (51), `.brand{...background:#071120;color:#F2F5F7;` (59), `color:#C7D97B;margin-bottom:10px` (70), las siete paradas del degradado `#0c361e #12572b #2e823d #60a84b #76b552 #a5c86a #c7d97b` (127) y `#1E4E79`/`#C7D97B` en la escena (143-149). El :root del archivo no declara ningún `--marca-*` (grep sin resultados), de modo que aunque se sustituyera haría falta declararlos. La escena SVG además usa ~20 hex sin token (#0B1B30, #1A3A5C, #9FD6E8…).",
+    "selector": ".brand, .copy h1 .sio, #lgrad stop",
+    "linea": 70,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 70,
+     "cita": "color:#C7D97B"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico. C15 figura en el PDF para esta pantalla y no está aplicado. Correspondencias: #C7D97B→var(--marca-7); #071120→var(--marca-lienzo); #F2F5F7→var(--marca-lienzo-ink); #1E4E79→var(--marca-azul); paradas del degradado→--marca-1…7. La escena de fondo necesita decisión del sistema (ver cobertura)."
+    },
+    "por_que_importa": "No aplicado. El valor visual es idéntico; lo que se pierde es que un cambio de marca se propague desde un solo sitio."
+   },
+   {
+    "id": "v2-01login-04",
+    "severidad": "media",
+    "regla": "§1.1 `--text-3` (2.15.0 = #5C6675) y tokens canónicos; trampa: el documento antecesor `sistema-diseno-acceso-sio-dproma.md` tiene los mismos nombres con otro valor",
+    "dice_el_sistema": "«`--text-3` cambió de valor. Era `#66717F`» (§1.1, 2.15.0); `--sh-modal:0 24px 60px rgba(19,29,43,.22)` (§4); `--font-brand` = `'Michroma',sans-serif`",
+    "hay_en_el_build": "`--text-3:#66717F` (línea 23), `--sh-modal:0 24px 60px rgba(19,29,43,.20)` (línea 26), `--font-brand:'Ethnocentric Rg','Michroma','Inter',sans-serif` (línea 13), `--err-ink:#B03A31` y `--ok-ink:#22705A`. Son exactamente los valores del antecesor (docs/sistema-diseno-acceso-sio-dproma.md: líneas 35, 48 y 136 para --text-3 y --sh-modal), no los del 2.15.0. Medido: los textos en `--text-3` de esta pantalla (.hint, .foot) dan 4,74:1 como mínimo: cumplen.",
+    "selector": ":root",
+    "linea": 23,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 23,
+     "cita": "--text-3:#66717F"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico: contraste medido OK. El `_sio-tokens.css` del paquete ya trae los valores 2.15.0; basta con enlazarlo o propagarlos."
+    },
+    "por_que_importa": "Este archivo se construyó con los tokens del documento antecesor; el contrato canónico es el 2.15.0. Mientras no se propaguen, la pantalla de acceso diverge en 6 tokens del resto del paquete."
+   },
+   {
+    "id": "v2-01login-05",
+    "severidad": "media",
+    "regla": "§7.3 Objetivos táctiles",
+    "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8)»; el enlace primario de su fila «llevan padding hasta llegar a 24px»",
+    "hay_en_el_build": "`.foot a{color:var(--link);text-decoration:none;font-weight:600;border-radius:var(--r-ctrl)}` (línea 113): sin padding. El enlace «¿Problemas para entrar? Levanta un ticket a TI» mide 268,3×15 px (brief; 264,3×14,8 en mi medición, con la fuente del arnés).",
+    "selector": ".foot a",
+    "linea": 113,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "tactil",
+     "detalle": "[tactil_bajo24 (brief) + script aud-b/m01.cjs] brief: total 4, bajo24 1, a «¿Problemas para entrar?» w 268,3 h 15. m01.cjs: footA=[264,3 ; 14,77]"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": true,
+     "criterio": 1
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Destino < 24 px (criterio 1, definición del proyecto). Dos lecturas: la excepción de espaciado de WCAG 2.5.8 se cumple probablemente (ningún otro destino a < 24 px); pero §7.3 y el criterio del proyecto no la contemplan. Arreglo: `.foot a{display:inline-block;padding:4px 0;min-height:24px}`."
+    },
+    "por_que_importa": "Es la única salida si no puedes entrar (levantar un ticket), y la persona que llega aquí ya está en dificultades. Persiste desde v1."
+   },
+   {
+    "id": "v2-01login-06",
+    "severidad": "media",
+    "regla": "§6.4 Vistas de estado de una pantalla",
+    "dice_el_sistema": "«Toda pantalla que pida datos tiene cuatro formas de presentarse… En la pantalla de entrada, el contenedor es la propia tarjeta.»",
+    "hay_en_el_build": "`<div class=\"glass\">` (línea 235) contiene una sola vista: no hay vista de cargando, vacía ni de error. Solo existe el estado «ocupado» del botón (texto «Abriendo Google…»). No hay camino visible para «cuenta no @dproma.com», ventana cerrada o falla de red.",
+    "selector": ".glass",
+    "linea": 235,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 235,
+     "cita": "<div class=\"glass\">"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "decidir_diseño",
+     "motivo": "Pregunta abierta: ¿cuántas de las vistas de §6.4 hacen falta en un acceso con OAuth de un solo botón? La de error (cuenta no permitida / falla) sí; la de vacío no aplica. No se exige."
+    },
+    "por_que_importa": "Si el acceso falla, la persona no tiene ninguna pista en pantalla; la maqueta no muestra qué pasa."
+   },
+   {
+    "id": "v2-01login-07",
+    "severidad": "baja",
+    "regla": "§8 Voz de producto — `.note` una frase",
+    "dice_el_sistema": "«si el texto explica una decisión, no va en pantalla. Si explica una consecuencia para quien está mirando, sí — y en una frase.»",
+    "hay_en_el_build": "`<p class=\"note\">` con dos oraciones: «SIO-DPROMA no guarda tu contraseña. Si no la recuerdas, recupérala desde la misma ventana de Google con «¿Olvidaste tu contraseña?».» (≈133 caracteres) más el `.hint` de 2 líneas encima.",
+    "selector": "p.note",
+    "linea": 253,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 253,
+     "cita": "<p class=\"note\">"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Útil y accionable; solo excede por una frase. No crítico."
+    },
+    "por_que_importa": "Dos mensajes de ayuda seguidos (.hint y .note) compiten bajo el único botón."
+   },
+   {
+    "id": "v2-01login-08",
+    "severidad": "baja",
+    "regla": "§6.5 Iconos (`.msi`)",
+    "dice_el_sistema": "«Material Symbols Rounded, variante rellena (`FILL@1`).»",
+    "hay_en_el_build": "`.ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;...}` y `<symbol id=\"i-globe\">…` de trazo propio; sin `.msi`.",
+    "selector": ".ico",
+    "linea": 46,
+    "certeza": "leido_en_codigo",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 46,
+     "cita": ".ico{width:18px;height:18px;stroke:currentColor"
+    },
+    "estado_vs_v1": "persiste",
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "Decisión estable del cliente en todas sus maquetas; documentar (cobertura)."
+    },
+    "por_que_importa": "Nomenclatura; funciona."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [
+  {
+   "id_v1": "f1-01login-02",
+   "evidencia": "Cerrado: `.hint` y `.foot` ya no usan `--text-3-fuerte` (inexistente en el archivo) sino `--text-3` (diff v1flat→v2 líneas 105 y 112; `tokens_usados_no_declarados: []` en el brief). Medido: color final = --text-3 con 4,74:1 mínimo (aud-b/t3.cjs)."
+  }
+ ],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 2,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 2
+  },
+  "justificacion": "Es la pantalla visualmente más resuelta del lote, con el layout §7.1 (.split, corte a 920 px), dos temas y contraste sin fallos (14 textos, 0 fallos). Baja por el botón sin guardián (4 Intro = 4 ejecuciones), el enlace de ayuda de 15 px, la falta de vista de error, y porque no incorpora lo que el PDF declara para ella (C8, C9, C15): sigue con Google Fonts y hex de marca sueltos, y con los valores de tokens del documento antecesor.",
+  "evidencia": [
+   "brief: tactil bajo24 1, contraste claro 0 fallos, I1–I9 sin candidatos",
+   "aud-b/m01.cjs: gbtn 45,3 px, 4 clics por 4 Intro, @font-face 0 en el archivo",
+   "grep líneas 8-10 (Google Fonts) y 51/59/70/127 (hex de marca)",
+   "Captura 01_login--1440.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado — Tier B"
+ },
+ "cobertura": [
+  {
+   "patron": "Escena de fondo del acceso con ~20 hex sin token (azules y teal de la ilustración)",
+   "propuesta_de_regla": "La ilustración del acceso es el único lugar donde el color es decorativo y no tiene rol. Declarar `--marca-escena-1…n` o aceptar explícitamente que un SVG ilustrativo queda fuera de «ningún hex literal», con un tope de colores."
+  }
+ ],
+ "sin_datos": [
+  "El brief dice estado_vs_pdf 'no_listado_en_pdf', pero cambios.txt (el texto del PDF) lista `sistema/transversales/acceso/01_login.html` con C8 · C9 · C15 (PR #467): el cruce del orquestador falló por el prefijo de ruta (html_v2/ frente a sistema/transversales/). Lo correcto es NO_ALINEADO: ninguno de los tres está en el archivo.",
+  "No se probó el tema oscuro pintado ni anchos < 920 px (solo lectura del CSS).",
+  "Rendimiento: no_evaluado."
+ ]
+}

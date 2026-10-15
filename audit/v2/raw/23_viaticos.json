@@ -1,0 +1,340 @@
+{
+  "pantalla": "23_viaticos",
+  "tier": "B",
+  "sha256": "839f0e39579afc6f5e97792f75467e48289267c8c984f24d98ab80c66f0ae334",
+  "estado_entrega": "modificada",
+  "estado_vs_pdf": "alineado",
+  "estados_auditados": [
+    "lista con solicitudes (estado ok)",
+    "vacío y error (solo código)"
+  ],
+  "capturas": [
+    "23_viaticos--1440.png",
+    "23_viaticos--1280-fold.png"
+  ],
+  "observaciones_resueltas": [
+    {
+      "hoja": 8,
+      "texto_usuario": "«Monto y excedente»: textos largos en tabla. «Habíamos creado una versión limpia» (probable propuestas/viaticos.html).",
+      "veredicto": "confirmada",
+      "evidencia": [
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "script mi/t23.cjs (Playwright 1440; Range.getClientRects por celda) + I9_celdas (brief)",
+            "detalle": "Celda «Monto y excedente» de VI-2026-0731: 141 caracteres, texto exacto: «$4,200 estándar $3,800 +$400 «El hotel del tabulador estaba lleno por la feria; el más cercano con disponibilidad costaba $400 más la noche.»». Los tres primeros renglones son el dato (`.montos`); la cita (`.justifica`) son 112 caracteres que ocupan 5 líneas en una columna de 204 px: 8 líneas de texto en la celda (el brief cuenta 9 por la altura de la fila). Fila de VI-2026-0722: «Pide por encima del estándar y no escribió por qué.» (`.sin-just`), 51 caracteres, 2 líneas, celda de 82 caracteres."
+          },
+          "dato": "Dos de las seis filas llevan prosa en la celda de «Monto y excedente»; las otras cuatro, solo el dato (40 caracteres: «$2,500 estándar $2,500 igual al estándar»)."
+        },
+        {
+          "certeza": "leido_en_codigo",
+          "reproduce": {
+            "tipo": "codigo",
+            "linea": 698,
+            "cita": "<span class=\"justifica\">«El hotel del tabulador estaba lleno por la feria;"
+          },
+          "dato": "La prosa está escrita en la celda (línea 698) y en la 720 el `.sin-just`. Con el mismo patrón hay prosa en otras dos columnas de las mismas filas: `.motivo-r` («Motivo: «El vuelo no procede para un trayecto de 3 h por carretera. Se aprueba de nuevo si viaja en autobús.»», 109 caracteres, 4 líneas, columna «Aprobación del gasto», línea 722) y `.porque-no` («No puedes aprobar tu propia solicitud. La aprueba tu jefe directo.», 66 caracteres, 3 líneas, y «Mientras están en revisión no se pueden subir más.», 50 caracteres, líneas 713 y 735, columna de acciones)."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "script mi/t23b.cjs (Playwright, mismo ancho en ambos archivos, servidor local de propuestas en :8741 solo para lectura)",
+            "detalle": "Anchos de columna a 1440, cliente vs propuesta: Monto 204 vs 161 px, Quién 132 vs 189 px, Folio 127 vs 127, Aprobación 199 vs 194. Altura de fila del cliente: 170, 108, 121, 120, 119 y 89 px."
+          },
+          "dato": "La prosa de «Monto y excedente» ensancha esa columna 43 px y se los quita a «Quién» (los nombres pasan a dos líneas y el subtítulo a cuatro). La fila de VI-2026-0731 mide 170 px frente a 89 de la más corta."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "grep -n -E 'justifica|sin-just|motivo-r|porque-no' en web/entregables/propuestas/viaticos.html",
+            "detalle": "Propuesta del repo, líneas 774-776, 795-797: `<td data-et=\"Monto y excedente\"><span class=\"montos\"><span class=\"pide\">$4,200</span><span class=\"std\">estándar $3,800</span><span class=\"dif arriba\">+$400</span></span></td>`. Solo el dato. Las clases `.justifica` (línea 652), `.sin-just` (654), `.motivo-r` (656) y `.porque-no` (662) siguen declaradas en su CSS pero ningún marcado las usa. Historial: `f3ba73f fix(voz): quitar racional interno y educación general de la interfaz; mover lo relevante a toggletip`."
+          },
+          "dato": "La «versión limpia» existe y corresponde a esta celda: en la propuesta la celda «Monto y excedente» lleva solo `$4,200 / estándar $3,800 / +$400`, y la fila rechazada lleva solo la etiqueta «Rechazado». El cliente reintrodujo la prosa. En la propuesta, además, la justificación no aparece en ningún otro sitio (0 coincidencias de «justific» en `viatico-detalle.html`): si se saca de la celda hay que darle destino."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "I4_alineacion (brief) + captura",
+            "detalle": "I4: tablas 1, desalineadas 1; col 3 «Monto y excedente», cabecera `right`, celda `start`, dxIzq 31,4 px. En 23_viaticos--1440.png la cita con barra ámbar arranca en x≈668 y la cabecera «MONTO Y EXCEDENTE» en x≈699."
+          },
+          "dato": "Confirmado a ojo: las cifras van alineadas a la derecha y el bloque de la cita a la izquierda, 31 px más a la izquierda que la cabecera."
+        },
+        {
+          "certeza": "medido",
+          "reproduce": {
+            "tipo": "medicion",
+            "instrumento": "I9_celdas (brief)",
+            "detalle": "I9: celdas 30, largas 30. Mi lectura: el instrumento calcula `lineas = altura de la celda / interlineado`, y todas las celdas de una fila alta heredan la altura de la fila, así que marca las 30. Con el criterio de caracteres (> 60) quedan 5 celdas reales: Monto ×2 (141 y 82), Aprobación ×1 (119), Acciones ×1 (74: «Aprobar» + «No puedes aprobar tu propia solicitud…»), y Quién ×2 (83, que es la celda principal de dos líneas que §6.11 regla 8 permite)."
+          },
+          "dato": "I9 sobre-marca: 30 de 30 es un artefacto de su cálculo de líneas. Los datos de este veredicto salen de mi script, no del contador de I9."
+        }
+      ],
+      "causa_raiz": "La celda «Monto y excedente» mezcla dato (`.montos`, 3 líneas) y explicación (`.justifica`/`.sin-just`, prosa de 51 a 112 caracteres) sin que haya un sitio para el matiz: §6.11 regla 7 lo manda a «etiqueta emergente o a la ficha» y la maqueta no dibuja ninguno de los dos. El `.justifica` tiene `max-width:36ch` (línea 651), de modo que la columna crece hasta 204 px para alojarlo. Es decisión del autor (`S-08`, ficha: «lo que decidí yo»), no del contrato de DPROMA.",
+      "solucion_propuesta": "Qué dejar en la celda: solo `$4,200 / estándar $3,800 / +$400` (las tres líneas de `.montos`) y, cuando falta la justificación, una marca corta en el sitio de `+$1,400`: «Sin justificar» (14 caracteres, `.dif` o pill `p-warn` con icono). Qué mover fuera: (1) la cita de 112 caracteres a un toggletip `.infob`+`.tip` (§6.23) junto al `+$400`, con `aria-label` «Ver la justificación del excedente»; (2) el motivo de rechazo (`.motivo-r`, 109) a otro toggletip al lado de la pill «Rechazado», porque D60 pide que el motivo se muestre y un toggletip se alcanza con teclado y con toque; (3) los `.porque-no` al `title`/descripción del botón deshabilitado (`aria-describedby`) o al mismo toggletip. Alternativa B: fila desplegable (§6.15) con la prosa dentro, cero clics extra si se abre por defecto la fila seleccionada. Alternativa C: la ficha `viatico-detalle.html`, que hoy no tiene sección de justificación. Coste: A = 3 toggletips y borrar 4 clases (≈15 líneas de marcado y CSS); la columna vuelve a ~161 px y «Quién» recupera 57 px; B = más marcado y JS; C = diseñar la sección. Recomendado: A para la cita y el `.porque-no`; el motivo de rechazo por A solo si el producto acepta un clic para leerlo (decisión).",
+      "tipo_de_cambio": "medio",
+      "critico": {
+        "es": false,
+        "criterio": null
+      },
+      "decision": {
+        "valor": "decidir_diseño",
+        "motivo": "No es crítico. La justificación (S-08) es decisión del autor y puede salir de la celda sin consecuencias. El motivo de rechazo y el porqué de la acción deshabilitada están amparados por S17(d.1)/D60 y D65 («el motivo se muestra», «sale deshabilitada con su porqué»): hay que decidir si un toggletip cuenta como «mostrar»."
+      }
+    }
+  ],
+  "f1_cumplimiento": {
+    "veredicto": "cumple_parcialmente",
+    "hallazgos": [
+      {
+        "id": "v2-23viat-01",
+        "severidad": "media",
+        "regla": "§6.11 regla 7 Una celda no lleva un párrafo",
+        "dice_el_sistema": "«Una celda no lleva un párrafo. Una tabla se escanea en vertical; con dos o tres líneas de prosa distintas por fila deja de poder escanearse… En la celda va la etiqueta; el matiz va a etiqueta emergente o a la ficha.» (§6.11, regla 7)",
+        "hay_en_el_build": "`.justifica` (112 caracteres, 5 líneas), `.sin-just` (51, 2 líneas), `.motivo-r` (109, 4 líneas) y `.porque-no` (66 y 50, 3 líneas), dentro de `td`. La celda más cargada, «Monto y excedente» de VI-2026-0731, tiene 141 caracteres y 8 líneas.",
+        "selector": "td .justifica, td .sin-just, td .motivo-r, td .porque-no",
+        "linea": 698,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "script mi/t23.cjs + I9_celdas (brief)",
+          "detalle": "Celda Monto fila 1: tdChars 141, justChars 112, justLineas 5; fila 3: justChars 51; `.motivo-r` 109 caracteres, 4 líneas; `.porque-no` 66 y 50 caracteres, 3 líneas. (I9 marca 30/30 por un artefacto de cálculo; no uso su cifra.)"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Ver la respuesta a la observación 8: la cita puede salir sin coste; el motivo de rechazo y el porqué están amparados por D60/D65 y piden decidir cómo se muestran."
+        },
+        "por_que_importa": "La columna de montos es la que se compara en vertical («lo que la pantalla existe para hacer visible es el excedente», ficha); con 8 líneas en una fila y 3 en las demás deja de escanearse y la fila con prosa duplica la altura de las otras."
+      },
+      {
+        "id": "v2-23viat-02",
+        "severidad": "alta",
+        "regla": "§6.11 Tabla densa (`.tabla-caja` con scroll horizontal) + criterio 2 (acción primaria)",
+        "dice_el_sistema": "§6.11 define `.tabla-caja{overflow-x:auto}` como contenedor de la tabla; la columna de acciones es parte de la fila (Aprobar / Rechazar son la tarea de la pantalla).",
+        "hay_en_el_build": "`.via table{min-width:1180px}` y el área de contenido mide 1044 px a 1280 y 960 a 1024: la tabla tiene que desplazarse 136 y 220 px. Con la primera columna fija, la columna «Acciones» (cabecera solo `.sr`) queda fuera del encuadre: el botón «Aprobar» de la primera fila termina en x=1400 con un viewport de 1280.",
+        "selector": ".via table, .tabla-caja",
+        "linea": 640,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "anchos_1440_1280_1024 (brief) + script mi/t23b.cjs",
+          "detalle": "brief: 1280 → scroll-x en `div.tabla-caja`, dx 136, nodosFueraDelBorde 30; 1024 → dx 220, 46 nodos fuera. Mi medición: `.btn` de la fila 1 right = 1400 a 1280 (viewport 1280); a 1440 right = 1424 y dx 0. En 23_viaticos--1280-fold.png solo se ve un filo del botón verde al borde derecho."
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "decidir_diseño",
+          "motivo": "Dos lecturas. (A) Es el comportamiento previsto de §6.11 (scroll horizontal intencional): no crítico. (B) A 1280 px, un ancho muy habitual, la acción primaria queda fuera de la vista sin ninguna pista visible en el primer pliegue (la barra de scroll está al pie de la tabla): criterio 2. No lo doy por crítico porque el botón es alcanzable y porque el mismo ancho mínimo está en la propuesta del repo (dx 136 idéntico), así que no lo causa la prosa. Cambio sencillo que evaluar: columna «Acciones» fija a la derecha (`position:sticky;right:0`, como ya está la primera columna a la izquierda, línea 410) o bajar `min-width` a ~1000 px quitando la prosa de las celdas."
+        },
+        "por_que_importa": "La tarea de la pantalla es aprobar o rechazar; en una ventana de 1280 px hay que saber que existe un desplazamiento horizontal para encontrar los botones."
+      },
+      {
+        "id": "v2-23viat-03",
+        "severidad": "media",
+        "regla": "§2.1 El suelo son 12px",
+        "dice_el_sistema": "«`--fs-meta` es el tamaño más pequeño del sistema. Nada baja de ahí… si un dato se lee todos los días, va a 12–13px como mínimo.» (§2.1)",
+        "hay_en_el_build": "Seis `<span class=\"tnum\" style=\"color:var(--text-3);font-size:11px\">` con las fechas de cada solicitud («25–27 ago 2026», …), uno por fila, en la columna «Motivo y fechas».",
+        "selector": "td[data-et=\"Motivo y fechas\"] .tnum",
+        "linea": 695,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "script mi/t23.cjs",
+          "detalle": "getComputedStyle(td .tnum).fontSize = 11px en las 6 filas; resto de nodos de texto de la tabla ≥ 12 px (`.std` y `.dif` ya usan var(--fs-meta), línea 647-648)."
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "1 px bajo el suelo y no es un fallo de accesibilidad medido. Solución de una clase (`.fecha{font-size:var(--fs-meta);color:var(--text-3)}`); se ofrece. Contradicción del brief: lt12_medido = 0 y el PDF dice 0, pero hay 6 nodos a 11 px (estilo en línea, que el contador de declaraciones no ve)."
+        },
+        "por_que_importa": "La fecha de un viático es dato de consulta diaria y es exactamente el tipo de texto que §2.1 pide no bajar de 12 px."
+      },
+      {
+        "id": "v2-23viat-04",
+        "severidad": "media",
+        "regla": "§6.10 Etiqueta de estado (`.pill`)",
+        "dice_el_sistema": "«`.pill` = estado… Lleva color + icono + texto, nunca color a secas.»; familia documentada: `p-ok`, `p-warn`, `p-err`, `p-block`, `p-pause`. (§6.10)",
+        "hay_en_el_build": "`.p-neutro{background:var(--surface-2);color:var(--text-2)}` (clase no documentada) para «Por aprobar» y «Sin comprobar»; ninguna de las 12 `.pill` de la tabla lleva icono.",
+        "selector": ".pill.p-neutro, .pill.p-ok, .pill.p-warn, .pill.p-err",
+        "linea": 700,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 700,
+          "cita": "<span class=\"pill p-neutro\">Por aprobar</span>"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "ajustar_sistema",
+          "motivo": "«Pendiente de acción de otro» es un estado real y el sistema solo tiene `p-pause` («inactivo, no es un fallo»), que no significa «espera de decisión». O se documenta `p-neutro` o se usa `p-pause`. Los iconos que faltan (una sola línea por pill) se ofrecen; el texto ya dice el estado, así que no es «color a secas»."
+        },
+        "por_que_importa": "Es el componente más repetido de la pantalla (12 instancias) y diverge de la receta en dos puntos: una clase fuera del catálogo y sin icono."
+      },
+      {
+        "id": "v2-23viat-05",
+        "severidad": "media",
+        "regla": "§6.12 regla 8 — un control con pinta de interactivo tiene que interactuar",
+        "dice_el_sistema": "«Un control con pinta de interactivo tiene que interactuar.» (§6.12, regla 8)",
+        "hay_en_el_build": "Cuatro `.schip` con `aria-pressed=\"false\"` y `data-f`, el segmentado Cómoda/Compacta y el buscador no tienen manejador: el único `querySelectorAll` del script es `.demo [data-set]` (conmutador de andamio).",
+        "selector": ".p4-f .schip[data-f], .p4-f .seg button, #buscar",
+        "linea": 683,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 802,
+          "cita": "document.querySelectorAll('.demo [data-set]').forEach(function(b){"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "sin_accion",
+          "motivo": "Es una maqueta estática y el contrato del cliente (ficha) no promete lógica en filtros. Se anota por coherencia con v1; no hay solución que proponer."
+        },
+        "por_que_importa": "En la evaluación con usuarios la persona pulsará un filtro y no pasará nada."
+      },
+      {
+        "id": "v2-23viat-06",
+        "severidad": "media",
+        "regla": "§6.4 Vistas de estado de una pantalla (regla 2: encabezado real)",
+        "dice_el_sistema": "«Cada estado lleva un encabezado real, no un `<b>`.» (§6.4, regla 2); estado dentro de `.tarjeta-estado`.",
+        "hay_en_el_build": "`<b>No hay solicitudes de viático que te toquen</b>` y `<b>No se pudo cargar el listado de viáticos</b>` dentro de `div.state`; sin `.tarjeta-estado` ni `.estado-ico`. Sí lleva la corrección 2.15.0 `.state > .ico`.",
+        "selector": ".state.state-empty, .state.state-error",
+        "linea": 765,
+        "certeza": "leido_en_codigo",
+        "reproduce": {
+          "tipo": "codigo",
+          "linea": 765,
+          "cita": "<b>No hay solicitudes de viático que te toquen</b>"
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": false,
+          "criterio": null
+        },
+        "decision": {
+          "valor": "adoptar_cliente",
+          "motivo": "v1 lo puso en alta; aquí media (sin fallo medido, y la vista solo se alcanza por el conmutador de andamio). La estructura de §6.4 se ofrece al integrar."
+        },
+        "por_que_importa": "El lector de pantalla no anuncia el vacío ni el error como sección."
+      },
+      {
+        "id": "v2-23viat-07",
+        "severidad": "media",
+        "regla": "§7.3 Objetivos táctiles (24×24 px mínimo) + criterio crítico 1",
+        "dice_el_sistema": "«Todo destino interactivo mide 24×24px como mínimo (WCAG 2.2, 2.5.8)» (§7.3)",
+        "hay_en_el_build": "`.search input{border:0;background:transparent;…;width:100%}` sin alto propio: el `input#buscar` mide 329×16 dentro del contenedor visible `.search` de 380×34. Hacer clic en el borde superior del contenedor (3 px) deja el foco en `BODY`.",
+        "selector": ".search > input#buscar",
+        "linea": 337,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "tactil_bajo24 (brief) + script mi/tsearch.cjs",
+          "detalle": "brief: bajo24 1, `input` tipo search 329×16. Mi medición: `.search` 380×34, `input` 329×16; `page.mouse.click` a 3 px del borde superior del contenedor → document.activeElement = BODY."
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": true,
+          "criterio": 1
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Destino táctil medido bajo 24 px. Dos lecturas: el control visible mide 34 px y la franja muerta son 9 px arriba y abajo del texto (el teclado y el clic sobre el texto funcionan); pero el destino del input es de 16 px y el sistema fija 24. Solución de una línea que no cambia lo que se ve: `.search input{min-height:24px}` o hacer pulsable todo el contenedor (`<label class=\"search\">`)."
+        },
+        "por_que_importa": "Un clic en el borde del campo de búsqueda no lo enfoca; en pantallas táctiles el error es más probable."
+      },
+      {
+        "id": "v2-23viat-08",
+        "severidad": "alta",
+        "regla": "§7.2 Cromo de aplicación (modo colapsado) + criterio crítico 1 (control sin nombre accesible)",
+        "dice_el_sistema": "«En modo colapsado el rótulo se convierte en etiqueta emergente; no desaparece.» (§7.2)",
+        "hay_en_el_build": "Entre 861 y 1100 px: `.side .et,.grp,.side .wordmark{display:none}` oculta el texto de los 15 enlaces `a.it`; el icono es `<svg aria-hidden=\"true\">`, el enlace no lleva `aria-label` ni `title`. El árbol de accesibilidad (ariaSnapshot de `nav.side` a 1000 px) da `link` sin nombre ×15; no hay etiqueta emergente.",
+        "selector": ".side .et (en @media 860.02–1100 px) / a.it",
+        "linea": 291,
+        "certeza": "medido",
+        "reproduce": {
+          "tipo": "medicion",
+          "instrumento": "menu_1000px (brief)",
+          "detalle": "menu_1000px: hayMenu true, total 15, sinNombre 15, anchoSide 64. Reproducido con Playwright a 1000 px: `await page.locator('nav.side').ariaSnapshot()` → 15 `link:` sin texto (script mi/t20f.cjs). Citas de código: línea del `display:none` y enlaces `<a class=\"it\" href=\"#\">` sin atributos de nombre."
+        },
+        "estado_vs_v1": "persiste",
+        "critico": {
+          "es": true,
+          "criterio": 1
+        },
+        "decision": {
+          "valor": "exigir_cambio",
+          "motivo": "Control sin nombre accesible, medido. Arreglo de una línea en el cromo: sustituir el `display:none` por la clase de solo lectores (`.sr`) en `.et` y añadir `title`/etiqueta emergente. Lo que el cliente decidió (colapsar a iconos) se adopta; lo que se exige es que el nombre siga existiendo."
+        },
+        "por_que_importa": "Quien navega con lector de pantalla entre 861 y 1100 px (portátil con ventana reducida, tableta apaisada) oye «enlace» quince veces sin saber a qué módulo va cada uno. No es regresión: el CSS es idéntico en v1 (v1flat, líneas 288 a 291 según la pantalla) y delta_vs_v1.menu_sin_nombre = 0; v1 no lo registró como hallazgo. Es el cromo compartido: aparece igual en las otras pantallas del paquete. Quién lo introdujo no está determinado: la ficha dice que el cromo sale de `Marco.tsx`, no del cliente."
+      }
+    ]
+  },
+  "cerrados_desde_v1": [
+    {
+      "id_v1": "f1-23viaticos-13",
+      "evidencia": "`--text-3` ya es `#5C6675` (línea 71); contraste 0 fallos en claro y oscuro (124 nodos); delta_vs_v1.bajo24 = -6."
+    },
+    {
+      "id_v1": "f1-23viaticos-03",
+      "evidencia": "Parcialmente cerrado: `.std`, `.dif`, `.justifica`, `.motivo-r`, `.porque-no` y las cabeceras pasaron a `var(--fs-meta)` (propuesta del repo aún tiene 11 / 11,5 / 10,5 px, líneas 648-662). Persisten 6 fechas a 11 px en línea (v2-23viat-03)."
+    }
+  ],
+  "f3_boost_ui": {
+    "puntuacion": 3,
+    "dimensiones": {
+      "accesibilidad": 2,
+      "rendimiento": "no_evaluado",
+      "theming": 3,
+      "responsive": 2,
+      "integridad": 3
+    },
+    "justificacion": "Pantalla con mucho contrato (S17) bien trasladado: 0 fallos de contraste en ambos temas, destinos táctiles casi todos ≥ 24 px (bajo24 pasa de 7 a 1), tokens completos y suelo de 12 px respetado salvo las fechas. Lo que la baja: la prosa en celdas (que se ve y se mide), la columna de acciones fuera de vista a 1280 px, el cromo colapsado sin nombre y el buscador con un destino de 16 px.",
+    "evidencia": [
+      "brief: tactil bajo24 1 (input de búsqueda 329×16), contraste 0/0, menu sinNombre 15, I4 1 desalineada (31,4 px), anchos 1280/1024 con scroll-x",
+      "mi/t23.cjs: 141 caracteres y 8 líneas en una celda; mi/t23b.cjs: Monto 204 vs 161 px (propuesta) y Quién 132 vs 189"
+    ]
+  },
+  "f4_nielsen": [],
+  "f5_investigacion": {
+    "pain_points_evaluados": [],
+    "usabilidad_para_el_area": "no evaluado — Tier B"
+  },
+  "cobertura": [
+    {
+      "patron": "Estado «pendiente de decisión de otra persona» (Por aprobar, Sin comprobar) sin color de significado",
+      "propuesta_de_regla": "`.pill.p-neutro` = estado vigente que espera acción de otro: fondo `--surface-2`, texto `--text-2`, con icono (reloj). No es `p-pause` (inactivo) ni es un semáforo."
+    },
+    {
+      "patron": "Matiz de una celda (justificación, motivo de rechazo, porqué de un botón deshabilitado)",
+      "propuesta_de_regla": "§6.11 regla 7 pide «etiqueta emergente o ficha» pero el sistema no dice cuál para cada caso: texto > 60 caracteres que explica un dato → toggletip `.infob` al lado del dato; razón de una acción deshabilitada → `aria-describedby` del propio botón."
+    }
+  ],
+  "sin_datos": [
+    "No se pudo comprobar dónde mostraría la propuesta del repo la justificación del excedente: no aparece en `viaticos.html` ni en `viatico-detalle.html`.",
+    "I3 marca `main` (dy 206), `caption` y `span.sr` como recortados: scroll del shell y textos solo para lectores, falsos positivos conocidos.",
+    "I5/ritmo (valores fuera de escala 6 px ×64, 5 px ×60) no se evaluó contra §3: sin regla de escala de espaciado que cite en mi brief.",
+    "El PDF del cliente no está en mi brief; el estado «alineado» es el del orquestador."
+  ]
+}
