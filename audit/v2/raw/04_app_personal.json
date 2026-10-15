@@ -1,0 +1,156 @@
+{
+ "pantalla": "04_app_personal",
+ "tier": "no_indicado_en_dossier",
+ "modo": "cobertura",
+ "sha256": "d6ebe3a11fed5702cea1329b82f9ad1102e3772c025d0bec4725224d203a9393",
+ "estado_vs_pdf": "no_listado_en_pdf",
+ "estados_auditados": [
+  "Con datos (claro y oscuro)",
+  "Cargando (claro y oscuro)",
+  "Vacío (claro y oscuro)",
+  "Error (claro y oscuro)"
+ ],
+ "capturas": [
+  "04_app_personal--1440.png",
+  "04_app_personal--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-04apppers-01",
+    "severidad": "alta",
+    "regla": "§1.7 Regla de contraste (texto 4,5:1)",
+    "dice_el_sistema": "Texto normal 4,5:1 mínimo",
+    "hay_en_el_build": "En el estado Error, `.listmsg .ref` («Referencia: SYNC-0119-ERR-408», 10,5 px, peso 400) pinta `--text-3` rgb(102,113,127) sobre `--err-bg` rgb(244,232,231): 4,14:1 (mín. 4,5). Es el valor viejo `--text-3:#66717F` (línea 77); con el `#5C6675` de §1.1 daría 4,86:1 (cálculo propio con la fórmula WCAG). El brief no lo ve porque solo midió el estado «Con datos» en claro.",
+    "selector": ".listmsg .ref",
+    "linea": 281,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio:scratchpad/m6/run.cjs",
+     "detalle": "[script propio scratchpad/m6/run.cjs: Playwright 1440×900, lib.cjs preparar; para cada tema y estado de la demo recorre todos los nodos de texto visibles, compone el fondo real capa a capa (incluye degradados: usa ambos extremos) y calcula la razón WCAG; mide también ancho×alto de cada destino interactivo fuera del andamio] Resultado claro|error: span.ref.tnum color rgb(102,113,127) fondo rgb(244,232,231) 10,5 px ratio 4,14. El mismo nodo sobre `--surface` (estado Vacío) no falla (4,82:1)."
+    },
+    "critico": {
+     "es": true,
+     "criterio": "1 · falla de accesibilidad medida: texto con contraste 4,14:1 < 4,5:1"
+    },
+    "decision": {
+     "valor": "exigir_cambio",
+     "motivo": "Criterio 1 de la regla 1. La corrección es de una línea y ya está decidida en el sistema: `--text-3:#5C6675` (§1.1, 4,86:1 sobre `--err-bg`). No hay que rediseñar nada."
+    },
+    "por_que_importa": "La referencia citable del error es lo que el instalador le dicta a soporte cuando la lista no sincroniza; a 10,5 px y 4,14:1 es el texto más difícil de leer de la pantalla justo en el momento en que hace falta."
+   },
+   {
+    "id": "v2-04apppers-02",
+    "severidad": "media",
+    "regla": "§7.3 Objetivos táctiles",
+    "dice_el_sistema": "y 44px si es la acción",
+    "hay_en_el_build": "Los botones de recuperación de las vistas Vacío y Error (`.lbtn`: «Quitar filtro y ver toda la semana» 244×35 px y «Reintentar sincronización» 204×35 px) quedan a 35 px de alto, bajo los 44 px de §7.3 para acción principal / uso en campo. Superan el mínimo de 24 px. Los botones de la tarjeta (`.abtn`) sí llevan `min-height:44px` (línea 251) y el resto de la pantalla mide ≥ 44.",
+    "selector": ".lbtn",
+    "linea": 283,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "medicion",
+     "instrumento": "propio:scratchpad/m6/run.cjs",
+     "detalle": "[script propio scratchpad/m6/run.cjs: Playwright 1440×900, lib.cjs preparar; para cada tema y estado de la demo recorre todos los nodos de texto visibles, compone el fondo real capa a capa (incluye degradados: usa ambos extremos) y calcula la razón WCAG; mide también ancho×alto de cada destino interactivo fuera del andamio] `.lbtn` 244,1×35 (Vacío) y 204,4×35 (Error), en claro y en oscuro; los otros 9 destinos de la pantalla ≥ 44 px."
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico (≥ 24 px). Arreglo de una línea que la propia pantalla ya aplica a `.abtn`: `.lbtn{min-height:44px}`; conviene aplicarlo porque son la única salida de un estado de error en la calle."
+    },
+    "por_que_importa": "Con guantes o con la mano ocupada, el botón que reintenta la sincronización es el objetivo más pequeño de toda la pantalla y el único que saca al instalador de un error."
+   },
+   {
+    "id": "v2-04apppers-03",
+    "severidad": "media",
+    "regla": "§6.7 Esqueleto de carga (`.skel`)",
+    "dice_el_sistema": "Sin texto real dentro de las barras.",
+    "hay_en_el_build": "El estado Cargando es `<div id=\"state-loading\" hidden aria-hidden=\"true\" …>` con el aviso «Cargando órdenes del día…» dentro (`<p class=\"sr\">`). `showState()` solo alterna `hidden`, nunca quita `aria-hidden`, así que al mostrarse el bloque (visible: sí) sigue fuera del árbol de accesibilidad. Árbol de accesibilidad de la sección en ese estado: solo `region \"Lista de órdenes del día\"`, vacío. §6.7 pide un `role=\"status\"` con `aria-label` en el contenedor.",
+    "selector": "#state-loading",
+    "linea": 432,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 432,
+     "cita": "<div id=\"state-loading\" hidden aria-hidden=\"true\""
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico: el esqueleto es visual y la sección tiene `aria-live`. Arreglo trivial: `role=\"status\" aria-label=\"Cargando órdenes del día\"` en el contenedor y retirar `aria-hidden` y el `<p class=\"sr\">`. Medido con `locator.ariaSnapshot()` (script propio scratchpad/m6/m5.cjs): región vacía en el estado Cargando."
+    },
+    "por_que_importa": "Quien usa lector de pantalla no recibe ninguna señal de que la lista está cargando: oye una región vacía."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 3,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 3
+  },
+  "justificacion": "Pantalla móvil bien construida: tab bar con `<nav>` y `aria-current`, barra de progreso con `role=\"progressbar\"` y valores, semáforo con forma + color, botones de tarjeta a 44 px, cuatro estados de lista con esqueleto de la forma real, dos temas y sin desborde horizontal a 390 y 360 px. Baja por el contraste del código de referencia en Error (4,14:1), los botones de recuperación a 35 px, el estado Cargando mudo para lector de pantalla, Google Fonts por `<link>` y tamaños de 10–11,5 px.",
+  "evidencia": [
+   "brief: tactil bajo24 0 de 15 (solo estado «Con datos»); contraste 1 «fallo» (span.av) que es falso positivo",
+   "scratchpad/m6/run.cjs: 4 estados × 2 temas; sin fallos en Con datos/Cargando/Vacío; 1 fallo en Error claro (.ref 4,14:1)",
+   "scratchpad/m6/m2.cjs: scrollWidth = clientWidth a 390 y 360",
+   "captura 04_app_personal--1440.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Tamaños < 12 px en móvil: `.fol` (folio de la orden, 10,5 px, línea 233), `.badge` de estado (10,5 px, sin mayúsculas, línea 237), `.meta` y `.mini .l` (11 px), `.sub` (11,5 px) y etiquetas de la barra de pestañas (10 px, línea 289)",
+   "propuesta_de_regla": "§2.1 fija el suelo en 12 px y dice «Nada baja de ahí», escrito sobre el dashboard; falta decir si la app lo hereda. Propuesta: el mismo suelo. El folio y la etiqueta de estado se leen todos los días (§2.1 los cita), van a 12 px; las pestañas llevan una sola palabra a 12 px. La excepción de 10,5 px en mayúsculas no cubre pastillas de estado."
+  },
+  {
+   "patron": "Google Fonts por <link> en una pantalla de app (línea 10)",
+   "propuesta_de_regla": "D116 aplica a toda pantalla, también a las de app de campo: sin `<link>` a Google Fonts ni `preconnect`; `@font-face` autoalojado (§2). En una app offline-first es más fuerte: sin señal el CDN no responde y la pantalla cae a `system-ui` sin aviso."
+  },
+  {
+   "patron": "Bloque de tokens del antecesor en pantalla móvil: `--text-3:#66717F` (línea 77) y el resto de valores que el sistema 2.15.0 cambió (el brief además marca `--serie-1`/`--serie-2` y los pares `-ink`/`-bg` con otros valores)",
+   "propuesta_de_regla": "Propagar `_sio-tokens.css` 2.15.0 a las pantallas de app (`--text-3:#5C6675`, §1.1). Las pantallas móviles se pintan sobre `--bg`, `--surface` y `--surface-2` igual que las de escritorio, así que el mismo suelo de 4,5:1 aplica; el valor viejo da 4,21:1 sobre `--surface-2` y 4,14:1 sobre `--err-bg`."
+  },
+  {
+   "patron": "Barra inferior de pestañas de la app (`.tabbar`: `<nav>` con 5 enlaces icono + palabra, `aria-current=\"page\"`, `min-height:44px`)",
+   "propuesta_de_regla": "§7.2 solo describe el cromo de escritorio. Propuesta para móvil: `<nav aria-label>` con 3–5 destinos, cada uno ≥ 44×44 px, icono + etiqueta visible de ≥ 12 px, la activa con `aria-current=\"page\"` y color `--ok-ink`/`--accent` más peso (nunca solo color), y `padding-bottom:calc(10px + env(safe-area-inset-bottom))`."
+  },
+  {
+   "patron": "Vistas de estado de una lista móvil (`.listmsg` vacío y error, `.skel-card` de carga) distintas de §6.4",
+   "propuesta_de_regla": "§6.4 define la vista de estado de pantalla completa (`.state`). En una lista de tarjetas móvil el estado ocupa solo el hueco de la lista: tarjeta con borde discontinuo (vacío) o sólido con `--err-bg` (error), icono arriba, causa probable, qué datos están a salvo, referencia citable y un botón de ≥ 44 px. El esqueleto copia la forma de la tarjeta real y se anuncia con `role=\"status\"` (§6.7)."
+  },
+  {
+   "patron": "Marco de teléfono y barra de estado simulados dentro del DOM (`main.phone`, `.status`, líneas 348–357) sin `data-andamio`",
+   "propuesta_de_regla": "§9: el marco de dispositivo y la barra de estado (hora, señal, batería) son andamio de maqueta, llevan `data-andamio` y `aria-hidden=\"true\"`; en el build real los pinta el sistema operativo. Hoy un lector de pantalla leería «9:41» como contenido."
+  },
+  {
+   "patron": "Pastilla de estado con forma + color en tarjeta móvil (`.badge b-ok / b-warn / b-info`: reloj, círculo con palomita, hora)",
+   "propuesta_de_regla": "Variante móvil de `.pill` (§6.10): mismas parejas `-ink`/`-bg` opacas, icono distinto por estado (reloj = en curso, palomita = hecho) y texto de ≥ 12 px; el estado neutro agendado lleva solo la hora en `--surface-2`. Nunca solo color."
+  }
+ ],
+ "sin_datos": [
+  "`span.av` (iniciales «MT») figura en el brief con ratio 1,00: falso positivo. El instrumento solo lee `background-color` y el avatar pinta `linear-gradient(135deg,var(--chrome),var(--accent))` (línea 208). Medido en píxeles bajo el texto (script propio scratchpad/m6/m2.cjs + av.cjs): peor píxel 5,43:1 en claro y 4,70:1 en oscuro, ambos ≥ 4,5.",
+  "I2 holgura inferior (gap −33 en `header.topbar`): falso positivo. La barra de la demo (390 px) y el teléfono son hermanos en una rejilla con `flex-wrap`; el instrumento compara contra la línea de `main.phone`. No es cabecera del producto.",
+  "I3 recortó `div.body` (dy 131) y `h1.sr`: `.body` es el único eje de scroll de la pantalla a propósito y `.sr` es texto solo para lector.",
+  "I7 colisiones `b«Tab bar»`/`code«aria-current»`: texto de la columna explicativa de la demo, fuera del teléfono; no se evaluó como producto.",
+  "Dossier: `ficha_tecnica_del_cliente` es null y `estado_vs_pdf` es no_listado_en_pdf: no hay decisión del cliente que contrastar ni cambios declarados.",
+  "No evaluado: lector de pantalla real (solo árbol de accesibilidad de Chromium), navegación por teclado, comportamiento en un teléfono real (el marco de 390 px es de maqueta), rendimiento."
+ ]
+}

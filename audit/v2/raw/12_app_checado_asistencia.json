@@ -1,0 +1,107 @@
+{
+ "pantalla": "12_app_checado_asistencia",
+ "tier": "no_indicado_en_dossier",
+ "modo": "cobertura",
+ "sha256": "e78213b7d27a68461366e9393e73f847ef684f991461dc4f3097bd7e3a45fe49",
+ "estado_vs_pdf": "no_listado_en_pdf",
+ "estados_auditados": [
+  "Registro del día (con señal y sin conexión)",
+  "Capturando checado",
+  "Checado confirmado",
+  "Temas claro y oscuro"
+ ],
+ "capturas": [
+  "12_app_checado_asistencia--1440.png",
+  "12_app_checado_asistencia--1280-fold.png"
+ ],
+ "observaciones_resueltas": [],
+ "f1_cumplimiento": {
+  "veredicto": "cumple_parcialmente",
+  "hallazgos": [
+   {
+    "id": "v2-12checadoas-01",
+    "severidad": "baja",
+    "regla": "§7.3 Objetivos táctiles",
+    "dice_el_sistema": "y 44px si es la acción",
+    "hay_en_el_build": "El selector de modalidad «Sede / Campo» (`.modeswitch button`, 172×40 px cada uno) y el botón «Volver» de la vista de captura (`.backbtn`, 68,3×40 px) miden 40 px de alto: superan el mínimo de 24 px pero quedan 4 px bajo los 44 px de §7.3 para uso en campo. El resto (botón de checado, `.pbtn` 48, `.abtn` 44, pestañas 44) cumple.",
+    "selector": ".modeswitch button, .backbtn",
+    "linea": 114,
+    "certeza": "medido",
+    "reproduce": {
+     "tipo": "codigo",
+     "linea": 114,
+     "cita": "gap:6px;min-height:40px}"
+    },
+    "critico": {
+     "es": false,
+     "criterio": null
+    },
+    "decision": {
+     "valor": "adoptar_cliente",
+     "motivo": "No crítico. Es el mismo valor en dos controles (`min-height:40px`, líneas 114 y 158); subirlos a 44 px no mueve la maqueta. Medido con scratchpad/m6/run.cjs (todas las vistas, ambos temas)."
+    },
+    "por_que_importa": "La modalidad (Sede o Campo) cambia qué valida el checado; es la primera decisión de la pantalla y se toma con el pulgar, mientras que «Volver» es la única salida de la captura."
+   }
+  ]
+ },
+ "cerrados_desde_v1": [],
+ "f3_boost_ui": {
+  "puntuacion": 3,
+  "dimensiones": {
+   "accesibilidad": 3,
+   "rendimiento": "no_evaluado",
+   "theming": 3,
+   "responsive": 3,
+   "integridad": 3
+  },
+  "justificacion": "Flujo de checado claro y bien explicado (línea de tiempo del día, foto en vivo + ubicación, resultado congelado, cola sin conexión). §7.3 cumple casi del todo (13 destinos, mínimo 40 px) y el contraste pasa en todas las vistas y en ambos temas (las iniciales del avatar en oscuro dan 4,76:1 en píxeles). Resta por dos controles a 40 px, la línea «Vinculado a ORD-…» que parte el folio, el botón de confirmar fuera del primer pliegue en la vista de captura, Google Fonts por `<link>` y tamaños de 10–11,5 px.",
+  "evidencia": [
+   "brief: tactil bajo24 0 de 14; contraste 1 «fallo» (span.av) falso positivo",
+   "scratchpad/m6/run.cjs: 4 vistas × 2 temas, 0 fallos reales de contraste",
+   "scratchpad/m6/m4.cjs y m3.cjs: botón de confirmar en y=913 con el cuerpo visible hasta y=828; `.orderlink` con la `<b>` del folio de 30 px de alto (2 líneas)",
+   "captura 12_app_checado_asistencia--1440.png y scratchpad/m6/12-captura.png"
+  ]
+ },
+ "f4_nielsen": [],
+ "f5_investigacion": {
+  "pain_points_evaluados": [],
+  "usabilidad_para_el_area": "no evaluado"
+ },
+ "cobertura": [
+  {
+   "patron": "Línea de texto con negrita dentro de un contenedor flex: `.orderlink{display:flex;…}` (línea 213) con «Vinculado a <b>ORD-202607-0119</b> — Instalación cargador, Coyoacán» (línea 336)",
+   "propuesta_de_regla": "En un contenedor `display:flex`, cada nodo de texto y cada `<b>`/`<span>` se convierte en una columna: aquí «Vinculado a» se parte en dos líneas y el folio queda como «ORD-202607-/0119» (la `<b>` mide 90,8×30 px; captura 12_app_checado_asistencia--1440.png, tarjeta gris bajo la nota morada). Regla: una frase con partes en negrita va en un solo `<p>` dentro del flex, con el folio `white-space:nowrap`; el icono es el único otro hijo."
+  },
+  {
+   "patron": "Acción principal fuera del primer pliegue: en la vista «Capturando checado» el botón «Confirmar y enviar checado» (`#btnConfirm`) queda a y=913 con el cuerpo visible hasta y=828 (scrollHeight 807 > clientHeight 658) porque el recuadro de cámara ocupa un 4:3 completo (línea 162)",
+   "propuesta_de_regla": "Pantalla de captura móvil: la acción de confirmar vive en una barra inferior fija (como `.pie-accion` de 28/29) o el visor de cámara se limita a ~40 % del alto para que la lista de requisitos y el botón quepan sin desplazar. Un solo botón primario por pliegue."
+  },
+  {
+   "patron": "Color de modalidad: la nota «Modo campo» usa `.n-block` (`--block-bg`/`--block-ink`, línea 150) y la de sede `.n-info`",
+   "propuesta_de_regla": "§1.3 define `--block` como «bloqueado por una condición externa»; «Modo campo — cualquier ubicación es válida» no es un bloqueo. Para clasificar una modalidad el sistema tiene `.p-type` con `--serie-*` (§6.10 y §1.4, sin connotación de estado). Propuesta: nota neutra `.note` (§6.9) con el nombre de la modalidad en negrita, sin semáforo."
+  },
+  {
+   "patron": "Google Fonts por <link> en una pantalla de app (línea 10)",
+   "propuesta_de_regla": "D116 aplica a toda pantalla, también a las de app de campo: sin `<link>` a Google Fonts ni `preconnect`; `@font-face` autoalojado (§2). En una app offline-first es más fuerte: sin señal el CDN no responde y la pantalla cae a `system-ui` sin aviso."
+  },
+  {
+   "patron": "Bloque de tokens del antecesor en pantalla móvil: `--text-3:#66717F` (línea 30) y el resto de valores que el sistema 2.15.0 cambió",
+   "propuesta_de_regla": "Propagar `_sio-tokens.css` 2.15.0 a las pantallas de app (`--text-3:#5C6675`, §1.1). Las pantallas móviles se pintan sobre `--bg`, `--surface` y `--surface-2` igual que las de escritorio, así que el mismo suelo de 4,5:1 aplica; el valor viejo da 4,21:1 sobre `--surface-2` y 4,14:1 sobre `--err-bg`."
+  },
+  {
+   "patron": "Tamaños < 12 px: `.badge` de estado 10,5 px sin mayúsculas (línea 199), `.tinfo span`, `.req .rt span` y `.regrow .rt span` a 11 px (líneas 176, 212) y pestañas a 10 px (línea 219)",
+   "propuesta_de_regla": "Mismo caso que 04: §2.1 «Nada baja de ahí» está escrito para el dashboard; falta decir si la app lo hereda. Propuesta: sí; el registro del día (hora, lugar, estado) se lee a diario."
+  },
+  {
+   "patron": "Línea de tiempo vertical del día (`.timeline`, `.tstep`, `.tdot` done/next/queued) con estado por icono + texto secundario",
+   "propuesta_de_regla": "Patrón de pasos con estado (§6.6 cubre pasos numerados): punto de 22 px con icono distinto por estado (✓ hecho, reloj siguiente/pendiente, nube tachada en cola), nombre y hora en la primera línea, lugar o «Siguiente movimiento» en la segunda; el estado nunca solo por color."
+  }
+ ],
+ "sin_datos": [
+  "`span.av` («MT») figura en el brief con ratio 1,00: falso positivo del instrumento (fondo con degradado). Medido en píxeles en oscuro: peor píxel 4,76:1.",
+  "Overflow horizontal a 360 px (scrollWidth 375): lo causa el marco de 390 px (`.topbar` y `main.phone` con ancho fijo), que es andamio de maqueta; a 390 px no hay desborde. No se cuenta como defecto del producto.",
+  "I3 `div.body` (scroll intencional de la pantalla) y `h1.sr`: falsos positivos conocidos.",
+  "Al cambiar de vista (`showView`) el foco no se mueve; no se probó con teclado ni lector de pantalla si eso desorienta. No evaluado.",
+  "Dossier: sin ficha del cliente y `no_listado_en_pdf`. No evaluado: cámara y GPS reales (la maqueta los simula con `setTimeout`), rendimiento."
+ ]
+}
