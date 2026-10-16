@@ -464,7 +464,7 @@ DOC = f'''<!doctype html>
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>{TITULO} — 2894 Studio</title>
+<title>{TITULO} · octubre 2026 — 2894 Studio</title>
 <meta name="description" content="Lo que se midió en las 50 pantallas del paquete del 12 de octubre, explicado cambio por cambio con capturas del antes y del después." />
 <style>{CSS}</style>
 </head>
@@ -479,7 +479,7 @@ DOC = f'''<!doctype html>
     <h1>{TITULO}</h1>
     <p class="sub">Lo que se midió en las 50 pantallas del paquete del 12 de octubre, explicado cambio por cambio: dónde está, qué se ve, qué cambiar y cómo comprobarlo, con capturas del antes y del después.</p>
   </div>
-  <p class="fecha">14 oct 2026 · Informe para el equipo de ingeniería de DPROMA</p>
+  <p class="fecha">14 oct 2026 · Informe para el equipo de DPROMA</p>
 </section>
 
 <section class="como" id="indice">
