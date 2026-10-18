@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Genera web/entregables/benchmark-web/index.html con la estética de los entregables
+"""Genera experimentos/benchmark-web/index.html (experimento interno: NO va en web/, que publica Vercel) con la estética de los entregables
 (sistema de diseño 2894_ / AZ: DM Sans, cloud white, cobalt, ink; docs/brand/az-branding-guide.md).
 
 Fuente de datos: datos/benchmark.json (puntuaciones y evidencia observadas) y
@@ -13,7 +13,7 @@ import re
 import statistics
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-OUT = ROOT / "web/entregables/benchmark-web"
+OUT = ROOT / "experimentos/benchmark-web"
 data = json.loads((OUT / "datos/benchmark.json").read_text(encoding="utf-8"))
 med = json.loads((OUT / "datos/medidas.json").read_text(encoding="utf-8"))
 vf_path = OUT / "datos/verificacion.json"
@@ -852,7 +852,7 @@ page = f"""<!doctype html>
   <div class="wrap">
     <p class="mision">{MISION}</p>
     <p class="marca">2894_</p>
-    <div class="meta-pie"><span>Benchmark web de dproma.com · {FECHA}</span><a href="../../entregables.html">← Volver a los entregables</a></div>
+    <div class="meta-pie"><span>Benchmark web de dproma.com · {FECHA} · Experimento interno</span></div>
   </div>
 </footer>
 {script}
