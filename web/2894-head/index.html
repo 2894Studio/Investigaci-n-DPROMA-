@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2894_ Head Follow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cloud-white: #F7F8FA;
+    --sky-blue: #7DB7FF;
+    --deep-cobalt: #0A46FF;
+    --soft-gray: #E6E8EC;
+    --ink-black: #0B0B0D;
+    --bg: var(--cloud-white);
+    --fg: var(--ink-black);
+    --surface: #FFFFFF;
+    --line: var(--soft-gray);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: var(--ink-black); --fg: var(--cloud-white); --surface: #16161A; --line: #26262C; }
+  }
+  :root[data-theme="dark"] { --bg: var(--ink-black); --fg: var(--cloud-white); --surface: #16161A; --line: #26262C; }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background: var(--bg); color: var(--fg);
+    font-family: "DM Sans", system-ui, sans-serif; font-weight: 400;
+    display: grid; grid-template-rows: auto 1fr auto;
+  }
+  header, footer { padding: 24px clamp(16px, 4vw, 48px); display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+  .wordmark { font-weight: 700; font-size: 22px; letter-spacing: -0.01em; }
+  .tagline { font-weight: 300; font-size: 15px; opacity: .75; }
+  main { display: grid; place-items: center; padding: 8px 16px 24px; }
+
+  /* El contenedor toma su tamaño del <img>; el canvas se superpone encima. */
+  .head { width: min(420px, 78vw, 52vh); }
+  .head img { display: block; width: 100%; height: auto; }
+
+  .panel {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center;
+    font-size: 13px; font-weight: 500;
+  }
+  .panel label { display: flex; align-items: center; gap: 10px; }
+  .panel input[type=range] { width: 120px; accent-color: var(--deep-cobalt); }
+  .panel output { font-variant-numeric: tabular-nums; min-width: 3ch; font-weight: 400; opacity: .7; }
+  button {
+    font: inherit; color: #fff; background: var(--deep-cobalt); border: 0;
+    border-radius: 8px; padding: 8px 14px; cursor: pointer;
+  }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--deep-cobalt); outline-offset: 2px; }
+  @media (max-width: 600px) { footer { flex-direction: column; } .panel input[type=range] { width: 96px; } }
+</style>
+</head>
+<body>
+<header>
+  <span class="wordmark">2894_</span>
+  <span class="tagline">Discover. Apply. Grow.</span>
+</header>
+
+<main>
+  <div class="head" id="head" data-head-follow data-depth="assets/head-depth.png">
+    <img src="assets/head.png" width="1063" height="1518" alt="2894_: cabeza azul cubierta de nubes, con los ojos cerrados">
+  </div>
+</main>
+
+<footer>
+  <div class="panel" role="group" aria-label="Ajustes de la animación">
+    <label>Intensidad <input id="strength" type="range" min="0" max="0.06" step="0.002" value="0.03"><output for="strength"></output></label>
+    <label>Suavizado <input id="smoothing" type="range" min="2" max="16" step="0.5" value="7"><output for="smoothing"></output></label>
+    <label><input id="idle" type="checkbox" checked> Respiración en reposo</label>
+    <button id="compare" type="button" aria-pressed="false">Ver original</button>
+  </div>
+</footer>
+
+<script src="head-follow.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var el = document.getElementById("head");
+    var inputs = ["strength", "smoothing"].map(function (id) { return document.getElementById(id); });
+    function sync() {
+      inputs.forEach(function (i) { i.nextElementSibling.value = i.value; });
+      if (el.headFollow) el.headFollow.setOptions({
+        strength: +inputs[0].value, smoothing: +inputs[1].value,
+        idle: document.getElementById("idle").checked,
+      });
+    }
+    inputs.concat(document.getElementById("idle")).forEach(function (i) { i.addEventListener("input", sync); });
+    sync();
+
+    var btn = document.getElementById("compare");
+    btn.addEventListener("click", function () {
+      var off = btn.getAttribute("aria-pressed") !== "true";
+      btn.setAttribute("aria-pressed", off);
+      btn.textContent = off ? "Ver animado" : "Ver original";
+      if (off && el.headFollow) { el.headFollow.destroy(); el.headFollow = null; }
+      else if (!off) { el.headFollow = HeadFollow.mount(el); sync(); }
+    });
+  });
+</script>
+</body>
+</html>
