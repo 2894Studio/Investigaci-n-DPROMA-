@@ -11,16 +11,18 @@
  *   </div>
  *   <script src="head-follow.js" defer></script>
  *
- * O por código: const h = HeadFollow.mount(el, { strength: 0.03 });
- *   h.setOptions({ smoothing: 6 }); h.destroy();
+ * O por código: const h = HeadFollow.mount(el, { idle: false });
+ *   h.setOptions({ idle: true }); h.destroy();
  */
 (function () {
   "use strict";
 
+  // Valores fijos de marca: no se pueden cambiar desde fuera.
+  var STRENGTH = 0.06; // desplazamiento máximo, en fracción del ancho de la imagen
+  var SMOOTHING = 16; // frecuencia del muelle: más alto es más rápido
+  var PIVOT = 0.45; // profundidad que no se mueve (0 lejos, 1 cerca)
+
   var DEFAULTS = {
-    strength: 0.03, // desplazamiento máximo, en fracción del ancho de la imagen
-    smoothing: 7, // frecuencia del muelle: más alto es más rápido
-    pivot: 0.45, // profundidad que no se mueve (0 lejos, 1 cerca)
     idle: true, // leve respiración cuando el puntero está quieto
   };
 
@@ -49,7 +51,8 @@
   }
 
   function mount(el, opts) {
-    var o = Object.assign({}, DEFAULTS, opts);
+    opts = opts || {};
+    var o = { idle: "idle" in opts ? !!opts.idle : DEFAULTS.idle, depth: opts.depth };
     var img = el.querySelector("img");
     var depthSrc = o.depth || el.getAttribute("data-depth");
     var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -161,15 +164,15 @@
       }
 
       // Muelle críticamente amortiguado: inercia sin rebote.
-      var w = o.smoothing;
+      var w = SMOOTHING;
       state.vx += (w * w * (tx - state.x) - 2 * w * state.vx) * dt;
       state.vy += (w * w * (ty - state.y) - 2 * w * state.vy) * dt;
       state.x += state.vx * dt;
       state.y += state.vy * dt;
 
       var aspect = el.clientWidth / el.clientHeight;
-      gl.uniform2f(uO, state.x * o.strength, state.y * o.strength * aspect);
-      gl.uniform1f(uPivot, o.pivot);
+      gl.uniform2f(uO, state.x * STRENGTH, state.y * STRENGTH * aspect);
+      gl.uniform1f(uPivot, PIVOT);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -225,7 +228,7 @@
     }).catch(function () { /* el <img> queda visible */ });
 
     return {
-      setOptions: function (next) { Object.assign(o, next); wake(); },
+      setOptions: function (next) { if (next && "idle" in next) o.idle = !!next.idle; wake(); },
       destroy: function () {
         destroyed = true;
         cancelAnimationFrame(raf);

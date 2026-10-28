@@ -13,6 +13,7 @@ Copiar `head-follow.js` y `assets/` y poner:
 <script src="head-follow.js" defer></script>
 ```
 
-- Ajustes: `HeadFollow.mount(el, { strength, smoothing, pivot, idle })`, o en vivo con `el.headFollow.setOptions({...})`.
+- La intensidad (0,06) y el suavizado (16) son fijos: son los valores aprobados por la marca.
+- Lo único configurable es la respiración en reposo: `HeadFollow.mount(el, { idle: false })` o `el.headFollow.setOptions({ idle: false })`.
 - Sin WebGL o con `prefers-reduced-motion` queda el `<img>` estático.
 - Si cambia el arte, regenerar la profundidad con `scripts/head-depth/make_depth.py`.
