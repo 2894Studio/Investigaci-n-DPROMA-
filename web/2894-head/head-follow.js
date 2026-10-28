@@ -57,7 +57,8 @@
 
     var canvas = document.createElement("canvas");
     canvas.setAttribute("aria-hidden", "true");
-    canvas.style.cssText = "position:absolute;inset:0;width:100%;height:100%;";
+    // pointer-events:none para que el lienzo nunca reciba foco, selección ni arrastre.
+    canvas.style.cssText = "position:absolute;inset:0;width:100%;height:100%;pointer-events:none;outline:none;";
     var gl2 = canvas.getContext("webgl2", { premultipliedAlpha: true, antialias: false });
     var gl = gl2 || canvas.getContext("webgl", { premultipliedAlpha: true, antialias: false });
     if (!gl) return null;
@@ -192,6 +193,10 @@
       gl.uniform1i(gl.getUniformLocation(prog, "dep"), 1);
 
       if (getComputedStyle(el).position === "static") el.style.position = "relative";
+      // Sin el resaltado azul de selección (clic, doble clic), toque (móvil) ni arrastre nativo.
+      el.style.userSelect = el.style.webkitUserSelect = "none";
+      el.style.webkitTapHighlightColor = "transparent";
+      img.draggable = false;
       el.appendChild(canvas);
       img.style.visibility = "hidden"; // conserva el layout y el alt
       ready = true;
@@ -218,6 +223,8 @@
         ro.disconnect();
         canvas.remove();
         img.style.visibility = "";
+        img.draggable = true;
+        el.style.userSelect = el.style.webkitUserSelect = el.style.webkitTapHighlightColor = "";
       },
     };
   }
