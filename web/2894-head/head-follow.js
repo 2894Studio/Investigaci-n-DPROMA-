@@ -59,12 +59,12 @@
     canvas.setAttribute("aria-hidden", "true");
     // pointer-events:none para que el lienzo nunca reciba foco, selección ni arrastre.
     canvas.style.cssText = "position:absolute;inset:0;width:100%;height:100%;pointer-events:none;outline:none;";
-    var gl2 = canvas.getContext("webgl2", { premultipliedAlpha: true, antialias: false });
-    var gl = gl2 || canvas.getContext("webgl", { premultipliedAlpha: true, antialias: false });
+    var gl = canvas.getContext("webgl", { premultipliedAlpha: true, antialias: false });
     if (!gl) return null;
 
     var state = { x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0, lastMove: 0 };
     var raf = 0, visible = true, ready = false, destroyed = false, last = 0;
+    var art = null, artWidth = 0;
 
     function shader(type, src) {
       var s = gl.createShader(type);
@@ -87,21 +87,34 @@
     var uO = gl.getUniformLocation(prog, "o");
     var uPivot = gl.getUniformLocation(prog, "pivot");
 
+    // Sin mipmaps: las coordenadas desplazadas confunden a la GPU al elegir nivel y,
+    // en los bordes del lienzo, aparecían líneas con el color medio de la imagen.
+    // Para reducir sin aliasing, la imagen se reescala antes al tamaño del lienzo.
     function texture(unit, source, premultiply) {
       gl.activeTexture(gl.TEXTURE0 + unit);
       gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
-      // WebGL2 admite mipmaps en texturas de cualquier tamaño: nitidez sin aliasing al reducir.
-      if (gl2) {
-        gl.generateMipmap(gl.TEXTURE_2D);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-      } else {
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      }
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    }
+
+    function uploadArt(w, h) {
+      if (!art) return;
+      var source = art;
+      if (w < art.naturalWidth * 0.9) {
+        if (w === artWidth) return;
+        source = document.createElement("canvas");
+        source.width = w;
+        source.height = h;
+        var ctx = source.getContext("2d");
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(art, 0, 0, w, h);
+      } else if (artWidth === art.naturalWidth) return;
+      artWidth = source === art ? art.naturalWidth : w;
+      texture(0, source, true);
     }
 
     function resize() {
@@ -112,6 +125,7 @@
         canvas.height = h;
         gl.viewport(0, 0, w, h);
       }
+      uploadArt(w, h);
       wake();
     }
 
@@ -187,8 +201,8 @@
       loadImage(depthSrc),
     ]).then(function (images) {
       if (destroyed) return;
-      texture(0, images[0], true);
       texture(1, images[1], false);
+      art = images[0];
       gl.uniform1i(gl.getUniformLocation(prog, "img"), 0);
       gl.uniform1i(gl.getUniformLocation(prog, "dep"), 1);
 
