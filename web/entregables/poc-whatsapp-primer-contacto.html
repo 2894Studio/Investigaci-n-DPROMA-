@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PoC WhatsApp primer contacto · DPROMA × 2894 Studio</title>
+<meta name="description" content="Prueba de concepto: del primer mensaje de WhatsApp a una oportunidad en el CRM, con fotos en Drive, clasificación estándar/no estándar y SLA medido." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F8FA; --surface:#FFFFFF; --surface-alt:#E6E8EC; --text:#0B0B0D; --text-muted:#53565f;
+  --border:#d8dbe2; --accent:#0A46FF; --accent-text:#0A3FD6; --accent-soft:#7DB7FF; --on-accent:#F7F8FA;
+  --warn-bg:#FFF4D6; --warn-text:#6B4A00; --ok-bg:#E3F4EA; --ok-text:#14532D;
+  --shadow:0 1px 2px rgba(11,11,13,.04),0 8px 24px rgba(11,11,13,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0B0B0D; --surface:#16171c; --surface-alt:#1c1e24; --text:#F7F8FA; --text-muted:#b9bec9;
+    --border:#2a2d35; --accent:#3D6BFF; --accent-text:#8FA8FF; --accent-soft:#9CC7FF; --on-accent:#F7F8FA;
+    --warn-bg:#3a2e0b; --warn-text:#FFE08A; --ok-bg:#0f2e1c; --ok-text:#A7F3C4;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,-apple-system,sans-serif;line-height:1.55;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+a{color:var(--accent-text)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 clamp(1.25rem,4vw,2.5rem)}
+h1,h2,h3{font-weight:700;letter-spacing:-.01em;text-wrap:balance;margin:0}
+p{margin:0}
+.eyebrow{font-size:.8rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-text)}
+header.hero{padding:clamp(3rem,8vw,5.5rem) 0 2.5rem;border-bottom:1px solid var(--border)}
+.hero h1{font-size:clamp(2rem,5vw,3.25rem);line-height:1.08;margin:.6rem 0 1rem;max-width:20ch}
+.hero .lead{font-size:1.15rem;color:var(--text-muted);max-width:62ch}
+.meta{margin-top:1.5rem;display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;font-size:.9rem;color:var(--text-muted)}
+.wordmark{font-weight:700;color:var(--text)}
+section{padding:clamp(2.5rem,6vw,4rem) 0;border-bottom:1px solid var(--border)}
+section h2{font-size:clamp(1.5rem,3vw,2rem);margin:.4rem 0 .75rem}
+.intro{color:var(--text-muted);max-width:66ch;margin-bottom:1.75rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.25rem 1.4rem;box-shadow:var(--shadow)}
+.grid{display:grid;gap:1rem}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card h3{font-size:1.05rem;margin-bottom:.4rem}
+.card p,.card li{color:var(--text-muted);font-size:.95rem}
+.card ul{margin:.4rem 0 0;padding-left:1.1rem}
+.alert{background:var(--warn-bg);color:var(--warn-text);border-radius:14px;padding:1.25rem 1.4rem;border:1px solid transparent}
+.alert strong{color:inherit}
+.alert h3{font-size:1.1rem;margin-bottom:.35rem}
+table{width:100%;border-collapse:collapse;font-size:.92rem;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+th,td{text-align:left;padding:.7rem .85rem;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:var(--surface-alt);font-weight:500}
+tr:last-child td{border-bottom:none}
+.table-wrap{overflow-x:auto;border-radius:14px}
+.num{text-align:right;white-space:nowrap}
+.tag{display:inline-block;font-size:.75rem;font-weight:500;padding:.15rem .55rem;border-radius:999px;background:var(--surface-alt);color:var(--text)}
+.tag.pend{background:var(--warn-bg);color:var(--warn-text)}
+.tag.ok{background:var(--ok-bg);color:var(--ok-text)}
+/* flujo */
+.flow{display:grid;gap:.6rem;counter-reset:paso}
+.step{display:grid;grid-template-columns:2.4rem 1fr;gap:.9rem;align-items:start;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.9rem 1.1rem}
+.step .n{width:2.4rem;height:2.4rem;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:700}
+.step h3{font-size:1rem}
+.step p{color:var(--text-muted);font-size:.93rem}
+.btns{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.45rem}
+.btns span{font-size:.82rem;border:1px solid var(--accent-soft);color:var(--accent-text);border-radius:999px;padding:.15rem .65rem}
+/* arquitectura */
+.pipe{display:flex;flex-wrap:wrap;align-items:stretch;gap:.5rem}
+.node{flex:1 1 150px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.85rem 1rem}
+.node b{display:block;font-size:.95rem}
+.node small{color:var(--text-muted);font-size:.82rem}
+.arrow{align-self:center;color:var(--text-muted);font-size:1.2rem}
+.split{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:1rem}
+.branch{border-left:4px solid var(--accent);padding:.9rem 1.1rem;background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+.branch.alt{border-left-color:var(--accent-soft)}
+.branch h3{font-size:1rem;margin-bottom:.3rem}
+.branch p{color:var(--text-muted);font-size:.93rem}
+.big{font-size:2rem;font-weight:700;line-height:1}
+.note{font-size:.85rem;color:var(--text-muted);margin-top:1rem;max-width:80ch}
+footer{padding:2.5rem 0 3.5rem;color:var(--text-muted);font-size:.88rem}
+footer ul{padding-left:1.1rem}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Iniciativa · Automatización del primer contacto</p>
+    <h1>Del primer WhatsApp a una oportunidad en el CRM, sin captura manual</h1>
+    <p class="lead">Prueba de concepto para que cada prospecto de cargador eléctrico que escribe por WhatsApp quede registrado, con sus fotos guardadas, clasificado como cotización estándar o con visita técnica, y con el tiempo de respuesta medido.</p>
+    <div class="meta">
+      <span class="wordmark">DPROMA × 2894_</span>
+      <span>Borrador v0.1 · 31 oct 2026</span>
+      <span>Fuente: <code>docs/poc-whatsapp/</code></span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section id="pendientes">
+  <div class="wrap">
+    <p class="eyebrow">Antes de construir</p>
+    <h2>Lo que falta para cerrar el diseño</h2>
+    <div class="alert" style="margin-bottom:1rem">
+      <h3>Prioridad 1 · El sistema de Félix</h3>
+      <p>Necesitamos saber en qué está construido, si tiene API o webhooks, cómo se autentica una integración, qué campos y etapas tiene la oportunidad y si hay ambiente de pruebas. Mientras tanto, el mapeo al CRM queda <strong>por confirmar</strong>.</p>
+    </div>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Pendiente</th><th>Quién</th><th>Desbloquea</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Stack, API, campos y etapas del sistema interno</td><td>Félix</td><td>Mapeo de datos, alta del lead</td></tr>
+        <tr><td>2</td><td>5–10 capturas de chats reales y tiempo actual de cotización</td><td>Bernardo</td><td>Textos del bot, línea base del SLA</td></tr>
+        <tr><td>3</td><td>Catálogo de SKUs con precios y regla de cálculo</td><td>Nacho</td><td>Cotización automática</td></tr>
+        <tr><td>4</td><td>Número del bot y administrador de Meta Business</td><td>Dirección + Félix</td><td>Alta en Cloud API</td></tr>
+        <tr><td>5</td><td>SLAs y diagrama de derivación a ICEP</td><td>Nicole / Diana</td><td>Alertas y tiempos</td></tr>
+        <tr><td>6</td><td>Aviso de privacidad publicado (LFPDPPP)</td><td>Jurídico</td><td>Salida del bot</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section id="hoy">
+  <div class="wrap">
+    <p class="eyebrow">Situación actual</p>
+    <h2>Hoy todo llega al teléfono de una persona</h2>
+    <p class="intro">Los prospectos escriben directo al WhatsApp de Bernardo con fotos sueltas del tablero, la acometida y el lugar, y mensajes sin estructura. Las fotos se quedan en el teléfono y los datos se capturan a mano.</p>
+    <div class="grid g3">
+      <div class="card"><p class="big">400+</p><p>grupos de WhatsApp en la operación, según la investigación con las áreas.</p></div>
+      <div class="card"><p class="big">200+</p><p>mensajes de una campaña que no alcanzaron a atenderse a tiempo.</p></div>
+      <div class="card"><p class="big">30–40</p><p>autos eléctricos al mes por agencia aliada (ej. Changan del Valle, Dipal S07).</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="flujo">
+  <div class="wrap">
+    <p class="eyebrow">Lo que vive el cliente</p>
+    <h2>Cinco preguntas, casi todas de un toque</h2>
+    <p class="intro">El teléfono sale del propio WhatsApp y la marca del auto, del enlace de la agencia. En cualquier momento, escribir <em>asesor</em> pasa con una persona.</p>
+    <div class="flow">
+      <div class="step"><span class="n">0</span><div><h3>Bienvenida y nombre</h3><p>Saludo, enlace al aviso de privacidad y “¿a nombre de quién hacemos la cotización?”</p></div></div>
+      <div class="step"><span class="n">1</span><div><h3>Tipo de inmueble</h3><div class="btns"><span>Casa</span><span>Empresa / flotilla → Bernardo</span><span>Otro lugar</span></div></div></div>
+      <div class="step"><span class="n">2</span><div><h3>Auto</h3><p>Lista de marcas frecuentes. Se salta si vino de una agencia.</p></div></div>
+      <div class="step"><span class="n">3</span><div><h3>Ubicación</h3><p>Botón “Enviar ubicación” o código postal.</p></div></div>
+      <div class="step"><span class="n">4</span><div><h3>Distancia del tablero al lugar de carga</h3><div class="btns"><span>Hasta 10 m</span><span>Más de 10 m</span><span>No sé</span></div></div></div>
+      <div class="step"><span class="n">5</span><div><h3>Fotos (opcionales)</h3><p>Tablero y lugar de carga, de una en una, o “enviar después” con un enlace de carga.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="arquitectura">
+  <div class="wrap">
+    <p class="eyebrow">Cómo funciona por dentro</p>
+    <h2>Un orquestador conecta WhatsApp, CRM, Drive y cotizador</h2>
+    <div class="pipe" aria-label="Recorrido de un mensaje">
+      <div class="node"><b>WhatsApp Cloud API</b><small>Número dedicado, conexión directa con Meta</small></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node"><b>Orquestador</b><small>n8n: estados del bot, validación, reintentos</small></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node"><b>CRM de Félix</b><small>Crea o actualiza la oportunidad <span class="tag pend">por confirmar</span></small></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node"><b>Google Drive</b><small>Una carpeta de fotos por cliente</small></div>
+    </div>
+    <div class="split">
+      <div class="branch">
+        <h3>Estándar · casa y hasta 10 m</h3>
+        <p>El cotizador calcula con el catálogo de SKUs de Almacén, Bernardo aprueba con un clic y la propuesta sale por WhatsApp. Meta: <strong>menos de 2 horas</strong>.</p>
+      </div>
+      <div class="branch alt">
+        <h3>No estándar · más de 10 m, “no sé” u otro lugar</h3>
+        <p>Alerta a ICEP (Mauricio CR / Jhonatan Álvarez) con fotos y ubicación, se agenda la visita técnica y después sale la oferta formal.</p>
+      </div>
+    </div>
+    <div class="grid g2" style="margin-top:1rem">
+      <div class="card">
+        <h3>Decisiones recomendadas</h3>
+        <ul>
+          <li><strong>Meta Cloud API directa</strong>, sin intermediario: el volumen es bajo y no hace falta pagar margen.</li>
+          <li><strong>n8n Cloud para la PoC</strong> y el mismo flujo <em>self-hosted</em> en la infraestructura de Félix si se escala.</li>
+          <li><strong>Número nuevo</strong> para el bot; el WhatsApp de Bernardo sigue igual.</li>
+          <li>Clasificación con <strong>reglas fijas</strong>, sin IA, para que sea auditable.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Reglas del webhook</h3>
+        <ul>
+          <li>Validar la firma de Meta en cada mensaje.</li>
+          <li>Responder de inmediato y procesar aparte.</li>
+          <li>No procesar dos veces el mismo mensaje.</li>
+          <li>Descargar las fotos al momento: el enlace de Meta caduca en minutos.</li>
+          <li>Fuera de la ventana de 24 h, solo plantillas aprobadas.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="costos">
+  <div class="wrap">
+    <p class="eyebrow">Costos estimados · USD / mes</p>
+    <h2>Los mensajes cuestan poco; el orquestador decide</h2>
+    <p class="intro">Desde julio de 2025 Meta cobra por mensaje, y desde el 1 de octubre de 2026 también las respuestas dentro de las 24 h, después de 1,000 gratis al mes por número.</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th></th><th class="num">A · PoC</th><th class="num">B · 3 agencias</th><th class="num">C · Escala</th></tr></thead>
+      <tbody>
+        <tr><td>Leads por mes</td><td class="num">100</td><td class="num">300</td><td class="num">1,000</td></tr>
+        <tr><td>WhatsApp (Meta)</td><td class="num">≈ $1</td><td class="num">≈ $20</td><td class="num">≈ $85</td></tr>
+        <tr><td>n8n self-hosted (servidor)</td><td class="num">$5–20</td><td class="num">$5–20</td><td class="num">$20–40</td></tr>
+        <tr><td>n8n Cloud, con filtro de avisos</td><td class="num">≈ €24</td><td class="num">≈ €60</td><td class="num">≈ €60</td></tr>
+        <tr><td><strong>Costo por lead</strong> (Meta + n8n self-hosted)</td><td class="num"><strong>$0.06–0.21</strong></td><td class="num"><strong>$0.08–0.13</strong></td><td class="num"><strong>$0.11–0.13</strong></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="note">Supuestos: ~10 mensajes del bot por lead, 30 % de leads terminan en instalación, tarifas de México desde 1/10/2026 (servicio y utilidad ≈ $0.0085, marketing ≈ $0.0397). Cada aviso de “entregado/leído” también dispara el webhook: sin un filtro delante, Make y n8n Cloud se encarecen rápido. Tarifas de fuentes no oficiales: verificar con Meta, Make y n8n antes de presupuestar. No incluye horas de construcción.</p>
+  </div>
+</section>
+
+<section id="kpis">
+  <div class="wrap">
+    <p class="eyebrow">Cómo sabremos si funciona</p>
+    <h2>Indicadores de la PoC</h2>
+    <p class="intro">Todos salen de las marcas de tiempo que el orquestador guarda en cada paso. La línea base de hoy la da Bernardo antes de arrancar.</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Indicador</th><th>Cómo se calcula</th><th>Meta</th></tr></thead>
+      <tbody>
+        <tr><td>Primera respuesta</td><td>Respuesta del bot − primer mensaje</td><td>&lt; 1 min</td></tr>
+        <tr><td>Cotización estándar</td><td>Propuesta enviada − datos completos</td><td>&lt; 2 h en ≥ 90 %</td></tr>
+        <tr><td>Leads completos</td><td>Datos completos ÷ conversaciones iniciadas</td><td>≥ 60 % <span class="tag pend">validar</span></td></tr>
+        <tr><td>Abandono por paso</td><td>% que deja de responder en cada pregunta</td><td>Encontrar la pregunta que sobra</td></tr>
+        <tr><td>Lead → visita → instalación</td><td>Conversión por etapa</td><td><span class="tag pend">con dirección</span></td></tr>
+        <tr><td>Errores de integración</td><td>Fallas ÷ mensajes procesados</td><td>&lt; 2 %</td></tr>
+        <tr><td>Satisfacción a 15 días</td><td>NPS de la encuesta posventa</td><td>≥ 50 <span class="tag pend">validar</span></td></tr>
+        <tr><td>Costo por lead</td><td>(Meta + orquestador + servidor) ÷ leads</td><td>&lt; $0.50</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section id="siguientes">
+  <div class="wrap">
+    <p class="eyebrow">Siguientes pasos</p>
+    <h2>Cuatro a seis semanas con una agencia</h2>
+    <div class="grid g3">
+      <div class="card"><span class="tag">Semana 0</span><h3 style="margin-top:.5rem">Relevamiento</h3><p>Respuestas de Félix, chats de Bernardo, catálogo de Nacho, número y cuenta de Meta.</p></div>
+      <div class="card"><span class="tag">Semanas 1–2</span><h3 style="margin-top:.5rem">Construcción</h3><p>Webhook, estados del bot, Drive, alta en CRM, alertas a ICEP. Pruebas con el equipo.</p></div>
+      <div class="card"><span class="tag">Semanas 3–6</span><h3 style="margin-top:.5rem">Piloto</h3><p>QR en Changan del Valle y enlace en la web. Revisión semanal de abandono, errores y SLA.</p></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Documentos de trabajo</strong> en el repositorio: arquitectura de integración, flujo conversacional, plantilla de relevamiento, costos y KPIs, contrato JSON del lead (<code>docs/poc-whatsapp/</code>, <code>schema/poc-whatsapp-lead.schema.json</code>).</p>
+    <p style="margin-top:.75rem">Fuentes de tarifas (consultadas el 31/10/2026, verificar en las oficiales):</p>
+    <ul>
+      <li><a href="https://developers.facebook.com/docs/whatsapp/pricing">Meta — precios de WhatsApp Business Platform</a> (oficial)</li>
+      <li><a href="https://getkanal.com/blog/whatsapp-business-pricing-guide">getkanal.com — tarifas por país 2026</a></li>
+      <li><a href="https://respond.io/blog/whatsapp-pricing-change-2026">respond.io — cambio de precios de mensajes de servicio</a></li>
+      <li><a href="https://www.jetadmin.io/blog/make-pricing/">Jet Admin — precios de Make</a> · <a href="https://www.jetadmin.io/blog/n8n-pricing/">precios de n8n</a></li>
+    </ul>
+    <p style="margin-top:1rem"><span class="wordmark">2894_</span> Studio para DPROMA</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dproma.local/schema/poc-whatsapp-lead.schema.json",
+  "title": "Lead de WhatsApp — PoC primer contacto DPROMA",
+  "description": "Contrato del lead que el orquestador (n8n/Make) entrega al sistema interno/CRM. Borrador v0.1 (31/10/2026): los nombres de campo del CRM destino están por confirmar con Félix.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["lead_id", "wa_id", "telefono", "origen", "estado", "creado_en", "eventos"],
+  "properties": {
+    "lead_id": { "type": "string", "description": "Identificador interno del orquestador (UUID)." },
+    "crm_id": { "type": ["string", "null"], "description": "Id del registro en el CRM, cuando ya existe." },
+    "wa_id": { "type": "string", "pattern": "^[0-9]{10,15}$", "description": "Id de WhatsApp del cliente (contacts[].wa_id)." },
+    "telefono": { "type": "string", "pattern": "^\\+[0-9]{10,15}$", "description": "Teléfono en formato E.164." },
+    "nombre": { "type": ["string", "null"], "minLength": 2, "maxLength": 120 },
+    "nombre_perfil_wa": { "type": ["string", "null"], "description": "contacts[].profile.name; referencia, no sustituye a nombre." },
+    "origen": {
+      "type": "string",
+      "pattern": "^(agencia:[a-z0-9-]+|web|directo|campana:[a-z0-9-]+)$",
+      "description": "Canal de entrada, deducido del texto precargado del enlace wa.me."
+    },
+    "tipo_inmueble": { "type": ["string", "null"], "enum": ["casa", "empresa_flotilla", "otro", null] },
+    "marca_auto": { "type": ["string", "null"] },
+    "modelo_auto": { "type": ["string", "null"] },
+    "ubicacion": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "latitud": { "type": ["number", "null"], "minimum": -90, "maximum": 90 },
+        "longitud": { "type": ["number", "null"], "minimum": -180, "maximum": 180 },
+        "direccion": { "type": ["string", "null"] },
+        "codigo_postal": { "type": ["string", "null"], "pattern": "^[0-9]{5}$" }
+      }
+    },
+    "distancia": { "type": ["string", "null"], "enum": ["hasta_10m", "mas_10m", "no_se", null] },
+    "clasificacion": {
+      "type": ["string", "null"],
+      "enum": ["ESTANDAR", "ESTANDAR_PENDIENTE_FOTOS", "NO_ESTANDAR", null]
+    },
+    "estado": {
+      "type": "string",
+      "enum": ["EN_CONVERSACION", "COMPLETO", "INCOMPLETO", "HUMANO", "COTIZADO", "VISITA_AGENDADA", "INSTALADO", "PERDIDO"]
+    },
+    "motivo_humano": {
+      "type": ["string", "null"],
+      "enum": ["pidio_asesor", "flotilla", "no_reconocido", "archivo_no_soportado", "sin_respuesta", "error_integracion", null]
+    },
+    "carpeta_drive_url": { "type": ["string", "null"], "format": "uri" },
+    "evidencias": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tipo", "drive_url", "mime_type"],
+        "properties": {
+          "tipo": { "type": "string", "enum": ["tablero", "sitio", "acometida", "otro"] },
+          "drive_url": { "type": "string", "format": "uri" },
+          "mime_type": { "type": "string" },
+          "wa_media_id": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "creado_en": { "type": "string", "format": "date-time" },
+    "eventos": {
+      "type": "array",
+      "description": "Marcas de tiempo para SLA y errores (tabla lead_evento).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tipo", "ocurrido_en"],
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "primer_mensaje", "bot_respuesta", "datos_completos", "clasificado", "derivado_humano",
+              "cotizacion_generada", "cotizacion_aprobada", "cotizacion_enviada",
+              "alerta_icep", "visita_agendada", "visita_realizada", "instalacion_realizada",
+              "encuesta_enviada", "encuesta_respondida",
+              "error_crm", "error_media", "error_cotizador", "error_envio", "no_reconocido"
+            ]
+          },
+          "ocurrido_en": { "type": "string", "format": "date-time" },
+          "detalle": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}
