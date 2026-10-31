@@ -1,6 +1,7 @@
 # 02 · Flujo conversacional del bot (borrador)
 
-> Borrador v0.1 · 31/10/2026. Los textos tienen que pasar por Bernardo: él sabe cómo le
+> Borrador v0.2 · 31/10/2026. El bot captura datos y avisa a Bernardo; no cotiza (el Cotizador
+> es otra iniciativa). Los textos tienen que pasar por Bernardo: él sabe cómo le
 > hablan los clientes. Se ajustan con las capturas que mande (relevamiento B).
 
 ## Principios
@@ -17,8 +18,8 @@
 ## Guion
 
 ### 0 · Bienvenida + nombre
-> ¡Hola! 👋 Soy el asistente de **DPROMA**. Te ayudo a cotizar la instalación de tu cargador
-> para auto eléctrico en un par de minutos.
+> ¡Hola! 👋 Soy el asistente de **DPROMA**. En un par de minutos tomo los datos para preparar la
+> cotización de la instalación de tu cargador para auto eléctrico.
 >
 > Al seguir aceptas nuestro aviso de privacidad: {URL_AVISO}
 >
@@ -35,7 +36,7 @@
 
 - **Empresa / flotilla →** "Para flotillas armamos una propuesta a la medida. Te comunico con
   Bernardo, de nuestro equipo comercial." → `HUMANO` (Bernardo recibe todo lo capturado).
-- **Otro lugar →** se sigue, pero se marca `NO_ESTANDAR`.
+- **Otro lugar →** se sigue normal; Bernardo lo ve en el resumen.
 
 ### 2 · Auto (lista) — *se salta si vino de una agencia*
 > ¿Qué auto tienes o vas a recibir?
@@ -53,7 +54,7 @@ más comunes)
 - Acepta un `location` (lat/long) o un texto con CP de 5 dígitos. Cualquier otra cosa → repite
   una vez y luego pasa a una persona.
 
-### 4 · Distancia (botones) — la pregunta que decide estándar / no estándar
+### 4 · Distancia (botones)
 > Última pregunta 🙌 Más o menos, ¿qué distancia hay **del tablero eléctrico al lugar donde
 > vas a cargar el auto**?
 
@@ -72,25 +73,30 @@ más comunes)
 
 `[Enviar después]`
 
-- Cada foto se guarda en Drive con su tipo (`tablero`, `sitio`). La foto de la **acometida de
-  CFE** se pide solo en los casos no estándar, en el mensaje de cierre.
+> Y por último, si la tienes a la mano, una foto de tu **medidor de CFE**.
+
+`[Enviar después]`
+
+- Cada foto se guarda en Drive con su tipo (`tablero`, `sitio`, `acometida`). 🟡 Bernardo
+  confirma cuáles fotos le sirven de verdad; si alguna sobra, se quita.
 - `Enviar después` → se le manda el enlace del formulario de carga (plan B).
 
 ### 6 · Cierre
+> ¡Listo, {nombre}! Ya tenemos todo. **Bernardo, de nuestro equipo**, te escribe para darte tu
+> cotización. Nuestro horario es lun–vie 9–18 h, sáb 9–14 h 🟡.
 
-**Estándar** (casa + hasta 10 m):
-> ¡Listo, {nombre}! Con esto preparamos tu cotización. Te la mandamos por aquí **en menos de
-> 2 horas** (horario: lun–vie 9–18 h, sáb 9–14 h 🟡).
+→ Se crea el lead en el CRM y Bernardo recibe el resumen:
 
-→ Cotizador → Bernardo aprueba → se envía el PDF de la propuesta.
+```
+🔌 Nuevo lead · {origen}
+{nombre} · {telefono}
+{tipo_inmueble} · {marca_auto} {modelo_auto}
+📍 {ubicacion}  · Distancia: {distancia}
+📷 {n} fotos: {carpeta_drive_url}
+CRM: {enlace_al_lead}
+```
 
-**No estándar** (más de 10 m, no sé, otro lugar):
-> ¡Gracias, {nombre}! Por la distancia, uno de nuestros técnicos necesita revisar el lugar
-> para darte un precio exacto. Te escribimos para agendar la visita **antes de {SLA_ICEP} 🟡**.
->
-> Si puedes, mándanos también una foto de tu **medidor de CFE** (acometida).
-
-→ Alerta a ICEP con carpeta y ubicación.
+🟡 El tiempo que se le promete al cliente lo define Bernardo según su capacidad real.
 
 ## Pasar con una persona (*handoff*)
 
@@ -111,19 +117,12 @@ fotos), así no tiene que volver a preguntar.
 
 Uno solo. No se insiste más.
 
-## Posventa (15 días después de la instalación — plantilla)
-> Hola {nombre}, hace dos semanas instalamos tu cargador. Del 0 al 10, ¿qué tan probable es
-> que nos recomiendes? 
-
-Lista 0–10 → si es 9–10: plantilla de **referidos** ("¿Conoces a alguien con auto eléctrico?
-…"); si es 0–6: aviso a Bernardo para llamar.
-
 ## Lo que hay que validar con Bernardo
 
 - [ ] ¿Los clientes entienden "tablero eléctrico"? ¿Cómo lo llaman ellos?
 - [ ] Marcas y modelos más frecuentes para la lista del paso 2.
-- [ ] ¿La pregunta de distancia se puede contestar sin ir a medir? ¿Qué tanto se equivocan?
-- [ ] ¿Qué fotos son realmente indispensables para cotizar estándar?
+- [ ] ¿La pregunta de distancia le sirve para priorizar? ¿Los clientes pueden contestarla sin ir a medir?
+- [ ] ¿Qué fotos son realmente indispensables?
 - [ ] Horario de atención y tiempo de respuesta que se puede prometer.
 - [ ] ¿Hay preguntas frecuentes (precio, tiempo de instalación, garantía, facturación) que el bot
   debería contestar antes de pedir datos?
