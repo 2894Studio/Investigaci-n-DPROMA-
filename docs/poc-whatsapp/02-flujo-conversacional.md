@@ -6,6 +6,22 @@
 > preguntar (ver la tabla al final). Los textos los revisa Bernardo con las capturas reales
 > (relevamiento B).
 
+> **Fuente de verdad:** los textos y reglas viven en `n8n/motor-guion.js`. Este documento los
+> explica; si hay diferencias, manda el código. Para cambiar el guion, ver `07-demo-n8n.md`.
+
+## ¿Se entrena?
+
+No en esta prueba. El bot es un guion con reglas: no usa IA, así que no aprende solo. Se
+**ajusta** cada semana del piloto con cuatro pasos:
+1. escribirlo con chats reales de Bernardo;
+2. probarlo en la demo de n8n;
+3. medir el abandono por pregunta y las respuestas no entendidas;
+4. cambiar textos, opciones o palabras reconocidas.
+
+Si el piloto muestra que mucha gente abandona porque escribe libre, la fase 2 puede agregar un
+modelo de IA que lea el texto y llene varios datos a la vez. Ahí el "entrenamiento" consiste en
+instrucciones y ejemplos reales, no en un modelo propio, y el bot confirma lo que entendió.
+
 ## Principios
 
 - **Pocas preguntas, casi todas de un toque.** Botones (máximo 3 por mensaje) y listas (máximo

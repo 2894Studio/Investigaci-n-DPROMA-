@@ -4,11 +4,16 @@ Prueba de concepto de DPROMA × 2894_. Cuando un prospecto escribe por WhatsApp,
 sus datos y sus fotos, crea la oportunidad en el sistema interno y avisa a Bernardo con todo
 listo. Sin captura manual.
 
-> **Estado:** borrador v0.3 · 02/11/2026 · todavía no se construye nada.
-> v0.2: el Cotizador quedó fuera de alcance (es otra iniciativa y va en paralelo).
-> v0.3: revisión de solo lectura del panel real (`panel.dproma.com`). El destino del bot es la
-> tabla `contactos_comerciales` (Supabase); las fotos usan la carpeta de Drive que el panel ya
-> tiene. Las preguntas del bot se derivan de lo que pide el cotizador. Orquestador: **n8n**.
+> **Estado:** borrador v0.4 · 02/11/2026 · demo lista, piloto sin construir.
+>
+> **Empieza aquí:** la página interactiva `web/entregables/poc-whatsapp-primer-contacto.html`
+> (simulador de WhatsApp, flujo, cómo aprende el bot, limitaciones, calculadoras de costo e
+> impacto). Para mostrarlo funcionando sin WhatsApp: la demo de n8n
+> ([`07-demo-n8n.md`](07-demo-n8n.md)). Los documentos 01–06 son el anexo técnico.
+>
+> v0.2: el Cotizador quedó fuera de alcance. v0.3: destino real = Contactos del panel
+> (Supabase); preguntas derivadas del cotizador; orquestador n8n. v0.4: página didáctica con
+> simulaciones y demo n8n probada.
 
 ## Alcance
 
@@ -41,6 +46,8 @@ cotizaciones y ninguna de las dos iniciativas depende de la otra.
 
 | Archivo | Para quién | Qué contiene |
 |---|---|---|
+| [`07-demo-n8n.md`](07-demo-n8n.md) | Todo el equipo | Cómo correr y mostrar la demo en n8n sin WhatsApp ni APIs |
+| [`../../n8n/`](../../n8n/) | Studio2894 | Workflow importable y motor del guion (fuente única) |
 | [`06-hallazgos-panel.md`](06-hallazgos-panel.md) | Félix, Studio2894 | Lo que se encontró en la revisión del panel |
 | [`01-arquitectura-integracion.md`](01-arquitectura-integracion.md) | Félix, Studio2894 | Componentes, webhook de Meta, fotos en Drive, errores, modelo de datos, Make vs n8n, riesgos |
 | [`02-flujo-conversacional.md`](02-flujo-conversacional.md) | Bernardo, Studio2894 | Guion del bot paso a paso, textos y reglas de paso a una persona |

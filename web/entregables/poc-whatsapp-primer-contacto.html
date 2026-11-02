@@ -1,273 +1,531 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PoC WhatsApp primer contacto · DPROMA × 2894 Studio</title>
-<meta name="description" content="Prueba de concepto: del primer mensaje de WhatsApp a una oportunidad en el CRM, con fotos en Drive, aviso a comercial y tiempos medidos." />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>PoC WhatsApp primer contacto</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Prueba de concepto del bot de primer contacto de DPROMA: simulador de WhatsApp, flujo, cómo se ajusta el bot, limitaciones, costos e impacto, y demo en n8n.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
 <style>
+/* Layout: documento de una columna (máx. 1120px) con un "laboratorio" a dos columnas
+   (teléfono | por dentro) que se apila en móvil. Marca 2894_: DM Sans, cobalto sobre cloud white.
+   Dentro del teléfono se usan los colores de WhatsApp, porque es lo que el cliente verá. */
 :root{
-  --bg:#F7F8FA; --surface:#FFFFFF; --surface-alt:#E6E8EC; --text:#0B0B0D; --text-muted:#53565f;
-  --border:#d8dbe2; --accent:#0A46FF; --accent-text:#0A3FD6; --accent-soft:#7DB7FF; --on-accent:#F7F8FA;
-  --warn-bg:#FFF4D6; --warn-text:#6B4A00; --ok-bg:#E3F4EA; --ok-text:#14532D;
-  --shadow:0 1px 2px rgba(11,11,13,.04),0 8px 24px rgba(11,11,13,.06);
+  --bg:#F7F8FA; --surface:#FFFFFF; --surface-2:#EEF0F4; --line:#D8DBE2;
+  --fg:#0B0B0D; --muted:#53565F; --accent:#0A46FF; --accent-ink:#0A3FD6; --accent-soft:#E3EAFF; --sky:#7DB7FF;
+  --ok:#14804A; --ok-bg:#E3F4EA; --warn:#8A5A00; --warn-bg:#FFF4D6; --bad:#B42318; --bad-bg:#FDECEA;
+  --wa-head:#008069; --wa-head-fg:#FFFFFF; --wa-chat:#EFEAE2; --wa-in:#FFFFFF; --wa-out:#D9FDD3; --wa-fg:#111B21; --wa-meta:#667781; --wa-tick:#53BDEB; --wa-btn:#027EB5; --wa-bar:#F0F2F5;
+  --font:'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono:ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --shadow:0 1px 2px rgba(11,11,13,.05), 0 10px 30px rgba(11,11,13,.07);
+  --r:14px;
 }
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg:#0B0B0D; --surface:#16171c; --surface-alt:#1c1e24; --text:#F7F8FA; --text-muted:#b9bec9;
-    --border:#2a2d35; --accent:#3D6BFF; --accent-text:#8FA8FF; --accent-soft:#9CC7FF; --on-accent:#F7F8FA;
-    --warn-bg:#3a2e0b; --warn-text:#FFE08A; --ok-bg:#0f2e1c; --ok-text:#A7F3C4;
-    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
-  }
-}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0B0C10; --surface:#15171D; --surface-2:#1C1F27; --line:#2A2E38;
+  --fg:#F2F4F8; --muted:#AEB4C2; --accent:#4D7BFF; --accent-ink:#9DB4FF; --accent-soft:#1B2547; --sky:#9CC7FF;
+  --ok:#6FD39C; --ok-bg:#0F2A1C; --warn:#F5C451; --warn-bg:#33270A; --bad:#FF8A80; --bad-bg:#3A1513;
+  --wa-head:#202C33; --wa-head-fg:#E9EDEF; --wa-chat:#0B141A; --wa-in:#202C33; --wa-out:#005C4B; --wa-fg:#E9EDEF; --wa-meta:#8696A0; --wa-tick:#53BDEB; --wa-btn:#53BDEB; --wa-bar:#1F2C34;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35); color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#0B0C10; --surface:#15171D; --surface-2:#1C1F27; --line:#2A2E38;
+  --fg:#F2F4F8; --muted:#AEB4C2; --accent:#4D7BFF; --accent-ink:#9DB4FF; --accent-soft:#1B2547; --sky:#9CC7FF;
+  --ok:#6FD39C; --ok-bg:#0F2A1C; --warn:#F5C451; --warn-bg:#33270A; --bad:#FF8A80; --bad-bg:#3A1513;
+  --wa-head:#202C33; --wa-head-fg:#E9EDEF; --wa-chat:#0B141A; --wa-in:#202C33; --wa-out:#005C4B; --wa-fg:#E9EDEF; --wa-meta:#8696A0; --wa-tick:#53BDEB; --wa-btn:#53BDEB; --wa-bar:#1F2C34;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35); color-scheme:dark; }
+
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
-body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,-apple-system,sans-serif;line-height:1.55;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
-a{color:var(--accent-text)}
-a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
-.wrap{max-width:1120px;margin:0 auto;padding:0 clamp(1.25rem,4vw,2.5rem)}
-h1,h2,h3{font-weight:700;letter-spacing:-.01em;text-wrap:balance;margin:0}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{animation:none!important; transition:none!important} }
+body{margin:0; background:var(--bg); color:var(--fg); font-family:var(--font); font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;}
+.wrap{max-width:1120px; margin:0 auto; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px));}
+h1,h2,h3{margin:0; letter-spacing:-.015em; text-wrap:balance; font-weight:700}
 p{margin:0}
-.eyebrow{font-size:.8rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-text)}
-header.hero{padding:clamp(3rem,8vw,5.5rem) 0 2.5rem;border-bottom:1px solid var(--border)}
-.hero h1{font-size:clamp(2rem,5vw,3.25rem);line-height:1.08;margin:.6rem 0 1rem;max-width:20ch}
-.hero .lead{font-size:1.15rem;color:var(--text-muted);max-width:62ch}
-.meta{margin-top:1.5rem;display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;font-size:.9rem;color:var(--text-muted)}
-.wordmark{font-weight:700;color:var(--text)}
-section{padding:clamp(2.5rem,6vw,4rem) 0;border-bottom:1px solid var(--border)}
-section h2{font-size:clamp(1.5rem,3vw,2rem);margin:.4rem 0 .75rem}
-.intro{color:var(--text-muted);max-width:66ch;margin-bottom:1.75rem}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.25rem 1.4rem;box-shadow:var(--shadow)}
-.grid{display:grid;gap:1rem}
-.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-.card h3{font-size:1.05rem;margin-bottom:.4rem}
-.card p,.card li{color:var(--text-muted);font-size:.95rem}
-.card ul{margin:.4rem 0 0;padding-left:1.1rem}
-.alert{background:var(--warn-bg);color:var(--warn-text);border-radius:14px;padding:1.25rem 1.4rem;border:1px solid transparent}
-.alert strong{color:inherit}
-.alert h3{font-size:1.1rem;margin-bottom:.35rem}
-table{width:100%;border-collapse:collapse;font-size:.92rem;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
-th,td{text-align:left;padding:.7rem .85rem;border-bottom:1px solid var(--border);vertical-align:top}
-th{background:var(--surface-alt);font-weight:500}
-tr:last-child td{border-bottom:none}
-.table-wrap{overflow-x:auto;border-radius:14px}
-.num{text-align:right;white-space:nowrap}
-.tag{display:inline-block;font-size:.75rem;font-weight:500;padding:.15rem .55rem;border-radius:999px;background:var(--surface-alt);color:var(--text)}
-.tag.pend{background:var(--warn-bg);color:var(--warn-text)}
-.tag.ok{background:var(--ok-bg);color:var(--ok-text)}
-/* flujo */
-.flow{display:grid;gap:.6rem;counter-reset:paso}
-.step{display:grid;grid-template-columns:2.4rem 1fr;gap:.9rem;align-items:start;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.9rem 1.1rem}
-.step .n{width:2.4rem;height:2.4rem;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:700}
-.step h3{font-size:1rem}
-.step p{color:var(--text-muted);font-size:.93rem}
-.btns{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.45rem}
-.btns span{font-size:.82rem;border:1px solid var(--accent-soft);color:var(--accent-text);border-radius:999px;padding:.15rem .65rem}
-/* arquitectura */
-.pipe{display:flex;flex-wrap:wrap;align-items:stretch;gap:.5rem}
-.node{flex:1 1 150px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.85rem 1rem}
-.node b{display:block;font-size:.95rem}
-.node small{color:var(--text-muted);font-size:.82rem}
-.arrow{align-self:center;color:var(--text-muted);font-size:1.2rem}
-.split{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:1rem}
-.branch{border-left:4px solid var(--accent);padding:.9rem 1.1rem;background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
-.branch.alt{border-left-color:var(--accent-soft)}
-.branch h3{font-size:1rem;margin-bottom:.3rem}
-.branch p{color:var(--text-muted);font-size:.93rem}
-.big{font-size:2rem;font-weight:700;line-height:1}
-.note{font-size:.85rem;color:var(--text-muted);margin-top:1rem;max-width:80ch}
-footer{padding:2.5rem 0 3.5rem;color:var(--text-muted);font-size:.88rem}
+a{color:var(--accent-ink)}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+.num{font-variant-numeric:tabular-nums}
+code{font-family:var(--mono); font-size:.86em; background:var(--surface-2); padding:.1em .35em; border-radius:5px}
+
+/* Encabezado */
+header.top{padding-block:clamp(2.5rem,6vw,4rem) 2rem; border-bottom:1px solid var(--line)}
+.kicker{font-size:.78rem; font-weight:500; letter-spacing:.09em; text-transform:uppercase; color:var(--accent-ink)}
+header.top h1{font-size:clamp(2rem,4.6vw,3.1rem); line-height:1.06; margin:.55rem 0 1rem; max-width:22ch}
+.lede{font-size:1.12rem; color:var(--muted); max-width:62ch}
+.preguntas{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:1.75rem}
+.pregunta{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:14px 16px; display:flex; flex-direction:column; gap:4px; text-decoration:none; color:inherit}
+.pregunta:hover{border-color:var(--accent)}
+.pregunta b{font-size:1.02rem}
+.pregunta span{color:var(--muted); font-size:.92rem}
+.pregunta small{color:var(--accent-ink); font-weight:500; font-size:.82rem}
+.firma{display:flex; flex-wrap:wrap; gap:.4rem 1.2rem; margin-top:1.4rem; color:var(--muted); font-size:.88rem}
+.firma b{color:var(--fg)}
+
+nav.indice{position:sticky; top:env(safe-area-inset-top, 0px); z-index:5; background:color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter:blur(8px); border-bottom:1px solid var(--line)}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top, 0px); z-index:10; background:var(--bg)}
+nav.indice .wrap{display:flex; gap:4px; overflow-x:auto; padding-block:8px; scrollbar-width:none}
+nav.indice a{flex:none; text-decoration:none; color:var(--muted); font-size:.88rem; font-weight:500; padding:6px 10px; border-radius:999px}
+nav.indice a:hover{background:var(--surface-2); color:var(--fg)}
+
+section.bloque{padding-block:clamp(2.5rem,6vw,4rem); border-bottom:1px solid var(--line); scroll-margin-top:52px}
+section.bloque h2{font-size:clamp(1.5rem,3vw,2.05rem); margin:.45rem 0 .7rem}
+.intro{color:var(--muted); max-width:66ch; margin-bottom:1.6rem}
+
+/* ───────── Laboratorio ───────── */
+.escenarios{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px}
+.chip{font:inherit; font-size:.9rem; font-weight:500; border:1px solid var(--line); background:var(--surface); color:var(--fg); padding:8px 14px; border-radius:999px; cursor:pointer; text-align:left}
+.chip small{display:block; font-weight:400; color:var(--muted); font-size:.78rem}
+.chip[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft); box-shadow:inset 0 0 0 1px var(--accent)}
+.controles{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:18px}
+.btn{font:inherit; font-size:.92rem; font-weight:500; border-radius:10px; padding:9px 14px; cursor:pointer; border:1px solid var(--line); background:var(--surface); color:var(--fg)}
+.btn.primario{background:var(--accent); border-color:var(--accent); color:#fff}
+.btn:disabled{opacity:.45; cursor:not-allowed}
+.controles .estado{font-size:.88rem; color:var(--muted)}
+.lab{display:grid; grid-template-columns:minmax(0,380px) minmax(0,1fr); gap:24px; align-items:start}
+
+.telefono{background:#0F1115; border-radius:38px; padding:10px; box-shadow:var(--shadow); max-width:380px; width:100%; margin-inline:auto}
+.pantalla{border-radius:30px; overflow:hidden; display:flex; flex-direction:column; height:640px; max-height:78vh; background:var(--wa-chat)}
+.wa-head{background:var(--wa-head); color:var(--wa-head-fg); display:flex; align-items:center; gap:10px; padding:14px 14px 10px}
+.avatar{width:36px; height:36px; border-radius:50%; background:#fff; display:grid; place-items:center; flex:none}
+.avatar svg{width:22px; height:22px}
+.wa-head b{display:block; font-size:.98rem; line-height:1.2}
+.wa-head small{font-size:.76rem; opacity:.85}
+.chat{flex:1; overflow-y:auto; padding:12px 10px; display:flex; flex-direction:column; gap:6px; background-color:var(--wa-chat);
+  background-image:radial-gradient(color-mix(in srgb, var(--wa-meta) 14%, transparent) 1px, transparent 1px); background-size:18px 18px}
+.dia{align-self:center; font-size:.72rem; color:var(--wa-meta); background:var(--wa-in); padding:3px 10px; border-radius:8px; margin-block:4px}
+.globo{max-width:84%; padding:6px 9px 4px; border-radius:8px; color:var(--wa-fg); font-size:.9rem; line-height:1.38; white-space:pre-wrap; overflow-wrap:anywhere; box-shadow:0 1px .5px rgba(11,20,26,.13); animation:entra .18s ease-out}
+.globo.in{align-self:flex-start; background:var(--wa-in); border-top-left-radius:2px}
+.globo.out{align-self:flex-end; background:var(--wa-out); border-top-right-radius:2px}
+.globo .hora{display:block; text-align:right; font-size:.68rem; color:var(--wa-meta); margin-top:2px}
+.globo .hora .tick{color:var(--wa-tick); margin-left:3px}
+.globo.foto{padding:4px}
+.foto-sim{width:190px; max-width:100%; aspect-ratio:4/3; border-radius:6px; display:grid; place-items:center; color:#fff; font-size:.8rem; text-align:center; background:linear-gradient(135deg,#55626E,#2F3A44)}
+.opciones{align-self:flex-start; max-width:84%; display:flex; flex-direction:column; gap:3px; margin-top:-3px}
+.opciones button{font:inherit; font-size:.88rem; background:var(--wa-in); color:var(--wa-btn); border:0; border-radius:8px; padding:8px 10px; cursor:pointer; box-shadow:0 1px .5px rgba(11,20,26,.13)}
+.opciones button:disabled{cursor:default; opacity:.6}
+.opciones .titulo-lista{font-size:.74rem; color:var(--wa-meta); padding:2px 4px}
+.escribiendo{align-self:flex-start; background:var(--wa-in); border-radius:8px; padding:8px 12px; display:flex; gap:4px}
+.escribiendo i{width:6px; height:6px; border-radius:50%; background:var(--wa-meta); animation:pulso 1s infinite}
+.escribiendo i:nth-child(2){animation-delay:.15s} .escribiendo i:nth-child(3){animation-delay:.3s}
+.sistema{align-self:center; max-width:90%; text-align:center; font-size:.76rem; color:var(--wa-meta); background:color-mix(in srgb, var(--wa-in) 80%, transparent); border-radius:8px; padding:4px 10px}
+@keyframes entra{from{transform:translateY(4px); opacity:.4}}
+@keyframes pulso{50%{opacity:.25}}
+.wa-bar{background:var(--wa-bar); display:flex; gap:6px; padding:8px; align-items:center}
+.wa-bar input{flex:1; min-width:0; font:inherit; font-size:.9rem; border:0; border-radius:20px; padding:9px 14px; background:var(--wa-in); color:var(--wa-fg)}
+.wa-bar button{font:inherit; border:0; background:transparent; color:var(--wa-meta); font-size:1.1rem; cursor:pointer; padding:6px; border-radius:50%}
+.wa-bar button.enviar{background:#00A884; color:#fff; width:38px; height:38px}
+.wa-bar button:disabled{opacity:.4; cursor:not-allowed}
+
+.dentro{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); min-width:0; overflow:hidden}
+.pestanas{display:flex; border-bottom:1px solid var(--line); overflow-x:auto}
+.pestanas button{flex:1 0 auto; font:inherit; font-size:.88rem; font-weight:500; background:none; border:0; border-bottom:2px solid transparent; color:var(--muted); padding:12px 14px; cursor:pointer}
+.pestanas button[aria-selected="true"]{color:var(--fg); border-bottom-color:var(--accent)}
+.panel{padding:16px 18px; max-height:560px; overflow-y:auto}
+.medidores{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; background:var(--line); border-bottom:1px solid var(--line)}
+.medidor{background:var(--surface); padding:12px 14px}
+.medidor small{display:block; font-size:.74rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em}
+.medidor b{font-size:1.25rem; font-variant-numeric:tabular-nums}
+.medidor span{display:block; font-size:.76rem; color:var(--muted)}
+ol.bitacora{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
+ol.bitacora li{display:grid; grid-template-columns:62px 1fr; gap:10px; font-size:.88rem; animation:entra .2s ease-out}
+ol.bitacora time{font-family:var(--mono); font-size:.78rem; color:var(--muted); padding-top:2px}
+.ev{border-left:3px solid var(--line); padding-left:10px}
+.ev b{font-weight:500}
+.ev small{display:block; color:var(--muted)}
+.ev.n8n{border-color:var(--accent)} .ev.panel{border-color:var(--ok)} .ev.persona{border-color:var(--warn)} .ev.error{border-color:var(--bad)}
+.etq{display:inline-block; font-size:.7rem; font-weight:500; padding:1px 7px; border-radius:999px; margin-right:6px; vertical-align:1px; background:var(--surface-2); color:var(--muted)}
+.etq.n8n{background:var(--accent-soft); color:var(--accent-ink)} .etq.panel{background:var(--ok-bg); color:var(--ok)} .etq.persona{background:var(--warn-bg); color:var(--warn)} .etq.error{background:var(--bad-bg); color:var(--bad)}
+.vacio{color:var(--muted); font-size:.92rem; padding:6px 0}
+
+.ficha{border:1px solid var(--line); border-radius:12px; overflow:hidden}
+.ficha-head{display:flex; justify-content:space-between; gap:8px; align-items:center; padding:12px 14px; background:var(--surface-2)}
+.ficha-head b{font-size:1rem}
+.pill{font-size:.74rem; font-weight:500; padding:3px 9px; border-radius:999px; background:var(--surface); border:1px solid var(--line); white-space:nowrap}
+.pill.ok{background:var(--ok-bg); color:var(--ok); border-color:transparent}
+.pill.warn{background:var(--warn-bg); color:var(--warn); border-color:transparent}
+.campos{display:grid; grid-template-columns:minmax(0,150px) minmax(0,1fr)}
+.campos dt,.campos dd{margin:0; padding:8px 14px; border-top:1px solid var(--line); font-size:.88rem}
+.campos dt{color:var(--muted)}
+.campos dd{overflow-wrap:anywhere}
+.campos dd.vacio-c{color:var(--muted)}
+.campos dd.nuevo{animation:resalta 1.4s ease-out}
+@keyframes resalta{0%{background:var(--accent-soft)}100%{background:transparent}}
+.nota-campo{font-size:.72rem; color:var(--muted); display:block}
+.aviso-wa{background:var(--wa-chat); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:8px}
+.aviso-wa .globo{max-width:100%}
+.para-que{margin-top:14px; font-size:.86rem; color:var(--muted)}
+
+/* ───────── Flujo ───────── */
+.flujo{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px}
+.fase{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:14px; display:flex; flex-direction:column; gap:8px}
+.fase h3{font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:500}
+.nodo{font:inherit; text-align:left; border:1px solid var(--line); background:var(--bg); border-radius:10px; padding:9px 11px; cursor:pointer; color:var(--fg); font-size:.9rem; display:flex; gap:8px; align-items:flex-start}
+.nodo .n{flex:none; width:22px; height:22px; border-radius:50%; background:var(--accent); color:#fff; font-size:.74rem; font-weight:700; display:grid; place-items:center}
+.nodo.salida .n{background:var(--warn)}
+.nodo[aria-pressed="true"]{border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent)}
+.detalle-flujo{margin-top:14px; background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:0 var(--r) var(--r) 0; padding:16px 18px; display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:18px}
+.detalle-flujo h3{font-size:1.1rem; margin-bottom:6px}
+.detalle-flujo p{color:var(--muted); font-size:.94rem}
+.detalle-flujo dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:6px 12px; font-size:.86rem}
+.detalle-flujo dt{color:var(--muted)}
+.detalle-flujo dd{margin:0}
+
+/* ───────── Aprender ───────── */
+.ciclo{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; counter-reset:c}
+.ciclo div{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:14px 16px}
+.ciclo b{display:block; margin-bottom:4px}
+.ciclo b::before{counter-increment:c; content:counter(c); display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%; background:var(--accent-soft); color:var(--accent-ink); font-size:.76rem; margin-right:8px}
+.ciclo p{color:var(--muted); font-size:.9rem}
+.comparar{margin-top:20px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px}
+.modo{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px; display:flex; flex-direction:column; gap:10px}
+.modo h3{font-size:1.08rem}
+.modo .sub{font-size:.84rem; color:var(--muted)}
+.mini-chat{background:var(--wa-chat); border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:6px}
+.mini-chat .globo{font-size:.84rem}
+.modo ul{margin:0; padding-left:1.1rem; font-size:.9rem; color:var(--muted)}
+.modo ul li+li{margin-top:3px}
+.recomendacion{margin-top:14px; padding:14px 16px; border-radius:var(--r); background:var(--accent-soft); color:var(--fg); font-size:.95rem}
+
+/* ───────── Limitaciones ───────── */
+.limites{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+.limite{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:14px 16px; display:flex; flex-direction:column; gap:8px}
+.limite header{display:flex; justify-content:space-between; gap:8px; align-items:baseline}
+.limite h3{font-size:1rem}
+.limite p{font-size:.9rem; color:var(--muted)}
+.limite .hacemos{color:var(--fg)}
+.limite .hacemos::before{content:"→ "; color:var(--accent-ink); font-weight:700}
+.sev{font-size:.7rem; font-weight:500; padding:2px 8px; border-radius:999px; white-space:nowrap}
+.sev.alta{background:var(--bad-bg); color:var(--bad)} .sev.media{background:var(--warn-bg); color:var(--warn)} .sev.baja{background:var(--ok-bg); color:var(--ok)}
+.filtros{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px}
+
+/* ───────── Calculadoras ───────── */
+.calc{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:20px; align-items:start}
+.form{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:18px; display:flex; flex-direction:column; gap:16px}
+.campo label{display:flex; justify-content:space-between; gap:8px; font-size:.9rem; font-weight:500; margin-bottom:6px}
+.campo label output{font-variant-numeric:tabular-nums; color:var(--accent-ink)}
+.campo input[type=range]{width:100%; accent-color:var(--accent)}
+.campo .ayuda{font-size:.8rem; color:var(--muted); margin-top:4px}
+.seg{display:flex; flex-wrap:wrap; gap:6px}
+.seg button{font:inherit; font-size:.86rem; border:1px solid var(--line); background:var(--bg); color:var(--fg); border-radius:8px; padding:7px 10px; cursor:pointer}
+.seg button[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-ink); font-weight:500}
+.resultado{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+.resultado .total{padding:18px; border-bottom:1px solid var(--line)}
+.resultado .total small{color:var(--muted); font-size:.82rem}
+.resultado .total b{display:block; font-size:2.2rem; line-height:1.1; font-variant-numeric:tabular-nums}
+.resultado .total span{color:var(--muted); font-size:.9rem}
+.filas{display:grid; grid-template-columns:minmax(0,1fr) auto; font-size:.9rem}
+.filas div{padding:9px 18px; border-bottom:1px solid var(--line)}
+.filas div:nth-child(even){text-align:right; font-variant-numeric:tabular-nums}
+.barras{padding:14px 18px; display:flex; flex-direction:column; gap:8px}
+.barra{display:grid; grid-template-columns:96px minmax(0,1fr) 72px; gap:10px; align-items:center; font-size:.84rem}
+.barra .pista{height:10px; background:var(--surface-2); border-radius:6px; overflow:hidden}
+.barra .relleno{height:100%; border-radius:6px; background:var(--accent); transition:width .3s}
+.barra .relleno.meta{background:var(--sky)}
+.barra output{text-align:right; font-variant-numeric:tabular-nums}
+.alerta{margin:0 18px 16px; padding:10px 12px; border-radius:10px; font-size:.86rem; background:var(--warn-bg); color:var(--warn)}
+.fuente{font-size:.8rem; color:var(--muted); margin-top:12px}
+
+.timeline{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:18px; display:flex; flex-direction:column; gap:14px; margin-bottom:20px}
+.linea h3{font-size:.95rem; margin-bottom:6px; display:flex; justify-content:space-between; gap:8px}
+.linea h3 span{font-weight:400; color:var(--muted); font-size:.85rem}
+.tramos{display:flex; height:30px; border-radius:8px; overflow:hidden; background:var(--surface-2)}
+.tramo{display:flex; align-items:center; padding-inline:8px; font-size:.74rem; white-space:nowrap; overflow:hidden; color:#fff}
+.tramo.espera{background:color-mix(in srgb, var(--bad) 75%, var(--surface))}
+.tramo.ida{background:color-mix(in srgb, var(--warn) 85%, var(--surface)); color:#1a1300}
+.tramo.captura{background:var(--muted)}
+.tramo.bot{background:var(--accent)}
+.tramo.listo{background:var(--ok)}
+.leyenda{font-size:.8rem; color:var(--muted)}
+
+table.kpi{width:100%; border-collapse:collapse; font-size:.9rem; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+table.kpi th,table.kpi td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+table.kpi th{background:var(--surface-2); font-weight:500}
+.tabla{overflow-x:auto; border-radius:var(--r)}
+
+/* ───────── Demo n8n y fases ───────── */
+.pasos-demo{display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:20px}
+.pasos-demo ol{margin:0; padding-left:1.2rem; display:flex; flex-direction:column; gap:10px}
+.pasos-demo li{padding-left:4px}
+.pasos-demo li span{display:block; color:var(--muted); font-size:.9rem}
+.lienzo{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:16px; display:flex; flex-direction:column; gap:10px}
+.lienzo .fila{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.n8n-nodo{border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:.84rem; background:var(--bg); display:flex; gap:6px; align-items:center}
+.n8n-nodo i{font-style:normal; font-size:.7rem; color:var(--muted)}
+.n8n-nodo.sim{border-style:dashed}
+.flecha{color:var(--muted)}
+.copiar{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:16px}
+.copiar small{color:var(--muted)}
+.fases{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+.fase-sig{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:16px; display:flex; flex-direction:column; gap:8px}
+.fase-sig .cuando{font-size:.78rem; font-weight:500; color:var(--accent-ink); text-transform:uppercase; letter-spacing:.07em}
+.fase-sig ul{margin:0; padding-left:1.1rem; color:var(--muted); font-size:.9rem}
+.fase-sig .quien{font-size:.84rem; border-top:1px solid var(--line); padding-top:8px}
+footer{padding-block:2.5rem 3rem; color:var(--muted); font-size:.86rem}
 footer ul{padding-left:1.1rem}
+
+@media (max-width: 900px){
+  .lab,.calc,.pasos-demo,.comparar,.detalle-flujo{grid-template-columns:minmax(0,1fr)}
+  .flujo,.ciclo{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .limites,.fases{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .medidores{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width: 600px){
+  .preguntas,.flujo,.ciclo,.limites,.fases{grid-template-columns:minmax(0,1fr)}
+  .pantalla{height:560px}
+  .campos{grid-template-columns:minmax(0,1fr)}
+  .campos dd{border-top:0; padding-top:0}
+  .barra{grid-template-columns:76px minmax(0,1fr) 64px}
+}
 </style>
 </head>
 <body>
 
-<header class="hero">
+<header class="top">
   <div class="wrap">
-    <p class="eyebrow">Iniciativa · Automatización del primer contacto</p>
-    <h1>Del primer WhatsApp a una oportunidad en el CRM, sin captura manual</h1>
-    <p class="lead">Prueba de concepto para que cada prospecto de cargador eléctrico que escribe por WhatsApp quede registrado en el CRM, con sus fotos guardadas y el tiempo de respuesta medido, y le llegue a Bernardo listo para atender.</p>
-    <div class="meta">
-      <span class="wordmark">DPROMA × 2894_</span>
-      <span>Borrador v0.3 · 2 nov 2026</span>
-      <span>Fuente: <code>docs/poc-whatsapp/</code></span>
+    <p class="kicker">DPROMA × 2894_ · Prueba de concepto · v0.4</p>
+    <h1>Un bot que atiende el primer WhatsApp y deja la ficha lista para Bernardo</h1>
+    <p class="lede">Antes de construirlo en serio, queremos saber tres cosas. Esta página te deja verlo funcionar con conversaciones de ejemplo y probarlo tú mismo, sin WhatsApp ni sistemas reales.</p>
+    <div class="preguntas">
+      <a class="pregunta" href="#limitaciones"><small>Pregunta 1</small><b>¿Qué lo limita?</b><span>Reglas de WhatsApp, lo que el bot no entiende y lo que depende de otras áreas.</span></a>
+      <a class="pregunta" href="#costos"><small>Pregunta 2</small><b>¿Cuánto cuesta?</b><span>Mensajes de WhatsApp y la herramienta que mueve el bot, según el volumen.</span></a>
+      <a class="pregunta" href="#impacto"><small>Pregunta 3</small><b>¿Qué mejora?</b><span>Tiempo de respuesta, horas de captura y calidad de los datos.</span></a>
     </div>
+    <div class="firma"><span><b>Estado:</b> borrador para discutir · 2 nov 2026</span><span><b>Alcance:</b> primer contacto. Cotizar sigue siendo otra iniciativa.</span></div>
   </div>
 </header>
 
+<nav class="indice" aria-label="Secciones">
+  <div class="wrap">
+    <a href="#simulador">Simulador</a><a href="#flujo">Flujo</a><a href="#aprende">¿Cómo aprende?</a><a href="#limitaciones">Limitaciones</a><a href="#costos">Costos</a><a href="#impacto">Impacto</a><a href="#demo">Demo n8n</a><a href="#sigue">Qué sigue</a>
+  </div>
+</nav>
+
 <main>
 
-<section id="pendientes">
+<!-- ───────── SIMULADOR ───────── -->
+<section class="bloque" id="simulador">
   <div class="wrap">
-    <p class="eyebrow">Antes de construir</p>
-    <h2>Lo que falta para cerrar el diseño</h2>
-    <div class="alert" style="margin-bottom:1rem">
-      <h3>Prioridad 1 · Validar con Félix cómo entra el bot al panel</h3>
-      <p>Ya sabemos que el panel es Supabase + Netlify y que los leads viven en Contactos (<code>contactos_comerciales</code>), con fotos en Drive. Falta que Félix apruebe el usuario de servicio del bot, la RPC de registro y los campos nuevos (o el plan B: resumirlos en las observaciones de la ficha).</p>
+    <p class="kicker">Míralo funcionar</p>
+    <h2>Simulador: lo que ve el cliente y lo que pasa por dentro</h2>
+    <p class="intro">Elige un caso y dale a <b>Reproducir</b>, o avanza mensaje por mensaje. En <b>Prueba tú</b> contestas como si fueras el cliente. A la derecha ves qué hace el sistema en cada mensaje, cómo se llena la ficha del panel y qué le llega a Bernardo. Los nombres y datos son ficticios.</p>
+
+    <div class="escenarios" role="group" aria-label="Casos de ejemplo" id="escenarios"></div>
+    <div class="controles">
+      <button class="btn primario" id="b-play" type="button">▶ Reproducir</button>
+      <button class="btn" id="b-paso" type="button">Siguiente mensaje ⏭</button>
+      <button class="btn" id="b-reset" type="button">↺ Reiniciar</button>
+      <span class="estado" id="estado-sim" aria-live="polite"></span>
     </div>
-    <div class="table-wrap">
-    <table>
-      <thead><tr><th>#</th><th>Pendiente</th><th>Quién</th><th>Desbloquea</th></tr></thead>
+
+    <div class="lab">
+      <div class="telefono">
+        <div class="pantalla">
+          <div class="wa-head">
+            <span class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20 L11 4 L13 4 L20 20 L16.5 20 L12 9 L7.5 20 Z" fill="#0A46FF"/></svg></span>
+            <div><b>DPROMA Cargadores</b><small id="wa-sub">cuenta de empresa</small></div>
+          </div>
+          <div class="chat" id="chat" aria-live="polite" aria-label="Conversación simulada"></div>
+          <form class="wa-bar" id="wa-form" autocomplete="off">
+            <button type="button" id="b-foto" title="Enviar una foto de ejemplo" aria-label="Enviar foto">📷</button>
+            <button type="button" id="b-ubic" title="Enviar ubicación de ejemplo" aria-label="Enviar ubicación">📍</button>
+            <input id="wa-input" type="text" placeholder="Mensaje" aria-label="Escribe como cliente">
+            <button class="enviar" type="submit" aria-label="Enviar">➤</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="dentro">
+        <div class="medidores">
+          <div class="medidor"><small>Primera respuesta</small><b id="m-frt">—</b><span>hoy: lo que tarde Bernardo</span></div>
+          <div class="medidor"><small>Duración del chat</small><b id="m-dur">—</b><span>tiempo del cliente</span></div>
+          <div class="medidor"><small>Mensajes del bot</small><b id="m-msg">0</b><span id="m-msg-s">servicio · 24 h</span></div>
+          <div class="medidor"><small>Costo de WhatsApp</small><b id="m-cost">$0.00</b><span id="m-cost-s">dentro de los 1,000 gratis</span></div>
+        </div>
+        <div class="pestanas" role="tablist">
+          <button role="tab" aria-selected="true" aria-controls="p-bitacora" id="t-bitacora" type="button">Por dentro</button>
+          <button role="tab" aria-selected="false" aria-controls="p-ficha" id="t-ficha" type="button">Ficha en el panel</button>
+          <button role="tab" aria-selected="false" aria-controls="p-aviso" id="t-aviso" type="button">Aviso a Bernardo</button>
+        </div>
+        <div class="panel" role="tabpanel" id="p-bitacora" aria-labelledby="t-bitacora"><ol class="bitacora" id="bitacora"></ol></div>
+        <div class="panel" role="tabpanel" id="p-ficha" aria-labelledby="t-ficha" hidden><div id="ficha"></div></div>
+        <div class="panel" role="tabpanel" id="p-aviso" aria-labelledby="t-aviso" hidden><div id="aviso"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── FLUJO ───────── -->
+<section class="bloque" id="flujo">
+  <div class="wrap">
+    <p class="kicker">El recorrido completo</p>
+    <h2>Del primer “Hola” a la ficha lista, en cuatro tramos</h2>
+    <p class="intro">Toca cualquier paso para ver qué pregunta, por qué la pregunta y qué hace el sistema con la respuesta. Las preguntas salen de lo que pide el cotizador del panel, para que Bernardo cotice sin volver a preguntar.</p>
+    <div class="flujo" id="flujo-mapa"></div>
+    <div class="detalle-flujo" id="flujo-detalle" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ───────── APRENDE ───────── -->
+<section class="bloque" id="aprende">
+  <div class="wrap">
+    <p class="kicker">Entrenamiento</p>
+    <h2>¿Cómo “aprende” el bot?</h2>
+    <p class="intro">El bot de esta prueba <b>no usa inteligencia artificial</b>. Es un guion con preguntas, botones y reglas. Por eso no se entrena con datos: se <b>ajusta</b>, como se ajusta un formulario después de ver cómo lo llena la gente. Ese ajuste tiene cuatro pasos y se repite cada semana del piloto.</p>
+    <div class="ciclo">
+      <div><b>Escribir el guion</b><p>Con 5 a 10 chats reales de Bernardo: cómo escriben los clientes, qué preguntan, qué palabras usan para “tablero” o “medidor”.</p></div>
+      <div><b>Probarlo en casa</b><p>El equipo lo usa en la demo de n8n e intenta romperlo: respuestas raras, faltas de ortografía, preguntas fuera de guion.</p></div>
+      <div><b>Medir</b><p>En el piloto se ve en qué pregunta abandona la gente, qué respuestas no entendió y qué datos tuvo que corregir Bernardo.</p></div>
+      <div><b>Ajustar</b><p>Se cambia el texto de una pregunta, se agregan palabras que debe reconocer (“depa” = condominio) o se quita una pregunta que estorba.</p></div>
+    </div>
+
+    <div class="comparar">
+      <div class="modo">
+        <h3>Guion con reglas <span class="pill ok">Lo que probamos</span></h3>
+        <p class="sub">El cliente escribe: “tengo un dipal y vivo en del valle 03100”</p>
+        <div class="mini-chat">
+          <div class="globo out">tengo un dipal y vivo en del valle 03100<span class="hora">10:02</span></div>
+          <div class="globo in">Perdón, no te entendí. Elige una opción o escribe tu respuesta, por favor.<span class="hora">10:02</span></div>
+        </div>
+        <ul><li>Siempre hace lo mismo: fácil de revisar y de explicar.</li><li>Sin costo extra por mensaje.</li><li>No inventa datos.</li><li>Se pierde con mensajes largos o fuera de orden.</li></ul>
+      </div>
+      <div class="modo">
+        <h3>Guion + IA que lee el texto <span class="pill">Fase 2, opcional</span></h3>
+        <p class="sub">El mismo mensaje, leído por un modelo de lenguaje</p>
+        <div class="mini-chat">
+          <div class="globo out">tengo un dipal y vivo en del valle 03100<span class="hora">10:02</span></div>
+          <div class="globo in">¡Perfecto! Anoté: Changan Dipal S07, CP 03100 (Del Valle). ¿Me compartes calle y número?<span class="hora">10:02</span></div>
+        </div>
+        <ul><li>Entiende mensajes libres y llena varios datos de una vez.</li><li>Cuesta centavos por conversación, que se suman al costo de WhatsApp.</li><li>Puede equivocarse o inventar: el bot debe confirmar lo que entendió.</li><li>Aquí sí hay “entrenamiento”: instrucciones y ejemplos reales, no un modelo propio.</li></ul>
+      </div>
+    </div>
+    <p class="recomendacion"><b>Recomendación:</b> probar primero con reglas. Si el piloto muestra que mucha gente abandona porque escribe libre, ese dato justifica agregar IA en la fase 2, y ya sabremos exactamente dónde hace falta.</p>
+  </div>
+</section>
+
+<!-- ───────── LIMITACIONES ───────── -->
+<section class="bloque" id="limitaciones">
+  <div class="wrap">
+    <p class="kicker">Pregunta 1</p>
+    <h2>Limitaciones y qué hacemos con cada una</h2>
+    <p class="intro">Unas las pone WhatsApp, otras vienen de cómo funciona un bot de reglas y otras dependen de otras áreas. Ninguna impide la prueba, pero todas se tienen que medir o resolver antes de escalar.</p>
+    <div class="filtros" role="group" aria-label="Filtrar limitaciones" id="filtros-lim"></div>
+    <div class="limites" id="limites"></div>
+  </div>
+</section>
+
+<!-- ───────── COSTOS ───────── -->
+<section class="bloque" id="costos">
+  <div class="wrap">
+    <p class="kicker">Pregunta 2</p>
+    <h2>Calculadora de costos mensuales</h2>
+    <p class="intro">Mueve el volumen y la opción de herramienta. Los números de ejemplo parten de una agencia aliada más el canal directo (unos 100 leads al mes). Supabase, Netlify y Drive ya los paga DPROMA para el panel, así que no suman.</p>
+    <div class="calc">
+      <form class="form" id="f-costos" onsubmit="return false">
+        <div class="campo"><label for="c-leads">Leads al mes <output id="o-leads" class="num">100</output></label><input id="c-leads" type="range" min="20" max="1500" step="10" value="100"><p class="ayuda">1 agencia ≈ 30–40 autos/mes. 3 agencias + directo ≈ 300.</p></div>
+        <div class="campo"><label for="c-msgs">Mensajes del bot por lead <output id="o-msgs" class="num">11</output></label><input id="c-msgs" type="range" min="4" max="20" step="1" value="11"><p class="ayuda">El guion actual manda unos 11: bienvenida, 6 preguntas, 3 pedidos de foto y el cierre.</p></div>
+        <div class="campo"><label id="l-herr">Herramienta que mueve el bot</label><div class="seg" role="group" aria-labelledby="l-herr" id="c-herr"></div><p class="ayuda" id="c-herr-ayuda"></p></div>
+        <div class="campo"><label id="l-filtro">Filtro de avisos de “entregado/leído”</label><div class="seg" role="group" aria-labelledby="l-filtro" id="c-filtro"></div><p class="ayuda">Cada mensaje del bot genera unos 3 avisos de Meta. Sin filtro, n8n Cloud los cuenta como ejecuciones.</p></div>
+        <div class="campo"><label for="c-eur">Tipo de cambio supuesto (US$ por €) <output id="o-eur" class="num">1.10</output></label><input id="c-eur" type="range" min="1" max="1.3" step="0.01" value="1.10"></div>
+      </form>
+      <div class="resultado" aria-live="polite">
+        <div class="total"><small>Costo mensual estimado</small><b id="r-total">$0</b><span id="r-lead"></span></div>
+        <div class="filas" id="r-filas"></div>
+        <div class="barras" id="r-barras"></div>
+        <p class="alerta" id="r-alerta" hidden></p>
+      </div>
+    </div>
+    <p class="fuente">Tarifas de WhatsApp para México vigentes desde el 1/10/2026: mensajes de servicio gratis hasta 1,000 al mes por número y después ≈ US$0.0085 c/u. n8n Cloud Starter ≈ €24/mes (2,500 ejecuciones), Pro ≈ €60/mes (10,000). Fuentes públicas no oficiales consultadas el 31/10/2026; hay que confirmarlas en las páginas de Meta y n8n antes de presupuestar. No incluye horas de construcción.</p>
+  </div>
+</section>
+
+<!-- ───────── IMPACTO ───────── -->
+<section class="bloque" id="impacto">
+  <div class="wrap">
+    <p class="kicker">Pregunta 3</p>
+    <h2>Impacto: el mismo cliente, hoy y con el bot</h2>
+    <p class="intro">Ejemplo ilustrativo: los tiempos de “hoy” son <b>supuestos</b> hasta que Bernardo nos dé su línea base. Medir esa diferencia con datos reales es justamente el objetivo de la prueba.</p>
+    <div class="timeline">
+      <div class="linea"><h3>Hoy <span>≈ 4 h hasta tener los datos</span></h3>
+        <div class="tramos" aria-label="Hoy: espera, idas y vueltas, captura">
+          <div class="tramo espera" style="flex:55">Espera a que Bernardo vea el mensaje</div>
+          <div class="tramo ida" style="flex:35">Idas y vueltas pidiendo datos y fotos</div>
+          <div class="tramo captura" style="flex:10">Captura</div>
+        </div></div>
+      <div class="linea"><h3>Con el bot <span>≈ 5 min hasta tener los datos</span></h3>
+        <div class="tramos" aria-label="Con el bot: conversación y ficha lista">
+          <div class="tramo bot" style="flex:2">Bot</div>
+          <div class="tramo listo" style="flex:98">Ficha completa en el panel; Bernardo solo cotiza</div>
+        </div></div>
+      <p class="leyenda">Escala: la barra completa son 4 horas. Con el bot, el cliente recibe respuesta en segundos, a cualquier hora, y la ficha llega al panel sin capturarla.</p>
+    </div>
+    <div class="calc">
+      <form class="form" id="f-impacto" onsubmit="return false">
+        <div class="campo"><label for="i-leads">Leads al mes <output id="o-ileads" class="num">100</output></label><input id="i-leads" type="range" min="20" max="1500" step="10" value="100"></div>
+        <div class="campo"><label for="i-min">Minutos que hoy toma juntar y capturar los datos de un lead <output id="o-imin" class="num">15</output></label><input id="i-min" type="range" min="3" max="45" step="1" value="15"><p class="ayuda">Supuesto: escribir, esperar, pedir fotos, pasar a la ficha. Reemplazar con el dato de Bernardo.</p></div>
+        <div class="campo"><label for="i-fuera">Leads que escriben fuera de horario <output id="o-ifuera" class="num">35 %</output></label><input id="i-fuera" type="range" min="0" max="80" step="5" value="35"><p class="ayuda">Supuesto. Hoy esperan al día siguiente; con el bot reciben respuesta al momento.</p></div>
+      </form>
+      <div class="resultado" aria-live="polite">
+        <div class="total"><small>Tiempo de captura que se libera</small><b id="i-horas">0 h</b><span id="i-horas-s"></span></div>
+        <div class="filas" id="i-filas"></div>
+      </div>
+    </div>
+    <h3 style="margin:28px 0 10px; font-size:1.1rem">Cómo vamos a medirlo en el piloto</h3>
+    <div class="tabla"><table class="kpi">
+      <thead><tr><th>Indicador</th><th>Qué significa</th><th>Meta de la prueba</th></tr></thead>
       <tbody>
-        <tr><td>1</td><td>Validar la propuesta de entrada al panel: usuario del bot, RPC de registro y campos nuevos (el stack y la tabla ya se conocen)</td><td>Félix</td><td>Nodo “Registrar lead”</td></tr>
-        <tr><td>2</td><td>5–10 capturas de chats reales y tiempo actual de primera respuesta</td><td>Bernardo</td><td>Textos del bot, línea base</td></tr>
-        <tr><td>3</td><td>Número del bot y acceso a la cuenta de Meta Business</td><td>Félix</td><td>Alta en Cloud API</td></tr>
-        <tr><td>4</td><td>Aviso de privacidad publicado (LFPDPPP)</td><td>Quien lleve lo legal</td><td>Salida del bot</td></tr>
+        <tr><td>Primera respuesta</td><td>Segundos desde que el cliente escribe hasta que el bot contesta</td><td>&lt; 1 min, a cualquier hora</td></tr>
+        <tr><td>Fichas completas</td><td>De cada 100 que empiezan, cuántas terminan las 6 preguntas</td><td>≥ 60</td></tr>
+        <tr><td>Abandono por pregunta</td><td>En qué pregunta se va la gente</td><td>Encontrar la que sobra</td></tr>
+        <tr><td>Cotizar sin volver a preguntar</td><td>Fichas que Bernardo pudo cotizar sin pedir más datos</td><td>≥ 70 de cada 100</td></tr>
+        <tr><td>Primer contacto humano</td><td>Desde el aviso hasta que Bernardo escribe</td><td>Se fija con la línea base</td></tr>
+        <tr><td>Errores</td><td>Mensajes que fallaron o fichas que no llegaron al panel</td><td>&lt; 2 de cada 100</td></tr>
+        <tr><td>Costo por lead</td><td>WhatsApp + herramienta ÷ leads</td><td>&lt; US$0.50</td></tr>
       </tbody>
-    </table>
-    </div>
+    </table></div>
   </div>
 </section>
 
-<section id="alcance">
+<!-- ───────── DEMO N8N ───────── -->
+<section class="bloque" id="demo">
   <div class="wrap">
-    <p class="eyebrow">Alcance</p>
-    <h2>Termina cuando el lead está en el CRM y Bernardo lo tiene</h2>
-    <p class="intro">Cotizar, agendar visitas y cerrar siguen como hoy. El Cotizador es otra iniciativa y va en paralelo: no depende de esta PoC ni esta PoC depende de él. Solo comparten nombres de campo, para que se conecten después sin rehacer nada.</p>
-    <div class="grid g2">
-      <div class="card"><h3><span class="tag ok">Dentro</span></h3><ul><li>Bot que recibe al prospecto y captura sus datos</li><li>Fotos en una carpeta de Drive por cliente</li><li>Ficha «lead» en Contactos del panel</li><li>Aviso a Bernardo y paso a una persona</li><li>Tiempos y métricas del primer contacto</li></ul></div>
-      <div class="card"><h3><span class="tag">Fuera</span></h3><ul><li>Cálculo y envío de cotizaciones (iniciativa Cotizador)</li><li>Agenda de visitas técnicas</li><li>Catálogo de materiales y precios</li><li>Posventa y encuestas</li></ul></div>
-    </div>
-  </div>
-</section>
-
-<section id="hoy">
-  <div class="wrap">
-    <p class="eyebrow">Situación actual</p>
-    <h2>Hoy todo llega al teléfono de una persona</h2>
-    <p class="intro">Los prospectos escriben directo al WhatsApp de Bernardo con fotos sueltas del tablero, la acometida y el lugar, y mensajes sin estructura. Las fotos se quedan en el teléfono y los datos se capturan a mano.</p>
-    <div class="grid g3">
-      <div class="card"><p class="big">400+</p><p>grupos de WhatsApp en la operación, según la investigación con las áreas.</p></div>
-      <div class="card"><p class="big">200+</p><p>mensajes de una campaña que no alcanzaron a atenderse a tiempo.</p></div>
-      <div class="card"><p class="big">30–40</p><p>autos eléctricos al mes por agencia aliada (ej. Changan del Valle, Dipal S07).</p></div>
-    </div>
-  </div>
-</section>
-
-<section id="flujo">
-  <div class="wrap">
-    <p class="eyebrow">Lo que vive el cliente</p>
-    <h2>Seis preguntas sacadas del cotizador</h2>
-    <p class="intro">El bot no cotiza: pide justo lo que el cotizador del panel necesita (cliente, tipo de inmueble, vehículo, domicilio, metros a partir del 11 y medidor nuevo con mufa), así Bernardo cotiza sin volver a preguntar. El teléfono sale del propio WhatsApp. En cualquier momento, escribir <em>asesor</em> pasa con una persona.</p>
-    <div class="flow">
-      <div class="step"><span class="n">0</span><div><h3>Bienvenida y nombre</h3><p>Saludo, enlace al aviso de privacidad y “¿a nombre de quién hacemos la cotización?”</p></div></div>
-      <div class="step"><span class="n">1</span><div><h3>Tipo de inmueble</h3><div class="btns"><span>Casa</span><span>Condominio / edificio</span><span>Empresa / flotilla → Bernardo</span></div></div></div>
-      <div class="step"><span class="n">2</span><div><h3>Vehículo</h3><p>Lista de marcas frecuentes. Se salta si vino de una agencia.</p></div></div>
-      <div class="step"><span class="n">3</span><div><h3>Domicilio</h3><p>Calle, número, colonia y código postal; la ubicación es opcional.</p></div></div>
-      <div class="step"><span class="n">4</span><div><h3>Metros del tablero al lugar de carga</h3><div class="btns"><span>Hasta 10 m</span><span>11–20</span><span>21–30</span><span>Más de 30</span><span>No sé</span></div></div></div>
-      <div class="step"><span class="n">5</span><div><h3>Medidor de CFE</h3><div class="btns"><span>Medidor nuevo</span><span>Mi luz actual</span><span>No sé</span></div></div></div>
-      <div class="step"><span class="n">6</span><div><h3>Fotos (opcionales)</h3><p>Tablero, lugar de carga con el recorrido del cable y medidor, de una en una, o “enviar después”.</p></div></div>
-      <div class="step"><span class="n">✓</span><div><h3>Cierre</h3><p>“Ya tenemos todo, Bernardo te escribe para darte tu cotización.” Se crea la ficha en Contactos, las fotos van a su carpeta de Drive y Bernardo recibe una actividad en su Agenda y un resumen por WhatsApp.</p></div></div>
-    </div>
-  </div>
-</section>
-
-<section id="arquitectura">
-  <div class="wrap">
-    <p class="eyebrow">Cómo funciona por dentro</p>
-    <h2>El panel ya tiene casi todo: el bot solo lo alimenta</h2>
-    <div class="pipe" aria-label="Recorrido de un mensaje">
-      <div class="node"><b>WhatsApp Cloud API</b><small>Número dedicado, conexión directa con Meta</small></div>
-      <span class="arrow" aria-hidden="true">→</span>
-      <div class="node"><b>n8n · Studio2894</b><small>Conversación, validación, reintentos</small></div>
-      <span class="arrow" aria-hidden="true">→</span>
-      <div class="node"><b>Panel DPROMA · Supabase</b><small>Ficha «lead» en <code>contactos_comerciales</code> vía RPC <span class="tag pend">propuesta</span></small></div>
-      <span class="arrow" aria-hidden="true">→</span>
-      <div class="node"><b>Google Drive</b><small>Carpeta de la ficha, como ya hace el panel</small></div>
-    </div>
-    <div class="split">
-      <div class="branch">
-        <h3>Ya existe en el panel</h3>
-        <p>Fichas de Contactos con etapas lead → prospecto → cliente, detección de duplicados por teléfono, fotos en Drive por ficha, Agenda del vendedor y el paso a ICEV.</p>
-      </div>
-      <div class="branch alt">
-        <h3>Lo que se le pide a Félix</h3>
-        <p>Un usuario de servicio para el bot, una RPC <code>whatsapp_registrar_lead</code> y, si se puede, columnas para canal, agencia, tipo de inmueble, metros y medidor.</p>
+    <p class="kicker">Para mostrarlo en una reunión</p>
+    <h2>Demo en n8n, sin WhatsApp ni APIs</h2>
+    <p class="intro">Sí se puede. n8n tiene una ventana de chat propia que hace de WhatsApp. El workflow de la demo usa <b>exactamente el mismo guion</b> que este simulador, crea la ficha que se mandaría al panel y muestra el aviso a Bernardo, todo simulado: no necesita cuentas de Meta, ni Supabase, ni contraseñas.</p>
+    <div class="pasos-demo">
+      <ol>
+        <li><b>Abre n8n</b><span>Una cuenta de prueba gratis en n8n.io, o en tu computadora con <code>npx n8n</code> (requiere Node.js).</span></li>
+        <li><b>Importa el workflow</b><span>Copia el workflow con el botón de abajo y pégalo en un lienzo vacío de n8n (Ctrl/Cmd + V). También está en el repositorio: <code>n8n/demo-bot-whatsapp-dproma.json</code>.</span></li>
+        <li><b>Publícalo</b><span>Botón <i>Publish</i> arriba a la derecha (en versiones anteriores de n8n, el interruptor <i>Active</i>). La memoria de la conversación solo funciona con el workflow publicado.</span></li>
+        <li><b>Abre el chat</b><span>En el nodo “Chat (simula WhatsApp)” copia la <i>Chat URL</i> y ábrela en otra pestaña o en el teléfono.</span></li>
+        <li><b>Conversa</b><span>Escribe “Hola, vengo de Changan del Valle”. Contesta con el número de la opción; escribe “foto” para simular una imagen y “reiniciar” para empezar de nuevo.</span></li>
+        <li><b>Muestra lo de adentro</b><span>En <i>Executions</i> se ve cada mensaje y, al final, la ficha completa y el aviso a Bernardo.</span></li>
+      </ol>
+      <div class="lienzo" aria-label="Esquema del workflow">
+        <div class="fila"><span class="n8n-nodo">💬 Chat <i>simula WhatsApp</i></span><span class="flecha">→</span><span class="n8n-nodo">⚙️ Motor del guion</span><span class="flecha">→</span><span class="n8n-nodo">◇ ¿Terminó?</span></div>
+        <div class="fila"><span class="flecha">no →</span><span class="n8n-nodo">↩ Responder siguiente pregunta</span></div>
+        <div class="fila"><span class="flecha">sí →</span><span class="n8n-nodo sim">🗂 Simular registro en panel</span><span class="flecha">→</span><span class="n8n-nodo sim">📣 Simular aviso a Bernardo</span><span class="flecha">→</span><span class="n8n-nodo">↩ Responder</span></div>
+        <p class="leyenda">Los nodos punteados son los que en el piloto se cambian por los reales: la función del panel (Supabase) y el WhatsApp de Bernardo. El chat de entrada se cambia por el webhook de WhatsApp.</p>
+        <p class="leyenda">Diferencias con el WhatsApp real: los botones salen como opciones numeradas y las fotos se simulan escribiendo “foto”.</p>
       </div>
     </div>
-    <div class="grid g2" style="margin-top:1rem">
-      <div class="card">
-        <h3>Decisiones recomendadas</h3>
-        <ul>
-          <li><strong>Meta Cloud API directa</strong>, sin intermediario: el volumen es bajo y no hace falta pagar margen.</li>
-          <li><strong>n8n</strong> para la lógica del bot (Studio2894 lo opera): nube para la PoC, <em>self-hosted</em> si se escala.</li>
-          <li>Sin la cuenta de Comercial ni la llave maestra de Supabase: <strong>usuario propio del bot</strong> y una RPC con permisos acotados.</li>
-          <li><strong>Número nuevo</strong> para el bot; el WhatsApp de Bernardo sigue igual.</li>
-          <li>Un enlace o QR <strong>por agencia</strong> para saber de dónde llega cada cliente.</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Reglas del webhook</h3>
-        <ul>
-          <li>Validar la firma de Meta en cada mensaje.</li>
-          <li>Responder de inmediato y procesar aparte.</li>
-          <li>No procesar dos veces el mismo mensaje.</li>
-          <li>Descargar las fotos al momento: el enlace de Meta caduca en minutos.</li>
-          <li>Filtrar los avisos de “entregado/leído” para no pagar ejecuciones de más.</li>
-        </ul>
-      </div>
+    <div class="copiar">
+      <button class="btn primario" type="button" id="b-copiar">Copiar workflow de n8n</button>
+      <small id="copiar-estado" aria-live="polite">Se copia como JSON; pégalo directo en el lienzo de n8n.</small>
     </div>
+    <textarea id="n8n-json" hidden readonly aria-label="Workflow de n8n en JSON"></textarea>
   </div>
 </section>
 
-<section id="costos">
+<!-- ───────── QUÉ SIGUE ───────── -->
+<section class="bloque" id="sigue">
   <div class="wrap">
-    <p class="eyebrow">Costos estimados · USD / mes</p>
-    <h2>Los mensajes cuestan poco; el orquestador decide</h2>
-    <p class="intro">Desde julio de 2025 Meta cobra por mensaje, y desde el 1 de octubre de 2026 también las respuestas dentro de las 24 h, después de 1,000 gratis al mes por número. El bot solo usa ese tipo de mensaje: en la PoC casi todo cabe en lo gratuito.</p>
-    <div class="table-wrap">
-    <table>
-      <thead><tr><th></th><th class="num">A · PoC</th><th class="num">B · 3 agencias</th><th class="num">C · Escala</th></tr></thead>
-      <tbody>
-        <tr><td>Leads por mes</td><td class="num">100</td><td class="num">300</td><td class="num">1,000</td></tr>
-        <tr><td>WhatsApp (Meta)</td><td class="num">≈ $1</td><td class="num">≈ $20</td><td class="num">≈ $85</td></tr>
-        <tr><td>n8n self-hosted (servidor)</td><td class="num">$5–20</td><td class="num">$5–20</td><td class="num">$20–40</td></tr>
-        <tr><td>n8n Cloud, con filtro de avisos</td><td class="num">≈ €24</td><td class="num">≈ €60</td><td class="num">≈ €60 (al límite)</td></tr>
-        <tr><td><strong>Costo por lead</strong> (Meta + n8n self-hosted)</td><td class="num"><strong>$0.06–0.21</strong></td><td class="num"><strong>$0.08–0.13</strong></td><td class="num"><strong>$0.11–0.13</strong></td></tr>
-      </tbody>
-    </table>
-    </div>
-    <p class="note">Supuestos: ~11 mensajes del bot por lead, Supabase, Netlify y Drive ya los paga el panel, tarifa de México desde 1/10/2026 (servicio ≈ $0.0085 después de los 1,000 gratis). Cada aviso de “entregado/leído” también dispara el webhook: sin un filtro delante, Make y n8n Cloud se encarecen rápido. Tarifas de fuentes no oficiales: verificar con Meta, Make y n8n antes de presupuestar. No incluye horas de construcción.</p>
-  </div>
-</section>
-
-<section id="kpis">
-  <div class="wrap">
-    <p class="eyebrow">Cómo sabremos si funciona</p>
-    <h2>Indicadores de la PoC</h2>
-    <p class="intro">Todos salen de las marcas de tiempo que el orquestador guarda en cada paso. La línea base de hoy la da Bernardo antes de arrancar.</p>
-    <div class="table-wrap">
-    <table>
-      <thead><tr><th>Indicador</th><th>Cómo se calcula</th><th>Meta</th></tr></thead>
-      <tbody>
-        <tr><td>Primera respuesta al cliente</td><td>Respuesta del bot − primer mensaje</td><td>&lt; 1 min, 24/7</td></tr>
-        <tr><td>Primer contacto humano</td><td>Bernardo toma el lead − aviso recibido</td><td><span class="tag pend">con línea base</span></td></tr>
-        <tr><td>Leads completos</td><td>Datos completos ÷ conversaciones iniciadas</td><td>≥ 60 % <span class="tag pend">validar</span></td></tr>
-        <tr><td>Abandono por paso</td><td>% que deja de responder en cada pregunta</td><td>Encontrar la pregunta que sobra</td></tr>
-        <tr><td>Fichas sin corrección manual</td><td>Fichas del bot que Bernardo no editó ÷ fichas del bot</td><td>≥ 80 %</td></tr>
-        <tr><td>Cotizar sin volver a preguntar</td><td>Cotizaciones hechas sin pedir datos extra ÷ fichas cotizadas</td><td>≥ 70 % <span class="tag pend">validar</span></td></tr>
-        <tr><td>Errores de integración</td><td>Fallas ÷ mensajes procesados</td><td>&lt; 2 %</td></tr>
-        <tr><td>Leads por canal</td><td>Conteo por agencia, web y directo</td><td>Hoy no se mide</td></tr>
-        <tr><td>Costo por lead</td><td>(Meta + orquestador + servidor) ÷ leads</td><td>&lt; $0.50</td></tr>
-      </tbody>
-    </table>
-    </div>
-  </div>
-</section>
-
-<section id="siguientes">
-  <div class="wrap">
-    <p class="eyebrow">Siguientes pasos</p>
-    <h2>Cuatro a seis semanas con una agencia</h2>
-    <div class="grid g3">
-      <div class="card"><span class="tag">Semana 0</span><h3 style="margin-top:.5rem">Relevamiento</h3><p>Validar la propuesta con Félix, chats de Bernardo, número y cuenta de Meta, aviso de privacidad.</p></div>
-      <div class="card"><span class="tag">Semanas 1–2</span><h3 style="margin-top:.5rem">Construcción</h3><p>Webhook y filtro, flujo en n8n, RPC y usuario del bot en el panel, fotos a Drive, aviso a Bernardo. Pruebas con el equipo.</p></div>
-      <div class="card"><span class="tag">Semanas 3–6</span><h3 style="margin-top:.5rem">Piloto</h3><p>QR en Changan del Valle y enlace en la web. Revisión semanal de abandono, errores y tiempos.</p></div>
+    <p class="kicker">Siguientes pasos</p>
+    <h2>De la demo al piloto con clientes reales</h2>
+    <div class="fases">
+      <div class="fase-sig"><span class="cuando">Fase 0 · esta semana</span><h3>Demo y guion</h3><ul><li>Mostrar la demo de n8n al equipo.</li><li>Bernardo comparte 5–10 chats reales y valida las preguntas.</li><li>Ajustar textos y opciones.</li></ul><p class="quien"><b>Quién:</b> Studio2894 y Bernardo</p></div>
+      <div class="fase-sig"><span class="cuando">Fase 1 · 4 a 6 semanas</span><h3>Piloto con una agencia</h3><ul><li>Número nuevo de WhatsApp y cuenta de Meta.</li><li>Félix abre la entrada al panel (usuario del bot y función de registro).</li><li>QR en Changan del Valle y enlace en la web.</li><li>Medir cada semana.</li></ul><p class="quien"><b>Quién:</b> Félix, Studio2894 y Bernardo</p></div>
+      <div class="fase-sig"><span class="cuando">Fase 2 · según resultados</span><h3>Escalar o ajustar</h3><ul><li>Más agencias y campañas.</li><li>IA para entender mensajes libres, solo si el piloto lo justifica.</li><li>Conectar con la iniciativa del Cotizador.</li></ul><p class="quien"><b>Quién:</b> decisión de Dirección con los datos del piloto</p></div>
     </div>
   </div>
 </section>
@@ -276,17 +534,621 @@ footer ul{padding-left:1.1rem}
 
 <footer>
   <div class="wrap">
-    <p><strong>Documentos de trabajo</strong> en el repositorio: arquitectura de integración, flujo conversacional, plantilla de relevamiento, costos y KPIs, contrato JSON del lead (<code>docs/poc-whatsapp/</code>, <code>schema/poc-whatsapp-lead.schema.json</code>).</p>
-    <p style="margin-top:.75rem">Fuentes de tarifas (consultadas el 31/10/2026, verificar en las oficiales):</p>
-    <ul>
-      <li><a href="https://developers.facebook.com/docs/whatsapp/pricing">Meta — precios de WhatsApp Business Platform</a> (oficial)</li>
-      <li><a href="https://getkanal.com/blog/whatsapp-business-pricing-guide">getkanal.com — tarifas por país 2026</a></li>
-      <li><a href="https://respond.io/blog/whatsapp-pricing-change-2026">respond.io — cambio de precios de mensajes de servicio</a></li>
-      <li><a href="https://www.jetadmin.io/blog/make-pricing/">Jet Admin — precios de Make</a> · <a href="https://www.jetadmin.io/blog/n8n-pricing/">precios de n8n</a></li>
-    </ul>
-    <p style="margin-top:1rem"><span class="wordmark">2894_</span> Studio para DPROMA</p>
+    <p>Documentos técnicos (para Félix y el equipo) en el repositorio: <code>docs/poc-whatsapp/</code> (arquitectura, guion, relevamiento, costos, hallazgos del panel, guía de la demo) y <code>n8n/</code> (workflow y motor del guion).</p>
+    <p style="margin-top:.6rem">Fuentes de tarifas, a confirmar en las oficiales: <a href="https://developers.facebook.com/docs/whatsapp/pricing">Meta — precios de WhatsApp Business Platform</a> · <a href="https://respond.io/blog/whatsapp-pricing-change-2026">respond.io — cambio de octubre 2026</a> · <a href="https://getkanal.com/blog/whatsapp-business-pricing-guide">getkanal.com — tarifas por país</a> · <a href="https://n8n.io/pricing">n8n.io/pricing</a>.</p>
+    <p style="margin-top:.6rem"><b style="color:var(--fg)">2894_</b> Studio para DPROMA</p>
   </div>
 </footer>
 
+<script>
+/*MOTOR:INICIO*/
+/* Motor del guion — bot de primer contacto DPROMA (PoC WhatsApp)
+ * Fuente única de la lógica de conversación. Se inserta tal cual en:
+ *   - n8n/demo-bot-whatsapp-dproma.json (nodo Code «Motor del guion»)
+ *   - web/entregables/poc-whatsapp-primer-contacto.html (simulador)
+ * mediante scripts/build-poc-whatsapp.py. Edita aquí y vuelve a correr el script.
+ * Sin dependencias: JavaScript puro, sin red, sin credenciales.
+ */
+const MOTOR = (() => {
+  const AGENCIAS = [
+    { clave: 'changan del valle', nombre: 'Changan del Valle', slug: 'changan-del-valle', marca: 'Changan' },
+  ];
+  const PALABRAS_ASESOR = /\b(asesor|humano|persona|llamar|ll[aá]mame|hablar con alguien)\b/i;
+  const PREGUNTA_LIBRE = /\?|cu[aá]nto|precio|costo|cuesta/i;
+
+  const P = {
+    INMUEBLE: { tipo: 'botones', texto: 'Gracias, {nombre}. ¿Dónde quieres instalar el cargador?',
+      opciones: [ { id: 'casa', label: 'Casa', claves: ['casa'] },
+                  { id: 'condominio', label: 'Condominio / edificio', claves: ['condominio', 'edificio', 'depa', 'departamento'] },
+                  { id: 'empresa', label: 'Empresa / flotilla', claves: ['empresa', 'flotilla', 'negocio', 'oficina'] } ] },
+    VEHICULO: { tipo: 'lista', texto: '¿Qué auto tienes o vas a recibir?',
+      opciones: [ { id: 'Changan Dipal S07', label: 'Changan Dipal S07', claves: ['dipal', 'changan'] },
+                  { id: 'BYD', label: 'BYD', claves: ['byd'] },
+                  { id: 'MG', label: 'MG', claves: ['mg'] },
+                  { id: 'Tesla', label: 'Tesla', claves: ['tesla'] },
+                  { id: 'otro', label: 'Otro…', claves: ['otro'] } ] },
+    VEHICULO_OTRO: { tipo: 'texto', texto: '¿Cuál? Escríbelo, por favor (marca y modelo).' },
+    DOMICILIO: { tipo: 'texto', texto: '¿Cuál es el domicilio de la instalación? Calle, número, colonia y código postal.\nSi te queda más fácil, también puedes mandar tu ubicación 📍' },
+    DOMICILIO_CP: { tipo: 'texto', texto: '¡Gracias! ¿Y el código postal? (5 dígitos)' },
+    METROS: { tipo: 'lista', texto: 'Más o menos, ¿qué distancia hay del tablero eléctrico al lugar donde vas a cargar el auto? 📏 Un auto mide unos 4.5 m.',
+      opciones: [ { id: 'hasta_10', label: 'Hasta 10 m', claves: ['hasta 10', 'menos de 10'] },
+                  { id: '11_20', label: 'De 11 a 20 m', claves: ['11 a 20', '11-20'] },
+                  { id: '21_30', label: 'De 21 a 30 m', claves: ['21 a 30', '21-30'] },
+                  { id: 'mas_30', label: 'Más de 30 m', claves: ['mas de 30', 'más de 30'] },
+                  { id: 'no_se', label: 'No sé', claves: ['no se', 'no sé', 'ni idea'] } ] },
+    MEDIDOR: { tipo: 'botones', texto: '¿Quieres un medidor de CFE independiente solo para el cargador, o conectarlo a tu luz de siempre?',
+      opciones: [ { id: 'si', label: 'Medidor nuevo', claves: ['nuevo', 'independiente', 'si', 'sí'] },
+                  { id: 'no', label: 'Mi luz actual', claves: ['actual', 'mi luz', 'no'] },
+                  { id: 'no_se', label: 'No sé', claves: ['no se', 'no sé'] } ] },
+    FOTO_TABLERO: { tipo: 'foto', foto: 'tablero', texto: '¿Nos mandas una foto de tu tablero eléctrico (la caja con los interruptores)? Así la cotización sale más precisa.',
+      opciones: [ { id: 'despues', label: 'Enviar después', claves: ['despues', 'después', 'luego', 'no tengo'] } ] },
+    FOTO_SITIO: { tipo: 'foto', foto: 'sitio_recorrido', texto: 'Ahora una foto del lugar donde quieres cargar el auto y, si se puede, del camino por donde iría el cable.',
+      opciones: [ { id: 'despues', label: 'Enviar después', claves: ['despues', 'después', 'luego', 'no tengo'] } ] },
+    FOTO_MEDIDOR: { tipo: 'foto', foto: 'medidor', texto: 'Y por último, una foto de tu medidor de CFE.',
+      opciones: [ { id: 'despues', label: 'Enviar después', claves: ['despues', 'después', 'luego', 'no tengo'] } ] },
+  };
+  const ORDEN = ['INMUEBLE', 'VEHICULO', 'DOMICILIO', 'METROS', 'MEDIDOR', 'FOTO_TABLERO', 'FOTO_SITIO', 'FOTO_MEDIDOR'];
+  const NOMBRE_INMUEBLE = { casa: 'Casa particular', condominio: 'Residencial', empresa: 'Empresa / flotilla' };
+
+  const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+  const titulo = s => String(s).trim().replace(/\s+/g, ' ').replace(/(^|\s)\S/g, c => c.toUpperCase());
+
+  function nuevoEstado() {
+    return { paso: 'NUEVO', datos: {}, fallos: 0, fotos: [], fotosPendientes: [], origen: 'directa', agencia: null,
+             terminado: false, estado_bot: null, motivo_humano: null, eventos: [] };
+  }
+
+  function pregunta(clave, est) {
+    const p = P[clave];
+    return { clave, tipo: p.tipo, texto: p.texto.replace('{nombre}', (est.datos.nombre || '').split(' ')[0]),
+             opciones: (p.opciones || []).map(o => ({ id: o.id, label: o.label })) };
+  }
+
+  function siguiente(clave, est) {
+    let i = ORDEN.indexOf(clave) + 1;
+    if (ORDEN[i] === 'VEHICULO' && est.agencia) i++;           // la agencia ya dice la marca
+    return ORDEN[i] || 'COMPLETO';
+  }
+
+  function elegir(clave, entrada) {
+    const ops = P[clave].opciones || [];
+    if (entrada.opcion) return ops.find(o => o.id === entrada.opcion) || null;
+    const t = norm(entrada.texto);
+    if (!t) return null;
+    if (/^\d+$/.test(t)) return ops[Number(t) - 1] || null;
+    // Gana la clave más larga que aparezca como palabra completa («no sé» antes que «no»).
+    let mejor = null, largo = 0;
+    for (const o of ops) for (const k of o.claves) {
+      const nk = norm(k).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      if (new RegExp(`(^|[^a-z0-9])${nk}($|[^a-z0-9])`).test(t) && nk.length > largo) { mejor = o; largo = nk.length; }
+    }
+    return mejor;
+  }
+
+  function evento(est, tipo, detalle, t) { est.eventos.push({ tipo, detalle: detalle == null ? null : String(detalle), t: t || null }); }
+
+  function aHumano(est, motivo, texto) {
+    est.paso = 'HUMANO'; est.terminado = true; est.estado_bot = 'HUMANO'; est.motivo_humano = motivo;
+    evento(est, 'derivado_humano', motivo);
+    return [{ tipo: 'texto', texto }];
+  }
+
+  function fallo(est, clave) {
+    est.fallos++;
+    evento(est, 'no_reconocido', clave);
+    if (est.fallos >= 2) return aHumano(est, 'no_reconocido', 'Mejor te comunico con alguien del equipo para no hacerte perder tiempo. Bernardo te escribe en cuanto pueda 🙂');
+    const p = pregunta(clave, est);
+    return [{ tipo: 'texto', texto: 'Perdón, no te entendí. Elige una opción o escribe tu respuesta, por favor.' }, p];
+  }
+
+  function avanzar(est, clave) {
+    est.fallos = 0;
+    evento(est, 'paso_respondido', clave);
+    const sig = siguiente(clave, est);
+    est.paso = sig;
+    if (sig === 'COMPLETO') return completar(est);
+    return [pregunta(sig, est)];
+  }
+
+  function completar(est) {
+    est.terminado = true; est.estado_bot = 'COMPLETO';
+    evento(est, 'datos_completos');
+    const nombre = (est.datos.nombre || '').split(' ')[0];
+    return [{ tipo: 'texto', texto: `¡Listo, ${nombre}! Ya tenemos todo ✅ Bernardo, de nuestro equipo, te escribe para darte tu cotización. Horario: lun–vie 9–18 h, sáb 9–14 h.` }];
+  }
+
+  /** entrada: { texto?, opcion?, imagen?: true, ubicacion?: {lat, lng} } → { estado, respuestas[] } */
+  function paso(estadoPrevio, entrada) {
+    const est = estadoPrevio ? JSON.parse(JSON.stringify(estadoPrevio)) : nuevoEstado();
+    entrada = entrada || {};
+    const texto = entrada.texto || '';
+    let r;
+
+    if (est.terminado) {
+      evento(est, 'mensaje_posterior', texto || (entrada.imagen ? 'imagen' : ''));
+      if (entrada.imagen) est.fotos.push('otro');
+      return { estado: est, respuestas: [{ tipo: 'texto', texto: 'Gracias, ya se lo pasé a Bernardo junto con tu ficha 👍' }] };
+    }
+
+    if (texto && PALABRAS_ASESOR.test(texto) && est.paso !== 'NUEVO') {
+      r = aHumano(est, 'pidio_asesor', 'Claro, te comunico con alguien del equipo. Bernardo te escribe en cuanto pueda 🙂');
+      return { estado: est, respuestas: r };
+    }
+
+    switch (est.paso) {
+      case 'NUEVO': {
+        evento(est, 'primer_mensaje', texto);
+        const ag = AGENCIAS.find(a => norm(texto).includes(a.clave));
+        let saludo = '¡Hola! 👋 Soy el asistente de DPROMA.';
+        if (ag) { est.agencia = ag.nombre; est.origen = 'oem'; est.datos.vehiculo = `${ag.marca} (modelo por confirmar)`;
+                  saludo = `¡Hola! 👋 Vienes de ${ag.nombre}, ¡felicidades por tu auto nuevo! Soy el asistente de DPROMA.`; }
+        est.paso = 'NOMBRE';
+        r = [{ tipo: 'texto', texto: `${saludo} En un par de minutos tomo los datos para preparar la cotización de la instalación de tu cargador.\n\nAl seguir aceptas nuestro aviso de privacidad: dproma.com/privacidad\n\n¿A nombre de quién hacemos la cotización? (persona o empresa)` }];
+        break;
+      }
+      case 'NOMBRE': {
+        if (!texto || texto.trim().length < 2 || PREGUNTA_LIBRE.test(texto)) {
+          est.fallos++; evento(est, 'no_reconocido', 'NOMBRE');
+          if (est.fallos >= 2) { r = aHumano(est, 'no_reconocido', 'Mejor te comunico con alguien del equipo para resolver tus dudas. Bernardo te escribe en cuanto pueda 🙂'); break; }
+          r = [{ tipo: 'texto', texto: 'Con gusto te damos el precio exacto, solo necesito unos datos 🙂 ¿A nombre de quién hacemos la cotización?' }];
+          break;
+        }
+        est.datos.nombre = titulo(texto); est.fallos = 0; evento(est, 'paso_respondido', 'NOMBRE');
+        est.paso = 'INMUEBLE'; r = [pregunta('INMUEBLE', est)];
+        break;
+      }
+      case 'INMUEBLE': {
+        const o = elegir('INMUEBLE', entrada);
+        if (!o) { r = fallo(est, 'INMUEBLE'); break; }
+        est.datos.tipo_inmueble = NOMBRE_INMUEBLE[o.id];
+        if (o.id === 'empresa') { r = aHumano(est, 'flotilla', 'Para empresas y flotillas armamos una propuesta a la medida. Te comunico con Bernardo, de nuestro equipo comercial 🙂'); break; }
+        r = avanzar(est, 'INMUEBLE');
+        break;
+      }
+      case 'VEHICULO': {
+        const o = elegir('VEHICULO', entrada);
+        if (!o) { r = fallo(est, 'VEHICULO'); break; }
+        if (o.id === 'otro') { est.fallos = 0; est.paso = 'VEHICULO_OTRO'; r = [pregunta('VEHICULO_OTRO', est)]; break; }
+        est.datos.vehiculo = o.id; r = avanzar(est, 'VEHICULO');
+        break;
+      }
+      case 'VEHICULO_OTRO': {
+        if (!texto || texto.trim().length < 2) { r = fallo(est, 'VEHICULO_OTRO'); break; }
+        est.datos.vehiculo = titulo(texto); est.paso = 'VEHICULO'; r = avanzar(est, 'VEHICULO');
+        break;
+      }
+      case 'DOMICILIO':
+      case 'DOMICILIO_CP': {
+        if (entrada.ubicacion) {
+          est.datos.mapa = `https://maps.google.com/?q=${entrada.ubicacion.lat},${entrada.ubicacion.lng}`;
+          est.paso = 'DOMICILIO_CP'; est.fallos = 0;
+          r = [{ tipo: 'texto', texto: '¡Gracias por la ubicación! Para la cotización necesito también el domicilio por escrito: calle, número, colonia y código postal.' }];
+          break;
+        }
+        const cp = (texto.match(/\b\d{5}\b/) || [])[0];
+        if (est.paso === 'DOMICILIO') {
+          if (!texto || texto.trim().length < 6) { r = fallo(est, 'DOMICILIO'); break; }
+          est.datos.domicilio = texto.trim().replace(/\s+/g, ' ');
+          if (!cp) { est.paso = 'DOMICILIO_CP'; est.fallos = 0; r = [pregunta('DOMICILIO_CP', est)]; break; }
+        } else {
+          if (!cp) { r = fallo(est, 'DOMICILIO_CP'); break; }
+          if (!est.datos.domicilio || est.datos.domicilio === cp) est.datos.domicilio = texto.trim();
+          else if (!est.datos.domicilio.includes(cp)) est.datos.domicilio += `, CP ${cp}`;
+        }
+        est.datos.codigo_postal = cp; est.paso = 'DOMICILIO'; r = avanzar(est, 'DOMICILIO');
+        break;
+      }
+      case 'METROS':
+      case 'MEDIDOR': {
+        const clave = est.paso; const o = elegir(clave, entrada);
+        if (!o) { r = fallo(est, clave); break; }
+        est.datos[clave === 'METROS' ? 'metros_aprox' : 'medidor_independiente'] = o.id;
+        r = avanzar(est, clave);
+        break;
+      }
+      case 'FOTO_TABLERO':
+      case 'FOTO_SITIO':
+      case 'FOTO_MEDIDOR': {
+        const clave = est.paso;
+        if (entrada.imagen) { est.fotos.push(P[clave].foto); evento(est, 'foto_recibida', P[clave].foto); r = avanzar(est, clave); break; }
+        const o = elegir(clave, entrada);
+        if (!o) { r = fallo(est, clave); break; }
+        est.fotosPendientes.push(P[clave].foto); r = avanzar(est, clave);
+        break;
+      }
+      default:
+        r = [{ tipo: 'texto', texto: 'Gracias, ya se lo pasé al equipo 👍' }];
+    }
+    return { estado: est, respuestas: r };
+  }
+
+  /** Sin respuesta en 23 h: se registra con lo que haya. */
+  function abandonar(estadoPrevio) {
+    const est = JSON.parse(JSON.stringify(estadoPrevio || nuevoEstado()));
+    if (est.terminado) return est;
+    est.terminado = true; est.estado_bot = 'INCOMPLETO'; est.motivo_humano = 'sin_respuesta';
+    evento(est, 'sin_respuesta_23h', est.paso);
+    return est;
+  }
+
+  const ETIQUETA = { hasta_10: 'Hasta 10 m', '11_20': '11–20 m', '21_30': '21–30 m', mas_30: 'Más de 30 m', no_se: 'No sé',
+                     si: 'Sí, medidor nuevo', no: 'No, luz actual' };
+
+  const FOTO = { tablero: 'tablero', sitio_recorrido: 'lugar de carga', medidor: 'medidor' };
+
+  /** Parámetros para la RPC whatsapp_registrar_lead (ver schema/poc-whatsapp-lead.schema.json). */
+  function armarFicha(est, waId) {
+    const d = est.datos;
+    const partes = ['[Bot WhatsApp]', d.tipo_inmueble, d.metros_aprox && `Distancia: ${ETIQUETA[d.metros_aprox]}`,
+      d.medidor_independiente && `Medidor: ${d.medidor_independiente === 'no_se' ? 'No sé' : ETIQUETA[d.medidor_independiente]}`,
+      est.agencia && `Agencia: ${est.agencia}`, `${est.fotos.length} foto(s)`,
+      est.fotosPendientes.length ? `Fotos pendientes: ${est.fotosPendientes.map(f => FOTO[f] || f).join(', ')}` : null,
+      d.mapa && `Mapa: ${d.mapa}`, est.estado_bot !== 'COMPLETO' ? `Conversación: ${est.estado_bot} (${est.motivo_humano})` : null];
+    return {
+      nombre: d.nombre || 'Sin nombre (WhatsApp)',
+      telefono: '+' + waId,
+      correo: null,
+      vehiculo: d.vehiculo || null,
+      domicilio: d.domicilio || null,
+      codigo_postal: d.codigo_postal || null,
+      estado_id: null,
+      origen: est.origen,
+      agencia: est.agencia,
+      canal: 'whatsapp',
+      tipo_inmueble: d.tipo_inmueble || null,
+      metros_aprox: d.metros_aprox || null,
+      medidor_independiente: d.medidor_independiente || null,
+      observaciones_texto: partes.filter(Boolean).join(' · '),
+      wa_id: waId,
+      estado_bot: est.estado_bot,
+      motivo_humano: est.motivo_humano,
+      evidencias: est.fotos.map((tipo, i) => ({ tipo, wa_media_id: `MEDIA_DEMO_${i + 1}`, mime_type: 'image/jpeg', drive_file_id: null })),
+      eventos: est.eventos.map((e, i) => ({ tipo: e.tipo === 'foto_recibida' ? 'foto_subida' : ['primer_mensaje', 'datos_completos', 'derivado_humano', 'no_reconocido'].includes(e.tipo) ? e.tipo : 'paso_respondido',
+                                            ocurrido_en: e.t || new Date(Date.UTC(2026, 10, 2, 16, 0, i * 20)).toISOString(), detalle: e.detalle })),
+    };
+  }
+
+  /** Texto plano con opciones numeradas, para canales sin botones (chat de n8n). */
+  function comoTexto(respuestas) {
+    return respuestas.map(m => m.texto + (m.opciones && m.opciones.length
+      ? '\n\n' + m.opciones.map((o, i) => `${i + 1}) ${o.label}`).join('\n') + (m.tipo === 'foto' ? '\n(o adjunta la foto; en esta demo escribe «foto»)' : '')
+      : '')).join('\n\n');
+  }
+
+  return { paso, abandonar, armarFicha, comoTexto, nuevoEstado, ETIQUETA, FOTO };
+})();
+
+/*MOTOR:FIN*/
+</script>
+<script>
+/*N8N:INICIO*/
+const N8N_WORKFLOW = {"name": "DPROMA · Demo bot WhatsApp (sin APIs)", "nodes": [{"parameters": {"public": true, "mode": "hostedChat", "initialMessages": "Hola 👋 Esta es una demo del bot de DPROMA.\nEscribe «Hola» o «Hola, vengo de Changan del Valle» para empezar.", "options": {"title": "DPROMA · Demo bot WhatsApp", "subtitle": "Simulación sin WhatsApp ni APIs", "inputPlaceholder": "Escribe un mensaje…", "responseMode": "lastNode"}}, "id": "b1f0c001-0000-4000-8000-000000000001", "name": "Chat (simula WhatsApp)", "type": "@n8n/n8n-nodes-langchain.chatTrigger", "typeVersion": 1.1, "position": [0, 300], "webhookId": "d9f1a2b3-4c5d-4e6f-8a9b-0c1d2e3f4a5b"}, {"parameters": {"jsCode": "/* Motor del guion — bot de primer contacto DPROMA (PoC WhatsApp)\n * Fuente única de la lógica de conversación. Se inserta tal cual en:\n *   - n8n/demo-bot-whatsapp-dproma.json (nodo Code «Motor del guion»)\n *   - web/entregables/poc-whatsapp-primer-contacto.html (simulador)\n * mediante scripts/build-poc-whatsapp.py. Edita aquí y vuelve a correr el script.\n * Sin dependencias: JavaScript puro, sin red, sin credenciales.\n */\nconst MOTOR = (() => {\n  const AGENCIAS = [\n    { clave: 'changan del valle', nombre: 'Changan del Valle', slug: 'changan-del-valle', marca: 'Changan' },\n  ];\n  const PALABRAS_ASESOR = /\\b(asesor|humano|persona|llamar|ll[aá]mame|hablar con alguien)\\b/i;\n  const PREGUNTA_LIBRE = /\\?|cu[aá]nto|precio|costo|cuesta/i;\n\n  const P = {\n    INMUEBLE: { tipo: 'botones', texto: 'Gracias, {nombre}. ¿Dónde quieres instalar el cargador?',\n      opciones: [ { id: 'casa', label: 'Casa', claves: ['casa'] },\n                  { id: 'condominio', label: 'Condominio / edificio', claves: ['condominio', 'edificio', 'depa', 'departamento'] },\n                  { id: 'empresa', label: 'Empresa / flotilla', claves: ['empresa', 'flotilla', 'negocio', 'oficina'] } ] },\n    VEHICULO: { tipo: 'lista', texto: '¿Qué auto tienes o vas a recibir?',\n      opciones: [ { id: 'Changan Dipal S07', label: 'Changan Dipal S07', claves: ['dipal', 'changan'] },\n                  { id: 'BYD', label: 'BYD', claves: ['byd'] },\n                  { id: 'MG', label: 'MG', claves: ['mg'] },\n                  { id: 'Tesla', label: 'Tesla', claves: ['tesla'] },\n                  { id: 'otro', label: 'Otro…', claves: ['otro'] } ] },\n    VEHICULO_OTRO: { tipo: 'texto', texto: '¿Cuál? Escríbelo, por favor (marca y modelo).' },\n    DOMICILIO: { tipo: 'texto', texto: '¿Cuál es el domicilio de la instalación? Calle, número, colonia y código postal.\\nSi te queda más fácil, también puedes mandar tu ubicación 📍' },\n    DOMICILIO_CP: { tipo: 'texto', texto: '¡Gracias! ¿Y el código postal? (5 dígitos)' },\n    METROS: { tipo: 'lista', texto: 'Más o menos, ¿qué distancia hay del tablero eléctrico al lugar donde vas a cargar el auto? 📏 Un auto mide unos 4.5 m.',\n      opciones: [ { id: 'hasta_10', label: 'Hasta 10 m', claves: ['hasta 10', 'menos de 10'] },\n                  { id: '11_20', label: 'De 11 a 20 m', claves: ['11 a 20', '11-20'] },\n                  { id: '21_30', label: 'De 21 a 30 m', claves: ['21 a 30', '21-30'] },\n                  { id: 'mas_30', label: 'Más de 30 m', claves: ['mas de 30', 'más de 30'] },\n                  { id: 'no_se', label: 'No sé', claves: ['no se', 'no sé', 'ni idea'] } ] },\n    MEDIDOR: { tipo: 'botones', texto: '¿Quieres un medidor de CFE independiente solo para el cargador, o conectarlo a tu luz de siempre?',\n      opciones: [ { id: 'si', label: 'Medidor nuevo', claves: ['nuevo', 'independiente', 'si', 'sí'] },\n                  { id: 'no', label: 'Mi luz actual', claves: ['actual', 'mi luz', 'no'] },\n                  { id: 'no_se', label: 'No sé', claves: ['no se', 'no sé'] } ] },\n    FOTO_TABLERO: { tipo: 'foto', foto: 'tablero', texto: '¿Nos mandas una foto de tu tablero eléctrico (la caja con los interruptores)? Así la cotización sale más precisa.',\n      opciones: [ { id: 'despues', label: 'Enviar después', claves: ['despues', 'después', 'luego', 'no tengo'] } ] },\n    FOTO_SITIO: { tipo: 'foto', foto: 'sitio_recorrido', texto: 'Ahora una foto del lugar donde quieres cargar el auto y, si se puede, del camino por donde iría el cable.',\n      opciones: [ { id: 'despues', label: 'Enviar después', claves: ['despues', 'después', 'luego', 'no tengo'] } ] },\n    FOTO_MEDIDOR: { tipo: 'foto', foto: 'medidor', texto: 'Y por último, una foto de tu medidor de CFE.',\n      opciones: [ { id: 'despues', label: 'Enviar después', claves: ['despues', 'después', 'luego', 'no tengo'] } ] },\n  };\n  const ORDEN = ['INMUEBLE', 'VEHICULO', 'DOMICILIO', 'METROS', 'MEDIDOR', 'FOTO_TABLERO', 'FOTO_SITIO', 'FOTO_MEDIDOR'];\n  const NOMBRE_INMUEBLE = { casa: 'Casa particular', condominio: 'Residencial', empresa: 'Empresa / flotilla' };\n\n  const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();\n  const titulo = s => String(s).trim().replace(/\\s+/g, ' ').replace(/(^|\\s)\\S/g, c => c.toUpperCase());\n\n  function nuevoEstado() {\n    return { paso: 'NUEVO', datos: {}, fallos: 0, fotos: [], fotosPendientes: [], origen: 'directa', agencia: null,\n             terminado: false, estado_bot: null, motivo_humano: null, eventos: [] };\n  }\n\n  function pregunta(clave, est) {\n    const p = P[clave];\n    return { clave, tipo: p.tipo, texto: p.texto.replace('{nombre}', (est.datos.nombre || '').split(' ')[0]),\n             opciones: (p.opciones || []).map(o => ({ id: o.id, label: o.label })) };\n  }\n\n  function siguiente(clave, est) {\n    let i = ORDEN.indexOf(clave) + 1;\n    if (ORDEN[i] === 'VEHICULO' && est.agencia) i++;           // la agencia ya dice la marca\n    return ORDEN[i] || 'COMPLETO';\n  }\n\n  function elegir(clave, entrada) {\n    const ops = P[clave].opciones || [];\n    if (entrada.opcion) return ops.find(o => o.id === entrada.opcion) || null;\n    const t = norm(entrada.texto);\n    if (!t) return null;\n    if (/^\\d+$/.test(t)) return ops[Number(t) - 1] || null;\n    // Gana la clave más larga que aparezca como palabra completa («no sé» antes que «no»).\n    let mejor = null, largo = 0;\n    for (const o of ops) for (const k of o.claves) {\n      const nk = norm(k).replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n      if (new RegExp(`(^|[^a-z0-9])${nk}($|[^a-z0-9])`).test(t) && nk.length > largo) { mejor = o; largo = nk.length; }\n    }\n    return mejor;\n  }\n\n  function evento(est, tipo, detalle, t) { est.eventos.push({ tipo, detalle: detalle == null ? null : String(detalle), t: t || null }); }\n\n  function aHumano(est, motivo, texto) {\n    est.paso = 'HUMANO'; est.terminado = true; est.estado_bot = 'HUMANO'; est.motivo_humano = motivo;\n    evento(est, 'derivado_humano', motivo);\n    return [{ tipo: 'texto', texto }];\n  }\n\n  function fallo(est, clave) {\n    est.fallos++;\n    evento(est, 'no_reconocido', clave);\n    if (est.fallos >= 2) return aHumano(est, 'no_reconocido', 'Mejor te comunico con alguien del equipo para no hacerte perder tiempo. Bernardo te escribe en cuanto pueda 🙂');\n    const p = pregunta(clave, est);\n    return [{ tipo: 'texto', texto: 'Perdón, no te entendí. Elige una opción o escribe tu respuesta, por favor.' }, p];\n  }\n\n  function avanzar(est, clave) {\n    est.fallos = 0;\n    evento(est, 'paso_respondido', clave);\n    const sig = siguiente(clave, est);\n    est.paso = sig;\n    if (sig === 'COMPLETO') return completar(est);\n    return [pregunta(sig, est)];\n  }\n\n  function completar(est) {\n    est.terminado = true; est.estado_bot = 'COMPLETO';\n    evento(est, 'datos_completos');\n    const nombre = (est.datos.nombre || '').split(' ')[0];\n    return [{ tipo: 'texto', texto: `¡Listo, ${nombre}! Ya tenemos todo ✅ Bernardo, de nuestro equipo, te escribe para darte tu cotización. Horario: lun–vie 9–18 h, sáb 9–14 h.` }];\n  }\n\n  /** entrada: { texto?, opcion?, imagen?: true, ubicacion?: {lat, lng} } → { estado, respuestas[] } */\n  function paso(estadoPrevio, entrada) {\n    const est = estadoPrevio ? JSON.parse(JSON.stringify(estadoPrevio)) : nuevoEstado();\n    entrada = entrada || {};\n    const texto = entrada.texto || '';\n    let r;\n\n    if (est.terminado) {\n      evento(est, 'mensaje_posterior', texto || (entrada.imagen ? 'imagen' : ''));\n      if (entrada.imagen) est.fotos.push('otro');\n      return { estado: est, respuestas: [{ tipo: 'texto', texto: 'Gracias, ya se lo pasé a Bernardo junto con tu ficha 👍' }] };\n    }\n\n    if (texto && PALABRAS_ASESOR.test(texto) && est.paso !== 'NUEVO') {\n      r = aHumano(est, 'pidio_asesor', 'Claro, te comunico con alguien del equipo. Bernardo te escribe en cuanto pueda 🙂');\n      return { estado: est, respuestas: r };\n    }\n\n    switch (est.paso) {\n      case 'NUEVO': {\n        evento(est, 'primer_mensaje', texto);\n        const ag = AGENCIAS.find(a => norm(texto).includes(a.clave));\n        let saludo = '¡Hola! 👋 Soy el asistente de DPROMA.';\n        if (ag) { est.agencia = ag.nombre; est.origen = 'oem'; est.datos.vehiculo = `${ag.marca} (modelo por confirmar)`;\n                  saludo = `¡Hola! 👋 Vienes de ${ag.nombre}, ¡felicidades por tu auto nuevo! Soy el asistente de DPROMA.`; }\n        est.paso = 'NOMBRE';\n        r = [{ tipo: 'texto', texto: `${saludo} En un par de minutos tomo los datos para preparar la cotización de la instalación de tu cargador.\\n\\nAl seguir aceptas nuestro aviso de privacidad: dproma.com/privacidad\\n\\n¿A nombre de quién hacemos la cotización? (persona o empresa)` }];\n        break;\n      }\n      case 'NOMBRE': {\n        if (!texto || texto.trim().length < 2 || PREGUNTA_LIBRE.test(texto)) {\n          est.fallos++; evento(est, 'no_reconocido', 'NOMBRE');\n          if (est.fallos >= 2) { r = aHumano(est, 'no_reconocido', 'Mejor te comunico con alguien del equipo para resolver tus dudas. Bernardo te escribe en cuanto pueda 🙂'); break; }\n          r = [{ tipo: 'texto', texto: 'Con gusto te damos el precio exacto, solo necesito unos datos 🙂 ¿A nombre de quién hacemos la cotización?' }];\n          break;\n        }\n        est.datos.nombre = titulo(texto); est.fallos = 0; evento(est, 'paso_respondido', 'NOMBRE');\n        est.paso = 'INMUEBLE'; r = [pregunta('INMUEBLE', est)];\n        break;\n      }\n      case 'INMUEBLE': {\n        const o = elegir('INMUEBLE', entrada);\n        if (!o) { r = fallo(est, 'INMUEBLE'); break; }\n        est.datos.tipo_inmueble = NOMBRE_INMUEBLE[o.id];\n        if (o.id === 'empresa') { r = aHumano(est, 'flotilla', 'Para empresas y flotillas armamos una propuesta a la medida. Te comunico con Bernardo, de nuestro equipo comercial 🙂'); break; }\n        r = avanzar(est, 'INMUEBLE');\n        break;\n      }\n      case 'VEHICULO': {\n        const o = elegir('VEHICULO', entrada);\n        if (!o) { r = fallo(est, 'VEHICULO'); break; }\n        if (o.id === 'otro') { est.fallos = 0; est.paso = 'VEHICULO_OTRO'; r = [pregunta('VEHICULO_OTRO', est)]; break; }\n        est.datos.vehiculo = o.id; r = avanzar(est, 'VEHICULO');\n        break;\n      }\n      case 'VEHICULO_OTRO': {\n        if (!texto || texto.trim().length < 2) { r = fallo(est, 'VEHICULO_OTRO'); break; }\n        est.datos.vehiculo = titulo(texto); est.paso = 'VEHICULO'; r = avanzar(est, 'VEHICULO');\n        break;\n      }\n      case 'DOMICILIO':\n      case 'DOMICILIO_CP': {\n        if (entrada.ubicacion) {\n          est.datos.mapa = `https://maps.google.com/?q=${entrada.ubicacion.lat},${entrada.ubicacion.lng}`;\n          est.paso = 'DOMICILIO_CP'; est.fallos = 0;\n          r = [{ tipo: 'texto', texto: '¡Gracias por la ubicación! Para la cotización necesito también el domicilio por escrito: calle, número, colonia y código postal.' }];\n          break;\n        }\n        const cp = (texto.match(/\\b\\d{5}\\b/) || [])[0];\n        if (est.paso === 'DOMICILIO') {\n          if (!texto || texto.trim().length < 6) { r = fallo(est, 'DOMICILIO'); break; }\n          est.datos.domicilio = texto.trim().replace(/\\s+/g, ' ');\n          if (!cp) { est.paso = 'DOMICILIO_CP'; est.fallos = 0; r = [pregunta('DOMICILIO_CP', est)]; break; }\n        } else {\n          if (!cp) { r = fallo(est, 'DOMICILIO_CP'); break; }\n          if (!est.datos.domicilio || est.datos.domicilio === cp) est.datos.domicilio = texto.trim();\n          else if (!est.datos.domicilio.includes(cp)) est.datos.domicilio += `, CP ${cp}`;\n        }\n        est.datos.codigo_postal = cp; est.paso = 'DOMICILIO'; r = avanzar(est, 'DOMICILIO');\n        break;\n      }\n      case 'METROS':\n      case 'MEDIDOR': {\n        const clave = est.paso; const o = elegir(clave, entrada);\n        if (!o) { r = fallo(est, clave); break; }\n        est.datos[clave === 'METROS' ? 'metros_aprox' : 'medidor_independiente'] = o.id;\n        r = avanzar(est, clave);\n        break;\n      }\n      case 'FOTO_TABLERO':\n      case 'FOTO_SITIO':\n      case 'FOTO_MEDIDOR': {\n        const clave = est.paso;\n        if (entrada.imagen) { est.fotos.push(P[clave].foto); evento(est, 'foto_recibida', P[clave].foto); r = avanzar(est, clave); break; }\n        const o = elegir(clave, entrada);\n        if (!o) { r = fallo(est, clave); break; }\n        est.fotosPendientes.push(P[clave].foto); r = avanzar(est, clave);\n        break;\n      }\n      default:\n        r = [{ tipo: 'texto', texto: 'Gracias, ya se lo pasé al equipo 👍' }];\n    }\n    return { estado: est, respuestas: r };\n  }\n\n  /** Sin respuesta en 23 h: se registra con lo que haya. */\n  function abandonar(estadoPrevio) {\n    const est = JSON.parse(JSON.stringify(estadoPrevio || nuevoEstado()));\n    if (est.terminado) return est;\n    est.terminado = true; est.estado_bot = 'INCOMPLETO'; est.motivo_humano = 'sin_respuesta';\n    evento(est, 'sin_respuesta_23h', est.paso);\n    return est;\n  }\n\n  const ETIQUETA = { hasta_10: 'Hasta 10 m', '11_20': '11–20 m', '21_30': '21–30 m', mas_30: 'Más de 30 m', no_se: 'No sé',\n                     si: 'Sí, medidor nuevo', no: 'No, luz actual' };\n\n  const FOTO = { tablero: 'tablero', sitio_recorrido: 'lugar de carga', medidor: 'medidor' };\n\n  /** Parámetros para la RPC whatsapp_registrar_lead (ver schema/poc-whatsapp-lead.schema.json). */\n  function armarFicha(est, waId) {\n    const d = est.datos;\n    const partes = ['[Bot WhatsApp]', d.tipo_inmueble, d.metros_aprox && `Distancia: ${ETIQUETA[d.metros_aprox]}`,\n      d.medidor_independiente && `Medidor: ${d.medidor_independiente === 'no_se' ? 'No sé' : ETIQUETA[d.medidor_independiente]}`,\n      est.agencia && `Agencia: ${est.agencia}`, `${est.fotos.length} foto(s)`,\n      est.fotosPendientes.length ? `Fotos pendientes: ${est.fotosPendientes.map(f => FOTO[f] || f).join(', ')}` : null,\n      d.mapa && `Mapa: ${d.mapa}`, est.estado_bot !== 'COMPLETO' ? `Conversación: ${est.estado_bot} (${est.motivo_humano})` : null];\n    return {\n      nombre: d.nombre || 'Sin nombre (WhatsApp)',\n      telefono: '+' + waId,\n      correo: null,\n      vehiculo: d.vehiculo || null,\n      domicilio: d.domicilio || null,\n      codigo_postal: d.codigo_postal || null,\n      estado_id: null,\n      origen: est.origen,\n      agencia: est.agencia,\n      canal: 'whatsapp',\n      tipo_inmueble: d.tipo_inmueble || null,\n      metros_aprox: d.metros_aprox || null,\n      medidor_independiente: d.medidor_independiente || null,\n      observaciones_texto: partes.filter(Boolean).join(' · '),\n      wa_id: waId,\n      estado_bot: est.estado_bot,\n      motivo_humano: est.motivo_humano,\n      evidencias: est.fotos.map((tipo, i) => ({ tipo, wa_media_id: `MEDIA_DEMO_${i + 1}`, mime_type: 'image/jpeg', drive_file_id: null })),\n      eventos: est.eventos.map((e, i) => ({ tipo: e.tipo === 'foto_recibida' ? 'foto_subida' : ['primer_mensaje', 'datos_completos', 'derivado_humano', 'no_reconocido'].includes(e.tipo) ? e.tipo : 'paso_respondido',\n                                            ocurrido_en: e.t || new Date(Date.UTC(2026, 10, 2, 16, 0, i * 20)).toISOString(), detalle: e.detalle })),\n    };\n  }\n\n  /** Texto plano con opciones numeradas, para canales sin botones (chat de n8n). */\n  function comoTexto(respuestas) {\n    return respuestas.map(m => m.texto + (m.opciones && m.opciones.length\n      ? '\\n\\n' + m.opciones.map((o, i) => `${i + 1}) ${o.label}`).join('\\n') + (m.tipo === 'foto' ? '\\n(o adjunta la foto; en esta demo escribe «foto»)' : '')\n      : '')).join('\\n\\n');\n  }\n\n  return { paso, abandonar, armarFicha, comoTexto, nuevoEstado, ETIQUETA, FOTO };\n})();\n\n// ───────── Adaptador para el chat de n8n ─────────\n// El chat de n8n no tiene botones ni fotos: las opciones salen numeradas y\n// escribir «foto» o «ubicación» simula enviar una imagen o la ubicación.\nconst memoria = $getWorkflowStaticData('global');   // persiste solo con el workflow ACTIVO\nmemoria.sesiones = memoria.sesiones || {};\nconst entrada = $input.first().json;\nconst sesion = entrada.sessionId || 'demo';\nconst texto = String(entrada.chatInput || '').trim();\n\nif (/^(reiniciar|reset)$/i.test(texto)) {\n  delete memoria.sesiones[sesion];\n  return [{ json: { output: '🔄 Conversación reiniciada. Escribe «Hola» (o «Hola, vengo de Changan del Valle») para empezar.', terminado: false } }];\n}\n\nconst mensaje = /^foto$/i.test(texto) ? { imagen: true }\n  : /^ubicaci[oó]n$/i.test(texto) ? { ubicacion: { lat: 19.3907, lng: -99.161 } }\n  : { texto };\n\nconst previo = memoria.sesiones[sesion] || null;\nconst yaTerminado = !!(previo && previo.terminado);\nconst r = MOTOR.paso(previo, mensaje);\nmemoria.sesiones[sesion] = r.estado;\n\n// Teléfono de demostración estable por sesión (en el piloto viene de WhatsApp: contacts[].wa_id).\nlet h = 0; for (const c of sesion) h = (h * 31 + c.charCodeAt(0)) >>> 0;\nconst waId = '52155' + String(h % 100000000).padStart(8, '0');\n\nconst terminado = r.estado.terminado && !yaTerminado;\nreturn [{ json: {\n  output: MOTOR.comoTexto(r.respuestas),\n  terminado,\n  paso: r.estado.paso,\n  sesion,\n  waId,\n  ficha: terminado ? MOTOR.armarFicha(r.estado, waId) : null,\n} }];\n"}, "id": "b1f0c001-0000-4000-8000-000000000002", "name": "Motor del guion", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [260, 300]}, {"parameters": {"conditions": {"options": {"caseSensitive": true, "leftValue": "", "typeValidation": "loose", "version": 2}, "conditions": [{"id": "c1", "leftValue": "={{ $json.terminado }}", "rightValue": true, "operator": {"type": "boolean", "operation": "true", "singleValue": true}}], "combinator": "and"}, "options": {}}, "id": "b1f0c001-0000-4000-8000-000000000003", "name": "¿Terminó la conversación?", "type": "n8n-nodes-base.if", "typeVersion": 2.2, "position": [520, 300]}, {"parameters": {"assignments": {"assignments": [{"id": "a0-output", "name": "output", "value": "={{ $json.output }}", "type": "string"}]}, "options": {}}, "id": "b1f0c001-0000-4000-8000-000000000004", "name": "Responder siguiente pregunta", "type": "n8n-nodes-base.set", "typeVersion": 3.4, "position": [800, 420]}, {"parameters": {"assignments": {"assignments": [{"id": "a1-rpc", "name": "rpc", "value": "whatsapp_registrar_lead", "type": "string"}, {"id": "a2-parametros", "name": "parametros", "value": "={{ $json.ficha }}", "type": "object"}, {"id": "a3-respuesta_simulada", "name": "respuesta_simulada", "value": "={{ { folio: 'C-DEMO-' + $json.waId.slice(-4), nuevo: true } }}", "type": "object"}, {"id": "a4-actividad_agenda", "name": "actividad_agenda", "value": "={{ 'Contactar lead de WhatsApp: ' + $json.ficha.nombre }}", "type": "string"}]}, "options": {}}, "id": "b1f0c001-0000-4000-8000-000000000005", "name": "Simular registro en panel", "type": "n8n-nodes-base.set", "typeVersion": 3.4, "position": [800, 180]}, {"parameters": {"assignments": {"assignments": [{"id": "a5-para", "name": "para", "value": "Bernardo (WhatsApp)", "type": "string"}, {"id": "a6-aviso", "name": "aviso", "value": "={{ '🔌 Nuevo lead WhatsApp · ' + ($json.parametros.agencia || 'venta directa') + '\\nFicha ' + $json.respuesta_simulada.folio + ' · ' + $json.parametros.nombre + ' · ' + $json.parametros.telefono + '\\n🏠 ' + ($json.parametros.tipo_inmueble || '—') + ' · 🚗 ' + ($json.parametros.vehiculo || '—') + '\\n📍 ' + ($json.parametros.domicilio || '—') + '\\n📝 ' + $json.parametros.observaciones_texto }}", "type": "string"}]}, "options": {}}, "id": "b1f0c001-0000-4000-8000-000000000006", "name": "Simular aviso a Bernardo", "type": "n8n-nodes-base.set", "typeVersion": 3.4, "position": [1060, 180]}, {"parameters": {"assignments": {"assignments": [{"id": "a7-output", "name": "output", "value": "={{ $('Motor del guion').item.json.output + '\\n\\n— 🧪 Solo en la demo: esto le llegaría a Bernardo —\\n' + $json.aviso }}", "type": "string"}]}, "options": {}}, "id": "b1f0c001-0000-4000-8000-000000000007", "name": "Responder al cliente", "type": "n8n-nodes-base.set", "typeVersion": 3.4, "position": [1320, 180]}, {"parameters": {"content": "## 🧪 Demo · Bot de primer contacto DPROMA\n\n**Qué hace:** simula la conversación de WhatsApp en el chat de n8n, sin WhatsApp, sin APIs y sin credenciales.\n\n**Cómo probar:**\n1. Publica el workflow (botón *Publish*, arriba a la derecha; en versiones anteriores, interruptor *Active*).\n2. Abre el nodo **Chat (simula WhatsApp)** y copia la *Chat URL*, o usa el botón **Open chat**.\n3. Escribe «Hola, vengo de Changan del Valle» o solo «Hola».\n4. Contesta con el número de la opción. Escribe «foto» para simular una imagen y «reiniciar» para empezar de nuevo.\n\nGuía completa: `docs/poc-whatsapp/07-demo-n8n.md`", "height": 380, "width": 520, "color": 4}, "id": "b1f0c001-0000-4000-8000-000000000008", "name": "Nota · Cómo probar", "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [-60, -200]}, {"parameters": {"content": "### 1 · Motor del guion\nLa misma lógica que el simulador de la página: preguntas, validaciones, «no entendí» ×2 → persona, flotilla → Bernardo.\nGuarda el avance de cada conversación en la memoria del workflow.\n\n**En el piloto:** la entrada sería el webhook de WhatsApp Cloud API (con firma y filtro) en lugar de este chat.", "height": 240, "width": 400, "color": 7}, "id": "b1f0c001-0000-4000-8000-000000000009", "name": "Nota · Motor", "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [200, 480]}, {"parameters": {"content": "### 2 · Lo que en el piloto será real\n- **Simular registro en panel** → RPC `whatsapp_registrar_lead` en Supabase (crea la ficha «lead» en Contactos y la actividad en la Agenda de Bernardo).\n- **Simular aviso a Bernardo** → mensaje de WhatsApp al número de Bernardo.\n- Las fotos irían a Drive (`DPROMA — Comercial/{folio}`).\n\nAbre *Executions* para ver la ficha completa que se habría enviado.", "height": 260, "width": 560, "color": 6}, "id": "b1f0c001-0000-4000-8000-000000000010", "name": "Nota · Simulado", "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [760, -120]}], "connections": {"Chat (simula WhatsApp)": {"main": [[{"node": "Motor del guion", "type": "main", "index": 0}]]}, "Motor del guion": {"main": [[{"node": "¿Terminó la conversación?", "type": "main", "index": 0}]]}, "¿Terminó la conversación?": {"main": [[{"node": "Simular registro en panel", "type": "main", "index": 0}], [{"node": "Responder siguiente pregunta", "type": "main", "index": 0}]]}, "Simular registro en panel": {"main": [[{"node": "Simular aviso a Bernardo", "type": "main", "index": 0}]]}, "Simular aviso a Bernardo": {"main": [[{"node": "Responder al cliente", "type": "main", "index": 0}]]}}, "settings": {"executionOrder": "v1"}, "pinData": {}, "active": false, "id": "dpromaDemoBotWa01", "tags": []};
+/*N8N:FIN*/
+</script>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ═════════ Simulador ═════════ */
+const TARIFA = 0.0085, GRATIS = 1000;
+const ESCENARIOS = [
+  { id: 'A', titulo: 'Cliente de agencia', sub: 'Caso completo, con fotos', wa: '5215511112222', inicio: [10, 0],
+    pasos: [ { texto: 'Hola, vengo de Changan del Valle', s: 0 }, { texto: 'Ana López', s: 25 }, { opcion: 'casa', s: 8 },
+             { texto: 'Av. Coyoacán 1500, Col. Del Valle, Benito Juárez, CDMX 03100', s: 45 }, { opcion: 'hasta_10', s: 12 },
+             { opcion: 'si', s: 10 }, { imagen: true, s: 50 }, { imagen: true, s: 40 }, { imagen: true, s: 35 } ] },
+  { id: 'B', titulo: 'Particular, más de 20 m', sub: 'Escribe en vez de tocar botones', wa: '5215522223333', inicio: [21, 40],
+    pasos: [ { texto: 'Buenas noches, quiero instalar un cargador', s: 0 }, { texto: 'luis pérez', s: 30 }, { texto: 'es un depa', s: 15 },
+             { texto: '5', s: 10 }, { texto: 'MG4 Electric', s: 20 }, { texto: 'Calle Pino 12, Ciudad Satélite', s: 40 }, { texto: '53100', s: 15 },
+             { texto: 'de 21 a 30', s: 20 }, { texto: 'no sé', s: 12 }, { texto: 'después', s: 10 }, { imagen: true, s: 60 }, { texto: 'después', s: 8 } ] },
+  { id: 'C', titulo: 'Flotilla', sub: 'Pasa directo a Bernardo', wa: '5215533334444', inicio: [12, 15],
+    pasos: [ { texto: 'Buenas tardes', s: 0 }, { texto: 'Logística Norte SA de CV', s: 30 }, { opcion: 'empresa', s: 10 } ] },
+  { id: 'D', titulo: 'Pregunta el precio', sub: 'El bot no lo entiende dos veces', wa: '5215544445555', inicio: [16, 5],
+    pasos: [ { texto: 'hola', s: 0 }, { texto: '¿cuánto cuesta instalar un cargador?', s: 20 }, { texto: '¿pero más o menos el precio?', s: 25 } ] },
+  { id: 'E', titulo: 'Deja de contestar', sub: 'A las 23 h se registra lo que hay', wa: '5215555556666', inicio: [19, 30],
+    pasos: [ { texto: 'Hola', s: 0 }, { texto: 'Mariana Ruiz', s: 20 }, { opcion: 'casa', s: 10 }, { opcion: 'BYD', s: 8 }, { abandono: true, s: 0 } ] },
+  { id: 'L', titulo: 'Prueba tú', sub: 'Contesta como cliente', wa: '5215599990000', inicio: [11, 0], libre: true, pasos: [] },
+];
+
+let esc_ = ESCENARIOS[0], est = null, i = 0, reloj = 0, mensajesBot = 0, primerResp = null, t0 = null, corriendo = false, timer = null, ficha = null, aviso = null, campos = {};
+
+function hhmm(seg) { const t = (esc_.inicio[0] * 3600 + esc_.inicio[1] * 60 + seg); const h = Math.floor(t / 3600) % 24, m = Math.floor(t / 60) % 60; return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; }
+function hms(seg) { const h = Math.floor(seg / 3600), m = Math.floor(seg / 60) % 60, s = Math.round(seg % 60); return h ? `${h} h ${m} min` : m ? `${m} min ${String(s).padStart(2, '0')} s` : `${s} s`; }
+
+function pintarEscenarios() {
+  $('escenarios').innerHTML = ESCENARIOS.map(e => `<button class="chip" type="button" data-id="${e.id}" aria-pressed="${e === esc_}">${esc(e.titulo)}<small>${esc(e.sub)}</small></button>`).join('');
+}
+$('escenarios').addEventListener('click', ev => { const b = ev.target.closest('.chip'); if (!b) return; esc_ = ESCENARIOS.find(e => e.id === b.dataset.id); reiniciar(); });
+
+function reiniciar() {
+  clearTimeout(timer); corriendo = false; est = null; i = 0; reloj = 0; mensajesBot = 0; primerResp = null; t0 = null; ficha = null; aviso = null; campos = {};
+  pintarEscenarios();
+  $('chat').innerHTML = `<div class="dia">HOY</div><div class="sistema">🔒 Los mensajes y llamadas están cifrados de extremo a extremo. Simulación con datos ficticios.</div>`;
+  $('bitacora').innerHTML = `<li class="vacio" style="display:block">Aquí aparece cada cosa que hace el sistema. ${esc_.libre ? 'Escribe “Hola” abajo para empezar.' : 'Dale a Reproducir o a Siguiente mensaje.'}</li>`;
+  const libre = !!esc_.libre;
+  $('wa-input').disabled = !libre; $('b-foto').disabled = !libre; $('b-ubic').disabled = !libre; document.querySelector('.wa-bar .enviar').disabled = !libre;
+  $('wa-input').placeholder = libre ? 'Escribe como si fueras el cliente' : 'Elige “Prueba tú” para escribir';
+  $('b-play').disabled = libre; $('b-paso').disabled = libre;
+  $('estado-sim').textContent = libre ? 'Modo libre: escribe o toca las opciones.' : `${esc_.pasos.length} mensajes del cliente en este caso.`;
+  $('wa-sub').textContent = 'cuenta de empresa';
+  pintarMedidores(); pintarFicha(); pintarAviso();
+}
+
+function pintarMedidores() {
+  $('m-frt').textContent = primerResp == null ? '—' : hms(primerResp);
+  $('m-dur').textContent = t0 == null ? '—' : hms(reloj - t0);
+  $('m-msg').textContent = mensajesBot;
+  const costoLead = mensajesBot * TARIFA;
+  $('m-cost').textContent = '$0.00';
+  $('m-cost-s').textContent = mensajesBot ? `gratis hasta 1,000/mes; después $${costoLead.toFixed(3)} este chat` : 'dentro de los 1,000 gratis';
+}
+
+function globo(dir, html, seg, extra = '') {
+  const d = document.createElement('div'); d.className = `globo ${dir} ${extra}`;
+  d.innerHTML = `${html}<span class="hora">${hhmm(seg)}${dir === 'out' ? '<span class="tick">✓✓</span>' : ''}</span>`;
+  $('chat').appendChild(d); $('chat').scrollTop = $('chat').scrollHeight; return d;
+}
+function opcionesBot(m) {
+  if (!m.opciones || !m.opciones.length) return;
+  const w = document.createElement('div'); w.className = 'opciones';
+  w.innerHTML = (m.tipo === 'lista' ? '<span class="titulo-lista">☰ Ver opciones</span>' : '') +
+    m.opciones.map(o => `<button type="button" data-op="${esc(o.id)}" ${esc_.libre ? '' : 'disabled'}>${esc(o.label)}</button>`).join('');
+  $('chat').appendChild(w);
+}
+$('chat').addEventListener('click', ev => {
+  const b = ev.target.closest('.opciones button'); if (!b || !esc_.libre || b.disabled) return;
+  b.closest('.opciones').querySelectorAll('button').forEach(x => x.disabled = true);
+  enviar({ opcion: b.dataset.op, s: 6 }, b.textContent);
+});
+
+function log(tipo, titulo, detalle, seg) {
+  const li = document.createElement('li');
+  li.innerHTML = `<time>${hhmm(seg)}</time><div class="ev ${tipo}"><b><span class="etq ${tipo}">${{ n8n: 'n8n', panel: 'panel', persona: 'persona', error: 'aviso', meta: 'WhatsApp' }[tipo] || tipo}</span>${esc(titulo)}</b>${detalle ? `<small>${detalle}</small>` : ''}</div>`;
+  const ol = $('bitacora'); const vac = ol.querySelector('.vacio'); if (vac) vac.remove();
+  ol.appendChild(li); const p = $('p-bitacora'); p.scrollTop = p.scrollHeight;
+}
+
+const NOMBRE_PASO = { NOMBRE: 'nombre', INMUEBLE: 'tipo de inmueble', VEHICULO: 'vehículo', VEHICULO_OTRO: 'vehículo', DOMICILIO: 'domicilio', DOMICILIO_CP: 'código postal', METROS: 'metros', MEDIDOR: 'medidor', FOTO_TABLERO: 'foto del tablero', FOTO_SITIO: 'foto del lugar', FOTO_MEDIDOR: 'foto del medidor', COMPLETO: 'cierre', HUMANO: 'paso a persona' };
+
+function textoEntrada(e) {
+  if (e.imagen) return null;
+  if (e.ubicacion) return '📍 Ubicación compartida';
+  if (e.opcion) { const r = [].concat(...Object.values(OPS)).find(o => o.id === e.opcion); return r ? r.label : e.opcion; }
+  return e.texto;
+}
+const OPS = {};
+
+function enviar(e, etiqueta) {
+  if (e.abandono) { abandono(); return; }
+  reloj += e.s || 0;
+  if (t0 == null) { t0 = reloj; }
+  const pasoAntes = est ? est.paso : 'NUEVO';
+  if (e.imagen) { const g = globo('out', `<div class="foto-sim">📷 foto de ejemplo<br>${esc(NOMBRE_PASO[pasoAntes] || '')}</div>`, reloj, 'foto'); }
+  else globo('out', esc(etiqueta || textoEntrada(e)), reloj);
+  log('meta', 'Llega el mensaje del cliente', `WhatsApp lo entrega a n8n (webhook) · ${e.imagen ? 'imagen' : e.opcion ? 'toque de botón' : e.ubicacion ? 'ubicación' : 'texto'}`, reloj);
+  if (e.imagen) log('n8n', 'Descarga la foto y la guarda', 'Se sube a la carpeta de la ficha en Drive (en el piloto). El enlace de Meta caduca en minutos, por eso se baja al momento.', reloj);
+
+  const antes = est; const r = MOTOR.paso(est, e.imagen ? { imagen: true } : e); est = r.estado;
+  const nuevosEv = est.eventos.slice(antes ? antes.eventos.length : 0);
+  nuevosEv.forEach(ev => {
+    if (ev.tipo === 'paso_respondido') log('n8n', `Guarda: ${NOMBRE_PASO[ev.detalle] || ev.detalle}`, valorGuardado(ev.detalle), reloj);
+    if (ev.tipo === 'no_reconocido') log('error', 'No entendió la respuesta', `Pregunta: ${NOMBRE_PASO[ev.detalle] || ev.detalle} · intento ${est.fallos || 2} de 2`, reloj);
+    if (ev.tipo === 'primer_mensaje') log('n8n', 'Conversación nueva', est.agencia ? `Detecta la agencia por el texto del enlace: ${esc(est.agencia)} · origen “vía OEM”` : 'Sin agencia en el texto · origen “venta directa”', reloj);
+    if (ev.tipo === 'derivado_humano') log('persona', 'Pasa a Bernardo', { flotilla: 'Es empresa o flotilla: propuesta a la medida.', pidio_asesor: 'El cliente pidió hablar con alguien.', no_reconocido: 'Dos respuestas que el bot no entendió.' }[ev.detalle] || '', reloj);
+  });
+  actualizarCampos();
+
+  const responder = () => {
+    reloj += 2;
+    if (primerResp == null) primerResp = reloj - t0;
+    r.respuestas.forEach(m => { OPS[m.clave || 'x'] = m.opciones || []; globo('in', esc(m.texto), reloj); opcionesBot(m); mensajesBot++; });
+    log('meta', `Bot responde (${r.respuestas.length} mensaje${r.respuestas.length > 1 ? 's' : ''})`, 'Mensaje de servicio dentro de la ventana de 24 h.', reloj);
+    if (est.terminado && (!antes || !antes.terminado)) cerrar();
+    pintarMedidores(); pintarFicha();
+  };
+  if (reduce || !corriendo && !esc_.libre) responder();
+  else { const t = document.createElement('div'); t.className = 'escribiendo'; t.innerHTML = '<i></i><i></i><i></i>'; $('chat').appendChild(t); $('chat').scrollTop = 1e6;
+         setTimeout(() => { t.remove(); responder(); }, esc_.libre ? 650 : 450); }
+  pintarMedidores();
+}
+
+function valorGuardado(paso) {
+  const d = est.datos;
+  const v = { NOMBRE: d.nombre, INMUEBLE: d.tipo_inmueble, VEHICULO: d.vehiculo, DOMICILIO: d.domicilio, METROS: MOTOR.ETIQUETA[d.metros_aprox], MEDIDOR: d.medidor_independiente === 'no_se' ? 'No sé' : MOTOR.ETIQUETA[d.medidor_independiente],
+              FOTO_TABLERO: est.fotos.includes('tablero') ? 'foto recibida' : 'la manda después', FOTO_SITIO: est.fotos.includes('sitio_recorrido') ? 'foto recibida' : 'la manda después', FOTO_MEDIDOR: est.fotos.includes('medidor') ? 'foto recibida' : 'la manda después' }[paso];
+  return v ? `“${esc(v)}”` : '';
+}
+
+function actualizarCampos() {
+  const d = est.datos; const prev = campos;
+  campos = { Nombre: d.nombre, Teléfono: '+' + esc_.wa, Vehículo: d.vehiculo, Domicilio: d.domicilio, Origen: est.origen === 'oem' ? `Vía OEM · ${est.agencia}` : 'Venta directa',
+             'Tipo de inmueble': d.tipo_inmueble, 'Metros aprox.': MOTOR.ETIQUETA[d.metros_aprox], 'Medidor nuevo': d.medidor_independiente ? (d.medidor_independiente === 'no_se' ? 'No sé' : MOTOR.ETIQUETA[d.medidor_independiente]) : null,
+             Fotos: (est.fotos.length || est.fotosPendientes.length) ? `${est.fotos.length} en Drive${est.fotosPendientes.length ? ` · pendientes: ${est.fotosPendientes.map(f => MOTOR.FOTO[f] || f).join(', ')}` : ''}` : null };
+  campos._cambio = Object.keys(campos).filter(k => campos[k] && campos[k] !== prev[k]);
+}
+
+function pintarFicha() {
+  const c = campos; const hay = est && Object.keys(c).length;
+  const estado = !est ? ['Sin conversación', ''] : ficha ? (est.estado_bot === 'COMPLETO' ? ['Ficha creada · etapa Lead', 'ok'] : ['Ficha creada · revisar', 'warn']) : ['Llenándose…', ''];
+  const nuevas = ['Tipo de inmueble', 'Metros aprox.', 'Medidor nuevo'];
+  $('ficha').innerHTML = `<div class="ficha"><div class="ficha-head"><b>Contactos › ${ficha ? esc(ficha.folio) : 'Nuevo lead'}</b><span class="pill ${estado[1]}">${estado[0]}</span></div>
+    <dl class="campos">${['Nombre', 'Teléfono', 'Vehículo', 'Domicilio', 'Origen', 'Tipo de inmueble', 'Metros aprox.', 'Medidor nuevo', 'Fotos'].map(k => {
+      const v = hay ? c[k] : null; const n = hay && c._cambio && c._cambio.includes(k);
+      return `<dt>${k}${nuevas.includes(k) ? '<span class="nota-campo">campo nuevo propuesto</span>' : ''}</dt><dd class="${v ? (n ? 'nuevo' : '') : 'vacio-c'}">${v ? esc(v) : '—'}</dd>`; }).join('')}
+    ${ficha ? `<dt>Observaciones</dt><dd>${esc(ficha.params.observaciones_texto)}</dd>` : ''}</dl></div>
+    <p class="para-que">Así se vería la ficha en <b>Contactos</b> del panel. Los datos existentes (nombre, teléfono, vehículo, domicilio, origen) ya tienen campo; los marcados como “campo nuevo propuesto” los tiene que aprobar Félix. Si no, van resumidos en Observaciones.</p>`;
+}
+
+function pintarAviso() {
+  $('aviso').innerHTML = aviso ? `<div class="aviso-wa"><div class="globo in">${esc(aviso)}<span class="hora">${hhmm(reloj + 2)}</span></div></div>
+    <p class="para-que">Además del WhatsApp, Bernardo tiene una actividad nueva en su <b>Agenda</b> del panel: “Contactar lead de WhatsApp”.</p>`
+    : '<p class="vacio">Cuando la conversación termina (o pasa a una persona), aquí aparece lo que le llega a Bernardo.</p>';
+}
+
+function cerrar() {
+  const params = MOTOR.armarFicha(est, esc_.wa);
+  ficha = { folio: 'C-DEMO-' + esc_.wa.slice(-4), params };
+  reloj += 1;
+  log('n8n', 'Arma la ficha con todos los datos', `Llama a la función del panel <code>whatsapp_registrar_lead</code> (propuesta para Félix)`, reloj);
+  log('panel', `Ficha ${ficha.folio} creada en Contactos`, `Etapa “Lead”. Si el teléfono ya existía, se actualiza esa ficha en vez de duplicarla.`, reloj);
+  if (est.fotos.length) log('panel', `${est.fotos.length} foto(s) en Drive`, `Carpeta “DPROMA — Comercial/${ficha.folio}”`, reloj);
+  log('panel', 'Actividad en la Agenda de Bernardo', '“Contactar lead de WhatsApp”, con fecha de hoy', reloj);
+  aviso = `🔌 Nuevo lead WhatsApp · ${params.agencia || (params.origen === 'oem' ? 'vía OEM' : 'venta directa')}\nFicha ${ficha.folio} · ${params.nombre} · ${params.telefono}\n🏠 ${params.tipo_inmueble || '—'} · 🚗 ${params.vehiculo || '—'}\n📍 ${params.domicilio || '—'}\n📝 ${params.observaciones_texto}`;
+  log(est.estado_bot === 'COMPLETO' ? 'meta' : 'persona', 'Aviso por WhatsApp a Bernardo', 'Resumen con el enlace a la ficha', reloj);
+  $('estado-sim').textContent = { COMPLETO: 'Conversación completa: revisa las pestañas “Ficha en el panel” y “Aviso a Bernardo”.',
+    INCOMPLETO: 'El cliente dejó de contestar: la ficha se creó con lo que había y Bernardo da seguimiento.' }[est.estado_bot] || 'La conversación pasó a una persona: la ficha se creó con lo que había.';
+  pintarAviso(); pintarFicha();
+}
+
+function abandono() {
+  reloj += 23 * 3600;
+  $('chat').insertAdjacentHTML('beforeend', '<div class="sistema">⏱ Pasan 23 horas sin respuesta del cliente</div>'); $('chat').scrollTop = 1e6;
+  log('error', 'El cliente dejó de contestar', 'Hubo un recordatorio a los 30 min. A las 23 h, antes de que cierre la ventana de 24 h de WhatsApp, se registra lo que hay.', reloj);
+  est = MOTOR.abandonar(est); actualizarCampos(); cerrar(); pintarMedidores();
+}
+
+function siguiente() {
+  if (esc_.libre || i >= esc_.pasos.length) { corriendo = false; actualizarBotones(); return false; }
+  enviar(esc_.pasos[i++]);
+  actualizarBotones();
+  return i < esc_.pasos.length;
+}
+function actualizarBotones() {
+  const fin = i >= esc_.pasos.length;
+  $('b-paso').disabled = esc_.libre || fin; $('b-play').disabled = esc_.libre || fin;
+  $('b-play').textContent = corriendo ? '⏸ Pausar' : '▶ Reproducir';
+  if (!esc_.libre && !fin) $('estado-sim').textContent = `Mensaje ${i} de ${esc_.pasos.length}`;
+}
+function bucle() { if (!corriendo) return; const hay = siguiente(); if (hay) timer = setTimeout(bucle, reduce ? 300 : 1500); else { corriendo = false; actualizarBotones(); } }
+$('b-play').addEventListener('click', () => { if (corriendo) { corriendo = false; clearTimeout(timer); actualizarBotones(); return; } if (i >= esc_.pasos.length) reiniciar(); corriendo = true; actualizarBotones(); bucle(); });
+$('b-paso').addEventListener('click', () => { corriendo = false; clearTimeout(timer); siguiente(); });
+$('b-reset').addEventListener('click', reiniciar);
+$('wa-form').addEventListener('submit', ev => { ev.preventDefault(); const v = $('wa-input').value.trim(); if (!v || !esc_.libre) return; $('wa-input').value = ''; enviar({ texto: v, s: 8 }); });
+$('b-foto').addEventListener('click', () => esc_.libre && enviar({ imagen: true, s: 15 }));
+$('b-ubic').addEventListener('click', () => esc_.libre && enviar({ ubicacion: { lat: 19.3907, lng: -99.161 }, s: 10 }, '📍 Ubicación: Col. Del Valle, CDMX'));
+
+document.querySelectorAll('.pestanas [role=tab]').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.pestanas [role=tab]').forEach(x => { const on = x === t; x.setAttribute('aria-selected', on); $(x.getAttribute('aria-controls')).hidden = !on; });
+}));
+
+/* ═════════ Flujo ═════════ */
+const FLUJO = [
+  { fase: 'Entrada', pasos: [
+    { id: 'entrada', t: 'El cliente escribe', q: 'Toca el enlace o QR de su agencia, el botón de la web, o escribe directo al número del bot.', por: 'El texto que trae el enlace (“Hola, vengo de Changan del Valle”) le dice al bot de dónde viene sin preguntarlo.', guarda: 'Origen y agencia', panel: 'origen (venta directa / vía OEM)' },
+    { id: 'nombre', t: 'Bienvenida y nombre', q: '“¿A nombre de quién hacemos la cotización? (persona o empresa)”', por: 'Es el encabezado de la cotización. Incluye el enlace al aviso de privacidad, que la ley pide antes de recabar datos.', guarda: 'Nombre', panel: 'nombre' } ] },
+  { fase: 'Datos del cotizador', pasos: [
+    { id: 'inmueble', t: 'Tipo de inmueble', q: 'Botones: Casa · Condominio / edificio · Empresa / flotilla', por: 'El cotizador distingue “Casa particular” y “Residencial”. Empresa o flotilla se atiende a la medida.', guarda: 'Tipo de inmueble', panel: 'campo nuevo propuesto' },
+    { id: 'vehiculo', t: 'Vehículo', q: 'Lista: Changan Dipal S07, BYD, MG, Tesla, Otro', por: 'Campo “Vehículo” del cotizador. Se salta si el cliente viene de una agencia.', guarda: 'Vehículo', panel: 'vehiculo' },
+    { id: 'domicilio', t: 'Domicilio', q: 'Calle, número, colonia y código postal (la ubicación es opcional)', por: 'Campo “Domicilio” del cotizador. El código postal dice el estado y la zona.', guarda: 'Domicilio y CP', panel: 'domicilio, estado' },
+    { id: 'metros', t: 'Metros del tablero al cargador', q: 'Lista: Hasta 10 m · 11–20 · 21–30 · Más de 30 · No sé', por: 'La instalación estándar incluye 10 m; desde el metro 11 se cobra por metro. Bernardo sabe de antemano si hay metros extra.', guarda: 'Metros aproximados', panel: 'campo nuevo propuesto' },
+    { id: 'medidor', t: 'Medidor de CFE', q: 'Botones: Medidor nuevo · Mi luz actual · No sé', por: 'Define si entran el trámite ante CFE y la mufa en la cotización.', guarda: 'Medidor independiente', panel: 'campo nuevo propuesto' } ] },
+  { fase: 'Evidencia', pasos: [
+    { id: 'fotos', t: 'Tres fotos opcionales', q: 'Tablero eléctrico · lugar de carga y recorrido · medidor de CFE. Cada una con “Enviar después”.', por: 'Con ellas Bernardo revisa tierra física, mufa, muro y si hace falta andamio, sin ir al sitio.', guarda: 'Fotos', panel: 'Drive (carpeta de la ficha)' } ] },
+  { fase: 'Salida', pasos: [
+    { id: 'ficha', t: 'Ficha + aviso', q: '“¡Listo! Bernardo te escribe para darte tu cotización.”', por: 'Se crea la ficha en Contactos, se suben las fotos y Bernardo recibe una actividad en su Agenda y un WhatsApp.', guarda: 'Todo', panel: 'Contactos, Drive, Agenda' },
+    { id: 'persona', salida: true, t: 'Pasa a una persona', q: 'Si escribe “asesor”, si es flotilla, si el bot no entiende dos veces o si deja de contestar 23 h.', por: 'Nunca hay un callejón sin salida. La ficha se crea con lo que haya y Bernardo sigue.', guarda: 'Lo capturado + motivo', panel: 'Observaciones' } ] },
+];
+let flujoSel = 'metros';
+function pintarFlujo() {
+  let n = 0;
+  $('flujo-mapa').innerHTML = FLUJO.map(f => `<div class="fase"><h3>${esc(f.fase)}</h3>${f.pasos.map(p => { n++; return `<button class="nodo ${p.salida ? 'salida' : ''}" type="button" data-id="${p.id}" aria-pressed="${p.id === flujoSel}"><span class="n">${p.salida ? '!' : n}</span><span>${esc(p.t)}</span></button>`; }).join('')}</div>`).join('');
+  const p = FLUJO.flatMap(f => f.pasos).find(x => x.id === flujoSel);
+  $('flujo-detalle').innerHTML = `<div><h3>${esc(p.t)}</h3><p><b>Qué ve el cliente:</b> ${esc(p.q)}</p><p style="margin-top:8px"><b>Por qué:</b> ${esc(p.por)}</p></div>
+    <dl><dt>Dato que guarda</dt><dd>${esc(p.guarda)}</dd><dt>Dónde queda</dt><dd>${esc(p.panel)}</dd></dl>`;
+}
+$('flujo-mapa').addEventListener('click', ev => { const b = ev.target.closest('.nodo'); if (!b) return; flujoSel = b.dataset.id; pintarFlujo(); });
+
+/* ═════════ Limitaciones ═════════ */
+const LIMITES = [
+  { o: 'WhatsApp', s: 'alta', t: 'Ventana de 24 horas', p: 'El bot solo puede escribir libremente durante 24 h desde el último mensaje del cliente. Después, solo con plantillas aprobadas por Meta, que se cobran aparte.', h: 'El bot siempre contesta al momento. Si el cliente se va, se registra a las 23 h. Bernardo da seguimiento desde su propio WhatsApp.' },
+  { o: 'WhatsApp', s: 'media', t: 'Máximo 3 botones o 10 opciones', p: 'Cada mensaje admite hasta 3 botones, o una lista de hasta 10 opciones.', h: 'Las preguntas se diseñaron con esos límites: 3 botones para inmueble y medidor, listas para vehículo y metros.' },
+  { o: 'WhatsApp', s: 'media', t: 'Las fotos caducan en minutos', p: 'Meta da un enlace temporal para descargar cada foto.', h: 'n8n la descarga al instante y la sube a Drive. Si falla, la ficha queda con “fotos pendientes”.' },
+  { o: 'WhatsApp', s: 'alta', t: 'El número de Bernardo', p: 'Si su número pasa a la API, deja de funcionar en la app normal, salvo con “coexistencia”, que tiene sus propios límites.', h: 'El piloto usa un número nuevo (“DPROMA Cargadores”). Bernardo sigue con el suyo.' },
+  { o: 'WhatsApp', s: 'media', t: 'Verificación de la empresa en Meta', p: 'Sin verificar, hay topes de mensajes y de números.', h: 'Iniciar la verificación en cuanto se apruebe el piloto; para 100 leads al mes no estorba.' },
+  { o: 'Bot', s: 'alta', t: 'No entiende texto libre', p: 'Un guion de reglas se pierde con mensajes largos (“tengo un dipal y vivo en Del Valle”) o con preguntas fuera de guion.', h: 'Botones casi siempre, palabras clave (“depa” = condominio) y paso a persona al segundo intento. Si el piloto muestra mucho abandono por esto, se evalúa IA.' },
+  { o: 'Bot', s: 'media', t: 'Audios y videos', p: 'El bot no escucha audios ni ve videos.', h: 'Se guardan en la ficha para que Bernardo los revise; la conversación sigue.' },
+  { o: 'Bot', s: 'baja', t: 'No da precios', p: 'El bot no cotiza: eso es otra iniciativa. A algunos clientes les va a molestar no ver un precio.', h: 'El bot promete un tiempo de respuesta y Bernardo cotiza con todos los datos ya en la ficha.' },
+  { o: 'Otras áreas', s: 'alta', t: 'Entrada al panel', p: 'Para que la ficha llegue sola, Félix tiene que abrir una entrada segura: un usuario del bot y una función de registro.', h: 'Mientras no exista, la demo y el piloto pueden avisar a Bernardo por WhatsApp con la ficha completa para que la pegue.' },
+  { o: 'Otras áreas', s: 'alta', t: 'Datos personales', p: 'Pedir nombre, domicilio y fotos de la casa requiere aviso de privacidad (LFPDPPP).', h: 'Publicar el aviso antes del piloto; el bot lo enlaza en el primer mensaje.' },
+  { o: 'Otras áreas', s: 'media', t: 'Un solo destinatario', p: 'Todos los leads le llegan a Bernardo. En una campaña con 200 mensajes, él se vuelve el cuello de botella.', h: 'Medir “primer contacto humano”. Si se satura, sumar un segundo vendedor o reglas de asignación.' },
+];
+let filtroLim = 'Todas';
+function pintarLimites() {
+  const orig = ['Todas', 'WhatsApp', 'Bot', 'Otras áreas'];
+  $('filtros-lim').innerHTML = orig.map(o => `<button class="chip" type="button" data-f="${o}" aria-pressed="${o === filtroLim}">${o}</button>`).join('');
+  const sev = { alta: 'Importante', media: 'A cuidar', baja: 'Menor' };
+  $('limites').innerHTML = LIMITES.filter(l => filtroLim === 'Todas' || l.o === filtroLim).map(l => `<article class="limite"><header><h3>${esc(l.t)}</h3><span class="sev ${l.s}">${sev[l.s]}</span></header><p>${esc(l.p)}</p><p class="hacemos">${esc(l.h)}</p></article>`).join('');
+}
+$('filtros-lim').addEventListener('click', ev => { const b = ev.target.closest('.chip'); if (!b) return; filtroLim = b.dataset.f; pintarLimites(); });
+
+/* ═════════ Costos ═════════ */
+const HERR = [
+  { id: 'self', t: 'n8n en servidor propio', ayuda: 'Licencia gratis; se paga el servidor (≈ US$5–20 al mes). Sin tope de ejecuciones. Lo mantiene Félix o Studio2894.' },
+  { id: 'cloud', t: 'n8n Cloud', ayuda: 'Sin servidor que mantener. Starter ≈ €24 hasta 2,500 ejecuciones; Pro ≈ €60 hasta 10,000; arriba de eso, plan Business.' },
+];
+let herr = 'cloud', filtro = true;
+function seg(id, items, sel, on) { $(id).innerHTML = items.map(x => `<button type="button" data-v="${x.id}" aria-pressed="${x.id === sel}">${esc(x.t)}</button>`).join(''); $(id).onclick = ev => { const b = ev.target.closest('button'); if (b) on(b.dataset.v); }; }
+const usd = (n, d = 2) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+function calcular() {
+  const leads = +$('c-leads').value, msgs = +$('c-msgs').value, eur = +$('c-eur').value;
+  $('o-leads').textContent = leads.toLocaleString('en-US'); $('o-msgs').textContent = msgs; $('o-eur').textContent = eur.toFixed(2);
+  seg('c-herr', HERR, herr, v => { herr = v; calcular(); });
+  seg('c-filtro', [{ id: 'si', t: 'Con filtro (recomendado)' }, { id: 'no', t: 'Sin filtro' }], filtro ? 'si' : 'no', v => { filtro = v === 'si'; calcular(); });
+  $('c-herr-ayuda').textContent = HERR.find(h => h.id === herr).ayuda;
+  const totalMsgs = leads * msgs; const cobrados = Math.max(0, totalMsgs - GRATIS); const meta = cobrados * TARIFA;
+  const ejecuciones = Math.round(leads * (msgs - 1) * (filtro ? 1 : 4));   // ≈ un webhook por respuesta del cliente (+3 avisos por mensaje del bot sin filtro)
+  let n8n, plan;
+  if (herr === 'self') { n8n = leads > 600 ? 30 : 12; plan = leads > 600 ? 'Servidor mediano (≈ $20–40)' : 'Servidor pequeño (≈ $5–20)'; }
+  else if (ejecuciones <= 2500) { n8n = 24 * eur; plan = `Starter · ${ejecuciones.toLocaleString('en-US')} de 2,500 ejecuciones`; }
+  else if (ejecuciones <= 10000) { n8n = 60 * eur; plan = `Pro · ${ejecuciones.toLocaleString('en-US')} de 10,000 ejecuciones`; }
+  else { n8n = 800 * eur; plan = `Business · ${ejecuciones.toLocaleString('en-US')} ejecuciones`; }
+  const total = meta + n8n;
+  $('r-total').textContent = usd(total, 0) + ' USD';
+  $('r-lead').textContent = `≈ ${usd(total / leads)} por lead · ${leads.toLocaleString('en-US')} leads`;
+  $('r-filas').innerHTML = [
+    ['Mensajes del bot al mes', totalMsgs.toLocaleString('en-US')],
+    ['Gratis (1,000 por número)', Math.min(totalMsgs, GRATIS).toLocaleString('en-US')],
+    [`Cobrados × $${TARIFA}`, cobrados.toLocaleString('en-US')],
+    ['WhatsApp (Meta)', usd(meta)],
+    [`n8n · ${plan}`, usd(n8n)],
+  ].map(([a, b]) => `<div>${esc(a)}</div><div>${esc(b)}</div>`).join('');
+  const max = Math.max(meta, n8n, 1);
+  $('r-barras').innerHTML = [['WhatsApp', meta, 'meta'], ['n8n', n8n, '']].map(([t, v, c]) => `<div class="barra"><span>${t}</span><div class="pista"><div class="relleno ${c}" style="width:${(v / max * 100).toFixed(1)}%"></div></div><output>${usd(v)}</output></div>`).join('');
+  const al = $('r-alerta');
+  if (herr === 'cloud' && !filtro && ejecuciones > 10000) { al.hidden = false; al.textContent = 'Sin filtro, los avisos de “entregado/leído” disparan las ejecuciones y obligan al plan más caro. Con filtro, o con n8n en servidor propio, el costo baja mucho.'; }
+  else if (totalMsgs <= GRATIS) { al.hidden = false; al.textContent = 'Con este volumen, todos los mensajes del bot caben en los 1,000 gratis del mes: WhatsApp no cuesta nada.'; }
+  else al.hidden = true;
+}
+['c-leads', 'c-msgs', 'c-eur'].forEach(id => $(id).addEventListener('input', calcular));
+
+/* ═════════ Impacto ═════════ */
+function impacto() {
+  const leads = +$('i-leads').value, min = +$('i-min').value, fuera = +$('i-fuera').value;
+  $('o-ileads').textContent = leads.toLocaleString('en-US'); $('o-imin').textContent = min; $('o-ifuera').textContent = fuera + ' %';
+  const horas = leads * min * 0.8 / 60;   // 80 %: se asume que 2 de cada 10 fichas aún requieren completar algo a mano
+  $('i-horas').textContent = `${horas.toFixed(0)} h al mes`;
+  $('i-horas-s').textContent = `≈ ${(horas / 4.3).toFixed(1)} h por semana para cotizar y dar seguimiento en vez de capturar`;
+  $('i-filas').innerHTML = [
+    ['Leads que reciben respuesta en segundos', `${leads.toLocaleString('en-US')} de ${leads.toLocaleString('en-US')}`],
+    ['Fuera de horario, que hoy esperan al día siguiente', Math.round(leads * fuera / 100).toLocaleString('en-US')],
+    ['Fichas que llegan al panel sin captura', `≈ ${Math.round(leads * 0.6).toLocaleString('en-US')} completas + el resto parciales`],
+    ['Supuesto de corrección manual', '2 de cada 10 fichas'],
+  ].map(([a, b]) => `<div>${esc(a)}</div><div>${esc(b)}</div>`).join('');
+}
+['i-leads', 'i-min', 'i-fuera'].forEach(id => $(id).addEventListener('input', impacto));
+
+/* ═════════ Copiar workflow ═════════ */
+$('b-copiar').addEventListener('click', async () => {
+  const txt = JSON.stringify(N8N_WORKFLOW, null, 2); const ta = $('n8n-json'); const st = $('copiar-estado');
+  try { await navigator.clipboard.writeText(txt); st.textContent = '✓ Copiado. En n8n, abre un workflow vacío y pega con Ctrl/Cmd + V.'; }
+  catch (e) { ta.hidden = false; ta.value = txt; ta.style.cssText = 'width:100%;height:220px;margin-top:12px;font-family:var(--mono);font-size:.78rem'; ta.focus(); ta.select(); st.textContent = 'Tu navegador no dejó copiar automáticamente: el texto quedó seleccionado abajo, cópialo con Ctrl/Cmd + C.'; }
+});
+if (!N8N_WORKFLOW) $('b-copiar').disabled = true;
+
+pintarEscenarios(); reiniciar(); pintarFlujo(); pintarLimites(); calcular(); impacto();
+})();
+</script>
 </body>
 </html>

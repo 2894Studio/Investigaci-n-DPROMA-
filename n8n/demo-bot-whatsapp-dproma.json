@@ -1,0 +1,309 @@
+{
+  "name": "DPROMA · Demo bot WhatsApp (sin APIs)",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "mode": "hostedChat",
+        "initialMessages": "Hola 👋 Esta es una demo del bot de DPROMA.\nEscribe «Hola» o «Hola, vengo de Changan del Valle» para empezar.",
+        "options": {
+          "title": "DPROMA · Demo bot WhatsApp",
+          "subtitle": "Simulación sin WhatsApp ni APIs",
+          "inputPlaceholder": "Escribe un mensaje…",
+          "responseMode": "lastNode"
+        }
+      },
+      "id": "b1f0c001-0000-4000-8000-000000000001",
+      "name": "Chat (simula WhatsApp)",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "d9f1a2b3-4c5d-4e6f-8a9b-0c1d2e3f4a5b"
+    },
+    {
+      "parameters": {
+        "jsCode": "/* Motor del guion — bot de primer contacto DPROMA (PoC WhatsApp)\n * Fuente única de la lógica de conversación. Se inserta tal cual en:\n *   - n8n/demo-bot-whatsapp-dproma.json (nodo Code «Motor del guion»)\n *   - web/entregables/poc-whatsapp-primer-contacto.html (simulador)\n * mediante scripts/build-poc-whatsapp.py. Edita aquí y vuelve a correr el script.\n * Sin dependencias: JavaScript puro, sin red, sin credenciales.\n */\nconst MOTOR = (() => {\n  const AGENCIAS = [\n    { clave: 'changan del valle', nombre: 'Changan del Valle', slug: 'changan-del-valle', marca: 'Changan' },\n  ];\n  const PALABRAS_ASESOR = /\\b(asesor|humano|persona|llamar|ll[aá]mame|hablar con alguien)\\b/i;\n  const PREGUNTA_LIBRE = /\\?|cu[aá]nto|precio|costo|cuesta/i;\n\n  const P = {\n    INMUEBLE: { tipo: 'botones', texto: 'Gracias, {nombre}. ¿Dónde quieres instalar el cargador?',\n      opciones: [ { id: 'casa', label: 'Casa', claves: ['casa'] },\n                  { id: 'condominio', label: 'Condominio / edificio', claves: ['condominio', 'edificio', 'depa', 'departamento'] },\n                  { id: 'empresa', label: 'Empresa / flotilla', claves: ['empresa', 'flotilla', 'negocio', 'oficina'] } ] },\n    VEHICULO: { tipo: 'lista', texto: '¿Qué auto tienes o vas a recibir?',\n      opciones: [ { id: 'Changan Dipal S07', label: 'Changan Dipal S07', claves: ['dipal', 'changan'] },\n                  { id: 'BYD', label: 'BYD', claves: ['byd'] },\n                  { id: 'MG', label: 'MG', claves: ['mg'] },\n                  { id: 'Tesla', label: 'Tesla', claves: ['tesla'] },\n                  { id: 'otro', label: 'Otro…', claves: ['otro'] } ] },\n    VEHICULO_OTRO: { tipo: 'texto', texto: '¿Cuál? Escríbelo, por favor (marca y modelo).' },\n    DOMICILIO: { tipo: 'texto', texto: '¿Cuál es el domicilio de la instalación? Calle, número, colonia y código postal.\\nSi te queda más fácil, también puedes mandar tu ubicación 📍' },\n    DOMICILIO_CP: { tipo: 'texto', texto: '¡Gracias! ¿Y el código postal? (5 dígitos)' },\n    METROS: { tipo: 'lista', texto: 'Más o menos, ¿qué distancia hay del tablero eléctrico al lugar donde vas a cargar el auto? 📏 Un auto mide unos 4.5 m.',\n      opciones: [ { id: 'hasta_10', label: 'Hasta 10 m', claves: ['hasta 10', 'menos de 10'] },\n                  { id: '11_20', label: 'De 11 a 20 m', claves: ['11 a 20', '11-20'] },\n                  { id: '21_30', label: 'De 21 a 30 m', claves: ['21 a 30', '21-30'] },\n                  { id: 'mas_30', label: 'Más de 30 m', claves: ['mas de 30', 'más de 30'] },\n                  { id: 'no_se', label: 'No sé', claves: ['no se', 'no sé', 'ni idea'] } ] },\n    MEDIDOR: { tipo: 'botones', texto: '¿Quieres un medidor de CFE independiente solo para el cargador, o conectarlo a tu luz de siempre?',\n      opciones: [ { id: 'si', label: 'Medidor nuevo', claves: ['nuevo', 'independiente', 'si', 'sí'] },\n                  { id: 'no', label: 'Mi luz actual', claves: ['actual', 'mi luz', 'no'] },\n                  { id: 'no_se', label: 'No sé', claves: ['no se', 'no sé'] } ] },\n    FOTO_TABLERO: { tipo: 'foto', foto: 'tablero', texto: '¿Nos mandas una foto de tu tablero eléctrico (la caja con los interruptores)? Así la cotización sale más precisa.',\n      opciones: [ { id: 'despues', label: 'Enviar después', claves: ['despues', 'después', 'luego', 'no tengo'] } ] },\n    FOTO_SITIO: { tipo: 'foto', foto: 'sitio_recorrido', texto: 'Ahora una foto del lugar donde quieres cargar el auto y, si se puede, del camino por donde iría el cable.',\n      opciones: [ { id: 'despues', label: 'Enviar después', claves: ['despues', 'después', 'luego', 'no tengo'] } ] },\n    FOTO_MEDIDOR: { tipo: 'foto', foto: 'medidor', texto: 'Y por último, una foto de tu medidor de CFE.',\n      opciones: [ { id: 'despues', label: 'Enviar después', claves: ['despues', 'después', 'luego', 'no tengo'] } ] },\n  };\n  const ORDEN = ['INMUEBLE', 'VEHICULO', 'DOMICILIO', 'METROS', 'MEDIDOR', 'FOTO_TABLERO', 'FOTO_SITIO', 'FOTO_MEDIDOR'];\n  const NOMBRE_INMUEBLE = { casa: 'Casa particular', condominio: 'Residencial', empresa: 'Empresa / flotilla' };\n\n  const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();\n  const titulo = s => String(s).trim().replace(/\\s+/g, ' ').replace(/(^|\\s)\\S/g, c => c.toUpperCase());\n\n  function nuevoEstado() {\n    return { paso: 'NUEVO', datos: {}, fallos: 0, fotos: [], fotosPendientes: [], origen: 'directa', agencia: null,\n             terminado: false, estado_bot: null, motivo_humano: null, eventos: [] };\n  }\n\n  function pregunta(clave, est) {\n    const p = P[clave];\n    return { clave, tipo: p.tipo, texto: p.texto.replace('{nombre}', (est.datos.nombre || '').split(' ')[0]),\n             opciones: (p.opciones || []).map(o => ({ id: o.id, label: o.label })) };\n  }\n\n  function siguiente(clave, est) {\n    let i = ORDEN.indexOf(clave) + 1;\n    if (ORDEN[i] === 'VEHICULO' && est.agencia) i++;           // la agencia ya dice la marca\n    return ORDEN[i] || 'COMPLETO';\n  }\n\n  function elegir(clave, entrada) {\n    const ops = P[clave].opciones || [];\n    if (entrada.opcion) return ops.find(o => o.id === entrada.opcion) || null;\n    const t = norm(entrada.texto);\n    if (!t) return null;\n    if (/^\\d+$/.test(t)) return ops[Number(t) - 1] || null;\n    // Gana la clave más larga que aparezca como palabra completa («no sé» antes que «no»).\n    let mejor = null, largo = 0;\n    for (const o of ops) for (const k of o.claves) {\n      const nk = norm(k).replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n      if (new RegExp(`(^|[^a-z0-9])${nk}($|[^a-z0-9])`).test(t) && nk.length > largo) { mejor = o; largo = nk.length; }\n    }\n    return mejor;\n  }\n\n  function evento(est, tipo, detalle, t) { est.eventos.push({ tipo, detalle: detalle == null ? null : String(detalle), t: t || null }); }\n\n  function aHumano(est, motivo, texto) {\n    est.paso = 'HUMANO'; est.terminado = true; est.estado_bot = 'HUMANO'; est.motivo_humano = motivo;\n    evento(est, 'derivado_humano', motivo);\n    return [{ tipo: 'texto', texto }];\n  }\n\n  function fallo(est, clave) {\n    est.fallos++;\n    evento(est, 'no_reconocido', clave);\n    if (est.fallos >= 2) return aHumano(est, 'no_reconocido', 'Mejor te comunico con alguien del equipo para no hacerte perder tiempo. Bernardo te escribe en cuanto pueda 🙂');\n    const p = pregunta(clave, est);\n    return [{ tipo: 'texto', texto: 'Perdón, no te entendí. Elige una opción o escribe tu respuesta, por favor.' }, p];\n  }\n\n  function avanzar(est, clave) {\n    est.fallos = 0;\n    evento(est, 'paso_respondido', clave);\n    const sig = siguiente(clave, est);\n    est.paso = sig;\n    if (sig === 'COMPLETO') return completar(est);\n    return [pregunta(sig, est)];\n  }\n\n  function completar(est) {\n    est.terminado = true; est.estado_bot = 'COMPLETO';\n    evento(est, 'datos_completos');\n    const nombre = (est.datos.nombre || '').split(' ')[0];\n    return [{ tipo: 'texto', texto: `¡Listo, ${nombre}! Ya tenemos todo ✅ Bernardo, de nuestro equipo, te escribe para darte tu cotización. Horario: lun–vie 9–18 h, sáb 9–14 h.` }];\n  }\n\n  /** entrada: { texto?, opcion?, imagen?: true, ubicacion?: {lat, lng} } → { estado, respuestas[] } */\n  function paso(estadoPrevio, entrada) {\n    const est = estadoPrevio ? JSON.parse(JSON.stringify(estadoPrevio)) : nuevoEstado();\n    entrada = entrada || {};\n    const texto = entrada.texto || '';\n    let r;\n\n    if (est.terminado) {\n      evento(est, 'mensaje_posterior', texto || (entrada.imagen ? 'imagen' : ''));\n      if (entrada.imagen) est.fotos.push('otro');\n      return { estado: est, respuestas: [{ tipo: 'texto', texto: 'Gracias, ya se lo pasé a Bernardo junto con tu ficha 👍' }] };\n    }\n\n    if (texto && PALABRAS_ASESOR.test(texto) && est.paso !== 'NUEVO') {\n      r = aHumano(est, 'pidio_asesor', 'Claro, te comunico con alguien del equipo. Bernardo te escribe en cuanto pueda 🙂');\n      return { estado: est, respuestas: r };\n    }\n\n    switch (est.paso) {\n      case 'NUEVO': {\n        evento(est, 'primer_mensaje', texto);\n        const ag = AGENCIAS.find(a => norm(texto).includes(a.clave));\n        let saludo = '¡Hola! 👋 Soy el asistente de DPROMA.';\n        if (ag) { est.agencia = ag.nombre; est.origen = 'oem'; est.datos.vehiculo = `${ag.marca} (modelo por confirmar)`;\n                  saludo = `¡Hola! 👋 Vienes de ${ag.nombre}, ¡felicidades por tu auto nuevo! Soy el asistente de DPROMA.`; }\n        est.paso = 'NOMBRE';\n        r = [{ tipo: 'texto', texto: `${saludo} En un par de minutos tomo los datos para preparar la cotización de la instalación de tu cargador.\\n\\nAl seguir aceptas nuestro aviso de privacidad: dproma.com/privacidad\\n\\n¿A nombre de quién hacemos la cotización? (persona o empresa)` }];\n        break;\n      }\n      case 'NOMBRE': {\n        if (!texto || texto.trim().length < 2 || PREGUNTA_LIBRE.test(texto)) {\n          est.fallos++; evento(est, 'no_reconocido', 'NOMBRE');\n          if (est.fallos >= 2) { r = aHumano(est, 'no_reconocido', 'Mejor te comunico con alguien del equipo para resolver tus dudas. Bernardo te escribe en cuanto pueda 🙂'); break; }\n          r = [{ tipo: 'texto', texto: 'Con gusto te damos el precio exacto, solo necesito unos datos 🙂 ¿A nombre de quién hacemos la cotización?' }];\n          break;\n        }\n        est.datos.nombre = titulo(texto); est.fallos = 0; evento(est, 'paso_respondido', 'NOMBRE');\n        est.paso = 'INMUEBLE'; r = [pregunta('INMUEBLE', est)];\n        break;\n      }\n      case 'INMUEBLE': {\n        const o = elegir('INMUEBLE', entrada);\n        if (!o) { r = fallo(est, 'INMUEBLE'); break; }\n        est.datos.tipo_inmueble = NOMBRE_INMUEBLE[o.id];\n        if (o.id === 'empresa') { r = aHumano(est, 'flotilla', 'Para empresas y flotillas armamos una propuesta a la medida. Te comunico con Bernardo, de nuestro equipo comercial 🙂'); break; }\n        r = avanzar(est, 'INMUEBLE');\n        break;\n      }\n      case 'VEHICULO': {\n        const o = elegir('VEHICULO', entrada);\n        if (!o) { r = fallo(est, 'VEHICULO'); break; }\n        if (o.id === 'otro') { est.fallos = 0; est.paso = 'VEHICULO_OTRO'; r = [pregunta('VEHICULO_OTRO', est)]; break; }\n        est.datos.vehiculo = o.id; r = avanzar(est, 'VEHICULO');\n        break;\n      }\n      case 'VEHICULO_OTRO': {\n        if (!texto || texto.trim().length < 2) { r = fallo(est, 'VEHICULO_OTRO'); break; }\n        est.datos.vehiculo = titulo(texto); est.paso = 'VEHICULO'; r = avanzar(est, 'VEHICULO');\n        break;\n      }\n      case 'DOMICILIO':\n      case 'DOMICILIO_CP': {\n        if (entrada.ubicacion) {\n          est.datos.mapa = `https://maps.google.com/?q=${entrada.ubicacion.lat},${entrada.ubicacion.lng}`;\n          est.paso = 'DOMICILIO_CP'; est.fallos = 0;\n          r = [{ tipo: 'texto', texto: '¡Gracias por la ubicación! Para la cotización necesito también el domicilio por escrito: calle, número, colonia y código postal.' }];\n          break;\n        }\n        const cp = (texto.match(/\\b\\d{5}\\b/) || [])[0];\n        if (est.paso === 'DOMICILIO') {\n          if (!texto || texto.trim().length < 6) { r = fallo(est, 'DOMICILIO'); break; }\n          est.datos.domicilio = texto.trim().replace(/\\s+/g, ' ');\n          if (!cp) { est.paso = 'DOMICILIO_CP'; est.fallos = 0; r = [pregunta('DOMICILIO_CP', est)]; break; }\n        } else {\n          if (!cp) { r = fallo(est, 'DOMICILIO_CP'); break; }\n          if (!est.datos.domicilio || est.datos.domicilio === cp) est.datos.domicilio = texto.trim();\n          else if (!est.datos.domicilio.includes(cp)) est.datos.domicilio += `, CP ${cp}`;\n        }\n        est.datos.codigo_postal = cp; est.paso = 'DOMICILIO'; r = avanzar(est, 'DOMICILIO');\n        break;\n      }\n      case 'METROS':\n      case 'MEDIDOR': {\n        const clave = est.paso; const o = elegir(clave, entrada);\n        if (!o) { r = fallo(est, clave); break; }\n        est.datos[clave === 'METROS' ? 'metros_aprox' : 'medidor_independiente'] = o.id;\n        r = avanzar(est, clave);\n        break;\n      }\n      case 'FOTO_TABLERO':\n      case 'FOTO_SITIO':\n      case 'FOTO_MEDIDOR': {\n        const clave = est.paso;\n        if (entrada.imagen) { est.fotos.push(P[clave].foto); evento(est, 'foto_recibida', P[clave].foto); r = avanzar(est, clave); break; }\n        const o = elegir(clave, entrada);\n        if (!o) { r = fallo(est, clave); break; }\n        est.fotosPendientes.push(P[clave].foto); r = avanzar(est, clave);\n        break;\n      }\n      default:\n        r = [{ tipo: 'texto', texto: 'Gracias, ya se lo pasé al equipo 👍' }];\n    }\n    return { estado: est, respuestas: r };\n  }\n\n  /** Sin respuesta en 23 h: se registra con lo que haya. */\n  function abandonar(estadoPrevio) {\n    const est = JSON.parse(JSON.stringify(estadoPrevio || nuevoEstado()));\n    if (est.terminado) return est;\n    est.terminado = true; est.estado_bot = 'INCOMPLETO'; est.motivo_humano = 'sin_respuesta';\n    evento(est, 'sin_respuesta_23h', est.paso);\n    return est;\n  }\n\n  const ETIQUETA = { hasta_10: 'Hasta 10 m', '11_20': '11–20 m', '21_30': '21–30 m', mas_30: 'Más de 30 m', no_se: 'No sé',\n                     si: 'Sí, medidor nuevo', no: 'No, luz actual' };\n\n  const FOTO = { tablero: 'tablero', sitio_recorrido: 'lugar de carga', medidor: 'medidor' };\n\n  /** Parámetros para la RPC whatsapp_registrar_lead (ver schema/poc-whatsapp-lead.schema.json). */\n  function armarFicha(est, waId) {\n    const d = est.datos;\n    const partes = ['[Bot WhatsApp]', d.tipo_inmueble, d.metros_aprox && `Distancia: ${ETIQUETA[d.metros_aprox]}`,\n      d.medidor_independiente && `Medidor: ${d.medidor_independiente === 'no_se' ? 'No sé' : ETIQUETA[d.medidor_independiente]}`,\n      est.agencia && `Agencia: ${est.agencia}`, `${est.fotos.length} foto(s)`,\n      est.fotosPendientes.length ? `Fotos pendientes: ${est.fotosPendientes.map(f => FOTO[f] || f).join(', ')}` : null,\n      d.mapa && `Mapa: ${d.mapa}`, est.estado_bot !== 'COMPLETO' ? `Conversación: ${est.estado_bot} (${est.motivo_humano})` : null];\n    return {\n      nombre: d.nombre || 'Sin nombre (WhatsApp)',\n      telefono: '+' + waId,\n      correo: null,\n      vehiculo: d.vehiculo || null,\n      domicilio: d.domicilio || null,\n      codigo_postal: d.codigo_postal || null,\n      estado_id: null,\n      origen: est.origen,\n      agencia: est.agencia,\n      canal: 'whatsapp',\n      tipo_inmueble: d.tipo_inmueble || null,\n      metros_aprox: d.metros_aprox || null,\n      medidor_independiente: d.medidor_independiente || null,\n      observaciones_texto: partes.filter(Boolean).join(' · '),\n      wa_id: waId,\n      estado_bot: est.estado_bot,\n      motivo_humano: est.motivo_humano,\n      evidencias: est.fotos.map((tipo, i) => ({ tipo, wa_media_id: `MEDIA_DEMO_${i + 1}`, mime_type: 'image/jpeg', drive_file_id: null })),\n      eventos: est.eventos.map((e, i) => ({ tipo: e.tipo === 'foto_recibida' ? 'foto_subida' : ['primer_mensaje', 'datos_completos', 'derivado_humano', 'no_reconocido'].includes(e.tipo) ? e.tipo : 'paso_respondido',\n                                            ocurrido_en: e.t || new Date(Date.UTC(2026, 10, 2, 16, 0, i * 20)).toISOString(), detalle: e.detalle })),\n    };\n  }\n\n  /** Texto plano con opciones numeradas, para canales sin botones (chat de n8n). */\n  function comoTexto(respuestas) {\n    return respuestas.map(m => m.texto + (m.opciones && m.opciones.length\n      ? '\\n\\n' + m.opciones.map((o, i) => `${i + 1}) ${o.label}`).join('\\n') + (m.tipo === 'foto' ? '\\n(o adjunta la foto; en esta demo escribe «foto»)' : '')\n      : '')).join('\\n\\n');\n  }\n\n  return { paso, abandonar, armarFicha, comoTexto, nuevoEstado, ETIQUETA, FOTO };\n})();\n\n// ───────── Adaptador para el chat de n8n ─────────\n// El chat de n8n no tiene botones ni fotos: las opciones salen numeradas y\n// escribir «foto» o «ubicación» simula enviar una imagen o la ubicación.\nconst memoria = $getWorkflowStaticData('global');   // persiste solo con el workflow ACTIVO\nmemoria.sesiones = memoria.sesiones || {};\nconst entrada = $input.first().json;\nconst sesion = entrada.sessionId || 'demo';\nconst texto = String(entrada.chatInput || '').trim();\n\nif (/^(reiniciar|reset)$/i.test(texto)) {\n  delete memoria.sesiones[sesion];\n  return [{ json: { output: '🔄 Conversación reiniciada. Escribe «Hola» (o «Hola, vengo de Changan del Valle») para empezar.', terminado: false } }];\n}\n\nconst mensaje = /^foto$/i.test(texto) ? { imagen: true }\n  : /^ubicaci[oó]n$/i.test(texto) ? { ubicacion: { lat: 19.3907, lng: -99.161 } }\n  : { texto };\n\nconst previo = memoria.sesiones[sesion] || null;\nconst yaTerminado = !!(previo && previo.terminado);\nconst r = MOTOR.paso(previo, mensaje);\nmemoria.sesiones[sesion] = r.estado;\n\n// Teléfono de demostración estable por sesión (en el piloto viene de WhatsApp: contacts[].wa_id).\nlet h = 0; for (const c of sesion) h = (h * 31 + c.charCodeAt(0)) >>> 0;\nconst waId = '52155' + String(h % 100000000).padStart(8, '0');\n\nconst terminado = r.estado.terminado && !yaTerminado;\nreturn [{ json: {\n  output: MOTOR.comoTexto(r.respuestas),\n  terminado,\n  paso: r.estado.paso,\n  sesion,\n  waId,\n  ficha: terminado ? MOTOR.armarFicha(r.estado, waId) : null,\n} }];\n"
+      },
+      "id": "b1f0c001-0000-4000-8000-000000000002",
+      "name": "Motor del guion",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.terminado }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b1f0c001-0000-4000-8000-000000000003",
+      "name": "¿Terminó la conversación?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        520,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0-output",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b1f0c001-0000-4000-8000-000000000004",
+      "name": "Responder siguiente pregunta",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1-rpc",
+              "name": "rpc",
+              "value": "whatsapp_registrar_lead",
+              "type": "string"
+            },
+            {
+              "id": "a2-parametros",
+              "name": "parametros",
+              "value": "={{ $json.ficha }}",
+              "type": "object"
+            },
+            {
+              "id": "a3-respuesta_simulada",
+              "name": "respuesta_simulada",
+              "value": "={{ { folio: 'C-DEMO-' + $json.waId.slice(-4), nuevo: true } }}",
+              "type": "object"
+            },
+            {
+              "id": "a4-actividad_agenda",
+              "name": "actividad_agenda",
+              "value": "={{ 'Contactar lead de WhatsApp: ' + $json.ficha.nombre }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b1f0c001-0000-4000-8000-000000000005",
+      "name": "Simular registro en panel",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a5-para",
+              "name": "para",
+              "value": "Bernardo (WhatsApp)",
+              "type": "string"
+            },
+            {
+              "id": "a6-aviso",
+              "name": "aviso",
+              "value": "={{ '🔌 Nuevo lead WhatsApp · ' + ($json.parametros.agencia || 'venta directa') + '\\nFicha ' + $json.respuesta_simulada.folio + ' · ' + $json.parametros.nombre + ' · ' + $json.parametros.telefono + '\\n🏠 ' + ($json.parametros.tipo_inmueble || '—') + ' · 🚗 ' + ($json.parametros.vehiculo || '—') + '\\n📍 ' + ($json.parametros.domicilio || '—') + '\\n📝 ' + $json.parametros.observaciones_texto }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b1f0c001-0000-4000-8000-000000000006",
+      "name": "Simular aviso a Bernardo",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1060,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a7-output",
+              "name": "output",
+              "value": "={{ $('Motor del guion').item.json.output + '\\n\\n— 🧪 Solo en la demo: esto le llegaría a Bernardo —\\n' + $json.aviso }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b1f0c001-0000-4000-8000-000000000007",
+      "name": "Responder al cliente",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1320,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🧪 Demo · Bot de primer contacto DPROMA\n\n**Qué hace:** simula la conversación de WhatsApp en el chat de n8n, sin WhatsApp, sin APIs y sin credenciales.\n\n**Cómo probar:**\n1. Publica el workflow (botón *Publish*, arriba a la derecha; en versiones anteriores, interruptor *Active*).\n2. Abre el nodo **Chat (simula WhatsApp)** y copia la *Chat URL*, o usa el botón **Open chat**.\n3. Escribe «Hola, vengo de Changan del Valle» o solo «Hola».\n4. Contesta con el número de la opción. Escribe «foto» para simular una imagen y «reiniciar» para empezar de nuevo.\n\nGuía completa: `docs/poc-whatsapp/07-demo-n8n.md`",
+        "height": 380,
+        "width": 520,
+        "color": 4
+      },
+      "id": "b1f0c001-0000-4000-8000-000000000008",
+      "name": "Nota · Cómo probar",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### 1 · Motor del guion\nLa misma lógica que el simulador de la página: preguntas, validaciones, «no entendí» ×2 → persona, flotilla → Bernardo.\nGuarda el avance de cada conversación en la memoria del workflow.\n\n**En el piloto:** la entrada sería el webhook de WhatsApp Cloud API (con firma y filtro) en lugar de este chat.",
+        "height": 240,
+        "width": 400,
+        "color": 7
+      },
+      "id": "b1f0c001-0000-4000-8000-000000000009",
+      "name": "Nota · Motor",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### 2 · Lo que en el piloto será real\n- **Simular registro en panel** → RPC `whatsapp_registrar_lead` en Supabase (crea la ficha «lead» en Contactos y la actividad en la Agenda de Bernardo).\n- **Simular aviso a Bernardo** → mensaje de WhatsApp al número de Bernardo.\n- Las fotos irían a Drive (`DPROMA — Comercial/{folio}`).\n\nAbre *Executions* para ver la ficha completa que se habría enviado.",
+        "height": 260,
+        "width": 560,
+        "color": 6
+      },
+      "id": "b1f0c001-0000-4000-8000-000000000010",
+      "name": "Nota · Simulado",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        760,
+        -120
+      ]
+    }
+  ],
+  "connections": {
+    "Chat (simula WhatsApp)": {
+      "main": [
+        [
+          {
+            "node": "Motor del guion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Motor del guion": {
+      "main": [
+        [
+          {
+            "node": "¿Terminó la conversación?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Terminó la conversación?": {
+      "main": [
+        [
+          {
+            "node": "Simular registro en panel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder siguiente pregunta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simular registro en panel": {
+      "main": [
+        [
+          {
+            "node": "Simular aviso a Bernardo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simular aviso a Bernardo": {
+      "main": [
+        [
+          {
+            "node": "Responder al cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "active": false,
+  "id": "dpromaDemoBotWa01",
+  "tags": []
+}
