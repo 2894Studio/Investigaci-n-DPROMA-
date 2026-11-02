@@ -1,6 +1,6 @@
 # 04 · Costos estimados y KPIs de la PoC
 
-> Borrador v0.2 · 31/10/2026. Montos en **USD, sin IVA**. Tarifas de fuentes públicas
+> Borrador v0.3 · 02/11/2026. Montos en **USD, sin IVA**. Tarifas de fuentes públicas
 > consultadas el 31/10/2026 (lista al final). **Hay que verificarlas en las páginas oficiales
 > de Meta, Make y n8n antes de presupuestar.** Los volúmenes son supuestos que se corrigen con
 > los números de Bernardo (relevamiento B). Alcance: solo el primer contacto; la cotización es
@@ -29,8 +29,8 @@ Cloud API directa = estas tarifas sin recargo. Un BSP suma su suscripción o mar
 
 | Supuesto | Valor | De dónde sale |
 |---|---|---|
-| Mensajes que manda el bot por lead | ~9 | Guion de `02-flujo-conversacional.md` (bienvenida, 5 preguntas, pedido de fotos, cierre) |
-| Mensajes que manda el cliente por lead | ~8 | 6 respuestas + 2 fotos |
+| Mensajes que manda el bot por lead | ~11 | Guion de `02-flujo-conversacional.md` (bienvenida, 6 preguntas, 3 pedidos de foto, cierre) |
+| Mensajes que manda el cliente por lead | ~10 | 7 respuestas + 3 fotos |
 | Avisos de estado que manda Meta | ~3 por cada mensaje del bot (enviado, entregado, leído) | Así funciona el webhook |
 | Aviso a Bernardo | 1 por lead | Si va por WhatsApp desde el número del bot, también es un mensaje de servicio 🟡 |
 
@@ -44,28 +44,29 @@ ligero delante** (una función serverless gratuita que reenvía solo los mensaje
 | | **A · PoC** (1 agencia + directo) | **B · 3 agencias** | **C · Escala** (~10 agencias + campañas) |
 |---|---|---|---|
 | Leads por mes | 100 | 300 | 1,000 |
-| Mensajes de servicio (bot) | ~900 → **gratis** | ~2,700 → 1,700 cobrados | ~9,000 → 8,000 cobrados |
-| **Meta total / mes** | **$0** | **≈ $15** | **≈ $68** |
-| Webhooks que llegan (con avisos de estado) | ~3,500 | ~10,500 | ~35,000 |
-| Webhooks útiles (con filtro) | ~800 | ~2,400 | ~8,000 |
+| Mensajes de servicio (bot) | ~1,100 → 100 cobrados | ~3,300 → 2,300 cobrados | ~11,000 → 10,000 cobrados |
+| **Meta total / mes** | **≈ $1** | **≈ $20** | **≈ $85** |
+| Webhooks que llegan (con avisos de estado) | ~4,300 | ~12,900 | ~43,000 |
+| Webhooks útiles (con filtro) | ~1,000 | ~3,000 | ~10,000 |
 | **n8n self-hosted** (servidor) | $5–20 | $5–20 | $20–40 |
-| **n8n Cloud** con filtro | Starter ≈ €24 | Pro ≈ €60 | Pro ≈ €60 (al límite) |
+| **n8n Cloud** con filtro | Starter ≈ €24 | Pro ≈ €60 | Pro ≈ €60 (justo en el límite ⚠️) |
 | **n8n Cloud** sin filtro | Pro ≈ €60 | Business ≈ €800 ⚠️ | Business ≈ €800 ⚠️ |
-| **Make** (≈ 100 créditos/lead sin filtro) | ~10k créditos → Core al límite (~$11) | ~30k créditos | ~100k créditos |
-| **Costo por lead** (Meta + n8n self-hosted) | **≈ $0.05–0.20** | **≈ $0.07–0.12** | **≈ $0.09–0.11** |
+| **Make** (≈ 120 créditos/lead sin filtro) | ~12k créditos | ~36k créditos | ~120k créditos |
+| **Costo por lead** (Meta + n8n self-hosted) | **≈ $0.06–0.21** | **≈ $0.08–0.13** | **≈ $0.11–0.13** |
 
 Precios de referencia de los orquestadores (mensual, sin descuento anual):
 **Make** Core ≈ $10.59 / 10k créditos, Pro ≈ $18.82 / 10k; **n8n Cloud** Starter ≈ €24 /
 2,500 ejecuciones, Pro ≈ €60 / 10,000; **n8n Community *self-hosted*** sin costo de licencia
 y sin tope de ejecuciones (solo el servidor).
 
-**Lectura:** los mensajes de WhatsApp cuestan poco en los tres escenarios; en la PoC caben en
-el tramo gratuito. Lo que decide el costo es **el orquestador y cómo se cuentan los
+**Lectura:** los mensajes de WhatsApp cuestan poco en los tres escenarios; en la PoC casi caben
+en el tramo gratuito. Lo que decide el costo es **el orquestador y cómo se cuentan los
 webhooks**. Con n8n *self-hosted* (o n8n Cloud con filtro), el costo por lead queda en centavos
 de dólar.
 
 **No incluido:** horas de Félix y Studio2894 para construir y mantener, Google Workspace (ya
-existente 🟡), el hospedaje del aviso de privacidad y el tiempo de Bernardo.
+existente 🟡), el hospedaje del aviso de privacidad y el tiempo de Bernardo. Supabase, Netlify y
+Drive ya los paga DPROMA para el panel; la PoC solo suma filas y archivos.
 
 ## 4. KPIs de la PoC
 
@@ -79,7 +80,8 @@ Todos salen de la tabla `lead_evento` (`01-arquitectura-integracion.md` §9). La
 | Captura | Leads completos | `datos_completos / primer_mensaje` | ≥ 60 % 🟡 | — |
 | Captura | Abandono por paso | % que deja de responder en cada estado | encontrar la pregunta que sobra | — |
 | Captura | Leads con fotos | leads con ≥ 1 foto / leads completos | se observa | — |
-| Calidad de datos | Leads sin corrección manual | `leads sin edición de Bernardo / leads en CRM` | ≥ 80 % | — |
+| Calidad de datos | Fichas sin corrección manual | fichas del bot que Bernardo no editó antes de cotizar / fichas del bot | ≥ 80 % | — |
+| Utilidad para cotizar | Cotizaciones sin volver a preguntar | cotizaciones hechas sin pedir datos extra al cliente (Bernardo lo marca) / fichas cotizadas | ≥ 70 % 🟡 | — |
 | Integración | Tasa de error | `eventos error_* / mensajes procesados` | < 2 % | — |
 | Integración | Leads que llegan al CRM | `lead_creado_crm / (datos_completos + derivado_humano)` | 100 % (con reintentos) | — |
 | Paso a persona | Tasa de handoff | `derivado_humano / primer_mensaje` (por motivo) | se observa | — |

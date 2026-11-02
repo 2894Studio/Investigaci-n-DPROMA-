@@ -2,59 +2,91 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://dproma.local/schema/poc-whatsapp-lead.schema.json",
   "title": "Lead de WhatsApp — PoC primer contacto DPROMA",
-  "description": "Formato del lead que el orquestador (n8n/Make) entrega al sistema interno/CRM. Borrador v0.2 (31/10/2026): solo primer contacto; la cotización es de otra iniciativa. Los nombres de campo del CRM destino están por confirmar con Félix.",
+  "description": "Parámetros que n8n envía a la RPC whatsapp_registrar_lead (propuesta) del panel DPROMA (Supabase). Borrador v0.3 (02/11/2026). Los campos marcados como 'existe' ya están en contactos_comerciales; los 'propuesto' son columnas nuevas a validar con Félix (plan B: se resumen en observaciones_texto).",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "lead_id",
-    "wa_id",
+    "nombre",
     "telefono",
     "origen",
-    "estado",
-    "creado_en",
+    "canal",
+    "wa_id",
+    "estado_bot",
     "eventos"
   ],
   "properties": {
-    "lead_id": {
+    "nombre": {
       "type": "string",
-      "description": "Identificador interno del orquestador (UUID)."
-    },
-    "crm_id": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "Id del registro en el CRM, cuando ya existe."
-    },
-    "wa_id": {
-      "type": "string",
-      "pattern": "^[0-9]{10,15}$",
-      "description": "Id de WhatsApp del cliente (contacts[].wa_id)."
+      "minLength": 2,
+      "maxLength": 160,
+      "description": "existe · contactos_comerciales.nombre (persona o razón social)"
     },
     "telefono": {
       "type": "string",
       "pattern": "^\\+[0-9]{10,15}$",
-      "description": "Teléfono en formato E.164."
+      "description": "existe · contactos_comerciales.telefono (la BD calcula telefono_norm)"
     },
-    "nombre": {
+    "correo": {
       "type": [
         "string",
         "null"
       ],
-      "minLength": 2,
-      "maxLength": 120
+      "format": "email",
+      "description": "existe · contactos_comerciales.correo (el bot no lo pide; null)"
     },
-    "nombre_perfil_wa": {
+    "vehiculo": {
       "type": [
         "string",
         "null"
       ],
-      "description": "contacts[].profile.name; referencia, no sustituye a nombre."
+      "maxLength": 120,
+      "description": "existe · contactos_comerciales.vehiculo (marca / modelo)"
+    },
+    "domicilio": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 300,
+      "description": "existe · contactos_comerciales.domicilio (texto libre con CP)"
+    },
+    "codigo_postal": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9]{5}$",
+      "description": "Auxiliar: n8n lo extrae del domicilio para resolver estado_id"
+    },
+    "estado_id": {
+      "type": [
+        "integer",
+        "string",
+        "null"
+      ],
+      "description": "existe · contactos_comerciales.estado_id (catálogo de estados del panel)"
     },
     "origen": {
       "type": "string",
-      "pattern": "^(agencia:[a-z0-9-]+|web|directo|campana:[a-z0-9-]+)$",
-      "description": "Canal de entrada, deducido del texto precargado del enlace wa.me."
+      "enum": [
+        "directa",
+        "oem"
+      ],
+      "description": "existe · contactos_comerciales.origen: 'oem' si llegó por el enlace de una agencia"
+    },
+    "agencia": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "propuesto · nombre de la agencia (ej. 'Changan del Valle')"
+    },
+    "canal": {
+      "type": "string",
+      "enum": [
+        "whatsapp"
+      ],
+      "description": "propuesto · distingue leads del bot de la captura manual"
     },
     "tipo_inmueble": {
       "type": [
@@ -62,83 +94,61 @@
         "null"
       ],
       "enum": [
-        "casa",
-        "empresa_flotilla",
-        "otro",
+        "Casa particular",
+        "Residencial",
+        "Empresa / flotilla",
         null
-      ]
-    },
-    "marca_auto": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "modelo_auto": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "ubicacion": {
-      "type": [
-        "object",
-        "null"
       ],
-      "additionalProperties": false,
-      "properties": {
-        "latitud": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "minimum": -90,
-          "maximum": 90
-        },
-        "longitud": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "minimum": -180,
-          "maximum": 180
-        },
-        "direccion": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "codigo_postal": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "pattern": "^[0-9]{5}$"
-        }
-      }
+      "description": "propuesto · mismos valores que cotizaciones.tipo_inmueble (+ empresa)"
     },
-    "distancia": {
+    "metros_aprox": {
       "type": [
         "string",
         "null"
       ],
       "enum": [
-        "hasta_10m",
-        "mas_10m",
+        "hasta_10",
+        "11_20",
+        "21_30",
+        "mas_30",
         "no_se",
         null
       ],
-      "description": "Distancia aproximada del tablero al lugar de carga, según el cliente. Dato informativo para Bernardo y, a futuro, para el Cotizador."
+      "description": "propuesto · distancia tablero → lugar de carga (conceptos 1 y 3 del cotizador)"
     },
-    "estado": {
+    "medidor_independiente": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "si",
+        "no",
+        "no_se",
+        null
+      ],
+      "description": "propuesto · conceptos 2 (trámite CFE) y 5 (mufa) del cotizador"
+    },
+    "observaciones_texto": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "existe · resumen legible generado por n8n (plan B si no hay columnas nuevas)"
+    },
+    "wa_id": {
+      "type": "string",
+      "pattern": "^[0-9]{10,15}$",
+      "description": "propuesto · id de WhatsApp (bitácora del bot)"
+    },
+    "estado_bot": {
       "type": "string",
       "enum": [
-        "EN_CONVERSACION",
         "COMPLETO",
         "INCOMPLETO",
         "HUMANO"
-      ]
+      ],
+      "description": "Cómo terminó la conversación"
     },
     "motivo_humano": {
       "type": [
@@ -149,26 +159,19 @@
         "pidio_asesor",
         "flotilla",
         "no_reconocido",
-        "archivo_no_soportado",
         "sin_respuesta",
         null
       ]
     },
-    "carpeta_drive_url": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "format": "uri"
-    },
     "evidencias": {
       "type": "array",
+      "description": "Se suben a Drive y se registran en comercial_evidencias DESPUÉS de crear la ficha",
       "items": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "tipo",
-          "drive_url",
+          "wa_media_id",
           "mime_type"
         ],
         "properties": {
@@ -176,19 +179,18 @@
             "type": "string",
             "enum": [
               "tablero",
-              "sitio",
-              "acometida",
+              "sitio_recorrido",
+              "medidor",
               "otro"
             ]
           },
-          "drive_url": {
-            "type": "string",
-            "format": "uri"
+          "wa_media_id": {
+            "type": "string"
           },
           "mime_type": {
             "type": "string"
           },
-          "wa_media_id": {
+          "drive_file_id": {
             "type": [
               "string",
               "null"
@@ -197,13 +199,9 @@
         }
       }
     },
-    "creado_en": {
-      "type": "string",
-      "format": "date-time"
-    },
     "eventos": {
       "type": "array",
-      "description": "Marcas de tiempo para KPIs y errores (tabla lead_evento).",
+      "description": "Bitácora para KPIs (tabla whatsapp_eventos propuesta o n8n)",
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -217,12 +215,16 @@
             "enum": [
               "primer_mensaje",
               "bot_respuesta",
+              "paso_respondido",
               "datos_completos",
               "derivado_humano",
               "lead_creado_crm",
+              "lead_actualizado_crm",
+              "foto_subida",
               "aviso_bernardo",
               "contacto_humano",
               "error_crm",
+              "error_auth",
               "error_media",
               "error_aviso",
               "error_envio",

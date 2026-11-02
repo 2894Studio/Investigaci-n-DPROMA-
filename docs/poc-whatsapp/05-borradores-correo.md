@@ -1,27 +1,32 @@
 # 05 · Borradores de correo (no enviados)
 
-## Para Félix Sánchez — relevamiento técnico
+## Para Félix Sánchez — propuesta de entrada al panel
 
-**Asunto:** PoC WhatsApp → CRM: lo que necesitamos de tu sistema para arrancar
+**Asunto:** PoC WhatsApp → panel: propuesta para registrar los leads en Contactos
 
 ¡Hola, Félix!
 
-Para avanzar con la PoC del primer contacto por WhatsApp ya tenemos un borrador de
-arquitectura: el bot recibe al cliente, un orquestador (proponemos n8n) crea la oportunidad
-en tu sistema, guarda las fotos en Drive y le avisa a Bernardo con todo listo. El cotizador
-queda fuera de este proyecto.
+Revisamos el panel en modo de solo lectura, con la cuenta de prueba de Comercial, y vimos que
+el lugar natural para los leads del bot es `contactos_comerciales`, con las fotos en la carpeta
+de Drive de cada ficha (`drive-comercial-upload-auth` + `comercial_evidencias`). El bot no
+cotiza; solo pide los datos que el cotizador necesita y deja la ficha lista para Bernardo.
 
-Lo que falta para cerrar el diseño depende de tu sistema. ¿Nos ayudas con estos puntos?
-Pueden ser respuestas cortas o una llamada de 30 minutos:
+Para conectarlo sin usar cuentas de personas ni la llave de servicio, te proponemos:
 
-1. Stack y dónde está hospedado.
-2. Si tiene API REST o webhooks para crear y actualizar oportunidades, y cómo se autentica.
-3. La entidad de lead/oportunidad: campos, etapas del tablero comercial y cómo se identifica
-   a un cliente que ya existe.
-4. Si hay ambiente de pruebas.
-5. Tu experiencia con Make, n8n o similares, y dónde podría vivir n8n si escalamos.
+1. Un usuario de servicio `bot-whatsapp@dproma.com` con un rol propio, sin acceso al panel.
+2. Una RPC `whatsapp_registrar_lead` (SECURITY DEFINER) que cree o actualice la ficha,
+   deduplique por `telefono_norm`, asigne a Bernardo y cree la actividad en su Agenda.
+3. Columnas nuevas en `contactos_comerciales`: `canal`, `agencia`, `tipo_inmueble`,
+   `metros_aprox`, `medidor_independiente`. Si prefieres no tocar el esquema todavía, como
+   plan B lo resumimos en `observaciones_texto`.
+4. Permiso para que ese usuario use la función de Drive y registre las fotos.
 
-Te adjunto la plantilla completa (sección A) y el contrato JSON del lead que proponemos.
+La lógica del bot vive en n8n y la operamos nosotros; de tu lado solo quedarían la RPC y el
+usuario. ¿Lo vemos en una llamada de 30 minutos? También nos sirve saber si hay un proyecto
+Supabase de pruebas.
+
+Te adjunto la propuesta completa (`01-arquitectura-integracion.md`, §3 y §9), los hallazgos
+(`06-hallazgos-panel.md`) y el formato del lead.
 
 ¡Gracias!
 Studio2894

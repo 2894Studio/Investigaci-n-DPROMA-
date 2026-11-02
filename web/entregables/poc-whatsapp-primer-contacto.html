@@ -94,7 +94,7 @@ footer ul{padding-left:1.1rem}
     <p class="lead">Prueba de concepto para que cada prospecto de cargador eléctrico que escribe por WhatsApp quede registrado en el CRM, con sus fotos guardadas y el tiempo de respuesta medido, y le llegue a Bernardo listo para atender.</p>
     <div class="meta">
       <span class="wordmark">DPROMA × 2894_</span>
-      <span>Borrador v0.2 · 31 oct 2026</span>
+      <span>Borrador v0.3 · 2 nov 2026</span>
       <span>Fuente: <code>docs/poc-whatsapp/</code></span>
     </div>
   </div>
@@ -107,14 +107,14 @@ footer ul{padding-left:1.1rem}
     <p class="eyebrow">Antes de construir</p>
     <h2>Lo que falta para cerrar el diseño</h2>
     <div class="alert" style="margin-bottom:1rem">
-      <h3>Prioridad 1 · El sistema de Félix</h3>
-      <p>Necesitamos saber en qué está construido, si tiene API o webhooks, cómo se autentica una integración, qué campos y etapas tiene la oportunidad y si hay ambiente de pruebas. Mientras tanto, el mapeo al CRM queda <strong>por confirmar</strong>.</p>
+      <h3>Prioridad 1 · Validar con Félix cómo entra el bot al panel</h3>
+      <p>Ya sabemos que el panel es Supabase + Netlify y que los leads viven en Contactos (<code>contactos_comerciales</code>), con fotos en Drive. Falta que Félix apruebe el usuario de servicio del bot, la RPC de registro y los campos nuevos (o el plan B: resumirlos en las observaciones de la ficha).</p>
     </div>
     <div class="table-wrap">
     <table>
       <thead><tr><th>#</th><th>Pendiente</th><th>Quién</th><th>Desbloquea</th></tr></thead>
       <tbody>
-        <tr><td>1</td><td>Stack, API, campos y etapas del sistema interno</td><td>Félix</td><td>Mapeo de datos, alta del lead</td></tr>
+        <tr><td>1</td><td>Validar la propuesta de entrada al panel: usuario del bot, RPC de registro y campos nuevos (el stack y la tabla ya se conocen)</td><td>Félix</td><td>Nodo “Registrar lead”</td></tr>
         <tr><td>2</td><td>5–10 capturas de chats reales y tiempo actual de primera respuesta</td><td>Bernardo</td><td>Textos del bot, línea base</td></tr>
         <tr><td>3</td><td>Número del bot y acceso a la cuenta de Meta Business</td><td>Félix</td><td>Alta en Cloud API</td></tr>
         <tr><td>4</td><td>Aviso de privacidad publicado (LFPDPPP)</td><td>Quien lleve lo legal</td><td>Salida del bot</td></tr>
@@ -130,7 +130,7 @@ footer ul{padding-left:1.1rem}
     <h2>Termina cuando el lead está en el CRM y Bernardo lo tiene</h2>
     <p class="intro">Cotizar, agendar visitas y cerrar siguen como hoy. El Cotizador es otra iniciativa y va en paralelo: no depende de esta PoC ni esta PoC depende de él. Solo comparten nombres de campo, para que se conecten después sin rehacer nada.</p>
     <div class="grid g2">
-      <div class="card"><h3><span class="tag ok">Dentro</span></h3><ul><li>Bot que recibe al prospecto y captura sus datos</li><li>Fotos en una carpeta de Drive por cliente</li><li>Alta de la oportunidad en el CRM de Félix</li><li>Aviso a Bernardo y paso a una persona</li><li>Tiempos y métricas del primer contacto</li></ul></div>
+      <div class="card"><h3><span class="tag ok">Dentro</span></h3><ul><li>Bot que recibe al prospecto y captura sus datos</li><li>Fotos en una carpeta de Drive por cliente</li><li>Ficha «lead» en Contactos del panel</li><li>Aviso a Bernardo y paso a una persona</li><li>Tiempos y métricas del primer contacto</li></ul></div>
       <div class="card"><h3><span class="tag">Fuera</span></h3><ul><li>Cálculo y envío de cotizaciones (iniciativa Cotizador)</li><li>Agenda de visitas técnicas</li><li>Catálogo de materiales y precios</li><li>Posventa y encuestas</li></ul></div>
     </div>
   </div>
@@ -152,16 +152,17 @@ footer ul{padding-left:1.1rem}
 <section id="flujo">
   <div class="wrap">
     <p class="eyebrow">Lo que vive el cliente</p>
-    <h2>Cinco preguntas, casi todas de un toque</h2>
-    <p class="intro">El teléfono sale del propio WhatsApp y la marca del auto, del enlace de la agencia. En cualquier momento, escribir <em>asesor</em> pasa con una persona.</p>
+    <h2>Seis preguntas sacadas del cotizador</h2>
+    <p class="intro">El bot no cotiza: pide justo lo que el cotizador del panel necesita (cliente, tipo de inmueble, vehículo, domicilio, metros a partir del 11 y medidor nuevo con mufa), así Bernardo cotiza sin volver a preguntar. El teléfono sale del propio WhatsApp. En cualquier momento, escribir <em>asesor</em> pasa con una persona.</p>
     <div class="flow">
       <div class="step"><span class="n">0</span><div><h3>Bienvenida y nombre</h3><p>Saludo, enlace al aviso de privacidad y “¿a nombre de quién hacemos la cotización?”</p></div></div>
-      <div class="step"><span class="n">1</span><div><h3>Tipo de inmueble</h3><div class="btns"><span>Casa</span><span>Empresa / flotilla → Bernardo</span><span>Otro lugar</span></div></div></div>
-      <div class="step"><span class="n">2</span><div><h3>Auto</h3><p>Lista de marcas frecuentes. Se salta si vino de una agencia.</p></div></div>
-      <div class="step"><span class="n">3</span><div><h3>Ubicación</h3><p>Botón “Enviar ubicación” o código postal.</p></div></div>
-      <div class="step"><span class="n">4</span><div><h3>Distancia del tablero al lugar de carga</h3><div class="btns"><span>Hasta 10 m</span><span>Más de 10 m</span><span>No sé</span></div></div></div>
-      <div class="step"><span class="n">5</span><div><h3>Fotos (opcionales)</h3><p>Tablero, lugar de carga y medidor de CFE, de una en una, o “enviar después” con un enlace de carga.</p></div></div>
-      <div class="step"><span class="n">✓</span><div><h3>Cierre</h3><p>“Ya tenemos todo, Bernardo te escribe para darte tu cotización.” El lead entra al CRM y Bernardo recibe el resumen con enlaces.</p></div></div>
+      <div class="step"><span class="n">1</span><div><h3>Tipo de inmueble</h3><div class="btns"><span>Casa</span><span>Condominio / edificio</span><span>Empresa / flotilla → Bernardo</span></div></div></div>
+      <div class="step"><span class="n">2</span><div><h3>Vehículo</h3><p>Lista de marcas frecuentes. Se salta si vino de una agencia.</p></div></div>
+      <div class="step"><span class="n">3</span><div><h3>Domicilio</h3><p>Calle, número, colonia y código postal; la ubicación es opcional.</p></div></div>
+      <div class="step"><span class="n">4</span><div><h3>Metros del tablero al lugar de carga</h3><div class="btns"><span>Hasta 10 m</span><span>11–20</span><span>21–30</span><span>Más de 30</span><span>No sé</span></div></div></div>
+      <div class="step"><span class="n">5</span><div><h3>Medidor de CFE</h3><div class="btns"><span>Medidor nuevo</span><span>Mi luz actual</span><span>No sé</span></div></div></div>
+      <div class="step"><span class="n">6</span><div><h3>Fotos (opcionales)</h3><p>Tablero, lugar de carga con el recorrido del cable y medidor, de una en una, o “enviar después”.</p></div></div>
+      <div class="step"><span class="n">✓</span><div><h3>Cierre</h3><p>“Ya tenemos todo, Bernardo te escribe para darte tu cotización.” Se crea la ficha en Contactos, las fotos van a su carpeta de Drive y Bernardo recibe una actividad en su Agenda y un resumen por WhatsApp.</p></div></div>
     </div>
   </div>
 </section>
@@ -169,24 +170,24 @@ footer ul{padding-left:1.1rem}
 <section id="arquitectura">
   <div class="wrap">
     <p class="eyebrow">Cómo funciona por dentro</p>
-    <h2>Un orquestador conecta WhatsApp, el CRM y Drive</h2>
+    <h2>El panel ya tiene casi todo: el bot solo lo alimenta</h2>
     <div class="pipe" aria-label="Recorrido de un mensaje">
       <div class="node"><b>WhatsApp Cloud API</b><small>Número dedicado, conexión directa con Meta</small></div>
       <span class="arrow" aria-hidden="true">→</span>
-      <div class="node"><b>Orquestador</b><small>n8n: estados del bot, validación, reintentos</small></div>
+      <div class="node"><b>n8n · Studio2894</b><small>Conversación, validación, reintentos</small></div>
       <span class="arrow" aria-hidden="true">→</span>
-      <div class="node"><b>CRM de Félix</b><small>Crea o actualiza la oportunidad <span class="tag pend">por confirmar</span></small></div>
+      <div class="node"><b>Panel DPROMA · Supabase</b><small>Ficha «lead» en <code>contactos_comerciales</code> vía RPC <span class="tag pend">propuesta</span></small></div>
       <span class="arrow" aria-hidden="true">→</span>
-      <div class="node"><b>Google Drive</b><small>Una carpeta de fotos por cliente</small></div>
+      <div class="node"><b>Google Drive</b><small>Carpeta de la ficha, como ya hace el panel</small></div>
     </div>
     <div class="split">
       <div class="branch">
-        <h3>Aviso a Bernardo</h3>
-        <p>Nombre, teléfono, canal de origen, inmueble, auto, ubicación, distancia y enlace a las fotos y al lead. No tiene que volver a preguntar nada.</p>
+        <h3>Ya existe en el panel</h3>
+        <p>Fichas de Contactos con etapas lead → prospecto → cliente, detección de duplicados por teléfono, fotos en Drive por ficha, Agenda del vendedor y el paso a ICEV.</p>
       </div>
       <div class="branch alt">
-        <h3>Paso a una persona</h3>
-        <p>Si el cliente escribe <em>asesor</em>, es flotilla o el bot no lo entiende dos veces, pasa a Bernardo con lo que se haya capturado.</p>
+        <h3>Lo que se le pide a Félix</h3>
+        <p>Un usuario de servicio para el bot, una RPC <code>whatsapp_registrar_lead</code> y, si se puede, columnas para canal, agencia, tipo de inmueble, metros y medidor.</p>
       </div>
     </div>
     <div class="grid g2" style="margin-top:1rem">
@@ -194,7 +195,8 @@ footer ul{padding-left:1.1rem}
         <h3>Decisiones recomendadas</h3>
         <ul>
           <li><strong>Meta Cloud API directa</strong>, sin intermediario: el volumen es bajo y no hace falta pagar margen.</li>
-          <li><strong>n8n Cloud para la PoC</strong> y el mismo flujo <em>self-hosted</em> en la infraestructura de Félix si se escala.</li>
+          <li><strong>n8n</strong> para la lógica del bot (Studio2894 lo opera): nube para la PoC, <em>self-hosted</em> si se escala.</li>
+          <li>Sin la cuenta de Comercial ni la llave maestra de Supabase: <strong>usuario propio del bot</strong> y una RPC con permisos acotados.</li>
           <li><strong>Número nuevo</strong> para el bot; el WhatsApp de Bernardo sigue igual.</li>
           <li>Un enlace o QR <strong>por agencia</strong> para saber de dónde llega cada cliente.</li>
         </ul>
@@ -217,20 +219,20 @@ footer ul{padding-left:1.1rem}
   <div class="wrap">
     <p class="eyebrow">Costos estimados · USD / mes</p>
     <h2>Los mensajes cuestan poco; el orquestador decide</h2>
-    <p class="intro">Desde julio de 2025 Meta cobra por mensaje, y desde el 1 de octubre de 2026 también las respuestas dentro de las 24 h, después de 1,000 gratis al mes por número. El bot solo usa ese tipo de mensaje: en la PoC cabe en lo gratuito.</p>
+    <p class="intro">Desde julio de 2025 Meta cobra por mensaje, y desde el 1 de octubre de 2026 también las respuestas dentro de las 24 h, después de 1,000 gratis al mes por número. El bot solo usa ese tipo de mensaje: en la PoC casi todo cabe en lo gratuito.</p>
     <div class="table-wrap">
     <table>
       <thead><tr><th></th><th class="num">A · PoC</th><th class="num">B · 3 agencias</th><th class="num">C · Escala</th></tr></thead>
       <tbody>
         <tr><td>Leads por mes</td><td class="num">100</td><td class="num">300</td><td class="num">1,000</td></tr>
-        <tr><td>WhatsApp (Meta)</td><td class="num">$0</td><td class="num">≈ $15</td><td class="num">≈ $68</td></tr>
+        <tr><td>WhatsApp (Meta)</td><td class="num">≈ $1</td><td class="num">≈ $20</td><td class="num">≈ $85</td></tr>
         <tr><td>n8n self-hosted (servidor)</td><td class="num">$5–20</td><td class="num">$5–20</td><td class="num">$20–40</td></tr>
-        <tr><td>n8n Cloud, con filtro de avisos</td><td class="num">≈ €24</td><td class="num">≈ €60</td><td class="num">≈ €60</td></tr>
-        <tr><td><strong>Costo por lead</strong> (Meta + n8n self-hosted)</td><td class="num"><strong>$0.05–0.20</strong></td><td class="num"><strong>$0.07–0.12</strong></td><td class="num"><strong>$0.09–0.11</strong></td></tr>
+        <tr><td>n8n Cloud, con filtro de avisos</td><td class="num">≈ €24</td><td class="num">≈ €60</td><td class="num">≈ €60 (al límite)</td></tr>
+        <tr><td><strong>Costo por lead</strong> (Meta + n8n self-hosted)</td><td class="num"><strong>$0.06–0.21</strong></td><td class="num"><strong>$0.08–0.13</strong></td><td class="num"><strong>$0.11–0.13</strong></td></tr>
       </tbody>
     </table>
     </div>
-    <p class="note">Supuestos: ~9 mensajes del bot por lead, tarifa de México desde 1/10/2026 (servicio ≈ $0.0085 después de los 1,000 gratis). Cada aviso de “entregado/leído” también dispara el webhook: sin un filtro delante, Make y n8n Cloud se encarecen rápido. Tarifas de fuentes no oficiales: verificar con Meta, Make y n8n antes de presupuestar. No incluye horas de construcción.</p>
+    <p class="note">Supuestos: ~11 mensajes del bot por lead, Supabase, Netlify y Drive ya los paga el panel, tarifa de México desde 1/10/2026 (servicio ≈ $0.0085 después de los 1,000 gratis). Cada aviso de “entregado/leído” también dispara el webhook: sin un filtro delante, Make y n8n Cloud se encarecen rápido. Tarifas de fuentes no oficiales: verificar con Meta, Make y n8n antes de presupuestar. No incluye horas de construcción.</p>
   </div>
 </section>
 
@@ -247,7 +249,8 @@ footer ul{padding-left:1.1rem}
         <tr><td>Primer contacto humano</td><td>Bernardo toma el lead − aviso recibido</td><td><span class="tag pend">con línea base</span></td></tr>
         <tr><td>Leads completos</td><td>Datos completos ÷ conversaciones iniciadas</td><td>≥ 60 % <span class="tag pend">validar</span></td></tr>
         <tr><td>Abandono por paso</td><td>% que deja de responder en cada pregunta</td><td>Encontrar la pregunta que sobra</td></tr>
-        <tr><td>Datos sin corrección manual</td><td>Leads que Bernardo no tuvo que editar ÷ leads en CRM</td><td>≥ 80 %</td></tr>
+        <tr><td>Fichas sin corrección manual</td><td>Fichas del bot que Bernardo no editó ÷ fichas del bot</td><td>≥ 80 %</td></tr>
+        <tr><td>Cotizar sin volver a preguntar</td><td>Cotizaciones hechas sin pedir datos extra ÷ fichas cotizadas</td><td>≥ 70 % <span class="tag pend">validar</span></td></tr>
         <tr><td>Errores de integración</td><td>Fallas ÷ mensajes procesados</td><td>&lt; 2 %</td></tr>
         <tr><td>Leads por canal</td><td>Conteo por agencia, web y directo</td><td>Hoy no se mide</td></tr>
         <tr><td>Costo por lead</td><td>(Meta + orquestador + servidor) ÷ leads</td><td>&lt; $0.50</td></tr>
@@ -262,8 +265,8 @@ footer ul{padding-left:1.1rem}
     <p class="eyebrow">Siguientes pasos</p>
     <h2>Cuatro a seis semanas con una agencia</h2>
     <div class="grid g3">
-      <div class="card"><span class="tag">Semana 0</span><h3 style="margin-top:.5rem">Relevamiento</h3><p>Respuestas de Félix, chats de Bernardo, número y cuenta de Meta, aviso de privacidad.</p></div>
-      <div class="card"><span class="tag">Semanas 1–2</span><h3 style="margin-top:.5rem">Construcción</h3><p>Webhook, estados del bot, Drive, alta en CRM, aviso a Bernardo. Pruebas con el equipo.</p></div>
+      <div class="card"><span class="tag">Semana 0</span><h3 style="margin-top:.5rem">Relevamiento</h3><p>Validar la propuesta con Félix, chats de Bernardo, número y cuenta de Meta, aviso de privacidad.</p></div>
+      <div class="card"><span class="tag">Semanas 1–2</span><h3 style="margin-top:.5rem">Construcción</h3><p>Webhook y filtro, flujo en n8n, RPC y usuario del bot en el panel, fotos a Drive, aviso a Bernardo. Pruebas con el equipo.</p></div>
       <div class="card"><span class="tag">Semanas 3–6</span><h3 style="margin-top:.5rem">Piloto</h3><p>QR en Changan del Valle y enlace en la web. Revisión semanal de abandono, errores y tiempos.</p></div>
     </div>
   </div>

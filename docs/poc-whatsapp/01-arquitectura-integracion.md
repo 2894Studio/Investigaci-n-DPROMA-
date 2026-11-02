@@ -1,208 +1,201 @@
 # 01 · Arquitectura de integración (borrador)
 
-> Borrador v0.2 · 31/10/2026. Lo marcado **🟡 por confirmar** depende del relevamiento con
-> Félix (`03-plantilla-relevamiento.md`, sección A). El Cotizador está fuera de alcance; ver
-> §10.
+> Borrador v0.3 · 02/11/2026. Basado en una revisión **de solo lectura** del panel
+> (`panel.dproma.com`): sesión de prueba de Comercial y lectura del JavaScript público. No se
+> guardó ni modificó nada. Lo marcado **🟡** es una propuesta que Félix tiene que validar
+> (`03-plantilla-relevamiento.md`, sección A). El Cotizador está fuera de alcance (§10).
 
-## 1. Componentes
+## 1. Lo que ya existe en el panel
+
+| Pieza | Qué es | Cómo la usa la PoC |
+|---|---|---|
+| **Supabase** (`pguddleutaztxgihvpas`) | Auth, base de datos Postgres expuesta por PostgREST, RPCs y RLS por rol | Destino de los leads |
+| **Netlify** | Hospeda el panel (HTML/JS estático) y sus funciones (`/.netlify/functions/*`) | Función de Drive ya existente |
+| `contactos_comerciales` | Fichas de Comercial. Campos: `folio`, `nombre`, `telefono`, `telefono_norm`, `correo`, `vehiculo`, `domicilio`, `estado_id`, `observaciones_texto`, `origen` (`directa` / `oem`). Etapa `lead → prospecto → cliente` calculada por la BD; estado `activo` / `perdido` | **Aquí se crea el lead del bot** |
+| `comercial_evidencias` + función `drive-comercial-upload-auth` | Imágenes de la ficha en Google Drive, carpeta `DPROMA — Comercial/{folio}`; la función entrega token y carpeta, y la fila solo referencia el archivo | **Aquí van las fotos del bot** |
+| `comercial_actividades` (Agenda) | Pendientes de cada vendedor | **Aviso a Bernardo dentro del panel** |
+| RPC `prospecto_duplicados` + `telefono_norm` | Detección de teléfono repetido en fichas y prospectos de ICEV | Evitar fichas duplicadas |
+| `cotizaciones` (ligadas por `contacto_id`) | El Cotizador | Fuera de alcance; el bot solo junta los datos que pide (§10) |
+| `comercial_formalizar`, `comercial_pasar_a_icev`, `prospectos` | Lo que pasa después: cotización aceptada → ICEV | Sin cambios |
+
+**Conclusión:** no hace falta crear un CRM ni una bóveda de fotos. El bot crea una ficha
+`lead` en Contactos, igual que cuando Bernardo usa "Nuevo lead", pero sin captura manual.
+
+## 2. Componentes
 
 ```mermaid
 flowchart LR
   C[Cliente<br/>WhatsApp] -- mensaje --> M[Meta<br/>WhatsApp Cloud API]
-  M -- webhook POST --> O[Orquestador<br/>n8n / Make]
-  O -- respuestas del bot --> M
-  O -- crear/actualizar lead --> CRM[(Sistema interno / CRM<br/>de Félix 🟡)]
-  O -- subir fotos --> D[Google Drive<br/>carpeta por cliente]
-  O -- aviso con resumen --> B[Bernardo]
-  O -- registro de eventos --> L[(Bitácora<br/>lead_evento)]
+  M -- webhook POST --> F[Filtro ligero<br/>solo mensajes]
+  F --> N[n8n<br/>Studio2894]
+  N -- respuestas del bot --> M
+  N -- RPC whatsapp_registrar_lead 🟡 --> S[(Supabase<br/>contactos_comerciales)]
+  N -- token + carpeta --> D1[Netlify fn<br/>drive-comercial-upload-auth]
+  N -- subir fotos --> D[Google Drive<br/>DPROMA — Comercial/folio]
+  N -- registrar foto --> S
+  S -- actividad en Agenda --> B[Bernardo<br/>panel]
+  N -- resumen por WhatsApp --> B
+  N -- eventos --> L[(Bitácora del bot)]
 ```
 
-| Pieza | Qué hace | Opción para la PoC |
+| Pieza | Responsable | Decisión |
 |---|---|---|
-| Número de WhatsApp | Recibe a los prospectos | Número **nuevo y dedicado** ("DPROMA Cargadores") en Cloud API. Ver §8 sobre coexistencia con el número de Bernardo. |
-| Proveedor de WhatsApp | Envía y recibe mensajes | **Meta Cloud API directa** (sin intermediario; ver §7) |
-| Orquestador | Lógica del bot, mapeo de datos, llamadas al CRM y a Drive | **n8n** (ver §7) |
-| Estado de la conversación | Recordar en qué paso va cada cliente | Tabla `conversacion` en la BD del orquestador o del CRM 🟡 |
-| CRM / sistema interno | Guarda la oportunidad comercial | Sistema de Félix 🟡 |
-| Bóveda de evidencias | Fotos del tablero, la acometida y el sitio | Google Drive, una carpeta por lead |
-| Aviso a Bernardo | Le llega el lead completo | WhatsApp a su número, correo o notificación del CRM 🟡 |
+| Número de WhatsApp | Félix / Dirección | Número **nuevo y dedicado** en Cloud API (§8) |
+| Proveedor de WhatsApp | — | **Meta Cloud API directa**, sin BSP (§7) |
+| Orquestador | **Studio2894** | **n8n**: conversación, validación, reintentos, llamadas al panel |
+| Entrada al panel | Félix | RPC `whatsapp_registrar_lead` + usuario de servicio 🟡 (§3) |
+| Fotos | Félix (ya existe) | Función `drive-comercial-upload-auth` + `comercial_evidencias` |
+| Aviso | Félix (ya existe) | Actividad en `comercial_actividades` + WhatsApp a Bernardo |
 
-## 2. Webhook de Meta
+## 3. Entrada segura al panel (propuesta para Félix 🟡)
 
-Meta llama a **una sola URL** del orquestador con dos tipos de petición:
+**Lo que no se debe hacer:** que n8n use la cuenta `comercial@dproma.com` o la llave
+`service_role` de Supabase. La primera mezcla al bot con una persona; la segunda se salta
+todo el RLS.
 
-1. **Verificación (GET, una vez al configurarlo).** Meta manda `hub.mode=subscribe`,
-   `hub.verify_token` y `hub.challenge`. El orquestador compara el token con uno secreto y
-   responde el `hub.challenge` tal cual, con código 200.
-2. **Eventos (POST).** Cada mensaje entrante y cada cambio de estado (enviado, entregado,
-   leído, fallido) llega en `entry[].changes[].value`:
-   - `messages[]`: lo que escribió el cliente (`text`, `interactive` con la respuesta del botón
-     o lista, `location`, `image`, `document`, `audio`, `video`).
-   - `contacts[]`: `wa_id` (teléfono) y `profile.name` (nombre del perfil).
-   - `statuses[]`: confirmaciones de los mensajes que mandamos; sirven para medir errores.
+**Propuesta:**
 
-**Reglas obligatorias del nodo de entrada:**
+1. **Usuario de servicio** `bot-whatsapp@dproma.com` en Supabase Auth, con un rol propio
+   (por ejemplo `BotWhatsApp`) que no ve el panel y solo puede ejecutar las RPCs del bot.
+   n8n inicia sesión con él (`/auth/v1/token`) y renueva el token. Así `created_by` queda
+   atribuido al bot.
+2. **RPC `whatsapp_registrar_lead`** (SECURITY DEFINER, `GRANT EXECUTE` solo a ese rol). Hace
+   todo en una transacción:
+   - busca por `telefono_norm`: si ya hay una ficha **activa**, la actualiza y agrega una
+     observación; si no, inserta una nueva con etapa `lead`;
+   - guarda los campos del bot (§9);
+   - asigna como responsable a Bernardo (o al vendedor que diga la regla);
+   - crea una actividad en `comercial_actividades`: "Contactar lead de WhatsApp", con fecha de
+     hoy;
+   - devuelve `{ id, folio, nuevo: true|false }`.
+3. **RPC `whatsapp_registrar_evidencia`** (o un insert permitido por RLS) para registrar cada
+   foto en `comercial_evidencias` después de subirla.
+4. **Fotos:** n8n llama a `drive-comercial-upload-auth` con el token del bot y el
+   `contacto_id`, recibe `{ accessToken, folderId }`, sube a Drive por multipart y registra
+   el archivo. Es el mismo mecanismo que usa `contactos-imagenes.js`. 🟡 Confirmar que la
+   función acepta al rol del bot.
 
-- **Validar la firma** `X-Hub-Signature-256` (HMAC-SHA256 del cuerpo con el *App Secret*).
-  Si no coincide, se descarta.
-- **Responder 200 de inmediato** y procesar aparte. Si tarda o falla, Meta reintenta y llegan
-  duplicados.
-- **Evitar duplicados**: guardar el `messages[].id` (`wamid`) y no procesar dos veces el mismo.
-- Ignorar `statuses[]` en el flujo del bot, pero guardar los `failed` en la bitácora.
-- **Filtro de avisos de estado** (recomendado): cada mensaje del bot genera unos 3 avisos
-  (enviado, entregado, leído). Una función ligera delante del orquestador que reenvíe solo
-  `messages[]` y los `failed` reduce las ejecuciones cobradas unas 4 veces (ver
-  `04-costos-y-kpis.md`).
+**Por qué una RPC y no inserts sueltos:** la lógica de duplicados, la asignación y el aviso
+viven en un solo lugar, dentro del sistema de Félix, y n8n no necesita conocer la estructura
+interna de las tablas.
 
-Ejemplo completo de payload y del lead resultante: `schema/poc-whatsapp-ejemplo.json`.
+## 4. Webhook de Meta
 
-## 3. Máquina de estados de la conversación
+Meta llama a **una sola URL** con dos tipos de petición:
 
-Cada número (`wa_id`) tiene un estado. El orquestador lee el estado, interpreta el mensaje,
-guarda el dato y avanza.
+1. **Verificación (GET, una vez).** Meta manda `hub.mode=subscribe`, `hub.verify_token` y
+   `hub.challenge`; se compara el token y se responde el `hub.challenge` con código 200.
+2. **Eventos (POST).** En `entry[].changes[].value` llegan:
+   - `messages[]`: lo que escribió el cliente (`text`, `interactive`, `location`, `image`,
+     `document`, `audio`, `video`);
+   - `contacts[]`: `wa_id` y `profile.name`;
+   - `statuses[]`: confirmaciones de los mensajes enviados.
+
+**Reglas del nodo de entrada:**
+
+- **Validar la firma** `X-Hub-Signature-256` (HMAC-SHA256 con el *App Secret*).
+- **Responder 200 de inmediato** y procesar aparte; si no, Meta reintenta y llegan duplicados.
+- **Evitar duplicados** con `messages[].id` (`wamid`).
+- **Filtro de avisos de estado:** cada mensaje del bot genera unos 3 avisos (enviado,
+  entregado, leído). Una función ligera delante de n8n, que puede ser otra Netlify Function del
+  mismo sitio, reenvía solo `messages[]` y los `failed`. Así las ejecuciones cobradas bajan
+  unas 4 veces (`04-costos-y-kpis.md`).
+
+Ejemplo de payload y del lead resultante: `schema/poc-whatsapp-ejemplo.json`.
+
+## 5. Máquina de estados de la conversación
+
+El estado de cada `wa_id` lo guarda n8n (tabla de datos de n8n o tabla `whatsapp_conversaciones`
+en Supabase 🟡).
 
 ```
-NUEVO → NOMBRE → INMUEBLE → AUTO → UBICACION → DISTANCIA → FOTOS → COMPLETO
-                   │                                                  │
-                   └── flotilla / "asesor" / 2 respuestas no válidas ─► HUMANO
-                                                                      │
-                                       COMPLETO o HUMANO → lead en CRM + aviso a Bernardo
+NUEVO → NOMBRE → INMUEBLE → VEHICULO → DOMICILIO → METROS → MEDIDOR → FOTOS → COMPLETO
+                   │                                                            │
+                   └── flotilla / "asesor" / 2 respuestas no válidas ──────────► HUMANO
+                                                                                │
+                     COMPLETO o HUMANO → whatsapp_registrar_lead → fotos → aviso a Bernardo
 ```
 
-- Si el cliente vuelve a escribir después de `COMPLETO`, el mensaje se adjunta al lead como
-  nota y se avisa a Bernardo; el bot no vuelve a empezar.
-- Sin respuesta en 30 min: un recordatorio. Sin respuesta en 23 h: el lead queda
-  `INCOMPLETO` con lo que haya y pasa a Bernardo, antes de que cierre la ventana de 24 h.
-- Guion y textos de cada estado: `02-flujo-conversacional.md`.
-
-## 4. Fotos y documentos (bóveda de evidencias)
-
-1. Llega `image`/`document` con un `id` de media.
-2. `GET https://graph.facebook.com/v{n}/{media-id}` con el token → devuelve una `url`
-   **temporal** (caduca en minutos) y el `mime_type`.
-3. Descargar de esa `url` con el mismo token **en ese momento**.
-4. Subir a Drive: `Leads WhatsApp / {AAAA-MM} / {lead_id} - {nombre} /`, con nombre
-   `{tipo}-{n}.jpg` (`tablero`, `acometida`, `sitio`, `otro`).
-5. Guardar en `lead_evidencia` el enlace de Drive y el tipo.
-
-El tipo de foto se deduce del paso en que la mandó, porque el bot las pide de una en una. Si
-manda un audio, video o archivo raro, se guarda en la carpeta y el lead se marca para revisión
-humana.
-
-**Plan B:** si el cliente no puede mandar fotos en ese momento, el bot le manda un enlace a un
-formulario de carga (Google Forms con subida de archivos o una página del sistema de Félix 🟡)
-ligado a su `lead_id`.
-
-## 5. Origen del lead (atribución)
-
-Un enlace `wa.me` con mensaje precargado por canal; el orquestador reconoce el texto inicial:
-
-| Canal | Enlace | Texto precargado → `origen` |
-|---|---|---|
-| Changan del Valle | `https://wa.me/52XXXXXXXXXX?text=Hola%2C%20vengo%20de%20Changan%20del%20Valle` | `agencia:changan-del-valle` |
-| Otra agencia | igual, con su nombre | `agencia:{slug}` |
-| Sitio web | `...?text=Hola%2C%20vi%20su%20p%C3%A1gina` | `web` |
-| Sin texto reconocido | — | `directo` |
-
-Se puede imprimir como **código QR** para el piso de venta de cada agencia. Si viene de una
-agencia, el bot ya sabe la marca y se salta la pregunta del auto.
+- La ficha se crea **al terminar** (o al pasar a una persona), no con el primer mensaje. Así
+  no se llena Contactos de fichas vacías. Si el cliente abandona, a las 23 h se registra con
+  lo que haya y la observación "datos incompletos".
+- Si vuelve a escribir después de `COMPLETO`, el mensaje se agrega como observación de la
+  ficha y Bernardo recibe el aviso.
+- Sin respuesta en 30 min: un recordatorio, solo uno.
+- Guion completo: `02-flujo-conversacional.md`.
 
 ## 6. Manejo de errores
 
-| Falla | Qué hace el sistema | Se registra como |
+| Falla | Qué hace n8n | Evento |
 |---|---|---|
-| CRM no responde o da error | 3 reintentos (1 min, 5 min, 15 min); si sigue fallando, cola de fallidos, aviso a Félix y el resumen igual le llega a Bernardo | `error_crm` |
-| Error al descargar o subir una foto | Reintento; si falla, el lead queda con "fotos pendientes" | `error_media` |
-| Falla el aviso a Bernardo | Reintento por un canal alterno (correo) | `error_aviso` |
+| La RPC falla o Supabase no responde | 3 reintentos (1, 5, 15 min); después, cola de fallidos, aviso a Félix y el resumen igual le llega a Bernardo por WhatsApp | `error_crm` |
+| Token del bot vencido | Renueva la sesión y reintenta una vez | `error_auth` |
+| Error al subir una foto | Reintento; si falla, observación "fotos pendientes" en la ficha | `error_media` |
+| Falla el aviso por WhatsApp a Bernardo | Queda la actividad en la Agenda; reintento por correo | `error_aviso` |
 | Mensaje enviado con `status=failed` | Se guarda el código de error de Meta | `error_envio` |
-| Mensaje que el bot no entiende | Repite la pregunta; a la segunda, pasa a una persona | `no_reconocido` |
-| Cliente escribe fuera de horario | El bot captura igual y avisa en qué horario lo contactan | — |
+| Respuesta que el bot no entiende | Repite la pregunta; a la segunda, pasa a una persona | `no_reconocido` |
 
-**Ventana de 24 h:** dentro de las 24 h desde el último mensaje del cliente se puede contestar
-con texto libre. Fuera de esa ventana **solo se pueden mandar plantillas aprobadas por Meta**.
-En esta PoC el bot siempre contesta dentro de la ventana, así que no hacen falta plantillas.
-Lo que Bernardo responda después lo hace desde su flujo habitual.
+**Ventana de 24 h:** el bot siempre contesta dentro de la ventana, así que no necesita
+plantillas de Meta. Lo que Bernardo responda después lo hace desde su flujo habitual.
 
-La tasa de error de la PoC es `eventos error_* / mensajes procesados` (ver
-`04-costos-y-kpis.md`).
+## 7. Decisiones de stack
 
-## 7. Decisiones de stack (recomendación)
-
-### Make vs n8n
-
-| | Make | n8n |
-|---|---|---|
-| Arranque | Inmediato, en la nube | Nube (n8n Cloud) inmediato; *self-hosted* requiere servidor |
-| Costo | Por créditos (≈ 1 crédito por módulo ejecutado); sube con el volumen | Cloud por ejecuciones; *self-hosted* Community gratis (solo servidor) |
-| Datos de clientes | En servidores de Make | *Self-hosted*: en la infraestructura de DPROMA |
-| Lógica de estados y código | Posible pero incómoda | Nodos de código (JS) y BD nativos |
-| Migrar de nube a propio | Hay que rehacer todo en otra herramienta | El mismo flujo se exporta e importa |
-
-**Recomendación:** **n8n Cloud (Starter) para la PoC** y, si se valida, pasar el mismo flujo a
-**n8n *self-hosted* en la infraestructura de Félix**. No hay que montar servidor para probar
-y no se rehace nada al escalar. Si Félix ya domina Make y no n8n, Make es aceptable para la
-PoC, sabiendo que escalar implica rehacer. → Se decide con la respuesta de Félix
-(relevamiento A.6).
-
-### Cloud API directa vs BSP (Twilio, Wati, 360dialog…)
-
-**Recomendación: Cloud API directa.** El volumen de la PoC es bajo, n8n y Make tienen nodos
-nativos de WhatsApp Cloud API, y un BSP añade suscripción o margen por mensaje sin resolver
-nada que la PoC necesite. Un BSP tendría sentido si DPROMA quisiera una bandeja compartida para
-varios asesores sin construirla.
-
-Requisitos para la Cloud API: cuenta de Meta Business (idealmente verificada), una app en Meta
-for Developers con el producto WhatsApp, un usuario de sistema con **token permanente** y el
-número dado de alta. 🟡 ¿Quién administra la cuenta de Meta Business de DPROMA?
+- **Orquestador: n8n** (decidido). Para la PoC, n8n Cloud Starter; si se valida, el mismo
+  flujo en n8n *self-hosted*. Studio2894 lo opera y cambia el guion sin depender de un
+  despliegue del panel. Lo único que Félix expone es la RPC y el usuario de servicio.
+- **Cloud API directa, sin BSP:** volumen bajo, nodos nativos en n8n y sin margen por mensaje.
+  Requisitos: cuenta de Meta Business (idealmente verificada), app en Meta for Developers con
+  WhatsApp, usuario de sistema con token permanente y el número dado de alta.
 
 ## 8. Riesgos y puntos de atención
 
 | Riesgo | Detalle | Mitigación |
 |---|---|---|
-| **Número de Bernardo** | Si su número se pasa a la Cloud API, deja de funcionar en la app normal (salvo *coexistencia*). La coexistencia (app Business + API en el mismo número) está disponible en México, pero con límites (grupos, listas de difusión, etc., según la documentación vigente de Meta). | PoC con **número nuevo** dedicado; Bernardo sigue con su WhatsApp. Evaluar coexistencia después. |
-| **Datos personales** | La LFPDPPP exige informar el aviso de privacidad antes de recabar datos (nombre, domicilio, fotos de la casa) o al hacerlo. | El primer mensaje incluye enlace al aviso de privacidad, que debe estar publicado. |
-| **Verificación de Meta** | Sin verificación del negocio hay límites de mensajes y de números de teléfono. | Iniciar la verificación en cuanto se decida el stack. |
-| **Abandono del bot** | Cada pregunta extra pierde gente. | Preguntas de un toque, saltar la marca si viene de agencia, fotos opcionales; medir el abandono por paso. |
-| **Campañas con picos** | La campaña de más de 200 mensajes se perdió por falta de atención. | El bot responde siempre; Bernardo recibe leads ya ordenados. |
-| **Bernardo como cuello de botella** | Todos los avisos le llegan a una persona. | Medir el tiempo de primer contacto humano (KPI); si se satura, sumar un segundo destinatario. |
+| **Número de Bernardo** | Pasarlo a la Cloud API lo saca de la app normal, salvo con *coexistencia*, que tiene límites | PoC con **número nuevo**; evaluar coexistencia después |
+| **Datos personales (LFPDPPP)** | Se piden nombre, domicilio y fotos de la casa | Enlace al aviso de privacidad en el primer mensaje; publicarlo antes de salir |
+| **Credenciales** | Durante esta revisión se compartió por chat la contraseña de una cuenta de prueba | No guardarla en el repo; **cambiarla** al terminar la revisión; el bot usa su propio usuario |
+| **Fichas duplicadas** | Un cliente que ya escribió a Bernardo o que viene de una agencia ya registrada | La RPC deduplica por `telefono_norm` y actualiza en vez de crear |
+| **Abandono del bot** | 6 preguntas + fotos | Preguntas de un toque, saltar el vehículo si viene de agencia, fotos opcionales, medir el abandono por paso |
+| **Verificación de Meta** | Límites de mensajes sin verificación | Iniciarla en cuanto se apruebe la PoC |
 
-## 9. Modelo de datos mínimo
+## 9. Mapeo a `contactos_comerciales`
 
-Formato JSON del lead: `schema/poc-whatsapp-lead.schema.json`. Tablas:
-
-| Tabla | Campos clave | Para qué |
+| Dato del bot | Campo del panel | Estado |
 |---|---|---|
-| `lead` | `id`, `wa_id`, `telefono`, `nombre`, `origen`, `tipo_inmueble`, `marca_auto`, `modelo_auto`, `ubicacion` (lat/long, dirección, CP), `distancia` (`hasta_10m` / `mas_10m` / `no_se`), `estado`, `motivo_humano`, `carpeta_drive_url`, `crm_id` | La oportunidad |
-| `lead_evento` | `lead_id`, `tipo`, `ocurrido_en`, `detalle` | Marcas de tiempo para KPIs y errores |
-| `lead_evidencia` | `lead_id`, `tipo_foto`, `drive_url`, `mime_type`, `wa_media_id` | Fotos y archivos |
-| `conversacion` | `wa_id`, `estado`, `intentos_fallidos`, `ultimo_mensaje_en` | Estado del bot |
+| `nombre` | `nombre` | ✅ existe |
+| `telefono` (E.164 desde `wa_id`) | `telefono` (la BD calcula `telefono_norm`) | ✅ existe |
+| `vehiculo` (marca + modelo) | `vehiculo` | ✅ existe |
+| `domicilio` (texto) | `domicilio` | ✅ existe |
+| Estado de la república (a partir del CP) | `estado_id` | ✅ existe; n8n traduce CP → estado con el catálogo `estados` 🟡 |
+| `origen` | `origen`: `oem` si vino de agencia, `directa` en otro caso | ✅ existe |
+| Nombre de la agencia (`agencia:changan-del-valle`) | — | 🟡 columna nueva `agencia` (ya existe en `prospectos`) |
+| Canal (`whatsapp`) | — | 🟡 columna nueva `canal` (hoy no se distingue WhatsApp de captura manual) |
+| `tipo_inmueble` (`Casa particular` / `Residencial` / empresa) | — | 🟡 columna nueva (ya existe en `cotizaciones`, mismos valores) |
+| `metros_aprox` (`hasta_10` / `11_20` / `21_30` / `mas_30` / `no_se`) | — | 🟡 columna nueva |
+| `medidor_independiente` (`si` / `no` / `no_se`) | — | 🟡 columna nueva |
+| Resumen legible de todo lo anterior | `observaciones_texto` | ✅ existe; **plan B** si no se agregan columnas |
+| Fotos | `comercial_evidencias` + Drive | ✅ existe |
+| Responsable | (responsable de la ficha) | ✅ existe; regla: Bernardo 🟡 |
+| `wa_id`, eventos, `wamid` | — | 🟡 tabla `whatsapp_eventos` (o bitácora en n8n) |
 
-Eventos (`lead_evento.tipo`): `primer_mensaje`, `bot_respuesta`, `datos_completos`,
-`derivado_humano`, `lead_creado_crm`, `aviso_bernardo`, `contacto_humano`, y los `error_*`.
-`contacto_humano` lo marca Bernardo (o el CRM, si registra cambios) cuando toma el lead.
+**Mínimo para arrancar:** con solo la RPC y `observaciones_texto` como plan B, la PoC funciona
+sin tocar el esquema. Las columnas nuevas (`agencia`, `canal`, `tipo_inmueble`,
+`metros_aprox`, `medidor_independiente`) permiten filtrar y medir en el panel, y son las que
+el Cotizador va a querer leer.
 
-### Mapeo hacia el CRM 🟡
+## 10. Relación con el Cotizador (otra iniciativa)
 
-| Campo del lead | Campo en el sistema de Félix |
+El bot **no crea cotizaciones**. El cotizador del panel se usó solo para decidir **qué datos
+pedir**, de modo que Bernardo abra la ficha y cotice sin volver a preguntar:
+
+| Concepto o campo del cotizador | Dato que lo alimenta |
 |---|---|
-| `nombre` | 🟡 |
-| `telefono` | 🟡 |
-| `origen` | 🟡 (¿existe "fuente" o "canal"?) |
-| `tipo_inmueble`, `marca_auto`, `modelo_auto` | 🟡 |
-| `ubicacion` | 🟡 |
-| `distancia` | 🟡 |
-| `estado` | 🟡 (¿etapa inicial del tablero comercial?) |
-| `carpeta_drive_url` | 🟡 |
-| marcas de tiempo | 🟡 (¿las guarda el CRM o la bitácora del orquestador?) |
+| Cliente, Domicilio, Vehículo, Tipo de inmueble | `nombre`, `domicilio`, `vehiculo`, `tipo_inmueble` |
+| 1 · Instalación estándar (incluye 10 m) | `metros_aprox` = `hasta_10` |
+| 3 · Metro excedente desde el 11 ($450/m) | `metros_aprox` |
+| 2 · Trámite CFE / medidor independiente | `medidor_independiente` |
+| 5 · Mufa (acometida del nuevo medidor) | `medidor_independiente` + foto del medidor |
+| 4 · Tierra física, consideraciones de tablero, muro y andamio | Fotos del tablero y del recorrido |
 
-**Esta tabla se completa con la respuesta de Félix** (pendiente #1 del README).
-
-## 10. Relación con la iniciativa Cotizador (fuera de alcance)
-
-El Cotizador es otra iniciativa y avanza en paralelo. Esta PoC **no cotiza, no clasifica casos
-estándar o no estándar y no agenda visitas**. Lo único que comparten son los datos:
-
-- El bot ya captura `tipo_inmueble`, `marca_auto`, `modelo_auto`, `ubicacion`, `distancia` y
-  las fotos, con nombres estables.
-- Cuando el Cotizador esté listo, podrá leer el lead del CRM sin cambios en el bot. Esa
-  conexión se diseña dentro de esa iniciativa, no en esta.
+Cuando el Cotizador evolucione, podrá leer estos campos desde la ficha (`contacto_id`) sin
+cambios en el bot.

@@ -4,8 +4,11 @@ Prueba de concepto de DPROMA × 2894_. Cuando un prospecto escribe por WhatsApp,
 sus datos y sus fotos, crea la oportunidad en el sistema interno y avisa a Bernardo con todo
 listo. Sin captura manual.
 
-> **Estado:** borrador v0.2 · 31/10/2026 · todavía no se construye nada.
+> **Estado:** borrador v0.3 · 02/11/2026 · todavía no se construye nada.
 > v0.2: el Cotizador quedó fuera de alcance (es otra iniciativa y va en paralelo).
+> v0.3: revisión de solo lectura del panel real (`panel.dproma.com`). El destino del bot es la
+> tabla `contactos_comerciales` (Supabase); las fotos usan la carpeta de Drive que el panel ya
+> tiene. Las preguntas del bot se derivan de lo que pide el cotizador. Orquestador: **n8n**.
 
 ## Alcance
 
@@ -13,23 +16,23 @@ listo. Sin captura manual.
 |---|---|
 | Bot de WhatsApp que recibe al prospecto y captura sus datos | Cálculo y envío de cotizaciones (**iniciativa Cotizador**) |
 | Fotos guardadas en Drive, en una carpeta por cliente | Agenda de visitas técnicas (ICEP) |
-| Alta o actualización de la oportunidad en el CRM de Félix | Catálogo de SKUs y precios |
+| Alta o actualización de la ficha `lead` en Contactos del panel | Catálogo de SKUs y precios |
 | Aviso a Bernardo con todo lo capturado y paso a una persona | Posventa y encuestas de satisfacción |
 | Marcas de tiempo y métricas del primer contacto | Cambios al tablero comercial o al proceso de cierre |
 
 **Dónde termina la PoC:** cuando la oportunidad está en el CRM y Bernardo recibió el aviso. Lo
 que sigue (cotizar, visitar, cerrar) se hace igual que hoy.
 
-**Lo que hay en común con el Cotizador:** los datos que captura el bot (tipo de inmueble, auto,
-ubicación, distancia del tablero, fotos) son los mismos que el Cotizador va a necesitar. Por
-eso se usan nombres de campo estables (`schema/poc-whatsapp-lead.schema.json`), pero ninguna de
-las dos iniciativas depende de la otra.
+**Lo que hay en común con el Cotizador:** el cotizador del panel se usó como referencia para
+decidir **qué datos pide el bot** (cliente, tipo de inmueble, vehículo, domicilio, metros,
+medidor independiente y fotos), así Bernardo cotiza sin volver a preguntar. El bot no crea
+cotizaciones y ninguna de las dos iniciativas depende de la otra.
 
 ## ⚠️ Pendientes abiertos
 
 | # | Pendiente | Quién | Bloquea |
 |---|---|---|---|
-| **1** | **Información del sistema de Félix**: stack, si tiene API REST o webhooks, autenticación, entidad oportunidad/lead y sus campos, ambientes, si ya hay un tablero comercial. Sin esto los campos del CRM siguen "por confirmar". | Félix → Studio2894 | Mapeo de datos, nodo "Crear lead" |
+| **1** | **Validar con Félix la propuesta de entrada al panel**: usuario de servicio del bot, RPC `whatsapp_registrar_lead`, columnas nuevas (`canal`, `agencia`, `tipo_inmueble`, `metros_aprox`, `medidor_independiente`) o plan B en `observaciones_texto`, permiso del bot en la función de Drive, ambiente de pruebas. *El stack y la tabla ya se conocen (Supabase + Netlify, `contactos_comerciales`).* | Félix | Construir el nodo "Registrar lead" |
 | 2 | Muestras de chats reales (capturas), qué se pide hoy y en qué orden, tiempo actual de primera respuesta. | Bernardo | Textos del bot, línea base de los KPIs |
 | 3 | Número para el bot y acceso a la cuenta de Meta Business. | Félix (o quien administre la cuenta) | Alta en la Cloud API |
 | 4 | Aviso de privacidad (LFPDPPP) publicado en una URL. Lo exige la ley para pedir nombre, domicilio y fotos. | Quien lleve lo legal | Salida del bot |
@@ -38,6 +41,7 @@ las dos iniciativas depende de la otra.
 
 | Archivo | Para quién | Qué contiene |
 |---|---|---|
+| [`06-hallazgos-panel.md`](06-hallazgos-panel.md) | Félix, Studio2894 | Lo que se encontró en la revisión del panel |
 | [`01-arquitectura-integracion.md`](01-arquitectura-integracion.md) | Félix, Studio2894 | Componentes, webhook de Meta, fotos en Drive, errores, modelo de datos, Make vs n8n, riesgos |
 | [`02-flujo-conversacional.md`](02-flujo-conversacional.md) | Bernardo, Studio2894 | Guion del bot paso a paso, textos y reglas de paso a una persona |
 | [`03-plantilla-relevamiento.md`](03-plantilla-relevamiento.md) | Félix, Bernardo | Cuestionario con casillas |
@@ -69,13 +73,13 @@ repositorio muestra lo que eso cuesta: más de 400 grupos de WhatsApp, una campa
 Cliente (enlace wa.me de la agencia, de la web o directo)
    │
    ▼
-Bot de WhatsApp: nombre · inmueble · auto · ubicación · distancia · fotos
+Bot de WhatsApp: nombre · inmueble · vehículo · domicilio · metros · medidor · fotos
    │                          └─ pide asesor, es flotilla o no se entiende ─► Bernardo
    ▼
-Orquestador (n8n o Make)
-   ├─► crea/actualiza la oportunidad en el CRM de Félix
-   ├─► guarda las fotos en una carpeta de Drive del cliente
-   └─► avisa a Bernardo con el resumen y los enlaces
+n8n (Studio2894)
+   ├─► RPC whatsapp_registrar_lead → ficha «lead» en Contactos (Supabase) + actividad en la Agenda
+   ├─► fotos → Drive «DPROMA — Comercial/{folio}» + comercial_evidencias
+   └─► resumen por WhatsApp a Bernardo
                 │
                 ▼
       Bernardo sigue como hoy (cotiza, coordina visita, cierra)
@@ -86,12 +90,13 @@ Orquestador (n8n o Make)
 | Persona | Rol en la PoC |
 |---|---|
 | Bernardo Padilla (Líder Comercial) | Dueño del proceso, valida los textos del bot, recibe los leads y los casos que pasan a una persona |
-| Félix Sánchez (Tecnología) | Sistema interno/CRM, API y webhooks, cuenta de Meta, hospedaje del orquestador |
-| Studio2894 / Operaciones | Orquestación, diseño conversacional, métricas |
+| Félix Sánchez (Tecnología) | Panel DPROMA (Supabase/Netlify): RPC y usuario de servicio del bot, columnas nuevas, cuenta de Meta |
+| Studio2894 / Operaciones | Flujo en n8n, diseño conversacional, métricas |
 
 ## Fuentes
 
 - Correo de inicio de la iniciativa (Studio2894) y contexto entregado en la sesión.
+- Revisión de solo lectura de `panel.dproma.com` (02/11/2026) y capturas del cotizador.
 - Minutas de referencia (privadas en Drive de dproma.com, **no incorporadas todavía**): Reunión
   con Área Comercial 15/10 y las de la iniciativa Cotizador 26/10, que solo sirven de
   referencia por los campos en común.

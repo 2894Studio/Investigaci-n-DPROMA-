@@ -9,42 +9,36 @@
 
 ---
 
-## A · Sistema interno / CRM — Félix Sánchez *(prioridad 1)*
+## A · Panel DPROMA — Félix Sánchez *(prioridad 1)*
 
-### A.1 Stack
-- [ ] ¿En qué está construido el sistema? (lenguaje, framework, base de datos): ____
-- [ ] ¿Dónde está hospedado? (nube, servidor propio, proveedor): ____
-- [ ] ¿Es el mismo sistema que SIO-DPROMA o uno aparte para comercial? ____
+> Ya sabemos, por una revisión de solo lectura del panel, que es Supabase + Netlify, que los
+> leads viven en `contactos_comerciales` y que las fotos van a Drive con
+> `drive-comercial-upload-auth` + `comercial_evidencias` (ver
+> `01-arquitectura-integracion.md` §1). Aquí solo queda lo que el código no responde.
 
-### A.2 API y webhooks
-- [ ] ¿Tiene API REST (u otra) para **crear** y **actualizar** registros? ¿Documentación? ____
-- [ ] ¿Puede **enviar** webhooks cuando algo cambia (ej. cambio de etapa del lead)? ____
-- [ ] ¿Límites de peticiones por minuto o tamaño? ____
-- [ ] Si no hay API: ¿se puede escribir directo en la base de datos? ¿Con qué usuario y permisos? ____
+### A.1 Entrada del bot
+- [ ] ¿De acuerdo con crear un **usuario de servicio** `bot-whatsapp@dproma.com` con un rol propio, sin acceso al panel? ¿O prefieres otra forma (Edge Function con llave)? ____
+- [ ] ¿De acuerdo con una RPC `whatsapp_registrar_lead` (SECURITY DEFINER) que cree o actualice la ficha, deduplique por `telefono_norm`, asigne responsable y cree la actividad en Agenda? ¿La escribes tú o te mandamos un borrador SQL? ____
+- [ ] ¿A quién se asignan los leads del bot? ☐ siempre Bernardo ☐ por regla (agencia, zona) ____
+- [ ] ¿Qué pasa si el teléfono ya existe en una ficha **perdida** o en un prospecto de ICEV? ☐ reactivar ☐ ficha nueva ☐ solo avisar ____
 
-### A.3 Autenticación
-- [ ] ¿Cómo se autentica una integración? ☐ API key ☐ OAuth ☐ usuario/contraseña ☐ token JWT ☐ otro: ____
-- [ ] ¿Se puede crear un usuario o llave exclusivo para el orquestador? ____
+### A.2 Campos nuevos en `contactos_comerciales`
+- [ ] ¿Se pueden agregar estas columnas? ☐ `canal` ☐ `agencia` ☐ `tipo_inmueble` ☐ `metros_aprox` ☐ `medidor_independiente` — o, como plan B, ¿todo en `observaciones_texto`? ____
+- [ ] ¿`origen` = `oem` es correcto para un cliente que llega por el enlace de una agencia? ____
+- [ ] ¿Dónde guardamos la bitácora del bot (eventos, `wamid`)? ☐ tabla `whatsapp_eventos` en Supabase ☐ solo en n8n ____
 
-### A.4 Entidad oportunidad / lead
-- [ ] ¿Existe hoy una entidad "lead", "oportunidad" o "prospecto"? ¿Cómo se llama? ____
-- [ ] Lista de campos con tipo y si son obligatorios (adjuntar captura o export): ____
-- [ ] ¿Hay un tablero comercial con etapas? ¿Cuáles? ____
-- [ ] ¿Cómo se identifica a un cliente que ya existe? (teléfono, correo, RFC): ____
-- [ ] ¿Se pueden guardar enlaces a archivos (Drive) o adjuntos? ____
-- [ ] ¿Guarda fecha y hora de cada cambio de etapa (para medir el SLA)? ____
+### A.3 Fotos
+- [ ] ¿`drive-comercial-upload-auth` acepta el token del usuario de servicio? ¿Hay que darle permiso al rol? ____
+- [ ] ¿El registro en `comercial_evidencias` se hace con insert directo (RLS) o con una RPC? ____
 
-### A.5 Ambientes
-- [ ] ¿Hay ambiente de pruebas separado de producción? URL: ____
-- [ ] ¿Se pueden cargar datos de prueba sin afectar reportes? ____
+### A.4 Ambientes y despliegue
+- [ ] ¿Hay un proyecto Supabase de pruebas, o probamos en producción con fichas marcadas como prueba? ____
+- [ ] ¿El filtro de webhooks puede vivir como otra Netlify Function del sitio, o lo hospedamos aparte? ____
+- [ ] ¿Cómo se versionan los cambios de base de datos (migraciones numeradas tipo 218–223)? ____
 
-### A.6 Orquestador
-- [ ] ¿Experiencia previa con ☐ Make ☐ n8n ☐ Zapier ☐ otra: ____ ¿En qué proyectos? ____
-- [ ] Si se escala con n8n *self-hosted*, ¿dónde podría vivir? (VPS, Docker, nube existente): ____
-- [ ] ¿Quién daría mantenimiento? ____
-
-### A.7 Seguridad
-- [ ] ¿Políticas sobre dónde pueden guardarse datos de clientes (fuera del país, terceros)? ____
+### A.5 Orquestador y seguridad
+- [ ] ¿Experiencia previa con n8n? Si se escala a *self-hosted*, ¿dónde viviría? ____
+- [ ] ¿Políticas sobre datos de clientes en servicios de terceros (n8n Cloud, Meta)? ____
 - [ ] ¿Quién debe aprobar una integración nueva? ____
 
 ---
@@ -58,7 +52,8 @@
 - [ ] ¿Cuántos prospectos nuevos por semana? ¿Cuántos por canal (agencia / web / directo / flotilla)? ____
 - [ ] ¿Cuánto tardas hoy, en promedio, en contestar el primer mensaje de un prospecto nuevo? ____ *(línea base del KPI)*
 - [ ] ¿Cuántos mensajes de ida y vuelta te toma hoy juntar los datos y fotos de un cliente? ____ *(línea base)*
-- [ ] ¿Cómo quieres recibir el aviso de lead nuevo? ☐ WhatsApp ☐ correo ☐ notificación del CRM ☐ otro ____
+- [ ] Además de la actividad en tu Agenda del panel, ¿quieres el aviso por WhatsApp? ☐ sí ☐ no ☐ correo ____
+- [ ] En el cotizador, ¿«Residencial» significa condominio/edificio? ____
 - [ ] Lista de agencias aliadas activas y su contacto: ____
 - [ ] Marcas y modelos de auto más frecuentes: ____
 - [ ] ¿Quién más contesta mensajes de clientes? ____
@@ -69,7 +64,6 @@
 - [ ] ¿DPROMA tiene cuenta de **Meta Business**? ¿Verificada? ¿Quién es administrador? ____
 - [ ] Número para el bot: ☐ nuevo dedicado ☐ el de Bernardo (coexistencia) ☐ otro ____
 - [ ] Nombre visible del perfil de WhatsApp: ____
-- [ ] Cuenta de **Google Drive** donde vivirán las carpetas (compartida, no personal): ____
 - [ ] Método de pago para Meta (tarjeta en Billing Hub) y para el orquestador: ____
 - [ ] Aviso de privacidad publicado en: ____ (¿quién lo redacta y aprueba?)
 - [ ] ¿Quién da el visto bueno para arrancar la PoC? ____
