@@ -1,4 +1,4 @@
-# 02 · Flujo conversacional del bot (borrador)
+# 02 · Guion del bot
 
 > Borrador v0.3 · 02/11/2026. El bot captura datos, crea la ficha en Contactos del panel y
 > avisa a Bernardo; **no cotiza** (el Cotizador es otra iniciativa). Las preguntas se
@@ -9,7 +9,7 @@
 > **Fuente de verdad:** los textos y reglas viven en `n8n/motor-guion.js`. Este documento los
 > explica; si hay diferencias, manda el código. Para cambiar el guion, ver `07-demo-n8n.md`.
 
-## ¿Se entrena?
+## Aprendizaje
 
 No en esta prueba. El bot es un guion con reglas: no usa IA, así que no aprende solo. Se
 **ajusta** cada semana del piloto con cuatro pasos:
@@ -48,7 +48,7 @@ instrucciones y ejemplos reales, no en un modelo propio, y el bot confirma lo qu
   "Con gusto te damos el precio exacto, solo necesito unos datos 🙂" y repite la pregunta.
 - Si viene de agencia: "¡Hola! Vienes de **{Agencia}**, ¡felicidades por tu auto nuevo! …"
 
-### 1 · Tipo de inmueble (botones) → cotizador: «Tipo de inmueble»
+### 1 · Tipo de inmueble
 > Gracias, {nombre}. ¿Dónde quieres instalar el cargador?
 
 `[🏠 Casa]` `[🏢 Condominio / edificio]` `[Empresa / flotilla]`
@@ -61,7 +61,7 @@ instrucciones y ejemplos reales, no en un modelo propio, y el bot confirma lo qu
 - Condominio: añadir al cierre "Si tu condominio pide permiso de la administración, ten a la
   mano el reglamento" 🟡 (Bernardo decide si aplica).
 
-### 2 · Vehículo (lista) → cotizador: «Vehículo» — *se salta si vino de una agencia*
+### 2 · Vehículo
 > ¿Qué auto tienes o vas a recibir?
 
 Lista: `Changan Dipal S07` · `BYD` · `MG` · `Tesla` · `Otro…` 🟡 (Bernardo confirma las marcas
@@ -69,7 +69,7 @@ más comunes)
 
 - `Otro…` → "¿Cuál? Escríbelo, por favor." (texto libre).
 
-### 3 · Domicilio → cotizador: «Domicilio»
+### 3 · Domicilio
 > ¿Cuál es el domicilio de la instalación? Calle, número, colonia y código postal.
 >
 > Si te queda más fácil, también puedes mandar tu ubicación 📍
@@ -79,7 +79,7 @@ más comunes)
 - Si manda un `location`, se guarda el enlace de mapa en la observación y se pide igualmente
   el CP. El cotizador necesita el domicilio en texto.
 
-### 4 · Metros aproximados (lista) → cotizador: concepto 1 (incluye 10 m) y concepto 3 (metro desde el 11)
+### 4 · Metros aproximados
 > Más o menos, ¿qué distancia hay **del tablero eléctrico al lugar donde vas a cargar el
 > auto**? 📏 Un auto mide unos 4.5 m.
 
@@ -88,7 +88,7 @@ Lista: `Hasta 10 m` · `De 11 a 20 m` · `De 21 a 30 m` · `Más de 30 m` · `No
 - Se guarda como `metros_aprox`. No se le dice al cliente si su caso es "estándar": eso lo
   decide Bernardo al cotizar.
 
-### 5 · Medidor (botones) → cotizador: concepto 2 (trámite CFE) y concepto 5 (mufa)
+### 5 · Medidor
 > ¿Quieres un **medidor de CFE independiente** solo para el cargador, o conectarlo a tu luz de
 > siempre?
 
@@ -98,7 +98,7 @@ Lista: `Hasta 10 m` · `De 11 a 20 m` · `De 21 a 30 m` · `Más de 30 m` · `No
 - Ayuda opcional, si el cliente pregunta: "Un medidor aparte permite una tarifa especial para
   autos eléctricos; Bernardo te explica si te conviene."
 
-### 6 · Fotos (opcionales, de una en una) → cotizador: tierra física, mufa, consideraciones
+### 6 · Fotos
 > ¿Nos mandas una foto de tu **tablero eléctrico** (la caja con los interruptores)? Así la
 > cotización sale más precisa.
 
@@ -140,7 +140,7 @@ Abrir ficha: https://panel.dproma.com/#contactos ({folio})
 
 🟡 El tiempo que se le promete al cliente lo define Bernardo según su capacidad real.
 
-## Pasar con una persona (*handoff*)
+## Paso a persona
 
 | Disparador | Mensaje al cliente | Qué pasa |
 |---|---|---|
@@ -151,12 +151,12 @@ Abrir ficha: https://panel.dproma.com/#contactos ({folio})
 | Escribe después de terminar | — | Observación en la ficha + aviso |
 | Sin respuesta 23 h | — | Ficha con lo que haya y observación "datos incompletos" |
 
-## Recordatorio (sin respuesta 30 min)
+## Recordatorio
 > ¿Seguimos, {nombre}? Solo me falta {lo que falta} para tu cotización 🙂
 
 Uno solo. No se insiste más.
 
-## De dónde sale cada pregunta
+## Origen de las preguntas
 
 | Pregunta | Campo o concepto del cotizador | Por qué |
 |---|---|---|
@@ -168,7 +168,7 @@ Uno solo. No se insiste más.
 | Medidor | 2 · Trámite CFE · 5 · Mufa | Define si entran estos dos conceptos |
 | Fotos | 4 · Tierra física · consideraciones (tablero, muro, andamio) | Bernardo valida sin visita |
 
-## Lo que hay que validar con Bernardo
+## Pendientes con Bernardo
 
 - [ ] ¿"Residencial" en el cotizador es condominio/edificio? ¿Hace falta otra opción?
 - [ ] ¿Los clientes entienden "tablero eléctrico" y "medidor independiente"? ¿Cómo lo dicen ellos?

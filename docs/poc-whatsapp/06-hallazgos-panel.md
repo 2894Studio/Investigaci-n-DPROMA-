@@ -1,4 +1,4 @@
-# 06 · Hallazgos de la revisión del panel DPROMA
+# 06 · Hallazgos del panel
 
 > 02/11/2026 · Studio2894. Revisión **de solo lectura** de `panel.dproma.com`: inicio de sesión
 > con la cuenta de prueba de Comercial, navegación sin guardar y lectura del JavaScript que el
@@ -16,7 +16,7 @@
 | Archivos | Google Drive, a través de una función que entrega token y carpeta | `contactos-imagenes.js` → `drive-comercial-upload-auth` |
 | Roles | Comercial, ICEV y otros; menú y permisos por rol | `permissions.js` |
 
-## Módulo Comercial (lo relevante para la PoC)
+## Módulo Comercial
 
 **Contactos** (`contactos_comerciales`): son las fichas de Comercial.
 - Al registrar un "Nuevo lead" se guardan `nombre`, `telefono`, `correo`, `vehiculo`,
@@ -57,12 +57,12 @@ trayectoria indicada por el cliente".
 - ICEV trabaja `prospectos` (nuevo, datos incompletos, localizado, confirmado, convertido…),
   visitas técnicas y órdenes de instalación.
 
-## Qué significa para la PoC
+## Implicaciones
 
 1. **No hay que crear un CRM ni una bóveda de fotos.** El bot crea una ficha `lead` en
    Contactos y sube las fotos a la carpeta de esa ficha, igual que "Nuevo lead".
 2. **Las preguntas del bot salen del cotizador**, para que Bernardo cotice sin volver a
-   preguntar (ver `02-flujo-conversacional.md`, "De dónde sale cada pregunta").
+   preguntar (ver `02-flujo-conversacional.md`, "Origen de las preguntas").
 3. **Lo que falta en el panel** (y se le propone a Félix):
    - un usuario de servicio para el bot;
    - una RPC de entrada;
@@ -71,7 +71,7 @@ trayectoria indicada por el cliente".
    - una bitácora de eventos para los KPIs.
 4. **El flujo de ICEV no cambia.** La PoC termina en la ficha y el aviso.
 
-## Observaciones al margen (no bloquean la PoC)
+## Observaciones
 
 - El panel carga Tailwind desde el CDN de desarrollo (`cdn.tailwindcss.com`), que el propio
   Tailwind no recomienda para producción: es más pesado y depende de un tercero. Conviene

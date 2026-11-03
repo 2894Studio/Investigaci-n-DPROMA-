@@ -1,6 +1,6 @@
-# 05 · Borradores de correo (no enviados)
+# 05 · Correos (borradores)
 
-## Para Félix Sánchez — propuesta de entrada al panel
+## Félix
 
 **Asunto:** PoC WhatsApp → panel: propuesta para registrar los leads en Contactos
 
@@ -33,7 +33,7 @@ Studio2894
 
 ---
 
-## Para Bernardo Padilla — muestras de chats
+## Bernardo
 
 **Asunto:** PoC WhatsApp: ¿nos compartes 5–10 conversaciones de ejemplo?
 

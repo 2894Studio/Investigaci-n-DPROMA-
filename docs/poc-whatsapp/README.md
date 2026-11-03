@@ -1,4 +1,4 @@
-# PoC — Automatización del primer contacto por WhatsApp → CRM
+# PoC · Primer contacto por WhatsApp
 
 Prueba de concepto de DPROMA × 2894_. Cuando un prospecto escribe por WhatsApp, el bot captura
 sus datos y sus fotos, crea la oportunidad en el sistema interno y avisa a Bernardo con todo
@@ -33,7 +33,7 @@ decidir **qué datos pide el bot** (cliente, tipo de inmueble, vehículo, domici
 medidor independiente y fotos), así Bernardo cotiza sin volver a preguntar. El bot no crea
 cotizaciones y ninguna de las dos iniciativas depende de la otra.
 
-## ⚠️ Pendientes abiertos
+## Pendientes
 
 | # | Pendiente | Quién | Bloquea |
 |---|---|---|---|
@@ -47,6 +47,7 @@ cotizaciones y ninguna de las dos iniciativas depende de la otra.
 | Archivo | Para quién | Qué contiene |
 |---|---|---|
 | [`07-demo-n8n.md`](07-demo-n8n.md) | Todo el equipo | Cómo correr y mostrar la demo en n8n sin WhatsApp ni APIs |
+| [`08-auditoria-lenguaje.md`](08-auditoria-lenguaje.md) | Studio2894 | Criterios de lenguaje y cambios aplicados a la página |
 | [`../../n8n/`](../../n8n/) | Studio2894 | Workflow importable y motor del guion (fuente única) |
 | [`06-hallazgos-panel.md`](06-hallazgos-panel.md) | Félix, Studio2894 | Lo que se encontró en la revisión del panel |
 | [`01-arquitectura-integracion.md`](01-arquitectura-integracion.md) | Félix, Studio2894 | Componentes, webhook de Meta, fotos en Drive, errores, modelo de datos, Make vs n8n, riesgos |
@@ -59,7 +60,7 @@ cotizaciones y ninguna de las dos iniciativas depende de la otra.
 
 Página para compartir: `web/entregables/poc-whatsapp-primer-contacto.html`.
 
-## Hoy (as-is) vs. con la PoC (to-be)
+## Hoy vs. con el bot
 
 **Hoy.** El prospecto escribe al WhatsApp de Bernardo y manda fotos sueltas (tablero eléctrico,
 acometida de CFE, lugar de instalación) y mensajes sin estructura. Llega por tres canales:

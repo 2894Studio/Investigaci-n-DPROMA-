@@ -1,4 +1,4 @@
-# 04 · Costos estimados y KPIs de la PoC
+# 04 · Costos y KPIs
 
 > Borrador v0.3 · 02/11/2026. Montos en **USD, sin IVA**. Tarifas de fuentes públicas
 > consultadas el 31/10/2026 (lista al final). **Hay que verificarlas en las páginas oficiales
@@ -6,7 +6,7 @@
 > los números de Bernardo (relevamiento B). Alcance: solo el primer contacto; la cotización es
 > de otra iniciativa.
 
-## 1. Cómo cobra hoy WhatsApp (corrige el supuesto inicial)
+## 1. Tarifas de WhatsApp
 
 El contexto de arranque hablaba de un "modelo por conversación". **Eso ya no aplica:**
 
@@ -25,7 +25,7 @@ El contexto de arranque hablaba de un "modelo por conversación". **Eso ya no ap
 El bot siempre contesta dentro de la ventana de 24 h, así que la PoC no necesita plantillas.
 Cloud API directa = estas tarifas sin recargo. Un BSP suma su suscripción o margen.
 
-## 2. Supuestos por lead
+## 2. Supuestos
 
 | Supuesto | Valor | De dónde sale |
 |---|---|---|
@@ -39,7 +39,7 @@ Cloud cuenta como ejecución, aunque el flujo lo ignore. Por eso se recomienda u
 ligero delante** (una función serverless gratuita que reenvía solo los mensajes y los
 `failed`), o usar n8n *self-hosted*, donde las ejecuciones no se cobran.
 
-## 3. Tres escenarios
+## 3. Escenarios
 
 | | **A · PoC** (1 agencia + directo) | **B · 3 agencias** | **C · Escala** (~10 agencias + campañas) |
 |---|---|---|---|
@@ -68,7 +68,7 @@ de dólar.
 existente 🟡), el hospedaje del aviso de privacidad y el tiempo de Bernardo. Supabase, Netlify y
 Drive ya los paga DPROMA para el panel; la PoC solo suma filas y archivos.
 
-## 4. KPIs de la PoC
+## 4. KPIs
 
 Todos salen de la tabla `lead_evento` (`01-arquitectura-integracion.md` §9). La **línea base**
 (hoy) se toma de Bernardo antes de arrancar y, si se puede, de las capturas de chats.
@@ -91,7 +91,7 @@ Todos salen de la tabla `lead_evento` (`01-arquitectura-integracion.md` §9). La
 **Duración sugerida:** 4–6 semanas con 1 agencia y el canal directo, con revisión semanal de
 abandono por paso y de errores.
 
-## Fuentes (consultadas el 31/10/2026, no oficiales; verificar)
+## Fuentes
 
 - Tarifas de WhatsApp en México: [getkanal.com](https://getkanal.com/blog/whatsapp-business-pricing-guide), [goeva.ai](https://www.goeva.ai/en/resources/whatsapp-business-api-pricing-mexico), [ManyChat](https://help.manychat.com/hc/en-us/articles/14281380243740-WhatsApp-pricing-guide)
 - Cobro de mensajes de servicio desde 1/10/2026: [respond.io](https://respond.io/blog/whatsapp-pricing-change-2026), [YCloud](https://www.ycloud.com/blog/whatsapp-api-message-pricing-update-effective-october-1-2026)

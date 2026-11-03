@@ -1,4 +1,4 @@
-# 03 · Plantilla de relevamiento — PoC WhatsApp primer contacto
+# 03 · Relevamiento
 
 > Para completar con Félix y Bernardo. El Cotizador está fuera de alcance, así que aquí no se
 > pregunta nada de precios, SKUs ni visitas técnicas. Se puede contestar en este archivo, en una copia de Google
@@ -9,20 +9,20 @@
 
 ---
 
-## A · Panel DPROMA — Félix Sánchez *(prioridad 1)*
+## A · Panel (Félix)
 
 > Ya sabemos, por una revisión de solo lectura del panel, que es Supabase + Netlify, que los
 > leads viven en `contactos_comerciales` y que las fotos van a Drive con
 > `drive-comercial-upload-auth` + `comercial_evidencias` (ver
 > `01-arquitectura-integracion.md` §1). Aquí solo queda lo que el código no responde.
 
-### A.1 Entrada del bot
+### A.1 Entrada
 - [ ] ¿De acuerdo con crear un **usuario de servicio** `bot-whatsapp@dproma.com` con un rol propio, sin acceso al panel? ¿O prefieres otra forma (Edge Function con llave)? ____
 - [ ] ¿De acuerdo con una RPC `whatsapp_registrar_lead` (SECURITY DEFINER) que cree o actualice la ficha, deduplique por `telefono_norm`, asigne responsable y cree la actividad en Agenda? ¿La escribes tú o te mandamos un borrador SQL? ____
 - [ ] ¿A quién se asignan los leads del bot? ☐ siempre Bernardo ☐ por regla (agencia, zona) ____
 - [ ] ¿Qué pasa si el teléfono ya existe en una ficha **perdida** o en un prospecto de ICEV? ☐ reactivar ☐ ficha nueva ☐ solo avisar ____
 
-### A.2 Campos nuevos en `contactos_comerciales`
+### A.2 Campos nuevos
 - [ ] ¿Se pueden agregar estas columnas? ☐ `canal` ☐ `agencia` ☐ `tipo_inmueble` ☐ `metros_aprox` ☐ `medidor_independiente` — o, como plan B, ¿todo en `observaciones_texto`? ____
 - [ ] ¿`origen` = `oem` es correcto para un cliente que llega por el enlace de una agencia? ____
 - [ ] ¿Dónde guardamos la bitácora del bot (eventos, `wamid`)? ☐ tabla `whatsapp_eventos` en Supabase ☐ solo en n8n ____
@@ -31,19 +31,19 @@
 - [ ] ¿`drive-comercial-upload-auth` acepta el token del usuario de servicio? ¿Hay que darle permiso al rol? ____
 - [ ] ¿El registro en `comercial_evidencias` se hace con insert directo (RLS) o con una RPC? ____
 
-### A.4 Ambientes y despliegue
+### A.4 Ambientes
 - [ ] ¿Hay un proyecto Supabase de pruebas, o probamos en producción con fichas marcadas como prueba? ____
 - [ ] ¿El filtro de webhooks puede vivir como otra Netlify Function del sitio, o lo hospedamos aparte? ____
 - [ ] ¿Cómo se versionan los cambios de base de datos (migraciones numeradas tipo 218–223)? ____
 
-### A.5 Orquestador y seguridad
+### A.5 Seguridad
 - [ ] ¿Experiencia previa con n8n? Si se escala a *self-hosted*, ¿dónde viviría? ____
 - [ ] ¿Políticas sobre datos de clientes en servicios de terceros (n8n Cloud, Meta)? ____
 - [ ] ¿Quién debe aprobar una integración nueva? ____
 
 ---
 
-## B · Proceso comercial — Bernardo Padilla
+## B · Comercial (Bernardo)
 
 - [ ] **Capturas de 5–10 conversaciones reales** (tapar datos personales), idealmente: 2 de agencia, 2 de particular, 1 de flotilla, 1 que no se cerró.
 - [ ] ¿Qué es lo primero que escriben los clientes? ¿Qué preguntan más? ____
@@ -59,7 +59,7 @@
 - [ ] ¿Quién más contesta mensajes de clientes? ____
 - [ ] Horario de atención real: ____
 
-## C · Cuentas y accesos (Félix o quien administre las cuentas)
+## C · Cuentas
 
 - [ ] ¿DPROMA tiene cuenta de **Meta Business**? ¿Verificada? ¿Quién es administrador? ____
 - [ ] Número para el bot: ☐ nuevo dedicado ☐ el de Bernardo (coexistencia) ☐ otro ____

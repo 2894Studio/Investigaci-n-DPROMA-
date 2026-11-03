@@ -1,4 +1,4 @@
-# 07 · Demo en n8n sin WhatsApp ni APIs
+# 07 · Demo n8n
 
 > v0.4 · 02/11/2026. Sirve para **mostrar el bot en una reunión** sin cuenta de Meta, sin número
 > de WhatsApp, sin Supabase y sin contraseñas. Usa exactamente el mismo guion que el simulador
@@ -16,7 +16,7 @@
 | `n8n/motor-guion.js` | El guion (preguntas, reglas, validaciones). Fuente única para la demo y la página |
 | `scripts/build-poc-whatsapp.py` | Después de cambiar el guion, regenera el workflow y la página: `python3 scripts/build-poc-whatsapp.py` |
 
-## Cómo se ve el workflow
+## Workflow
 
 ```
 💬 Chat (simula WhatsApp) → ⚙️ Motor del guion → ◇ ¿Terminó la conversación?
@@ -35,23 +35,22 @@
 
 En el lienzo hay notas de colores que explican cada bloque.
 
-## Paso a paso
+## Pasos
 
-### 1. Tener n8n
+### 1. n8n
 Elige una:
 - **n8n Cloud (lo más fácil):** crea una cuenta de prueba gratis en [n8n.io](https://n8n.io).
 - **En tu computadora:** con Node.js 24 o superior, ejecuta `npx n8n` y abre
   `http://localhost:5678`.
 - **Con Docker:** `docker run -it --rm -p 5678:5678 docker.n8n.io/n8nio/n8n`.
 
-### 2. Importar el workflow
-- Opción A: en la página de la PoC, sección **Demo n8n**, botón **Copiar workflow de n8n**.
-  Luego, en n8n, crea un workflow vacío y pega con **Ctrl/Cmd + V**.
-- Opción B: en n8n, menú **⋯ → Import from File** y elige `n8n/demo-bot-whatsapp-dproma.json`.
+### 2. Importar
+- Ya está creado en n8n Cloud de Studio2894: https://studio2894.app.n8n.cloud/workflow/BSGo2SQsDdHyK888
+- En otra instancia: en n8n, menú **⋯ → Import from File** y elige `n8n/demo-bot-whatsapp-dproma.json`.
 
 No pide credenciales: ningún nodo se conecta a nada externo.
 
-### 3. Publicarlo
+### 3. Publicar
 Botón **Publish**, arriba a la derecha. En versiones anteriores de n8n es el interruptor
 **Active**.
 
@@ -59,7 +58,7 @@ Botón **Publish**, arriba a la derecha. En versiones anteriores de n8n es el in
 > pruebas con el botón **Open chat** del editor sin publicar, el bot olvida tus respuestas y
 > vuelve a saludar en cada mensaje.
 
-### 4. Abrir el chat
+### 4. Chat
 Abre el nodo **Chat (simula WhatsApp)** y copia la **Chat URL**. Ábrela en otra pestaña o
 mándala a tu teléfono: se ve como una ventana de chat.
 
@@ -73,12 +72,12 @@ mándala a tu teléfono: se ve como una ventana de chat.
 - Escribe **«asesor»** en cualquier momento para pasar a una persona.
 - Escribe **«reiniciar»** para empezar de nuevo.
 
-### 6. Mostrar lo de adentro
+### 6. Ejecuciones
 En **Executions** se ve cada mensaje como una ejecución. En la última de una conversación
 terminada, el nodo **Simular registro en panel** muestra la ficha completa y **Simular aviso
 a Bernardo** el WhatsApp que recibiría.
 
-## Guiones para la reunión
+## Guiones de prueba
 
 | Caso | Escribe, en orden | Qué demuestra |
 |---|---|---|
@@ -87,7 +86,7 @@ a Bernardo** el WhatsApp que recibiría.
 | Flotilla | `Buenas tardes` → `Logística Norte SA` → `3` | Pasa a Bernardo con lo capturado |
 | Pregunta el precio | `hola` → `¿cuánto cuesta?` → `¿y el precio?` | Limitación del guion: a la segunda, pasa a una persona |
 
-## Diferencias con el piloto real
+## Demo vs. piloto
 
 | En la demo | En el piloto |
 |---|---|
@@ -99,7 +98,7 @@ a Bernardo** el WhatsApp que recibiría.
 | «Simular aviso a Bernardo» | Mensaje de WhatsApp a Bernardo |
 | Sin recordatorio ni cierre a las 23 h | Workflow programado que revisa conversaciones sin respuesta |
 
-## Cambiar el guion
+## Edición del guion
 1. Edita `n8n/motor-guion.js` (textos en `P`, orden en `ORDEN`, palabras reconocidas en
    `claves`).
 2. Ejecuta `python3 scripts/build-poc-whatsapp.py`.

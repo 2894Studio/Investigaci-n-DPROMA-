@@ -1,11 +1,11 @@
-# 01 · Arquitectura de integración (borrador)
+# 01 · Arquitectura
 
 > Borrador v0.3 · 02/11/2026. Basado en una revisión **de solo lectura** del panel
 > (`panel.dproma.com`): sesión de prueba de Comercial y lectura del JavaScript público. No se
 > guardó ni modificó nada. Lo marcado **🟡** es una propuesta que Félix tiene que validar
 > (`03-plantilla-relevamiento.md`, sección A). El Cotizador está fuera de alcance (§10).
 
-## 1. Lo que ya existe en el panel
+## 1. Panel actual
 
 | Pieza | Qué es | Cómo la usa la PoC |
 |---|---|---|
@@ -47,7 +47,7 @@ flowchart LR
 | Fotos | Félix (ya existe) | Función `drive-comercial-upload-auth` + `comercial_evidencias` |
 | Aviso | Félix (ya existe) | Actividad en `comercial_actividades` + WhatsApp a Bernardo |
 
-## 3. Entrada segura al panel (propuesta para Félix 🟡)
+## 3. Entrada al panel (propuesta)
 
 **Lo que no se debe hacer:** que n8n use la cuenta `comercial@dproma.com` o la llave
 `service_role` de Supabase. La primera mezcla al bot con una persona; la segunda se salta
@@ -103,7 +103,7 @@ Meta llama a **una sola URL** con dos tipos de petición:
 
 Ejemplo de payload y del lead resultante: `schema/poc-whatsapp-ejemplo.json`.
 
-## 5. Máquina de estados de la conversación
+## 5. Estados de la conversación
 
 El estado de cada `wa_id` lo guarda n8n (tabla de datos de n8n o tabla `whatsapp_conversaciones`
 en Supabase 🟡).
@@ -124,7 +124,7 @@ NUEVO → NOMBRE → INMUEBLE → VEHICULO → DOMICILIO → METROS → MEDIDOR 
 - Sin respuesta en 30 min: un recordatorio, solo uno.
 - Guion completo: `02-flujo-conversacional.md`.
 
-## 6. Manejo de errores
+## 6. Errores
 
 | Falla | Qué hace n8n | Evento |
 |---|---|---|
@@ -138,7 +138,7 @@ NUEVO → NOMBRE → INMUEBLE → VEHICULO → DOMICILIO → METROS → MEDIDOR 
 **Ventana de 24 h:** el bot siempre contesta dentro de la ventana, así que no necesita
 plantillas de Meta. Lo que Bernardo responda después lo hace desde su flujo habitual.
 
-## 7. Decisiones de stack
+## 7. Stack
 
 - **Orquestador: n8n** (decidido). Para la PoC, n8n Cloud Starter; si se valida, el mismo
   flujo en n8n *self-hosted*. Studio2894 lo opera y cambia el guion sin depender de un
@@ -147,7 +147,7 @@ plantillas de Meta. Lo que Bernardo responda después lo hace desde su flujo hab
   Requisitos: cuenta de Meta Business (idealmente verificada), app en Meta for Developers con
   WhatsApp, usuario de sistema con token permanente y el número dado de alta.
 
-## 8. Riesgos y puntos de atención
+## 8. Riesgos
 
 | Riesgo | Detalle | Mitigación |
 |---|---|---|
@@ -158,7 +158,7 @@ plantillas de Meta. Lo que Bernardo responda después lo hace desde su flujo hab
 | **Abandono del bot** | 6 preguntas + fotos | Preguntas de un toque, saltar el vehículo si viene de agencia, fotos opcionales, medir el abandono por paso |
 | **Verificación de Meta** | Límites de mensajes sin verificación | Iniciarla en cuanto se apruebe la PoC |
 
-## 9. Mapeo a `contactos_comerciales`
+## 9. Mapeo de campos
 
 | Dato del bot | Campo del panel | Estado |
 |---|---|---|
@@ -183,7 +183,7 @@ sin tocar el esquema. Las columnas nuevas (`agencia`, `canal`, `tipo_inmueble`,
 `metros_aprox`, `medidor_independiente`) permiten filtrar y medir en el panel, y son las que
 el Cotizador va a querer leer.
 
-## 10. Relación con el Cotizador (otra iniciativa)
+## 10. Cotizador
 
 El bot **no crea cotizaciones**. El cotizador del panel se usó solo para decidir **qué datos
 pedir**, de modo que Bernardo abra la ficha y cotice sin volver a preguntar:
